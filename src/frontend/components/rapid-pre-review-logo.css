@@ -1,0 +1,85 @@
+.rapid-pre-review-logo {
+  height: var(--xlgrd);
+  position: relative;
+  /* max-width: 150px; */
+  & :any-link {
+    text-decoration: none !important;
+    color: var(--prereview-black);
+  }
+
+  & .rapid-pre-review-logo__svg-container {
+    display: flex;
+    height: 100%;
+    align-items: center;
+  }
+  & .rapid-pre-review-logo__icon-svg {
+    height: 100%;
+    margin-right: 10px;
+  }
+
+  & .rapid-pre-review-logo__outbreak-science {
+    display: flex;
+    flex-direction: row;
+    font-family: 'open sans', 'sans serif';
+
+    color: var(--prereview-black);
+    text-decoration: none !important;
+    text-transform: uppercase;
+    font-size: 16px;
+    line-height: 16px;
+    letter-spacing: 0.05em;
+
+    & .rapid-pre-review-logo__outbreak-science__outbreak {
+      color: var(--prereview-red);
+      font-weight: 700;
+      letter-spacing: 0.075em;
+    }
+    & .rapid-pre-review-logo__outbreak-science__science {
+    }
+  }
+
+  & .rapid-pre-review-logo__rapid-prereview {
+    color: var(--ui-basic-font-color--light);
+  }
+
+  &.rapid-pre-review-logo--responsive {
+    & .rapid-pre-review-logo__type {
+      @media (--narrow-screen) {
+        display: none;
+      }
+    }
+  }
+
+  &.rapid-pre-review-logo--short {
+    max-width: none;
+    height: var(--mgrd);
+    & .rapid-pre-review-logo__outbreak-science {
+      flex-direction: row;
+      font-size: 14px;
+      line-height: 12px;
+    }
+    & .rapid-pre-review-logo__rapid-prereview {
+      font-size: 11.5px;
+      line-height: 13px;
+    }
+  }
+
+  & .rapid-pre-review-logo__beta {
+    color: white;
+    position: relative;
+    display: inline-block;
+    background-color: var(--ui-basic-font-color--light);
+    top: 0px;
+    letter-spacing: 0.05em;
+    padding: 0px 2px;
+    margin-left: 4px;
+    border-radius: 2px;
+    font-size: 9px;
+    height: 11px;
+    box-sizing: border-box;
+    line-height: 1em;
+    @media (--narrow-screen) {
+      display: none;
+    }
+  }
+}

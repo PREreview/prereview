@@ -1,0 +1,10 @@
+.tag-pill {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  min-height: 20px;
+  border-radius: calc(var(--mgrd) / 2);
+  padding: 0 var(--xsgrd);
+  background-color: var(--ui-basic-font-color--light);
+  color: white;
+}

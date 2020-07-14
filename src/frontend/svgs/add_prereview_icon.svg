@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 42 (36781) - http://www.bohemiancoding.com/sketch -->
+    <title>add_prereview_icon</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="add_prereview_icon" transform="translate(5.500000, 4.000000)">
+            <g id="Group-2">
+                <path d="M12.5,16 L12.5,1.14062478 C12.5,0.510669119 12.0285199,0 11.4471191,0 L1.55288095,0 C0.971395857,0 0.5,0.510680525 0.5,1.14062478 L0.5,14.8593752 C0.5,15.4893423 0.971395857,16 1.55288095,16 L7.42300808,16" id="Shape" stroke="currentcolor" stroke-width="1.5"></path>
+                <polygon id="Shape" fill="currentcolor" fill-rule="nonzero" points="9.75 16.0838172 6 18.5176348 6 13.6499996"></polygon>
+            </g>
+            <g id="Group" transform="translate(2.750000, 5.000000)" fill="currentcolor">
+                <rect id="Rectangle" x="3" y="0" width="1.5" height="6"></rect>
+                <rect id="Rectangle-2" x="0.75" y="2.25" width="6" height="1.5"></rect>
+            </g>
+        </g>
+    </g>
+</svg>

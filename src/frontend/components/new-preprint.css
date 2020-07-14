@@ -1,0 +1,26 @@
+.new-preprint {
+  font: var(--ui-basic-font);
+
+  & .new-preprint__title {
+    font: var(--ui-header-1-font);
+    margin-bottom: var(--mgrd);
+  }
+
+  & .new-preprint__button-bar {
+    padding-top: var(--sgrd);
+    display: flex;
+    justify-content: flex-end;
+
+    & .button {
+      margin-left: var(--sgrd);
+
+      &:first-child {
+        margin-left: 0;
+      }
+    }
+  }
+
+  & .new-preprint__input-row {
+    margin-bottom: var(--mgrd);
+  }
+}

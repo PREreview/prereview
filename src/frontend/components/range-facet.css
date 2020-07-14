@@ -1,0 +1,112 @@
+.range-facet {
+  & input {
+    display: none;
+  }
+
+  & .range-facet__ruling-line {
+    border-bottom: 2px solid var(--xlight-grey);
+    height: 1px;
+    left: 0;
+    right: 0;
+    bottom: 14px;
+    position: absolute;
+  }
+  & .range-facet__bars {
+    display: inline-flex;
+    position: relative;
+  }
+  & .range-facet__caption {
+    height: var(--sgrd);
+    display: block;
+    padding-top: 3px;
+    box-sizing: border-box;
+  }
+  & .range-facet__label {
+    height: 100%;
+    display: flex;
+    flex-direction: column-reverse;
+    align-items: center;
+    justify-content: flex-start;
+    margin-left: calc(var(--xxsgrd) / 2);
+    margin-right: calc(var(--xxsgrd) / 2);
+
+    min-width: 2em;
+    cursor: pointer;
+
+    color: var(--ui-basic-font-color--light);
+
+    &:hover {
+      color: var(--ui-basic-font-color);
+      &.range-facet__label--disabled {
+        color: var(--ui-basic-font-color--light);
+      }
+
+      & .range-facet__count {
+        background-color: var(--light-grey);
+      }
+    }
+
+    & .range-facet__count {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      width: 100%;
+      align-items: flex-end;
+      background-color: var(--light-grey);
+
+      transition: height 0.3s, background-color 0.3s;
+      opacity: 0.8;
+
+      &:hover {
+        background-color: var(--prereview-grey);
+        color: white;
+        opacity: 1;
+      }
+
+      & .range-facet__count-text {
+        /*position: absolute;
+        top: -2.6em;
+        font-size: 0.4em; */
+        margin-bottom: 1px;
+
+        font: var(--ui-basic-font--small);
+      }
+    }
+
+    & .range-facet__count-filler {
+      transition: height 0.3s;
+    }
+
+    &.range-facet__label--na {
+      & .range-facet__count {
+        /*background-color: transparent*/
+      }
+    }
+
+    &.range-facet__label--disabled {
+      cursor: default;
+      & .range-facet__count {
+        pointer-events: none;
+      }
+    }
+
+    &.range-facet__label--active {
+      color: var(--ui-basic-font-color);
+      font-weight: 600;
+      & .range-facet__count {
+        background-color: var(--prereview-grey);
+        color: var(--prereview-white);
+      }
+    }
+  }
+  & .range-facet__caption {
+    width: 100%;
+    box-sizing: border-box;
+    text-align: center;
+  }
+  & .range-facet__ruling-line + .range-facet__segment {
+    & .range-facet__caption {
+      border-right: 2px solid var(--xlight-grey);
+    }
+  }
+}

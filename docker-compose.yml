@@ -1,0 +1,40 @@
+version: "3"
+services:
+  prereview:
+    build: .
+    depends_on:
+      - prereview-db
+    networks:
+      - prereview-private
+      - prereview-public
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      PREREVIEW_VIZ_LOG_LEVEL: ${PREREVIEW_VIZ_LOG_LEVEL:-debug}
+      PREREVIEW_VIZ_HOST: ${PREREVIEW_VIZ_HOST:-0.0.0.0}
+      PREREVIEW_VIZ_PORT: ${PREREVIEW_VIZ_PORT:-3000}
+      PREREVIEW_VIZ_DB_HOST: ${PREREVIEW_VIZ_DB_USER:-prereview-db}
+      PREREVIEW_VIZ_DB_USER: ${PREREVIEW_VIZ_DB_USER:-prereview}
+      PREREVIEW_VIZ_DB_PASSWORD: ${PREREVIEW_VIZ_DB_PASSWORD:-prereview}
+      PREREVIEW_VIZ_DB_DATABASE: ${PREREVIEW_VIZ_DB_DATABASE:-prereview}
+
+  prereview-db:
+    image: postgres:12-alpine
+    volumes:
+      - prereview-db_data:/var/lib/postgresql/data
+    networks:
+      - prereview-private
+    environment:
+      PGDATA: /var/lib/postgresql/data/pgdata
+      POSTGRES_USER: ${PREREVIEW_VIZ_DB_USER:-prereview}
+      POSTGRES_PASSWORD: ${PREREVIEW_VIZ_DB_PASSWORD:-prereview}
+      POSTGRES_DB: ${PREREVIEW_VIZ_DB_DATABASE:-prereview}
+
+volumes:
+  prereview-db_data: {}
+
+networks:
+  prereview-private:
+    internal: true
+  prereview-public:
