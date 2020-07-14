@@ -1,0 +1,52 @@
+.facets {
+  padding: 0 var(--mgrd) 0 var(--sgrd);
+  width: 100%;
+  max-width: calc(var(--left-panel-min-width));
+  box-sizing: border-box;
+
+  & .facets__list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  & .facets__section-header {
+    color: var(--ui-basic-font-color--light);
+    font: var(--ui-basic-font);
+    font-variant: small-caps;
+    text-transform: lowercase;
+    margin: var(--sgrd) 0;
+    border-bottom: 1px solid var(--ruling-color--light);
+    padding-bottom: var(--xxsgrd);
+    letter-spacing: 0.05em;
+  }
+
+  & .facets__list-item {
+    margin-bottom: var(--xsgrd);
+  }
+
+  & .checkbox__label {
+    /* MS Edge does not support display: contents used in the checkbox
+    this will get the desired effect with a justified count */
+    display: flex !important;
+    flex: 1 0 auto;
+  }
+  & .facets__facet-label {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+
+    & input {
+      width: 2em;
+    }
+
+    &-featured {
+      color: var(--prereview-red);
+      font-weight: bold;
+    }
+  }
+}
+
+.count--loading {
+  color: var(--light-grey);
+}

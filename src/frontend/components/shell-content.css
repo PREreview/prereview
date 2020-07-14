@@ -1,0 +1,101 @@
+.shell-content {
+  width: inherit;
+
+  overflow-x: hidden;
+  position: relative;
+
+  & .shell-content__header {
+    width: inherit;
+    height: var(--xlgrd);
+    overflow-x: hidden;
+    padding-right: var(--sgrd);
+    box-sizing: border-box;
+    z-index: 1000000;
+    background-color: white;
+    position: fixed;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-top: 1px solid var(--ruling-color);
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.4);
+    overflow: hidden;
+    & nav {
+      height: 100%;
+      display: block;
+      & ul {
+        margin: 0;
+        padding: 0;
+        display: flex;
+        list-style-type: none;
+        & li {
+          margin-right: 0;
+        }
+      }
+    }
+  }
+
+  & .controls {
+    margin-top: var(--mgrd);
+  }
+}
+
+.shell-content__tab-button {
+  display: block; /* prevent inheritance of vertical position from extension context */
+  & .button__contents {
+    padding: 0 var(--sgrd) !important;
+    height: var(--xlgrd);
+    display: block;
+    box-sizing: border-box;
+    line-height: var(--xlgrd);
+    border-radius: 0;
+    border-bottom: 2px solid transparent;
+
+    &:hover {
+      border-bottom: 2px solid var(--ruling-color);
+    }
+  }
+  &.shell-content__tab-button--active {
+    & .button__contents {
+      border-bottom: 2px solid black;
+    }
+  }
+}
+
+.shell-content__body {
+  padding: 64px var(--sgrd) var(--lgrd) var(--sgrd);
+}
+
+.shell-content-read__title,
+.shell-content-review__title,
+.shell-content-request__title,
+.shell-content-review-success__title,
+.shell-content-request-success__title {
+  font: var(--ui-header-1-font);
+  margin-bottom: var(--mgrd);
+}
+
+.shell-content-read {
+  & .review-reader {
+    margin-top: var(--mgrd);
+  }
+}
+
+.shell-content-read,
+.shell-content-review,
+.shell-content-request {
+  animation-name: open-tab;
+  animation-duration: 0.5s;
+  animation-iteration-count: 1;
+  animation-timing-function: ease-out;
+}
+
+@keyframes open-tab {
+  0% {
+    opacity: 0;
+    transform: translateY(var(--mgrd));
+  }
+  100% {
+    opacity: 100%;
+    transform: translateY(0px);
+  }
+}

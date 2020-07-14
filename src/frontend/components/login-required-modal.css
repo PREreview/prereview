@@ -1,0 +1,8 @@
+.login-required-modal {
+  & .login-required-modal__title-icon {
+    width: var(--mgrd);
+    height: var(--mgrd);
+    margin-right: var(--xsgrd);
+    color: var(--ui-basic-font-color--light);
+  }
+}

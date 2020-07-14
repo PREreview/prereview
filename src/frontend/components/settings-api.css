@@ -1,0 +1,10 @@
+.settings-api {
+  border-bottom: 1px solid var(--ruling-color);
+  margin-bottom: var(--lgrd);
+}
+
+.settings-api__secret {
+  & .button {
+    margin-left: var(--xsgrd);
+  }
+}

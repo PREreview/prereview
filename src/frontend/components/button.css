@@ -1,0 +1,114 @@
+a.button {
+  display: inline-block;
+}
+
+.button {
+  background-color: transparent;
+  outline: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  height: fit-content;
+  width: fit-content;
+
+  cursor: pointer;
+  opacity: 1;
+  transition: all 0.2s;
+
+  /* the button can be a link (<a />)*/
+  text-decoration: none;
+
+  &:disabled {
+    pointer-events: none;
+    opacity: 0.65;
+  }
+
+  &:focus {
+    outline: none;
+    & .button__contents {
+      box-shadow: 0px 0px 0px 3px rgba(0, 0, 0, 0.9);
+    }
+  }
+
+  &:hover {
+    opacity: 0.8;
+    & .button__contents {
+      &:hover {
+        box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.3);
+      }
+    }
+  }
+
+  &:active {
+    & .button__contents {
+      background-color: var(--button-background-focus-color);
+      color: var(--button-foreground-focus-color);
+    }
+    &.button--primary .button__contents {
+      background-color: var(--button-background-focus-color--primary);
+      color: var(--button-foreground-focus-color--primary);
+    }
+  }
+
+  & .button__contents {
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: var(--xxsgrd) var(--xsgrd);
+    font: var(--ui-button-font);
+    letter-spacing: 0.04em;
+    border-radius: 2px;
+    height: var(--lgrd);
+    background-color: var(--button-background-color);
+    color: var(--button-foreground-color);
+    white-space: pre;
+  }
+
+  &.button--pill .button__contents {
+    border-radius: 16px;
+  }
+
+  &.button--primary .button__contents {
+    background-color: var(--button-background-color--primary);
+    color: var(--button-foreground-color--primary);
+    font: var(--ui-button-font--primary);
+    height: var(--lgrd);
+    text-shadow: 0px 0px 10px #eb0000; /* improve contrast for accessability */
+  }
+  &.button--primary.button--pill .button__contents {
+    border-radius: 16px;
+    padding: var(--xxsgrd) var(--sgrd);
+  }
+
+  & .button__heartbeat {
+    width: 0;
+    height: var(--xsgrd);
+    border-radius: 50%;
+    background-color: currentcolor;
+    opacity: 0;
+    transition: width 0.2s;
+  }
+
+  &.button--waiting {
+    & .button__heartbeat {
+      width: var(--xsgrd);
+      margin-left: var(--xxsgrd);
+      animation-name: heartbeat;
+      animation-duration: 1.5s;
+      animation-iteration-count: infinite;
+    }
+  }
+}
+
+@keyframes heartbeat {
+  0% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
