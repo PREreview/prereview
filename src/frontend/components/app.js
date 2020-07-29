@@ -6,7 +6,7 @@ import TouchBackend from 'react-dnd-touch-backend';
 import { DndProvider } from 'react-dnd';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
-import smoothscroll from 'smoothscroll-polyfill';
+//import smoothscroll from 'smoothscroll-polyfill';
 import 'url-search-params-polyfill'; /* pollyfill for IE / Edge */
 import Home from './home';
 import ExtensionFallback from './extension-fallback';
@@ -32,7 +32,7 @@ const Moderate = React.lazy(() =>
 );
 
 // kick off the polyfill!
-smoothscroll.polyfill();
+//smoothscroll.polyfill();
 
 export default function App({ user }) {
   return (

@@ -180,6 +180,8 @@ class Config extends Command {
 
 const program = new Config();
 
+console.log('PROGRAM:', program);
+console.log('process.env:', process.env);
 export default program
   .description(process.env.npm_package_description)
   .version(process.env.npm_package_version)

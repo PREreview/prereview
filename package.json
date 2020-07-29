@@ -31,17 +31,31 @@
     "doc": "jsdoc -d ./dist/doc/ -r ./src/backend ./src/frontend ./src/worker",
     "build:imported-components": "imported-components src/frontend src/frontend/imported.js",
     "build:backend": "cross-env BABEL_ENV=server parcel build src/backend/index.js -d dist/backend --public-url / --target=node",
-    "build:frontend": "cross-env BABEL_ENV=client parcel build src/frontend/index.html -d dist/frontend --public-url /static",
+    "build:frontend": "cross-env BABEL_ENV=client parcel build src/frontend/index.html src/frontend/imported.js -d dist/frontend --public-url /static",
     "build": "rimraf dist && npm run build:backend && npm run build:imported-components && npm run build:frontend && rimraf dist/imported.js",
-    "build:backend:dev": "cross-env BABEL_ENV=server parcel build src/backend/index.js -d dist/backend --public-url / --target=node --no-minify",
-    "build:frontend:dev": "cross-env BABEL_ENV=client parcel build src/frontend/index.html dist/imported.js -d dist/frontend --public-url /static --no-minify",
-    "build:dev": "concurrently -p \"[{name}]\" -n \"BACKEND,FRONTEND\" -c \"bgBlue.bold,bgMagenta.bold,bgGreen.bold\" \"npm run build:backend:dev\" \"npm run build:frontend:dev\"",
+    "build:backend:dev": "cross-env NODE_ENV=development BABEL_ENV=server parcel build src/backend/index.js -d dist/backend --public-url / --target=node --no-minify --no-cache",
+    "build:frontend:dev": "cross-env NODE_ENV=development BABEL_ENV=client parcel build src/frontend/index.html src/frontend/imported.js -d dist/frontend --public-url /static --no-minify --no-cache",
+    "build:dev": "rimraf dist && npm run build:backend:dev && npm run build:imported-components && npm run build:frontend:dev && rimraf src/frontend/imported.js",
+    "db:migrations": "knex --esm migrate:latest",
+    "db:seeds": "knex --esm seed:run",
     "start:backend": "node dist/backend",
     "start": "npm run start:backend",
     "start:dev": "nodemon -e js,jsx,html --ignore dist --ignore src/frontend/imported.js --exec 'npm run build:dev && npm run start'"
   },
   "engines": {
     "node": ">=12.0"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   },
   "devDependencies": {
     "@babel/core": "^7.8.4",
@@ -51,6 +65,7 @@
     "@babel/preset-react": "^7.8.3",
     "acorn-jsx": "^5.1.0",
     "babel-jest": "^25.1.0",
+    "babel-plugin-transform-inline-environment-variables": "^0.4.3",
     "babel-polyfill": "^6.26.0",
     "concurrently": "^5.1.0",
     "cross-env": "^7.0.0",
@@ -83,18 +98,19 @@
     "@material-ui/icons": "^4.9.1",
     "@material-ui/pickers": "^3.2.10",
     "@material-ui/styles": "^4.9.0",
+    "@reach/combobox": "^0.10.5",
     "@reach/dialog": "^0.10.5",
     "@reach/menu-button": "^0.10.5",
     "@reach/tooltip": "^0.10.5",
     "@reach/visually-hidden": "^0.10.4",
     "@sendgrid/mail": "^7.2.1",
     "@storybook/addon-actions": "^5.3.19",
+    "bcryptjs": "^2.4.3",
     "bullmq": "^1.6.7",
     "classnames": "^2.2.6",
     "clipboard-copy": "^3.1.0",
     "combined-stream": "^1.0.8",
     "commander": "^5.1.0",
-    "cors-anywhere": "^0.4.1",
     "date-fns": "^2.14.0",
     "doi-regex": "^0.1.10",
     "dotenv": "8.0.0",
@@ -107,6 +123,8 @@
     "joi": "14.3.1",
     "jsdom": "^16.3.0",
     "jwks-rsa": "^1.6.2",
+    "knex": "^0.21.2",
+    "knex-migrate": "^1.7.4",
     "koa": "2.7.0",
     "koa-better-error-handler": "^3.0.5",
     "koa-body": "^4.1.1",
@@ -125,12 +143,15 @@
     "llog": "^0.2.0",
     "lodash": "^4.17.19",
     "lru-cache": "^6.0.0",
+    "match-sorter": "^4.2.0",
     "moment": "^2.27.0",
     "node-fetch": "^2.6.0",
     "orcid-utils": "^1.0.4",
     "passport-local": "^1.0.0",
     "passport-orcid": "0.0.4",
     "passport-strategy": "^1.0.0",
+    "pg": "^8.3.0",
+    "pg-range": "^1.1.0",
     "pino": "^5.16.0",
     "prop-types": "^15.7.2",
     "react": "^16.12.0",
@@ -150,6 +171,7 @@
     "request-promise-native": "^1.0.8",
     "smoothscroll-polyfill": "^0.4.4",
     "socket.io-client": "^2.3.0",
+    "sqlite3": "^5.0.0",
     "url": "^0.11.0",
     "url-search-params-polyfill": "^8.1.0",
     "uuid": "^3.3.2",
@@ -157,30 +179,31 @@
   },
   "babel": {
     "plugins": [
-      [
-        "react-imported-component/babel"
-      ]
+      "react-imported-component/babel"
+    ],
+    "presets": [
+      "@babel/preset-env",
+      "@babel/preset-react"
+    ],
+    "ignore": [
+      "./node_modules/mapbox-gl"
     ],
     "env": {
-      "test": {
-        "presets": [
-          [
-            "@babel/preset-env"
-          ],
-          [
-            "@babel/preset-react"
-          ]
-        ],
-        "plugins": [
-          [
-            "@babel/plugin-syntax-dynamic-import"
-          ]
-        ]
-      },
       "server": {
         "plugins": [
           "react-imported-component/babel",
-          "@babel/plugin-syntax-dynamic-import"
+          "@babel/plugin-syntax-dynamic-import",
+          [
+            "transform-inline-environment-variables",
+            {
+              "include": [
+                "NODE_ENV",
+                "npm_package_name",
+                "npm_package_version",
+                "npm_package_description"
+              ]
+            }
+          ]
         ]
       },
       "client": {
@@ -192,11 +215,28 @@
       }
     }
   },
+  "husky": {
+    "hooks": {
+      "pre-push": "npm run lint && npm test"
+    }
+  },
   "jest": {
     "verbose": true,
     "setupFiles": [
       "./.jest/env.js"
+    ],
+    "modulePathIgnorePatterns": [
+      "./src/frontend/data"
     ]
+  },
+  "prettier": {
+    "printWidth": 80,
+    "tabWidth": 2,
+    "semi": true,
+    "singleQuote": true,
+    "trailingComma": "all",
+    "bracketSpacing": true,
+    "proseWrap": "always"
   },
   "eslintConfig": {
     "parserOptions": {
@@ -226,6 +266,27 @@
       "react": {
         "version": "detect"
       }
+    },
+    "rules": {
+      "node/no-extraneous-import": [
+        "error",
+        {
+          "allowModules": [
+            "lodash"
+          ]
+        }
+      ],
+      "node/shebang": [
+        "error",
+        {
+          "convertPath": {
+            "src/**/*.js": [
+              "^src/(.+?)\\.js$",
+              "dist/$1.js"
+            ]
+          }
+        }
+      ]
     }
   }
 }
