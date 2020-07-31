@@ -1,11 +1,11 @@
+#!/usr/bin/env node
 import figlet from 'figlet';
 import { createServer } from 'http';
-import server from './server.js';
 import config from './config.js';
-import { ServerError } from '../common/errors.js';
+import configServer from './server.js';
 
 /**
- * Function to start up application.
+ * Function to start up the app.
  */
 async function bootstrap() {
   /**
@@ -13,10 +13,10 @@ async function bootstrap() {
    * e.g.
    * await sequelize.authenticate()
    */
-  return createServer(server.callback()).listen(config.server.port);
+  config.parse(process.argv);
+  return createServer(configServer(config)).listen(config.port);
 }
 
-/* eslint-disable no-useless-escape */
 bootstrap()
   .then(async server => {
     figlet.text(
@@ -40,10 +40,6 @@ ${bigName}
   })
   .catch(err => {
     setImmediate(() => {
-      throw new ServerError(
-        'Unable to run the server because of the following error',
-        err,
-      );
+      console.error('Encountered error while running the app: ', err);
     });
   });
-/* eslint-enable no-useless-escape */

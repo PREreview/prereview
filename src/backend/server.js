@@ -19,53 +19,62 @@ const __dirname = path.resolve();
 const STATIC_DIR = path.resolve(__dirname, 'dist', 'frontend');
 const ENTRYPOINT = path.resolve(STATIC_DIR, 'index.html');
 
-// Initialize our application server
-const server = new Koa();
+export default function configServer(config) {
+  // Initialize our application server
+  const server = new Koa();
 
-// Setup our API handlers
-const users = new UserModel();
-const auth = AuthController(users);
-const apiV2Router = compose([auth.routes(), auth.allowedMethods()]);
+  // Setup our API handlers
+  const users = new UserModel();
+  const auth = AuthController(users);
+  const apiV2Router = compose([auth.routes(), auth.allowedMethods()]);
 
-// Add here only development middlewares
-if (config.isDev) {
-  server.use(logger());
-} else {
-  server.silent = true;
-}
+  // Add here only development middlewares
+  if (config.isDev) {
+    server.use(logger());
+  } else {
+    server.silent = true;
+  }
 
-// Set session secrets
-server.keys = Array.isArray(config.secrets) ? config.secrets : [config.secrets];
+  // Set session secrets
+  server.keys = Array.isArray(config.secrets)
+    ? config.secrets
+    : [config.secrets];
 
-// Set custom error handler
-server.context.onerror = errorHandler;
+  // Set custom error handler
+  server.context.onerror = errorHandler;
 
-// If we're running behind Cloudflare, set the access parameters.
-if (config.cfaccess.url) {
-  server.use(cloudflareAccess(config.cfaccess.url, config.cfaccess.audience));
-  if (!config.isDev && !config.isTest) {
+  // If we're running behind Cloudflare, set the access parameters.
+  if (config.cfaccess_url) {
     server.use(async (ctx, next) => {
-      const email = ctx.request.header['cf-access-authenticated-user-email'];
+      let cfa = await cloudflareAccess();
+      await cfa(ctx, next);
+    });
+    server.use(async (ctx, next) => {
+      let email = ctx.request.header['cf-access-authenticated-user-email'];
       if (!email) {
-        ctx.throw(401, 'Missing header cf-access-authenticated-user-email');
+        if (!config.isDev && !config.isTest) {
+          ctx.throw(401, 'Missing header cf-access-authenticated-user-email');
+        } else {
+          email = 'foo@example.com';
+        }
       }
       ctx.state.email = email;
       await next();
     });
   }
+
+  server
+    .use(bodyParser({ multipart: true }))
+    .use(session(server))
+    .use(passport.initialize())
+    .use(passport.session())
+    .use(cors())
+    .use(mount('/api/v2', apiV2Router))
+    .use(mount('/static', serveStatic(STATIC_DIR)))
+    .use((ctx, next) => {
+      ctx.state.htmlEntrypoint = ENTRYPOINT;
+      ssr(ctx, next);
+    });
+
+  return server.callback();
 }
-
-server
-  .use(bodyParser({ multipart: true }))
-  .use(session(server))
-  .use(passport.initialize())
-  .use(passport.session())
-  .use(cors())
-  .use(mount('/api/v2', apiV2Router))
-  .use(mount('/static', serveStatic(STATIC_DIR)))
-  .use((ctx, next) => {
-    ctx.state.htmlEntrypoint = ENTRYPOINT;
-    ssr(ctx, next);
-  });
-
-export default server;
