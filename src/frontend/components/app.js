@@ -1,10 +1,10 @@
 import React, { Suspense } from 'react';
 import PropTypes from 'prop-types';
 import mobile from 'is-mobile';
-import HTML5Backend from 'react-dnd-html5-backend';
+import { HTML5Backend } from 'react-dnd-html5-backend';
 import TouchBackend from 'react-dnd-touch-backend';
 import { DndProvider } from 'react-dnd';
-import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
+import { Switch, Route } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 //import smoothscroll from 'smoothscroll-polyfill';
 import 'url-search-params-polyfill'; /* pollyfill for IE / Edge */
@@ -42,64 +42,62 @@ export default function App({ user }) {
       >
         <StoresProvider>
           <UserProvider user={user}>
-            <Router>
-              <Switch>
-                <Route path="/:new(new)?" exact={true}>
-                  <Home />
-                </Route>
-                <Route exact={true} path="/login">
-                  <Login />
-                </Route>
+            <Switch>
+              <Route path="/:new(new)?" exact={true}>
+                <Home />
+              </Route>
+              <Route exact={true} path="/login">
+                <Login />
+              </Route>
 
-                <Route exact={true} path="/about">
-                  <ToCPage>
-                    <About />
-                  </ToCPage>
-                </Route>
+              <Route exact={true} path="/about">
+                <ToCPage>
+                  <About />
+                </ToCPage>
+              </Route>
 
-                <Route exact={true} path="/code-of-conduct">
-                  <ToCPage>
-                    <CodeOfConduct />
-                  </ToCPage>
-                </Route>
+              <Route exact={true} path="/code-of-conduct">
+                <ToCPage>
+                  <CodeOfConduct />
+                </ToCPage>
+              </Route>
 
-                <Route exact={true} path="/api">
-                  <ToCPage>
-                    <API />
-                  </ToCPage>
-                </Route>
+              <Route exact={true} path="/api">
+                <ToCPage>
+                  <API />
+                </ToCPage>
+              </Route>
 
-                <Route exact={true} path="/about/:roleId">
-                  <Profile />
-                </Route>
-                <Route exact={true} path="/extension">
-                  <ExtensionSplash />
-                </Route>
-                <PrivateRoute exact={true} path="/settings">
-                  <Settings />
-                </PrivateRoute>
-                <AdminRoute exact={true} path="/admin">
-                  <AdminPanel />
-                </AdminRoute>
-                <AdminRoute exact={true} path="/block">
-                  <BlockPanel />
-                </AdminRoute>
-                <ModeratorRoute exact={true} path="/moderate">
-                  <Suspense
-                    fallback={<SuspenseLoading>Loading</SuspenseLoading>}
-                  >
-                    <Moderate />
-                  </Suspense>
-                </ModeratorRoute>
-                <Route exact={true} path="/:identifierPart1/:identifierPart2?">
-                  <ExtensionFallback />
-                </Route>
+              <Route exact={true} path="/about/:roleId">
+                <Profile />
+              </Route>
+              <Route exact={true} path="/extension">
+                <ExtensionSplash />
+              </Route>
+              <PrivateRoute exact={true} path="/settings">
+                <Settings />
+              </PrivateRoute>
+              <AdminRoute exact={true} path="/admin">
+                <AdminPanel />
+              </AdminRoute>
+              <AdminRoute exact={true} path="/block">
+                <BlockPanel />
+              </AdminRoute>
+              <ModeratorRoute exact={true} path="/moderate">
+                <Suspense
+                  fallback={<SuspenseLoading>Loading</SuspenseLoading>}
+                >
+                  <Moderate />
+                </Suspense>
+              </ModeratorRoute>
+              <Route exact={true} path="/:identifierPart1/:identifierPart2?">
+                <ExtensionFallback />
+              </Route>
 
-                <Route>
-                  <NotFound />
-                </Route>
-              </Switch>
-            </Router>
+              <Route>
+                <NotFound />
+              </Route>
+            </Switch>
           </UserProvider>
         </StoresProvider>
       </DndProvider>

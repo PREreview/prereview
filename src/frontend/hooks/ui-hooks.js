@@ -7,40 +7,42 @@ import { useStores } from '../contexts/store-context';
  * when needed (if called with a different `roleId` or `preprintId`)
  */
 export function useLocalState(key, roleId, preprintId, initialValue) {
-  let value = localStorage.getItem(key);
-
-  if (value) {
-    try {
-      value = JSON.parse(value);
-      if (value.roleId === roleId && value.preprintId === preprintId) {
-        initialValue = value.data;
-      } else {
-        localStorage.removeItem(key);
-      }
-    } catch (err) {
-      localStorage.removeItem(key);
-    }
-  }
-
   const [state, setState] = useState(initialValue);
 
-  function localSetState(value) {
-    if (typeof value === 'function') {
-      value = value(state);
+  useEffect(() => {
+    let value = localStorage.getItem(key);
+
+    if (value) {
+      try {
+        value = JSON.parse(value);
+        if (value.roleId === roleId && value.preprintId === preprintId) {
+          initialValue = value.data;
+        } else {
+          localStorage.removeItem(key);
+        }
+      } catch (err) {
+        localStorage.removeItem(key);
+      }
     }
 
-    localStorage.setItem(
-      key,
-      JSON.stringify({
-        data: value,
-        roleId,
-        preprintId,
-      }),
-    );
-    setState(value);
-  }
+    function localSetState(value) {
+      if (typeof value === 'function') {
+        value = value(state);
+      }
 
-  return [state, localSetState];
+      localStorage.setItem(
+        key,
+        JSON.stringify({
+          data: value,
+          roleId,
+          preprintId,
+        }),
+      );
+      setState(value);
+    }
+
+    return [state, localSetState];
+  });
 }
 
 /**
@@ -84,25 +86,17 @@ export function useHasAgreedCoC() {
 }
 
 export function useIsMobile() {
-  const [isMobile, setIsMobile] = useState(
-    window.matchMedia('(max-width: 900px)').matches,
-  );
+  const [isMobile, setIsMobile] = useState(null);
 
   useEffect(() => {
-    const mql = window.matchMedia('(max-width: 900px)');
+    function onFirstMount() {
+      const mql = window.matchMedia('(max-width: 900px)');
 
-    function handleChange(e) {
-      setIsMobile(e.matches);
+      setIsMobile(mql.matches);
     }
-
-    mql.addListener(handleChange);
-
-    return () => {
-      mql.removeListener(handleChange);
-    };
   }, []);
 
-  return isMobile;
+  return null;
 }
 
 export function useNewPreprints() {
