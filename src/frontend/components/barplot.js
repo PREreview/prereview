@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import './barplot.css';
 
 export default function Barplot({
   preview,

@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { getTimeScore } from '../utils/score';
+import './score-badge.css';
 
 const ScoreBadge = React.forwardRef(function ScoreBadge(
   {

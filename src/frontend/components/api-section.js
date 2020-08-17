@@ -6,6 +6,7 @@ import IconButton from './icon-button';
 import { createError } from '../utils/errors';
 import Controls from './controls';
 import { CSS_HEADER_HEIGHT } from '../constants';
+import './api-section.css';
 
 export default function APISection({
   id,

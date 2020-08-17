@@ -10,6 +10,7 @@ import Org from './org';
 import { ORG } from '../constants';
 import { useHasAgreedCoC } from '../hooks/ui-hooks';
 import Banner from './banner';
+import './login.css';
 
 // TODO make clear that by logging in user accepts the code of conduct
 

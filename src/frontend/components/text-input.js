@@ -2,6 +2,7 @@ import React, { useState, createRef, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import noop from 'lodash/noop';
+import './text-input.css';
 
 export default function TextInput({
   label,

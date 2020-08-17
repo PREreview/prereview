@@ -11,6 +11,7 @@ import Button from './button';
 import IconButton from './icon-button';
 import Modal from './modal';
 import { createContactPointId } from '../utils/ids';
+import './settings-notifications.css';
 
 export default function SettingsNotifications({ user }) {
   const history = useHistory();

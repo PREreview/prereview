@@ -11,6 +11,7 @@ import { usePostAction, useUserRoles } from '../hooks/api-hooks';
 import { useIsFirstTimeOnSettings } from '../hooks/ui-hooks';
 import IncognitoIcon from '../svgs/incognito_icon.svg';
 import XLink from './xlink';
+import './settings-roles.css';
 
 export default function SettingsRoles({ user }) {
   const isFirstTimeOnSettings = useIsFirstTimeOnSettings();

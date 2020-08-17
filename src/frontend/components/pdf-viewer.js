@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import throttle from 'lodash/throttle';
 import { Document, Page } from 'react-pdf/dist/entry.parcel';
+import './pdf-viewer.css';
 
 const CSS_MAX_WIDTH = 900; // keep in sync with CSS
 

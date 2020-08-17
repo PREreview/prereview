@@ -16,6 +16,7 @@ import Modal from './modal';
 import Button from './button';
 import Controls from './controls';
 import XLink from './xlink';
+import './share-menu.css';
 
 export default function ShareMenu({ identifier, roleIds = [] }) {
   const [permalink, setPermalink] = useState(null);

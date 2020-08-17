@@ -5,6 +5,7 @@ import Value from './value';
 import { getFormattedDatePosted } from '../utils/preprints';
 import XLink from './xlink';
 import ShellIcon from '../svgs/shell_icon.svg';
+import './preprint-preview.css';
 
 export default function PreprintPreview({ preprint, hyperlinkTitle }) {
   return (

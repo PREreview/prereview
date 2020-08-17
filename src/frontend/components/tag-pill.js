@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import './tag-pill.css';
 
 export default function TagPill({
   children,

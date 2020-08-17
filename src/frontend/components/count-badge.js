@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import './count-badge.css';
 
 export default function CountBadge({
   count = 0,

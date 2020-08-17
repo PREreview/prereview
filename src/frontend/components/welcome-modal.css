@@ -33,7 +33,7 @@
     width: 100%;
     height: 100%;
     overflow: hidden;
-    background-image: url('../images/epidemics-chart-2.svg');
+    background-image: url('../svgs/epidemics-chart-2.svg');
     opacity: 0.8;
     background-size: cover;
     background-position: center bottom;

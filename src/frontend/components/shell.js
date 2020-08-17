@@ -12,6 +12,7 @@ import { MdDragHandle, MdUnfoldMore, MdUnfoldLess } from 'react-icons/md';
 import IconButton from './icon-button';
 import RapidPreReviewLogo from './rapid-pre-review-logo';
 import debounce from 'lodash/debounce';
+import './shell.css';
 
 const SHELL_HEADER_HEIGHT = 40; // !! keep in sync with CSS
 

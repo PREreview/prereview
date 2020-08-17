@@ -30,6 +30,7 @@ import Button from './button';
 import { useAnimatedScore } from '../hooks/score-hooks';
 import { getFormattedDatePosted } from '../utils/preprints';
 import AnimatedNumber from './animated-number';
+import './preprint-card.css';
 
 export default function PreprintCard({
   user,

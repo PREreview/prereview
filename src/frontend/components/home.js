@@ -28,6 +28,7 @@ import XLink from './xlink';
 import AddButton from './add-button';
 import { ORG } from '../constants';
 import Banner from './banner';
+import './home.css';
 
 export default function Home() {
   const history = useHistory();

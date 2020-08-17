@@ -9,6 +9,7 @@ import { createModerationQs } from '../utils/search';
 import { useActionsSearchResults } from '../hooks/api-hooks';
 import Button from './button';
 import ModerationCard from './moderation-card';
+import './moderate.css';
 
 const socket = socketIoClient(window.location.origin, {
   autoConnect: false,

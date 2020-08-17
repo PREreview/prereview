@@ -7,6 +7,7 @@ import VisuallyHidden from '@reach/visually-hidden';
 import { MdClose } from 'react-icons/md';
 import IconButton from './icon-button';
 import { CSS_SCOPE_ID } from '../constants';
+import './modal.css';
 
 export default function Modal({
   onClose = noop,

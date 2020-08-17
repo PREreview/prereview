@@ -8,6 +8,7 @@ import Tooltip from '@reach/tooltip';
 import { unprefix, getId } from '../utils/jsonld';
 import { useRole } from '../hooks/api-hooks';
 import NoticeBadge from './notice-badge';
+import './role-badge.css';
 
 const RoleBadge = React.forwardRef(function RoleBadge(
   { roleId, children, className, tooltip, showNotice, disabled },

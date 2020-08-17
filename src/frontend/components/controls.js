@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
+import './controls.css';
 
 export default function Controls({ error, className, children }) {
   const errMsg = formatError(error);

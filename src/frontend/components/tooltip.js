@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import './tooltip.css';
 
 import ReachTooltip from '@reach/tooltip';
 import classNames from 'classnames';

@@ -6,6 +6,7 @@ import XLink from './xlink';
 import Controls from './controls';
 import Button from './button';
 import { usePostAction } from '../hooks/api-hooks';
+import './settings-api.css';
 
 export default function SettingsApi({ user }) {
   const [post, postProgress] = usePostAction();

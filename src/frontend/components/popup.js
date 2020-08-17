@@ -11,6 +11,7 @@ import {
   checkIfHasRequested,
   checkIfIsModerated,
 } from '../utils/actions';
+import './popup.css';
 
 export default function Popup({ preprint, dispatch }) {
   const [user] = useUser();

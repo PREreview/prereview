@@ -5,6 +5,7 @@ import Value from './value';
 import RoleBadge from './role-badge';
 import { getId, arrayify } from '../utils/jsonld';
 import { getTextAnswers } from '../utils/stats';
+import './text-answers.css';
 
 export default function TextAnswers({
   user,

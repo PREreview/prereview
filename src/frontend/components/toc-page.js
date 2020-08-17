@@ -12,7 +12,7 @@ import LeftSidePanel from './left-side-panel';
 import { useIsMobile } from '../hooks/ui-hooks';
 import { CSS_HEADER_HEIGHT } from '../constants';
 import Banner from './banner.js';
-
+import './toc-page.css';
 /**
  * Use that for all the documentation like pages (Code of Conduct etc.)
  */

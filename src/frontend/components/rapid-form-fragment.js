@@ -7,6 +7,7 @@ import RadioButton from './radio-button';
 import IconButton from './icon-button';
 import Collapse from './collapse';
 import NoticeBox from './notice-box';
+import './rapid-form-fragment.css';
 
 export default function RapidFormFragment({ answerMap = {}, onChange }) {
   function handleChange(key, value) {

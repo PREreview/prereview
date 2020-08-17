@@ -11,6 +11,7 @@ import {
 import { MdAdd } from 'react-icons/md';
 import { DISEASES } from '../constants';
 import IconButton from './icon-button';
+import './diseases.css';
 
 export default function Diseases({ onSubmit, blacklist = [] }) {
   const [term, setTerm] = useState('');

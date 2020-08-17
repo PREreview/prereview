@@ -6,6 +6,7 @@ import Button from './button';
 import PrereviewLogo from '../svgs/prereview-logo.svg';
 import OutbreakSciLogo from '../svgs/outbreak-science-logo.svg';
 import Org from './org';
+import './welcome-modal.css';
 
 export default function WelcomeModal(props) {
   return (
