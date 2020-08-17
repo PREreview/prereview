@@ -1,4 +1,4 @@
-import React, { Suspense, useMemo } from 'react';
+import React, { Suspense, useEffect, useMemo, useState } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import mobile from 'is-mobile';
@@ -32,7 +32,7 @@ export default function ExtensionFallback() {
   // See https://github.com/PREreview/rapid-prereview/issues/13
   // Drag and drop over a PDF object is currently broken in Chrome for Mac
   // Bug is tracked here: https://bugs.chromium.org/p/chromium/issues/detail?id=984891&q=drag%20object&colspec=ID%20Pri%20M%20Stars%20ReleaseBlock%20Component%20Status%20Owner%20Summary%20OS%20Modified
-  const isChromeOnMac = !!window.chrome && navigator.platform.includes('Mac');
+  const [isChromeOnMac, setIsChroneOnMac] = useState(false);
 
   const [preprint, fetchPreprintProgress] = usePreprint(
     identifier,
@@ -52,6 +52,12 @@ export default function ExtensionFallback() {
   preprintId = preprintId && unprefix(preprintId);
   const pdfUrl = getPdfUrl(preprint);
   const canonicalUrl = getCanonicalUrl(preprint);
+
+  useEffect(() => {
+    if (window) {
+      setIsChroneOnMac(!!window.chrome && navigator.platform.includes('Mac'));
+    }
+  }, []);
 
   return (
     <div className="extension-fallback">

@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import './collapse.css';
 
@@ -12,7 +12,7 @@ export default function Collapse({ isOpened, children }) {
     prevIsOpenedRef.current = isOpened;
   });
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     if (isOpened) {
       // opening case (transitionning from close)
       const $el = ref.current;

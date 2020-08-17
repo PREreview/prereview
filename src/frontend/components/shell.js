@@ -3,7 +3,6 @@ import React, {
   useEffect,
   useRef,
   useState,
-  useLayoutEffect,
   useCallback,
 } from 'react';
 import classNames from 'classnames';
@@ -161,7 +160,7 @@ export default function Shell({ children, defaultStatus = 'default' }) {
 
   // Make transition from `height` to `max-height` work with CSS transitions
   const [transition, setTransition] = useState(null);
-  useLayoutEffect(() => {
+  useEffect(() => {
     const { style, offsetHeight } = ref.current;
     if (transition === 'default') {
       // set max-height so that the CSS transition works

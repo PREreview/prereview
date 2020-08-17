@@ -8,8 +8,6 @@ import { Switch, Route } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 //import smoothscroll from 'smoothscroll-polyfill';
 import 'url-search-params-polyfill'; /* pollyfill for IE / Edge */
-import './app.css';
-import './variables.css';
 import Home from './home';
 import ExtensionFallback from './extension-fallback';
 import { UserProvider } from '../contexts/user-context';
@@ -28,6 +26,11 @@ import API from './api';
 import AdminPanel from './admin-panel';
 import BlockPanel from './block-panel';
 import SuspenseLoading from './suspense-loading';
+import './extension-fonts.css';
+import './variables.css';
+import './app.css';
+import './extension-body.css';
+import './menu.css';
 
 const Moderate = React.lazy(() =>
   import(/* webpackChunkName: "moderate" */ './moderate'),
