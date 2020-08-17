@@ -21,7 +21,7 @@ import {
 import ScoreBadge from './score-badge';
 import IconButton from './icon-button';
 import TagPill from './tag-pill';
-import AddPrereviewIcon from '../svgs/add_prereview_icon.svg';
+import addPrereviewIcon from '../svgs/add_prereview_icon.svg';
 import ShellIcon from '../svgs/shell_icon.svg';
 import Collapse from './collapse';
 import ReviewReader from './review-reader';
@@ -249,7 +249,12 @@ export default function PreprintCard({
               >
                 <div className="preprint-card__cta-button__contents">
                   <div className="preprint-card__cta-button__icon-container">
-                    <AddPrereviewIcon className="preprint-card__cta-button__icon" />
+                    <img
+                      src={addPrereviewIcon}
+                      className="preprint-card__cta-button__icon"
+                      aria-hidden="true"
+                      alt=""
+                    />
                   </div>
                   <div className="preprint-card__count-badge">
                     <AnimatedNumber

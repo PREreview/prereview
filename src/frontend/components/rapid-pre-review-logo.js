@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import XLink from './xlink';
 
-import PreReviewLogo from '../svgs/rapid-prereview-icon.svg';
+import preReviewLogo from '../svgs/rapid-prereview-icon.svg';
 
 export default function RapidPreReviewLogo({
   short = false,
@@ -17,7 +17,12 @@ export default function RapidPreReviewLogo({
       })}
     >
       <XLink to="/" href="/" className="rapid-pre-review-logo__svg-container">
-        <PreReviewLogo className="rapid-pre-review-logo__icon-svg" />
+        <img
+          src={preReviewLogo}
+          className="rapid-pre-review-logo__icon-svg"
+          aria-hidden="true"
+          alt=""
+        />
         <div className="rapid-pre-review-logo__type">
           <div className="rapid-pre-review-logo__outbreak-science">
             <span className="rapid-pre-review-logo__outbreak-science__outbreak">

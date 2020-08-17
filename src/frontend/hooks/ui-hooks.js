@@ -49,12 +49,13 @@ export function useLocalState(key, roleId, preprintId, initialValue) {
  * Assess if the visitor lands on rapid PREreview for the first time
  */
 export function useIsNewVisitor() {
-  const [isNewVisitor] = useState(
-    localStorage.getItem('isNewVisitor') !== 'false',
-  );
+  const [isNewVisitor, setIsNewVisitor] = useState(null);
 
   useEffect(() => {
-    localStorage.setItem('isNewVisitor', 'false');
+    if (localStorage) {
+      setIsNewVisitor(localStorage.getItem('isNewVisitor') !== 'false');
+      localStorage.setItem('isNewVisitor', 'false');
+    }
   }, []);
 
   return isNewVisitor;

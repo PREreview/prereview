@@ -26,7 +26,18 @@ export default function HeaderBar({ onClickMenuButton, closeGap }) {
   );
 
   useEffect(() => {
-    setHeaderOffset();
+    if (document) {
+      document.documentElement.style.setProperty(
+        '--announcement-bar-height',
+        closeGap ? '0px' : initialHeaderOffset,
+      );
+
+      document.documentElement.style.setProperty(
+        '--announcement-bar-height--mobile',
+        closeGap ? '0px' : initialHeaderOffsetMobile,
+      );
+      setHeaderOffset();
+    }
   }, []);
 
   const setHeaderOffset = () => {
@@ -41,16 +52,6 @@ export default function HeaderBar({ onClickMenuButton, closeGap }) {
     setinitialHeaderOffset(headerBarOffset);
     setinitialHeaderOffsetMobile(headerBarOffsetMobile);
   };
-
-  document.documentElement.style.setProperty(
-    '--announcement-bar-height',
-    closeGap ? '0px' : initialHeaderOffset,
-  );
-
-  document.documentElement.style.setProperty(
-    '--announcement-bar-height--mobile',
-    closeGap ? '0px' : initialHeaderOffsetMobile,
-  );
 
   return (
     <div className="header-bar">
