@@ -8,7 +8,6 @@ import Controls from './controls';
 import TextInput from './text-input';
 import { usePostAction } from '../hooks/api-hooks';
 import { getId } from '../utils/jsonld';
-import './role-editor.css';
 
 export default function RoleEditor({ user, role, onCancel, onSaved }) {
   const editorRef = useRef();

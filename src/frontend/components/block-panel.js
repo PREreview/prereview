@@ -15,7 +15,6 @@ import LabelStyle from './label-style';
 import Modal from './modal';
 import TextInput from './text-input';
 import Controls from './controls';
-import './block-panel.css';
 
 export default function BlockPanel() {
   const [user] = useUser();

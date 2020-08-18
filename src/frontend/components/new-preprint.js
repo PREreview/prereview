@@ -29,7 +29,6 @@ import Button from './button';
 import TextInput from './text-input';
 import PreprintPreview from './preprint-preview';
 import { preprintify } from '../utils/preprints';
-import './new-preprint.css';
 
 export default function NewPreprint({
   user,

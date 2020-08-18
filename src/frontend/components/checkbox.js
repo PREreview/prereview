@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import VisuallyHidden from '@reach/visually-hidden';
 import noop from 'lodash/noop';
 import { MdCheckBoxOutlineBlank, MdCheckBox } from 'react-icons/md';
-import './checkbox.css';
 
 import classNames from 'classnames';
 

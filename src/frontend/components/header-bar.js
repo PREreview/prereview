@@ -12,7 +12,6 @@ import XLink from './xlink';
 import NoticeBadge from './notice-badge';
 import { checkIfRoleLacksMininmalData } from '../utils/roles';
 import { useIsMobile } from '../hooks/ui-hooks';
-import './header-bar.css';
 
 export default function HeaderBar({ onClickMenuButton, closeGap }) {
   const [user] = useUser();

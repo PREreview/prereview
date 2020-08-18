@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import noop from 'lodash/noop';
 import XLink from './xlink';
-import './button.css';
 
 export default function Button({
   children,

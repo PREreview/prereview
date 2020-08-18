@@ -6,7 +6,6 @@ import { DISEASES } from '../constants';
 import Checkbox from './checkbox';
 import { createPreprintQs } from '../utils/search';
 import RangeFacet from './range-facet';
-import './facets.css';
 
 export default function Facets({ counts = {}, ranges = {}, isFetching }) {
   const history = useHistory();

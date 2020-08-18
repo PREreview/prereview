@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { MdInfoOutline, MdErrorOutline } from 'react-icons/md';
-import './notice-box.css';
 
 export default function NoticeBox({ type = 'info', children }) {
   return (

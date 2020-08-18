@@ -4,7 +4,6 @@ import classNames from 'classnames';
 import { MdArrowUpward } from 'react-icons/md';
 import Tooltip from '@reach/tooltip';
 import { useIsMobile } from '../hooks/ui-hooks';
-import './sort-options.css';
 
 export default function SortOptions({
   value,

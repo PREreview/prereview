@@ -4,7 +4,6 @@ import HeaderBar from './header-bar';
 import XLink from './xlink';
 import Org from './org';
 import { ORG } from '../constants';
-import './not-found.css';
 
 export default function NotFound() {
   return (

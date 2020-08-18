@@ -1,7 +1,6 @@
 import React, { useRef, useEffect } from 'react';
 import noop from 'lodash/noop';
 import PropTypes from 'prop-types';
-import './left-side-panel.css';
 
 export default function LeftSidePanel({
   visible,

@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { MdErrorOutline } from 'react-icons/md';
 import Modal from './modal';
 import XLink from './xlink';
-import './login-required-modal.css';
 
 export default function LoginRequiredModal({ onClose, next }) {
   const url = next ? `/login?next=${encodeURIComponent(next)}` : '/login';

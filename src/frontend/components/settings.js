@@ -6,7 +6,6 @@ import SettingsApi from './settings-api';
 import SettingsNotifications from './settings-notifications';
 import HeaderBar from './header-bar';
 import { ORG } from '../constants';
-import './settings.css';
 
 export default function Settings() {
   const [user] = useUser();

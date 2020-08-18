@@ -11,7 +11,6 @@ import { checkIfIsModerated } from '../utils/actions';
 import { useAnimatedScore } from '../hooks/score-hooks';
 import ScoreBadge from './score-badge';
 import AnimatedNumber from './animated-number';
-import './activity-card.css';
 
 export default function ActivityCard({ action }) {
   const [actions, fetchProgress] = usePreprintActions(getId(action.object));

@@ -6,7 +6,6 @@ import Button from './button';
 // import LabelStyle from './label-style';
 import { CONTACT_EMAIL_HREF, ORG } from '../constants';
 import Org from './org';
-import './extension-splash.css';
 
 export default function ExtensionSplash() {
   useEffect(() => {

@@ -31,7 +31,6 @@ import ModerationModal from './moderation-modal';
 import { preprintify } from '../utils/preprints';
 import { checkIfRoleLacksMininmalData } from '../utils/roles';
 import NoticeBadge from './notice-badge';
-import './shell-content.css';
 
 // !! this needs to work both in web and extension use
 // `process.env.IS_EXTENSION` to assess the environment we are in.

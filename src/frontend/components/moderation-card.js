@@ -14,7 +14,6 @@ import { getTextAnswers, getActiveReports } from '../utils/stats';
 import RoleBadge from './role-badge';
 import Modal from './modal';
 import { usePostAction, useRole } from '../hooks/api-hooks';
-import './moderation-card.css';
 
 export default function ModerationCard({
   user,

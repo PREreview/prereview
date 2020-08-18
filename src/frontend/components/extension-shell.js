@@ -8,7 +8,6 @@ import ShellContent from './shell-content';
 import { UserProvider, useUser } from '../contexts/user-context';
 import { StoresProvider } from '../contexts/store-context';
 import { TOGGLE_SHELL_TAB, SESSION_COOKIE_CHANGED } from '../constants';
-import './extension-shell.css';
 
 export default function ExtensionShell({
   preprint,

@@ -10,7 +10,6 @@ import Button from './button';
 import LabelStyle from './label-style';
 import XLink from './xlink';
 import ActivityCard from './activity-card';
-import './role-activity.css';
 
 export default function RoleActivity({ roleId }) {
   const [bookmark, setBookmark] = useState(null);

@@ -4,7 +4,6 @@ import Modal from './modal';
 import Controls from './controls';
 import Button from './button';
 import XLink from './xlink';
-import './moderation-modal.css';
 
 export default function ModerationModal({
   title,

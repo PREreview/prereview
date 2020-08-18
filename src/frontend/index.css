@@ -1,0 +1,82 @@
+/* variables */
+@import "./components/variables.css";
+
+/* app */
+@import "./components/app.css";
+
+/* extension */
+@import "./components/extension-fonts.css";
+@import "./components/extension-body.css";
+@import "./components/extension-shell.css";
+@import "./components/extension-splash.css";
+@import "./components/extension-fallback.css";
+
+/* etc */
+@import "@reach/tooltip/styles.css";
+
+/* modules */
+@import "./components/home.css";
+@import "./components/menu.css";
+@import "./components/activity-card.css";
+@import "./components/add-button.css";
+@import "./components/admin-panel.css";
+@import "./components/animated-number.css";
+@import "./components/api-section.css";
+@import "./components/api.css";
+@import "./components/banner.css";
+@import "./components/barplot.css";
+@import "./components/block-panel.css";
+@import "./components/button.css";
+@import "./components/checkbox.css";
+@import "./components/collapse.css";
+@import "./components/controls.css";
+@import "./components/count-badge.css";
+@import "./components/diseases.css";
+@import "./components/facets.css";
+@import "./components/header-bar.css";
+@import "./components/icon-button.css";
+@import "./components/label-style.css";
+@import "./components/left-side-panel.css";
+@import "./components/login-required-modal.css";
+@import "./components/login.css";
+@import "./components/modal.css";
+@import "./components/moderate.css";
+@import "./components/moderation-card.css";
+@import "./components/moderation-modal.css";
+@import "./components/new-preprint.css";
+@import "./components/not-found.css";
+@import "./components/notice-badge.css";
+@import "./components/notice-box.css";
+@import "./components/pdf-viewer.css";
+@import "./components/popup.css";
+@import "./components/preprint-card.css";
+@import "./components/preprint-preview.css";
+@import "./components/profile.css";
+@import "./components/radio-button.css";
+@import "./components/range-facet.css";
+@import "./components/rapid-form-fragment.css";
+@import "./components/rapid-pre-review-logo.css";
+@import "./components/review-reader.css";
+@import "./components/role-activity.css";
+@import "./components/role-badge.css";
+@import "./components/role-editor.css";
+@import "./components/role-list.css";
+@import "./components/score-badge.css";
+@import "./components/search-bar.css";
+@import "./components/settings-api.css";
+@import "./components/settings-notifications.css";
+@import "./components/settings-roles.css";
+@import "./components/settings.css";
+@import "./components/share-menu.css";
+@import "./components/shell-content.css";
+@import "./components/shell.css";
+@import "./components/sort-options.css";
+@import "./components/subject-editor.css";
+@import "./components/suspense-loading.css";
+@import "./components/tag-pill.css";
+@import "./components/text-answers.css";
+@import "./components/text-input.css";
+@import "./components/toc-page.css";
+@import "./components/toggle-switch.css";
+@import "./components/tooltip.css";
+@import "./components/welcome-modal.css";

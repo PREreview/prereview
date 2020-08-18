@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import XLink from './xlink';
-import './banner.css';
 
 export default function Banner() {
   return (

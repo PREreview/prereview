@@ -10,7 +10,6 @@ import TextAnswers from './text-answers';
 import { PotentialRoles, HighlightedRoles } from './role-list';
 import ShareMenu from './share-menu';
 import NoticeBox from './notice-box';
-import './review-reader.css';
 
 const ReviewReader = React.memo(function ReviewReader({
   user,

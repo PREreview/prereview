@@ -26,11 +26,6 @@ import API from './api';
 import AdminPanel from './admin-panel';
 import BlockPanel from './block-panel';
 import SuspenseLoading from './suspense-loading';
-import './extension-fonts.css';
-import './variables.css';
-import './app.css';
-import './extension-body.css';
-import './menu.css';
 
 const Moderate = React.lazy(() =>
   import(/* webpackChunkName: "moderate" */ './moderate'),

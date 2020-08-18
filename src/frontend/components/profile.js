@@ -12,7 +12,6 @@ import XLink from './xlink';
 import NotFound from './not-found';
 import { ORG } from '../constants';
 import { unprefix } from '../utils/jsonld';
-import './profile.css';
 
 export default function Profile() {
   const { roleId: unprefixedRoleId } = useParams();

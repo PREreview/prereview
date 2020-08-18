@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
-import './collapse.css';
 
 export default function Collapse({ isOpened, children }) {
   const ref = useRef(null);

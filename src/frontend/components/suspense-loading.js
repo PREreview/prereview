@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import './suspense-loading.css';
 
 export default function SuspenseLoading({ children = 'Loading' }) {
   return (

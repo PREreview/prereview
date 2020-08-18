@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import './toggle-switch.css';
 
 export default function ToggleSwitch({
   id,

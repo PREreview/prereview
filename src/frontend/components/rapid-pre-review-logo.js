@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import XLink from './xlink';
-import './rapid-pre-review-logo.css';
 
 import preReviewLogo from '../svgs/rapid-prereview-icon.svg';
 

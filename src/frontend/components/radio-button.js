@@ -4,7 +4,6 @@ import VisuallyHidden from '@reach/visually-hidden';
 import noop from 'lodash/noop';
 import { MdRadioButtonUnchecked, MdRadioButtonChecked } from 'react-icons/md';
 import classNames from 'classnames';
-import './radio-button.css';
 
 export default function RadioButton({
   inputId,

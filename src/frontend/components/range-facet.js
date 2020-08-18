@@ -3,7 +3,6 @@ import { useLocation } from 'react-router-dom';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
 import Tooltip from '@reach/tooltip';
-import './range-facet.css';
 
 export default function RangeFacet({
   type,

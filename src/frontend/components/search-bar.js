@@ -5,7 +5,6 @@ import { useHistory, useLocation } from 'react-router-dom';
 import { createPreprintQs } from '../utils/search';
 import IconButton from './icon-button';
 import { useIsMobile } from '../hooks/ui-hooks';
-import './search-bar.css';
 
 export default function SearchBar({ isFetching }) {
   const history = useHistory();

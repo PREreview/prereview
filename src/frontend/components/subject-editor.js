@@ -5,7 +5,6 @@ import { MdClose } from 'react-icons/md';
 import Diseases from './diseases';
 import TagPill from './tag-pill';
 import IconButton from './icon-button';
-import './subject-editor.css';
 
 export default function SubjectEditor({ subjects = [], onAdd, onDelete }) {
   return (

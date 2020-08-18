@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { usePrevious } from '../hooks/ui-hooks';
-import './animated-number.css';
 
 export default function AnimatedNumber({ value, isAnimating }) {
   const previousValue = usePrevious(value);

@@ -12,7 +12,6 @@ import SuspenseLoading from './suspense-loading';
 import { ORG } from '../constants';
 import { createPreprintId } from '../utils/ids';
 import { unprefix } from '../utils/jsonld';
-import './extension-fallback.css';
 
 const PdfViewer = React.lazy(() =>
   import(/* webpackChunkName: "pdf-viewer" */ './pdf-viewer'),
