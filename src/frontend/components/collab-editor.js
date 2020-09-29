@@ -1,4 +1,4 @@
-import React, { useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import { BoldExtension } from 'remirror/extension/bold';
 import { CollaborationExtension } from 'remirror/extension/collaboration';
 import { ItalicExtension } from 'remirror/extension/italic';
