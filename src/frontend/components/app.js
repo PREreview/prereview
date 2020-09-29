@@ -70,9 +70,7 @@ export default function App({ user }) {
               </Route>
 
               <Route exact={true} path="/review">
-                <ToCPage>
-                  <Review />
-                </ToCPage>
+                <Review />
               </Route>
 
               <Route exact={true} path="/about/:roleId">
@@ -91,9 +89,7 @@ export default function App({ user }) {
                 <BlockPanel />
               </AdminRoute>
               <ModeratorRoute exact={true} path="/moderate">
-                <Suspense
-                  fallback={<SuspenseLoading>Loading</SuspenseLoading>}
-                >
+                <Suspense fallback={<SuspenseLoading>Loading</SuspenseLoading>}>
                   <Moderate />
                 </Suspense>
               </ModeratorRoute>

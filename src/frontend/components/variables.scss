@@ -138,3 +138,4 @@
 
 @custom-media --narrow-screen screen and (0px <= width <= 900px);
 @custom-media --wide-screen screen and (width > 900px);
+$wide-bp: 900px;

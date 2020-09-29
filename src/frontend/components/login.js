@@ -33,7 +33,7 @@ export default function Login() {
       <HeaderBar />
       <div className="login__content">
         <div className="login__logo-container">
-          <AnimatedLogo />
+          <img src={AnimatedLogo} />
         </div>
 
         <h2 className="login__header">
