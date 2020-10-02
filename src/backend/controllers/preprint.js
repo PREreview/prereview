@@ -1,6 +1,6 @@
-import Router from '@koa/router';
+import router from 'koa-joi-router';
 import moment from 'moment';
-import Joi from '@hapi/joi';
+import Joi from router.Joi;
 import { getLogger } from '../log.js';
 import { BadRequestError } from '../../common/errors.js';
 
@@ -30,7 +30,23 @@ async function validate_query(query) {
 
 // eslint-disable-next-line no-unused-vars
 export default function controller(preprints, thisUser) {
-  const router = new Router();
+  const preprintRoutes = router();
+
+  preprintRoutes.route({
+    method: 'post',
+    path: '/preprints',
+    validate: {
+      body: 
+
+    }
+  },
+  pre: async (ctx, next) => {
+    await // check authentication here
+  },
+  handler: async (ctx) => {
+    await preprints.create()// the callback to actually create preprints
+  })
+
 
   router.post('/preprints', thisUser.can('access admin pages'), async ctx => {
     log.debug('Adding new preprint.');

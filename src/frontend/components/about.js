@@ -94,11 +94,11 @@ export default function About() {
             alignItems: 'center',
           }}
         >
-          <div style={{ margin: '24px', width: '100px' }}>
+          {/* <div style={{ margin: '24px', width: '100px' }}>
             <WellcomeLogo
               style={{ objectFit: 'contain', maxWidth: '100%', width: '100%' }}
             />
-          </div>
+          </div> */}
           <a href="https://wellcome.ac.uk/funding/schemes/open-research-fund">
             Wellcome Trust Open Research Fund
           </a>

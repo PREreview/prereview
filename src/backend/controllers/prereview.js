@@ -1,42 +1,54 @@
-import Router from '@koa/router';
+import router from 'koa-joi-router';
 import moment from 'moment';
-import Joi from '@hapi/joi';
+import Joi from router.Joi;
 import { getLogger } from '../log.js';
 import { BadRequestError } from '../../common/errors.js';
 
 const log = getLogger('backend:controllers:prereview');
 
-const query_schema = Joi.object({
-  start: Joi.number()
-    .integer()
-    .greater(-1),
-  end: Joi.number()
-    .integer()
-    .positive(),
-  asc: Joi.boolean(),
-  sort_by: Joi.string(),
-  from: Joi.string(),
-  to: Joi.string(),
-});
-
-async function validate_query(query) {
-  try {
-    const value = await query_schema.validateAsync(query);
-    return value;
-  } catch (err) {
-    throw new BadRequestError('Unable to validate query: ', err);
-  }
-}
+// async function validate_query(query) {
+//   try {
+//     const value = await query_schema.validateAsync(query);
+//     return value;
+//   } catch (err) {
+//     throw new BadRequestError('Unable to validate query: ', err);
+//   }
+// }
 
 // eslint-disable-next-line no-unused-vars
 export default function controller(prereviews, thisUser) {
-  const router = new Router();
+  const prereviewRouter = router()
 
-  router.post('/prereviews', thisUser.can('access admin pages'), async ctx => {
-    log.debug('Adding new prereview.');
-    let prereview;
-
-    try {
+  prereviewRouter.route({
+    method: 'post',
+    path: '/prereviews',
+    validate: {
+      // header: {}, 
+      // query: {},
+      // params: {},
+      // 
+      body: {
+        doi: Joi.string().required(),
+        authors: Joi.array(),
+        is_hidden: Joi.boolean(),
+        content: Joi.array(),
+      }, 
+      type: 'json', 
+      // failure: 400, 
+      output: {
+        201: { // could even be a code range!
+          body: {}
+        }
+      }, 
+      continueOnError: false
+    },
+    pre: async (ctx, next) => {
+      // this is where you authenticate, yea?
+      return next(); 
+    },
+    handler: async (ctx) => {
+      // prob will not need all the below anymore
+     try {
       prereview = await prereviews.create(ctx.request.body.data);
 
       // workaround for sqlite
@@ -50,7 +62,46 @@ export default function controller(prereviews, thisUser) {
 
     ctx.response.body = { statusCode: 201, status: 'created', data: prereview };
     ctx.response.status = 201;
-  });
+    }
+  })
+
+  prereviewRouter.route({
+    method: 'get',
+    path: '/prereviews',
+    validate: {
+      query: Joi.object({
+        start: Joi.number()
+          .integer()
+          .greater(-1),
+        end: Joi.number()
+          .integer()
+          .positive(),
+        asc: Joi.boolean(),
+        sort_by: Joi.string(),
+        from: Joi.string(),
+        to: Joi.string(),
+      }),
+    },
+    handler: async (ctx) => {
+      res = await prereviews.find({
+        start: query.start,
+        end: query.end,
+        asc: query.asc,
+        sort_by: query.sort_by,
+        from: from,
+        to: to,
+      });
+      ctx.response.body = {
+        statusCode: 200,
+        status: 'ok',
+        data: res,
+      };
+      ctx.response.status = 200;
+    }
+
+
+
+  })
 
   router.get('/prereviews', thisUser.can('access private pages'), async ctx => {
     log.debug(`Retrieving prereviews.`);

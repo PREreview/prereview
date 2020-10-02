@@ -97,7 +97,7 @@ export default function HeaderBar({ onClickMenuButton, closeGap }) {
                   to={process.env.IS_EXTENSION ? undefined : '/settings'}
                   href={
                     process.env.IS_EXTENSION
-                      ? `${process.env.API_URL}/settings`
+                      ? `/settings`
                       : undefined
                   }
                   target={process.env.IS_EXTENSION ? '_blank' : undefined}
