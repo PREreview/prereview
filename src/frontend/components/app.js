@@ -84,9 +84,7 @@ export default function App({ user }) {
                 <BlockPanel />
               </AdminRoute>
               <ModeratorRoute exact={true} path="/moderate">
-                <Suspense
-                  fallback={<SuspenseLoading>Loading</SuspenseLoading>}
-                >
+                <Suspense fallback={<SuspenseLoading>Loading</SuspenseLoading>}>
                   <Moderate />
                 </Suspense>
               </ModeratorRoute>

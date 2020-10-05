@@ -95,11 +95,7 @@ export default function HeaderBar({ onClickMenuButton, closeGap }) {
                 <MenuLink
                   as={process.env.IS_EXTENSION ? undefined : Link}
                   to={process.env.IS_EXTENSION ? undefined : '/settings'}
-                  href={
-                    process.env.IS_EXTENSION
-                      ? `/settings`
-                      : undefined
-                  }
+                  href={process.env.IS_EXTENSION ? `/settings` : undefined}
                   target={process.env.IS_EXTENSION ? '_blank' : undefined}
                 >
                   Complete Profile
