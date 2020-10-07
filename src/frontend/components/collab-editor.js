@@ -1,42 +1,86 @@
 import React, { useEffect, useState } from 'react';
+
+// Remirror
+import { AllStyledComponent } from '@remirror/styles/emotion';
+import { RemirrorProvider, useManager, useRemirror } from 'remirror/react';
+import { fromHtml } from 'remirror/core';
+
+// Remirror extensions
+import { WysiwygPreset } from 'remirror/preset/wysiwyg';
 import { BoldExtension } from 'remirror/extension/bold';
 import { CollaborationExtension } from 'remirror/extension/collaboration';
 import { ItalicExtension } from 'remirror/extension/italic';
+import { UnderlineExtension } from 'remirror/extension/underline';
 import { YjsExtension } from 'remirror/extension/yjs';
-import { RemirrorProvider, useManager, useRemirror } from 'remirror/react';
 
-let extensions = [];
+let EXTENSIONS = [
+  new BoldExtension(),
+  new ItalicExtension(),
+  new UnderlineExtension(),
+  new WysiwygPreset(),
+];
 
-/**
- * This component contains the editor and any toolbars/chrome it requires.
- */
-const SmallEditor = () => {
-  const { getRootProps, commands } = useRemirror();
-
-  return (
-    <div>
-      <button onClick={() => commands.toggleBold()}>bold</button>
-      <button onClick={() => commands.toggleItalic()}>italic</button>
-      <div {...getRootProps()} />
-    </div>
-  );
-};
-
-const SmallEditorContainer = () => {
-  let extensionManager = useManager(extensions);
-
-  const { value, onChange } = extensionManager;
-
+const Menu = () => {
+  const { commands, active } = useRemirror({ autoUpdate: true });
   const [isLoaded, setIsLoaded] = useState(false);
+  console.log('active: ', active);
+  console.log('commands: ', commands);
 
   useEffect(() => {
-    if (window !== undefined) {
-      extensions.push(
-        new BoldExtension(),
-        new CollaborationExtension(),
-        new ItalicExtension(),
-        new YjsExtension(),
-      );
+    if (active.bold) {
+      setIsLoaded(true);
+    }
+  }, []);
+
+  if (!isLoaded) {
+    return <div>Loading toolbar...</div>;
+  } else {
+    return (
+      <div>
+        <button
+          onClick={() => commands.toggleBold()}
+          style={{ fontWeight: active.bold() ? 'bold' : undefined }}
+        >
+          B
+        </button>
+        <button
+          onClick={() => commands.toggleItalic()}
+          style={{ fontWeight: active.italic() ? 'bold' : undefined }}
+        >
+          I
+        </button>
+        <button
+          onClick={() => commands.toggleUnderline()}
+          style={{ fontWeight: active.underline() ? 'bold' : undefined }}
+        >
+          U
+        </button>
+      </div>
+    );
+  }
+};
+
+const Editor = () => {
+  const { getRootProps } = useRemirror();
+
+  return <div {...getRootProps()} />;
+};
+
+const EditorWrapper = () => {
+  const manager = useManager(EXTENSIONS);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [value, setValue] = useState(() =>
+    // Use the `remirror` manager to create the state.
+    manager.createState({
+      content: '<p>This is the initial value</p>',
+      stringHandler: fromHtml,
+    }),
+  );
+
+  useEffect(() => {
+    if (window) {
+      EXTENSIONS.push(new YjsExtension(), new CollaborationExtension());
+
       setIsLoaded(true);
     }
   }, []);
@@ -45,15 +89,23 @@ const SmallEditorContainer = () => {
     return <div>Loading...</div>;
   } else {
     return (
-      <RemirrorProvider
-        manager={extensionManager}
-        value={value}
-        onChange={onChange}
-      >
-        <SmallEditor />
-      </RemirrorProvider>
+      <AllStyledComponent>
+        <RemirrorProvider
+          manager={manager}
+          value={value}
+          onChange={parameter => {
+            // Update the state to the latest value.
+            setValue(parameter.state);
+          }}
+        >
+          <div>
+            <Menu />
+            <Editor />
+          </div>
+        </RemirrorProvider>
+      </AllStyledComponent>
     );
   }
 };
 
-export default SmallEditorContainer;
+export default EditorWrapper;
