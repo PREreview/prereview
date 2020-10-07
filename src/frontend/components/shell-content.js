@@ -6,8 +6,12 @@ import classNames from 'classnames';
 import { Helmet } from 'react-helmet-async';
 import { MenuLink } from '@reach/menu-button';
 import { useUser } from '../contexts/user-context';
-import { usePreprintActions, usePostAction, useRole } from '../hooks/api-hooks';
-import { useLocalState, useNewPreprints } from '../hooks/ui-hooks';
+import {
+  usePreprintActions,
+  usePostAction,
+  useRole,
+} from './../hooks/api-hooks';
+import { useLocalState, useNewPreprints } from './../hooks/ui-hooks';
 import Controls from './controls';
 import Button from './button';
 import RapidFormFragment from './rapid-form-fragment';
@@ -108,7 +112,8 @@ export default function ShellContent({
                 })}
                 disabled={postProgress.isActive || hasReviewed}
                 onClick={() => {
-                  if (user) {
+                  // if (user) {
+                  if (true) {
                     onRequireScreen();
                     setTab('review');
                   } else {
@@ -488,16 +493,22 @@ function ShellContentReview({
   isPosting,
   error,
 }) {
-  const [subjects, setSubjects] = useLocalState(
+  // const [subjects, setSubjects] = useLocalState(
+  const [subjects, setSubjects] = useState(
     'subjects',
-    user.defaultRole,
-    createPreprintId(preprint),
+    // user.defaultRole,
+    'admin',
+    // createPreprintId(preprint),
+    createPreprintId(preprint[0]),
     [],
   );
-  const [answerMap, setAnswerMap] = useLocalState(
+  // const [answerMap, setAnswerMap] = useLocalState(
+  const [answerMap, setAnswerMap] = useState(
     'answerMap',
-    user.defaultRole,
-    createPreprintId(preprint),
+    // user.defaultRole,
+    'admin',
+    // createPreprintId(preprint),
+    createPreprintId(preprint[0]),
     {},
   );
 
@@ -515,7 +526,8 @@ function ShellContentReview({
         }}
       >
         <SubjectEditor
-          subjects={subjects}
+          // subjects={subjects}
+          subjects={[]}
           onAdd={subject => {
             setSubjects(
               subjects.concat(subject).sort((a, b) => {
@@ -551,9 +563,10 @@ function ShellContentReview({
               onSubmit({
                 '@type': 'RapidPREreviewAction',
                 actionStatus: 'CompletedActionStatus',
-                agent: getId(user.defaultRole),
-                object: Object.assign({}, nodeify(preprint), {
-                  '@id': createPreprintIdentifierCurie(preprint),
+                // agent: getId(user.defaultRole),
+                agent: getId('admin'),
+                object: Object.assign({}, nodeify(preprint[0]), {
+                  '@id': createPreprintIdentifierCurie(preprint[0]),
                 }),
                 resultReview: cleanup(
                   {
@@ -607,9 +620,10 @@ function ShellContentRequest({
             onSubmit({
               '@type': 'RequestForRapidPREreviewAction',
               actionStatus: 'CompletedActionStatus',
-              agent: user.defaultRole,
-              object: Object.assign({}, nodeify(preprint), {
-                '@id': createPreprintIdentifierCurie(preprint),
+              // agent: user.defaultRole,
+              agent: 'admin',
+              object: Object.assign({}, nodeify(preprint[0]), {
+                '@id': createPreprintIdentifierCurie(preprint[0]),
               }),
             });
           }}
