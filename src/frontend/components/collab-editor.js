@@ -7,18 +7,10 @@ import { fromHtml } from 'remirror/core';
 
 // Remirror extensions
 import { WysiwygPreset } from 'remirror/preset/wysiwyg';
-import { BoldExtension } from 'remirror/extension/bold';
 import { CollaborationExtension } from 'remirror/extension/collaboration';
-import { ItalicExtension } from 'remirror/extension/italic';
-import { UnderlineExtension } from 'remirror/extension/underline';
 import { YjsExtension } from 'remirror/extension/yjs';
 
-let EXTENSIONS = [
-  new BoldExtension(),
-  new ItalicExtension(),
-  new UnderlineExtension(),
-  new WysiwygPreset(),
-];
+let EXTENSIONS = [new WysiwygPreset()];
 
 const Menu = () => {
   const { commands, active } = useRemirror({ autoUpdate: true });
@@ -37,24 +29,34 @@ const Menu = () => {
   } else {
     return (
       <div>
-        <button
-          onClick={() => commands.toggleBold()}
-          style={{ fontWeight: active.bold() ? 'bold' : undefined }}
-        >
-          B
-        </button>
-        <button
-          onClick={() => commands.toggleItalic()}
-          style={{ fontWeight: active.italic() ? 'bold' : undefined }}
-        >
-          I
-        </button>
-        <button
-          onClick={() => commands.toggleUnderline()}
-          style={{ fontWeight: active.underline() ? 'bold' : undefined }}
-        >
-          U
-        </button>
+        <div>
+          <button
+            onClick={() => commands.toggleBold()}
+            style={{ fontWeight: active.bold() ? 'bold' : undefined }}
+          >
+            B
+          </button>
+          <button
+            onClick={() => commands.toggleItalic()}
+            style={{ fontWeight: active.italic() ? 'bold' : undefined }}
+          >
+            I
+          </button>
+          <button
+            onClick={() => commands.toggleUnderline()}
+            style={{ fontWeight: active.underline() ? 'bold' : undefined }}
+          >
+            U
+          </button>
+        </div>
+        <div>
+          <button
+            onClick={() => commands.toggleBold()}
+            style={{ fontWeight: active.bold() ? 'bold' : undefined }}
+          >
+            B
+          </button>
+        </div>
       </div>
     );
   }
