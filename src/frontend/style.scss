@@ -15,7 +15,10 @@
 @import "@reach/tooltip/styles.css";
 
 /* remirror */
-@import 'remirror/styles/all.css';
+@import "remirror/styles/all.css";
+
+/* fontawesome icons */
+@import "./assets/font-awesome/scss/font-awesome.scss";
 
 /* modules */
 @import "./assets/styles/home.scss";
@@ -31,6 +34,7 @@
 @import "./assets/styles/block-panel.scss";
 @import "./assets/styles/button.scss";
 @import "./assets/styles/checkbox.scss";
+@import "./assets/styles/collab-editor.scss";
 @import "./assets/styles/collapse.scss";
 @import "./assets/styles/controls.scss";
 @import "./assets/styles/count-badge.scss";

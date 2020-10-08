@@ -6,11 +6,15 @@ import { RemirrorProvider, useManager, useRemirror } from 'remirror/react';
 import { fromHtml } from 'remirror/core';
 
 // Remirror extensions
-import { WysiwygPreset } from 'remirror/preset/wysiwyg';
 import { CollaborationExtension } from 'remirror/extension/collaboration';
 import { YjsExtension } from 'remirror/extension/yjs';
 
-let EXTENSIONS = [new WysiwygPreset()];
+// Remirror presets
+import { CorePreset } from 'remirror/preset/core';
+import { WysiwygPreset } from 'remirror/preset/wysiwyg';
+
+
+let EXTENSIONS = [new CorePreset({ rootContent: 'block*' }), new WysiwygPreset()];
 
 const Menu = () => {
   const { commands, active } = useRemirror({ autoUpdate: true });
@@ -31,30 +35,35 @@ const Menu = () => {
       <div>
         <div>
           <button
+            onClick={() => commands.toggleHeading()}
+            style={{ fontWeight: active.heading() ? 'bold' : undefined }}
+          >
+            Heading
+          </button>
+          <button
             onClick={() => commands.toggleBold()}
             style={{ fontWeight: active.bold() ? 'bold' : undefined }}
           >
-            B
+            <strong>B</strong>
           </button>
           <button
             onClick={() => commands.toggleItalic()}
             style={{ fontWeight: active.italic() ? 'bold' : undefined }}
           >
-            I
+            <em>I</em>
           </button>
           <button
             onClick={() => commands.toggleUnderline()}
             style={{ fontWeight: active.underline() ? 'bold' : undefined }}
           >
-            U
+            <u>U</u>
           </button>
-        </div>
-        <div>
           <button
-            onClick={() => commands.toggleBold()}
-            style={{ fontWeight: active.bold() ? 'bold' : undefined }}
+            onClick={() => commands.toggleBlockquote()}
+            style={{ fontWeight: active.blockquote() ? 'bold' : undefined }}
           >
-            B
+            <i className="fa fa-quote-right fa-fw" aria-hidden="true" />
+            <span className="vh">Blockquote</span>
           </button>
         </div>
       </div>
@@ -80,6 +89,7 @@ const EditorWrapper = () => {
   );
 
   useEffect(() => {
+    console.log(EXTENSIONS);
     if (window) {
       EXTENSIONS.push(new YjsExtension(), new CollaborationExtension());
 
