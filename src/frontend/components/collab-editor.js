@@ -13,14 +13,16 @@ import { YjsExtension } from 'remirror/extension/yjs';
 import { CorePreset } from 'remirror/preset/core';
 import { WysiwygPreset } from 'remirror/preset/wysiwyg';
 
-
-let EXTENSIONS = [new CorePreset({ rootContent: 'block*' }), new WysiwygPreset()];
+const EXTENSIONS = [
+  new CorePreset({ rootContent: 'block*' }),
+  new WysiwygPreset(),
+  new YjsExtension(),
+  new CollaborationExtension(),
+];
 
 const Menu = () => {
   const { commands, active } = useRemirror({ autoUpdate: true });
   const [isLoaded, setIsLoaded] = useState(false);
-  console.log('active: ', active);
-  console.log('commands: ', commands);
 
   useEffect(() => {
     if (active.bold) {
@@ -79,7 +81,6 @@ const Editor = () => {
 
 const EditorWrapper = () => {
   const manager = useManager(EXTENSIONS);
-  const [isLoaded, setIsLoaded] = useState(false);
   const [value, setValue] = useState(() =>
     // Use the `remirror` manager to create the state.
     manager.createState({
@@ -88,36 +89,23 @@ const EditorWrapper = () => {
     }),
   );
 
-  useEffect(() => {
-    console.log(EXTENSIONS);
-    if (window) {
-      EXTENSIONS.push(new YjsExtension(), new CollaborationExtension());
-
-      setIsLoaded(true);
-    }
-  }, []);
-
-  if (!isLoaded) {
-    return <div>Loading...</div>;
-  } else {
-    return (
-      <AllStyledComponent>
-        <RemirrorProvider
-          manager={manager}
-          value={value}
-          onChange={parameter => {
-            // Update the state to the latest value.
-            setValue(parameter.state);
-          }}
-        >
-          <div>
-            <Menu />
-            <Editor />
-          </div>
-        </RemirrorProvider>
-      </AllStyledComponent>
-    );
-  }
+  return (
+    <AllStyledComponent>
+      <RemirrorProvider
+        manager={manager}
+        value={value}
+        onChange={parameter => {
+          // Update the state to the latest value.
+          setValue(parameter.state);
+        }}
+      >
+        <div>
+          <Menu />
+          <Editor />
+        </div>
+      </RemirrorProvider>
+    </AllStyledComponent>
+  );
 };
 
 export default EditorWrapper;

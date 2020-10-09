@@ -6,6 +6,7 @@ import { useStores } from '../contexts/store-context';
  * Persists data for `key` in local storage and take care of reseting the value
  * when needed (if called with a different `roleId` or `preprintId`)
  */
+
 export function useLocalState(key, roleId, preprintId, initialValue) {
   const [state, setState] = useState(initialValue);
 
