@@ -2,18 +2,19 @@ import path from 'path';
 import Koa from 'koa';
 import compose from 'koa-compose';
 import cors from '@koa/cors';
-import logger from 'koa-logger';
+import log4js from 'koa-log4';
 import bodyParser from 'koa-body';
 import mount from 'koa-mount';
 import serveStatic from 'koa-static';
 import session from 'koa-session';
 import passport from 'koa-passport';
 import errorHandler from 'koa-better-error-handler';
-import config from './config.js';
 import cloudflareAccess from './middleware/cloudflare.js';
 import ssr from './middleware/ssr.js';
 import AuthController from './controllers/auth.js';
 import UserModel from './models/user.js';
+import PreprintModel from './models/preprint.js';
+import PreprintController from './controllers/preprint.js';
 
 const __dirname = path.resolve();
 const STATIC_DIR = path.resolve(__dirname, 'dist', 'frontend');
@@ -23,17 +24,36 @@ export default function configServer(config) {
   // Initialize our application server
   const server = new Koa();
 
-  // Setup our API handlers
-  const users = new UserModel();
-  const auth = AuthController(users);
-  const apiV2Router = compose([auth.routes(), auth.allowedMethods()]);
+  // Configure logging
+  log4js.configure({
+    appenders: { console: { type: 'stdout', layout: { type: 'colored' } } },
+    categories: {
+      default: { appenders: ['console'], level: config.log_level },
+    },
+  });
+  server.use(log4js.koaLogger(log4js.getLogger('http'), { level: 'auto' }));
+
+  // Setup auth handlers
+  const userModel = new UserModel();
+  const auth = AuthController(userModel);
+
+  // setup API handlers
+  const preprintModel = new PreprintModel();
+  const preprintController = PreprintController(preprintModel, auth);
+  
+  const apiV2Router = compose([
+    auth.routes(), 
+    auth.allowedMethods(),
+    preprintController.middleware(),    
+  ]);
+
 
   // Add here only development middlewares
-  if (config.isDev) {
-    server.use(logger());
-  } else {
-    server.silent = true;
-  }
+  // if (config.isDev) {
+  //   server.use(logger());
+  // } else {
+  //   server.silent = true;
+  // }
 
   // Set session secrets
   server.keys = Array.isArray(config.secrets)
@@ -42,6 +62,8 @@ export default function configServer(config) {
 
   // Set custom error handler
   server.context.onerror = errorHandler;
+
+
 
   // If we're running behind Cloudflare, set the access parameters.
   if (config.cfaccess_url) {

@@ -11,17 +11,20 @@ const Joi = router.Joi;
 export default function controller(preprints, thisUser) {
   const preprintRoutes = router();
 
-  preprintRoutes.get({
-    path: '/preprints/resolve/',
+  preprintRoutes.route({
+    method: 'get',
+    path: '/preprints/resolve',
     handler: async ctx => {
-      console.log("hey hey hey", ctx.state.route)
+      console.log("hey hey hey!", ctx.request)
     }
   })
 
-  preprintRoutes.post({
+  preprintRoutes.route({
+    method: 'post',
     path: '/preprints',
     validate: {
       body: {},
+      type: 'json',
     },
     // pre: async (ctx, next) => {
     //   // check authentication here
@@ -41,13 +44,6 @@ export default function controller(preprints, thisUser) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse preprint schema: ${err}`);
       }
-
-      ctx.response.body = {
-        statusCode: 201,
-        status: 'created',
-        data: preprint,
-      };
-      ctx.response.status = 201;
     },
   });
 
@@ -56,6 +52,7 @@ export default function controller(preprints, thisUser) {
     path: '/preprints',
     validate: {
       body: {},
+      type: 'json',
       query: Joi.object({
         start: Joi.number()
           .integer()
@@ -72,7 +69,7 @@ export default function controller(preprints, thisUser) {
     // pre: async (ctx, next) => {
     //   // auth
     // },
-    handle: async ctx => {
+    handler: async ctx => {
       log.debug(`Retrieving preprints.`);
       // let res;
 
@@ -118,7 +115,8 @@ export default function controller(preprints, thisUser) {
     },
   });
 
-  preprintRoutes.get({
+  preprintRoutes.route({
+    method: 'get',
     path: '/preprints/:id',
     validate: {},
     // pre: async ctx => {},
@@ -150,7 +148,8 @@ export default function controller(preprints, thisUser) {
     },
   });
 
-  preprintRoutes.put({
+  preprintRoutes.route({
+    method: 'put',
     path: '/preprints/:id',
     // pre: async ctx => {},
     handler: async ctx => {
@@ -186,7 +185,8 @@ export default function controller(preprints, thisUser) {
     },
   });
 
-  preprintRoutes.delete({
+  preprintRoutes.route({
+    method: 'delete',
     path: '/preprints/:id',
     // pre: async ctx => {},
     handler: async ctx => {
@@ -217,5 +217,5 @@ export default function controller(preprints, thisUser) {
     },
   });
 
-  return router;
+  return preprintRoutes;
 }
