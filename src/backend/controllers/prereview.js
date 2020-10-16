@@ -1,68 +1,64 @@
 import router from 'koa-joi-router';
 import moment from 'moment';
-import Joi from router.Joi;
 import { getLogger } from '../log.js';
 import { BadRequestError } from '../../common/errors.js';
 
 const log = getLogger('backend:controllers:prereview');
-
-// async function validate_query(query) {
-//   try {
-//     const value = await query_schema.validateAsync(query);
-//     return value;
-//   } catch (err) {
-//     throw new BadRequestError('Unable to validate query: ', err);
-//   }
-// }
+const Joi = router.Joi;
 
 // eslint-disable-next-line no-unused-vars
 export default function controller(prereviews, thisUser) {
-  const prereviewRouter = router()
+  const prereviewRouter = router();
 
   prereviewRouter.post({
     path: '/prereviews',
     validate: {
-      // header: {}, 
+      // header: {},
       // query: {},
       // params: {},
-      // 
+      //
       body: {
         doi: Joi.string().required(),
         authors: Joi.array(),
         is_hidden: Joi.boolean(),
         content: Joi.array(),
-      }, 
-      type: 'json', 
-      // failure: 400, 
+      },
+      type: 'json',
+      // failure: 400,
       output: {
-        201: { // could even be a code range!
-          body: {}
-        }
-      }, 
-      continueOnError: false
+        201: {
+          // could even be a code range!
+          body: {},
+        },
+      },
+      continueOnError: false,
     },
     pre: async (ctx, next) => {
       // this is where you authenticate, yea?
-      return next(); 
+      return next();
     },
-    handler: async (ctx) => {
+    handler: async ctx => {
       // prob will not need all the below anymore
-     try {
-      prereview = await prereviews.create(ctx.request.body.data);
+      try {
+        prereview = await prereviews.create(ctx.request.body.data);
 
-      // workaround for sqlite
-      if (Number.isInteger(prereview)) {
-        prereview = await prereviews.findById(prereview);
+        // workaround for sqlite
+        if (Number.isInteger(prereview)) {
+          prereview = await prereviews.findById(prereview);
+        }
+      } catch (err) {
+        log.error('HTTP 400 Error: ', err);
+        ctx.throw(400, `Failed to parse prereview schema: ${err}`);
       }
-    } catch (err) {
-      log.error('HTTP 400 Error: ', err);
-      ctx.throw(400, `Failed to parse prereview schema: ${err}`);
-    }
 
-    ctx.response.body = { statusCode: 201, status: 'created', data: prereview };
-    ctx.response.status = 201;
-    }
-  })
+      ctx.response.body = {
+        statusCode: 201,
+        status: 'created',
+        data: prereview,
+      };
+      ctx.response.status = 201;
+    },
+  });
 
   prereviewRouter.get({
     path: '/prereviews',
@@ -78,16 +74,15 @@ export default function controller(prereviews, thisUser) {
         sort_by: Joi.string(),
         from: Joi.string(),
         to: Joi.string(),
-
       }),
       // params: {},
       // headers: {},
     },
-    pre: async (ctx) => {
+    pre: async ctx => {
       //authenticate here
-    }, 
-    handler: async (ctx) => {
-      let from, to; 
+    },
+    handler: async ctx => {
+      let from, to;
 
       if (query.from) {
         const timestamp = moment(query.from);
@@ -123,20 +118,20 @@ export default function controller(prereviews, thisUser) {
 
       ctx.response.status = 200;
     },
-  })
+  });
 
-    prereviewRouter.get({ 
-      path: '/prereviews/:id',
-      validate: {
-        // actually not sure if this is needed
-      },
-      pre: async ctx => {
-        // authenticate user
-      }, 
-      handler: async ctx => {
-        log.debug(`Retrieving prereview ${ctx.params.id}.`);
+  prereviewRouter.get({
+    path: '/prereviews/:id',
+    validate: {
+      // actually not sure if this is needed
+    },
+    pre: async ctx => {
+      // authenticate user
+    },
+    handler: async ctx => {
+      log.debug(`Retrieving prereview ${ctx.params.id}.`);
 
-        try {
+      try {
         prereview = await prereviews.findById(ctx.params.id);
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
@@ -157,10 +152,8 @@ export default function controller(prereviews, thisUser) {
           `That prereview with ID ${ctx.params.id} does not exist.`,
         );
       }
-
-      }
-    }),
-
+    },
+  }),
     router.put(
       '/prereviews/:id',
       thisUser.can('view this library'),
@@ -184,7 +177,11 @@ export default function controller(prereviews, thisUser) {
         }
 
         if (prereview.length && prereview.length > 0) {
-          ctx.response.body = { statusCode: 200, status: 'ok', data: prereview };
+          ctx.response.body = {
+            statusCode: 200,
+            status: 'ok',
+            data: prereview,
+          };
           ctx.response.status = 200;
         } else {
           log.error(
@@ -200,36 +197,36 @@ export default function controller(prereviews, thisUser) {
       },
     );
 
-    router.delete(
-      '/prereviews/:id',
-      thisUser.can('view this library'),
-      async ctx => {
-        log.debug(`Deleting prereview ${ctx.params.id}.`);
-        let prereview;
+  router.delete(
+    '/prereviews/:id',
+    thisUser.can('view this library'),
+    async ctx => {
+      log.debug(`Deleting prereview ${ctx.params.id}.`);
+      let prereview;
 
-        try {
-          prereview = await prereviews.delete(ctx.params.id);
-        } catch (err) {
-          log.error('HTTP 400 Error: ', err);
-          ctx.throw(400, `Failed to parse query: ${err}`);
-        }
+      try {
+        prereview = await prereviews.delete(ctx.params.id);
+      } catch (err) {
+        log.error('HTTP 400 Error: ', err);
+        ctx.throw(400, `Failed to parse query: ${err}`);
+      }
 
-        if (prereview.length && prereview.length > 0) {
-          ctx.response.body = { status: 'success', data: prereview };
-          ctx.response.status = 200;
-        } else {
-          log.error(
-            `HTTP 404 Error: That prereview with ID ${
-              ctx.params.id
-            } does not exist.`,
-          );
-          ctx.throw(
-            404,
-            `That prereview with ID ${ctx.params.id} does not exist.`,
-          );
-        }
-      },
-    );
+      if (prereview.length && prereview.length > 0) {
+        ctx.response.body = { status: 'success', data: prereview };
+        ctx.response.status = 200;
+      } else {
+        log.error(
+          `HTTP 404 Error: That prereview with ID ${
+            ctx.params.id
+          } does not exist.`,
+        );
+        ctx.throw(
+          404,
+          `That prereview with ID ${ctx.params.id} does not exist.`,
+        );
+      }
+    },
+  );
 
   return router;
 }

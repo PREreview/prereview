@@ -3,9 +3,12 @@ import identifiersArxiv from 'identifiers-arxiv';
 import fetch from 'node-fetch';
 import { DOMParser } from 'xmldom';
 import { JSDOM } from 'jsdom';
-import { unprefix, cleanup, arrayify } from './jsonld';
-import { createError } from './errors';
-import { parseGoogleScholar, getIdentifierFromPdfUrl } from './scholar';
+import { unprefix, cleanup, arrayify } from '../../frontend/utils/jsonld';
+import { createError } from '../../frontend/utils/errors';
+import {
+  parseGoogleScholar,
+  getIdentifierFromPdfUrl,
+} from '../../frontend/utils/scholar';
 
 /**
  * Get metadata for `identifier`

@@ -50,7 +50,7 @@ export default function WelcomeModal(props) {
           </div>
         </div>
         <div className="welcome-modal__logo-row">
-          <PrereviewLogo /> <OutbreakSciLogo />
+          {/* <PrereviewLogo /> <OutbreakSciLogo /> */}
         </div>
       </div>
     </Modal>
