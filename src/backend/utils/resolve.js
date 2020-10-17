@@ -8,7 +8,7 @@ import { createError } from '../../frontend/utils/errors';
 import {
   parseGoogleScholar,
   getIdentifierFromPdfUrl,
-} from '../../frontend/utils/scholar';
+} from '../../frontend/utils/scholar.js';
 
 /**
  * Get metadata for `identifier`

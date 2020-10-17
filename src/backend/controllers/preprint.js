@@ -13,9 +13,11 @@ export default function controller(preprints, thisUser) {
 
   preprintRoutes.route({
     method: 'get',
-    path: '/preprints/resolve',
+    path: '/resolve',
     handler: async ctx => {
-      console.log("hey hey hey!", ctx.request)
+      const { identifier, url } = req.query;
+      const data = await resolve(identifier)
+      res.json(data)
     }
   })
 

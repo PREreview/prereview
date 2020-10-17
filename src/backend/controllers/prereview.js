@@ -10,7 +10,8 @@ const Joi = router.Joi;
 export default function controller(prereviews, thisUser) {
   const prereviewRouter = router();
 
-  prereviewRouter.post({
+  prereviewRouter.route({
+    method: 'post',
     path: '/prereviews',
     validate: {
       // header: {},
@@ -32,10 +33,6 @@ export default function controller(prereviews, thisUser) {
         },
       },
       continueOnError: false,
-    },
-    pre: async (ctx, next) => {
-      // this is where you authenticate, yea?
-      return next();
     },
     handler: async ctx => {
       // prob will not need all the below anymore
