@@ -15,9 +15,9 @@ export default function controller(preprints, thisUser) {
     method: 'get',
     path: '/resolve',
     handler: async ctx => {
-      const { identifier, url } = req.query;
+      const { identifier, url } = ctx.query;
       const data = await resolve(identifier)
-      res.json(data)
+      ctx.body = data
     }
   })
 
