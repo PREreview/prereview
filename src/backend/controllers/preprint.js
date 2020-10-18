@@ -16,6 +16,7 @@ export default function controller(preprints, thisUser) {
     path: '/resolve',
     handler: async ctx => {
       const { identifier, url } = ctx.query;
+      log.debug(`Resolving preprint with ID: ${identifier}`);
       const data = await resolve(identifier)
       ctx.body = data
     }
