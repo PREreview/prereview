@@ -11,7 +11,7 @@ export default function Banner() {
           Click{' '}
           <a
             className="announcement-link"
-            href={`${process.env.API_URL}/?q=COVID-19`}
+            href={`?q=COVID-19`}
           >
             here
           </a>{' '}

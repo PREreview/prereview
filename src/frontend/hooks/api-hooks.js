@@ -61,7 +61,7 @@ export function usePostAction() {
       }
       controllerRef.current = controller;
 
-      fetch(`${process.env.API_URL}/api/action`, {
+      fetch(`api/v2/v2/action`, {
         signal: controller.signal,
         method: 'POST',
         body: JSON.stringify(action),
@@ -181,7 +181,7 @@ export function usePreprint(
         const controller = new AbortController();
 
         fetch(
-          `${process.env.API_URL}/api/resolve?identifier=${encodeURIComponent(
+          `api/v2/resolve?identifier=${encodeURIComponent(
             identifier,
           )}${fallbackUrl ? `&url=${encodeURIComponent(fallbackUrl)}` : ''}`,
           {
@@ -275,7 +275,7 @@ export function usePreprintActions(identifier) {
       const controller = new AbortController();
 
       fetch(
-        `${process.env.API_URL}/api/preprint/${unprefix(
+        `api/v2/preprint/${unprefix(
           createPreprintId(identifier),
         )}`,
         {
@@ -385,7 +385,7 @@ export function usePreprintSearchResults(
 
       const controller = new AbortController();
 
-      fetch(`${process.env.API_URL}/api/preprint/${search}`, {
+      fetch(`api/v2/preprint/${search}`, {
         signal: controller.signal,
       })
         .then(resp => {
@@ -477,7 +477,7 @@ export function useRole(roleId) {
 
         const controller = new AbortController();
 
-        fetch(`${process.env.API_URL}/api/role/${unprefix(roleId)}`, {
+        fetch(`api/v2/role/${unprefix(roleId)}`, {
           signal: controller.signal,
         })
           .then(resp => {
@@ -579,7 +579,7 @@ export function useUserRoles(user) {
           const controller = new AbortController();
           controllers.push(controller);
 
-          return fetch(`${process.env.API_URL}/api/role/${unprefix(roleId)}`, {
+          return fetch(`api/v2/role/${unprefix(roleId)}`, {
             signal: controller.signal,
           })
             .then(resp => {
@@ -658,7 +658,7 @@ export function useActionsSearchResults(
 
     const controller = new AbortController();
 
-    fetch(`${process.env.API_URL}/api/action/${search}`, {
+    fetch(`api/v2/action/${search}`, {
       signal: controller.signal,
     })
       .then(resp => {
@@ -728,7 +728,7 @@ export function useRolesSearchResults(
 
     const controller = new AbortController();
 
-    fetch(`${process.env.API_URL}/api/role/${search}`, {
+    fetch(`api/v2/role/${search}`, {
       signal: controller.signal,
     })
       .then(resp => {

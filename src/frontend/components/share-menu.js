@@ -30,7 +30,7 @@ export default function ShareMenu({ identifier, roleIds = [] }) {
         <MenuList>
           <MenuItem
             onSelect={() => {
-              setPermalink(`${process.env.API_URL}/${identifier}`);
+              setPermalink(`${identifier}`);
             }}
           >
             Permalink
@@ -44,7 +44,7 @@ export default function ShareMenu({ identifier, roleIds = [] }) {
                 qs.set('role', roleIds.map(unprefix));
 
                 setPermalink(
-                  `${process.env.API_URL}/${identifier}?${qs.toString()}`,
+                  `${identifier}?${qs.toString()}`,
                 );
               }}
             >
@@ -55,7 +55,7 @@ export default function ShareMenu({ identifier, roleIds = [] }) {
           <MenuLink
             className="menu__list__link-item"
             download="rapid-prereview-data.jsonld"
-            href={`${process.env.API_URL}/api/preprint/${unprefix(
+            href={`api/v2/preprint/${unprefix(
               createPreprintId(identifier),
             )}`}
           >

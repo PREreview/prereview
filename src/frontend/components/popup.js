@@ -137,7 +137,7 @@ export default function Popup({ preprint, dispatch }) {
         <ul className="popup__nav__list">
           <li className="popup__nav__list-item">
             <a
-              href={`${process.env.API_URL}/`}
+              href={``}
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -148,7 +148,7 @@ export default function Popup({ preprint, dispatch }) {
           {!!user && (
             <li className="popup__nav__list-item">
               <a
-                href={`${process.env.API_URL}/settings`}
+                href={`settings`}
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -160,7 +160,7 @@ export default function Popup({ preprint, dispatch }) {
           <li className="popup__nav__list-item">
             {user ? (
               <a
-                href={`${process.env.API_URL}/auth/logout`}
+                href={`auth/logout`}
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -168,7 +168,7 @@ export default function Popup({ preprint, dispatch }) {
               </a>
             ) : (
               <a
-                href={`${process.env.API_URL}/login`}
+                href={`login`}
                 target="_blank"
                 rel="noopener noreferrer"
               >

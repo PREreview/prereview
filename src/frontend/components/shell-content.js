@@ -152,7 +152,7 @@ export default function ShellContent({
                 to={process.env.IS_EXTENSION ? undefined : '/settings'}
                 href={
                   process.env.IS_EXTENSION
-                    ? `${process.env.API_URL}/settings`
+                    ? `settings`
                     : undefined
                 }
                 target={process.env.IS_EXTENSION ? '_blank' : undefined}
@@ -169,7 +169,7 @@ export default function ShellContent({
               to={process.env.IS_EXTENSION ? undefined : '/settings'}
               href={
                 process.env.IS_EXTENSION
-                  ? `${process.env.API_URL}/settings`
+                  ? `settings`
                   : undefined
               }
               target={process.env.IS_EXTENSION ? '_blank' : undefined}
@@ -183,7 +183,7 @@ export default function ShellContent({
                 to={process.env.IS_EXTENSION ? undefined : '/admin'}
                 href={
                   process.env.IS_EXTENSION
-                    ? `${process.env.API_URL}/admin`
+                    ? `admin`
                     : undefined
                 }
                 target={process.env.IS_EXTENSION ? '_blank' : undefined}
@@ -198,7 +198,7 @@ export default function ShellContent({
                 to={process.env.IS_EXTENSION ? undefined : '/block'}
                 href={
                   process.env.IS_EXTENSION
-                    ? `${process.env.API_URL}/block`
+                    ? `block`
                     : undefined
                 }
                 target={process.env.IS_EXTENSION ? '_blank' : undefined}
@@ -213,7 +213,7 @@ export default function ShellContent({
                 to={process.env.IS_EXTENSION ? undefined : '/moderate'}
                 href={
                   process.env.IS_EXTENSION
-                    ? `${process.env.API_URL}/moderate`
+                    ? `moderate`
                     : undefined
                 }
                 target={process.env.IS_EXTENSION ? '_blank' : undefined}
@@ -222,7 +222,7 @@ export default function ShellContent({
               </MenuLink>
             )}
 
-            <MenuLink href={`${process.env.API_URL}/auth/logout`}>
+            <MenuLink href={`auth/logout`}>
               Logout
             </MenuLink>
           </UserBadge>
