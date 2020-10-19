@@ -4,9 +4,9 @@ import { Strategy as OrcidStrategy } from 'passport-orcid';
 import Strategy from 'passport-strategy';
 import fetch from 'node-fetch';
 import DB from '../db/db';
-import { getId, cleanup } from './jsonld';
-import { createError } from './errors';
-import { ADMIN_ORCIDS } from '../constants';
+import { getId, cleanup } from '../../frontend/utils/jsonld';
+import { createError } from '../../frontend/utils/errors';
+import { ADMIN_ORCIDS } from '../../frontend/constants';
 
 /**
  * See https://support.orcid.org/hc/en-us/articles/360006897674-Structure-of-the-ORCID-Identifier

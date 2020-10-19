@@ -11,7 +11,8 @@ import passport from 'koa-passport';
 import errorHandler from 'koa-better-error-handler';
 import cloudflareAccess from './middleware/cloudflare.js';
 import ssr from './middleware/ssr.js';
-import AuthController from './controllers/auth.js';
+import AuthController from './controllers/auth.js'; // authentication/logins
+import authWrapper from '../backend/middleware/auth.js'; // authorization/user roles
 import UserModel from './models/user.js';
 import PreprintModel from './models/preprint.js';
 import PreprintController from './controllers/preprint.js';
@@ -36,20 +37,22 @@ export default function configServer(config) {
   server.use(log4js.koaLogger(log4js.getLogger('http'), { level: 'auto' }));
 
   // Setup auth handlers
-  const userModel = new UserModel();
-  const auth = AuthController(userModel);
+  const userModel = new UserModel(); 
+  const authz = authWrapper(); // this is for authorization, not authentication
+  server.use(authz.middleware());
 
   // setup API handlers
+  const auth = AuthController(userModel, config, authz); 
   const preprintModel = new PreprintModel();
-  const preprintController = PreprintController(preprintModel, auth);
+  const preprints = PreprintController(preprintModel, authz);
   const prereviewModel = new PrereviewModel();
-  const prereviewController = PrereviewController(prereviewModel, auth);
+  const prereviews = PrereviewController(prereviewModel, authz);
   
   const apiV2Router = compose([
     auth.routes(), 
     auth.allowedMethods(),
-    preprintController.middleware(),
-    prereviewController.middleware(),
+    preprints.middleware(),
+    prereviews.middleware(),
   ]);
 
 
