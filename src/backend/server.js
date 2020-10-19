@@ -15,6 +15,8 @@ import AuthController from './controllers/auth.js';
 import UserModel from './models/user.js';
 import PreprintModel from './models/preprint.js';
 import PreprintController from './controllers/preprint.js';
+import PrereviewModel from './models/prereview.js';
+import PrereviewController from './controllers/prereview.js';
 
 const __dirname = path.resolve();
 const STATIC_DIR = path.resolve(__dirname, 'dist', 'frontend');
@@ -40,11 +42,14 @@ export default function configServer(config) {
   // setup API handlers
   const preprintModel = new PreprintModel();
   const preprintController = PreprintController(preprintModel, auth);
+  const prereviewModel = new PrereviewModel();
+  const prereviewController = PrereviewController(prereviewModel, auth);
   
   const apiV2Router = compose([
     auth.routes(), 
     auth.allowedMethods(),
-    preprintController.middleware(),    
+    preprintController.middleware(),
+    prereviewController.middleware(),
   ]);
 
 

@@ -30,7 +30,7 @@ export default function controller(preprints, thisUser) {
       type: 'json',
     },
     // pre: async (ctx, next) => {
-    //   // check authentication here
+    //   thisUser.can('')
     // },
     handler: async ctx => {
       log.debug('Adding new preprint.');
@@ -70,39 +70,40 @@ export default function controller(preprints, thisUser) {
       }),
     },
     // pre: async (ctx, next) => {
-    //   // auth
+    //    thisUser.can(')
     // },
     handler: async ctx => {
       log.debug(`Retrieving preprints.`);
-      // let res;
+      let res;
+      const query = ctx.query;
 
       try {
-        // let from, to;
+        let from, to;
 
-        // if (!ctx.invalid.query) {
-        //   const timestamp = moment(query.from);
-        //   if (timestamp.isValid()) {
-        //     log.error('HTTP 400 Error: Invalid timestamp value.');
-        //     ctx.throw(400, 'Invalid timestamp value.');
-        //   }
-        //   from = timestamp.toISOString();
-        // }
-        // if (query.to) {
-        //   const timestamp = moment(query.to);
-        //   if (timestamp.isValid()) {
-        //     log.error('HTTP 400 Error: Invalid timestamp value.');
-        //     ctx.throw(400, 'Invalid timestamp value.');
-        //   }
-        //   to = timestamp.toISOString();
-        // }
-        // res = await preprints.find({
-        //   start: query.start,
-        //   end: query.end,
-        //   asc: query.asc,
-        //   sort_by: query.sort_by,
-        //   from: from,
-        //   to: to,
-        // });
+        if (!ctx.invalid.query) {
+          const timestamp = moment(query.from);
+          if (timestamp.isValid()) {
+            log.error('HTTP 400 Error: Invalid timestamp value.');
+            ctx.throw(400, 'Invalid timestamp value.');
+          }
+          from = timestamp.toISOString();
+        }
+        if (query.to) {
+          const timestamp = moment(query.to);
+          if (timestamp.isValid()) {
+            log.error('HTTP 400 Error: Invalid timestamp value.');
+            ctx.throw(400, 'Invalid timestamp value.');
+          }
+          to = timestamp.toISOString();
+        }
+        res = await preprints.find({
+          start: query.start,
+          end: query.end,
+          asc: query.asc,
+          sort_by: query.sort_by,
+          from: from,
+          to: to,
+        });
 
         ctx.response.body = {
           statusCode: 200,
@@ -122,7 +123,9 @@ export default function controller(preprints, thisUser) {
     method: 'get',
     path: '/preprints/:id',
     validate: {},
-    // pre: async ctx => {},
+    // pre: async ctx => {
+    //   thisUser.can('')
+    // },
     handler: async ctx => {
       log.debug(`Retrieving preprint ${ctx.params.id}.`);
       let preprint;
@@ -154,7 +157,9 @@ export default function controller(preprints, thisUser) {
   preprintRoutes.route({
     method: 'put',
     path: '/preprints/:id',
-    // pre: async ctx => {},
+    // pre: async ctx => {
+    //   thisUser.can('')
+    // },
     handler: async ctx => {
       log.debug(`Updating preprint ${ctx.params.id}.`);
       let preprint;
@@ -191,7 +196,9 @@ export default function controller(preprints, thisUser) {
   preprintRoutes.route({
     method: 'delete',
     path: '/preprints/:id',
-    // pre: async ctx => {},
+    // pre: async ctx => {
+      // thisUser.can('')
+    // },
     handler: async ctx => {
       log.debug(`Deleting preprint ${ctx.params.id}.`);
       let preprint;

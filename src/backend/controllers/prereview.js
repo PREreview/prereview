@@ -13,6 +13,9 @@ export default function controller(prereviews, thisUser) {
   prereviewRouter.route({
     method: 'post',
     path: '/prereviews',
+    // pre: async ctx => {
+      // thisUser.can('')
+    // },
     validate: {
       // header: {},
       // query: {},
@@ -60,6 +63,9 @@ export default function controller(prereviews, thisUser) {
   prereviewRouter.route({
     method: 'get',
     path: '/prereviews',
+    // pre: async ctx => {
+      // thisUser.can('')
+    // },
     validate: {
       query: Joi.object({
         start: Joi.number()
@@ -75,9 +81,6 @@ export default function controller(prereviews, thisUser) {
       }),
       // params: {},
       // headers: {},
-    },
-    pre: async ctx => {
-      //authenticate here
     },
     handler: async ctx => {
       let from, to;
@@ -124,9 +127,9 @@ export default function controller(prereviews, thisUser) {
     validate: {
       // actually not sure if this is needed
     },
-    pre: async ctx => {
-      // authenticate user
-    },
+   // pre: async ctx => {
+      // thisUser.can('')
+    // },
     handler: async ctx => {
       log.debug(`Retrieving prereview ${ctx.params.id}.`);
 
@@ -157,7 +160,9 @@ export default function controller(prereviews, thisUser) {
   prereviewRouter.route({
     method: 'put',
     path: '/prereviews/:id',
-    pre: async ctx => {},
+    // pre: async ctx => {
+      // thisUser.can('')
+    // },
     handler: async ctx => {
       log.debug(`Updating prereview ${ctx.params.id}.`)
       let prereview;
@@ -183,6 +188,9 @@ export default function controller(prereviews, thisUser) {
   prereviewRouter.route({
     method: 'delete',
     path: '/prereviews/:id',
+    // pre: async ctx => {
+      // thisUser.can('')
+    // },
     handler: async ctx => {
       log.debug(`Deleting prereview ${ctx.params.id}.`);
       let prereview;
