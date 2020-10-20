@@ -13,7 +13,7 @@ export default function controller(prereviews, thisUser) {
   prereviewRouter.route({
     method: 'post',
     path: '/prereviews',
-    pre: async => {
+    pre: async ctx => {
       await thisUser.can('access private pages');
       return next();
     },

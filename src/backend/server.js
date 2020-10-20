@@ -49,10 +49,9 @@ export default function configServer(config) {
   const prereviews = PrereviewController(prereviewModel, authz);
   
   const apiV2Router = compose([
-    auth.routes(), 
-    auth.allowedMethods(),
+    auth.middleware(), 
     preprints.middleware(),
-    prereviews.middleware(),
+    // prereviews.middleware(),
   ]);
 
 
