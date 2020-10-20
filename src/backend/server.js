@@ -38,7 +38,7 @@ export default function configServer(config) {
 
   // Setup auth handlers
   const userModel = new UserModel(); 
-  const authz = authWrapper(); // this is for authorization, not authentication
+  const authz = authWrapper(); // authorization, not authentication
   server.use(authz.middleware());
 
   // setup API handlers

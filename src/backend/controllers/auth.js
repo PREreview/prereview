@@ -1,16 +1,12 @@
 import passport from 'koa-passport';
-import { Strategy as LocalStrategy } from 'passport-local';
-import Router from '@koa/router';
-import auth from '../middleware/auth.js';
+import { Strategy as OrcidStrategy } from 'passport-orcid';
+import MockStrategy from '../utils/mockStrategy.js';
+import router from 'koa-joi-router';
 
-/**
- * Initialize the user auth controller
- *
- * @param {Object} users - User model
- * @returns {Object} Auth controller Koa router
- */
-export default function controller(users) {
-  const router = new Router();
+const log = getLogger('backend:controllers:auth');
+
+export default function controller(users, config, thisUser) {
+  const authzRouter = router();
 
   /**
    * Serialize user
@@ -33,9 +29,36 @@ export default function controller(users) {
       const user = await users.findById(id);
       done(null, user);
     } catch (err) {
+      log.debug()
       done(err);
     }
   });
+
+  // defining ORCID auth callback
+  // see https://members.orcid.org/api/oauth/refresh-tokens
+  const verifyCallback = async (req, accessToken, refreshToken, params, profile, done) => {
+
+     if (req && req.session && req.session.cookie && params.expires_in) {
+      req.session.cookie.expires = new Date(
+        Date.now() + params.expires_in * 1000
+      );
+    }
+
+    try {
+      // prolly depends on how the user model would look
+      const user = await users.findOrCreateUser({orcid: params.orcid})
+      log.debug('passport.use, username: ', user);
+      if (user) {
+        log.debug('Authenticated user!')
+        done(null, user);
+      } else {
+        done(null, false);
+      }
+    } catch (err) {
+      log.debug("Error authenticating: ", err)
+      done(err);
+    }
+  }
 
   /**
    * Initialize passport strategy
@@ -44,86 +67,43 @@ export default function controller(users) {
    * @param {string} password - Password
    * @param {function} done - 'Done' callback
    */
-  passport.use(
-    new LocalStrategy(async (username, password, done) => {
-      try {
-        const user = await users.findByUsername(username);
-        if (username === user.username && password === user.password) {
-          done(null, user);
-        } else {
-          done(null, false);
-        }
-      } catch (err) {
-        done(err);
-      }
-    }),
-  );
 
-  /**
-   * Login user.
-   *
-   * @param {Object} ctx - Koa context object
-   */
-  router.post('/login', async ctx => {
-    return passport.authenticate('local', (err, user) => {
-      if (!user) {
-        ctx.body = { success: false };
-        ctx.throw(401, 'Authentication failed.');
-      } else {
-        ctx.body = { success: true };
-        return ctx.login(user);
-      }
-    })(ctx);
-  });
+   let strategy;
 
-  /**
-   * Logout user.
-   *
-   * @param {Object} ctx - Koa context object
-   */
-  router.get('/logout', ctx => {
-    ctx.logout();
-    ctx.redirect('/');
-  });
+   if (process.env.NODE_ENV === 'production') {
+     strategy = new OrcidStrategy(
+       {
+        sandbox: false,
+        state: true,
+        clientID: config.orcidClientId || process.env.ORCID_CLIENT_ID,
+        clientSecret:
+          config.orcidClientSecret || process.env.ORCID_CLIENT_SECRET,
+        callbackURL,
+        passReqToCallback: true
+       },
+       verifyCallback
+     );
+   } else {
+     strategy = new MockStrategy('orcid', callbackURL, verifyCallback)
+   }
 
-  /**
-   * Authentication required
-   *
-   * @param {Object} auth - Authentication middleware
-   * @param {Object} ctx - Koa context object
-   */
-  router.get('/authenticated', auth, async ctx => {
-    ctx.body = { msg: 'Authenticated', user: ctx.state.user };
-  });
+   passport.use(strategy)
+}
 
-  /**
-   * Get all users.
-   *
-   * @param {Object} auth - Authentication middleware
-   * @param {Object} ctx - Koa context object
-   */
-  router.get('/users', auth, async (ctx, next) => {
-    const allUsers = await users.findAll();
-    ctx.body = allUsers;
-    await next();
-  });
-
-  /**
-   * Get single user
-   *
-   * @param integer
-   * @returns object|null 	User object or null
-   */
-  router.get('/users/:id', auth, async (ctx, next) => {
-    const user = await users.findById(ctx.params.id);
-    if (user) {
-      ctx.body = user;
-    } else {
-      ctx.status = 404;
-      ctx.body = `User with id ${ctx.params.id} was not found.`;
+/**
+ * See https://members.orcid.org/api/tutorial/read-orcid-records
+ */
+export async function getOrcidProfile(orcid, token) {
+  const r = await fetch(`https://pub.orcid.org/v2.1/${orcid}/person`, {
+    headers: {
+      Accept: 'application/json',
+      Authorization: `${token.tokenType} ${token.accessToken}`
     }
-    await next();
   });
 
-  return router;
+  if (r.ok) {
+    return await r.json();
+  } else {
+    throw createError(r.status);
+  }
 }

@@ -13,9 +13,10 @@ export default function controller(prereviews, thisUser) {
   prereviewRouter.route({
     method: 'post',
     path: '/prereviews',
-    // pre: async ctx => {
-      // thisUser.can('')
-    // },
+    pre: async => {
+      await thisUser.can('access private pages');
+      return next();
+    },
     validate: {
       // header: {},
       // query: {},
