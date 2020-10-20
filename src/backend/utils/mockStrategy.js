@@ -1,6 +1,8 @@
 import Strategy from 'passport-strategy';
 import { createRandomOrcid } from './orcid.js'
 
+// here we define a strategy for authenticating users in the non-production environment
+
 export default class MockStrategy extends Strategy {
     constructor(name, callbackURL, verifyCallback) {
       super();

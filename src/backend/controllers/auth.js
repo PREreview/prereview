@@ -69,6 +69,9 @@ export default function controller(users, config, thisUser) {
    */
 
    let strategy;
+   const callbackURL = `${config.appRootUrl ||
+    process.env.APP_ROOT_URL ||
+    'http://127.0.0.1:3000'}/auth/orcid/callback`;
 
    if (process.env.NODE_ENV === 'production') {
      strategy = new OrcidStrategy(
@@ -88,22 +91,4 @@ export default function controller(users, config, thisUser) {
    }
 
    passport.use(strategy)
-}
-
-/**
- * See https://members.orcid.org/api/tutorial/read-orcid-records
- */
-export async function getOrcidProfile(orcid, token) {
-  const r = await fetch(`https://pub.orcid.org/v2.1/${orcid}/person`, {
-    headers: {
-      Accept: 'application/json',
-      Authorization: `${token.tokenType} ${token.accessToken}`
-    }
-  });
-
-  if (r.ok) {
-    return await r.json();
-  } else {
-    throw createError(r.status);
-  }
 }
