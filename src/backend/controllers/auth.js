@@ -111,7 +111,7 @@ export default function controller(users, config, thisUser) {
      path: 'auth/orcid/callback',
      handler: async ctx => {
       log.debug('Finishing authenticating with ORCID...')
-      return passport.authenticate('oauth2', (err, user) => {
+      return passport.authenticate('orcid', (err, user) => {
 
         if (!user) {
           ctx.body = { success: false };
@@ -125,9 +125,9 @@ export default function controller(users, config, thisUser) {
             ctx.session.maxAge = 'session';
           }
 
-          ctx.cookies.set('p_user', user.username, { httpOnly: false });
+          ctx.cookies.set('PRE_user', user.username, { httpOnly: false });
           ctx.body = { success: true, user: user };
-          log.debug('OAuth2 Callback user:', user);
+          log.debug('Orcid Callback user:', user);
           ctx.login(user);
           return ctx.redirect('/admin');
         }
