@@ -51,7 +51,7 @@ export default function configServer(config) {
   const apiV2Router = compose([
     auth.middleware(), 
     preprints.middleware(),
-    // prereviews.middleware(),
+    prereviews.middleware(),
   ]);
 
 
