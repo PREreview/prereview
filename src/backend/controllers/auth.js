@@ -98,28 +98,10 @@ export default function controller(users, config, thisUser) {
    // start ORCID authentication
    authRouter.route({
      method: 'get',
-     path: '/login',
+     path: '/auth/orcid',
      handler: async ctx => {
-       log.debug("*************** ctx,", ctx)
-       log.debug("Authenticating user with strategy: ", strategy)
-       return passport.authenticate('orcid', (err, user) => {
-         if (!user) {
-           ctx.body = { success: false };
-           ctx.throw(401, 'Authentication failed.')
-         } else {
-          ctx.state.user = user;
-
-          if (ctx.request.body.remember === 'true') {
-            ctx.session.maxAge = 86400000; // 1 day
-          } else {
-            ctx.session.maxAge = 'session';
-          }
-
-          ctx.cookies.set('PRE_user', user.username, { httpOnly: false });
-          ctx.body = { success: true, user: user };
-          return ctx.login(user);
-         }
-       })(ctx);
+       log.debug('Starting to authenticate with ORCID...')
+       return passport.authenticate('orcid')
      }
    })
 
@@ -128,16 +110,29 @@ export default function controller(users, config, thisUser) {
      method: 'get',
      path: 'auth/orcid/callback',
      handler: async ctx => {
-       log.debug("ctx", ctx)
-       return passport.authenticate('orcid', (err, user) => {
-         if (ctx.session.next) {
-           ctx.redirect(ctx.session.next);
-           delete ctx.session.next
-           return;
-         }
-         ctx.redirect('/')
-       })
-     }
+      log.debug('Finishing authenticating with ORCID...')
+      return passport.authenticate('oauth2', (err, user) => {
+
+        if (!user) {
+          ctx.body = { success: false };
+          ctx.throw(401, 'Authentication failed.');
+        } else {
+          ctx.state.user = user;
+
+          if (ctx.request.body.remember === 'true') {
+            ctx.session.maxAge = 86400000; // 1 day
+          } else {
+            ctx.session.maxAge = 'session';
+          }
+
+          ctx.cookies.set('p_user', user.username, { httpOnly: false });
+          ctx.body = { success: true, user: user };
+          log.debug('OAuth2 Callback user:', user);
+          ctx.login(user);
+          return ctx.redirect('/admin');
+        }
+      })(ctx);
+    },
    })
 
    authRouter.route({
