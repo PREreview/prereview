@@ -6,7 +6,8 @@ import router from 'koa-joi-router';
 const log = getLogger('backend:controllers:auth');
 
 export default function controller(users, config, thisUser) {
-  const authzRouter = router();
+  const authRouter = router();
+  log.debug('Authenticating user...')
 
   /**
    * Serialize user
@@ -91,4 +92,51 @@ export default function controller(users, config, thisUser) {
    }
 
    passport.use(strategy)
+
+   // login
+
+   // start ORCID authentication
+   authRouter.route({
+     method: 'get',
+     path: '/orcid/login',
+     handler: async ctx => {
+       return passport.authenticate('orcid', (err, user) => {
+         if (!user) {
+           ctx.body = { success: false };
+           ctx.throw(401, 'Authentication failed.')
+         } else {
+          ctx.state.user = user;
+          if (ctx.request.body.remember === 'true') {
+            ctx.session.maxAge = 86400000; // 1 day
+          } else {
+            ctx.session.maxAge = 'session';
+          }
+
+          ctx.cookies.set('pre_user', user.username, { httpOnly: false });
+          ctx.body = { success: true, user: user };
+          return ctx.login(user);
+         }
+       })(ctx);
+     }
+   })
+
+   //finish ORCID authentication
+   authRouter.route({
+     method: 'get',
+     path: '/orcid/callback',
+     handler: async ctx => {
+       
+     }
+   })
+
+   authRouter.route({
+     method: 'get',
+     path: '/logout',
+     handler: async ctx => {
+
+     }
+
+   })
+
+
 }
