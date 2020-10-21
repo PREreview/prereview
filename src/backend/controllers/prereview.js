@@ -1,5 +1,5 @@
 import router from 'koa-joi-router';
-// import moment from 'moment';
+import moment from 'moment';
 import { getLogger } from '../log.js';
 // import { BadRequestError } from '../../common/errors.js';
 
@@ -13,7 +13,7 @@ export default function controller(prereviews, thisUser) {
   prereviewRouter.route({
     method: 'post',
     path: '/prereviews',
-    pre: async => {
+    pre: async (_, next) => {
       await thisUser.can('access private pages');
       return next();
     },
@@ -40,6 +40,7 @@ export default function controller(prereviews, thisUser) {
     },
     handler: async ctx => {
       // prob will not need all the below anymore
+      let prereview;
       try {
         prereview = await prereviews.create(ctx.request.body.data);
 
@@ -65,7 +66,7 @@ export default function controller(prereviews, thisUser) {
     method: 'get',
     path: '/prereviews',
     // pre: async ctx => {
-      // thisUser.can('')
+    // thisUser.can('')
     // },
     validate: {
       query: Joi.object({
@@ -86,16 +87,16 @@ export default function controller(prereviews, thisUser) {
     handler: async ctx => {
       let from, to;
 
-      if (query.from) {
-        const timestamp = moment(query.from);
+      if (ctx.query.from) {
+        const timestamp = moment(ctx.query.from);
         if (timestamp.isValid()) {
           log.error('HTTP 400 Error: Invalid timestamp value.');
           ctx.throw(400, 'Invalid timestamp value.');
         }
         from = timestamp.toISOString();
       }
-      if (query.to) {
-        const timestamp = moment(query.to);
+      if (ctx.query.to) {
+        const timestamp = moment(ctx.query.to);
         if (timestamp.isValid()) {
           log.error('HTTP 400 Error: Invalid timestamp value.');
           ctx.throw(400, 'Invalid timestamp value.');
@@ -103,11 +104,11 @@ export default function controller(prereviews, thisUser) {
         to = timestamp.toISOString();
       }
 
-      res = await prereviews.find({
-        start: query.start,
-        end: query.end,
-        asc: query.asc,
-        sort_by: query.sort_by,
+      const res = await prereviews.find({
+        start: ctx.query.start,
+        end: ctx.query.end,
+        asc: ctx.query.asc,
+        sort_by: ctx.query.sort_by,
         from: from,
         to: to,
       });
@@ -128,11 +129,12 @@ export default function controller(prereviews, thisUser) {
     validate: {
       // actually not sure if this is needed
     },
-   // pre: async ctx => {
-      // thisUser.can('')
+    // pre: async ctx => {
+    // thisUser.can('')
     // },
     handler: async ctx => {
       log.debug(`Retrieving prereview ${ctx.params.id}.`);
+      let prereview;
 
       try {
         prereview = await prereviews.findById(ctx.params.id);
@@ -156,41 +158,40 @@ export default function controller(prereviews, thisUser) {
         );
       }
     },
-  })
+  });
 
   prereviewRouter.route({
     method: 'put',
     path: '/prereviews/:id',
     // pre: async ctx => {
-      // thisUser.can('')
+    // thisUser.can('')
     // },
     handler: async ctx => {
-      log.debug(`Updating prereview ${ctx.params.id}.`)
+      log.debug(`Updating prereview ${ctx.params.id}.`);
       let prereview;
 
       try {
-      prereview = await prereviews.update(
-        ctx.params.id,
-        ctx.request.body.data,
-      );
+        prereview = await prereviews.update(
+          ctx.params.id,
+          ctx.request.body.data,
+        );
 
         // workaround for sqlite
         if (Number.isInteger(prereview)) {
           prereview = await prereviews.findById(ctx.params.id);
         }
-      
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse query: ${err}`);
       }
-    }
-  })
+    },
+  });
 
   prereviewRouter.route({
     method: 'delete',
     path: '/prereviews/:id',
     // pre: async ctx => {
-      // thisUser.can('')
+    // thisUser.can('')
     // },
     handler: async ctx => {
       log.debug(`Deleting prereview ${ctx.params.id}.`);
@@ -217,7 +218,7 @@ export default function controller(prereviews, thisUser) {
           `That prereview with ID ${ctx.params.id} does not exist.`,
         );
       }
-    }
+    },
   });
 
   return router;

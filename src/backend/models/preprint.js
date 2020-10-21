@@ -1,4 +1,7 @@
-import { validate } from '../../common/schemas/preprint.js';
+import {
+  validateCreation,
+  validateUpdate,
+} from '../../common/schemas/preprint.js';
 import { BadRequestError } from '../../common/errors.js';
 
 export default class PreprintManager {
@@ -8,7 +11,7 @@ export default class PreprintManager {
 
   async create(preprint) {
     try {
-      await validate(preprint);
+      await validateCreation(preprint);
     } catch (err) {
       throw new BadRequestError('Failed to create library: ', err);
     }
@@ -20,7 +23,7 @@ export default class PreprintManager {
 
   async update(id, preprint) {
     try {
-      await validate(preprint);
+      await validateUpdate(preprint);
     } catch (err) {
       throw new BadRequestError('Failed to update preprint: ', err);
     }

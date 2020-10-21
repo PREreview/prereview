@@ -2,7 +2,7 @@ import router from 'koa-joi-router';
 // import moment from 'moment';
 import { getLogger } from '../log.js';
 // import { BadRequestError } from '../../common/errors.js';
-import resolve from '../utils/resolve.js'
+import resolve from '../utils/resolve.js';
 
 const log = getLogger('backend:controllers:preprint');
 const Joi = router.Joi;
@@ -17,10 +17,10 @@ export default function controller(preprints, thisUser) {
     handler: async ctx => {
       const { identifier, url } = ctx.query;
       log.debug(`Resolving preprint with ID: ${identifier}`);
-      const data = await resolve(identifier)
-      ctx.body = data
-    }
-  })
+      const data = await resolve(identifier);
+      ctx.body = data;
+    },
+  });
 
   preprintRoutes.route({
     method: 'post',
@@ -197,7 +197,7 @@ export default function controller(preprints, thisUser) {
     method: 'delete',
     path: '/preprints/:id',
     // pre: async ctx => {
-      // thisUser.can('')
+    // thisUser.can('')
     // },
     handler: async ctx => {
       log.debug(`Deleting preprint ${ctx.params.id}.`);

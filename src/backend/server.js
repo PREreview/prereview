@@ -37,24 +37,23 @@ export default function configServer(config) {
   server.use(log4js.koaLogger(log4js.getLogger('http'), { level: 'auto' }));
 
   // Setup auth handlers
-  const userModel = new UserModel(); 
+  const userModel = new UserModel();
   const authz = authWrapper(); // authorization, not authentication
   server.use(authz.middleware());
 
   // setup API handlers
-  const auth = AuthController(userModel, config, authz); 
+  const auth = AuthController(userModel, config, authz);
   const preprintModel = new PreprintModel();
   const preprints = PreprintController(preprintModel, authz);
   const prereviewModel = new PrereviewModel();
   const prereviews = PrereviewController(prereviewModel, authz);
-  
+
   const apiV2Router = compose([
-    auth.routes(), 
+    auth.routes(),
     auth.allowedMethods(),
     preprints.middleware(),
     prereviews.middleware(),
   ]);
-
 
   // Add here only development middlewares
   // if (config.isDev) {
@@ -70,8 +69,6 @@ export default function configServer(config) {
 
   // Set custom error handler
   server.context.onerror = errorHandler;
-
-
 
   // If we're running behind Cloudflare, set the access parameters.
   if (config.cfaccess_url) {

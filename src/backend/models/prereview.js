@@ -1,4 +1,7 @@
-import { validate } from '../../common/schemas/prereview.js';
+import {
+  validateCreation,
+  validateUpdate,
+} from '../../common/schemas/prereview.js';
 import { BadRequestError } from '../../common/errors.js';
 
 export default class Prereview {
@@ -8,7 +11,7 @@ export default class Prereview {
 
   async create(prereview) {
     try {
-      await validate(prereview);
+      await validateCreation(prereview);
     } catch (err) {
       throw new BadRequestError('Failed to create library: ', err);
     }
@@ -20,7 +23,7 @@ export default class Prereview {
 
   async update(id, prereview) {
     try {
-      await validate(prereview);
+      await validateUpdate(prereview);
     } catch (err) {
       throw new BadRequestError('Failed to update prereview: ', err);
     }
