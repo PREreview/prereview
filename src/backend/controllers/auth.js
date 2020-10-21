@@ -44,7 +44,6 @@ export default function controller(users, config, thisUser) {
         Date.now() + params.expires_in * 1000
       );
     }
-
     try {
       // prolly depends on how the user model would look
       const user = await users.findOrCreateUser({orcid: params.orcid})
@@ -96,14 +95,7 @@ export default function controller(users, config, thisUser) {
    // login
 
    // start ORCID authentication
-   authRouter.route({
-     method: 'get',
-     path: '/auth/orcid',
-     handler: async ctx => {
-       log.debug('Starting to authenticate with ORCID...')
-       return passport.authenticate('orcid')
-     }
-   })
+   authRouter.get('/orcid-login', passport.authenticate('orcid'))
 
    //finish ORCID authentication
    authRouter.route({
