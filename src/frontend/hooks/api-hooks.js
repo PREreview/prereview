@@ -181,9 +181,9 @@ export function usePreprint(
         const controller = new AbortController();
 
         fetch(
-          `api/v2/resolve?identifier=${encodeURIComponent(
-            identifier,
-          )}${fallbackUrl ? `&url=${encodeURIComponent(fallbackUrl)}` : ''}`,
+          `api/v2/resolve?identifier=${encodeURIComponent(identifier)}${
+            fallbackUrl ? `&url=${encodeURIComponent(fallbackUrl)}` : ''
+          }`,
           {
             signal: controller.signal,
           },
@@ -274,14 +274,9 @@ export function usePreprintActions(identifier) {
 
       const controller = new AbortController();
 
-      fetch(
-        `api/v2/preprint/${unprefix(
-          createPreprintId(identifier),
-        )}`,
-        {
-          signal: controller.signal,
-        },
-      )
+      fetch(`api/v2/preprint/${unprefix(createPreprintId(identifier))}`, {
+        signal: controller.signal,
+      })
         .then(resp => {
           if (resp.ok) {
             return resp.json();

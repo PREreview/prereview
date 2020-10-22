@@ -10,7 +10,6 @@ import session from 'koa-session';
 import passport from 'koa-passport';
 import errorHandler from 'koa-better-error-handler';
 import cloudflareAccess from './middleware/cloudflare.js';
-import ssr from './middleware/ssr.js';
 import AuthController from './controllers/auth.js'; // authentication/logins
 import authWrapper from '../backend/middleware/auth.js'; // authorization/user roles
 import UserModel from './models/user.js';
@@ -21,7 +20,6 @@ import PrereviewController from './controllers/prereview.js';
 
 const __dirname = path.resolve();
 const STATIC_DIR = path.resolve(__dirname, 'dist', 'frontend');
-const ENTRYPOINT = path.resolve(STATIC_DIR, 'index.html');
 
 export default function configServer(config) {
   // Initialize our application server
@@ -98,10 +96,13 @@ export default function configServer(config) {
     .use(cors())
     .use(mount('/api/v2', apiV2Router))
     .use(mount('/static', serveStatic(STATIC_DIR)))
-    .use((ctx, next) => {
-      ctx.state.htmlEntrypoint = ENTRYPOINT;
-      ssr(ctx, next);
-    });
+    .use(
+      async (ctx, next) =>
+        await serveStatic(STATIC_DIR)(
+          Object.assign(ctx, { path: 'index.html' }),
+          next,
+        ),
+    );
 
   return server.callback();
 }

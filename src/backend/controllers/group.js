@@ -23,15 +23,15 @@ async function validate_query(query) {
  */
 // eslint-disable-next-line no-unused-vars
 export default function controller(groups, thisUser) {
-  const groupRoutes = router()
+  const groupRoutes = router();
 
   groupRoutes.route({
-    method: 'post', 
-    path: '/groups', 
+    method: 'post',
+    path: '/groups',
     // validate: {},
     pre: async ctx => {
       thisUser.can('access admin pages');
-    }, 
+    },
     handler: async ctx => {
       log.debug('Adding new group.');
       let group;
@@ -49,8 +49,8 @@ export default function controller(groups, thisUser) {
       }
       ctx.response.body = { statusCode: 201, status: 'created', data: group };
       ctx.response.status = 201;
-    }
-});
+    },
+  });
 
   groupRoutes.route({
     method: 'get',
@@ -67,11 +67,11 @@ export default function controller(groups, thisUser) {
         sort_by: Joi.string(),
         from: Joi.string(),
         to: Joi.string(),
-      })
-    }, 
+      }),
+    },
     pre: async ctx => {
-      thisUser.can('access admin pages')
-     },
+      thisUser.can('access admin pages');
+    },
     handler: async ctx => {
       log.debug(`Retrieving groups.`);
       let res;
@@ -113,14 +113,14 @@ export default function controller(groups, thisUser) {
         ctx.throw(400, `Failed to parse query: ${err}`);
       }
     },
-});
+  });
 
   groupRoutes.route({
     method: 'get',
-    path: '/groups/:id', 
+    path: '/groups/:id',
     pre: async ctx => {
-      thisUser.can('access private pages')
-     }, 
+      thisUser.can('access private pages');
+    },
     handler: async ctx => {
       log.debug(`Retrieving group ${ctx.params.id}.`);
       let group;
@@ -141,15 +141,15 @@ export default function controller(groups, thisUser) {
         );
         ctx.throw(404, `That group with ID ${ctx.params.id} does not exist.`);
       }
-    }
+    },
   });
 
   groupRoutes.route({
     method: 'put',
-    path: '/groups/:id', 
+    path: '/groups/:id',
     pre: async ctx => {
-      thisUser.can('access admin pages')
-    }, 
+      thisUser.can('access admin pages');
+    },
     handler: async ctx => {
       log.debug(`Updating group ${ctx.params.id}.`);
       let group;
@@ -175,14 +175,14 @@ export default function controller(groups, thisUser) {
         );
         ctx.throw(404, `That group with ID ${ctx.params.id} does not exist.`);
       }
-    }
+    },
   });
 
   groupRoutes.route({
     method: 'delete',
     path: '/groups/:id',
     pre: async ctx => {
-      thisUser.can('access admin pages')
+      thisUser.can('access admin pages');
     },
     handler: async ctx => {
       log.debug(`Deleting group ${ctx.params.id}.`);
@@ -211,7 +211,7 @@ export default function controller(groups, thisUser) {
     method: 'get',
     path: '/groups/:id/members',
     pre: async ctx => {
-      thisUser.can('access admin pages')
+      thisUser.can('access admin pages');
     },
     handler: async ctx => {
       log.debug(`Retrieving members of group ${ctx.params.id}.`);
@@ -246,7 +246,7 @@ export default function controller(groups, thisUser) {
     method: 'put',
     path: '/groups/:id/members/:uid',
     pre: async ctx => {
-      thisUser.can('access admin pages')
+      thisUser.can('access admin pages');
     },
     handler: async ctx => {
       log.debug(`Adding user ${ctx.params.uid} to group ${ctx.params.id}.`);
@@ -282,7 +282,7 @@ export default function controller(groups, thisUser) {
     method: 'delete',
     path: '/groups/:id/members/:uid',
     pre: async ctx => {
-      thisUser.can('access admin pages')
+      thisUser.can('access admin pages');
     },
     handler: async ctx => {
       log.debug(`Removing user ${ctx.params.uid} from group ${ctx.params.id}.`);

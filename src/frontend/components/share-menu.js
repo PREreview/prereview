@@ -43,9 +43,7 @@ export default function ShareMenu({ identifier, roleIds = [] }) {
                 const qs = new URLSearchParams();
                 qs.set('role', roleIds.map(unprefix));
 
-                setPermalink(
-                  `${identifier}?${qs.toString()}`,
-                );
+                setPermalink(`${identifier}?${qs.toString()}`);
               }}
             >
               Permalink (for selected user{roleIds.length > 1 ? 's' : ''})
@@ -55,9 +53,7 @@ export default function ShareMenu({ identifier, roleIds = [] }) {
           <MenuLink
             className="menu__list__link-item"
             download="rapid-prereview-data.jsonld"
-            href={`api/v2/preprint/${unprefix(
-              createPreprintId(identifier),
-            )}`}
+            href={`api/v2/preprint/${unprefix(createPreprintId(identifier))}`}
           >
             Download data (JSON-LD)
           </MenuLink>

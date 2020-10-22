@@ -11,7 +11,7 @@ import { getLogger } from '../log.js';
 const log = getLogger('backend:middleware:auth');
 
 const authWrapper = () => {
-  const roles = new Roles()
+  const roles = new Roles();
 
   // roles.isMemberOf = (group, id) => {
   //   return groups.isMemberOf(group, id);
@@ -19,7 +19,7 @@ const authWrapper = () => {
 
   roles.use('access private pages', ctx => ctx.isAuthenticated());
 
-  return roles 
-}
+  return roles;
+};
 
 export default authWrapper;

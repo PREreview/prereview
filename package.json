@@ -31,14 +31,17 @@
     "lint": "eslint --ignore-path .gitignore --fix ./src",
     "test": "jest --coverage --forceExit",
     "doc": "jsdoc -d ./dist/doc/ -r ./src/backend ./src/frontend",
-    "build:imported-components": "imported-components src/frontend src/frontend/imported.js",
-    "build": "rimraf dist && npm run build:backend && npm run build:imported-components && npm run build:frontend && rimraf src/frontend/imported.js",
+    "build": "rimraf dist && npm run build:backend && npm run build:frontend",
+    "build:dev": "rimraf dist && npm run build:backend:dev && npm run build:frontend:dev",
     "build:backend": "parcel build --target=backend src/backend/index.js",
+    "build:backend:dev": "parcel build --target=backend --no-minify src/backend/index.js",
     "build:frontend": "parcel build --target=frontend src/frontend/index.html",
+    "build:frontend:dev": "parcel build --target=frontend --no-minify src/frontend/index.html",
     "db:migrations": "knex --esm migrate:latest",
     "db:seeds": "knex --esm seed:run",
+    "start:backend": "npm run build && node dist/backend/index.js",
     "start": "npm run start:backend",
-    "start:dev": "nodemon -e js,jsx,html --ignore dist --ignore src/frontend/imported.js --exec 'npm run build:dev && npm run start'"
+    "start:dev": "parcel serve src/frontend/index.html"
   },
   "backend": "dist/backend/index.js",
   "frontend": "dist/frontend/index.html",
@@ -75,6 +78,9 @@
     "@material-ui/icons": "^4.9.1",
     "@material-ui/pickers": "^3.2.10",
     "@material-ui/styles": "^4.9.0",
+    "@mikro-orm/core": "^4.2.1",
+    "@mikro-orm/postgresql": "^4.2.1",
+    "@mikro-orm/sqlite": "^4.2.1",
     "@reach/combobox": "^0.10.5",
     "@reach/dialog": "^0.10.5",
     "@reach/menu-button": "^0.10.5",
@@ -153,18 +159,11 @@
     "xmldom": "^0.3.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.8.4",
-    "@babel/plugin-syntax-dynamic-import": "^7.8.3",
-    "@babel/polyfill": "^7.8.3",
-    "@babel/preset-env": "^7.8.4",
-    "@babel/preset-react": "^7.8.3",
     "@parcel/transformer-typescript-tsc": "^2.0.0-alpha.3",
     "@parcel/validator-typescript": "^2.0.0-alpha.3",
+    "@typescript-eslint/eslint-plugin": "^4.5.0",
+    "@typescript-eslint/parser": "^4.5.0",
     "acorn-jsx": "^5.1.0",
-    "babel-jest": "^25.1.0",
-    "babel-plugin-transform-inline-environment-variables": "^0.4.3",
-    "babel-polyfill": "^6.26.0",
-    "cross-env": "^7.0.0",
     "eslint": "^6.8.0",
     "eslint-config-prettier": "4.3.0",
     "eslint-plugin-import": "^2.20.0",
@@ -179,11 +178,11 @@
     "nodemon": "^2.0.2",
     "parcel": "^2.0.0-nightly.426",
     "prettier": "1.17.1",
-    "react-hot-loader": "^4.12.19",
     "rimraf": "^3.0.2",
     "sass": "^1.26.10",
     "supertest": "^4.0.2",
-    "supertest-session": "^4.0.0"
+    "supertest-session": "^4.0.0",
+    "typescript": "^4.0.3"
   },
   "husky": {
     "hooks": {
@@ -224,7 +223,9 @@
       "plugin:node/recommended-module",
       "plugin:prettier/recommended",
       "plugin:promise/recommended",
-      "plugin:react/recommended"
+      "plugin:react/recommended",
+      "plugin:@typescript-eslint/recommended",
+      "prettier/@typescript-eslint"
     ],
     "env": {
       "es2017": true,
