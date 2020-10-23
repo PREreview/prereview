@@ -9,13 +9,14 @@ import serveStatic from 'koa-static';
 import session from 'koa-session';
 import passport from 'koa-passport';
 import errorHandler from 'koa-better-error-handler';
+import dbWrapper from './db.ts';
 import cloudflareAccess from './middleware/cloudflare.js';
 import AuthController from './controllers/auth.js'; // authentication/logins
 import authWrapper from '../backend/middleware/auth.js'; // authorization/user roles
-import UserModel from './models/user.js';
-import PreprintModel from './models/preprint.js';
+import UserModel from './models/users.ts';
+import PreprintModel from './models/preprints.ts';
 import PreprintController from './controllers/preprint.js';
-import PrereviewModel from './models/prereview.js';
+import FullReviewModel from './models/fullReviews.ts';
 import PrereviewController from './controllers/prereview.js';
 
 const __dirname = path.resolve();
@@ -34,16 +35,28 @@ export default function configServer(config) {
   });
   server.use(log4js.koaLogger(log4js.getLogger('http'), { level: 'auto' }));
 
+  // Initialize database
+  const dbType = config.isDev ? 'sqlite' : 'postgres';
+  const [db, dbMiddleware] = dbWrapper(
+    dbType,
+    config.dbHost,
+    config.dbPort,
+    config.dbName,
+    config.dbUser,
+    config.dbPass,
+  );
+  server.use(dbMiddleware);
+
   // Setup auth handlers
-  const userModel = new UserModel();
+  const userModel = new UserModel(db);
   const authz = authWrapper(); // authorization, not authentication
   server.use(authz.middleware());
 
   // setup API handlers
   const auth = AuthController(userModel, config, authz);
-  const preprintModel = new PreprintModel();
+  const preprintModel = PreprintModel(db);
   const preprints = PreprintController(preprintModel, authz);
-  const prereviewModel = new PrereviewModel();
+  const prereviewModel = FullReviewModel(db);
   const prereviews = PrereviewController(prereviewModel, authz);
 
   const apiV2Router = compose([

@@ -39,14 +39,14 @@ export class User {
   @ManyToMany()
   communities = new Collection<Community>(this);
 
-  @ManyToMany()
+  @OneToMany()
   identities = new Collection<Persona>(this);
 
   @OneToMany()
   rapidReviews = new Collection<RapidReview>(this);
 
   @ManyToMany()
-  reviews = new Collection<Review>(this);
+  fullReviews = new Collection<FullReview>(this);
 
   constructor(username: string, email: string) {
     this.username = username;
