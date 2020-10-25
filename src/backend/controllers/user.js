@@ -1,8 +1,5 @@
-import bcrypt from 'bcryptjs';
 import router from 'koa-joi-router';
 import moment from 'moment';
-import passport from 'koa-passport';
-import { Strategy as LocalStrategy } from 'passport-local';
 
 import { getLogger } from '../log.js';
 import { BadRequestError } from '../../common/errors.js';
