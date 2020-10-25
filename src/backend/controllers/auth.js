@@ -1,6 +1,7 @@
 import passport from 'koa-passport';
 import { Strategy as OrcidStrategy } from 'passport-orcid';
 import MockStrategy from '../utils/mockStrategy.js';
+import { getLogger } from '../log.js';
 import router from 'koa-joi-router';
 import { getLogger } from '../log.js';
 
@@ -51,7 +52,6 @@ export default function controller(users, config, thisUser) {
         Date.now() + params.expires_in * 1000,
       );
     }
-
     try {
       // prolly depends on how the user model would look
       const user = await users.findOrCreateUser({ orcid: params.orcid });
@@ -79,7 +79,7 @@ export default function controller(users, config, thisUser) {
   let strategy;
   const callbackURL = `${config.appRootUrl ||
     process.env.APP_ROOT_URL ||
-    'http://127.0.0.1:3000'}/auth/orcid/callback`;
+    'http://127.0.0.1:3000'}/api/v2/auth/orcid/callback`;
 
   if (process.env.NODE_ENV === 'production') {
     strategy = new OrcidStrategy(
@@ -102,41 +102,62 @@ export default function controller(users, config, thisUser) {
 
   // login
 
-  // start ORCID authentication
-  authRouter.route({
-    method: 'get',
-    path: '/orcid/login',
-    handler: async ctx => {
+   // start ORCID authentication
+   authRouter.get('/orcid-login', passport.authenticate('orcid'))
+
+   //finish ORCID authentication
+   authRouter.route({
+     method: 'get',
+     path: 'auth/orcid/callback',
+     handler: async ctx => {
+      log.debug('Finishing authenticating with ORCID...')
       return passport.authenticate('orcid', (err, user) => {
+
         if (!user) {
           ctx.body = { success: false };
           ctx.throw(401, 'Authentication failed.');
         } else {
           ctx.state.user = user;
+
           if (ctx.request.body.remember === 'true') {
             ctx.session.maxAge = 86400000; // 1 day
           } else {
             ctx.session.maxAge = 'session';
           }
 
-          ctx.cookies.set('pre_user', user.username, { httpOnly: false });
+          ctx.cookies.set('PRE_user', user.username, { httpOnly: false });
           ctx.body = { success: true, user: user };
-          return ctx.login(user);
+          log.debug('Orcid Callback user:', user);
+          ctx.login(user);
+          return ctx.redirect('/admin');
         }
       })(ctx);
     },
-  });
+   })
 
-  //finish ORCID authentication
-  authRouter.route({
-    method: 'get',
-    path: '/orcid/callback',
-    handler: async ctx => {},
-  });
+   authRouter.route({
+     method: 'get',
+     path: '/logout',
+     handler: async ctx => {
+       log.debug("Logging out...")
+       if (ctx.isAuthenticated()) {
+         ctx.logout()
+         ctx.session = null 
+         ctx.cookies.set('PRE_user', '');
+         ctx.redirect('/')
+       } else {
+         ctx.body = { success: false }
+         ctx.throw(401, 'Logout failed')
+       }
+     }
+   })
 
-  authRouter.route({
-    method: 'get',
-    path: '/logout',
-    handler: async ctx => {},
-  });
+   /**
+   * Authentication required
+   *
+   * @param {Object} auth - Authentication middleware
+   * @param {Object} ctx - Koa context object
+   */
+
+   return authRouter
 }

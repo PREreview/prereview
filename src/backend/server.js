@@ -74,8 +74,7 @@ export default function configServer(config) {
   const tagModel = TagModel(db);
 
   const apiV2Router = compose([
-    auth.routes(),
-    auth.allowedMethods(),
+    auth.middleware(), 
     preprints.middleware(),
     prereviews.middleware(),
   ]);

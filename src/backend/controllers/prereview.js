@@ -221,5 +221,5 @@ export default function controller(prereviews, thisUser) {
     },
   });
 
-  return router;
+  return prereviewRouter;
 }
