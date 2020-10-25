@@ -100,16 +100,14 @@ export default function controller(users, config, thisUser) {
 
   passport.use(strategy);
 
-  // login
-
    // start ORCID authentication
-   authRouter.get('/orcid-login', passport.authenticate('orcid'))
+  authRouter.get('auth/orcid/login', passport.authenticate('orcid'))
 
    //finish ORCID authentication
-   authRouter.route({
-     method: 'get',
-     path: 'auth/orcid/callback',
-     handler: async ctx => {
+  authRouter.route({
+    method: 'get',
+    path: 'auth/orcid/callback',
+    handler: async ctx => {
       log.debug('Finishing authenticating with ORCID...')
       return passport.authenticate('orcid', (err, user) => {
 
@@ -133,53 +131,66 @@ export default function controller(users, config, thisUser) {
         }
       })(ctx);
     },
-   })
+  })
 
-   router.post('/login', async ctx => {
-    return passport.authenticate('orcid', (err, user) => {
-      if (!user) {
-        ctx.body = { success: false };
-        ctx.throw(401, 'Authentication failed.');
+   // TODO: figure out non-ORCID login/authentication
+
+  // authRouter.route({
+  //   method: 'post',
+  //   path: '/login', 
+  //   handler: async ctx => {
+  //     return passport.authenticate('orcid', (err, user) => {
+  //       if (!user) {
+  //         ctx.body = { success: false };
+  //         ctx.throw(401, 'Authentication failed.');
+  //       } else {
+  //         ctx.state.user = user;
+  //         if (ctx.request.body.remember === 'true') {
+  //           ctx.session.maxAge = 86400000; // 1 day
+  //         } else {
+  //           ctx.session.maxAge = 'session';
+  //         }
+  //         ctx.cookies.set('PRE_user', user.username, { httpOnly: false });
+  //         ctx.body = {
+  //           success: true,
+  //           user: user,
+  //         };
+  //         return ctx.login(user);
+  //       }
+  //     })(ctx);
+  //   }
+  // });
+
+  authRouter.route({
+    method: 'get',
+    path: '/logout',
+    handler: async ctx => {
+      log.debug("Logging out...")
+      if (ctx.isAuthenticated()) {
+        ctx.logout()
+        ctx.session = null 
+        ctx.cookies.set('PRE_user', '');
+        ctx.redirect('/')
       } else {
-        ctx.state.user = user;
-        if (ctx.request.body.remember === 'true') {
-          ctx.session.maxAge = 86400000; // 1 day
-        } else {
-          ctx.session.maxAge = 'session';
-        }
-        ctx.cookies.set('PRE_user', user.username, { httpOnly: false });
-        ctx.body = {
-          success: true,
-          user: user,
-        };
-        return ctx.login(user);
+        ctx.body = { success: false }
+        ctx.throw(401, 'Logout failed')
       }
-    })(ctx);
-  });
+    }
+  })
 
-   authRouter.route({
-     method: 'get',
-     path: '/logout',
-     handler: async ctx => {
-       log.debug("Logging out...")
-       if (ctx.isAuthenticated()) {
-         ctx.logout()
-         ctx.session = null 
-         ctx.cookies.set('PRE_user', '');
-         ctx.redirect('/')
-       } else {
-         ctx.body = { success: false }
-         ctx.throw(401, 'Logout failed')
-       }
-     }
-   })
-
-   /**
+  /**
    * Authentication required
    *
    * @param {Object} auth - Authentication middleware
    * @param {Object} ctx - Koa context object
    */
+  authRouter.get(
+    '/authenticated',
+    thisUser.can('access private pages'),
+    async ctx => {
+      ctx.body = { msg: 'Authenticated', user: ctx.state.user.id };
+    },
+  );
 
    return authRouter
 }
