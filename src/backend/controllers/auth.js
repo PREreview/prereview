@@ -135,6 +135,28 @@ export default function controller(users, config, thisUser) {
     },
    })
 
+   router.post('/login', async ctx => {
+    return passport.authenticate('orcid', (err, user) => {
+      if (!user) {
+        ctx.body = { success: false };
+        ctx.throw(401, 'Authentication failed.');
+      } else {
+        ctx.state.user = user;
+        if (ctx.request.body.remember === 'true') {
+          ctx.session.maxAge = 86400000; // 1 day
+        } else {
+          ctx.session.maxAge = 'session';
+        }
+        ctx.cookies.set('PRE_user', user.username, { httpOnly: false });
+        ctx.body = {
+          success: true,
+          user: user,
+        };
+        return ctx.login(user);
+      }
+    })(ctx);
+  });
+
    authRouter.route({
      method: 'get',
      path: '/logout',
