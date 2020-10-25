@@ -37,8 +37,7 @@
     "build:backend:dev": "parcel build --target=backend --no-minify src/backend/index.js",
     "build:frontend": "parcel build --target=frontend src/frontend/index.html",
     "build:frontend:dev": "parcel build --target=frontend --no-minify src/frontend/index.html",
-    "db:migrations": "knex --esm migrate:latest",
-    "db:seeds": "knex --esm seed:run",
+    "db": "mikro-orm",
     "start:backend": "npm run build && node dist/backend/index.js",
     "start": "npm run start:backend",
     "start:dev": "parcel serve src/frontend/index.html"
@@ -160,7 +159,10 @@
     "xmldom": "^0.3.0"
   },
   "devDependencies": {
-    "@parcel/transformer-typescript-tsc": "^2.0.0-alpha.3",
+    "@babel/plugin-proposal-decorators": "^7.12.1",
+    "@babel/preset-typescript": "^7.12.1",
+    "@mikro-orm/cli": "^4.2.3",
+    "@parcel/transformer-typescript-tsc": "^2.0.0-nightly.432",
     "@parcel/validator-typescript": "^2.0.0-alpha.3",
     "@typescript-eslint/eslint-plugin": "^4.5.0",
     "@typescript-eslint/parser": "^4.5.0",
@@ -183,6 +185,7 @@
     "sass": "^1.26.10",
     "supertest": "^4.0.2",
     "supertest-session": "^4.0.0",
+    "ts-node": "^9.0.0",
     "typescript": "^4.0.3"
   },
   "husky": {
@@ -199,6 +202,29 @@
       "./src/frontend/data"
     ]
   },
+  "babel": {
+    "presets": [
+      "@parcel/babel-preset-env",
+      "@babel/preset-typescript"
+    ],
+    "plugins": [
+      [
+        "@babel/plugin-proposal-decorators",
+        {
+          "legacy": true
+        }
+      ],
+      [
+        "@babel/plugin-proposal-class-properties",
+        {
+          "loose": true
+        }
+      ],
+      [
+        "@babel/plugin-transform-react-jsx"
+      ]
+    ]
+  },
   "prettier": {
     "printWidth": 80,
     "tabWidth": 2,
@@ -207,6 +233,13 @@
     "trailingComma": "all",
     "bracketSpacing": true,
     "proseWrap": "always"
+  },
+  "mikro-orm": {
+    "useTsNode": true,
+    "configPaths": [
+      "./src/backend/mikro-orm.config.ts",
+      "./dist/backend/mikro-orm.config.js"
+    ]
   },
   "eslintConfig": {
     "parserOptions": {

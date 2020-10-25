@@ -1,19 +1,17 @@
 import {
-  Collection,
   Entity,
   EntityRepositoryType,
   ManyToMany,
   PrimaryKey,
   Property,
   SerializedPrimaryKey,
-  Unique,
 } from '@mikro-orm/core';
-import GroupModel from '../groups.ts';
-import User from './user.ts';
+import RapidReviewModel from '../rapidReviews.ts';
+import Preprint from './preprint.ts';
 
 @Entity()
-export default class Group {
-  [EntityRepositoryType]: GroupModel;
+export default class RapidReview {
+  [EntityRepositoryType]: RapidReviewModel;
 
   @PrimaryKey()
   _id!: ObjectId;
@@ -31,10 +29,14 @@ export default class Group {
   @Unique()
   name!: string;
 
-  @ManyToMany()
-  members = new Collection<User>(this);
+  @Property()
+  color?: string;
 
-  constructor(name: string) {
+  @ManyToMany(() => Preprint, preprint => preprint.tags)
+  preprints = new Collection<Preprint>(this);
+
+  constructor(name: string, color = '#FF0000') {
     this.name = name;
+    this.color = color;
   }
 }

@@ -8,12 +8,13 @@ import {
   SerializedPrimaryKey,
   Unique,
 } from '@mikro-orm/core';
-import GroupModel from '../groups.ts';
+import CommunityModel from '../communities.ts';
+import Preprint from './preprint.ts';
 import User from './user.ts';
 
 @Entity()
-export default class Group {
-  [EntityRepositoryType]: GroupModel;
+export default class Community {
+  [EntityRepositoryType]: CommunityModel;
 
   @PrimaryKey()
   _id!: ObjectId;
@@ -31,10 +32,21 @@ export default class Group {
   @Unique()
   name!: string;
 
+  @Property()
+  description?: string;
+
+  @Property()
+  logo?: Buffer;
+
   @ManyToMany()
   members = new Collection<User>(this);
 
-  constructor(name: string) {
+  @ManyToMany()
+  preprints = new Collection<Preprint>(this);
+
+  constructor(name: string, description: string, logo: Buffer) {
     this.name = name;
+    this.description = description;
+    this.logo = logo;
   }
 }

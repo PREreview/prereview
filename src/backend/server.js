@@ -13,10 +13,17 @@ import dbWrapper from './db.ts';
 import cloudflareAccess from './middleware/cloudflare.js';
 import AuthController from './controllers/auth.js'; // authentication/logins
 import authWrapper from '../backend/middleware/auth.js'; // authorization/user roles
-import UserModel from './models/users.ts';
-import PreprintModel from './models/preprints.ts';
-import PreprintController from './controllers/preprint.js';
+import CommentModel from './models/comments.ts';
+import CommunityModel from './models/communities.ts';
 import FullReviewModel from './models/fullReviews.ts';
+import GroupModel from './models/groups.ts';
+import PersonaModel from './models/preprints.ts';
+import PreprintModel from './models/preprints.ts';
+import RapidReviewModel from './models/rapidReviews.ts';
+import RequestModel from './models/requests.ts';
+import TagModel from './models/tags.ts';
+import UserModel from './models/users.ts';
+import PreprintController from './controllers/preprint.js';
 import PrereviewController from './controllers/prereview.js';
 
 const __dirname = path.resolve();
@@ -54,10 +61,17 @@ export default function configServer(config) {
 
   // setup API handlers
   const auth = AuthController(userModel, config, authz);
+  const commentModel = CommentModel(db);
+  const communityModel = CommunityModel(db);
+  const fullReviewModel = FullReviewModel(db);
+  const prereviews = PrereviewController(fullReviewModel, authz);
+  const groupModel = GroupModel(db);
+  const personaModel = PersonaModel(db);
   const preprintModel = PreprintModel(db);
   const preprints = PreprintController(preprintModel, authz);
-  const prereviewModel = FullReviewModel(db);
-  const prereviews = PrereviewController(prereviewModel, authz);
+  const rapidReviewModel = RapidReviewModel(db);
+  const requestModel = RequestModel(db);
+  const tagModel = TagModel(db);
 
   const apiV2Router = compose([
     auth.routes(),

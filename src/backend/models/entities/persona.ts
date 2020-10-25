@@ -1,14 +1,18 @@
 import {
-  Collection,
   Entity,
-  ManyToMany,
+  EntityRepositoryType,
   PrimaryKey,
   Property,
+  SerializedPrimaryKey,
   Unique,
 } from '@mikro-orm/core';
+import PersonaModel from '../personas.ts';
+import User from './user.ts';
 
 @Entity()
-export class Persona {
+export default class Persona {
+  [EntityRepositoryType]: PersonaModel;
+
   @PrimaryKey()
   _id!: ObjectId;
 
@@ -25,10 +29,14 @@ export class Persona {
   @Unique()
   name!: string;
 
-  @ManyToMany()
-  members = new Collection<User>(this);
+  @ManyToOne()
+  identity!: User;
 
-  constructor(name: string) {
+  @Property()
+  avatar?: Buffer;
+
+  constructor(name: string, avatar: Buffer) {
     this.name = name;
+    this.avatar = avatar;
   }
 }
