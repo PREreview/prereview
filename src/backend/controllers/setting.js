@@ -17,7 +17,7 @@ export default function controller(settings, thisUser) {
       let setting;
 
       try {
-        setting = await settings.findById(ctx.params.key);
+        setting = await settings.findOne(ctx.params.key);
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse query: ${err}`);
