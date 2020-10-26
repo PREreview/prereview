@@ -38,9 +38,10 @@
     "build:frontend": "parcel build --target=frontend src/frontend/index.html",
     "build:frontend:dev": "parcel build --target=frontend --no-minify src/frontend/index.html",
     "db": "mikro-orm",
-    "start:backend": "npm run build && node dist/backend/index.js",
+    "start:backend": "node dist/backend/index.js",
     "start": "npm run start:backend",
-    "start:dev": "parcel serve src/frontend/index.html"
+    "start:frontend": "parcel serve src/frontend/index.html",
+    "start:dev": "concurrently -p \"[{name}]\" -n \"BACKEND,FRONTEND\" -c \"bgBlue.bold,bgMagenta.bold\" \"npm run start:backend\" \"npm run start:frontend:dev\""
   },
   "backend": "dist/backend/index.js",
   "frontend": "dist/frontend/index.html",
@@ -169,6 +170,8 @@
     "@typescript-eslint/eslint-plugin": "^4.5.0",
     "@typescript-eslint/parser": "^4.5.0",
     "acorn-jsx": "^5.1.0",
+    "babel-plugin-transform-inline-environment-variables": "^0.4.3",
+    "concurrently": "^5.3.0",
     "eslint": "^6.8.0",
     "eslint-config-prettier": "4.3.0",
     "eslint-plugin-import": "^2.20.0",
@@ -224,6 +227,16 @@
       ],
       [
         "@babel/plugin-transform-react-jsx"
+      ],
+      [
+        "transform-inline-environment-variables",
+        {
+          "include": [
+            "npm_package_name",
+            "npm_package_version",
+            "npm_package_description"
+          ]
+        }
       ]
     ]
   },

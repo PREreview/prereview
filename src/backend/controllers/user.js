@@ -1,5 +1,5 @@
 import bcrypt from 'bcryptjs';
-import router from 'koa-joi-router';
+import Router from 'koa-joi-router';
 import moment from 'moment';
 import passport from 'koa-passport';
 import { Strategy as LocalStrategy } from 'passport-local';
@@ -9,7 +9,7 @@ import { BadRequestError } from '../../common/errors.js';
 import _ from 'lodash/core';
 
 const log = getLogger('backend:controllers:user');
-const Joi = router.Joi;
+const Joi = Router.Joi;
 
 function comparePass(userPassword, databasePassword) {
   return bcrypt.compareSync(userPassword, databasePassword);

@@ -17,7 +17,7 @@ import CommentModel from './models/comments.ts';
 import CommunityModel from './models/communities.ts';
 import FullReviewModel from './models/fullReviews.ts';
 import GroupModel from './models/groups.ts';
-import PersonaModel from './models/preprints.ts';
+import PersonaModel from './models/personas.ts';
 import PreprintModel from './models/preprints.ts';
 import RapidReviewModel from './models/rapidReviews.ts';
 import RequestModel from './models/requests.ts';
@@ -74,7 +74,7 @@ export default function configServer(config) {
   const tagModel = TagModel(db);
 
   const apiV2Router = compose([
-    auth.middleware(), 
+    auth.middleware(),
     preprints.middleware(),
     prereviews.middleware(),
   ]);

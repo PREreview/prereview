@@ -66,7 +66,7 @@ export default function controller(prereviews, thisUser) {
     method: 'get',
     path: '/prereviews',
     // pre: async ctx => {
-      // thisUser.can('')
+    // thisUser.can('')
     // },
     validate: {
       query: Joi.object({
@@ -180,7 +180,6 @@ export default function controller(prereviews, thisUser) {
         if (Number.isInteger(prereview)) {
           prereview = await prereviews.findById(ctx.params.id);
         }
-      
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse query: ${err}`);

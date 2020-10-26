@@ -1,19 +1,9 @@
 import router from 'koa-joi-router';
 import moment from 'moment';
 import { getLogger } from '../log.js';
-import { BadRequestError } from '../../common/errors.js';
 
 const Joi = router.Joi;
 const log = getLogger('backend:controllers:group');
-
-async function validate_query(query) {
-  try {
-    const value = await query_schema.validateAsync(query);
-    return value;
-  } catch (err) {
-    throw new BadRequestError('Unable to validate query: ', err);
-  }
-}
 
 /**
  * Initialize the group auth controller
@@ -29,7 +19,7 @@ export default function controller(groups, thisUser) {
     method: 'post',
     path: '/groups',
     // validate: {},
-    pre: async ctx => {
+    pre: async () => {
       thisUser.can('access admin pages');
     },
     handler: async ctx => {
@@ -69,7 +59,7 @@ export default function controller(groups, thisUser) {
         to: Joi.string(),
       }),
     },
-    pre: async ctx => {
+    pre: () => {
       thisUser.can('access admin pages');
     },
     handler: async ctx => {
@@ -77,18 +67,17 @@ export default function controller(groups, thisUser) {
       let res;
 
       try {
-        const query = await validate_query(ctx.query);
         let from, to;
-        if (query.from) {
-          const timestamp = moment(query.from);
+        if (ctx.query.from) {
+          const timestamp = moment(ctx.query.from);
           if (timestamp.isValid()) {
             log.error('HTTP 400 Error: Invalid timestamp value.');
             ctx.throw(400, 'Invalid timestamp value.');
           }
           from = timestamp.toISOString();
         }
-        if (query.to) {
-          const timestamp = moment(query.to);
+        if (ctx.query.to) {
+          const timestamp = moment(ctx.query.to);
           if (timestamp.isValid()) {
             log.error('HTTP 400 Error: Invalid timestamp value.');
             ctx.throw(400, 'Invalid timestamp value.');
@@ -96,10 +85,10 @@ export default function controller(groups, thisUser) {
           to = timestamp.toISOString();
         }
         res = await groups.find({
-          start: query.start,
-          end: query.end,
-          asc: query.asc,
-          sort_by: query.sort_by,
+          start: ctx.query.start,
+          end: ctx.query.end,
+          asc: ctx.query.asc,
+          sort_by: ctx.query.sort_by,
           from: from,
           to: to,
         });
@@ -118,7 +107,7 @@ export default function controller(groups, thisUser) {
   groupRoutes.route({
     method: 'get',
     path: '/groups/:id',
-    pre: async ctx => {
+    pre: async () => {
       thisUser.can('access private pages');
     },
     handler: async ctx => {
@@ -147,7 +136,7 @@ export default function controller(groups, thisUser) {
   groupRoutes.route({
     method: 'put',
     path: '/groups/:id',
-    pre: async ctx => {
+    pre: async () => {
       thisUser.can('access admin pages');
     },
     handler: async ctx => {
@@ -181,7 +170,7 @@ export default function controller(groups, thisUser) {
   groupRoutes.route({
     method: 'delete',
     path: '/groups/:id',
-    pre: async ctx => {
+    pre: async () => {
       thisUser.can('access admin pages');
     },
     handler: async ctx => {
@@ -210,7 +199,7 @@ export default function controller(groups, thisUser) {
   groupRoutes.route({
     method: 'get',
     path: '/groups/:id/members',
-    pre: async ctx => {
+    pre: async () => {
       thisUser.can('access admin pages');
     },
     handler: async ctx => {
@@ -218,12 +207,11 @@ export default function controller(groups, thisUser) {
       let group;
 
       try {
-        const query = await validate_query(ctx.query);
         group = await groups.members({
           gid: ctx.params.id,
-          start: query.start,
-          end: query.end,
-          asc: query.asc,
+          start: ctx.query.start,
+          end: ctx.query.end,
+          asc: ctx.query.asc,
         });
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
@@ -245,7 +233,7 @@ export default function controller(groups, thisUser) {
   groupRoutes.route({
     method: 'put',
     path: '/groups/:id/members/:uid',
-    pre: async ctx => {
+    pre: async () => {
       thisUser.can('access admin pages');
     },
     handler: async ctx => {
@@ -281,7 +269,7 @@ export default function controller(groups, thisUser) {
   groupRoutes.route({
     method: 'delete',
     path: '/groups/:id/members/:uid',
-    pre: async ctx => {
+    pre: async () => {
       thisUser.can('access admin pages');
     },
     handler: async ctx => {

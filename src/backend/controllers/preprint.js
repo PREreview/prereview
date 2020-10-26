@@ -1,5 +1,5 @@
 import router from 'koa-joi-router';
-// import moment from 'moment';
+import moment from 'moment';
 import { getLogger } from '../log.js';
 // import { BadRequestError } from '../../common/errors.js';
 import resolve from '../utils/resolve.js';
@@ -15,7 +15,7 @@ export default function controller(preprints, thisUser) {
     method: 'get',
     path: '/resolve',
     handler: async ctx => {
-      const { identifier, url } = ctx.query;
+      const { identifier } = ctx.query;
       log.debug(`Resolving preprint with ID: ${identifier}`);
       const data = await resolve(identifier);
       ctx.body = data;

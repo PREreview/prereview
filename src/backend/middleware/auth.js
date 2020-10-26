@@ -8,8 +8,6 @@ import { getLogger } from '../log.js';
  * @param {funtion} next - continue to next middleware
  */
 
-const log = getLogger('backend:middleware:auth');
-
 const authWrapper = () => {
   const roles = new Roles();
 

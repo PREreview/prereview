@@ -64,8 +64,8 @@ export default async function resolve(
     if (strategy === 'all' || strategy === 'apiOnly') {
       // try crossref and openAIRE
       const results = await Promise.all([
-        resolveCrossRefDoi(doi, baseUrlCrossref).catch(err => null),
-        resolveOpenAireDoi(doi, baseUrlOpenAire).catch(err => null),
+        resolveCrossRefDoi(doi, baseUrlCrossref).catch(() => null),
+        resolveOpenAireDoi(doi, baseUrlOpenAire).catch(() => null),
       ]);
 
       // keep the one with the most metadata
