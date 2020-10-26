@@ -31,18 +31,24 @@ export default function controller(users, config, thisUser) {
       const user = await users.findById(id);
       done(null, user);
     } catch (err) {
-      log.debug()
+      log.debug();
       done(err);
     }
   });
 
   // defining ORCID auth callback
   // see https://members.orcid.org/api/oauth/refresh-tokens
-  const verifyCallback = async (req, accessToken, refreshToken, params, profile, done) => {
-
-     if (req && req.session && req.session.cookie && params.expires_in) {
+  const verifyCallback = async (
+    req,
+    accessToken,
+    refreshToken,
+    params,
+    profile,
+    done,
+  ) => {
+    if (req && req.session && req.session.cookie && params.expires_in) {
       req.session.cookie.expires = new Date(
-        Date.now() + params.expires_in * 1000
+        Date.now() + params.expires_in * 1000,
       );
     }
 
@@ -50,16 +56,16 @@ export default function controller(users, config, thisUser) {
       const user = await users.persistAndFlush({ orcid: params.orcid });
       log.debug('passport.use, username: ', user);
       if (user) {
-        log.debug('Authenticated user!')
+        log.debug('Authenticated user!');
         done(null, user);
       } else {
         done(null, false);
       }
     } catch (err) {
-      log.debug("Error authenticating: ", err)
+      log.debug('Error authenticating: ', err);
       done(err);
     }
-  }
+  };
 
   /**
    * Initialize passport strategy
@@ -69,41 +75,40 @@ export default function controller(users, config, thisUser) {
    * @param {function} done - 'Done' callback
    */
 
-   let strategy;
-   const callbackURL = `${config.appRootUrl ||
+  let strategy;
+  const callbackURL = `${config.appRootUrl ||
     process.env.APP_ROOT_URL ||
     'http://127.0.0.1:3000'}/api/v2/auth/orcid/callback`;
 
-   if (process.env.NODE_ENV === 'production') {
-     strategy = new OrcidStrategy(
-       {
+  if (process.env.NODE_ENV === 'production') {
+    strategy = new OrcidStrategy(
+      {
         sandbox: false,
         state: true,
         clientID: config.orcidClientId || process.env.ORCID_CLIENT_ID,
         clientSecret:
           config.orcidClientSecret || process.env.ORCID_CLIENT_SECRET,
         callbackURL,
-        passReqToCallback: true
-       },
-       verifyCallback
-     );
-   } else {
-     strategy = new MockStrategy('orcid', callbackURL, verifyCallback)
-   }
+        passReqToCallback: true,
+      },
+      verifyCallback,
+    );
+  } else {
+    strategy = new MockStrategy('orcid', callbackURL, verifyCallback);
+  }
 
-   passport.use(strategy)
+  passport.use(strategy);
 
-   // start ORCID authentication
-  authRouter.get('auth/orcid/login', passport.authenticate('orcid'))
+  // start ORCID authentication
+  authRouter.get('auth/orcid/login', passport.authenticate('orcid'));
 
-   //finish ORCID authentication
+  //finish ORCID authentication
   authRouter.route({
     method: 'get',
     path: 'auth/orcid/callback',
     handler: async ctx => {
-      log.debug('Finishing authenticating with ORCID...')
+      log.debug('Finishing authenticating with ORCID...');
       return passport.authenticate('orcid', (err, user) => {
-
         if (!user) {
           ctx.body = { success: false };
           ctx.throw(401, 'Authentication failed.');
@@ -124,13 +129,13 @@ export default function controller(users, config, thisUser) {
         }
       })(ctx);
     },
-  })
+  });
 
-   // TODO: figure out non-ORCID login/authentication
+  // TODO: figure out non-ORCID login/authentication
 
   // authRouter.route({
   //   method: 'post',
-  //   path: '/login', 
+  //   path: '/login',
   //   handler: async ctx => {
   //     return passport.authenticate('orcid', (err, user) => {
   //       if (!user) {
@@ -158,18 +163,18 @@ export default function controller(users, config, thisUser) {
     method: 'get',
     path: '/logout',
     handler: async ctx => {
-      log.debug("Logging out...")
+      log.debug('Logging out...');
       if (ctx.isAuthenticated()) {
-        ctx.logout()
-        ctx.session = null 
+        ctx.logout();
+        ctx.session = null;
         ctx.cookies.set('PRE_user', '');
-        ctx.redirect('/')
+        ctx.redirect('/');
       } else {
-        ctx.body = { success: false }
-        ctx.throw(401, 'Logout failed')
+        ctx.body = { success: false };
+        ctx.throw(401, 'Logout failed');
       }
-    }
-  })
+    },
+  });
 
   /**
    * Authentication required
@@ -185,5 +190,5 @@ export default function controller(users, config, thisUser) {
     },
   );
 
-   return authRouter
+  return authRouter;
 }

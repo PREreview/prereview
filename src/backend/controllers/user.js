@@ -32,49 +32,49 @@ const query_schema = Joi.object({
  * @returns {Object} Auth controller Koa router
  */
 export default function controller(users, thisUser) {
-  const userRouter = router()
+  const userRouter = router();
 
   userRouter.route({
     method: 'get',
-    path: '/users', 
+    path: '/users',
     pre: thisUser.can('access private pages'),
     // validate: {
     //   query: query_schema
     // },
     handler: async ctx => {
       log.debug(`Retrieving users.`);
-      const users = await users.findAll()
+      const users = await users.findAll();
       ctx.body = {
-        data: users
-      }
-    }
+        data: users,
+      };
+    },
   });
 
   userRouter.route({
     method: 'get',
-    path: '/users/:id', 
+    path: '/users/:id',
     pre: thisUser.can('access private pages'),
     validate: {
       params: Joi.object({
-        id: Joi.integer()
+        id: Joi.integer(),
       }),
       continueOnError: false,
       failure: 400,
     },
     handler: async ctx => {
       log.debug(`Retrieving user ${ctx.params.id}.`);
-      
-      const user = await users.findOne(ctx.params.id)
-      
+
+      const user = await users.findOne(ctx.params.id);
+
       if (user) {
-        ctx.status = 200
+        ctx.status = 200;
         ctx.body = {
-          data: user
-        }
+          data: user,
+        };
       } else {
-        ctx.throw(404, `That user with ID ${ctx.params.id} does not exist.`)
+        ctx.throw(404, `That user with ID ${ctx.params.id} does not exist.`);
       }
-    }
+    },
   });
 
   userRouter.route({
@@ -87,24 +87,24 @@ export default function controller(users, thisUser) {
       }),
       type: 'json',
       params: Joi.object({
-        id: Joi.integer()
+        id: Joi.integer(),
       }),
       continueOnError: false,
-      false: 400
+      false: 400,
     },
     pre: thisUser.can('access private pages'), // TODO: can edit self only no?
     handler: async ctx => {
       log.debug(`Updating user ${ctx.params.id}.`);
-      
+
       const user = await users.findOne(ctx.params.id);
 
       if (!user) {
-        ctx.throw(404, `That user with ID ${ctx.params.id} does not exist.`)
+        ctx.throw(404, `That user with ID ${ctx.params.id} does not exist.`);
       }
 
       users.assign(user, ctx.request.body);
       await users.persistAndFlush(author);
-    }
+    },
   });
 
   userRouter.route({
@@ -112,16 +112,16 @@ export default function controller(users, thisUser) {
     path: '/users/:id',
     validate: {
       params: Joi.object({
-        id: Joi.integer()
-      })
+        id: Joi.integer(),
+      }),
     },
     pre: thisUser.can('access admin pages'), // TODO: can users delete their own account?
     handler: async ctx => {
       log.debug(`Deleting user ${ctx.params.id}.`);
 
-      const user = users.remove(ctx.params.id)
-      await users.persistAndFlush(user)
-    }
+      const user = users.remove(ctx.params.id);
+      await users.persistAndFlush(user);
+    },
   });
 
   return userRouter;

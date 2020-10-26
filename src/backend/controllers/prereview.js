@@ -1,4 +1,3 @@
-import { text } from 'figlet';
 import router from 'koa-joi-router';
 import { getLogger } from '../log.js';
 
@@ -6,17 +5,17 @@ const log = getLogger('backend:controllers:prereview');
 const Joi = router.Joi;
 
 const querySchema = Joi.object({
-        start: Joi.number()
-          .integer()
-          .greater(-1),
-        end: Joi.number()
-          .integer()
-          .positive(),
-        asc: Joi.boolean(),
-        sort_by: Joi.string(),
-        from: Joi.string(),
-        to: Joi.string(),
-      }),
+  start: Joi.number()
+    .integer()
+    .greater(-1),
+  end: Joi.number()
+    .integer()
+    .positive(),
+  asc: Joi.boolean(),
+  sort_by: Joi.string(),
+  from: Joi.string(),
+  to: Joi.string(),
+});
 
 // eslint-disable-next-line no-unused-vars
 export default function controller(prereviews, thisUser) {
@@ -50,18 +49,17 @@ export default function controller(prereviews, thisUser) {
       },
     },
     handler: async ctx => {
-      log.debug('Posting prereview...')
+      log.debug('Posting prereview...');
 
       try {
         const prereview = prereviews.create(ctx.request.body);
-        await prereviews.persistAndFlush(prereview)
+        await prereviews.persistAndFlush(prereview);
       } catch (error) {
-        return ctx.throw(400, { message: error.message })
+        return ctx.throw(400, { message: error.message });
       }
-      
+
       ctx.response.status = 201;
     },
-
   });
 
   prereviewRouter.route({
@@ -73,20 +71,19 @@ export default function controller(prereviews, thisUser) {
     handler: async ctx => {
       log.debug(`Retrieving prereviews.`);
 
-     try {
-        const allPreprints = await preprints.findAll()
-        if (allPreprints) {
+      try {
+        const allPrereviews = await prereviews.findAll();
+        if (allPrereviews) {
           ctx.response.body = {
             statusCode: 200,
             status: 'ok',
-            data: allPreprints
-          }
+            data: allPrereviews,
+          };
         }
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse query: ${err}`);
       }
-    
     },
   });
 
@@ -147,7 +144,7 @@ export default function controller(prereviews, thisUser) {
   //       if (Number.isInteger(prereview)) {
   //         prereview = await prereviews.findById(ctx.params.id);
   //       }
-      
+
   //     } catch (err) {
   //       log.error('HTTP 400 Error: ', err);
   //       ctx.throw(400, `Failed to parse query: ${err}`);
@@ -165,8 +162,7 @@ export default function controller(prereviews, thisUser) {
 
       try {
         prereview = prereviews.findOne(ctx.params.id);
-        await prereviews.removeAndFlush(prereview)
-        
+        await prereviews.removeAndFlush(prereview);
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse query: ${err}`);

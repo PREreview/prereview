@@ -75,10 +75,10 @@ export default function configServer(config) {
   const users = UsersController(userModel, authz);
 
   const apiV2Router = compose([
-    auth.middleware(), 
+    auth.middleware(),
     preprints.middleware(),
     prereviews.middleware(),
-    users.middleware()
+    users.middleware(),
   ]);
 
   // Add here only development middlewares

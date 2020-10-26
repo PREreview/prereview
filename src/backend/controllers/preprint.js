@@ -6,17 +6,17 @@ const log = getLogger('backend:controllers:preprint');
 const Joi = router.Joi;
 
 const querySchema = Joi.object({
-        start: Joi.number()
-          .integer()
-          .greater(-1),
-        end: Joi.number()
-          .integer()
-          .positive(),
-        asc: Joi.boolean(),
-        sort_by: Joi.string(),
-        from: Joi.string(),
-        to: Joi.string(),
-      })
+  start: Joi.number()
+    .integer()
+    .greater(-1),
+  end: Joi.number()
+    .integer()
+    .positive(),
+  asc: Joi.boolean(),
+  sort_by: Joi.string(),
+  from: Joi.string(),
+  to: Joi.string(),
+});
 
 // eslint-disable-next-line no-unused-vars
 export default function controller(preprints, thisUser) {
@@ -26,7 +26,7 @@ export default function controller(preprints, thisUser) {
     method: 'get',
     path: '/resolve',
     handler: async ctx => {
-      const { identifier, url } = ctx.query;
+      const { identifier } = ctx.query;
       log.debug(`Resolving preprint with ID: ${identifier}`);
       const data = await resolve(identifier);
       ctx.body = data;
@@ -36,12 +36,10 @@ export default function controller(preprints, thisUser) {
   preprintRoutes.route({
     method: 'post',
     path: '/preprints',
-    // validate: {
-    //   body: {
-
-    //   },
-    //   type: 'json',
-    // },
+    validate: {
+      body: {},
+      type: 'json',
+    },
     pre: thisUser.can('access private pages'),
     handler: async ctx => {
       log.debug('Adding new preprint.');
@@ -49,7 +47,7 @@ export default function controller(preprints, thisUser) {
 
       try {
         preprint = preprints.create(ctx.request.body);
-        await preprints.persistAndFlush(preprint)
+        await preprints.persistAndFlush(preprint);
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse preprint schema: ${err}`);
@@ -60,20 +58,21 @@ export default function controller(preprints, thisUser) {
   preprintRoutes.route({
     method: 'get',
     path: '/preprints',
-    // validate: {
-    //   body: {},
-    //   type: 'json',
+    validate: {
+      query: querySchema,
+      body: {},
+      type: 'json',
     handler: async ctx => {
       log.debug(`Retrieving preprints.`);
 
       try {
-        const allPreprints = await preprints.findAll()
+        const allPreprints = await preprints.findAll();
         if (allPreprints) {
           ctx.response.body = {
             statusCode: 200,
             status: 'ok',
-            data: allPreprints
-          }
+            data: allPreprints,
+          };
         }
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
@@ -86,9 +85,6 @@ export default function controller(preprints, thisUser) {
     method: 'get',
     path: '/preprints/:id',
     validate: {},
-    // pre: async ctx => {
-    //   thisUser.can('')
-    // },
     handler: async ctx => {
       log.debug(`Retrieving preprint ${ctx.params.id}.`);
       let preprint;
@@ -128,8 +124,10 @@ export default function controller(preprints, thisUser) {
       let preprint;
 
       try {
-        preprint = await preprints.findOne(ctx.params.id, ctx.request.body.data);
-
+        preprint = await preprints.findOne(
+          ctx.params.id,
+          ctx.request.body.data,
+        );
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse query: ${err}`);
@@ -155,14 +153,14 @@ export default function controller(preprints, thisUser) {
   preprintRoutes.route({
     method: 'delete',
     path: '/preprints/:id',
-    pre: async ctx => thisUser.can('access admin pages'),
+    pre: thisUser.can('access admin pages'),
     handler: async ctx => {
       log.debug(`Deleting preprint ${ctx.params.id}.`);
       let preprint;
 
       try {
         preprint = preprints.findOne(ctx.params.id);
-        await preprints.removeAndFlush(preprint)
+        await preprints.removeAndFlush(preprint);
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse query: ${err}`);
