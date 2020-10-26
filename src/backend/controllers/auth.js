@@ -6,7 +6,7 @@ import { getLogger } from '../log.js';
 
 const log = getLogger('backend:controllers:auth');
 
-export default function controller(users, config, thisUser) {
+export default function controller(users, config) {
   const authRouter = router();
   log.debug('Authenticating user...');
 
