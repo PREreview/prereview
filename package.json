@@ -28,7 +28,7 @@
     "/dist"
   ],
   "scripts": {
-    "lint": "eslint --ignore-path .gitignore --fix ./src",
+    "lint": "eslint --ignore-path .gitignore --fix ./src/backend",
     "test": "jest --coverage --forceExit",
     "doc": "jsdoc -d ./dist/doc/ -r ./src/backend ./src/frontend",
     "build": "rimraf dist && npm run build:backend && npm run build:frontend",
