@@ -5,18 +5,18 @@ import resolve from '../utils/resolve.js';
 const log = getLogger('backend:controllers:preprint');
 const Joi = router.Joi;
 
-const querySchema = Joi.object({
-  start: Joi.number()
-    .integer()
-    .greater(-1),
-  end: Joi.number()
-    .integer()
-    .positive(),
-  asc: Joi.boolean(),
-  sort_by: Joi.string(),
-  from: Joi.string(),
-  to: Joi.string(),
-});
+// const querySchema = Joi.object({
+//   start: Joi.number()
+//     .integer()
+//     .greater(-1),
+//   end: Joi.number()
+//     .integer()
+//     .positive(),
+//   asc: Joi.boolean(),
+//   sort_by: Joi.string(),
+//   from: Joi.string(),
+//   to: Joi.string(),
+// });
 
 // eslint-disable-next-line no-unused-vars
 export default function controller(preprints, thisUser) {
@@ -37,7 +37,13 @@ export default function controller(preprints, thisUser) {
     method: 'post',
     path: '/preprints',
     validate: {
-      body: {},
+      body: {
+        doi: Joi.string(),
+        title: Joi.string(),
+        server: Joi.string(),
+        url: Joi.string(),
+        pdfUrl: Joi.string(),
+      }, // #TODO
       type: 'json',
     },
     pre: thisUser.can('access private pages'),
@@ -58,10 +64,6 @@ export default function controller(preprints, thisUser) {
   preprintRoutes.route({
     method: 'get',
     path: '/preprints',
-    validate: {
-      query: querySchema,
-      body: {},
-      type: 'json',
     handler: async ctx => {
       log.debug(`Retrieving preprints.`);
 
@@ -84,7 +86,6 @@ export default function controller(preprints, thisUser) {
   preprintRoutes.route({
     method: 'get',
     path: '/preprints/:id',
-    validate: {},
     handler: async ctx => {
       log.debug(`Retrieving preprint ${ctx.params.id}.`);
       let preprint;
@@ -116,9 +117,7 @@ export default function controller(preprints, thisUser) {
   preprintRoutes.route({
     method: 'put',
     path: '/preprints/:id',
-    // pre: async ctx => {
-    //   thisUser.can('')
-    // },
+    pre: thisUser.can('access private pages'),
     handler: async ctx => {
       log.debug(`Updating preprint ${ctx.params.id}.`);
       let preprint;

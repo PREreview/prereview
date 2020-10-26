@@ -4,18 +4,18 @@ import { getLogger } from '../log.js';
 const log = getLogger('backend:controllers:prereview');
 const Joi = router.Joi;
 
-const querySchema = Joi.object({
-  start: Joi.number()
-    .integer()
-    .greater(-1),
-  end: Joi.number()
-    .integer()
-    .positive(),
-  asc: Joi.boolean(),
-  sort_by: Joi.string(),
-  from: Joi.string(),
-  to: Joi.string(),
-});
+// const querySchema = Joi.object({
+//   start: Joi.number()
+//     .integer()
+//     .greater(-1),
+//   end: Joi.number()
+//     .integer()
+//     .positive(),
+//   asc: Joi.boolean(),
+//   sort_by: Joi.string(),
+//   from: Joi.string(),
+//   to: Joi.string(),
+// });
 
 // eslint-disable-next-line no-unused-vars
 export default function controller(prereviews, thisUser) {
@@ -29,10 +29,6 @@ export default function controller(prereviews, thisUser) {
       return next();
     },
     validate: {
-      // header: {},
-      // query: {},
-      // params: {},
-      //
       body: {
         doi: Joi.string().required(),
         authors: Joi.array(),
@@ -41,12 +37,12 @@ export default function controller(prereviews, thisUser) {
       },
       type: 'json',
       failure: 400,
-      output: {
-        201: {
-          // could even be a code range!
-          body: {},
-        },
-      },
+      // output: {
+      //   201: {
+      //     // could even be a code range!
+      //     body: {},
+      //   },
+      // },
     },
     handler: async ctx => {
       log.debug('Posting prereview...');
@@ -65,9 +61,6 @@ export default function controller(prereviews, thisUser) {
   prereviewRouter.route({
     method: 'get',
     path: '/prereviews',
-    validate: {
-      // query: querySchema,
-    },
     handler: async ctx => {
       log.debug(`Retrieving prereviews.`);
 
@@ -90,12 +83,6 @@ export default function controller(prereviews, thisUser) {
   prereviewRouter.route({
     method: 'get',
     path: '/prereviews/:id',
-    validate: {
-      // actually not sure if this is needed
-    },
-    // pre: async ctx => {
-    // thisUser.can('')
-    // },
     handler: async ctx => {
       log.debug(`Retrieving prereview ${ctx.params.id}.`);
       let prereview;
@@ -107,8 +94,8 @@ export default function controller(prereviews, thisUser) {
         ctx.throw(400, `Failed to parse query: ${err}`);
       }
 
-      if (preprint.length) {
-        ctx.response.body = { statusCode: 200, status: 'ok', data: preprint };
+      if (prereview.length) {
+        ctx.response.body = { statusCode: 200, status: 'ok', data: prereview };
         ctx.response.status = 200;
       } else {
         log.error(
@@ -124,6 +111,7 @@ export default function controller(prereviews, thisUser) {
     },
   });
 
+  // TODO
   // prereviewRouter.route({
   //   method: 'put',
   //   path: '/prereviews/:id',

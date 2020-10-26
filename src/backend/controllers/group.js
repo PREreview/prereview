@@ -5,18 +5,18 @@ import { getLogger } from '../log.js';
 const Joi = router.Joi;
 const log = getLogger('backend:controllers:group');
 
-const querySchema = Joi.object({
-  start: Joi.number()
-    .integer()
-    .greater(-1),
-  end: Joi.number()
-    .integer()
-    .positive(),
-  asc: Joi.boolean(),
-  sort_by: Joi.string(),
-  from: Joi.string(),
-  to: Joi.string(),
-});
+// const querySchema = Joi.object({
+//   start: Joi.number()
+//     .integer()
+//     .greater(-1),
+//   end: Joi.number()
+//     .integer()
+//     .positive(),
+//   asc: Joi.boolean(),
+//   sort_by: Joi.string(),
+//   from: Joi.string(),
+//   to: Joi.string(),
+// });
 
 /**
  * Initialize the group auth controller
@@ -33,7 +33,9 @@ export default function controller(groups, thisUser) {
     method: 'post',
     path: '/groups',
     validate: {
-      body: {},
+      body: {
+        name: Joi.string(),
+      },
       type: 'json',
     },
     pre: thisUser.can('access admin pages'),
@@ -55,9 +57,6 @@ export default function controller(groups, thisUser) {
   groupRoutes.route({
     method: 'get',
     path: '/groups',
-    validate: {
-      query: querySchema,
-    },
     pre: thisUser.can('access admin pages'),
     handler: async ctx => {
       log.debug(`Retrieving groups.`);
@@ -132,6 +131,12 @@ export default function controller(groups, thisUser) {
   groupRoutes.route({
     method: 'put',
     path: '/groups/:id',
+    validate: {
+      body: {
+        name: Joi.string(), // possible #FIXME
+      },
+      type: 'json',
+    },
     pre: thisUser.can('access admin pages'),
     handler: async ctx => {
       log.debug(`Updating group ${ctx.params.id}.`);
@@ -193,9 +198,6 @@ export default function controller(groups, thisUser) {
   groupRoutes.route({
     method: 'get',
     path: '/groups/:id/members',
-    validate: {
-      query: querySchema,
-    },
     pre: thisUser.can('access admin pages'),
     handler: async ctx => {
       log.debug(`Retrieving members of group ${ctx.params.id}.`);
@@ -229,6 +231,18 @@ export default function controller(groups, thisUser) {
   groupRoutes.route({
     method: 'put',
     path: '/groups/:id/members/:uid',
+    validate: {
+      body: {
+        username: Joi.string(),
+        password: Joi.string(),
+        id: Joi.number(),
+        firstName: Joi.string(),
+        lastName: Joi.string(),
+        email: Joi.string(),
+        role: Joi.number(),
+      },
+      type: 'json',
+    },
     pre: thisUser.can('access admin pages'),
     handler: async ctx => {
       log.debug(`Adding user ${ctx.params.uid} to group ${ctx.params.id}.`);
