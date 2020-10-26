@@ -38,11 +38,7 @@ export default function controller(groups, thisUser) {
 
       try {
         group = await groups.create(ctx.request.body.data);
-
-        // workaround for sqlite
-        if (Number.isInteger(group)) {
-          group = await groups.findById(group);
-        }
+        
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse group schema: ${err}`);

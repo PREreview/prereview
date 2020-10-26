@@ -48,7 +48,7 @@ export default function controller(preprints, thisUser) {
       let preprint;
 
       try {
-        preprint = preprints.create(ctx.request.body.data);
+        preprint = preprints.create(ctx.request.body);
         await preprints.persistAndFlush(preprint)
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
@@ -65,19 +65,20 @@ export default function controller(preprints, thisUser) {
     //   type: 'json',
     handler: async ctx => {
       log.debug(`Retrieving preprints.`);
-    
-      const allPreprints = preprints.findAll()
 
-      if (allPreprints) {
-        ctx.body = {
-          status = 200,
-          data: allPreprints
+      try {
+        const allPreprints = await preprints.findAll()
+        if (allPreprints) {
+          ctx.response.body = {
+            statusCode: 200,
+            status: 'ok',
+            data: allPreprints
+          }
         }
-      } else {
+      } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse query: ${err}`);
       }
-    
     },
   });
 
@@ -93,7 +94,7 @@ export default function controller(preprints, thisUser) {
       let preprint;
 
       try {
-        preprint = await preprints.findById(ctx.params.id);
+        preprint = await preprints.findOne(ctx.params.id);
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse query: ${err}`);
@@ -127,12 +128,8 @@ export default function controller(preprints, thisUser) {
       let preprint;
 
       try {
-        preprint = await preprints.update(ctx.params.id, ctx.request.body.data);
+        preprint = await preprints.findOne(ctx.params.id, ctx.request.body.data);
 
-        // workaround for sqlite
-        if (Number.isInteger(preprint)) {
-          preprint = await preprints.findById(ctx.params.id);
-        }
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse query: ${err}`);
@@ -158,15 +155,14 @@ export default function controller(preprints, thisUser) {
   preprintRoutes.route({
     method: 'delete',
     path: '/preprints/:id',
-    // pre: async ctx => {
-    // thisUser.can('')
-    // },
+    pre: async ctx => thisUser.can('access admin pages'),
     handler: async ctx => {
       log.debug(`Deleting preprint ${ctx.params.id}.`);
       let preprint;
 
       try {
-        preprint = await preprints.delete(ctx.params.id);
+        preprint = preprints.findOne(ctx.params.id);
+        await preprints.removeAndFlush(preprint)
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse query: ${err}`);
