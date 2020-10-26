@@ -108,3 +108,6 @@ dist
 
 # SQLite DB
 dev.sqlite3
+
+# Junk
+.DS_Store
