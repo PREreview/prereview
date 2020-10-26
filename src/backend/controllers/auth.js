@@ -53,8 +53,7 @@ export default function controller(users, config, thisUser) {
       );
     }
     try {
-      // prolly depends on how the user model would look
-      const user = await users.findOrCreateUser({ orcid: params.orcid });
+      const user = await users.persistAndFlush({ orcid: params.orcid });
       log.debug('passport.use, username: ', user);
       if (user) {
         log.debug('Authenticated user!');

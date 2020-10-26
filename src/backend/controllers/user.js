@@ -1,8 +1,6 @@
 import router from 'koa-joi-router';
 import moment from 'moment';
-
 import { getLogger } from '../log.js';
-import { BadRequestError } from '../../common/errors.js';
 import _ from 'lodash/core';
 
 const log = getLogger('backend:controllers:user');
@@ -40,13 +38,15 @@ export default function controller(users, thisUser) {
     method: 'get',
     path: '/users', 
     pre: thisUser.can('access private pages'),
-    validate: {
-      query: query_schema
-    },
+    // validate: {
+    //   query: query_schema
+    // },
     handler: async ctx => {
       log.debug(`Retrieving users.`);
-      // mikro orm magic here 
-
+      const users = await users.findAll()
+      ctx.body = {
+        data: users
+      }
     }
   });
 
@@ -57,35 +57,70 @@ export default function controller(users, thisUser) {
     validate: {
       params: Joi.object({
         id: Joi.integer()
-      })
+      }),
+      continueOnError: false,
+      failure: 400,
     },
     handler: async ctx => {
       log.debug(`Retrieving user ${ctx.params.id}.`);
-      // mikro orm magic
+      
+      const user = await users.findOne(ctx.params.id)
+      
+      if (user) {
+        ctx.status = 200
+        ctx.body = {
+          data: user
+        }
+      } else {
+        ctx.throw(404, `That user with ID ${ctx.params.id} does not exist.`)
+      }
+    }
   });
 
   userRouter.route({
     method: 'put',
     path: '/users/:id',
     validate: {
-      body: {},
+      body: Joi.object({
+        name: Joi.string(),
+        email: Joi.string(),
+      }),
       type: 'json',
+      params: Joi.object({
+        id: Joi.integer()
+      }),
+      continueOnError: false,
+      false: 400
     },
     pre: thisUser.can('access private pages'), // TODO: can edit self only no?
     handler: async ctx => {
       log.debug(`Updating user ${ctx.params.id}.`);
-      let user;
+      
+      const user = await users.findOne(ctx.params.id);
 
-    
+      if (!user) {
+        ctx.throw(404, `That user with ID ${ctx.params.id} does not exist.`)
+      }
+
+      users.assign(user, ctx.request.body);
+      await users.persistAndFlush(author);
     }
   });
 
   userRouter.route({
     method: 'delete',
-    path: '/users/:id', 
+    path: '/users/:id',
+    validate: {
+      params: Joi.object({
+        id: Joi.integer()
+      })
+    },
     pre: thisUser.can('access admin pages'), // TODO: can users delete their own account?
     handler: async ctx => {
       log.debug(`Deleting user ${ctx.params.id}.`);
+
+      const user = users.remove(ctx.params.id)
+      await users.persistAndFlush(user)
     }
   });
 
