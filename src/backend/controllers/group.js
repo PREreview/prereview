@@ -65,16 +65,16 @@ export default function controller(groups, thisUser) {
       try {
         const query = ctx.query;
         let from, to;
-        if (query.from) {
-          const timestamp = moment(query.from);
+        if (ctx.query.from) {
+          const timestamp = moment(ctx.query.from);
           if (timestamp.isValid()) {
             log.error('HTTP 400 Error: Invalid timestamp value.');
             ctx.throw(400, 'Invalid timestamp value.');
           }
           from = timestamp.toISOString();
         }
-        if (query.to) {
-          const timestamp = moment(query.to);
+        if (ctx.query.to) {
+          const timestamp = moment(ctx.query.to);
           if (timestamp.isValid()) {
             log.error('HTTP 400 Error: Invalid timestamp value.');
             ctx.throw(400, 'Invalid timestamp value.');

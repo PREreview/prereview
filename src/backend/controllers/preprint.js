@@ -117,7 +117,7 @@ export default function controller(preprints, thisUser) {
   preprintRoutes.route({
     method: 'put',
     path: '/preprints/:id',
-    pre: thisUser.can('access private pages'),
+    pre: thisUser.can('access admin pages'),
     handler: async ctx => {
       log.debug(`Updating preprint ${ctx.params.id}.`);
       let preprint;

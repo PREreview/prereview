@@ -17,12 +17,14 @@ import CommentModel from './models/comments.ts';
 import CommunityModel from './models/communities.ts';
 import FullReviewModel from './models/fullReviews.ts';
 import GroupModel from './models/groups.ts';
-import PersonaModel from './models/preprints.ts';
+import PersonaModel from './models/personas.ts';
 import PreprintModel from './models/preprints.ts';
 import RapidReviewModel from './models/rapidReviews.ts';
 import RequestModel from './models/requests.ts';
 import TagModel from './models/tags.ts';
 import UserModel from './models/users.ts';
+import GroupController from './controllers/group.js';
+import UserController from './controllers/user.js';
 import PreprintController from './controllers/preprint.js';
 import PrereviewController from './controllers/prereview.js';
 
@@ -55,8 +57,9 @@ export default function configServer(config) {
   server.use(dbMiddleware);
 
   // Setup auth handlers
-  const userModel = new UserModel(db);
-  const authz = authWrapper(); // authorization, not authentication
+  const userModel = UserModel(db);
+  const groupModel = GroupModel(db);
+  const authz = authWrapper(groupModel, config, authz); // authorization, not authentication
   server.use(authz.middleware());
 
   // setup API handlers
@@ -64,18 +67,19 @@ export default function configServer(config) {
   const commentModel = CommentModel(db);
   const communityModel = CommunityModel(db);
   const fullReviewModel = FullReviewModel(db);
+  const groups = GroupController(groupModel, authz);
   const prereviews = PrereviewController(fullReviewModel, authz);
-  const groupModel = GroupModel(db);
   const personaModel = PersonaModel(db);
   const preprintModel = PreprintModel(db);
   const preprints = PreprintController(preprintModel, authz);
   const rapidReviewModel = RapidReviewModel(db);
   const requestModel = RequestModel(db);
   const tagModel = TagModel(db);
-  const users = UsersController(userModel, authz);
+  const users = UserController(userModel, authz);
 
   const apiV2Router = compose([
     auth.middleware(),
+    groups.middleware(),
     preprints.middleware(),
     prereviews.middleware(),
     users.middleware(),

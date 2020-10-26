@@ -12,6 +12,7 @@ export default class MockStrategy extends Strategy {
     this._verifyCallback = verifyCallback;
   }
 
+  // eslint-disable-next-line no-unused-vars
   authenticate(req, options) {
     const accessToken = 'accessToken';
     const refreshToken = 'refreshToken';

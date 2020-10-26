@@ -10,14 +10,21 @@ import { getLogger } from '../log.js';
 
 const log = getLogger('backend:middleware:auth');
 
-const authWrapper = () => {
+const authWrapper = groups => {
   const roles = new Roles();
 
-  // roles.isMemberOf = (group, id) => {
-  //   return groups.isMemberOf(group, id);
-  // };
+  roles.isMemberOf = (group, id) => {
+    return groups.isMemberOf(group, id);
+  };
 
   roles.use('access private pages', ctx => ctx.isAuthenticated());
+
+  roles.use('access admin pages', ctx => {
+    log.debug('Checking if user can access admin pages.');
+    if (!ctx.isAuthenticated()) return false;
+
+    return groups.isMemberOf('admins', ctx.state.user.id);
+  });
 
   return roles;
 };
