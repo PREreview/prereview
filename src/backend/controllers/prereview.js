@@ -84,11 +84,8 @@ export default function controller(prereviews, thisUser) {
     method: 'get',
     path: '/prereviews/:id',
     validate: {
-      // actually not sure if this is needed
+      query: querySchema,
     },
-    // pre: async ctx => {
-    // thisUser.can('')
-    // },
     handler: async ctx => {
       log.debug(`Retrieving prereview ${ctx.params.id}.`);
       let prereview;
@@ -144,7 +141,7 @@ export default function controller(prereviews, thisUser) {
   prereviewRouter.route({
     method: 'delete',
     path: '/prereviews/:id',
-    pre: async () => thisUser.can('access admin pages'),
+    pre: thisUser.can('access admin pages'),
     handler: async ctx => {
       log.debug(`Deleting prereview ${ctx.params.id}.`);
       let prereview;
