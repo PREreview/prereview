@@ -1,23 +1,20 @@
 import {
   Entity,
   EntityRepositoryType,
+  ManyToOne,
   PrimaryKey,
   Property,
-  SerializedPrimaryKey,
   Unique,
 } from '@mikro-orm/core';
-import PersonaModel from '../personas.ts';
-import User from './user.ts';
+import { PersonaModel } from '../personas';
+import User from './user';
 
 @Entity()
 export default class Persona {
-  [EntityRepositoryType]: PersonaModel;
+  [EntityRepositoryType]?: PersonaModel;
 
   @PrimaryKey()
-  _id!: ObjectId;
-
-  @SerializedPrimaryKey()
-  id!: string;
+  id!: number;
 
   @Property()
   createdAt = new Date();

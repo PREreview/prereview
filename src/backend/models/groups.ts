@@ -1,8 +1,8 @@
 import { EntityRepository, MikroORM, Repository } from '@mikro-orm/core';
-import Group from './entities/group.ts';
+import Group from './entities/group';
 
 @Repository(Group)
-class GroupModel extends EntityRepository<Group> {}
+export class GroupModel extends EntityRepository<Group> {}
 
 const groupModelWrapper = (db: MikroORM): GroupModel =>
   db.em.getRepository(Group);

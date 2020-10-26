@@ -1,8 +1,8 @@
 import { EntityRepository, MikroORM, Repository } from '@mikro-orm/core';
-import FullReview from './entities/fullReview.ts';
+import FullReview from './entities/fullReview';
 
 @Repository(FullReview)
-class FullReviewModel extends EntityRepository<FullReview> {}
+export class FullReviewModel extends EntityRepository<FullReview> {}
 
 const fullReviewModelWrapper = (db: MikroORM): FullReviewModel =>
   db.em.getRepository(FullReview);

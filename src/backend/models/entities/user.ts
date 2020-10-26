@@ -6,25 +6,21 @@ import {
   OneToMany,
   PrimaryKey,
   Property,
-  SerializedPrimaryKey,
   Unique,
 } from '@mikro-orm/core';
-import UserModel from '../users.ts';
-import Community from './community.ts';
-import FullReview from './fullReview.ts';
-import Group from './group.ts';
-import Persona from './persona.ts';
-import RapidReview from './rapidReview.ts';
+import { UserModel } from '../users';
+import Community from './community';
+import FullReview from './fullReview';
+import Group from './group';
+import Persona from './persona';
+import RapidReview from './rapidReview';
 
 @Entity()
 export default class User {
-  [EntityRepositoryType]: UserModel;
+  [EntityRepositoryType]?: UserModel;
 
   @PrimaryKey()
-  _id!: ObjectId;
-
-  @SerializedPrimaryKey()
-  id!: string;
+  id!: number;
 
   @Property()
   createdAt = new Date();
@@ -52,13 +48,10 @@ export default class User {
   @ManyToMany(() => Community, community => community.members)
   communities = new Collection<Community>(this);
 
-  @ManyToMany()
-  communities = new Collection<Community>(this);
-
-  @OneToMany()
+  @OneToMany('Persona', 'identity')
   personas = new Collection<Persona>(this);
 
-  @OneToMany()
+  @OneToMany('RapidReview', 'author')
   rapidReviews = new Collection<RapidReview>(this);
 
   @ManyToMany()

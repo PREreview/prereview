@@ -1,8 +1,8 @@
 import { EntityRepository, MikroORM, Repository } from '@mikro-orm/core';
-import Tag from './entities/tag.ts';
+import Tag from './entities/tag';
 
 @Repository(Tag)
-class TagModel extends EntityRepository<Tag> {}
+export class TagModel extends EntityRepository<Tag> {}
 
 const tagModelWrapper = (db: MikroORM): TagModel => db.em.getRepository(Tag);
 

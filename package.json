@@ -257,9 +257,7 @@
       "plugin:node/recommended-module",
       "plugin:prettier/recommended",
       "plugin:promise/recommended",
-      "plugin:react/recommended",
-      "plugin:@typescript-eslint/recommended",
-      "prettier/@typescript-eslint"
+      "plugin:react/recommended"
     ],
     "env": {
       "es2017": true,
@@ -272,6 +270,23 @@
         "version": "detect"
       }
     },
+    "overrides": [
+      {
+        "files": [
+          "**/*.ts",
+          "**/*.tsx"
+        ],
+        "parser": "@typescript-eslint/parser",
+        "parserOptions": {
+          "sourceType": "module",
+          "project": "./tsconfig.json"
+        },
+        "extends": [
+          "plugin:@typescript-eslint/recommended",
+          "prettier/@typescript-eslint"
+        ]
+      }
+    ],
     "rules": {
       "node/no-extraneous-import": [
         "error",

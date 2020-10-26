@@ -4,21 +4,17 @@ import {
   ManyToOne,
   PrimaryKey,
   Property,
-  SerializedPrimaryKey,
 } from '@mikro-orm/core';
-import CommentModel from '../comments.ts';
-import Persona from './persona.ts';
-import Preprint from './preprint.ts';
+import { CommentModel } from '../comments';
+import Persona from './persona';
+import Preprint from './preprint';
 
 @Entity()
 export default class Comment {
-  [EntityRepositoryType]: CommentModel;
+  [EntityRepositoryType]?: CommentModel;
 
   @PrimaryKey()
-  _id!: ObjectId;
-
-  @SerializedPrimaryKey()
-  id!: string;
+  id!: number;
 
   @Property()
   createdAt = new Date();
