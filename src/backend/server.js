@@ -72,11 +72,13 @@ export default function configServer(config) {
   const rapidReviewModel = RapidReviewModel(db);
   const requestModel = RequestModel(db);
   const tagModel = TagModel(db);
+  const users = UsersController(userModel, authz);
 
   const apiV2Router = compose([
     auth.middleware(), 
     preprints.middleware(),
     prereviews.middleware(),
+    users.middleware()
   ]);
 
   // Add here only development middlewares

@@ -1,11 +1,22 @@
 import router from 'koa-joi-router';
-// import moment from 'moment';
 import { getLogger } from '../log.js';
-// import { BadRequestError } from '../../common/errors.js';
 import resolve from '../utils/resolve.js';
 
 const log = getLogger('backend:controllers:preprint');
 const Joi = router.Joi;
+
+const querySchema = Joi.object({
+        start: Joi.number()
+          .integer()
+          .greater(-1),
+        end: Joi.number()
+          .integer()
+          .positive(),
+        asc: Joi.boolean(),
+        sort_by: Joi.string(),
+        from: Joi.string(),
+        to: Joi.string(),
+      })
 
 // eslint-disable-next-line no-unused-vars
 export default function controller(preprints, thisUser) {
@@ -25,24 +36,20 @@ export default function controller(preprints, thisUser) {
   preprintRoutes.route({
     method: 'post',
     path: '/preprints',
-    validate: {
-      body: {},
-      type: 'json',
-    },
-    // pre: async (ctx, next) => {
-    //   thisUser.can('')
+    // validate: {
+    //   body: {
+
+    //   },
+    //   type: 'json',
     // },
+    pre: thisUser.can('access private pages'),
     handler: async ctx => {
       log.debug('Adding new preprint.');
       let preprint;
 
       try {
-        preprint = await preprints.create(ctx.request.body.data);
-
-        // workaround for sqlite
-        if (Number.isInteger(preprint)) {
-          preprint = await preprints.findById(preprint);
-        }
+        preprint = preprints.create(ctx.request.body.data);
+        await preprints.persistAndFlush(preprint)
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse preprint schema: ${err}`);
@@ -53,69 +60,24 @@ export default function controller(preprints, thisUser) {
   preprintRoutes.route({
     method: 'get',
     path: '/preprints',
-    validate: {
-      body: {},
-      type: 'json',
-      query: Joi.object({
-        start: Joi.number()
-          .integer()
-          .greater(-1),
-        end: Joi.number()
-          .integer()
-          .positive(),
-        asc: Joi.boolean(),
-        sort_by: Joi.string(),
-        from: Joi.string(),
-        to: Joi.string(),
-      }),
-    },
-    // pre: async (ctx, next) => {
-    //    thisUser.can(')
-    // },
+    // validate: {
+    //   body: {},
+    //   type: 'json',
     handler: async ctx => {
       log.debug(`Retrieving preprints.`);
-      let res;
-      const query = ctx.query;
+    
+      const allPreprints = preprints.findAll()
 
-      try {
-        let from, to;
-
-        if (!ctx.invalid.query) {
-          const timestamp = moment(query.from);
-          if (timestamp.isValid()) {
-            log.error('HTTP 400 Error: Invalid timestamp value.');
-            ctx.throw(400, 'Invalid timestamp value.');
-          }
-          from = timestamp.toISOString();
+      if (allPreprints) {
+        ctx.body = {
+          status = 200,
+          data: allPreprints
         }
-        if (query.to) {
-          const timestamp = moment(query.to);
-          if (timestamp.isValid()) {
-            log.error('HTTP 400 Error: Invalid timestamp value.');
-            ctx.throw(400, 'Invalid timestamp value.');
-          }
-          to = timestamp.toISOString();
-        }
-        res = await preprints.find({
-          start: query.start,
-          end: query.end,
-          asc: query.asc,
-          sort_by: query.sort_by,
-          from: from,
-          to: to,
-        });
-
-        ctx.response.body = {
-          statusCode: 200,
-          status: 'ok',
-          data: res,
-        };
-
-        ctx.response.status = 200;
-      } catch (err) {
+      } else {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse query: ${err}`);
       }
+    
     },
   });
 
