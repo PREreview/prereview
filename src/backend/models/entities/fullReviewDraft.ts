@@ -5,13 +5,12 @@ import {
   PrimaryKey,
   Property,
 } from '@mikro-orm/core';
-import { CommentModel } from '../comments';
-import Persona from './persona';
-import Preprint from './preprint';
+import { FullReviewDraftModel } from '../fullReviewDrafts';
+import FullReview from './fullReview';
 
 @Entity()
-export default class Comment {
-  [EntityRepositoryType]?: CommentModel;
+export default class FullReviewDraft {
+  [EntityRepositoryType]: FullReviewDraftModel;
 
   @PrimaryKey()
   id!: number;
@@ -22,17 +21,14 @@ export default class Comment {
   @Property({ onUpdate: () => new Date() })
   updatedAt = new Date();
 
+  @ManyToOne()
+  parent!: FullReview;
+
   @Property()
   title!: string;
 
   @Property()
   contents!: string;
-
-  @ManyToOne()
-  author!: Persona;
-
-  @ManyToOne()
-  parent!: Preprint;
 
   constructor(title: string, contents: string) {
     this.title = title;

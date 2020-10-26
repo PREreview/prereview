@@ -1,24 +1,21 @@
 import {
   Entity,
   EntityRepositoryType,
+  JsonType,
   ManyToOne,
   PrimaryKey,
   Property,
-  SerializedPrimaryKey,
 } from '@mikro-orm/core';
-import RapidReviewModel from '../rapidReviews.ts';
-import Persona from './persona.ts';
-import Preprint from './preprint.ts';
+import { RapidReviewModel } from '../rapidReviews';
+import Persona from './persona';
+import Preprint from './preprint';
 
 @Entity()
 export default class RapidReview {
-  [EntityRepositoryType]: RapidReviewModel;
+  [EntityRepositoryType]?: RapidReviewModel;
 
   @PrimaryKey()
-  _id!: ObjectId;
-
-  @SerializedPrimaryKey()
-  id!: string;
+  id!: number;
 
   @Property()
   createdAt = new Date();

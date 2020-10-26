@@ -8,10 +8,19 @@ const portString = config.dbPort ? `:${config.dbPort}` : '';
 
 export default {
   metadataProvider: TsMorphMetadataProvider, // use actual TS types
-  entities: ['../../dist/backend/entities'],
-  entitiesTS: ['models/entities'],
+  entities: ['dist/backend/models/entities'],
+  entitiesTs: ['src/backend/models/entities'],
   type: dbType,
   clientUrl: `${dbType}://${authString}${config.dbHost}${portString}/${
     config.dbName
   }`,
+  cache: {
+    pretty: true,
+    options: {
+      cacheDir: '.mikroorm-cache',
+    },
+  },
+  migrations: {
+    path: 'src/backend/db/migrations',
+  },
 };

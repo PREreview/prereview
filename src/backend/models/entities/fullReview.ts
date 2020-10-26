@@ -1,53 +1,24 @@
 import {
+  Collection,
   Entity,
   EntityRepositoryType,
+  ManyToMany,
+  ManyToOne,
   OneToMany,
   PrimaryKey,
   Property,
-  SerializedPrimaryKey,
 } from '@mikro-orm/core';
-import FullReviewModel from '../fullReviews.ts';
-import Persona from './persona.ts';
-import Preprint from './preprint.ts';
-
-@Entity()
-export class FullReviewDraft {
-  @PrimaryKey()
-  _id!: ObjectId;
-
-  @SerializedPrimaryKey()
-  id!: string;
-
-  @Property()
-  createdAt = new Date();
-
-  @Property({ onUpdate: () => new Date() })
-  updatedAt = new Date();
-
-  @ManyToOne()
-  parent!: FullReview;
-
-  @Property()
-  title!: string;
-
-  @Property()
-  contents!: string;
-
-  constructor(title: string, contents: string) {
-    this.title = title;
-    this.contents = contents;
-  }
-}
+import { FullReviewModel } from '../fullReviews';
+import FullReviewDraft from './fullReviewDraft';
+import Persona from './persona';
+import Preprint from './preprint';
 
 @Entity()
 export default class FullReview {
   [EntityRepositoryType]: FullReviewModel;
 
   @PrimaryKey()
-  _id!: ObjectId;
-
-  @SerializedPrimaryKey()
-  id!: string;
+  id!: number;
 
   @Property()
   createdAt = new Date();
@@ -61,8 +32,8 @@ export default class FullReview {
   @Property()
   doi = '';
 
-  @OneToMany()
-  drafts = new Collection<FullReviewDrafts>(this);
+  @OneToMany('FullReviewDraft', 'parent')
+  drafts = new Collection<FullReviewDraft>(this);
 
   @ManyToMany()
   authors = new Collection<Persona>(this);

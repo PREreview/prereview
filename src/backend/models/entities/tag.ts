@@ -1,23 +1,21 @@
 import {
+  Collection,
   Entity,
   EntityRepositoryType,
   ManyToMany,
   PrimaryKey,
   Property,
-  SerializedPrimaryKey,
+  Unique,
 } from '@mikro-orm/core';
-import RapidReviewModel from '../rapidReviews.ts';
-import Preprint from './preprint.ts';
+import { TagModel } from '../tags';
+import Preprint from './preprint';
 
 @Entity()
-export default class RapidReview {
-  [EntityRepositoryType]: RapidReviewModel;
+export default class Tag {
+  [EntityRepositoryType]: TagModel;
 
   @PrimaryKey()
-  _id!: ObjectId;
-
-  @SerializedPrimaryKey()
-  id!: string;
+  id!: number;
 
   @Property()
   createdAt = new Date();

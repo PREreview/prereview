@@ -28,7 +28,7 @@
     "/dist"
   ],
   "scripts": {
-    "lint": "eslint --ignore-path .gitignore --fix ./src",
+    "lint": "eslint --ignore-path .gitignore --fix ./src/backend",
     "test": "jest --coverage --forceExit",
     "doc": "jsdoc -d ./dist/doc/ -r ./src/backend ./src/frontend",
     "build": "rimraf dist && npm run build:backend && npm run build:frontend",
@@ -77,10 +77,10 @@
     "@material-ui/icons": "^4.9.1",
     "@material-ui/pickers": "^3.2.10",
     "@material-ui/styles": "^4.9.0",
-    "@mikro-orm/core": "^4.2.1",
-    "@mikro-orm/postgresql": "^4.2.1",
-    "@mikro-orm/reflection": "^4.2.1",
-    "@mikro-orm/sqlite": "^4.2.1",
+    "@mikro-orm/core": "^4.2.3",
+    "@mikro-orm/postgresql": "^4.2.3",
+    "@mikro-orm/reflection": "^4.2.3",
+    "@mikro-orm/sqlite": "^4.2.3",
     "@reach/combobox": "^0.10.5",
     "@reach/dialog": "^0.10.5",
     "@reach/menu-button": "^0.10.5",
@@ -163,6 +163,7 @@
     "@babel/plugin-proposal-decorators": "^7.12.1",
     "@babel/preset-typescript": "^7.12.1",
     "@mikro-orm/cli": "^4.2.3",
+    "@mikro-resources/fixtures": "^1.6.1",
     "@parcel/transformer-typescript-tsc": "^2.0.0-nightly.432",
     "@parcel/validator-typescript": "^2.0.0-alpha.3",
     "@typescript-eslint/eslint-plugin": "^4.5.0",
@@ -258,9 +259,7 @@
       "plugin:node/recommended-module",
       "plugin:prettier/recommended",
       "plugin:promise/recommended",
-      "plugin:react/recommended",
-      "plugin:@typescript-eslint/recommended",
-      "prettier/@typescript-eslint"
+      "plugin:react/recommended"
     ],
     "env": {
       "es2017": true,
@@ -273,6 +272,23 @@
         "version": "detect"
       }
     },
+    "overrides": [
+      {
+        "files": [
+          "**/*.ts",
+          "**/*.tsx"
+        ],
+        "parser": "@typescript-eslint/parser",
+        "parserOptions": {
+          "sourceType": "module",
+          "project": "./tsconfig.json"
+        },
+        "extends": [
+          "plugin:@typescript-eslint/recommended",
+          "prettier/@typescript-eslint"
+        ]
+      }
+    ],
     "rules": {
       "node/no-extraneous-import": [
         "error",

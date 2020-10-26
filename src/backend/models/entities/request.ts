@@ -4,21 +4,17 @@ import {
   ManyToOne,
   PrimaryKey,
   Property,
-  SerializedPrimaryKey,
 } from '@mikro-orm/core';
-import RequestModel from '../requests.ts';
-import Persona from './persona.ts';
-import Preprint from './preprint.ts';
+import { RequestModel } from '../requests';
+import Persona from './persona';
+import Preprint from './preprint';
 
 @Entity()
 export default class Request {
-  [EntityRepositoryType]: RequestModel;
+  [EntityRepositoryType]?: RequestModel;
 
   @PrimaryKey()
-  _id!: ObjectId;
-
-  @SerializedPrimaryKey()
-  id!: string;
+  id!: number;
 
   @Property()
   createdAt = new Date();

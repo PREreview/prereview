@@ -1,26 +1,24 @@
 import {
+  Collection,
   Entity,
   EntityRepositoryType,
+  ManyToMany,
   OneToMany,
   PrimaryKey,
   Property,
-  SerializedPrimaryKey,
 } from '@mikro-orm/core';
-import PreprintModel from '../preprints.ts';
-import FullReview from './fullReview.ts';
-import RapidReview from './rapidReview.ts';
-import Request from './request.ts';
-import Tag from './tag.ts';
+import { PreprintModel } from '../preprints';
+import FullReview from './fullReview';
+import RapidReview from './rapidReview';
+import Request from './request';
+import Tag from './tag';
 
 @Entity()
 export default class Preprint {
-  [EntityRepositoryType]: PreprintModel;
+  [EntityRepositoryType]?: PreprintModel;
 
   @PrimaryKey()
-  _id!: ObjectId;
-
-  @SerializedPrimaryKey()
-  id!: string;
+  id!: number;
 
   @Property()
   createdAt = new Date();
@@ -37,13 +35,13 @@ export default class Preprint {
   @Property()
   url!: string;
 
-  @OneToMany()
+  @OneToMany('RapidReview', 'preprint')
   rapidReviews = new Collection<RapidReview>(this);
 
-  @OneToMany()
+  @OneToMany('FullReview', 'preprint')
   fullReviews = new Collection<FullReview>(this);
 
-  @OneToMany()
+  @OneToMany('Request', 'preprint')
   requests = new Collection<Request>(this);
 
   @ManyToMany()

@@ -5,22 +5,18 @@ import {
   ManyToMany,
   PrimaryKey,
   Property,
-  SerializedPrimaryKey,
   Unique,
 } from '@mikro-orm/core';
-import CommunityModel from '../communities.ts';
-import Preprint from './preprint.ts';
-import User from './user.ts';
+import { CommunityModel } from '../communities';
+import Preprint from './preprint';
+import User from './user';
 
 @Entity()
 export default class Community {
-  [EntityRepositoryType]: CommunityModel;
+  [EntityRepositoryType]?: CommunityModel;
 
   @PrimaryKey()
-  _id!: ObjectId;
-
-  @SerializedPrimaryKey()
-  id!: string;
+  id!: number;
 
   @Property()
   createdAt = new Date();

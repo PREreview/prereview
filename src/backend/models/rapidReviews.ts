@@ -1,8 +1,8 @@
 import { EntityRepository, MikroORM, Repository } from '@mikro-orm/core';
-import RapidReview from './entities/rapidReview.ts';
+import RapidReview from './entities/rapidReview';
 
 @Repository(RapidReview)
-class RapidReviewModel extends EntityRepository<RapidReview> {}
+export class RapidReviewModel extends EntityRepository<RapidReview> {}
 
 const rapidReviewModelWrapper = (db: MikroORM): RapidReviewModel =>
   db.em.getRepository(RapidReview);

@@ -109,3 +109,6 @@ dist
 
 # SQLite DB
 dev.sqlite3
+
+# MikroORM Cache
+.mikroorm-cache

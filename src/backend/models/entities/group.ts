@@ -5,21 +5,17 @@ import {
   ManyToMany,
   PrimaryKey,
   Property,
-  SerializedPrimaryKey,
   Unique,
 } from '@mikro-orm/core';
-import GroupModel from '../groups.ts';
-import User from './user.ts';
+import { GroupModel } from '../groups';
+import User from './user';
 
 @Entity()
 export default class Group {
-  [EntityRepositoryType]: GroupModel;
+  [EntityRepositoryType]?: GroupModel;
 
   @PrimaryKey()
-  _id!: ObjectId;
-
-  @SerializedPrimaryKey()
-  id!: string;
+  id!: number;
 
   @Property()
   createdAt = new Date();
