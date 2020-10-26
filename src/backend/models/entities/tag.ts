@@ -5,14 +5,14 @@ import {
   ManyToMany,
   PrimaryKey,
   Property,
-  Unique
+  Unique,
 } from '@mikro-orm/core';
-import { RapidReviewModel } from '../rapidReviews';
+import { TagModel } from '../tags';
 import Preprint from './preprint';
 
 @Entity()
-export default class RapidReview {
-  [EntityRepositoryType]?: RapidReviewModel;
+export default class Tag {
+  [EntityRepositoryType]: TagModel;
 
   @PrimaryKey()
   id!: number;

@@ -14,7 +14,7 @@ const dbWrapper = async (
 
   const orm = await MikroORM.init({
     metadataProvider: TsMorphMetadataProvider, // use actual TS types
-    entities: ['dist/backend/entities'],
+    entities: ['dist/backend/models/entities'],
     entitiesTS: ['src/backend/models/entities'],
     type: dbType,
     clientUrl: `${dbType}://${authString}${dbHost}${portString}/${dbName}`,

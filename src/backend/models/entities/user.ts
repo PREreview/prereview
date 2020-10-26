@@ -17,7 +17,7 @@ import RapidReview from './rapidReview';
 
 @Entity()
 export default class User {
-  [EntityRepositoryType]?: UserModel;
+  [EntityRepositoryType]: UserModel;
 
   @PrimaryKey()
   id!: number;
@@ -50,12 +50,6 @@ export default class User {
 
   @OneToMany('Persona', 'identity')
   personas = new Collection<Persona>(this);
-
-  @OneToMany('RapidReview', 'author')
-  rapidReviews = new Collection<RapidReview>(this);
-
-  @ManyToMany()
-  fullReviews = new Collection<FullReview>(this);
 
   constructor(username: string, email: string, orcid: string) {
     this.username = username;
