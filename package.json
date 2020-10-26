@@ -162,6 +162,7 @@
     "@babel/plugin-proposal-decorators": "^7.12.1",
     "@babel/preset-typescript": "^7.12.1",
     "@mikro-orm/cli": "^4.2.3",
+    "@mikro-resources/fixtures": "^1.6.1",
     "@parcel/transformer-typescript-tsc": "^2.0.0-nightly.432",
     "@parcel/validator-typescript": "^2.0.0-alpha.3",
     "@typescript-eslint/eslint-plugin": "^4.5.0",

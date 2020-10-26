@@ -21,6 +21,6 @@ export default {
     },
   },
   migrations: {
-    path: 'src/backend/migrations',
+    path: 'src/backend/db/migrations',
   },
 };
