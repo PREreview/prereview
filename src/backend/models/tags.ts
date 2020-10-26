@@ -1,5 +1,5 @@
 import { EntityRepository, MikroORM, Repository } from '@mikro-orm/core';
-import Tag from './entities/Tag';
+import Tag from './entities/tag';
 
 @Repository(Tag)
 export class TagModel extends EntityRepository<Tag> {}

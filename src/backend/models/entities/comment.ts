@@ -6,11 +6,11 @@ import {
   Property,
 } from '@mikro-orm/core';
 import { CommentModel } from '../comments';
-import Persona from './Persona';
-import Preprint from './Preprint';
+import Persona from './persona';
+import Preprint from './preprint';
 
 @Entity()
-export class Comment {
+export default class Comment {
   [EntityRepositoryType]?: CommentModel;
 
   @PrimaryKey()

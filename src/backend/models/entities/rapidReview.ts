@@ -7,11 +7,11 @@ import {
   Property,
 } from '@mikro-orm/core';
 import { RapidReviewModel } from '../rapidReviews';
-import Persona from './Persona';
-import Preprint from './Preprint';
+import Persona from './persona';
+import Preprint from './preprint';
 
 @Entity()
-export class RapidReview {
+export default class RapidReview {
   [EntityRepositoryType]?: RapidReviewModel;
 
   @PrimaryKey()

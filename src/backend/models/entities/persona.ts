@@ -10,12 +10,12 @@ import {
   Unique,
 } from '@mikro-orm/core';
 import { PersonaModel } from '../personas';
-import FullReview from './FullReview';
-import RapidReview from './RapidReview';
-import User from './User';
+import FullReview from './fullReview';
+import RapidReview from './rapidReview';
+import User from './user';
 
 @Entity()
-export class Persona {
+export default class Persona {
   [EntityRepositoryType]: PersonaModel;
 
   @PrimaryKey()

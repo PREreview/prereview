@@ -1,5 +1,5 @@
 import { EntityRepository, MikroORM, Repository } from '@mikro-orm/core';
-import Community from './entities/Community';
+import Community from './entities/community';
 
 @Repository(Community)
 export class CommunityModel extends EntityRepository<Community> {}

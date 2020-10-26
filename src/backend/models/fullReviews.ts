@@ -1,5 +1,5 @@
 import { EntityRepository, MikroORM, Repository } from '@mikro-orm/core';
-import FullReview from './entities/FullReview';
+import FullReview from './entities/fullReview';
 
 @Repository(FullReview)
 export class FullReviewModel extends EntityRepository<FullReview> {}

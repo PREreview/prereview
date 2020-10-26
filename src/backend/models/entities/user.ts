@@ -9,14 +9,14 @@ import {
   Unique,
 } from '@mikro-orm/core';
 import { UserModel } from '../users';
-import Community from './Community';
-import FullReview from './FullReview';
-import Group from './Group';
-import Persona from './Persona';
-import RapidReview from './RapidReview';
+import Community from './community';
+import FullReview from './fullReview';
+import Group from './group';
+import Persona from './persona';
+import RapidReview from './rapidReview';
 
 @Entity()
-export class User {
+export default class User {
   [EntityRepositoryType]: UserModel;
 
   @PrimaryKey()

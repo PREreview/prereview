@@ -1,5 +1,5 @@
 import { EntityRepository, MikroORM, Repository } from '@mikro-orm/core';
-import Request from './entities/Request';
+import Request from './entities/request';
 
 @Repository(Request)
 export class RequestModel extends EntityRepository<Request> {}
