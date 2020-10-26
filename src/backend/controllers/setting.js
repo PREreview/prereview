@@ -1,13 +1,12 @@
-import Router from '@koa/router';
+import router from 'koa-joi-router';
 import { getLogger } from '../log.js';
-import resolve from '../utils/resolve.js';
 
 const log = getLogger('backend:controllers:setting');
 const Joi = router.Joi;
 
 // eslint-disable-next-line no-unused-vars
 export default function controller(settings, thisUser) {
-  const settingsRoutes = new Router();
+  const settingsRoutes = router();
 
   settingsRoutes.route({
     method: 'get',
