@@ -1,5 +1,5 @@
 import Roles from 'koa-roles';
-// import { getLogger } from '../log.js';
+import { getLogger } from '../log.js';
 
 /**
  * Installs authorization middleware into the koa app.
@@ -10,7 +10,7 @@ import Roles from 'koa-roles';
 
 const log = getLogger('backend:middleware:auth');
 
-const authWrapper = () => {
+const authWrapper = groups => {
   const roles = new Roles();
 
   roles.isMemberOf = (group, id) => {
@@ -24,8 +24,8 @@ const authWrapper = () => {
     if (!ctx.isAuthenticated()) return false;
 
     return groups.isMemberOf('admins', ctx.state.user.id);
-  })
-  
+  });
+
   return roles;
 };
 
