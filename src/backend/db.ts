@@ -1,5 +1,6 @@
 import { MikroORM } from '@mikro-orm/core';
 import { TsMorphMetadataProvider } from '@mikro-orm/reflection';
+import { Comment, Community, FullReview, FullReviewDraft, Group, Persona, Preprint, RapidReview, Request, Tag, User } from './models/entities'
 
 const dbWrapper = async (
   dbType: string,
@@ -14,8 +15,7 @@ const dbWrapper = async (
 
   const orm = await MikroORM.init({
     metadataProvider: TsMorphMetadataProvider, // use actual TS types
-    entities: ['dist/backend/models/entities'],
-    entitiesTS: ['src/backend/models/entities'],
+    entities: [Comment, Community, FullReview, FullReviewDraft, Group, Persona, Preprint, RapidReview, Request, Tag, User],
     type: dbType,
     clientUrl: `${dbType}://${authString}${dbHost}${portString}/${dbName}`,
   });

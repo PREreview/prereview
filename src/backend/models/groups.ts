@@ -1,5 +1,5 @@
 import { EntityRepository, MikroORM, Repository } from '@mikro-orm/core';
-import Group from './entities/group';
+import Group from './entities/Group';
 
 @Repository(Group)
 export class GroupModel extends EntityRepository<Group> {}

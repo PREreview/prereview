@@ -8,11 +8,11 @@ import {
   Unique,
 } from '@mikro-orm/core';
 import { CommunityModel } from '../communities';
-import Preprint from './preprint';
-import User from './user';
+import Preprint from './Preprint';
+import User from './User';
 
 @Entity()
-export default class Community {
+export class Community {
   [EntityRepositoryType]?: CommunityModel;
 
   @PrimaryKey()

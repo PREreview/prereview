@@ -6,11 +6,11 @@ import {
   Property,
 } from '@mikro-orm/core';
 import { RequestModel } from '../requests';
-import Persona from './persona';
-import Preprint from './preprint';
+import Persona from './Persona';
+import Preprint from './Preprint';
 
 @Entity()
-export default class Request {
+export class Request {
   [EntityRepositoryType]?: RequestModel;
 
   @PrimaryKey()

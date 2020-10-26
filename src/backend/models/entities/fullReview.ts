@@ -9,12 +9,12 @@ import {
   Property,
 } from '@mikro-orm/core';
 import { FullReviewModel } from '../fullReviews';
-import FullReviewDraft from './fullReviewDraft';
-import Persona from './persona';
-import Preprint from './preprint';
+import FullReviewDraft from './FullReviewDraft';
+import Persona from './Persona';
+import Preprint from './Preprint';
 
 @Entity()
-export default class FullReview {
+export class FullReview {
   [EntityRepositoryType]: FullReviewModel;
 
   @PrimaryKey()

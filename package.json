@@ -155,6 +155,7 @@
     "smoothscroll-polyfill": "^0.4.4",
     "socket.io-client": "^2.3.0",
     "sqlite3": "^5.0.0",
+    "typescript": "^4.0.3",
     "url": "^0.11.0",
     "url-search-params-polyfill": "^8.1.0",
     "uuid": "^3.3.2",
@@ -190,8 +191,7 @@
     "sass": "^1.26.10",
     "supertest": "^4.0.2",
     "supertest-session": "^4.0.0",
-    "ts-node": "^9.0.0",
-    "typescript": "^4.0.3"
+    "ts-node": "^9.0.0"
   },
   "husky": {
     "hooks": {

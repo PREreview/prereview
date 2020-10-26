@@ -8,10 +8,10 @@ import {
   Unique,
 } from '@mikro-orm/core';
 import { GroupModel } from '../groups';
-import User from './user';
+import User from './User';
 
 @Entity()
-export default class Group {
+export class Group {
   [EntityRepositoryType]?: GroupModel;
 
   @PrimaryKey()

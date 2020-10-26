@@ -8,10 +8,10 @@ import {
   Unique,
 } from '@mikro-orm/core';
 import { TagModel } from '../tags';
-import Preprint from './preprint';
+import Preprint from './Preprint';
 
 @Entity()
-export default class Tag {
+export class Tag {
   [EntityRepositoryType]: TagModel;
 
   @PrimaryKey()

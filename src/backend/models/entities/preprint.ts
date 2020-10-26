@@ -8,13 +8,13 @@ import {
   Property,
 } from '@mikro-orm/core';
 import { PreprintModel } from '../preprints';
-import FullReview from './fullReview';
-import RapidReview from './rapidReview';
-import Request from './request';
-import Tag from './tag';
+import FullReview from './FullReview';
+import RapidReview from './RapidReview';
+import Request from './Request';
+import Tag from './Tag';
 
 @Entity()
-export default class Preprint {
+export class Preprint {
   [EntityRepositoryType]?: PreprintModel;
 
   @PrimaryKey()

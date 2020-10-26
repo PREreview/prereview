@@ -6,10 +6,10 @@ import {
   Property,
 } from '@mikro-orm/core';
 import { FullReviewDraftModel } from '../fullReviewDrafts';
-import FullReview from './fullReview';
+import FullReview from './FullReview';
 
 @Entity()
-export default class FullReviewDraft {
+export class FullReviewDraft {
   [EntityRepositoryType]: FullReviewDraftModel;
 
   @PrimaryKey()
