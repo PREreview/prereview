@@ -1,12 +1,10 @@
 import router from 'koa-joi-router';
-import moment from 'moment';
 import { getLogger } from '../log.js';
-import _ from 'lodash/core';
 
 const log = getLogger('backend:controllers:user');
 const Joi = router.Joi;
 
-const query_schema = Joi.object({
+const querySchema = Joi.object({
   start: Joi.number()
     .integer()
     .greater(-1),
@@ -38,9 +36,9 @@ export default function controller(users, thisUser) {
     method: 'get',
     path: '/users',
     pre: thisUser.can('access private pages'),
-    // validate: {
-    //   query: query_schema
-    // },
+    validate: {
+      query: querySchema,
+    },
     handler: async ctx => {
       log.debug(`Retrieving users.`);
       const users = await users.findAll();
@@ -103,7 +101,7 @@ export default function controller(users, thisUser) {
       }
 
       users.assign(user, ctx.request.body);
-      await users.persistAndFlush(author);
+      await users.persistAndFlush(user);
     },
   });
 

@@ -17,12 +17,13 @@ import CommentModel from './models/comments.ts';
 import CommunityModel from './models/communities.ts';
 import FullReviewModel from './models/fullReviews.ts';
 import GroupModel from './models/groups.ts';
-import PersonaModel from './models/preprints.ts';
+import PersonaModel from './models/personas.ts';
 import PreprintModel from './models/preprints.ts';
 import RapidReviewModel from './models/rapidReviews.ts';
 import RequestModel from './models/requests.ts';
 import TagModel from './models/tags.ts';
 import UserModel from './models/users.ts';
+import UsersController from './controllers/user.js';
 import PreprintController from './controllers/preprint.js';
 import PrereviewController from './controllers/prereview.js';
 

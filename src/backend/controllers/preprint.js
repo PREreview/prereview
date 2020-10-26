@@ -62,6 +62,7 @@ export default function controller(preprints, thisUser) {
       query: querySchema,
       body: {},
       type: 'json',
+    },
     handler: async ctx => {
       log.debug(`Retrieving preprints.`);
 

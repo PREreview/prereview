@@ -24,15 +24,8 @@ export default function controller(prereviews, thisUser) {
   prereviewRouter.route({
     method: 'post',
     path: '/prereviews',
-    pre: async (_, next) => {
-      await thisUser.can('access private pages');
-      return next();
-    },
+    pre: thisUser.can('access private pages'),
     validate: {
-      // header: {},
-      // query: {},
-      // params: {},
-      //
       body: {
         doi: Joi.string().required(),
         authors: Joi.array(),
@@ -66,7 +59,7 @@ export default function controller(prereviews, thisUser) {
     method: 'get',
     path: '/prereviews',
     validate: {
-      // query: querySchema,
+      query: querySchema,
     },
     handler: async ctx => {
       log.debug(`Retrieving prereviews.`);
@@ -107,8 +100,8 @@ export default function controller(prereviews, thisUser) {
         ctx.throw(400, `Failed to parse query: ${err}`);
       }
 
-      if (preprint.length) {
-        ctx.response.body = { statusCode: 200, status: 'ok', data: preprint };
+      if (prereview.length) {
+        ctx.response.body = { statusCode: 200, status: 'ok', data: prereview };
         ctx.response.status = 200;
       } else {
         log.error(
@@ -124,33 +117,29 @@ export default function controller(prereviews, thisUser) {
     },
   });
 
-  // prereviewRouter.route({
-  //   method: 'put',
-  //   path: '/prereviews/:id',
-  //   // pre: async ctx => {
-  //   // thisUser.can('')
-  //   // },
-  //   handler: async ctx => {
-  //     log.debug(`Updating prereview ${ctx.params.id}.`);
-  //     let prereview;
+  prereviewRouter.route({
+    method: 'put',
+    path: '/prereviews/:id',
+    pre: thisUser.can('access admin pages'),
+    handler: async ctx => {
+      log.debug(`Updating prereview ${ctx.params.id}.`);
+      let prereview;
 
-  //     try {
-  //       prereview = await prereviews.update(
-  //         ctx.params.id,
-  //         ctx.request.body.data,
-  //       );
+      try {
+        prereview = prereviews.assign(ctx.params.id, ctx.request.body.data);
 
-  //       // workaround for sqlite
-  //       if (Number.isInteger(prereview)) {
-  //         prereview = await prereviews.findById(ctx.params.id);
-  //       }
+        prereviews.persistAndFlush(prereview);
 
-  //     } catch (err) {
-  //       log.error('HTTP 400 Error: ', err);
-  //       ctx.throw(400, `Failed to parse query: ${err}`);
-  //     }
-  //   },
-  // });
+        // workaround for sqlite
+        if (Number.isInteger(prereview)) {
+          prereview = await prereviews.findOne(ctx.params.id);
+        }
+      } catch (err) {
+        log.error('HTTP 400 Error: ', err);
+        ctx.throw(400, `Failed to parse query: ${err}`);
+      }
+    },
+  });
 
   prereviewRouter.route({
     method: 'delete',
