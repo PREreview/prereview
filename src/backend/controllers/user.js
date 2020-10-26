@@ -2,7 +2,7 @@ import router from 'koa-joi-router';
 import { getLogger } from '../log.js';
 
 const log = getLogger('backend:controllers:user');
-const Joi = Router.Joi;
+const Joi = router.Joi;
 
 const querySchema = Joi.object({
   start: Joi.number()

@@ -64,10 +64,7 @@ export default function controller(groups, thisUser) {
       let res;
 
       try {
-<<<<<<< HEAD
         const query = ctx.query;
-=======
->>>>>>> mikro-orm
         let from, to;
         if (ctx.query.from) {
           const timestamp = moment(ctx.query.from);
@@ -85,19 +82,11 @@ export default function controller(groups, thisUser) {
           }
           to = timestamp.toISOString();
         }
-<<<<<<< HEAD
         res = await groups.findAll({
           start: query.start,
           end: query.end,
           asc: query.asc,
           sort_by: query.sort_by,
-=======
-        res = await groups.find({
-          start: ctx.query.start,
-          end: ctx.query.end,
-          asc: ctx.query.asc,
-          sort_by: ctx.query.sort_by,
->>>>>>> mikro-orm
           from: from,
           to: to,
         });
@@ -116,13 +105,7 @@ export default function controller(groups, thisUser) {
   groupRoutes.route({
     method: 'get',
     path: '/groups/:id',
-<<<<<<< HEAD
     pre: thisUser.can('access private pages'),
-=======
-    pre: async () => {
-      thisUser.can('access private pages');
-    },
->>>>>>> mikro-orm
     handler: async ctx => {
       log.debug(`Retrieving group ${ctx.params.id}.`);
       let group;
@@ -149,13 +132,7 @@ export default function controller(groups, thisUser) {
   groupRoutes.route({
     method: 'put',
     path: '/groups/:id',
-<<<<<<< HEAD
     pre: thisUser.can('access admin pages'),
-=======
-    pre: async () => {
-      thisUser.can('access admin pages');
-    },
->>>>>>> mikro-orm
     handler: async ctx => {
       log.debug(`Updating group ${ctx.params.id}.`);
       let group;
@@ -188,13 +165,7 @@ export default function controller(groups, thisUser) {
   groupRoutes.route({
     method: 'delete',
     path: '/groups/:id',
-<<<<<<< HEAD
     pre: thisUser.can('access admin pages'),
-=======
-    pre: async () => {
-      thisUser.can('access admin pages');
-    },
->>>>>>> mikro-orm
     handler: async ctx => {
       log.debug(`Deleting group ${ctx.params.id}.`);
       let group;
@@ -222,13 +193,8 @@ export default function controller(groups, thisUser) {
   groupRoutes.route({
     method: 'get',
     path: '/groups/:id/members',
-<<<<<<< HEAD
     validate: {
       query: querySchema,
-=======
-    pre: async () => {
-      thisUser.can('access admin pages');
->>>>>>> mikro-orm
     },
     pre: thisUser.can('access admin pages'),
     handler: async ctx => {
@@ -236,15 +202,12 @@ export default function controller(groups, thisUser) {
       let group;
 
       try {
-<<<<<<< HEAD
         const query = ctx.query;
-=======
->>>>>>> mikro-orm
         group = await groups.members({
           gid: ctx.params.id,
-          start: ctx.query.start,
-          end: ctx.query.end,
-          asc: ctx.query.asc,
+          start: query.start,
+          end: query.end,
+          asc: query.asc,
         });
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
@@ -266,13 +229,7 @@ export default function controller(groups, thisUser) {
   groupRoutes.route({
     method: 'put',
     path: '/groups/:id/members/:uid',
-<<<<<<< HEAD
     pre: thisUser.can('access admin pages'),
-=======
-    pre: async () => {
-      thisUser.can('access admin pages');
-    },
->>>>>>> mikro-orm
     handler: async ctx => {
       log.debug(`Adding user ${ctx.params.uid} to group ${ctx.params.id}.`);
       let res;
@@ -306,13 +263,7 @@ export default function controller(groups, thisUser) {
   groupRoutes.route({
     method: 'delete',
     path: '/groups/:id/members/:uid',
-<<<<<<< HEAD
     pre: thisUser.can('access admin pages'),
-=======
-    pre: async () => {
-      thisUser.can('access admin pages');
-    },
->>>>>>> mikro-orm
     handler: async ctx => {
       log.debug(`Removing user ${ctx.params.uid} from group ${ctx.params.id}.`);
       let res;
