@@ -23,10 +23,13 @@ import RapidReviewModel from './models/rapidReviews.ts';
 import RequestModel from './models/requests.ts';
 import TagModel from './models/tags.ts';
 import UserModel from './models/users.ts';
+import CommentController from './controllers/comment.js';
+import CommunityController from './controllers/community.js';
 import GroupController from './controllers/group.js';
 import UserController from './controllers/user.js';
 import PreprintController from './controllers/preprint.js';
 import PrereviewController from './controllers/prereview.js';
+import DocsRouter from './docs/apiDocs.js';
 
 const __dirname = path.resolve();
 const STATIC_DIR = path.resolve(__dirname, 'dist', 'frontend');
@@ -66,8 +69,9 @@ export default async function configServer(config) {
   const auth = AuthController(userModel, config, authz);
   // eslint-disable-next-line no-unused-vars
   const commentModel = CommentModel(db);
-  // eslint-disable-next-line no-unused-vars
+  const comments = CommentController(commentModel, authz);
   const communityModel = CommunityModel(db);
+  const communities = CommunityController(communityModel, authz);
   const fullReviewModel = FullReviewModel(db);
   const groups = GroupController(groupModel, authz);
   const prereviews = PrereviewController(fullReviewModel, authz);
@@ -82,9 +86,15 @@ export default async function configServer(config) {
   // eslint-disable-next-line no-unused-vars
   const tagModel = TagModel(db);
   const users = UserController(userModel, authz);
+  const apiDocs = DocsRouter();
+
+  prereviews.use('/prereviews/:pid', comments.middleware());
 
   const apiV2Router = compose([
+    apiDocs.middleware(),
     auth.middleware(),
+    comments.middleware(),
+    communities.middleware(),
     groups.middleware(),
     preprints.middleware(),
     prereviews.middleware(),
