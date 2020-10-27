@@ -24,6 +24,7 @@ import RequestModel from './models/requests.ts';
 import TagModel from './models/tags.ts';
 import UserModel from './models/users.ts';
 import CommentController from './controllers/comment.js';
+import CommunityController from './controllers/community.js';
 import GroupController from './controllers/group.js';
 import UserController from './controllers/user.js';
 import PreprintController from './controllers/preprint.js';
@@ -66,8 +67,9 @@ export default function configServer(config) {
   // setup API handlers
   const auth = AuthController(userModel, config, authz);
   const commentModel = CommentModel(db);
-  const comments = CommentController(commentModel, authz)
+  const comments = CommentController(commentModel, authz);
   const communityModel = CommunityModel(db);
+  const communities = CommunityController(communityModel, authz);
   const fullReviewModel = FullReviewModel(db);
   const groups = GroupController(groupModel, authz);
   const prereviews = PrereviewController(fullReviewModel, authz);
@@ -83,7 +85,8 @@ export default function configServer(config) {
 
   const apiV2Router = compose([
     auth.middleware(),
-    comment.middleware(),
+    comments.middleware(),
+    communities.middleware(),
     groups.middleware(),
     preprints.middleware(),
     prereviews.middleware(),
