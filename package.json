@@ -90,6 +90,7 @@
     "@reach/visually-hidden": "^0.10.4",
     "@sendgrid/mail": "^7.2.1",
     "@storybook/addon-actions": "^5.3.19",
+    "babel-polyfill": "^6.26.0",
     "bcryptjs": "^2.4.3",
     "classnames": "^2.2.6",
     "clipboard-copy": "^3.1.0",
