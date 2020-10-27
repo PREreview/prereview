@@ -196,17 +196,11 @@
   },
   "husky": {
     "hooks": {
-      "pre-push": "npm run lint && npm test"
+      "pre-push": "npm run lint"
     }
   },
   "jest": {
-    "verbose": true,
-    "setupFiles": [
-      "./.jest/env.js"
-    ],
-    "modulePathIgnorePatterns": [
-      "./src/frontend/data"
-    ]
+    "verbose": true
   },
   "babel": {
     "presets": [
