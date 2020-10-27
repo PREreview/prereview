@@ -21,8 +21,8 @@ const defaults = {
   db: {
     host: process.env.PREREVIEW_DB_HOST || 'localhost',
     port: process.env.PREREVIEW_DB_PORT || 5432,
-    database: process.env.PREREVIEW_DB_DATABASE || 'preview',
-    user: process.env.PREREVIEW_DB_USERNAME || 'preview',
+    database: process.env.PREREVIEW_DB_DATABASE || 'prereview',
+    user: process.env.PREREVIEW_DB_USERNAME || 'prereview',
     password: process.env.PREREVIEW_DB_PASSWORD,
     pool_min: process.env.PREREVIEW_DB_POOL_MIN || 0,
     pool_max: process.env.PREREVIEW_DB_POOL_MAX || 10,

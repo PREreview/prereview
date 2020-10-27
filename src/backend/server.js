@@ -31,7 +31,7 @@ import PrereviewController from './controllers/prereview.js';
 const __dirname = path.resolve();
 const STATIC_DIR = path.resolve(__dirname, 'dist', 'frontend');
 
-export default function configServer(config) {
+export default async function configServer(config) {
   // Initialize our application server
   const server = new Koa();
 
@@ -45,8 +45,8 @@ export default function configServer(config) {
   server.use(log4js.koaLogger(log4js.getLogger('http'), { level: 'auto' }));
 
   // Initialize database
-  const dbType = config.isDev ? 'sqlite' : 'postgres';
-  const [db, dbMiddleware] = dbWrapper(
+  const dbType = config.isProd ? 'postgresql' : 'sqlite';
+  const [db, dbMiddleware] = await dbWrapper(
     dbType,
     config.dbHost,
     config.dbPort,

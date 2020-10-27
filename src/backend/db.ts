@@ -17,13 +17,25 @@ const dbWrapper = async (
   const authString = dbUser && dbPass ? `${dbUser}:${dbPass}@` : '';
   const portString = dbPort ? `:${dbPort}` : '';
 
-  const orm = await MikroORM.init({
-    metadataProvider: TsMorphMetadataProvider, // use actual TS types
-    entities: ['dist/models/entities'],
-    entitiesTs: ['src/backend/models/entities'],
-    type: 'postgresql',
-    clientUrl: `${dbType}://${authString}${dbHost}${portString}/${dbName}`,
-  });
+  let orm;
+  if (dbType === 'postgresql') {
+    orm = await MikroORM.init({
+      metadataProvider: TsMorphMetadataProvider, // use actual TS types
+      entities: ['dist/models/entities'],
+      entitiesTs: ['src/backend/models/entities'],
+      type: 'postgresql',
+      clientUrl: `${dbType}://${authString}${dbHost}${portString}/${dbName}`,
+    });
+  } else {
+    orm = await MikroORM.init({
+      metadataProvider: TsMorphMetadataProvider, // use actual TS types
+      entities: ['dist/models/entities'],
+      entitiesTs: ['src/backend/models/entities'],
+      type: 'sqlite',
+      clientUrl: `${dbType}://${authString}${dbHost}${portString}/${dbName}`,
+    });
+  }
+
   const dbMiddleware: Middleware = (_, next) =>
     RequestContext.createAsync(orm.em, next);
   return [orm, dbMiddleware];
