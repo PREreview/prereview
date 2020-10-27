@@ -33,8 +33,8 @@
     "doc": "jsdoc -d ./dist/doc/ -r ./src/backend ./src/frontend",
     "build": "rimraf dist && npm run build:backend && npm run build:frontend",
     "build:dev": "rimraf dist && npm run build:backend:dev && npm run build:frontend:dev",
-    "build:backend": "parcel build --target=backend src/backend/index.js",
-    "build:backend:dev": "parcel build --target=backend --no-minify src/backend/index.js",
+    "build:backend": "parcel build --target=backend src/backend/index.js --no-scope-hoist",
+    "build:backend:dev": "parcel build --target=backend --no-minify src/backend/index.js --no-scope-hoist",
     "build:frontend": "parcel build --target=frontend src/frontend/index.html",
     "build:frontend:dev": "parcel build --target=frontend --no-minify src/frontend/index.html",
     "tsc": "rimraf dist && tsc",
@@ -42,7 +42,7 @@
     "start:backend": "node dist/backend/index.js",
     "start": "npm run start:backend",
     "start:frontend": "parcel serve src/frontend/index.html",
-    "start:dev": "concurrently -p \"[{name}]\" -n \"BACKEND,FRONTEND\" -c \"bgBlue.bold,bgMagenta.bold\" \"npm run start:backend\" \"npm run start:frontend:dev\""
+    "start:dev": "concurrently -p \"[{name}]\" -n \"BACKEND,FRONTEND\" -c \"bgBlue.bold,bgMagenta.bold\" \"npm run start:backend\" \"npm run start:frontend\""
   },
   "backend": "dist/backend/index.js",
   "frontend": "dist/frontend/index.html",
@@ -95,6 +95,7 @@
     "clipboard-copy": "^3.1.0",
     "combined-stream": "^1.0.8",
     "commander": "^5.1.0",
+    "core-util-is": "^1.0.2",
     "date-fns": "^2.14.0",
     "doi-regex": "^0.1.10",
     "dotenv": "8.0.0",
