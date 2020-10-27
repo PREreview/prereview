@@ -66,6 +66,26 @@ export default function controller(preprints, thisUser) {
     path: '/preprints',
     validate: {
       query: querySchema,
+      validate: {
+        output: {
+          200: {
+            body: {
+              statusCode: 200,
+              status: 'ok',
+              data: Joi.array().items(
+                Joi.object({
+                  doi: Joi.string(),
+                  title: Joi.string(),
+                  server: Joi.string(),
+                  url: Joi.string(),
+                  pdfUrl: Joi.string(),
+                }).min(1)
+              )
+            }
+          }
+        },
+        failure: 400,
+      },
     },
     handler: async ctx => {
       log.debug(`Retrieving preprints.`);
@@ -93,6 +113,24 @@ export default function controller(preprints, thisUser) {
       params: {
         id: Joi.integer(),
       },
+      failure: 400,
+      output: {
+          200: {
+            body: {
+              statusCode: 200,
+              status: 'ok',
+              data: Joi.array().items(
+                Joi.object({
+                  doi: Joi.string(),
+                  title: Joi.string(),
+                  server: Joi.string(),
+                  url: Joi.string(),
+                  pdfUrl: Joi.string(),
+                }).min(1)
+              )
+            }
+          }
+        },
     },
     handler: async ctx => {
       log.debug(`Retrieving preprint ${ctx.params.id}.`);

@@ -58,6 +58,9 @@ export default function controller(groups, thisUser) {
     method: 'get',
     path: '/groups',
     pre: thisUser.can('access admin pages'),
+    validate: {
+      query: querySchema,
+    },
     handler: async ctx => {
       log.debug(`Retrieving groups.`);
       let res;
@@ -142,6 +145,7 @@ export default function controller(groups, thisUser) {
         name: Joi.string(), // possible #FIXME
       },
       type: 'json',
+      failure: 400,
     },
     pre: thisUser.can('access admin pages'),
     handler: async ctx => {
