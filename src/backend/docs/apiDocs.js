@@ -41,9 +41,27 @@ export default function docs() {
   );
   const specJson = JSON.stringify(spec, null, 2);
 
-  routes.get('/apiDocs', async ctx => {
+  routes.get('/openapi.json', async ctx => {
     log.debug('...in the API docs...');
     ctx.body = specJson;
+  });
+
+  routes.get('/docs', async ctx => {
+    ctx.body = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta http-equiv="X-UA-Compatible" content="ie=edge">
+      <title>Example API</title>
+    </head>
+    <body>
+      <redoc spec-url='/api/v2/openapi.json' lazy-rendering></redoc>
+      <script src="https://rebilly.github.io/ReDoc/releases/latest/redoc.min.js"></script>
+    </body>
+    </html>
+    `;
   });
 
   return routes;
