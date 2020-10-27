@@ -34,7 +34,7 @@ import DocsRouter from './docs/apiDocs.js';
 const __dirname = path.resolve();
 const STATIC_DIR = path.resolve(__dirname, 'dist', 'frontend');
 
-export default function configServer(config) {
+export default async function configServer(config) {
   // Initialize our application server
   const server = new Koa();
 
@@ -48,8 +48,8 @@ export default function configServer(config) {
   server.use(log4js.koaLogger(log4js.getLogger('http'), { level: 'auto' }));
 
   // Initialize database
-  const dbType = config.isDev ? 'sqlite' : 'postgres';
-  const [db, dbMiddleware] = dbWrapper(
+  const dbType = config.isProd ? 'postgresql' : 'sqlite';
+  const [db, dbMiddleware] = await dbWrapper(
     dbType,
     config.dbHost,
     config.dbPort,
@@ -62,11 +62,12 @@ export default function configServer(config) {
   // Setup auth handlers
   const userModel = UserModel(db);
   const groupModel = GroupModel(db);
-  const authz = authWrapper(groupModel, config, authz); // authorization, not authentication
+  const authz = authWrapper(groupModel); // authorization, not authentication
   server.use(authz.middleware());
 
   // setup API handlers
   const auth = AuthController(userModel, config, authz);
+  // eslint-disable-next-line no-unused-vars
   const commentModel = CommentModel(db);
   const comments = CommentController(commentModel, authz);
   const communityModel = CommunityModel(db);
@@ -74,11 +75,15 @@ export default function configServer(config) {
   const fullReviewModel = FullReviewModel(db);
   const groups = GroupController(groupModel, authz);
   const prereviews = PrereviewController(fullReviewModel, authz);
+  // eslint-disable-next-line no-unused-vars
   const personaModel = PersonaModel(db);
   const preprintModel = PreprintModel(db);
   const preprints = PreprintController(preprintModel, authz);
+  // eslint-disable-next-line no-unused-vars
   const rapidReviewModel = RapidReviewModel(db);
+  // eslint-disable-next-line no-unused-vars
   const requestModel = RequestModel(db);
+  // eslint-disable-next-line no-unused-vars
   const tagModel = TagModel(db);
   const users = UserController(userModel, authz);
   const apiDocs = DocsRouter();

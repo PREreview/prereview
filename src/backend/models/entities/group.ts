@@ -12,7 +12,7 @@ import User from './user';
 
 @Entity()
 export default class Group {
-  [EntityRepositoryType]?: GroupModel;
+  [EntityRepositoryType]: GroupModel;
 
   @PrimaryKey()
   id!: number;
@@ -27,7 +27,7 @@ export default class Group {
   @Unique()
   name!: string;
 
-  @ManyToMany()
+  @ManyToMany('User', 'groups', { owner: true })
   members = new Collection<User>(this);
 
   constructor(name: string) {

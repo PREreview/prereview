@@ -33,15 +33,16 @@
     "doc": "jsdoc -d ./dist/doc/ -r ./src/backend ./src/frontend",
     "build": "rimraf dist && npm run build:backend && npm run build:frontend",
     "build:dev": "rimraf dist && npm run build:backend:dev && npm run build:frontend:dev",
-    "build:backend": "parcel build --target=backend src/backend/index.js",
-    "build:backend:dev": "parcel build --target=backend --no-minify src/backend/index.js",
+    "build:backend": "parcel build --target=backend --no-scope-hoist src/backend/index.js && npm run tsc",
+    "build:backend:dev": "parcel build --target=backend --no-minify --no-scope-hoist src/backend/index.js && npm run tsc",
     "build:frontend": "parcel build --target=frontend src/frontend/index.html",
     "build:frontend:dev": "parcel build --target=frontend --no-minify src/frontend/index.html",
+    "tsc": "tsc",
     "db": "mikro-orm",
     "start:backend": "node dist/backend/index.js",
     "start": "npm run start:backend",
     "start:frontend": "parcel serve src/frontend/index.html",
-    "start:dev": "concurrently -p \"[{name}]\" -n \"BACKEND,FRONTEND\" -c \"bgBlue.bold,bgMagenta.bold\" \"npm run start:backend\" \"npm run start:frontend:dev\""
+    "start:dev": "concurrently -p \"[{name}]\" -n \"BACKEND,FRONTEND\" -c \"bgBlue.bold,bgMagenta.bold\" \"npm run start:backend\" \"npm run start:frontend\""
   },
   "backend": "dist/backend/index.js",
   "frontend": "dist/frontend/index.html",
@@ -89,11 +90,13 @@
     "@reach/visually-hidden": "^0.10.4",
     "@sendgrid/mail": "^7.2.1",
     "@storybook/addon-actions": "^5.3.19",
+    "babel-polyfill": "^6.26.0",
     "bcryptjs": "^2.4.3",
     "classnames": "^2.2.6",
     "clipboard-copy": "^3.1.0",
     "combined-stream": "^1.0.8",
     "commander": "^5.1.0",
+    "core-util-is": "^1.0.2",
     "date-fns": "^2.14.0",
     "doi-regex": "^0.1.10",
     "dotenv": "8.0.0",
@@ -106,8 +109,7 @@
     "joi": "^17.1.1",
     "jsdom": "^16.3.0",
     "jwks-rsa": "^1.6.2",
-    "knex": "^0.21.2",
-    "knex-migrate": "^1.7.4",
+    "knex": "^0.21.8",
     "koa": "2.7.0",
     "koa-better-error-handler": "^3.0.5",
     "koa-body": "^4.1.1",
@@ -140,7 +142,7 @@
     "pg-range": "^1.1.0",
     "prop-types": "^15.7.2",
     "react": "^16.12.0",
-    "react-avatar-editor": "^11.0.9",
+    "react-avatar-editor": "^11.0.12",
     "react-dnd": "^11.1.3",
     "react-dnd-html5-backend": "^11.1.3",
     "react-dnd-touch-backend": "^11.1.3",
@@ -152,6 +154,7 @@
     "react-pdf": "^4.1.0",
     "react-prerendered-component": "^1.2.4",
     "react-router-dom": "^5.1.2",
+    "reflect-metadata": "^0.1.13",
     "request-promise-native": "^1.0.8",
     "smoothscroll-polyfill": "^0.4.4",
     "socket.io-client": "^2.3.0",
@@ -192,21 +195,15 @@
     "supertest": "^4.0.2",
     "supertest-session": "^4.0.0",
     "ts-node": "^9.0.0",
-    "typescript": "^4.0.3"
+    "typescript": "^4.0.5"
   },
   "husky": {
     "hooks": {
-      "pre-push": "npm run lint && npm test"
+      "pre-push": "npm run lint"
     }
   },
   "jest": {
-    "verbose": true,
-    "setupFiles": [
-      "./.jest/env.js"
-    ],
-    "modulePathIgnorePatterns": [
-      "./src/frontend/data"
-    ]
+    "verbose": true
   },
   "babel": {
     "presets": [
@@ -254,7 +251,7 @@
     "useTsNode": true,
     "configPaths": [
       "./src/backend/mikro-orm.config.ts",
-      "./dist/backend/mikro-orm.config.js"
+      "./dist/mikro-orm.config.js"
     ]
   },
   "eslintConfig": {

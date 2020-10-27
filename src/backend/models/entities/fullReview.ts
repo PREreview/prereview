@@ -35,7 +35,7 @@ export default class FullReview {
   @OneToMany('FullReviewDraft', 'parent')
   drafts = new Collection<FullReviewDraft>(this);
 
-  @ManyToMany()
+  @ManyToMany('Persona', 'fullReviews', { owner: true })
   authors = new Collection<Persona>(this);
 
   @ManyToOne()

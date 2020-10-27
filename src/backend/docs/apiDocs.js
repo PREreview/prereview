@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { SwaggerAPI } from 'koa-joi-router-docs';
 import router from 'koa-joi-router';
 import preprintRoutes from '../controllers/preprint.js';

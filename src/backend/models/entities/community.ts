@@ -13,7 +13,7 @@ import User from './user';
 
 @Entity()
 export default class Community {
-  [EntityRepositoryType]?: CommunityModel;
+  [EntityRepositoryType]: CommunityModel;
 
   @PrimaryKey()
   id!: number;
@@ -34,10 +34,10 @@ export default class Community {
   @Property()
   logo?: Buffer;
 
-  @ManyToMany()
+  @ManyToMany('User', 'communities', { owner: true })
   members = new Collection<User>(this);
 
-  @ManyToMany()
+  @ManyToMany('Preprint', 'communities', { owner: true })
   preprints = new Collection<Preprint>(this);
 
   constructor(name: string, description: string, logo: Buffer) {
