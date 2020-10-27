@@ -72,8 +72,6 @@ export default function configServer(config) {
   const groups = GroupController(groupModel, authz);
   const prereviews = PrereviewController(fullReviewModel, authz);
   // eslint-disable-next-line no-unused-vars
-  const groupModel = GroupModel(db);
-  // eslint-disable-next-line no-unused-vars
   const personaModel = PersonaModel(db);
   const preprintModel = PreprintModel(db);
   const preprints = PreprintController(preprintModel, authz);
