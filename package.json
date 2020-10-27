@@ -37,6 +37,7 @@
     "build:backend:dev": "parcel build --target=backend --no-minify src/backend/index.js",
     "build:frontend": "parcel build --target=frontend src/frontend/index.html",
     "build:frontend:dev": "parcel build --target=frontend --no-minify src/frontend/index.html",
+    "tsc": "rimraf dist && tsc",
     "db": "mikro-orm",
     "start:backend": "node dist/backend/index.js",
     "start": "npm run start:backend",

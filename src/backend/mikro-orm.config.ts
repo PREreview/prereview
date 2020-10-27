@@ -8,7 +8,7 @@ const portString = config.dbPort ? `:${config.dbPort}` : '';
 
 export default {
   metadataProvider: TsMorphMetadataProvider, // use actual TS types
-  entities: ['dist/backend/models/entities'],
+  entities: ['dist/models/entities'],
   entitiesTs: ['src/backend/models/entities'],
   type: dbType,
   clientUrl: `${dbType}://${authString}${config.dbHost}${portString}/${
