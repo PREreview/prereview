@@ -49,7 +49,7 @@ export default function controller(preprints, thisUser) {
     meta: {
       swagger: {
         summary: 'Post a preprint',
-      }
+      },
     },
     pre: thisUser.can('access private pages'),
     handler: async ctx => {
