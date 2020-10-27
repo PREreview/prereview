@@ -4,13 +4,13 @@ import { getLogger } from '../log.js';
 const log = getLogger('backend:controller:comment');
 const Joi = router.Joi;
 
-export default function controller(comments, thisUser) {
+export default function controller(comments) {
   const commentRouter = router();
 
   commentRouter.route({
     method: 'post',
     path: '/comments',
-    pre: thisUser.can('access private pages'),
+    // pre:thisUserthisUser.can('access private pages'),
     validate: {
       body: Joi.array()
         .items(

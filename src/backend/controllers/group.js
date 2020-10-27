@@ -38,7 +38,7 @@ export default function controller(groups, thisUser) {
       },
       type: 'json',
     },
-    pre: thisUser.can('access admin pages'),
+    // pre:thisUser.can('access admin pages'),
     handler: async ctx => {
       log.debug('Adding new group.');
       let group;
@@ -57,7 +57,7 @@ export default function controller(groups, thisUser) {
   groupRoutes.route({
     method: 'get',
     path: '/groups',
-    pre: thisUser.can('access admin pages'),
+    // pre:thisUser.can('access admin pages'),
     validate: {
       query: querySchema,
     },
@@ -113,7 +113,7 @@ export default function controller(groups, thisUser) {
         id: Joi.number().integer(),
       },
     },
-    pre: thisUser.can('access private pages'),
+    // pre:thisUser.can('access private pages'),
     handler: async ctx => {
       log.debug(`Retrieving group ${ctx.params.id}.`);
       let group;
@@ -147,7 +147,7 @@ export default function controller(groups, thisUser) {
       type: 'json',
       failure: 400,
     },
-    pre: thisUser.can('access admin pages'),
+    // pre:thisUser.can('access admin pages'),
     handler: async ctx => {
       log.debug(`Updating group ${ctx.params.id}.`);
       let group;
@@ -180,7 +180,7 @@ export default function controller(groups, thisUser) {
   groupRoutes.route({
     method: 'delete',
     path: '/groups/:id',
-    pre: thisUser.can('access admin pages'),
+    // pre:thisUser.can('access admin pages'),
     handler: async ctx => {
       log.debug(`Deleting group ${ctx.params.id}.`);
       let group;
@@ -208,7 +208,7 @@ export default function controller(groups, thisUser) {
   groupRoutes.route({
     method: 'get',
     path: '/groups/:id/members',
-    pre: thisUser.can('access admin pages'),
+    // pre:thisUser.can('access admin pages'),
     handler: async ctx => {
       log.debug(`Retrieving members of group ${ctx.params.id}.`);
       let group;
@@ -253,7 +253,7 @@ export default function controller(groups, thisUser) {
       },
       type: 'json',
     },
-    pre: thisUser.can('access admin pages'),
+    // pre:thisUser.can('access admin pages'),
     handler: async ctx => {
       log.debug(`Adding user ${ctx.params.uid} to group ${ctx.params.id}.`);
       let res;
@@ -287,7 +287,7 @@ export default function controller(groups, thisUser) {
   groupRoutes.route({
     method: 'delete',
     path: '/groups/:id/members/:uid',
-    pre: thisUser.can('access admin pages'),
+    // pre:thisUser.can('access admin pages'),
     handler: async ctx => {
       log.debug(`Removing user ${ctx.params.uid} from group ${ctx.params.id}.`);
       let res;

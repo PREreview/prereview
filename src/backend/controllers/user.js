@@ -29,13 +29,13 @@ const Joi = router.Joi;
  * @param {Object} users - User model
  * @returns {Object} Auth controller Koa router
  */
-export default function controller(users, thisUser) {
+export default function controller(users) {
   const userRouter = router();
 
   userRouter.route({
     method: 'get',
     path: '/users',
-    pre: thisUser.can('access private pages'),
+    // pre:thisUserthisUser.can('access private pages'),
     handler: async ctx => {
       log.debug(`Retrieving users.`);
       const users = await users.findAll();
@@ -48,7 +48,7 @@ export default function controller(users, thisUser) {
   userRouter.route({
     method: 'get',
     path: '/users/:id',
-    pre: thisUser.can('access private pages'),
+    // pre:thisUserthisUser.can('access private pages'),
     validate: {
       params: Joi.object({
         id: Joi.number().integer(), // TODO should we be validating this?
@@ -87,7 +87,7 @@ export default function controller(users, thisUser) {
       continueOnError: false,
       false: 400,
     },
-    pre: thisUser.can('access private pages'), // TODO: can edit self only no?
+    // pre:thisUserthisUser.can('access private pages'), // TODO: can edit self only no?
     handler: async ctx => {
       log.debug(`Updating user ${ctx.params.id}.`);
 
@@ -110,7 +110,7 @@ export default function controller(users, thisUser) {
         id: Joi.number().integer(),
       }),
     },
-    pre: thisUser.can('access admin pages'), // TODO: can users delete their own account?
+    // pre:thisUserthisUser.can('access admin pages'), // TODO: can users delete their own account?
     handler: async ctx => {
       log.debug(`Deleting user ${ctx.params.id}.`);
 

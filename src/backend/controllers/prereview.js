@@ -24,7 +24,7 @@ export default function controller(prereviews, thisUser) {
   prereviewRouter.route({
     method: 'post',
     path: '/prereviews',
-    pre: thisUser.can('access private pages'),
+    // pre:thisUserthisUser.can('access private pages'),
     validate: {
       body: {
         doi: Joi.string().required(),
@@ -111,7 +111,7 @@ export default function controller(prereviews, thisUser) {
   prereviewRouter.route({
     method: 'put',
     path: '/prereviews/:id',
-    pre: thisUser.can('access admin pages'),
+    // pre:thisUserthisUser.can('access admin pages'),
     validate: {
       body: {
         doi: Joi.string().required(),
@@ -145,7 +145,7 @@ export default function controller(prereviews, thisUser) {
   prereviewRouter.route({
     method: 'delete',
     path: '/prereviews/:id',
-    pre: thisUser.can('access admin pages'),
+    // pre:thisUserthisUser.can('access admin pages'),
     handler: async ctx => {
       log.debug(`Deleting prereview ${ctx.params.id}.`);
       let prereview;
