@@ -1,5 +1,10 @@
-import { MikroORM } from '@mikro-orm/core';
+import { MikroORM, RequestContext } from '@mikro-orm/core';
 import { TsMorphMetadataProvider } from '@mikro-orm/reflection';
+
+type Middleware = (
+  ctx: Record<string, unknown>,
+  next: (...args: any[]) => Promise<void>,
+) => Promise<void>;
 
 const dbWrapper = async (
   dbType: string,
@@ -8,18 +13,19 @@ const dbWrapper = async (
   dbName: string,
   dbUser: string,
   dbPass: string,
-): [MikroORM, function] => {
+): Promise<[MikroORM, Middleware]> => {
   const authString = dbUser && dbPass ? `${dbUser}:${dbPass}@` : '';
   const portString = dbPort ? `:${dbPort}` : '';
 
   const orm = await MikroORM.init({
     metadataProvider: TsMorphMetadataProvider, // use actual TS types
-    entities: ['dist/backend/models/entities'],
-    entitiesTS: ['src/backend/models/entities'],
-    type: dbType,
+    entities: ['dist/models/entities'],
+    entitiesTs: ['src/backend/models/entities'],
+    type: 'postgresql',
     clientUrl: `${dbType}://${authString}${dbHost}${portString}/${dbName}`,
   });
-  const dbMiddleware = (_, next) => RequestContext.createAsync(orm.em, next);
+  const dbMiddleware: Middleware = (_, next) =>
+    RequestContext.createAsync(orm.em, next);
   return [orm, dbMiddleware];
 };
 

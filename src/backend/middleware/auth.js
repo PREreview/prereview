@@ -1,5 +1,4 @@
 import Roles from 'koa-roles';
-import { getLogger } from '../log.js';
 
 /**
  * Installs authorization middleware into the koa app.

@@ -64,16 +64,24 @@ export default function configServer(config) {
 
   // setup API handlers
   const auth = AuthController(userModel, config, authz);
+  // eslint-disable-next-line no-unused-vars
   const commentModel = CommentModel(db);
+  // eslint-disable-next-line no-unused-vars
   const communityModel = CommunityModel(db);
   const fullReviewModel = FullReviewModel(db);
   const groups = GroupController(groupModel, authz);
   const prereviews = PrereviewController(fullReviewModel, authz);
+  // eslint-disable-next-line no-unused-vars
+  const groupModel = GroupModel(db);
+  // eslint-disable-next-line no-unused-vars
   const personaModel = PersonaModel(db);
   const preprintModel = PreprintModel(db);
   const preprints = PreprintController(preprintModel, authz);
+  // eslint-disable-next-line no-unused-vars
   const rapidReviewModel = RapidReviewModel(db);
+  // eslint-disable-next-line no-unused-vars
   const requestModel = RequestModel(db);
+  // eslint-disable-next-line no-unused-vars
   const tagModel = TagModel(db);
   const users = UserController(userModel, authz);
 
