@@ -46,6 +46,11 @@ export default function controller(preprints, thisUser) {
       }, // #TODO
       type: 'json',
     },
+    meta: {
+      swagger: {
+        summary: 'Post a preprint',
+      }
+    },
     pre: thisUser.can('access private pages'),
     handler: async ctx => {
       log.debug('Adding new preprint.');
@@ -79,10 +84,10 @@ export default function controller(preprints, thisUser) {
                   server: Joi.string(),
                   url: Joi.string(),
                   pdfUrl: Joi.string(),
-                }).min(1)
-              )
-            }
-          }
+                }).min(1),
+              ),
+            },
+          },
         },
         failure: 400,
       },
@@ -115,22 +120,22 @@ export default function controller(preprints, thisUser) {
       },
       failure: 400,
       output: {
-          200: {
-            body: {
-              statusCode: 200,
-              status: 'ok',
-              data: Joi.array().items(
-                Joi.object({
-                  doi: Joi.string(),
-                  title: Joi.string(),
-                  server: Joi.string(),
-                  url: Joi.string(),
-                  pdfUrl: Joi.string(),
-                }).min(1)
-              )
-            }
-          }
+        200: {
+          body: {
+            statusCode: 200,
+            status: 'ok',
+            data: Joi.array().items(
+              Joi.object({
+                doi: Joi.string(),
+                title: Joi.string(),
+                server: Joi.string(),
+                url: Joi.string(),
+                pdfUrl: Joi.string(),
+              }).min(1),
+            ),
+          },
         },
+      },
     },
     handler: async ctx => {
       log.debug(`Retrieving preprint ${ctx.params.id}.`);

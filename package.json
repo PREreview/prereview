@@ -117,6 +117,7 @@
     "koa-helmet": "4.1.0",
     "koa-http-request": "^2.2.1",
     "koa-joi-router": "^6.0.2",
+    "koa-joi-router-docs": "^1.2.1",
     "koa-jwt": "^3.6.0",
     "koa-log4": "^2.3.2",
     "koa-logger": "3.2.0",
