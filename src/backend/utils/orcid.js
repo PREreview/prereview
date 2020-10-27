@@ -30,8 +30,8 @@ export async function getOrcidProfile(orcid, token) {
   const r = await fetch(`https://pub.orcid.org/v2.1/${orcid}/person`, {
     headers: {
       Accept: 'application/json',
-      Authorization: `${token.tokenType} ${token.accessToken}`
-    }
+      Authorization: `${token.tokenType} ${token.accessToken}`,
+    },
   });
 
   if (r.ok) {

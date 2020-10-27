@@ -9,10 +9,7 @@ export default function Banner() {
       <div className="announcement">
         <p>
           Click{' '}
-          <a
-            className="announcement-link"
-            href={`?q=COVID-19`}
-          >
+          <a className="announcement-link" href={`?q=COVID-19`}>
             here
           </a>{' '}
           to find preprints on COVID-19 with reviews or requests for reviews.

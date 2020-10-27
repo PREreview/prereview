@@ -2,7 +2,7 @@ import React, { Suspense } from 'react';
 import PropTypes from 'prop-types';
 import mobile from 'is-mobile';
 import { HTML5Backend } from 'react-dnd-html5-backend';
-import TouchBackend from 'react-dnd-touch-backend';
+import { TouchBackend } from 'react-dnd-touch-backend';
 import { DndProvider } from 'react-dnd';
 import { Switch, Route } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
@@ -88,7 +88,7 @@ export default function App({ user }) {
                   <Moderate />
                 </Suspense>
               </ModeratorRoute>
-              <Route exact={true} path="/:identifierPart1/:identifierPart2?">
+              <Route exact={true} path="/preprint/:identifierPart1/:identifierPart2?">
                 <ExtensionFallback />
               </Route>
 

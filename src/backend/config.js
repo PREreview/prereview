@@ -1,5 +1,5 @@
 import { Command } from 'commander';
-import Joi from '@hapi/joi';
+import Joi from 'joi';
 import dotenv from 'dotenv';
 
 /**
@@ -229,14 +229,14 @@ export default program
     defaults.db.timeout,
   )
   .option(
-    '--db-database <database>',
+    '--db-name <database>',
     'Database name',
     validateToken,
     defaults.db.database,
   )
   .option('--db-user <user>', 'Database user', validateUser, defaults.db.user)
   .option(
-    '--db-password <password>',
+    '--db-pass <password>',
     'Database password',
     validatePassword,
     defaults.db.password,

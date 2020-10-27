@@ -1,5 +1,5 @@
 import { UnprocessableError } from '../../common/errors.js';
-import Joi from 'joi'
+import Joi from 'joi';
 
 const creationSchema = Joi.array()
   .items(
@@ -9,11 +9,11 @@ const creationSchema = Joi.array()
       server: Joi.string(),
       url: Joi.string(),
       pdfUrl: Joi.string(),
-    })
+    }),
   )
   .min(1);
 
-  const updateSchema = Joi.array()
+const updateSchema = Joi.array()
   .items(
     Joi.object({
       doi: Joi.string(),
@@ -21,7 +21,7 @@ const creationSchema = Joi.array()
       server: Joi.string(),
       url: Joi.string(),
       pdfUrl: Joi.string(),
-    })
+    }),
   )
   .min(1);
 

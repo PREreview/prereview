@@ -1,10 +1,21 @@
 import router from 'koa-joi-router';
-// import moment from 'moment';
 import { getLogger } from '../log.js';
-// import { BadRequestError } from '../../common/errors.js';
 
 const log = getLogger('backend:controllers:prereview');
 const Joi = router.Joi;
+
+// const querySchema = Joi.object({
+//   start: Joi.number()
+//     .integer()
+//     .greater(-1),
+//   end: Joi.number()
+//     .integer()
+//     .positive(),
+//   asc: Joi.boolean(),
+//   sort_by: Joi.string(),
+//   from: Joi.string(),
+//   to: Joi.string(),
+// });
 
 // eslint-disable-next-line no-unused-vars
 export default function controller(prereviews, thisUser) {
@@ -13,15 +24,8 @@ export default function controller(prereviews, thisUser) {
   prereviewRouter.route({
     method: 'post',
     path: '/prereviews',
-    pre: async ctx => {
-      await thisUser.can('access private pages');
-      return next();
-    },
+    pre: thisUser.can('access private pages'),
     validate: {
-      // header: {},
-      // query: {},
-      // params: {},
-      //
       body: {
         doi: Joi.string().required(),
         authors: Joi.array(),
@@ -29,34 +33,24 @@ export default function controller(prereviews, thisUser) {
         content: Joi.array(),
       },
       type: 'json',
-      // failure: 400,
-      output: {
-        201: {
-          // could even be a code range!
-          body: {},
-        },
-      },
-      continueOnError: false,
+      failure: 400,
+      // output: {
+      //   201: {
+      //     // could even be a code range!
+      //     body: {},
+      //   },
+      // },
     },
     handler: async ctx => {
-      // prob will not need all the below anymore
-      try {
-        prereview = await prereviews.create(ctx.request.body.data);
+      log.debug('Posting prereview...');
 
-        // workaround for sqlite
-        if (Number.isInteger(prereview)) {
-          prereview = await prereviews.findById(prereview);
-        }
-      } catch (err) {
-        log.error('HTTP 400 Error: ', err);
-        ctx.throw(400, `Failed to parse prereview schema: ${err}`);
+      try {
+        const prereview = prereviews.create(ctx.request.body);
+        await prereviews.persistAndFlush(prereview);
+      } catch (error) {
+        return ctx.throw(400, { message: error.message });
       }
 
-      ctx.response.body = {
-        statusCode: 201,
-        status: 'created',
-        data: prereview,
-      };
       ctx.response.status = 201;
     },
   });
@@ -64,78 +58,34 @@ export default function controller(prereviews, thisUser) {
   prereviewRouter.route({
     method: 'get',
     path: '/prereviews',
-    // pre: async ctx => {
-      // thisUser.can('')
-    // },
-    validate: {
-      query: Joi.object({
-        start: Joi.number()
-          .integer()
-          .greater(-1),
-        end: Joi.number()
-          .integer()
-          .positive(),
-        asc: Joi.boolean(),
-        sort_by: Joi.string(),
-        from: Joi.string(),
-        to: Joi.string(),
-      }),
-      // params: {},
-      // headers: {},
-    },
     handler: async ctx => {
-      let from, to;
+      log.debug(`Retrieving prereviews.`);
 
-      if (query.from) {
-        const timestamp = moment(query.from);
-        if (timestamp.isValid()) {
-          log.error('HTTP 400 Error: Invalid timestamp value.');
-          ctx.throw(400, 'Invalid timestamp value.');
+      try {
+        const allPrereviews = await prereviews.findAll();
+        if (allPrereviews) {
+          ctx.response.body = {
+            statusCode: 200,
+            status: 'ok',
+            data: allPrereviews,
+          };
         }
-        from = timestamp.toISOString();
+      } catch (err) {
+        log.error('HTTP 400 Error: ', err);
+        ctx.throw(400, `Failed to parse query: ${err}`);
       }
-      if (query.to) {
-        const timestamp = moment(query.to);
-        if (timestamp.isValid()) {
-          log.error('HTTP 400 Error: Invalid timestamp value.');
-          ctx.throw(400, 'Invalid timestamp value.');
-        }
-        to = timestamp.toISOString();
-      }
-
-      res = await prereviews.find({
-        start: query.start,
-        end: query.end,
-        asc: query.asc,
-        sort_by: query.sort_by,
-        from: from,
-        to: to,
-      });
-
-      ctx.response.body = {
-        statusCode: 200,
-        status: 'ok',
-        data: res,
-      };
-
-      ctx.response.status = 200;
     },
   });
 
   prereviewRouter.route({
     method: 'get',
     path: '/prereviews/:id',
-    validate: {
-      // actually not sure if this is needed
-    },
-   // pre: async ctx => {
-      // thisUser.can('')
-    // },
     handler: async ctx => {
       log.debug(`Retrieving prereview ${ctx.params.id}.`);
+      let prereview;
 
       try {
-        prereview = await prereviews.findById(ctx.params.id);
+        prereview = await prereviews.findOne(ctx.params.id);
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse query: ${err}`);
@@ -146,58 +96,63 @@ export default function controller(prereviews, thisUser) {
         ctx.response.status = 200;
       } else {
         log.error(
-          `HTTP 404 Error: That prereview with ID ${
+          `HTTP 404 Error: That preprint with ID ${
             ctx.params.id
           } does not exist.`,
         );
         ctx.throw(
           404,
-          `That prereview with ID ${ctx.params.id} does not exist.`,
+          `That preprint with ID ${ctx.params.id} does not exist.`,
         );
       }
     },
-  })
+  });
 
   prereviewRouter.route({
     method: 'put',
     path: '/prereviews/:id',
-    // pre: async ctx => {
-      // thisUser.can('')
-    // },
+    pre: thisUser.can('access admin pages'),
+    validate: {
+      body: {
+        doi: Joi.string().required(),
+        authors: Joi.array(),
+        is_hidden: Joi.boolean(),
+        content: Joi.array(),
+      },
+      type: 'json',
+      failure: 400,
+    },
     handler: async ctx => {
-      log.debug(`Updating prereview ${ctx.params.id}.`)
+      log.debug(`Updating prereview ${ctx.params.id}.`);
       let prereview;
 
       try {
-      prereview = await prereviews.update(
-        ctx.params.id,
-        ctx.request.body.data,
-      );
+        prereview = prereviews.assign(ctx.params.id, ctx.request.body.data);
+
+        prereviews.persistAndFlush(prereview);
 
         // workaround for sqlite
         if (Number.isInteger(prereview)) {
-          prereview = await prereviews.findById(ctx.params.id);
+          prereview = await prereviews.findOne(ctx.params.id);
         }
-      
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse query: ${err}`);
       }
-    }
-  })
+    },
+  });
 
   prereviewRouter.route({
     method: 'delete',
     path: '/prereviews/:id',
-    // pre: async ctx => {
-      // thisUser.can('')
-    // },
+    pre: thisUser.can('access admin pages'),
     handler: async ctx => {
       log.debug(`Deleting prereview ${ctx.params.id}.`);
       let prereview;
 
       try {
-        prereview = await prereviews.delete(ctx.params.id);
+        prereview = prereviews.findOne(ctx.params.id);
+        await prereviews.removeAndFlush(prereview);
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse query: ${err}`);
@@ -217,7 +172,7 @@ export default function controller(prereviews, thisUser) {
           `That prereview with ID ${ctx.params.id} does not exist.`,
         );
       }
-    }
+    },
   });
 
   return prereviewRouter;

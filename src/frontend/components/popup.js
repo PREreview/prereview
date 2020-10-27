@@ -136,22 +136,14 @@ export default function Popup({ preprint, dispatch }) {
       <nav className="popup__nav">
         <ul className="popup__nav__list">
           <li className="popup__nav__list-item">
-            <a
-              href={``}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
+            <a href={``} target="_blank" rel="noopener noreferrer">
               Home
             </a>
           </li>
 
           {!!user && (
             <li className="popup__nav__list-item">
-              <a
-                href={`settings`}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
+              <a href={`settings`} target="_blank" rel="noopener noreferrer">
                 Profile Settings
               </a>
             </li>
@@ -159,19 +151,11 @@ export default function Popup({ preprint, dispatch }) {
 
           <li className="popup__nav__list-item">
             {user ? (
-              <a
-                href={`auth/logout`}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
+              <a href={`auth/logout`} target="_blank" rel="noopener noreferrer">
                 Logout
               </a>
             ) : (
-              <a
-                href={`login`}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
+              <a href={`login`} target="_blank" rel="noopener noreferrer">
                 Login
               </a>
             )}

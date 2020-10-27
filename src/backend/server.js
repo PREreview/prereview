@@ -9,19 +9,27 @@ import serveStatic from 'koa-static';
 import session from 'koa-session';
 import passport from 'koa-passport';
 import errorHandler from 'koa-better-error-handler';
+import dbWrapper from './db.ts';
 import cloudflareAccess from './middleware/cloudflare.js';
-import ssr from './middleware/ssr.js';
 import AuthController from './controllers/auth.js'; // authentication/logins
 import authWrapper from '../backend/middleware/auth.js'; // authorization/user roles
-import UserModel from './models/user.js';
-import PreprintModel from './models/preprint.js';
+import CommentModel from './models/comments.ts';
+import CommunityModel from './models/communities.ts';
+import FullReviewModel from './models/fullReviews.ts';
+import GroupModel from './models/groups.ts';
+import PersonaModel from './models/personas.ts';
+import PreprintModel from './models/preprints.ts';
+import RapidReviewModel from './models/rapidReviews.ts';
+import RequestModel from './models/requests.ts';
+import TagModel from './models/tags.ts';
+import UserModel from './models/users.ts';
+import GroupController from './controllers/group.js';
+import UserController from './controllers/user.js';
 import PreprintController from './controllers/preprint.js';
-import PrereviewModel from './models/prereview.js';
 import PrereviewController from './controllers/prereview.js';
 
 const __dirname = path.resolve();
 const STATIC_DIR = path.resolve(__dirname, 'dist', 'frontend');
-const ENTRYPOINT = path.resolve(STATIC_DIR, 'index.html');
 
 export default function configServer(config) {
   // Initialize our application server
@@ -36,24 +44,46 @@ export default function configServer(config) {
   });
   server.use(log4js.koaLogger(log4js.getLogger('http'), { level: 'auto' }));
 
+  // Initialize database
+  const dbType = config.isDev ? 'sqlite' : 'postgres';
+  const [db, dbMiddleware] = dbWrapper(
+    dbType,
+    config.dbHost,
+    config.dbPort,
+    config.dbName,
+    config.dbUser,
+    config.dbPass,
+  );
+  server.use(dbMiddleware);
+
   // Setup auth handlers
-  const userModel = new UserModel(); 
-  const authz = authWrapper(); // authorization, not authentication
+  const userModel = UserModel(db);
+  const groupModel = GroupModel(db);
+  const authz = authWrapper(groupModel, config, authz); // authorization, not authentication
   server.use(authz.middleware());
 
   // setup API handlers
-  const auth = AuthController(userModel, config, authz); 
-  const preprintModel = new PreprintModel();
+  const auth = AuthController(userModel, config, authz);
+  const commentModel = CommentModel(db);
+  const communityModel = CommunityModel(db);
+  const fullReviewModel = FullReviewModel(db);
+  const groups = GroupController(groupModel, authz);
+  const prereviews = PrereviewController(fullReviewModel, authz);
+  const personaModel = PersonaModel(db);
+  const preprintModel = PreprintModel(db);
   const preprints = PreprintController(preprintModel, authz);
-  const prereviewModel = new PrereviewModel();
-  const prereviews = PrereviewController(prereviewModel, authz);
-  
+  const rapidReviewModel = RapidReviewModel(db);
+  const requestModel = RequestModel(db);
+  const tagModel = TagModel(db);
+  const users = UserController(userModel, authz);
+
   const apiV2Router = compose([
-    auth.middleware(), 
+    auth.middleware(),
+    groups.middleware(),
     preprints.middleware(),
     prereviews.middleware(),
+    users.middleware(),
   ]);
-
 
   // Add here only development middlewares
   // if (config.isDev) {
@@ -69,8 +99,6 @@ export default function configServer(config) {
 
   // Set custom error handler
   server.context.onerror = errorHandler;
-
-
 
   // If we're running behind Cloudflare, set the access parameters.
   if (config.cfaccess_url) {
@@ -100,10 +128,13 @@ export default function configServer(config) {
     .use(cors())
     .use(mount('/api/v2', apiV2Router))
     .use(mount('/static', serveStatic(STATIC_DIR)))
-    .use((ctx, next) => {
-      ctx.state.htmlEntrypoint = ENTRYPOINT;
-      ssr(ctx, next);
-    });
+    .use(
+      async (ctx, next) =>
+        await serveStatic(STATIC_DIR)(
+          Object.assign(ctx, { path: 'index.html' }),
+          next,
+        ),
+    );
 
   return server.callback();
 }
