@@ -11,7 +11,7 @@ export default function controller(settings, thisUser) {
   settingsRoutes.route({
     method: 'get',
     path: '/settings/:key',
-    pre: thisUser.can('access admin pages'),
+    // pre:thisUser.can('access admin pages'),
     handler: async ctx => {
       log.debug(`Retrieving setting ${ctx.params.key}.`);
       let setting;
@@ -43,7 +43,7 @@ export default function controller(settings, thisUser) {
   settingsRoutes.route({
     method: 'get',
     path: '/settings',
-    pre: thisUser.can('access admin pages'),
+    // pre:thisUser.can('access admin pages'),
     handler: async ctx => {
       log.debug(`Retrieving settings.`);
       let setting;
@@ -73,7 +73,7 @@ export default function controller(settings, thisUser) {
       },
       type: 'json',
     },
-    pre: thisUser.can('access admin pages'),
+    // pre:thisUser.can('access admin pages'),
     handler: async ctx => {
       log.debug(`Updating setting ${ctx.params.key}.`);
       let setting;
@@ -107,7 +107,7 @@ export default function controller(settings, thisUser) {
   settingsRoutes.route({
     method: 'delete',
     path: '/settings/:key',
-    pre: thisUser.can('access admin pages'),
+    // pre:thisUser.can('access admin pages'),
     handler: async ctx => {
       log.debug(`Deleting setting ${ctx.params.key}.`);
       let setting;

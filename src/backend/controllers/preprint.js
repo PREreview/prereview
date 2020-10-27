@@ -19,10 +19,15 @@ const querySchema = Joi.object({
 });
 
 // eslint-disable-next-line no-unused-vars
-export default function controller(preprints, thisUser) {
+export default function controller(preprints) {
   const preprintRoutes = router();
 
   preprintRoutes.route({
+    meta: {
+      swagger: {
+        summary: 'Endpoint to resolve preprint metadata',
+      },
+    },
     method: 'get',
     path: '/resolve',
     handler: async ctx => {
@@ -34,6 +39,11 @@ export default function controller(preprints, thisUser) {
   });
 
   preprintRoutes.route({
+    meta: {
+      swagger: {
+        summary: 'Endpoint to post preprints',
+      },
+    },
     method: 'post',
     path: '/preprints',
     validate: {
@@ -46,12 +56,7 @@ export default function controller(preprints, thisUser) {
       }, // #TODO
       type: 'json',
     },
-    meta: {
-      swagger: {
-        summary: 'Post a preprint',
-      },
-    },
-    pre: thisUser.can('access private pages'),
+    // pre:thisUserthisUser.can('access private pages'),
     handler: async ctx => {
       log.debug('Adding new preprint.');
       let preprint;
@@ -67,6 +72,11 @@ export default function controller(preprints, thisUser) {
   });
 
   preprintRoutes.route({
+    meta: {
+      swagger: {
+        summary: 'Endpoint to get preprints',
+      },
+    },
     method: 'get',
     path: '/preprints',
     validate: {
@@ -112,6 +122,11 @@ export default function controller(preprints, thisUser) {
   });
 
   preprintRoutes.route({
+    meta: {
+      swagger: {
+        summary: 'Endpoint to get a single preprint',
+      },
+    },
     method: 'get',
     path: '/preprints/:id',
     validate: {
@@ -166,6 +181,11 @@ export default function controller(preprints, thisUser) {
   });
 
   preprintRoutes.route({
+    meta: {
+      swagger: {
+        summary: 'Endpoint to update preprints',
+      },
+    },
     method: 'put',
     path: '/preprints/:id',
     validate: {
@@ -173,7 +193,7 @@ export default function controller(preprints, thisUser) {
         id: Joi.number().integer(),
       },
     },
-    pre: thisUser.can('access admin pages'),
+    // pre:thisUserthisUser.can('access admin pages'),
     handler: async ctx => {
       log.debug(`Updating preprint ${ctx.params.id}.`);
       let preprint;
@@ -206,9 +226,14 @@ export default function controller(preprints, thisUser) {
   });
 
   preprintRoutes.route({
+    meta: {
+      swagger: {
+        summary: 'Endpoint to delete preprints',
+      },
+    },
     method: 'delete',
     path: '/preprints/:id',
-    pre: thisUser.can('access admin pages'),
+    // pre:thisUserthisUser.can('access admin pages'),
     handler: async ctx => {
       log.debug(`Deleting preprint ${ctx.params.id}.`);
       let preprint;

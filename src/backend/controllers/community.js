@@ -4,18 +4,18 @@ import { getLogger } from '../log.js';
 const log = getLogger('backend:controller:community');
 const Joi = router.Joi;
 
-export default function controller(communities, thisUser) {
+export default function controller(communities) {
   const communityRouter = router();
 
   communityRouter.route({
     method: 'post',
     path: '/communities',
-    pre: thisUser.can('access admin pages'),
+    // pre:thisUserthisUser.can('access admin pages'),
     validate: {
       body: Joi.array()
         .items(
           Joi.object({
-            name: Joi.string().unique(),
+            name: Joi.string(),
             description: Joi.string(),
           }),
         )
