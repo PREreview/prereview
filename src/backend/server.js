@@ -66,6 +66,7 @@ export default function configServer(config) {
   // setup API handlers
   const auth = AuthController(userModel, config, authz);
   const commentModel = CommentModel(db);
+  const comments = CommentController(commentModel, authz)
   const communityModel = CommunityModel(db);
   const fullReviewModel = FullReviewModel(db);
   const groups = GroupController(groupModel, authz);
@@ -82,6 +83,7 @@ export default function configServer(config) {
 
   const apiV2Router = compose([
     auth.middleware(),
+    comment.middleware(),
     groups.middleware(),
     preprints.middleware(),
     prereviews.middleware(),
