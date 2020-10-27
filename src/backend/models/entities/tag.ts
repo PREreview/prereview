@@ -30,7 +30,7 @@ export default class Tag {
   @Property()
   color?: string;
 
-  @ManyToMany(() => Preprint, preprint => preprint.tags)
+  @ManyToMany('Preprint', 'tags', { owner: true })
   preprints = new Collection<Preprint>(this);
 
   constructor(name: string, color = '#FF0000') {

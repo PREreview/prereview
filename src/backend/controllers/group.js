@@ -110,7 +110,7 @@ export default function controller(groups, thisUser) {
     validate: {
       query: querySchema,
       params: {
-        id: Joi.integer(),
+        id: Joi.number().integer(),
       },
     },
     pre: thisUser.can('access private pages'),

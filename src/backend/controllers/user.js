@@ -51,7 +51,7 @@ export default function controller(users, thisUser) {
     pre: thisUser.can('access private pages'),
     validate: {
       params: Joi.object({
-        id: Joi.integer(), // TODO should we be validating this?
+        id: Joi.number().integer(), // TODO should we be validating this?
       }),
       continueOnError: false,
       failure: 400,
@@ -82,7 +82,7 @@ export default function controller(users, thisUser) {
       }),
       type: 'json',
       params: Joi.object({
-        id: Joi.integer(),
+        id: Joi.number().integer(),
       }),
       continueOnError: false,
       false: 400,
@@ -107,7 +107,7 @@ export default function controller(users, thisUser) {
     path: '/users/:id',
     validate: {
       params: Joi.object({
-        id: Joi.integer(),
+        id: Joi.number().integer(),
       }),
     },
     pre: thisUser.can('access admin pages'), // TODO: can users delete their own account?

@@ -59,7 +59,7 @@ export default async function configServer(config) {
   // Setup auth handlers
   const userModel = UserModel(db);
   const groupModel = GroupModel(db);
-  const authz = authWrapper(groupModel, config, authz); // authorization, not authentication
+  const authz = authWrapper(groupModel); // authorization, not authentication
   server.use(authz.middleware());
 
   // setup API handlers

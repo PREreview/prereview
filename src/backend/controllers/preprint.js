@@ -116,7 +116,7 @@ export default function controller(preprints, thisUser) {
     path: '/preprints/:id',
     validate: {
       params: {
-        id: Joi.integer(),
+        id: Joi.number().integer(),
       },
       failure: 400,
       output: {
@@ -170,7 +170,7 @@ export default function controller(preprints, thisUser) {
     path: '/preprints/:id',
     validate: {
       params: {
-        id: Joi.integer(),
+        id: Joi.number().integer(),
       },
     },
     pre: thisUser.can('access admin pages'),

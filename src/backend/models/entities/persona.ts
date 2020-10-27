@@ -40,7 +40,7 @@ export default class Persona {
   @OneToMany('RapidReview', 'author')
   rapidReviews = new Collection<RapidReview>(this);
 
-  @ManyToMany()
+  @ManyToMany('FullReview', 'authors')
   fullReviews = new Collection<FullReview>(this);
 
   constructor(name: string, avatar: Buffer) {

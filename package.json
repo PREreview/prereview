@@ -33,8 +33,8 @@
     "doc": "jsdoc -d ./dist/doc/ -r ./src/backend ./src/frontend",
     "build": "rimraf dist && npm run build:backend && npm run build:frontend",
     "build:dev": "rimraf dist && npm run build:backend:dev && npm run build:frontend:dev",
-    "build:backend": "parcel build --target=backend src/backend/index.js --no-scope-hoist",
-    "build:backend:dev": "parcel build --target=backend --no-minify src/backend/index.js --no-scope-hoist",
+    "build:backend": "parcel build --target=backend --no-scope-hoist src/backend/index.js && npm run tsc",
+    "build:backend:dev": "parcel build --target=backend --no-minify --no-scope-hoist src/backend/index.js && npm run tsc",
     "build:frontend": "parcel build --target=frontend src/frontend/index.html",
     "build:frontend:dev": "parcel build --target=frontend --no-minify src/frontend/index.html",
     "tsc": "tsc",
@@ -155,6 +155,7 @@
     "react-pdf": "^4.1.0",
     "react-prerendered-component": "^1.2.4",
     "react-router-dom": "^5.1.2",
+    "reflect-metadata": "^0.1.13",
     "request-promise-native": "^1.0.8",
     "smoothscroll-polyfill": "^0.4.4",
     "socket.io-client": "^2.3.0",
@@ -251,7 +252,7 @@
     "useTsNode": true,
     "configPaths": [
       "./src/backend/mikro-orm.config.ts",
-      "./dist/backend/mikro-orm.config.js"
+      "./dist/mikro-orm.config.js"
     ]
   },
   "eslintConfig": {

@@ -8,6 +8,7 @@ import {
   Property,
 } from '@mikro-orm/core';
 import { PreprintModel } from '../preprints';
+import Community from './fullReview';
 import FullReview from './fullReview';
 import RapidReview from './rapidReview';
 import Request from './request';
@@ -15,7 +16,7 @@ import Tag from './tag';
 
 @Entity()
 export default class Preprint {
-  [EntityRepositoryType]?: PreprintModel;
+  [EntityRepositoryType]: PreprintModel;
 
   @PrimaryKey()
   id!: number;
@@ -44,7 +45,10 @@ export default class Preprint {
   @OneToMany('Request', 'preprint')
   requests = new Collection<Request>(this);
 
-  @ManyToMany()
+  @ManyToMany('Community', 'preprints')
+  communities = new Collection<Community>(this);
+
+  @ManyToMany('Tag', 'preprints')
   tags = new Collection<Tag>(this);
 
   constructor(title: string, uuid: string, url: string) {
