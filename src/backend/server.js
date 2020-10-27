@@ -29,6 +29,7 @@ import GroupController from './controllers/group.js';
 import UserController from './controllers/user.js';
 import PreprintController from './controllers/preprint.js';
 import PrereviewController from './controllers/prereview.js';
+import DocsRouter from './docs/apiDocs.js';
 
 const __dirname = path.resolve();
 const STATIC_DIR = path.resolve(__dirname, 'dist', 'frontend');
@@ -80,10 +81,12 @@ export default function configServer(config) {
   const requestModel = RequestModel(db);
   const tagModel = TagModel(db);
   const users = UserController(userModel, authz);
+  const apiDocs = DocsRouter();
 
   prereviews.use('/prereviews/:pid', comments.middleware());
 
   const apiV2Router = compose([
+    apiDocs.middleware(),
     auth.middleware(),
     comments.middleware(),
     communities.middleware(),
