@@ -23,6 +23,7 @@ import RapidReviewModel from './models/rapidReviews.ts';
 import RequestModel from './models/requests.ts';
 import TagModel from './models/tags.ts';
 import UserModel from './models/users.ts';
+import CommentController from './controllers/comment.js';
 import GroupController from './controllers/group.js';
 import UserController from './controllers/user.js';
 import PreprintController from './controllers/preprint.js';
@@ -76,6 +77,8 @@ export default function configServer(config) {
   const requestModel = RequestModel(db);
   const tagModel = TagModel(db);
   const users = UserController(userModel, authz);
+
+  prereviews.use('/prereviews/:pid', comments.middleware());
 
   const apiV2Router = compose([
     auth.middleware(),
