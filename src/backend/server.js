@@ -101,10 +101,7 @@ export default async function configServer(config) {
 
   // set up router for API docs
   const apiDocs = DocsRouter();
-  const apiDocsRouter = compose([
-    apiDocs.middleware()
-  ]);
-
+  const apiDocsRouter = compose([apiDocs.middleware()]);
 
   // Add here only development middlewares
   // if (config.isDev) {

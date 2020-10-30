@@ -44,6 +44,7 @@ export default function docs() {
   const specJson = JSON.stringify(spec, null, 2);
 
   routes.get('/openapi.json', async ctx => {
+    log.debug(`Serving OpenAPI-specified docs in JSON format.`);
     ctx.body = specJson;
   });
 
