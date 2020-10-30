@@ -1,3 +1,4 @@
+import { koaSwagger } from 'koa2-swagger-ui';
 import { SwaggerAPI } from 'koa-joi-router-docs';
 import preprintRoutes from '../controllers/preprint.js';
 import { getLogger } from '../log.js';
@@ -39,6 +40,7 @@ export default function docs() {
       }, // Custom default responses if you don't like default 200
     },
   );
+
   const specJson = JSON.stringify(spec, null, 2);
 
   routes.get('/openapi.json', async ctx => {
@@ -46,23 +48,13 @@ export default function docs() {
     ctx.body = specJson;
   });
 
-  routes.get('/docs', async ctx => {
-    ctx.body = `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <meta http-equiv="X-UA-Compatible" content="ie=edge">
-      <title>Example API</title>
-    </head>
-    <body>
-      <redoc spec-url='/api/v2/openapi.json' lazy-rendering></redoc>
-      <script src="https://rebilly.github.io/ReDoc/releases/latest/redoc.min.js"></script>
-    </body>
-    </html>
-    `;
-  });
+  routes.get(
+    '/docs',
+    koaSwagger({
+      routePrefix: false,
+      swaggerOptions: { spec },
+    }),
+  );
 
   return routes;
 }

@@ -128,6 +128,7 @@
     "koa-roles": "^2.0.0",
     "koa-session": "^5.13.1",
     "koa-static": "^5.0.0",
+    "koa2-swagger-ui": "^5.0.3",
     "lodash": "^4.17.19",
     "log4js": "^6.3.0",
     "lru-cache": "^6.0.0",
