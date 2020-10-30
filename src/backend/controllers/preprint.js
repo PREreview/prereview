@@ -50,30 +50,50 @@ export default function controller(preprints) {
       body: Joi.object({
         title: Joi.string(),
         url: Joi.string(),
-        uuid: Joi.string().guid({
-          version: ['uuidv4', 'uuidv5'],
-        }),
+        uuid: Joi.string().guid(),
       }), // #TODO
       type: 'json',
+      continueOnError: true,
     },
     // pre:thisUserthisUser.can('access private pages'),
-    handler: async ctx => {
+    handler: async (ctx, next) => {
+      if (ctx.invalid) {
+        log.error(
+          'HTTP 400 Error. This is the error object: ',
+          '\n',
+          ctx.invalid,
+        );
+        ctx.response.status = 400;
+        ctx.body = {
+          statusCode: 400,
+          status: 'HTTP 400 error',
+          error: ctx.invalid.body ? ctx.invalid.body.name : ctx.invalid,
+          message: ` ${ctx.invalid.body.name}: ${ctx.invalid.body.msg}`,
+        };
+        return next();
+      }
+
       log.debug('Adding new preprint.');
       let preprint;
 
       try {
-        preprint = preprints.create(ctx.request.body);
+        preprint = preprints.create(ctx.request.body.data);
         await preprints.persistAndFlush(preprint);
+        ctx.response.status = 201;
+        ctx.body = {
+          statusCode: 201,
+          status: 'created',
+          data: preprint,
+        };
       } catch (err) {
+        log.debug('In the error block...');
         log.error('HTTP 400 Error: ', err);
-        ctx.throw(400, `Failed to parse preprint schema: ${err}`);
+        ctx.response.status = 400;
+        ctx.body = {
+          statusCode: 400,
+          message: 'error from the catch block',
+        };
       }
-
-      ctx.body = {
-        statusCode: 201,
-        status: 'created',
-        data: preprint,
-      };
     },
   });
 
@@ -105,7 +125,6 @@ export default function controller(preprints) {
             },
           },
         },
-        failure: 400,
       },
     },
     handler: async ctx => {
