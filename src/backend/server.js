@@ -86,12 +86,10 @@ export default async function configServer(config) {
   // eslint-disable-next-line no-unused-vars
   const tagModel = TagModel(db);
   const users = UserController(userModel, authz);
-  const apiDocs = DocsRouter();
 
   prereviews.use('/prereviews/:pid', comments.middleware());
 
   const apiV2Router = compose([
-    apiDocs.middleware(),
     auth.middleware(),
     comments.middleware(),
     communities.middleware(),
@@ -100,6 +98,13 @@ export default async function configServer(config) {
     prereviews.middleware(),
     users.middleware(),
   ]);
+
+  // set up router for API docs
+  const apiDocs = DocsRouter();
+  const apiDocsRouter = compose([
+    apiDocs.middleware()
+  ]);
+
 
   // Add here only development middlewares
   // if (config.isDev) {
@@ -142,6 +147,7 @@ export default async function configServer(config) {
     .use(passport.initialize())
     .use(passport.session())
     .use(cors())
+    .use(mount('/api', apiDocsRouter))
     .use(mount('/api/v2', apiV2Router))
     .use(mount('/static', serveStatic(STATIC_DIR)))
     .use(
