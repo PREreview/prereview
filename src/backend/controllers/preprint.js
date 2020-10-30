@@ -47,13 +47,13 @@ export default function controller(preprints) {
     method: 'post',
     path: '/preprints',
     validate: {
-      body: {
-        doi: Joi.string(),
+      body: Joi.object({
         title: Joi.string(),
-        server: Joi.string(),
         url: Joi.string(),
-        pdfUrl: Joi.string(),
-      }, // #TODO
+        uuid: Joi.string().guid({
+          version: ['uuidv4', 'uuidv5'],
+        }),
+      }), // #TODO
       type: 'json',
     },
     // pre:thisUserthisUser.can('access private pages'),
@@ -68,6 +68,12 @@ export default function controller(preprints) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse preprint schema: ${err}`);
       }
+
+      ctx.body = {
+        statusCode: 201,
+        status: 'created',
+        data: preprint,
+      };
     },
   });
 
@@ -89,11 +95,11 @@ export default function controller(preprints) {
               status: 'ok',
               data: Joi.array().items(
                 Joi.object({
-                  doi: Joi.string(),
                   title: Joi.string(),
-                  server: Joi.string(),
                   url: Joi.string(),
-                  pdfUrl: Joi.string(),
+                  uuid: Joi.string().guid({
+                    version: ['uuidv4', 'uuidv5'],
+                  }),
                 }).min(1),
               ),
             },
@@ -108,7 +114,7 @@ export default function controller(preprints) {
       try {
         const allPreprints = await preprints.findAll();
         if (allPreprints) {
-          ctx.response.body = {
+          ctx.body = {
             statusCode: 200,
             status: 'ok',
             data: allPreprints,
