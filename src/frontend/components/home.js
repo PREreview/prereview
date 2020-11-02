@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import omit from 'lodash/omit';
+import { useGet } from 'restful-react';
 import { MdChevronRight, MdFirstPage } from 'react-icons/md';
 import PrivateRoute from './private-route';
-import { usePreprintSearchResults } from '../hooks/api-hooks';
 import {
   useIsNewVisitor,
   useIsMobile,
@@ -33,6 +33,16 @@ export default function Home() {
   const history = useHistory();
   const location = useLocation();
 
+  const { data: preprints, loading, refetch } = useGet({
+    path: 'preprints', // inferred from RestfulProvider in index.js
+    lazy: true,
+  });
+
+  const apiQs = apifyPreprintQs(
+    location.search,
+    location.state && location.state.bookmark,
+  );
+
   const [user] = useUser();
   const isMobile = useIsMobile();
   const [showLeftPanel, setShowLeftPanel] = useState(!isMobile);
@@ -41,17 +51,7 @@ export default function Home() {
   const [isWelcomeModalOpen, setIsWelcomeModalOpen] = useState(true);
   const [newPreprints, setNewPreprints] = useNewPreprints();
 
-  const apiQs = apifyPreprintQs(
-    location.search,
-    location.state && location.state.bookmark,
-  );
-  const [results, fetchResultsProgress] = usePreprintSearchResults(apiQs);
-
   const [hoveredSortOption, setHoveredSortOption] = useState(null);
-
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [apiQs]);
 
   const params = new URLSearchParams(location.search);
 
@@ -104,7 +104,9 @@ export default function Home() {
     [user, history],
   );
 
-  return (
+  return loading ? (
+    <div>Loading...</div>
+  ) : (
     <div className="home">
       <Helmet>
         <title>{ORG} • Home</title>
@@ -119,12 +121,12 @@ export default function Home() {
         />
       )}
       <HeaderBar
-        onClickMenuButton={e => {
+        onClickMenuButton={() => {
           setShowLeftPanel(!showLeftPanel);
         }}
       />
 
-      <SearchBar isFetching={fetchResultsProgress.isActive} />
+      <SearchBar isFetching={loading} />
 
       <div className="home__main">
         <LeftSidePanel
@@ -135,18 +137,16 @@ export default function Home() {
         >
           <Facets
             counts={
-              fetchResultsProgress.isActive || results.search !== apiQs
+              (preprints && loading) || (preprints && preprints.search) !== apiQs
                 ? undefined
-                : results.counts
+                : preprints.counts
             }
             ranges={
-              fetchResultsProgress.isActive || results.search !== apiQs
+              (preprints && loading) || (preprints && preprints.search) !== apiQs
                 ? undefined
-                : results.ranges
+                : preprints.ranges
             }
-            isFetching={
-              fetchResultsProgress.isActive || results.search !== apiQs
-            }
+            isFetching={loading}
           />
         </LeftSidePanel>
 
@@ -156,7 +156,7 @@ export default function Home() {
               Preprints with reviews or requests for reviews
             </h3>
             <AddButton
-              onClick={e => {
+              onClick={() => {
                 if (user) {
                   history.push('/new');
                 } else {
@@ -194,7 +194,7 @@ export default function Home() {
                     setNewPreprints(newPreprints.concat(preprint));
                   }
                 }}
-                onViewInContext={({ preprint, tab }, isNew) => {
+                onViewInContext={({ preprint, tab }) => {
                   history.push(
                     `/${unprefix(preprint.doi || preprint.arXivId)}`,
                     {
@@ -221,7 +221,7 @@ export default function Home() {
             onMouseEnterSortOption={sortOption => {
               setHoveredSortOption(sortOption);
             }}
-            onMouseLeaveSortOption={sortOption => {
+            onMouseLeaveSortOption={() => {
               setHoveredSortOption(null);
             }}
             onChange={(
@@ -257,7 +257,7 @@ export default function Home() {
             </ul>
           )}
 
-          {results.total_rows === 0 && !fetchResultsProgress.isActive ? (
+          {!preprints || (preprints.total_rows === 0 && !loading) ? (
             <div>
               No preprints about this topic have been added to Rapid PREreview.{' '}
               {!!location.search && (
@@ -266,12 +266,12 @@ export default function Home() {
                 </XLink>
               )}
             </div>
-          ) : results.bookmark ===
+          ) : preprints.bookmark ===
             (location.state && location.state.bookmark) ? (
-            <div>No more results.</div>
+            <div>No more preprints.</div>
           ) : (
             <ul className="home__preprint-list">
-              {results.rows.map(row => (
+              {preprints.rows.map(row => (
                 <li key={row.id} className="home__preprint-list__item">
                   <PreprintCard
                     isNew={false}
@@ -304,27 +304,21 @@ export default function Home() {
                 <MdFirstPage /> First page
               </Button>
             )}
-            {/* Cloudant returns the same bookmark when it hits the end of the list */}
-            {!!(
-              results.rows.length < results.total_rows &&
-              results.bookmark !== (location.state && location.state.bookmark)
-            ) && (
-              <Button
-                className="home__next-page-button"
-                onClick={() => {
-                  history.push({
-                    pathname: location.pathname,
-                    search: createPreprintQs(
-                      { text: params.get('q') },
-                      location.search,
-                    ),
-                    state: { bookmark: results.bookmark },
-                  });
-                }}
-              >
-                Next Page <MdChevronRight />
-              </Button>
-            )}
+            <Button
+              className="home__next-page-button"
+              onClick={() => {
+                history.push({
+                  pathname: location.pathname,
+                  search: createPreprintQs(
+                    { text: params.get('q') },
+                    location.search,
+                  ),
+                  state: { bookmark: preprints.bookmark },
+                });
+              }}
+            >
+              Next Page <MdChevronRight />
+            </Button>
           </div>
         </div>
 

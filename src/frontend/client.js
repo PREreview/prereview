@@ -4,6 +4,7 @@ import ReactDOM from 'react-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import { BrowserRouter } from 'react-router-dom';
 import { rehydrateMarks } from 'react-imported-component';
+import { RestfulProvider } from 'restful-react';
 import { ThemeProvider } from '@material-ui/core/styles';
 import theme from './theme.js';
 import App from './components/app.js';
@@ -18,7 +19,9 @@ export const start = ({ isProduction, document, module, hydrate }) => {
     <HelmetProvider>
       <BrowserRouter>
         <ThemeProvider theme={theme}>
-          <App />
+          <RestfulProvider base="/api/v2/">
+            <App />
+          </RestfulProvider>
         </ThemeProvider>
       </BrowserRouter>
     </HelmetProvider>
