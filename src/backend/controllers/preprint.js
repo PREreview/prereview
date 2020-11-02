@@ -9,7 +9,7 @@ const querySchema = Joi.object({
   start: Joi.number()
     .integer()
     .greater(-1),
-  end: Joi.number()
+  end: Joi.number() 
     .integer()
     .positive(),
   asc: Joi.boolean(),
@@ -22,6 +22,8 @@ const querySchema = Joi.object({
 export default function controller(preprints) {
   const preprintRoutes = router();
 
+
+  // RESOLVE PREPRINT METADATA
   preprintRoutes.route({
     meta: {
       swagger: {
@@ -38,6 +40,7 @@ export default function controller(preprints) {
     },
   });
 
+  // POST   
   preprintRoutes.route({
     meta: {
       swagger: {
@@ -63,13 +66,16 @@ export default function controller(preprints) {
           '\n',
           ctx.invalid,
         );
+        
         ctx.response.status = 400;
+
         ctx.body = {
           statusCode: 400,
           status: 'HTTP 400 error',
-          error: ctx.invalid.body ? ctx.invalid.body.name : ctx.invalid,
+          error: ctx.invalid.body ? ctx.invalid.body.name : ctx.invalid, // TODO: make dynamic
           message: ` ${ctx.invalid.body.name}: ${ctx.invalid.body.msg}`,
         };
+        
         return next();
       }
 
@@ -88,15 +94,12 @@ export default function controller(preprints) {
       } catch (err) {
         log.debug('In the error block...');
         log.error('HTTP 400 Error: ', err);
-        ctx.response.status = 400;
-        ctx.body = {
-          statusCode: 400,
-          message: 'error from the catch block',
-        };
+        ctx.response.status = 400
       }
     },
   });
 
+  // GET ALL
   preprintRoutes.route({
     meta: {
       swagger: {
@@ -125,6 +128,7 @@ export default function controller(preprints) {
             },
           },
         },
+        continueOnError: true
       },
     },
     handler: async ctx => {
