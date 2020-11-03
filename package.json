@@ -42,7 +42,9 @@
     "start:backend": "cross-env PREREVIEW_PORT=3001 node dist/backend/index.js",
     "start": "npm run start:backend",
     "start:frontend": "parcel serve -p 3000 src/frontend/index.html",
-    "start:dev": "concurrently -p \"[{name}]\" -n \"BACKEND,FRONTEND\" -c \"bgBlue.bold,bgMagenta.bold\" \"npm run start:backend\" \"npm run start:frontend\""
+    "start:dev": "concurrently -p \"[{name}]\" -n \"BACKEND,FRONTEND\" -c \"bgBlue.bold,bgMagenta.bold\" \"npm run start:backend\" \"npm run start:frontend\"",
+    "generate-fetcher": "restful-react import --file docs.json --output docs.tsx",
+    "postgenerate-fetcher": "prettier docs.d.tsx --write"
   },
   "backend": "dist/backend/index.js",
   "frontend": "dist/frontend/index.html",

@@ -113,5 +113,9 @@ dev.sqlite3
 # MikroORM Cache
 .mikroorm-cache
 
+# RESTful react docs
+docs.json
+docs.d.tsx
+
 # Junk
 .DS_Store
