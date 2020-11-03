@@ -1,6 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { useLocation, useHistory } from 'react-router-dom';
+import { useGet } from 'restful-react';
 import identifiersArxiv from 'identifiers-arxiv';
 import doiRegex from 'doi-regex';
 import {
@@ -58,9 +59,11 @@ export default function NewPreprint({
       null,
   });
 
-  const [actions, fetchActionsProgress] = usePreprintActions(identifier);
+  const [actions, loadingActions, refetchActions] = usePreprintActions(
+    identifier,
+  );
 
-  const [preprint, resolvePreprintStatus] = usePreprint(
+  const [preprint, loadingPreprint, refetchPreprint] = usePreprint(
     identifier,
     location.state && location.state.preprint,
     url,
@@ -77,7 +80,7 @@ export default function NewPreprint({
   );
 
   const isNew =
-    !fetchActionsProgress.isActive &&
+    !loadingPreprint &&
     actions.filter(_action => getId(_action) !== getId(action)).length === 0;
 
   const handleViewInContext = useCallback(
@@ -92,7 +95,7 @@ export default function NewPreprint({
       {step === 'NEW_PREPRINT' ? (
         <StepPreprint
           actions={actions}
-          fetchActionsProgress={fetchActionsProgress}
+          loadingActions={loadingActions}
           user={user}
           onCancel={onCancel}
           onStep={setStep}
@@ -174,7 +177,7 @@ function StepPreprint({
   identifier,
   preprint,
   actions,
-  fetchActionsProgress,
+  loadingActions,
   resolvePreprintStatus,
   onViewInContext,
 }) {
@@ -245,7 +248,7 @@ function StepPreprint({
 
       {preprint ? (
         <PreprintPreview preprint={preprint} />
-      ) : resolvePreprintStatus.isActive ? (
+      ) : loadingPreprint ? (
         <p>{`resolving ${identifier}`}</p>
       ) : resolvePreprintStatus.error &&
         resolvePreprintStatus.error.statusCode === 404 &&
@@ -267,9 +270,7 @@ function StepPreprint({
         </p>
       ) : null}
 
-      {fetchActionsProgress.isActive && (
-        <p>Checking for existing reviews or requests for reviews…</p>
-      )}
+      {loadingPreprint && <p>Checking for existing reviews or requests for reviews…</p>}
 
       <Controls
         className="new-preprint__button-bar"
@@ -289,7 +290,7 @@ function StepPreprint({
             onStep('NEW_REQUEST');
           }}
           disabled={
-            fetchActionsProgress.isActive ||
+            loadingActions ||
             hasRequested ||
             !identifier ||
             !preprint
@@ -305,7 +306,7 @@ function StepPreprint({
             });
           }}
           disabled={
-            fetchActionsProgress.isActive ||
+            loadingActions ||
             hasReviewed ||
             !identifier ||
             !preprint
@@ -326,7 +327,7 @@ StepPreprint.propTypes = {
   preprint: PropTypes.object,
   resolvePreprintStatus: PropTypes.object.isRequired,
   actions: PropTypes.array.isRequired,
-  fetchActionsProgress: PropTypes.object.isRequired,
+  loadingActions: PropTypes.bool.isRequired,
   onViewInContext: PropTypes.func.isRequired,
 };
 

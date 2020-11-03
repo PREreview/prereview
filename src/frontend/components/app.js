@@ -88,7 +88,10 @@ export default function App({ user }) {
                   <Moderate />
                 </Suspense>
               </ModeratorRoute>
-              <Route exact={true} path="/preprint/:identifierPart1/:identifierPart2?">
+              <Route
+                exact={true}
+                path="/preprint/:identifierPart1/:identifierPart2?"
+              >
                 <ExtensionFallback />
               </Route>
 

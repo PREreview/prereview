@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import noop from 'lodash/noop';
+import { useGet } from 'restful-react';
 import { createError } from '../utils/errors';
 import { unprefix, getId, arrayify } from '../utils/jsonld';
 import { createPreprintId } from '../utils/ids';
@@ -143,14 +144,14 @@ export function usePreprint(
 ) {
   identifier = unprefix(identifier);
 
-  const [progress, setProgress] = useState({
-    isActive: false,
-    error: null,
+  const { data: resolvedPreprint, loading, refetch } = useGet({
+    path: `resolve?identifier=${encodeURIComponent(identifier)}${
+      fallbackUrl ? `&url=${encodeURIComponent(fallbackUrl)}` : ''
+    }`,
+    lazy: true,
   });
 
   const [preprint, setPreprint] = useState(null);
-
-  const { preprintsWithActionsStore } = useStores();
 
   useEffect(() => {
     if (identifier) {
@@ -161,76 +162,21 @@ export function usePreprint(
           identifier
       ) {
         cached = prefetchedPreprint;
-      } else if (preprintsWithActionsStore.has(identifier)) {
-        cached = preprintsWithActionsStore.get(identifier, { actions: false });
+      } else if (resolvedPreprint.has(identifier)) {
+        cached = resolvedPreprint.get(identifier, { actions: false });
       }
 
       if (cached) {
-        setProgress({
-          isActive: false,
-          error: null,
-        });
         setPreprint(cached);
       } else {
-        setProgress({
-          isActive: true,
-          error: null,
-        });
-        setPreprint(null);
-
-        const controller = new AbortController();
-
-        fetch(
-          `api/v2/resolve?identifier=${encodeURIComponent(identifier)}${
-            fallbackUrl ? `&url=${encodeURIComponent(fallbackUrl)}` : ''
-          }`,
-          {
-            signal: controller.signal,
-          },
-        )
-          .then(resp => {
-            if (resp.ok) {
-              return resp.json();
-            } else {
-              return resp.json().then(
-                body => {
-                  throw createError(resp.status, body.description || body.name);
-                },
-                err => {
-                  throw createError(resp.status, 'something went wrong');
-                },
-              );
-            }
-          })
-          .then(data => {
-            preprintsWithActionsStore.set(data, {
-              onlyIfNotExisting: true,
-              emit: false,
-            });
-            setPreprint(data);
-            setProgress({ isActive: false, error: null });
-          })
-          .catch(err => {
-            if (err.name !== 'AbortError') {
-              setProgress({ isActive: false, error: err });
-              setPreprint(null);
-            }
-          });
-
-        return () => {
-          controller.abort();
-        };
+        setPreprint(resolvedPreprint);
       }
     } else {
-      setProgress({
-        isActive: false,
-        error: null,
-      });
       setPreprint(null);
     }
-  }, [identifier, fallbackUrl, prefetchedPreprint, preprintsWithActionsStore]);
+  }, [identifier, fallbackUrl, prefetchedPreprint]);
 
-  return [preprint, progress];
+  return [preprint, loading, refetch];
 }
 
 /**
@@ -238,84 +184,13 @@ export function usePreprint(
  * associated with a preprint
  */
 export function usePreprintActions(identifier) {
-  const { preprintsWithActionsStore } = useStores();
 
-  const [progress, setProgress] = useState({
-    isActive: true,
-    error: null,
+  const { data: actions, loading, refetch } = useGet({
+    path: `preprint/${unprefix(createPreprintId(identifier))}`,
+    lazy: true,
   });
 
-  const [actions, setActions] = useState(
-    identifier ? preprintsWithActionsStore.getActions(identifier) : [],
-  );
-
-  useEffect(() => {
-    // keep `actions` up-to-date
-    function update(preprint) {
-      if (createPreprintId(preprint) === createPreprintId(identifier)) {
-        setActions(arrayify(preprint.potentialAction));
-      }
-    }
-
-    preprintsWithActionsStore.addListener('SET', update);
-
-    return () => {
-      preprintsWithActionsStore.removeListener('SET', update);
-    };
-  }, [identifier, preprintsWithActionsStore]);
-
-  useEffect(() => {
-    if (identifier) {
-      setProgress({
-        isActive: true,
-        error: null,
-      });
-      setActions(preprintsWithActionsStore.getActions(identifier));
-
-      const controller = new AbortController();
-
-      fetch(`api/v2/preprint/${unprefix(createPreprintId(identifier))}`, {
-        signal: controller.signal,
-      })
-        .then(resp => {
-          if (resp.ok) {
-            return resp.json();
-          } else {
-            return resp.json().then(
-              body => {
-                throw createError(resp.status, body.description || body.name);
-              },
-              err => {
-                throw createError(resp.status, 'something went wrong');
-              },
-            );
-          }
-        })
-        .then(data => {
-          preprintsWithActionsStore.set(data);
-          setActions(arrayify(data.potentialAction));
-          setProgress({ isActive: false, error: null });
-        })
-        .catch(err => {
-          if (err.name !== 'AbortError') {
-            setProgress({ isActive: false, error: err });
-            setActions([]);
-          }
-        });
-
-      return () => {
-        controller.abort();
-      };
-    } else {
-      setProgress({
-        isActive: false,
-        error: null,
-      });
-      setActions([]);
-    }
-  }, [identifier, preprintsWithActionsStore]);
-
-  return [actions, progress];
+  return [actions, loading, refetch];
 }
 
 /**
