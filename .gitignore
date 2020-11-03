@@ -114,8 +114,8 @@ dev.sqlite3
 .mikroorm-cache
 
 # RESTful react docs
-docs.json
-docs.d.tsx
+hooks.json
+hooks.d.tsx
 
 # Junk
 .DS_Store
