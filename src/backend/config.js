@@ -28,6 +28,7 @@ const defaults = {
     pool_max: process.env.PREREVIEW_DB_POOL_MAX || 10,
     timeout: process.env.PREREVIEW_DB_TIMEOUT || 0,
   },
+  secrets: process.env.PREREVIEW_SECRETS,
   server: {
     port: process.env.PREREVIEW_PORT || '3000',
   },
@@ -206,6 +207,12 @@ export default program
     'Logging verbosity',
     validateLoglevel,
     defaults.loglevel,
+  )
+  .option(
+    '-s, --secrets <string>',
+    'Session secret(s)',
+    validateArray,
+    defaults.secrets,
   )
   .option('--no-proxy', 'Disable support for proxy headers')
   .option('--db-host <host>', 'Database host', validateHost, defaults.db.host)
