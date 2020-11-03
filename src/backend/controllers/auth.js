@@ -8,8 +8,6 @@ const log = getLogger('backend:controllers:auth');
 
 export default function controller(users, config, thisUser) {
   const authRouter = router();
-  log.debug('Authenticating user...');
-
   /**
    * Serialize user
    *
@@ -52,9 +50,18 @@ export default function controller(users, config, thisUser) {
       );
     }
 
+    log.debug('In the auth callback.');
+    log.debug('***************PARAMS***********', params);
+
     try {
-      const user = await users.persistAndFlush({ orcid: params.orcid });
-      log.debug('passport.use, username: ', user);
+      const user = users.create({
+        orcid: params.orcid,
+        username: params.username,
+        email: params.email,
+        name: params.name,
+      });
+      await users.persistAndFlush(user);
+      log.debug('**************User:', user);
       if (user) {
         log.debug('Authenticated user!');
         done(null, user);
@@ -100,12 +107,12 @@ export default function controller(users, config, thisUser) {
   passport.use(strategy);
 
   // start ORCID authentication
-  authRouter.get('auth/orcid/login', passport.authenticate('orcid'));
+  authRouter.get('/auth/orcid/login', passport.authenticate('orcid'));
 
   //finish ORCID authentication
   authRouter.route({
     method: 'get',
-    path: 'auth/orcid/callback',
+    path: '/auth/orcid/callback',
     handler: async ctx => {
       log.debug('Finishing authenticating with ORCID...');
       return passport.authenticate('orcid', (err, user) => {

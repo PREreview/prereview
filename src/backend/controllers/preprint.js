@@ -9,7 +9,7 @@ const querySchema = Joi.object({
   start: Joi.number()
     .integer()
     .greater(-1),
-  end: Joi.number() 
+  end: Joi.number()
     .integer()
     .positive(),
   asc: Joi.boolean(),
@@ -21,7 +21,6 @@ const querySchema = Joi.object({
 // eslint-disable-next-line no-unused-vars
 export default function controller(preprints) {
   const preprintRoutes = router();
-
 
   // RESOLVE PREPRINT METADATA
   preprintRoutes.route({
@@ -40,7 +39,7 @@ export default function controller(preprints) {
     },
   });
 
-  // POST   
+  // POST
   preprintRoutes.route({
     meta: {
       swagger: {
@@ -66,7 +65,7 @@ export default function controller(preprints) {
           '\n',
           ctx.invalid,
         );
-        
+
         ctx.response.status = 400;
 
         ctx.body = {
@@ -75,7 +74,7 @@ export default function controller(preprints) {
           error: ctx.invalid.body ? ctx.invalid.body.name : ctx.invalid, // TODO: make dynamic
           message: ` ${ctx.invalid.body.name}: ${ctx.invalid.body.msg}`,
         };
-        
+
         return next();
       }
 
@@ -94,7 +93,7 @@ export default function controller(preprints) {
       } catch (err) {
         log.debug('In the error block...');
         log.error('HTTP 400 Error: ', err);
-        ctx.response.status = 400
+        ctx.response.status = 400;
       }
     },
   });
@@ -128,7 +127,7 @@ export default function controller(preprints) {
             },
           },
         },
-        continueOnError: true
+        continueOnError: true,
       },
     },
     handler: async ctx => {
