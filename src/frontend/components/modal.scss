@@ -9,9 +9,23 @@
   min-width: 400px;
   position: absolute;
   top: 50%;
-  transform: translate(-50%, -50%);
+  transform: translate(-45%, -70%);
   width: fit-content !important;
   z-index: 1005;
+
+  &:before {
+    background-color: rgba(0, 0, 0, 0.5);
+    bottom: 0;
+    content: '';
+    height: 200%;
+    left: 50%;
+    position: fixed;
+    right: 0;
+    top: 50%;
+    transform: translate(-60%, -50%);
+    width: 270%;
+    z-index: -1;
+  }
 }
 
 .rpos-modal {
