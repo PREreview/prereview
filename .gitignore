@@ -115,7 +115,6 @@ dev.sqlite3
 
 # RESTful react docs
 hooks.json
-hooks.d.tsx
 
 # Junk
 .DS_Store
