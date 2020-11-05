@@ -2,15 +2,14 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useLocation, useHistory } from 'react-router-dom';
 import { MdInfoOutline, MdWarning, MdCheck } from 'react-icons/md';
-import { getId, unprefix } from '../utils/jsonld';
-import { usePostAction } from '../hooks/api-hooks';
+import { unprefix } from '../utils/jsonld';
+import { UpdateUser } from '../hooks/api-hooks.tsx';
 import ToggleSwitch from './toggle-switch';
 import TextInput from './text-input';
 import Controls from './controls';
 import Button from './button';
 import IconButton from './icon-button';
 import Modal from './modal';
-import { createContactPointId } from '../utils/ids';
 
 export default function SettingsNotifications({ user }) {
   const history = useHistory();
@@ -21,8 +20,7 @@ export default function SettingsNotifications({ user }) {
 
   const params = new URLSearchParams(location.search);
 
-  const [postEmail, postEmailProgress] = usePostAction();
-  const [postActive, postActiveProgress] = usePostAction();
+  const updateUser = UpdateUser();
   const [modalType, setModalType] = useState(
     params.get('verified') === 'true' ? 'checked' : null,
   );
@@ -55,19 +53,12 @@ export default function SettingsNotifications({ user }) {
         <span>Enable notifications</span>
         <ToggleSwitch
           id="notification-switch"
-          disabled={postEmailProgress.isActive || postActiveProgress.isActive}
+          disabled={updateUser.loading}
           checked={contactPoint.active || false}
-          onChange={e => {
-            postActive({
-              '@type': 'UpdateContactPointAction',
-              agent: getId(user),
-              actionStatus: 'CompletedActionStatus',
-              object: createContactPointId(user),
-              payload: {
-                contactType: 'notifications',
-                active: !contactPoint.active,
-              },
-            });
+          onChange={() => {
+            updateUser({ contactPoint: contactPoint.active })
+              .then(() => alert('Contact info updated successfully.'))
+              .catch(err => alert(`An error occurred: ${err}`));
           }}
         />
       </div>
@@ -104,32 +95,20 @@ export default function SettingsNotifications({ user }) {
         </IconButton>
       </div>
 
-      <Controls error={postEmailProgress.error}>
+      <Controls
+        error={updateUser.error} // #FIXME
+      >
         <Button
-          disabled={
-            !isEmailValid ||
-            !email ||
-            postEmailProgress.isActive ||
-            postActiveProgress.isActive
-          }
-          isWaiting={postEmailProgress.isActive}
+          disabled={!isEmailValid || !email || updateUser.loading}
+          isWaiting={updateUser.loading}
           onClick={() => {
-            postEmail(
-              {
-                '@type': 'UpdateContactPointAction',
-                agent: getId(user),
-                actionStatus: 'CompletedActionStatus',
-                object: createContactPointId(user),
-                payload: {
-                  contactType: 'notifications',
-                  active: !!contactPoint.active,
-                  email: `mailto:${email}`,
-                },
-              },
-              action => {
-                setModalType('verifying');
-              },
-            );
+            updateUser({
+              contactPoint: contactPoint.active,
+              email: `mailto:${email}`,
+            })
+              .then(() => alert('Contact info updated successfully.'))
+              .catch(err => alert(`An error occurred: ${err}`));
+            setModalType('verifying');
           }}
         >
           {contactPoint.email ? 'Update' : 'Submit'}
@@ -156,14 +135,5 @@ export default function SettingsNotifications({ user }) {
 }
 
 SettingsNotifications.propTypes = {
-  user: PropTypes.shape({
-    '@id': PropTypes.string.isRequired,
-    '@type': PropTypes.oneOf(['Person']).isRequired,
-    contactPoint: PropTypes.shape({
-      '@type': PropTypes.oneOf(['ContactPoint']).isRequired,
-      email: PropTypes.string,
-      dateVerified: PropTypes.string,
-      active: PropTypes.bool,
-    }),
-  }).isRequired,
+  user: PropTypes.object.isRequired,
 };

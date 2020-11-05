@@ -1,23 +1,19 @@
-import React, { useCallback, useState } from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { getId } from '../utils/jsonld';
 import Org from './org';
 import XLink from './xlink';
 import Controls from './controls';
 import Button from './button';
-import { usePostAction } from '../hooks/api-hooks';
+import { UpdateKeys } from '../hooks/api-hooks.tsx'; // #FIXME need to build this
 
 export default function SettingsApi({ user }) {
-  const [post, postProgress] = usePostAction();
+  const updateKeys = UpdateKeys();
 
-  const handleSubmit = useCallback(() => {
-    post({
-      '@type': 'CreateApiKeyAction',
-      actionStatus: 'CompletedActionStatus',
-      agent: getId(user),
-      object: getId(user),
-    });
-  }, [post, user]);
+  const handleSubmit = () => {
+    updateKeys(user)
+      .then(() => alert('API key successfully updated.'))
+      .catch(err => alert(`An error occurred: ${err}`));
+  };
 
   return (
     <section className="settings-api settings__section">
@@ -37,11 +33,13 @@ export default function SettingsApi({ user }) {
             <Secret value={user.apiKey.value} />
           </p>
 
-          <Controls error={postProgress.error}>
+          <Controls
+            error={updateKeys.error} // #FIXME
+          >
             <Button
               onClick={handleSubmit}
-              disabled={postProgress.isActive}
-              isWaiting={postProgress.isActive}
+              disabled={updateKeys.loading}
+              isWaiting={updateKeys.loading}
             >
               Regenerate API key
             </Button>
@@ -49,11 +47,13 @@ export default function SettingsApi({ user }) {
         </div>
       ) : (
         <div>
-          <Controls error={postProgress.error}>
+          <Controls
+            error={updateKeys.error} // #FIXME
+          >
             <Button
               onClick={handleSubmit}
-              disabled={postProgress.isActive}
-              isWaiting={postProgress.isActive}
+              disabled={updateKeys.loading}
+              isWaiting={updateKeys.loading}
             >
               Create API key
             </Button>
@@ -65,14 +65,7 @@ export default function SettingsApi({ user }) {
 }
 
 SettingsApi.propTypes = {
-  user: PropTypes.shape({
-    '@id': PropTypes.string.isRequired,
-    '@type': PropTypes.oneOf(['Person']).isRequired,
-    apiKey: PropTypes.shape({
-      '@type': PropTypes.oneOf(['ApiKey']).isRequired,
-      value: PropTypes.string.isRequired,
-    }),
-  }).isRequired,
+  user: PropTypes.object.isRequired,
 };
 
 function Secret({ value, defaultIsVisible = false }) {

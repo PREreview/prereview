@@ -7,7 +7,7 @@ import Modal from './modal';
 import RoleEditor from './role-editor';
 import { RoleBadgeUI } from './role-badge';
 import Controls from './controls';
-import { usePostAction, useUserRoles } from '../hooks/api-hooks';
+import { UpdateUser, usePostAction, useUserRoles } from '../hooks/api-hooks.tsx';
 import { useIsFirstTimeOnSettings } from '../hooks/ui-hooks';
 import IncognitoIcon from '../svgs/incognito_icon.svg';
 import XLink from './xlink';
@@ -17,9 +17,9 @@ export default function SettingsRoles({ user }) {
   const [editedRoleId, setEditedRoleId] = useState(null);
   const [roles, fetchRolesProgress] = useUserRoles(user);
 
-  if (!roles) {
-    if (fetchRolesProgress.error) {
-      console.error(fetchRolesProgress.error);
+  if (!user) {
+    if (user.error) {
+      console.error(`Error: ${user.error}`);
     }
     return null;
   }
@@ -179,24 +179,8 @@ SettingsRoles.propTypes = {
   user: PropTypes.shape({
     orcid: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
-    defaultRole(props, propName, componentName) {
-      if (
-        props[propName] &&
-        !arrayify(props.hasRole).some(
-          role => getId(role) === getId(props[propName]),
-        )
-      ) {
-        return new Error(
-          `Invalid prop ${propName} supplied to ${componentName}. Value must be one of ${arrayify(
-            props.hasRole,
-          )
-            .map(getId)
-            .filter(Boolean)
-            .join(', ')}`,
-        );
-      }
-    },
     hasRole: PropTypes.arrayOf(PropTypes.string),
+    error: PropTypes.string,
   }).isRequired,
 };
 
