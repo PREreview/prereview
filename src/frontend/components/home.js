@@ -4,7 +4,7 @@ import { Helmet } from 'react-helmet-async';
 import omit from 'lodash/omit';
 import { MdChevronRight, MdFirstPage } from 'react-icons/md';
 import PrivateRoute from './private-route';
-import { usePreprintSearchResults } from '../hooks/api-hooks';
+import { GetPreprints } from '../hooks/api-hooks.tsx';
 import {
   useIsNewVisitor,
   useIsMobile,
@@ -45,7 +45,7 @@ export default function Home() {
     location.search,
     location.state && location.state.bookmark,
   );
-  const [results, fetchResultsProgress] = usePreprintSearchResults(apiQs);
+  const preprints = GetPreprints(apiQs);
 
   const [hoveredSortOption, setHoveredSortOption] = useState(null);
 
@@ -59,7 +59,7 @@ export default function Home() {
     preprint => {
       if (user) {
         history.push('/new', {
-          preprint: omit(preprint, ['potentialAction']),
+          preprint: omit(preprint, ['potentialAction']), // #FIXME, do we need omit?
           tab: 'review',
           isSingleStep: true,
         });
@@ -76,7 +76,7 @@ export default function Home() {
     preprint => {
       if (user) {
         history.push('/new', {
-          preprint: omit(preprint, ['potentialAction']),
+          preprint: omit(preprint, ['potentialAction']), // #FIXME, do we need omit?
           tab: 'request',
           isSingleStep: true,
         });
@@ -93,7 +93,7 @@ export default function Home() {
     preprint => {
       if (user) {
         history.push('/new', {
-          preprint: omit(preprint, ['potentialAction']),
+          preprint: omit(preprint, ['potentialAction']), // #FIXME, do we need omit?
         });
       } else {
         setLoginModalOpenNext(
@@ -119,12 +119,12 @@ export default function Home() {
         />
       )}
       <HeaderBar
-        onClickMenuButton={e => {
+        onClickMenuButton={() => {
           setShowLeftPanel(!showLeftPanel);
         }}
       />
 
-      <SearchBar isFetching={fetchResultsProgress.isActive} />
+      <SearchBar isFetching={preprints.loading} />
 
       <div className="home__main">
         <LeftSidePanel
@@ -135,18 +135,16 @@ export default function Home() {
         >
           <Facets
             counts={
-              fetchResultsProgress.isActive || results.search !== apiQs
+              preprints.loading || preprints.search !== apiQs
                 ? undefined
-                : results.counts
+                : preprints.counts
             }
             ranges={
-              fetchResultsProgress.isActive || results.search !== apiQs
+              preprints.loading || preprints.search !== apiQs
                 ? undefined
-                : results.ranges
+                : preprints.ranges
             }
-            isFetching={
-              fetchResultsProgress.isActive || results.search !== apiQs
-            }
+            isFetching={preprints.loading || preprints.search !== apiQs}
           />
         </LeftSidePanel>
 
@@ -156,7 +154,7 @@ export default function Home() {
               Preprints with reviews or requests for reviews
             </h3>
             <AddButton
-              onClick={e => {
+              onClick={() => {
                 if (user) {
                   history.push('/new');
                 } else {
@@ -187,13 +185,13 @@ export default function Home() {
                   history.push('/');
                   setNewPreprints(newPreprints.concat(preprint));
                 }}
-                onViewInContext={({ preprint, tab }, isNew) => {
+                onViewInContext={({ preprint, tab }) => {
                   history.push(
                     `/${unprefix(preprint.doi || preprint.arXivId)}`,
                     {
                       preprint: omit(preprint, ['potentialAction']),
                       tab,
-                    },
+                    }, // #FIXME, do we need omit?
                   );
                 }}
               />
@@ -214,7 +212,7 @@ export default function Home() {
             onMouseEnterSortOption={sortOption => {
               setHoveredSortOption(sortOption);
             }}
-            onMouseLeaveSortOption={sortOption => {
+            onMouseLeaveSortOption={() => {
               setHoveredSortOption(null);
             }}
             onChange={(
@@ -250,7 +248,7 @@ export default function Home() {
             </ul>
           )}
 
-          {results.total_rows === 0 && !fetchResultsProgress.isActive ? (
+          {preprints.total_rows === 0 && !preprints.loading ? (
             <div>
               No preprints about this topic have been added to Rapid PREreview.{' '}
               {!!location.search && (
@@ -259,12 +257,12 @@ export default function Home() {
                 </XLink>
               )}
             </div>
-          ) : results.bookmark ===
+          ) : preprints.bookmark ===
             (location.state && location.state.bookmark) ? (
             <div>No more results.</div>
           ) : (
             <ul className="home__preprint-list">
-              {results.rows.map(row => (
+              {preprints.rows.map(row => (
                 <li key={row.id} className="home__preprint-list__item">
                   <PreprintCard
                     isNew={false}
@@ -299,8 +297,8 @@ export default function Home() {
             )}
             {/* Cloudant returns the same bookmark when it hits the end of the list */}
             {!!(
-              results.rows.length < results.total_rows &&
-              results.bookmark !== (location.state && location.state.bookmark)
+              preprints.rows.length < preprints.total_rows &&
+              preprints.bookmark !== (location.state && location.state.bookmark)
             ) && (
               <Button
                 className="home__next-page-button"
@@ -311,7 +309,7 @@ export default function Home() {
                       { text: params.get('q') },
                       location.search,
                     ),
-                    state: { bookmark: results.bookmark },
+                    state: { bookmark: preprints.bookmark },
                   });
                 }}
               >

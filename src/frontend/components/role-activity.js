@@ -47,7 +47,7 @@ export default function RoleActivity({ roleId }) {
           <ul className="role-activity__list">
             {results.rows.map(({ doc }) => (
               <li key={getId(doc)} className="role-activity__list-item">
-                <ActivityCard action={doc} />
+                <ActivityCard preprint={doc} />
               </li>
             ))}
           </ul>
