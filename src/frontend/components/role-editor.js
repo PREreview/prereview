@@ -6,17 +6,16 @@ import { MdPerson } from 'react-icons/md';
 import Button from './button';
 import Controls from './controls';
 import TextInput from './text-input';
-import { usePostAction } from '../hooks/api-hooks';
-import { getId } from '../utils/jsonld';
+import { UpdateUser } from '../hooks/api-hooks.tsx';
 
-export default function RoleEditor({ user, role, onCancel, onSaved }) {
+export default function RoleEditor({ editor, user, onCancel, onSaved }) {
   const editorRef = useRef();
-  const [name, setName] = useState(role.name);
-  const [image, setImage] = useState(role.avatar && role.avatar.contentUrl);
+  const [name, setName] = useState(user.name);
+  const [image, setImage] = useState(user.avatar && user.avatar.contentUrl);
   const [file, setFile] = useState(null);
   const [scale, setScale] = useState(1);
   const [rotate, setRotate] = useState(0);
-  const [post, postProgressData] = usePostAction();
+  const updateUser = UpdateUser();
 
   const onDrop = useCallback(acceptedFiles => {
     const [file] = acceptedFiles;
@@ -63,7 +62,7 @@ export default function RoleEditor({ user, role, onCancel, onSaved }) {
 
         <div className="role-editor__avatar-block">
           <h4 className="role-editor__avatar-block-title">Avatar Editor</h4>
-          {/* The Dropzone. Note that we remove the input if an image is present so that when user move the image with DmD it doesn't open the file picker */}
+          {/* The Dropzone. Note that we remove the input if an image is present so that when editor moves the image with DmD it doesn't open the file picker */}
           <div
             {...getRootProps()}
             className="role-editor__avatar-editor-dropzone"
@@ -92,7 +91,7 @@ export default function RoleEditor({ user, role, onCancel, onSaved }) {
             </label>
           </div>
 
-          {/* Control to allow users to open the file picker (and to replace the one on the canvas). Once a file is in the canvas clicking on the canvas does _not_ open the file picker so this is necessary  */}
+          {/* Control to allow editors to open the file picker (and to replace the one on the canvas). Once a file is in the canvas clicking on the canvas does _not_ open the file picker so this is necessary  */}
 
           <input {...getInputProps()} id="role-editor-input" />
 
@@ -150,11 +149,11 @@ export default function RoleEditor({ user, role, onCancel, onSaved }) {
         </div>
       </div>
       <Controls
-        error={postProgressData.error}
+        error={updateUser.error} // #FIXME
         className="role-editor__controls"
       >
         <Button
-          disabled={postProgressData.isActive}
+          disabled={updateUser.loading}
           onClick={() => {
             onCancel();
           }}
@@ -163,14 +162,12 @@ export default function RoleEditor({ user, role, onCancel, onSaved }) {
         </Button>
 
         <Button
-          isWaiting={postProgressData.isActive}
-          disabled={
-            (name === role.name && !hasNewAvatar) || postProgressData.isActive
-          }
+          isWaiting={updateUser.loading}
+          disabled={(name === user.name && !hasNewAvatar) || updateUser.loading}
           primary={true}
           onClick={() => {
             const payload = {};
-            if (role.name !== name) {
+            if (user.name !== name) {
               payload.name = name;
             }
             if (hasNewAvatar) {
@@ -187,23 +184,15 @@ export default function RoleEditor({ user, role, onCancel, onSaved }) {
 
               payload.avatar = {
                 '@type': 'ImageObject',
-                encodingFormat: file ? file.type : role.avatar.encodingFormat,
+                encodingFormat: file ? file.type : user.avatar.encodingFormat,
                 contentUrl: dataUrl,
               };
             }
 
-            post(
-              {
-                '@type': 'UpdateRoleAction',
-                agent: getId(user),
-                actionStatus: 'CompletedActionStatus',
-                object: getId(role),
-                payload,
-              },
-              action => {
-                onSaved(action);
-              },
-            );
+            updateUser(editor, user)
+              .then(() => alert('User updated successfully.'))
+              .catch(err => alert(`An error occurred: ${err}`));
+            onSaved(user);
           }}
         >
           Save
@@ -216,17 +205,6 @@ export default function RoleEditor({ user, role, onCancel, onSaved }) {
 RoleEditor.propTypes = {
   onCancel: PropTypes.func.isRequired,
   onSaved: PropTypes.func.isRequired,
-  user: PropTypes.shape({
-    '@id': PropTypes.string.isRequired,
-  }).isRequired,
-  role: PropTypes.shape({
-    '@id': PropTypes.string.isRequired,
-    '@type': PropTypes.oneOf(['PublicReviewerRole', 'AnonymousReviewerRole']),
-    name: PropTypes.string,
-    avatar: PropTypes.shape({
-      '@type': PropTypes.oneOf(['ImageObject']),
-      encodingFormat: PropTypes.oneOf(['image/jpeg', 'image/png']),
-      contentUrl: PropTypes.string, // base64
-    }),
-  }),
+  editor: PropTypes.object.isRequired,
+  user: PropTypes.object,
 };

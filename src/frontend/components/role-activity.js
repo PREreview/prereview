@@ -1,14 +1,11 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { format } from 'date-fns';
 import { MdChevronRight, MdFirstPage } from 'react-icons/md';
 import { getId } from '../utils/jsonld';
 import { createActivityQs } from '../utils/search';
-import { useActionsSearchResults } from '../hooks/api-hooks';
-import Value from './value';
+import { GetPreprints } from '../hooks/api-hooks.tsx';
 import Button from './button';
 import LabelStyle from './label-style';
-import XLink from './xlink';
 import ActivityCard from './activity-card';
 
 export default function RoleActivity({ roleId }) {
@@ -16,30 +13,30 @@ export default function RoleActivity({ roleId }) {
 
   const search = createActivityQs({ roleId, bookmark });
 
-  const [results, progress] = useActionsSearchResults(search);
+  const results = GetPreprints(search);
 
   return (
     <div className="role-activity">
-      {!!(results.counts && results.counts['@type']) && (
+      {!!results.counts && (
         <dl className="role-activity__summary">
           <dt className="role-activity__summary__label">
             <LabelStyle>Total number of requests</LabelStyle>
           </dt>
           <dd className="role-activity__summary__stat">
-            {results.counts['@type']['RequestForRapidPREreviewAction'] || 0}
+            {results.requests || 0}
           </dd>
           <dt className="role-activity__summary__label">
             <LabelStyle>Total number of reviews</LabelStyle>
           </dt>
           <dd className="role-activity__summary__stat">
-            {results.counts['@type']['RapidPREreviewAction'] || 0}
+            {results.reviews || 0}
           </dd>
         </dl>
       )}
 
-      {results.total_rows === 0 && !progress.isActive ? (
+      {results.total_rows === 0 && !results.loading ? (
         <div>No activity yet.</div>
-      ) : bookmark && results.bookmark === bookmark && !progress.isActive ? (
+      ) : bookmark && results.bookmark === bookmark && !results.loading ? (
         <div>No more activity.</div>
       ) : (
         <section className="role-activity__history">

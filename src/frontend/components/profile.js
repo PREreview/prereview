@@ -5,7 +5,7 @@ import { MdPublic } from 'react-icons/md';
 import { Helmet } from 'react-helmet-async';
 import IncognitoIcon from '../svgs/incognito_icon.svg';
 import HeaderBar from './header-bar';
-import { useRole } from '../hooks/api-hooks';
+import { GetUser } from '../hooks/api-hooks.tsx';
 import RoleActivity from './role-activity';
 import LabelStyle from './label-style';
 import XLink from './xlink';
@@ -17,19 +17,20 @@ export default function Profile() {
   const { roleId: unprefixedRoleId } = useParams();
   const roleId = `role:${unprefixedRoleId}`;
 
-  const [role, fetchRoleProgress] = useRole(roleId);
+  const user = GetUser(roleId);
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
-  const userId = role && role.isRoleOf;
+  const userId = user && user.isRoleOf;
   let orcid;
   if (userId) {
     orcid = unprefix(userId);
   }
 
-  if (fetchRoleProgress.error && fetchRoleProgress.error.statusCode >= 400) {
+  if (user.error) {
+    // #FIXME
     return <NotFound />;
   }
 
@@ -39,15 +40,15 @@ export default function Profile() {
 
       <Helmet>
         <title>
-          {ORG} • Profile {(role && role.name) || unprefixedRoleId}
+          {ORG} • Profile {(user && user.name) || unprefixedRoleId}
         </title>
       </Helmet>
 
       <section className="profile__content">
         <header className="profile__header">
-          {role && role.avatar && role.avatar.contentUrl ? (
+          {user && user.avatar && user.avatar.contentUrl ? (
             <img
-              src={role.avatar.contentUrl}
+              src={user.avatar.contentUrl}
               alt="avatar"
               className="profile__avatar-img"
             />
@@ -56,11 +57,11 @@ export default function Profile() {
           <section className="profile__identity-info">
             <header className="profile__indentity-info-header">
               <h2 className="profile__username">
-                {role && role.name ? role.name : unprefixedRoleId}
+                {user && user.name ? user.name : unprefixedRoleId}
               </h2>
-              {!!role && (
+              {!!user && (
                 <span className="profile__persona-status">
-                  {role['@type'] === 'PublicReviewerRole' ? (
+                  {user['@type'] === 'PublicReviewerRole' ? (
                     <div className="profile__persona-status__icon-container">
                       <MdPublic className="profile__persona-status__icon" />{' '}
                       Public
@@ -87,13 +88,13 @@ export default function Profile() {
                   {unprefixedRoleId}
                 </XLink>
               </dd>
-              {!!role && (
+              {!!user && (
                 <Fragment>
                   <dt>
                     <LabelStyle>Identity</LabelStyle>
                   </dt>
                   <dd>
-                    {role['@type'] === 'AnonymousReviewerRole'
+                    {user['@type'] === 'AnonymousReviewerRole'
                       ? 'Anonymous'
                       : 'Public'}
                   </dd>
@@ -111,12 +112,12 @@ export default function Profile() {
                 </Fragment>
               )}
 
-              {!!role && (
+              {!!user && (
                 <Fragment>
                   <dt>
                     <LabelStyle>Member since</LabelStyle>
                   </dt>
-                  <dd>{format(new Date(role.startDate), 'MMM. d, yyyy')}</dd>
+                  <dd>{format(new Date(user.startDate), 'MMM. d, yyyy')}</dd>
                 </Fragment>
               )}
             </dl>

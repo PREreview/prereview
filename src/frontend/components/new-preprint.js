@@ -282,8 +282,6 @@ StepPreprint.propTypes = {
   identifier: PropTypes.string,
   preprint: PropTypes.object,
   resolvePreprintStatus: PropTypes.object.isRequired,
-  actions: PropTypes.array.isRequired,
-  loadingActions: PropTypes.bool.isRequired,
   onViewInContext: PropTypes.func.isRequired,
 };
 
