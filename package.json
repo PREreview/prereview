@@ -43,8 +43,8 @@
     "start": "npm run start:backend",
     "start:frontend": "parcel serve -p 3000 src/frontend/index.html",
     "start:dev": "concurrently -p \"[{name}]\" -n \"BACKEND,FRONTEND\" -c \"bgBlue.bold,bgMagenta.bold\" \"npm run start:backend\" \"npm run start:frontend\"",
-    "generate-fetcher": "restful-react import --file hooks.json --output ./src/frontend/hooks/hooks.tsx",
-    "postgenerate-fetcher": "prettier ./src/frontend/hooks/hooks.d.tsx --write"
+    "generate-fetcher": "restful-react import --file hooks.json --output ./src/frontend/hooks/api-hooks.tsx",
+    "postgenerate-fetcher": "prettier ./src/frontend/hooks/api-hooks.d.tsx --write"
   },
   "backend": "dist/backend/index.js",
   "frontend": "dist/frontend/index.html",

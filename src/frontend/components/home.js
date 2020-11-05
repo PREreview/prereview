@@ -183,16 +183,9 @@ export default function Home() {
                 onCancel={() => {
                   history.push('/');
                 }}
-                onSuccess={(preprint, isNew) => {
+                onSuccess={preprint => {
                   history.push('/');
-                  if (
-                    isNew &&
-                    !newPreprints.some(
-                      _preprint => getId(_preprint) === getId(preprint),
-                    )
-                  ) {
-                    setNewPreprints(newPreprints.concat(preprint));
-                  }
+                  setNewPreprints(newPreprints.concat(preprint));
                 }}
                 onViewInContext={({ preprint, tab }, isNew) => {
                   history.push(
