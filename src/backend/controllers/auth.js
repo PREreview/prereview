@@ -1,6 +1,6 @@
 import passport from 'koa-passport';
 import { Strategy as OrcidStrategy } from 'passport-orcid';
-import MockStrategy from '../utils/mockStrategy.js';
+// import MockStrategy from '../utils/mockStrategy.js';
 import router from 'koa-joi-router';
 import { getLogger } from '../log.js';
 
@@ -26,7 +26,7 @@ export default function controller(users, config, thisUser) {
    */
   passport.deserializeUser(async (id, done) => {
     try {
-      const user = await users.findById(id);
+      const user = await users.findOne(id);
       done(null, user);
     } catch (err) {
       log.debug();
@@ -44,27 +44,34 @@ export default function controller(users, config, thisUser) {
     profile,
     done,
   ) => {
-    if (req && req.session && req.session.cookie && params.expires_in) {
-      req.session.cookie.expires = new Date(
-        Date.now() + params.expires_in * 1000,
-      );
-    }
-
     log.debug('In the auth callback.');
     log.debug('***************PARAMS***********', params);
+
+    profile = {
+      orcid: params.orcid,
+      name: params.name,
+      token: {
+        access_token: params.access_token || accessToken,
+        token_type: params.token_type,
+        expires_in: params.expires_in
+      },
+      profile: {}
+    }
 
     try {
       const user = users.create({
         orcid: params.orcid,
-        username: params.username,
-        email: params.email,
+        username: 'a unique username',
+        email: 'uniqueemail@emailemailemail.com',
         name: params.name,
       });
+
       await users.persistAndFlush(user);
       log.debug('**************User:', user);
+
       if (user) {
         log.debug('Authenticated user!');
-        done(null, user);
+        done(null, profile);
       } else {
         done(null, false);
       }
@@ -82,27 +89,39 @@ export default function controller(users, config, thisUser) {
    * @param {function} done - 'Done' callback
    */
 
-  let strategy;
+  // let strategy;
   const callbackURL = `${config.appRootUrl ||
     process.env.APP_ROOT_URL ||
     'http://127.0.0.1:3000'}/api/v2/auth/orcid/callback`;
 
-  if (process.env.NODE_ENV === 'production') {
-    strategy = new OrcidStrategy(
-      {
-        sandbox: false,
-        state: true,
-        clientID: config.orcidClientId || process.env.ORCID_CLIENT_ID,
-        clientSecret:
-          config.orcidClientSecret || process.env.ORCID_CLIENT_SECRET,
-        callbackURL,
-        passReqToCallback: true,
-      },
-      verifyCallback,
-    );
-  } else {
-    strategy = new MockStrategy('orcid', callbackURL, verifyCallback);
-  }
+  const strategy = new OrcidStrategy(
+    {
+      sandbox: true,
+      state: true,
+      clientID: config.orcidClientId || process.env.ORCID_CLIENT_ID,
+      clientSecret: config.orcidClientSecret || process.env.ORCID_CLIENT_SECRET,
+      callbackURL,
+      passReqToCallback: true,
+    },
+    verifyCallback,
+  );
+
+  // if (process.env.NODE_ENV === 'production') {
+  //   strategy = new OrcidStrategy(
+  //     {
+  //       sandbox: false,
+  //       state: true,
+  //       clientID: config.orcidClientId || process.env.ORCID_CLIENT_ID,
+  //       clientSecret:
+  //         config.orcidClientSecret || process.env.ORCID_CLIENT_SECRET,
+  //       callbackURL,
+  //       passReqToCallback: true,
+  //     },
+  //     verifyCallback,
+  //   );
+  // } else {
+  //   strategy = new MockStrategy('orcid', callbackURL, verifyCallback);
+  // }
 
   passport.use(strategy);
 
@@ -114,13 +133,20 @@ export default function controller(users, config, thisUser) {
     method: 'get',
     path: '/auth/orcid/callback',
     handler: async ctx => {
-      log.debug('Finishing authenticating with ORCID...');
-      return passport.authenticate('orcid', (err, user) => {
+      passport.authenticate('orcid', (err, user) => {
+        log.debug('Finishing authenticating with ORCID...');
         if (!user) {
           ctx.body = { success: false };
           ctx.throw(401, 'Authentication failed.');
         } else {
           ctx.state.user = user;
+
+          log.debug('ctx.state***************')
+          log.debug(ctx.state)
+          log.debug('ctx.session*****************')
+          log.debug(ctx.session)
+          log.debug('ctx.request.body**************')
+          log.debug(ctx.request)
 
           if (ctx.request.body.remember === 'true') {
             ctx.session.maxAge = 86400000; // 1 day
@@ -130,9 +156,16 @@ export default function controller(users, config, thisUser) {
 
           ctx.cookies.set('PRE_user', user.username, { httpOnly: false });
           ctx.body = { success: true, user: user };
+          log.debug('******************ctx*****************************')
+          log.debug(ctx.body)
           log.debug('Orcid Callback user:', user);
-          ctx.login(user);
+
+        try {
+          await ctx.login(user);
           return ctx.redirect('/admin');
+        } catch (err) {
+
+        }
         }
       })(ctx);
     },
