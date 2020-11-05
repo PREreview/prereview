@@ -8,11 +8,7 @@ import HeaderBar from './header-bar';
 import { ORG } from '../constants';
 import { createBlockedRolesQs } from '../utils/search';
 // import { useRolesSearchResults, usePostAction } from '../hooks/api-hooks.tsx';
-import {
-  GetGroups,
-  PostGroups,
-  UpdateUserRole, // #FIXME need to build this
-} from '../hooks/api-hooks.tsx';
+import { GetGroups, PostGroups } from '../hooks/api-hooks.tsx';
 import Button from './button';
 import IconButton from './icon-button';
 import { RoleBadgeUI } from './role-badge';
@@ -167,7 +163,7 @@ function BlockPanelAddModal({ user, onClose, onSuccess }) {
               label={<span>Enter a role (persona) ID</span>}
               minimal={true}
               autoComplete="off"
-              disabled={postProgress.isActive}
+              disabled={postGroups.loading}
               placeholder=""
               pattern={pattern}
               onChange={e => {
@@ -260,10 +256,10 @@ function BlockPanelRemoveModal({ user, role, onClose, onSuccess }) {
                 disabled={postGroups.loading}
                 isWaiting={postGroups.loading}
                 onClick={() => {
-                  postGroups(user, value)
+                  postGroups(user, role)
                     .then(() => alert('Role posted successfully.'))
                     .catch(err => alert(`An error occurred: ${err}`));
-                  onSuccess(value);
+                  onSuccess(role);
                 }}
               >
                 Unblock
@@ -277,9 +273,11 @@ function BlockPanelRemoveModal({ user, role, onClose, onSuccess }) {
               unblocked.
             </p>
 
-            <Controls error={postProgress.error}>
+            <Controls
+              error={postGroups.error} // #FIXME
+            >
               <Button
-                disabled={postProgress.isActive}
+                disabled={postGroups.loading}
                 onClick={() => {
                   onClose();
                 }}

@@ -6,7 +6,9 @@ import { MenuLink } from '@reach/menu-button';
 import RapidPreReviewLogo from './rapid-pre-review-logo';
 import IconButton from './icon-button';
 import { useUser } from '../contexts/user-context';
-import { useRole } from '../hooks/api-hooks';
+import {
+  GetUserGroup // FIXME need to build this out
+} from '../hooks/api-hooks.tsx';
 import UserBadge from './user-badge';
 import XLink from './xlink';
 import NoticeBadge from './notice-badge';
@@ -15,7 +17,7 @@ import { useIsMobile } from '../hooks/ui-hooks';
 
 export default function HeaderBar({ onClickMenuButton, closeGap }) {
   const [user] = useUser();
-  const [role] = useRole(user && user.defaultRole);
+  const [role] = GetUserGroup(user && user.defaultRole);
 
   const showProfileNotice = checkIfRoleLacksMininmalData(role);
   const isMobile = useIsMobile();

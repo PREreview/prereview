@@ -2,7 +2,7 @@ import React, { Suspense, useEffect, useMemo, useState } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import mobile from 'is-mobile';
-import { usePreprint } from '../hooks/api-hooks';
+import { GetPreprint } from '../hooks/api-hooks.tsx';
 import { useExtension } from '../hooks/extension-hooks';
 import { getPdfUrl, getCanonicalUrl } from '../utils/preprints';
 import Shell from './shell';
@@ -33,7 +33,7 @@ export default function ExtensionFallback() {
   // Bug is tracked here: https://bugs.chromium.org/p/chromium/issues/detail?id=984891&q=drag%20object&colspec=ID%20Pri%20M%20Stars%20ReleaseBlock%20Component%20Status%20Owner%20Summary%20OS%20Modified
   const [isChromeOnMac, setIsChroneOnMac] = useState(false);
 
-  const [preprint, fetchPreprintProgress] = usePreprint(
+  const preprint = GetPreprint(
     identifier,
     location.state && location.state.preprint,
     location.state && location.state.preprint && location.state.preprint.url,
@@ -41,8 +41,8 @@ export default function ExtensionFallback() {
   useExtension(preprint && createPreprintId(preprint));
 
   if (
-    fetchPreprintProgress.error &&
-    fetchPreprintProgress.error.statusCode >= 400
+    preprint.error && // #FIXME
+    preprint.error.statusCode >= 400
   ) {
     return <NotFound />;
   }
@@ -91,7 +91,7 @@ export default function ExtensionFallback() {
             </Suspense>
           </object>
         )
-      ) : preprint && !pdfUrl && !fetchPreprintProgress.isActive ? (
+      ) : preprint && !pdfUrl && !preprint.loading ? (
         <div className="extension-fallback__no-pdf-message">
           <div>
             No PDF available.

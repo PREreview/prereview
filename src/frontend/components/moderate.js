@@ -6,7 +6,7 @@ import { getId } from '../utils/jsonld';
 import HeaderBar from './header-bar';
 import { ORG } from '../constants';
 import { createModerationQs } from '../utils/search';
-import { useActionsSearchResults } from '../hooks/api-hooks';
+import { GetPreprintReviews } from '../hooks/api-hooks.tsx';
 import Button from './button';
 import ModerationCard from './moderation-card';
 
@@ -20,6 +20,7 @@ export default function Moderate() {
   const [excluded, setExcluded] = useState(new Set());
   const [lockersByReviewActionId, setLockersByReviewActionId] = useState({});
 
+  // #FIXME refactor to remove callback
   const handleLocked = useCallback(
     data => {
       const nextLockersByReviewActionId = data.reduce((map, item) => {
@@ -36,7 +37,7 @@ export default function Moderate() {
 
   const search = createModerationQs({ bookmark });
 
-  const [results, progress] = useActionsSearchResults(search, !!bookmark);
+  const results = GetPreprintReviews(search, !!bookmark);
 
   const [isOpenedMap, setIsOpenedMap] = useState(
     results.rows.reduce((map, row) => {
@@ -93,7 +94,7 @@ export default function Moderate() {
           <span>{results.total_rows} Flagged Reviews</span>
         </header>
 
-        {results.total_rows === 0 && !progress.isActive ? (
+        {results.total_rows === 0 && !results.loading ? (
           <div>No reported reviews.</div>
         ) : (
           <div>
