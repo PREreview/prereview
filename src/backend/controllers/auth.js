@@ -67,22 +67,30 @@ export default function controller(users, config, thisUser) {
       log.debug('Error fetching user.', err);
     }
 
-    if (!!user) {
-      const completeUser = merge(profile, usr)
+    if (user) {
+      const completeUser = merge(profile, user);
       log.debug('Authenticated user!', user);
       done(null, completeUser);
     } else {
+      // mock user here
+      const userInsert = {
+        orcid: params.orcid,
+        username: 'unique',
+        email: 'unique@email.com',
+        name: params.name,
+      };
 
-      let newUser
-    
+      let newUser;
+
       try {
-        newUser = await users.create({orcid: params.orcid});
+        log.debug('User insert: ', userInsert);
+        newUser = await users.create(userInsert);
         users.persistAndFlush(newUser);
       } catch (err) {
         log.debug('Error creating user.', err);
       }
 
-      if (!!newUser) {
+      if (newUser) {
         log.debug('Authenticated & created user!', newUser);
         const completeUser = merge(profile, newUser);
         done(null, completeUser);
@@ -161,11 +169,11 @@ export default function controller(users, config, thisUser) {
 
           if (ctx.request.body.remember === 'true') {
             ctx.session.maxAge = 86400000; // 1 day
-            log.debug(ctx.cookies)
+            log.debug(ctx.cookies);
           } else {
             ctx.session.maxAge = 'session';
           }
-          
+
           ctx.body = { success: true, user: user };
           log.debug('******************ctx*****************************');
           log.debug(ctx.body);
@@ -174,7 +182,7 @@ export default function controller(users, config, thisUser) {
           try {
             log.debug('Trying ctx.login');
             ctx.login(user);
-            return ctx.redirect('/preprints')
+            return ctx.redirect('/preprints');
           } catch (err) {
             ctx.throw(401, err);
           }
