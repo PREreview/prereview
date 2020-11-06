@@ -57,34 +57,38 @@ export default function controller(users, config, thisUser) {
         token_type: params.token_type,
         expires_in: params.expires_in,
       },
-      profile: {},
     };
 
+    let user;
+
     try {
-      const user = users.create({
-        orcid: params.orcid,
-        username: 'a unique username',
-        email: 'uniqueemail@emailemailemail.com',
-        name: params.name,
-      });
+      user = await users.findOne({ orcid: params.orcid });
+    } catch (err) {
+      log.debug('Error fetching user.', err);
+    }
 
-      await users.persistAndFlush(user);
-      log.debug('**************User:', user);
+    if (!!user) {
+      const completeUser = merge(profile, usr)
+      log.debug('Authenticated user!', user);
+      done(null, completeUser);
+    } else {
 
-      log.debug('***********complete user********************');
+      let newUser
+    
+      try {
+        newUser = await users.create({orcid: params.orcid});
+        users.persistAndFlush(newUser);
+      } catch (err) {
+        log.debug('Error creating user.', err);
+      }
 
-      const completeUser = merge(profile, user);
-      log.debug(completeUser);
-
-      if (user) {
-        log.debug('Authenticated user!');
+      if (!!newUser) {
+        log.debug('Authenticated & created user!', newUser);
+        const completeUser = merge(profile, newUser);
         done(null, completeUser);
       } else {
         done(null, false);
       }
-    } catch (err) {
-      log.debug('Error authenticating: ', err);
-      done(err);
     }
   };
 
@@ -96,14 +100,14 @@ export default function controller(users, config, thisUser) {
    * @param {function} done - 'Done' callback
    */
 
-  // let strategy;
+  let strategy;
   const callbackURL = `${config.appRootUrl ||
     process.env.APP_ROOT_URL ||
     'http://127.0.0.1:3000'}/api/v2/auth/orcid/callback`;
 
-  const strategy = new OrcidStrategy(
+  strategy = new OrcidStrategy(
     {
-      sandbox: false,
+      sandbox: true, // TODO: change to false for production
       state: true,
       clientID: config.orcidClientId || process.env.ORCID_CLIENT_ID,
       clientSecret: config.orcidClientSecret || process.env.ORCID_CLIENT_SECRET,
@@ -153,25 +157,27 @@ export default function controller(users, config, thisUser) {
           log.debug('ctx.session*****************');
           log.debug(ctx.session);
           log.debug('ctx.request.body**************');
-          log.debug(ctx.request);
+          log.debug(ctx.request.body);
 
           if (ctx.request.body.remember === 'true') {
             ctx.session.maxAge = 86400000; // 1 day
+            log.debug(ctx.cookies)
           } else {
             ctx.session.maxAge = 'session';
           }
-
-          // ctx.cookies.set('PRE_user', user.username, { httpOnly: false });
+          
           ctx.body = { success: true, user: user };
           log.debug('******************ctx*****************************');
           log.debug(ctx.body);
           log.debug('Orcid Callback user:', user);
+
           try {
+            log.debug('Trying ctx.login');
             ctx.login(user);
+            return ctx.redirect('/preprints')
           } catch (err) {
-            ctx.throw(401, err)
+            ctx.throw(401, err);
           }
-          return ctx.redirect('/');
         }
       })(ctx);
     },
