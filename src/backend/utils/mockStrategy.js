@@ -32,7 +32,7 @@ export default class MockStrategy extends Strategy {
     const profile = {};
 
     if (req.url.split('?')[0] === '/orcid') {
-      log.debug('In this condition in the mockStrategy...')
+      log.debug('In this condition in the mockStrategy...');
       this.redirect(this._callbackURL);
     } else {
       this._verifyCallback(

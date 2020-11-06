@@ -3,6 +3,7 @@ import { Strategy as OrcidStrategy } from 'passport-orcid';
 // import MockStrategy from '../utils/mockStrategy.js';
 import router from 'koa-joi-router';
 import { getLogger } from '../log.js';
+import merge from 'lodash.merge';
 
 const log = getLogger('backend:controllers:auth');
 
@@ -15,6 +16,7 @@ export default function controller(users, config, thisUser) {
    * @param {function} done - 'Done' callback
    */
   passport.serializeUser((user, done) => {
+    log.debug('in the serialize user!');
     done(null, user.id);
   });
 
@@ -53,10 +55,10 @@ export default function controller(users, config, thisUser) {
       token: {
         access_token: params.access_token || accessToken,
         token_type: params.token_type,
-        expires_in: params.expires_in
+        expires_in: params.expires_in,
       },
-      profile: {}
-    }
+      profile: {},
+    };
 
     try {
       const user = users.create({
@@ -69,9 +71,14 @@ export default function controller(users, config, thisUser) {
       await users.persistAndFlush(user);
       log.debug('**************User:', user);
 
+      log.debug('***********complete user********************');
+
+      const completeUser = merge(profile, user);
+      log.debug(completeUser);
+
       if (user) {
         log.debug('Authenticated user!');
-        done(null, profile);
+        done(null, completeUser);
       } else {
         done(null, false);
       }
@@ -96,7 +103,7 @@ export default function controller(users, config, thisUser) {
 
   const strategy = new OrcidStrategy(
     {
-      sandbox: true,
+      sandbox: false,
       state: true,
       clientID: config.orcidClientId || process.env.ORCID_CLIENT_ID,
       clientSecret: config.orcidClientSecret || process.env.ORCID_CLIENT_SECRET,
@@ -141,12 +148,12 @@ export default function controller(users, config, thisUser) {
         } else {
           ctx.state.user = user;
 
-          log.debug('ctx.state***************')
-          log.debug(ctx.state)
-          log.debug('ctx.session*****************')
-          log.debug(ctx.session)
-          log.debug('ctx.request.body**************')
-          log.debug(ctx.request)
+          log.debug('ctx.state***************');
+          log.debug(ctx.state);
+          log.debug('ctx.session*****************');
+          log.debug(ctx.session);
+          log.debug('ctx.request.body**************');
+          log.debug(ctx.request);
 
           if (ctx.request.body.remember === 'true') {
             ctx.session.maxAge = 86400000; // 1 day
@@ -154,18 +161,17 @@ export default function controller(users, config, thisUser) {
             ctx.session.maxAge = 'session';
           }
 
-          ctx.cookies.set('PRE_user', user.username, { httpOnly: false });
+          // ctx.cookies.set('PRE_user', user.username, { httpOnly: false });
           ctx.body = { success: true, user: user };
-          log.debug('******************ctx*****************************')
-          log.debug(ctx.body)
+          log.debug('******************ctx*****************************');
+          log.debug(ctx.body);
           log.debug('Orcid Callback user:', user);
-
-        try {
-          await ctx.login(user);
-          return ctx.redirect('/admin');
-        } catch (err) {
-
-        }
+          try {
+            ctx.login(user);
+          } catch (err) {
+            ctx.throw(401, err)
+          }
+          return ctx.redirect('/');
         }
       })(ctx);
     },
@@ -226,7 +232,9 @@ export default function controller(users, config, thisUser) {
     '/authenticated',
     thisUser.can('access private pages'),
     async ctx => {
-      ctx.body = { msg: 'Authenticated', user: ctx.state.user.id };
+      ctx.state.user
+        ? (ctx.body = { msg: 'Authenticated', user: ctx.state.user.id })
+        : (ctx.body = { msg: 'No user has been authenticated' });
     },
   );
 
