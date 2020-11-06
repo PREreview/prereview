@@ -6,7 +6,16 @@ import classNames from 'classnames';
 import { Helmet } from 'react-helmet-async';
 import { MenuLink } from '@reach/menu-button';
 import { useUser } from '../contexts/user-context';
-import { usePreprintActions, usePostAction, useRole } from '../hooks/api-hooks';
+import {
+  GetUserPrereview, // #FIXME need to build this
+  GetUserRequest, // #FIXME need to build this
+  PostPrereview, // #FIXME need to build this
+  PostReport, // #FIXME need to build this
+  PostReviewRequest, // #FIXME need to build this
+  usePreprintActions,
+  usePostAction,
+  useRole,
+} from '../hooks/api-hooks.tsx';
 import { useLocalState, useNewPreprints } from '../hooks/ui-hooks';
 import Controls from './controls';
 import Button from './button';
@@ -14,8 +23,6 @@ import RapidFormFragment from './rapid-form-fragment';
 import {
   getReviewAnswers,
   checkIfAllAnswered,
-  checkIfHasReviewed,
-  checkIfHasRequested,
   checkIfIsModerated,
 } from '../utils/actions';
 import { getCounts } from '../utils/stats';
@@ -42,31 +49,29 @@ export default function ShellContent({
 }) {
   const location = useLocation();
   const [user] = useUser();
-  const [role] = useRole(user && user.defaultRole);
   const [newPreprints, setNewPreprints] = useNewPreprints();
 
   const [actions, fetchActionsProgress] = usePreprintActions(
     preprint.doi || preprint.arXivId,
   );
 
-  const safeActions = actions.filter(action => !checkIfIsModerated(action));
-
-  const [post, postProgress] = usePostAction();
+  const postPrereview = PostPrereview();
+  const postReviewRequest = PostReviewRequest();
 
   const [tab, setTab] = useState(defaultTab);
 
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
-  const hasReviewed = checkIfHasReviewed(user, actions); // `actions` (_all_ of them including moderated ones) not `safeActions`
-  const hasRequested = checkIfHasRequested(user, actions); // `actions` (_all_ of them including moderated ones) not `safeActions`
+  const hasReviewed = GetUserPrereview(user, preprint);
+  const hasRequested = GetUserRequest(user, preprint);
 
-  const counts = getCounts(actions);
+  const counts = preprint.requests.length + preprint.reviews.length;
 
   const loginUrl = process.env.IS_EXTENSION
     ? '/login'
     : `/login?next=${encodeURIComponent(location.pathname)}`;
 
-  const showProfileNotice = checkIfRoleLacksMininmalData(role);
+  const showProfileNotice = checkIfRoleLacksMininmalData(user);
 
   return (
     <div className="shell-content">
@@ -191,7 +196,7 @@ export default function ShellContent({
               </MenuLink>
             )}
 
-            {!!(role && role.isModerator && !role.isModerated) && (
+            {!!(user && user.isModerator && !role.isModerated) && (
               <MenuLink
                 as={process.env.IS_EXTENSION ? undefined : Link}
                 to={process.env.IS_EXTENSION ? undefined : '/moderate'}
@@ -223,78 +228,36 @@ export default function ShellContent({
           <ShellContentRead
             user={user}
             preprint={preprint}
-            actions={safeActions}
-            fetchActionsProgress={fetchActionsProgress}
+            loading={preprint.loading}
+            counts={counts}
           />
         ) : tab === 'request' ? (
           <ShellContentRequest
             user={user}
             preprint={preprint}
-            onSubmit={action => {
-              post(action, body => {
-                setTab('request#success');
-
-                const isNew =
-                  !fetchActionsProgress.isActive &&
-                  actions.filter(_action => getId(_action) !== getId(body))
-                    .length === 0;
-
-                if (
-                  !process.env.IS_EXTENSION &&
-                  isNew &&
-                  !newPreprints.some(
-                    _preprint => getId(_preprint) === getId(preprint),
-                  )
-                ) {
-                  setNewPreprints(
-                    newPreprints.concat(preprintify(preprint, body)),
-                  );
-                }
-              });
+            onSubmit={() => {
+              postReviewRequest(user, preprint)
+                .then(() => alert('PREreview request submitted successfully.'))
+                .catch(err => alert(`An error occurred: ${err}`));
+              setNewPreprints(preprint);
             }}
-            isPosting={postProgress.isActive}
-            disabled={postProgress.isActive}
-            error={
-              postProgress.body &&
-              postProgress.body['@type'] === 'RequestForRapidPREreviewAction'
-                ? postProgress.error
-                : undefined
-            }
+            isPosting={postReviewRequest.loading}
+            disabled={postReviewRequest.loading}
+            error={postReviewRequest.error} // #FIXME
           />
         ) : tab === 'review' ? (
           <ShellContentReview
             user={user}
             preprint={preprint}
-            onSubmit={action => {
-              post(action, body => {
-                setTab('review#success');
-
-                const isNew =
-                  !fetchActionsProgress.isActive &&
-                  actions.filter(_action => getId(_action) !== getId(body))
-                    .length === 0;
-
-                if (
-                  !process.env.IS_EXTENSION &&
-                  isNew &&
-                  !newPreprints.some(
-                    _preprint => getId(_preprint) === getId(preprint),
-                  )
-                ) {
-                  setNewPreprints(
-                    newPreprints.concat(preprintify(preprint, body)),
-                  );
-                }
-              });
+            onSubmit={() => {
+              postPrereview(user, preprint)
+                .then(() => alert('PREreview request submitted successfully.'))
+                .catch(err => alert(`An error occurred: ${err}`));
+              setNewPreprints(preprint);
             }}
-            isPosting={postProgress.isActive}
-            disabled={postProgress.isActive}
-            error={
-              postProgress.body &&
-              postProgress.body['@type'] === 'RapidPREreviewAction'
-                ? postProgress.error
-                : undefined
-            }
+            isPosting={postPrereview.loading}
+            disabled={postPrereview.loading}
+            error={postPrereview.error} // #FIXME
           />
         ) : tab === 'review#success' ? (
           <ShellContentReviewSuccess
@@ -322,62 +285,12 @@ ShellContent.propTypes = {
   defaultTab: PropTypes.oneOf(['read', 'review', 'request']),
 };
 
-function ShellContentRead({ user, preprint, actions, fetchActionsProgress }) {
+function ShellContentRead({ user, preprint, loading, counts }) {
   // Note: !! this needs to work both in the webApp where it is URL driven and in
   // the extension where it is shell driven
 
-  const location = useLocation();
-  const history = useHistory();
   const [moderatedReviewId, setModeratedReviewId] = useState(null);
-  const [post, postProgress, resetPostState] = usePostAction();
-  const [role, fetchRoleProgress] = useRole(user && user.defaultRole);
-
-  // sanitize qs
-  useEffect(() => {
-    if (!process.env.IS_EXTENSION && !fetchActionsProgress.isActive) {
-      const qs = new URLSearchParams(location.search);
-      const roleIdsQs = qs.get('role');
-
-      if (roleIdsQs != null) {
-        const raw = roleIdsQs.split(',').map(id => `role:${id}`);
-        const roleIds = uniq(raw).filter(roleId =>
-          actions.some(
-            action =>
-              action['@type'] === 'RapidPREreviewAction' &&
-              getId(action.agent) === roleId,
-          ),
-        );
-
-        if (!roleIds.length || roleIds.length !== raw.length) {
-          if (roleIds.length) {
-            qs.set('role', roleIds.map(unprefix));
-          } else {
-            qs.delete('role');
-          }
-
-          history.replace({
-            hash: location.hash,
-            pathname: location.pathname,
-            search: qs.toString(),
-          });
-        }
-      }
-    }
-  }, [history, location, actions, fetchActionsProgress]);
-
-  let appRoleIds;
-  if (!process.env.IS_EXTENSION) {
-    const qs = new URLSearchParams(location.search);
-    const roleIdsQs = qs.get('role');
-
-    appRoleIds = roleIdsQs
-      ? roleIdsQs.split(',').map(id => `role:${id}`)
-      : undefined;
-  }
-
-  const [extensionRoleIds, setExtensionRoleIds] = useState();
-
-  const roleIds = process.env.IS_EXTENSION ? extensionRoleIds : appRoleIds;
+  const postReport = PostReport();
 
   return (
     <div className="shell-content-read">
@@ -385,63 +298,23 @@ function ShellContentRead({ user, preprint, actions, fetchActionsProgress }) {
 
       <PreprintPreview preprint={preprint} />
 
-      {!fetchActionsProgress.isActive && (
+      {!loading && (
         <ReviewReader
           user={user}
-          role={role}
-          isModerationInProgress={postProgress.isActive}
-          onModerate={reportedActionId => {
-            resetPostState();
-            setModeratedReviewId(reportedActionId);
-          }}
-          onHighlighedRoleIdsChange={roleIds => {
-            if (process.env.IS_EXTENSION) {
-              setExtensionRoleIds(roleIds);
-            } else {
-              const qs = new URLSearchParams(location.search);
-              if (roleIds && roleIds.length) {
-                qs.set('role', roleIds.map(unprefix));
-              } else {
-                qs.delete('role');
-              }
-              history.push({
-                hash: location.hash,
-                pathname: location.pathname,
-                search: qs.toString(),
-              });
-            }
-          }}
-          defaultHighlightedRoleIds={roleIds}
           identifier={preprint.doi || preprint.arXivId}
-          actions={actions.filter(
-            action => action['@type'] === 'RapidPREreviewAction',
-          )}
-          nRequests={actions.reduce((count, action) => {
-            if (action['@type'] === 'RequestForRapidPREreviewAction') {
-              count++;
-            }
-            return count;
-          }, 0)}
+          nRequests={counts}
         />
       )}
 
       {!!moderatedReviewId && (
         <ModerationModal
           title={`Report review as violating the Code of Conduct`}
-          moderationProgress={postProgress}
+          moderationProgress={postReport}
           onSubmit={(moderationReason, onSuccess) => {
-            post(
-              cleanup({
-                '@type': 'ReportRapidPREreviewAction',
-                agent: user.defaultRole,
-                actionStatus: 'CompletedActionStatus',
-                object: moderatedReviewId,
-                moderationReason,
-              }),
-              body => {
-                onSuccess();
-              },
-            );
+            postReport(moderatedReviewId, moderationReason)
+              .then(() => alert('Reort submitted successfully.'))
+              .catch(err => alert(`An error occurred: ${err}`));
+            onSuccess();
           }}
           onCancel={() => {
             setModeratedReviewId(null);
@@ -455,7 +328,7 @@ ShellContentRead.propTypes = {
   user: PropTypes.object,
   preprint: PropTypes.object.isRequired,
   actions: PropTypes.array.isRequired,
-  fetchActionsProgress: PropTypes.object.isRequired,
+  loading: PropTypes.bool.isRequired,
 };
 
 function ShellContentReview({
@@ -582,14 +455,7 @@ function ShellContentRequest({
           isWaiting={isPosting}
           disabled={disabled}
           onClick={() => {
-            onSubmit({
-              '@type': 'RequestForRapidPREreviewAction',
-              actionStatus: 'CompletedActionStatus',
-              agent: user.defaultRole,
-              object: Object.assign({}, nodeify(preprint), {
-                '@id': createPreprintIdentifierCurie(preprint),
-              }),
-            });
+            onSubmit(preprint);
           }}
         >
           Submit
