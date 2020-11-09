@@ -19,16 +19,15 @@ const querySchema = Joi.object({
   to: Joi.string(),
 });
 
-const creationSchema =  Joi.array().items(
-                Joi.object({
-                  title: Joi.string(),
-                  url: Joi.string(),
-                  uuid: Joi.string().guid({
-                    version: ['uuidv4', 'uuidv5'],
-                  }),
-                }).min(1)
-              )
-  
+const preprintSchema = Joi.array().items(
+  Joi.object({
+    title: Joi.string(),
+    url: Joi.string(),
+    uuid: Joi.string().guid({
+      version: ['uuidv4', 'uuidv5'],
+    }),
+  }).min(1),
+);
 
 // eslint-disable-next-line no-unused-vars
 export default function controller(preprints) {
@@ -62,7 +61,7 @@ export default function controller(preprints) {
     path: '/preprints',
     validate: {
       body: Joi.object({
-        data: preprintSchema
+        data: preprintSchema,
       }), // #TODO
       type: 'json',
       continueOnError: true,
@@ -117,7 +116,7 @@ export default function controller(preprints) {
             body: {
               statusCode: 200,
               status: 'ok',
-              data: preprintSchema
+              data: preprintSchema,
             },
           },
         },
@@ -167,7 +166,7 @@ export default function controller(preprints) {
           body: {
             statusCode: 200,
             status: 'ok',
-            data: preprintSchema
+            data: preprintSchema,
           },
         },
       },
@@ -225,11 +224,11 @@ export default function controller(preprints) {
         id: Joi.number().integer(),
       },
       body: {
-        data: preprintSchema
+        data: preprintSchema,
       },
       type: 'json',
       failure: 400,
-      continueOnError: true
+      continueOnError: true,
     },
     // pre:thisUserthisUser.can('access admin pages'),
     handler: async ctx => {
@@ -237,15 +236,12 @@ export default function controller(preprints) {
       let preprint;
 
       try {
-        preprint = preprints.findOne(
-          ctx.params.id,
-        );
-        await preprints.persistAndFlush(ctx.request.body.data[0])
+        preprint = preprints.findOne(ctx.params.id);
+        await preprints.persistAndFlush(ctx.request.body.data[0]);
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse query: ${err}`);
       }
-
 
       if (preprint) {
         ctx.response.body = { statusCode: 200, status: 'ok', data: preprint };
