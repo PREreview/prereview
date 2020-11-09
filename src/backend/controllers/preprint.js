@@ -9,7 +9,7 @@ const querySchema = Joi.object({
   start: Joi.number()
     .integer()
     .greater(-1),
-  end: Joi.number() 
+  end: Joi.number()
     .integer()
     .positive(),
   asc: Joi.boolean(),
@@ -22,12 +22,11 @@ const querySchema = Joi.object({
 export default function controller(preprints) {
   const preprintRoutes = router();
 
-
   // RESOLVE PREPRINT METADATA
   preprintRoutes.route({
     meta: {
       swagger: {
-        summary: 'Endpoint to resolve preprint metadata',
+        summary: 'Endpoint to GET and resolve preprint metadata',
       },
     },
     method: 'get',
@@ -40,21 +39,24 @@ export default function controller(preprints) {
     },
   });
 
-  // POST   
+  // POST
   preprintRoutes.route({
     meta: {
       swagger: {
-        summary: 'Endpoint to post preprints',
+        summary: 'Endpoint to POST a new preprint',
       },
     },
     method: 'post',
     path: '/preprints',
     validate: {
       body: Joi.object({
-        title: Joi.string(),
-        url: Joi.string(),
-        uuid: Joi.string().guid(),
-      }), // #TODO
+        data: Joi.array().items(
+          Joi.object({
+          title: Joi.string(),
+          url: Joi.string(),
+          uuid: Joi.string().guid(),
+        })).min(1),
+       }), // #TODO
       type: 'json',
       continueOnError: true,
     },
@@ -66,24 +68,24 @@ export default function controller(preprints) {
           '\n',
           ctx.invalid,
         );
-        
+
         ctx.response.status = 400;
 
         ctx.body = {
           statusCode: 400,
           status: 'HTTP 400 error',
           error: ctx.invalid.body ? ctx.invalid.body.name : ctx.invalid, // TODO: make dynamic
-          message: ` ${ctx.invalid.body.name}: ${ctx.invalid.body.msg}`,
+          message: ctx.invalid.body ? ` ${ctx.invalid.body.name}: ${ctx.invalid.body.msg}` : ctx.invalid 
         };
-        
-        return next();
+
+        return next()
       }
 
       log.debug('Adding new preprint.');
       let preprint;
 
       try {
-        preprint = preprints.create(ctx.request.body.data);
+        preprint = preprints.create(ctx.request.body.data[0]);
         await preprints.persistAndFlush(preprint);
         ctx.response.status = 201;
         ctx.body = {
@@ -92,18 +94,22 @@ export default function controller(preprints) {
           data: preprint,
         };
       } catch (err) {
-        log.debug('In the error block...');
         log.error('HTTP 400 Error: ', err);
-        ctx.response.status = 400
+        ctx.response.status = 400;
+        ctx.body = {
+          statusCode: 400, 
+          status: 'HTTP 400 Error',
+          message: err
+        }
       }
     },
   });
 
-  // GET ALL
+  // GET 
   preprintRoutes.route({
     meta: {
       swagger: {
-        summary: 'Endpoint to get preprints',
+        summary: 'Endpoint to GET multiple preprints',
       },
     },
     method: 'get',
@@ -128,10 +134,29 @@ export default function controller(preprints) {
             },
           },
         },
-        continueOnError: true
+        continueOnError: true,
       },
     },
     handler: async ctx => {
+
+      if (ctx.invalid) {
+        log.error(
+          'HTTP 400 Error. This is the error object: ',
+          '\n',
+          ctx.invalid,
+        );
+
+        ctx.response.status = 400;
+
+        ctx.body = {
+          statusCode: 400,
+          status: 'HTTP 400 error',
+          error: ctx.invalid // TODO: make dynamic
+        };
+
+        return next()
+      }
+
       log.debug(`Retrieving preprints.`);
 
       try {
@@ -153,7 +178,7 @@ export default function controller(preprints) {
   preprintRoutes.route({
     meta: {
       swagger: {
-        summary: 'Endpoint to get a single preprint',
+        summary: 'Endpoint to GET a single preprint',
       },
     },
     method: 'get',
@@ -162,26 +187,41 @@ export default function controller(preprints) {
       params: {
         id: Joi.number().integer(),
       },
-      failure: 400,
       output: {
         200: {
           body: {
             statusCode: 200,
             status: 'ok',
-            data: Joi.array().items(
-              Joi.object({
-                doi: Joi.string(),
-                title: Joi.string(),
-                server: Joi.string(),
-                url: Joi.string(),
-                pdfUrl: Joi.string(),
-              }).min(1),
-            ),
-          },
+            data: Joi.array().items(Joi.object()).min(1),
+          }
         },
       },
+      failure: 400,
+      continueOnError: false,
     },
-    handler: async ctx => {
+    handler: async (ctx, next) => {
+      log.debug('ctx!!!', ctx)
+      // ctx.invalid ? log.debug('*******************ctx.invalid', ctx.invalid) : log.debug("Nothing to see here.")
+
+      if (ctx.invalid) {
+        log.error(
+          'HTTP 400 Error. This is the error object: ',
+          '\n',
+          ctx.invalid,
+        );
+
+        ctx.response.status = 400;
+
+        // ctx.body = {
+        //   statusCode: 400,
+        //   status: 'HTTP 400 error',
+        //   error: ctx.invalid.body ? ctx.invalid.body.name : ctx.invalid, // TODO: make dynamic
+        //   message: ctx.invalid.body ? ` ${ctx.invalid.body.name}: ${ctx.invalid.body.msg}` : ctx.invalid 
+        // };
+
+        return next()
+      }
+
       log.debug(`Retrieving preprint ${ctx.params.id}.`);
       let preprint;
 
@@ -192,8 +232,8 @@ export default function controller(preprints) {
         ctx.throw(400, `Failed to parse query: ${err}`);
       }
 
-      if (preprint.length) {
-        ctx.response.body = { statusCode: 200, status: 'ok', data: preprint };
+      if (!!preprint) {
+        ctx.response.body = { statusCode: 200, status: 'ok', data: [preprint] };
         ctx.response.status = 200;
       } else {
         log.error(
