@@ -1,10 +1,4 @@
-import React, {
-  useEffect,
-  useState,
-  useRef,
-  useCallback,
-  Fragment,
-} from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { Link, useLocation } from 'react-router-dom';
 import HeaderBar from './header-bar';
@@ -57,14 +51,11 @@ export default function TocPage({ children }) {
   }, [location.hash]);
 
   // close side panel
-  const handleClick = useCallback(
-    e => {
-      if (isMobile) {
-        setShowLeftPanel(false);
-      }
-    },
-    [isMobile],
-  );
+  const handleClick = useCallback(() => {
+    if (isMobile) {
+      setShowLeftPanel(false);
+    }
+  }, [isMobile]);
 
   return (
     <div className="toc-page">

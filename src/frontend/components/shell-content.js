@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { Link, useLocation, useHistory } from 'react-router-dom';
-import uniq from 'lodash/uniq';
+import { Link, useLocation } from 'react-router-dom';
 import classNames from 'classnames';
 import { Helmet } from 'react-helmet-async';
 import { MenuLink } from '@reach/menu-button';
@@ -12,22 +11,11 @@ import {
   PostPrereview, // #FIXME need to build this
   PostReport, // #FIXME need to build this
   PostReviewRequest, // #FIXME need to build this
-  usePreprintActions,
-  usePostAction,
-  useRole,
 } from '../hooks/api-hooks.tsx';
-import { useLocalState, useNewPreprints } from '../hooks/ui-hooks';
+import { useLocalState } from '../hooks/ui-hooks';
 import Controls from './controls';
 import Button from './button';
 import RapidFormFragment from './rapid-form-fragment';
-import {
-  getReviewAnswers,
-  checkIfAllAnswered,
-  checkIfIsModerated,
-} from '../utils/actions';
-import { getCounts } from '../utils/stats';
-import { getId, cleanup, unprefix, nodeify } from '../utils/jsonld';
-import { createPreprintIdentifierCurie, createPreprintId } from '../utils/ids';
 import LoginRequiredModal from './login-required-modal';
 import UserBadge from './user-badge';
 import SubjectEditor from './subject-editor';
@@ -35,7 +23,6 @@ import ReviewReader from './review-reader';
 import PreprintPreview from './preprint-preview';
 import XLink from './xlink';
 import ModerationModal from './moderation-modal';
-import { preprintify } from '../utils/preprints';
 import { checkIfRoleLacksMininmalData } from '../utils/roles';
 import NoticeBadge from './notice-badge';
 
@@ -49,11 +36,6 @@ export default function ShellContent({
 }) {
   const location = useLocation();
   const [user] = useUser();
-  const [newPreprints, setNewPreprints] = useNewPreprints();
-
-  const [actions, fetchActionsProgress] = usePreprintActions(
-    preprint.doi || preprint.arXivId,
-  );
 
   const postPrereview = PostPrereview();
   const postReviewRequest = PostReviewRequest();
@@ -97,7 +79,7 @@ export default function ShellContent({
                 className={classNames('shell-content__tab-button', {
                   'shell-content__tab-button--active': tab === 'read',
                 })}
-                disabled={postProgress.isActive}
+                disabled={postReviewRequest.loading}
                 onClick={() => {
                   onRequireScreen();
                   setTab('read');
@@ -111,7 +93,7 @@ export default function ShellContent({
                 className={classNames('shell-content__tab-button', {
                   'shell-content__tab-button--active': tab === 'review',
                 })}
-                disabled={postProgress.isActive || hasReviewed}
+                disabled={postReviewRequest.loading || hasReviewed}
                 onClick={() => {
                   if (user) {
                     onRequireScreen();
@@ -129,7 +111,7 @@ export default function ShellContent({
                 className={classNames('shell-content__tab-button', {
                   'shell-content__tab-button--active': tab === 'request',
                 })}
-                disabled={postProgress.isActive || hasRequested}
+                disabled={postReviewRequest.loading || hasRequested}
                 onClick={() => {
                   if (user) {
                     onRequireScreen();
@@ -196,7 +178,7 @@ export default function ShellContent({
               </MenuLink>
             )}
 
-            {!!(user && user.isModerator && !role.isModerated) && (
+            {!!(user && user.isModerator && !user.isModerated) && (
               <MenuLink
                 as={process.env.IS_EXTENSION ? undefined : Link}
                 to={process.env.IS_EXTENSION ? undefined : '/moderate'}
@@ -239,7 +221,6 @@ export default function ShellContent({
               postReviewRequest(user, preprint)
                 .then(() => alert('PREreview request submitted successfully.'))
                 .catch(err => alert(`An error occurred: ${err}`));
-              setNewPreprints(preprint);
             }}
             isPosting={postReviewRequest.loading}
             disabled={postReviewRequest.loading}
@@ -253,7 +234,6 @@ export default function ShellContent({
               postPrereview(user, preprint)
                 .then(() => alert('PREreview request submitted successfully.'))
                 .catch(err => alert(`An error occurred: ${err}`));
-              setNewPreprints(preprint);
             }}
             isPosting={postPrereview.loading}
             disabled={postPrereview.loading}
@@ -326,33 +306,31 @@ function ShellContentRead({ user, preprint, loading, counts }) {
 }
 ShellContentRead.propTypes = {
   user: PropTypes.object,
+  counts: PropTypes.number,
   preprint: PropTypes.object.isRequired,
   actions: PropTypes.array.isRequired,
   loading: PropTypes.bool.isRequired,
 };
 
-function ShellContentReview({
-  user,
-  preprint,
-  onSubmit,
-  disabled,
-  isPosting,
-  error,
-}) {
+function ShellContentReview({ user, preprint, disabled, isPosting, error }) {
   const [subjects, setSubjects] = useLocalState(
     'subjects',
     user.defaultRole,
-    createPreprintId(preprint),
+    preprint.id,
     [],
   );
   const [answerMap, setAnswerMap] = useLocalState(
     'answerMap',
     user.defaultRole,
-    createPreprintId(preprint),
+    preprint.id,
     {},
   );
 
-  const canSubmit = checkIfAllAnswered(answerMap);
+  const postPrereview = PostPrereview();
+
+  const canSubmit = () => {
+    // #TODO build function to check if all questions have been answered
+  };
 
   return (
     <div className="shell-content-review">
@@ -399,22 +377,9 @@ function ShellContentReview({
             isWaiting={isPosting}
             disabled={disabled || !canSubmit}
             onClick={() => {
-              onSubmit({
-                '@type': 'RapidPREreviewAction',
-                actionStatus: 'CompletedActionStatus',
-                agent: getId(user.defaultRole),
-                object: Object.assign({}, nodeify(preprint), {
-                  '@id': createPreprintIdentifierCurie(preprint),
-                }),
-                resultReview: cleanup(
-                  {
-                    '@type': 'RapidPREreview',
-                    about: subjects,
-                    reviewAnswer: getReviewAnswers(answerMap),
-                  },
-                  { removeEmptyArray: true },
-                ),
-              });
+              postPrereview(user, preprint)
+                .then(() => alert('User updated successfully.'))
+                .catch(err => alert(`An error occurred: ${err}`));
             }}
           >
             Submit
@@ -434,7 +399,6 @@ ShellContentReview.propTypes = {
 };
 
 function ShellContentRequest({
-  user,
   preprint,
   onSubmit,
   disabled,
