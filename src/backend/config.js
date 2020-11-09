@@ -28,11 +28,21 @@ const defaults = {
     pool_max: process.env.PREREVIEW_DB_POOL_MAX || 10,
     timeout: process.env.PREREVIEW_DB_TIMEOUT || 0,
   },
+  orcid: {
+    client_id: process.env.PREREVIEW_ORCID_CLIENT_ID,
+    client_secret: process.env.PREREVIEW_ORCID_CLIENT_SECRET,
+    sandbox: process.env.PREREVIEW_ORCID_SANDBOX || 'false',
+  },
   secrets: process.env.PREREVIEW_SECRETS,
   server: {
     port: process.env.PREREVIEW_PORT || '3000',
   },
 };
+
+function validateBool(value, previous) {
+  const bool = value ? value : previous;
+  Joi.assert(bool, Joi.boolean());
+}
 
 function validateUser(value, previous) {
   const user = value ? value : previous;
@@ -259,4 +269,22 @@ export default program
     'Cloudflare Access Audience',
     validateToken,
     defaults.cfaccess.audience,
+  )
+  .option(
+    '--orcid_client_id <id>',
+    'OrcID client ID',
+    validateUser,
+    defaults.orcid.client_id,
+  )
+  .option(
+    '--orcid_client_secret <secret>',
+    'OrcID client secret',
+    validatePassword,
+    defaults.orcid.client_secret,
+  )
+  .option(
+    '--orcid_sandbox <bool>',
+    'OrcID sandbox environment?',
+    validateBool,
+    defaults.orcid.sandbox,
   );

@@ -115,10 +115,11 @@ export default function controller(users, config, thisUser) {
 
   strategy = new OrcidStrategy(
     {
-      sandbox: true, // TODO: change to false for production
+      sandbox: config.orcid_sandbox || process.env.PREREVIEW_ORCID_SANDBOX,
       state: true,
-      clientID: config.orcidClientId || process.env.ORCID_CLIENT_ID,
-      clientSecret: config.orcidClientSecret || process.env.ORCID_CLIENT_SECRET,
+      clientID: config.orcid_client_id || process.env.PREREVIEW_ORCID_CLIENT_ID,
+      clientSecret:
+        config.orcid_client_secret || process.env.PREREVIEW_ORCID_CLIENT_SECRET,
       callbackURL,
       passReqToCallback: true,
     },
