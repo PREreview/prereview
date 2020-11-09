@@ -46,9 +46,6 @@ export default function controller(users, config, thisUser) {
     profile,
     done,
   ) => {
-    log.debug('In the auth callback.');
-    log.debug('***************PARAMS***********', params);
-
     profile = {
       orcid: params.orcid,
       name: params.name,
@@ -115,12 +112,15 @@ export default function controller(users, config, thisUser) {
 
   strategy = new OrcidStrategy(
     {
-      sandbox: config.orcid_sandbox || process.env.PREREVIEW_ORCID_SANDBOX,
-      state: true,
+      sandbox:
+        config.orcid_sandbox ||
+        process.env.PREREVIEW_ORCID_SANDBOX ||
+        process.env.NODE_ENV !== 'production', // use the sandbox for non-production environments if not specified otherwise
+      state: true, // needed for sessions
       clientID: config.orcid_client_id || process.env.PREREVIEW_ORCID_CLIENT_ID,
       clientSecret:
         config.orcid_client_secret || process.env.PREREVIEW_ORCID_CLIENT_SECRET,
-      callbackURL,
+      callbackURL: callbackURL,
       passReqToCallback: true,
     },
     verifyCallback,
@@ -183,7 +183,7 @@ export default function controller(users, config, thisUser) {
           try {
             log.debug('Trying ctx.login');
             ctx.login(user);
-            return ctx.redirect('/preprints');
+            return ctx.redirect('/');
           } catch (err) {
             ctx.throw(401, err);
           }
