@@ -175,8 +175,6 @@ export default function controller(users, config) {
 
           ctx.cookies.set('PRE_user', user.username, { httpOnly: false });
           ctx.body = { success: true, user: user };
-          log.debug(ctx.body);
-          log.debug('Orcid Callback user:', user);
 
           try {
             ctx.login(user);
