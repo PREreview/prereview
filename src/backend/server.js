@@ -48,15 +48,7 @@ export default async function configServer(config) {
   server.use(log4js.koaLogger(log4js.getLogger('http'), { level: 'auto' }));
 
   // Initialize database
-  const dbType = config.isProd ? 'postgresql' : 'sqlite';
-  const [db, dbMiddleware] = await dbWrapper(
-    dbType,
-    config.dbHost,
-    config.dbPort,
-    config.dbName,
-    config.dbUser,
-    config.dbPass,
-  );
+  const [db, dbMiddleware] = await dbWrapper();
   server.use(dbMiddleware);
 
   // Setup auth handlers
