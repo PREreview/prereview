@@ -16,7 +16,6 @@ export default function controller(users, config, thisUser) {
    * @param {function} done - 'Done' callback
    */
   passport.serializeUser((user, done) => {
-    log.debug('in the serialize user!');
     done(null, user.id);
   });
 
@@ -81,8 +80,8 @@ export default function controller(users, config, thisUser) {
 
       try {
         log.debug('User insert: ', userInsert);
-        newUser = await users.create(userInsert);
-        users.persistAndFlush(newUser);
+        newUser = users.create(userInsert);
+        await users.persistAndFlush(newUser);
       } catch (err) {
         log.debug('Error creating user.', err);
       }
@@ -183,7 +182,7 @@ export default function controller(users, config, thisUser) {
           try {
             log.debug('Trying ctx.login');
             ctx.login(user);
-            return ctx.redirect('/');
+            return ctx.redirect('/preprints');
           } catch (err) {
             ctx.throw(401, err);
           }
