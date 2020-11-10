@@ -3,36 +3,33 @@ import {
   EntityRepositoryType,
   JsonType,
   ManyToOne,
-  PrimaryKey,
   Property,
 } from '@mikro-orm/core';
+import { Fixture } from 'class-fixtures-factory';
 import { RapidReviewModel } from '../rapidReviews';
-import Persona from './persona';
-import Preprint from './preprint';
+import { BaseEntity } from './BaseEntity';
+import { Persona } from './Persona';
+import { Preprint } from './Preprint';
 
 @Entity()
-export default class RapidReview {
+export class RapidReview extends BaseEntity {
+  //eslint-disable-next-line
   [EntityRepositoryType]?: RapidReviewModel;
 
-  @PrimaryKey()
-  id!: number;
-
-  @Property()
-  createdAt = new Date();
-
-  @Property({ onUpdate: () => new Date() })
-  updatedAt = new Date();
-
-  @ManyToOne()
+  @ManyToOne({ entity: () => Persona })
   author!: Persona;
 
-  @ManyToOne()
+  @ManyToOne({ entity: () => Preprint })
   preprint!: Preprint;
 
+  @Fixture(() => ({
+    data: 'Test data',
+  }))
   @Property({ type: JsonType })
   contents!: Record<string, unknown>;
 
   constructor(contents: Record<string, unknown>) {
+    super();
     this.contents = contents;
   }
 }

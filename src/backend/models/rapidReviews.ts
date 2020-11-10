@@ -1,5 +1,5 @@
 import { EntityRepository, MikroORM, Repository } from '@mikro-orm/core';
-import RapidReview from './entities/rapidReview';
+import { RapidReview } from './entities';
 
 @Repository(RapidReview)
 export class RapidReviewModel extends EntityRepository<RapidReview> {}

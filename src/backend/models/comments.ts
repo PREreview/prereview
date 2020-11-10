@@ -1,5 +1,5 @@
 import { EntityRepository, MikroORM, Repository } from '@mikro-orm/core';
-import Comment from './entities/comment';
+import { Comment } from './entities';
 
 @Repository(Comment)
 export class CommentModel extends EntityRepository<Comment> {}

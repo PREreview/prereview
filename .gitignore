@@ -118,3 +118,6 @@ hooks.json
 
 # Junk
 .DS_Store
+
+# development sqlite database
+/prereview
