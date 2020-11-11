@@ -131,23 +131,6 @@ export default function controller(users, config) {
     verifyCallback,
   );
 
-  // if (process.env.NODE_ENV === 'production') {
-  //   strategy = new OrcidStrategy(
-  //     {
-  //       sandbox: false,
-  //       state: true,
-  //       clientID: config.orcidClientId || process.env.ORCID_CLIENT_ID,
-  //       clientSecret:
-  //         config.orcidClientSecret || process.env.ORCID_CLIENT_SECRET,
-  //       callbackURL,
-  //       passReqToCallback: true,
-  //     },
-  //     verifyCallback,
-  //   );
-  // } else {
-  //   strategy = new MockStrategy('orcid', callbackURL, verifyCallback);
-  // }
-
   passport.use(strategy);
 
   // start ORCID authentication

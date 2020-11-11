@@ -69,27 +69,9 @@ export default function controller(preprints) {
     // pre:thisUserthisUser.can('access private pages'),
     handler: async (ctx, next) => {
       if (ctx.invalid) {
-<<<<<<< HEAD
         log.error('400 Error! This is the error object', '\n', ctx.invalid);
         ctx.response.status = 400;
         handleValidationError(ctx);
-=======
-        log.error(
-          'HTTP 400 Error. This is the error object: ',
-          '\n',
-          ctx.invalid,
-        );
-
-        ctx.response.status = 400;
-
-        ctx.body = {
-          statusCode: 400,
-          status: 'HTTP 400 error',
-          error: ctx.invalid.body ? ctx.invalid.body.name : ctx.invalid, // TODO: make dynamic
-          message: ` ${ctx.invalid.body.name}: ${ctx.invalid.body.msg}`,
-        };
-
->>>>>>> login
         return next();
       }
 
@@ -108,14 +90,11 @@ export default function controller(preprints) {
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.response.status = 400;
-<<<<<<< HEAD
         ctx.body = {
           statusCode: 400,
           status: 'HTTP 400 Error',
           message: err,
         };
-=======
->>>>>>> login
       }
     },
   });
