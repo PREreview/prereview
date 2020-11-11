@@ -23,9 +23,7 @@ const preprintSchema = Joi.array().items(
   Joi.object({
     title: Joi.string(),
     url: Joi.string(),
-    uuid: Joi.string().guid({
-      version: ['uuidv4', 'uuidv5'],
-    }),
+    uuid: Joi.string(),
   }).min(1),
 );
 
@@ -69,7 +67,7 @@ export default function controller(preprints) {
     // pre:thisUserthisUser.can('access private pages'),
     handler: async (ctx, next) => {
       if (ctx.invalid) {
-        log.error('400 Error! This is the error object', '\n', ctx.invalid);
+        log.error('This is the error object', '\n', ctx.invalid);
         ctx.response.status = 400;
         handleValidationError(ctx);
         return next();
@@ -81,21 +79,17 @@ export default function controller(preprints) {
       try {
         preprint = preprints.create(ctx.request.body.data[0]);
         await preprints.persistAndFlush(preprint);
-        ctx.response.status = 201;
+      } catch (err) {
+        log.error('HTTP 400 Error: ', err);
+        ctx.throw(400, `Failed to add preprint: ${err}`)
+      }
+
+      ctx.response.status = 201;
         ctx.body = {
           statusCode: 201,
           status: 'created',
           data: preprint,
         };
-      } catch (err) {
-        log.error('HTTP 400 Error: ', err);
-        ctx.response.status = 400;
-        ctx.body = {
-          statusCode: 400,
-          status: 'HTTP 400 Error',
-          message: err,
-        };
-      }
     },
   });
 
