@@ -66,7 +66,7 @@ export default function Login() {
         <Button
           disabled={!hasAgreed}
           element={hasAgreed ? 'a' : 'button'}
-          href={`/auth/orcid${next ? `?next=${encodeURIComponent(next)}` : ''}`}
+          href={`/api/v2/auth/orcid/login`}
           primary={true}
           className="login__login-button"
         >
