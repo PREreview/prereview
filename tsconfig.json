@@ -5,6 +5,7 @@
     "noImplicitAny": false,
     "removeComments": true,
     "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
     "noLib": false,
     "lib": ["es2017", "dom"],
     "emitDecoratorMetadata": true,

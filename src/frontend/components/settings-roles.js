@@ -7,7 +7,7 @@ import Modal from './modal';
 import RoleEditor from './role-editor';
 import { RoleBadgeUI } from './role-badge';
 import Controls from './controls';
-import { UpdateUser } from '../hooks/api-hooks.tsx';
+import { PutUser } from '../hooks/api-hooks.tsx';
 import { useIsFirstTimeOnSettings } from '../hooks/ui-hooks';
 import IncognitoIcon from '../svgs/incognito_icon.svg';
 import XLink from './xlink';
@@ -176,7 +176,7 @@ SettingsRoles.propTypes = {
 
 function MakeActivePersonaModalButton({ user }) {
   const [isOpen, setIsOpen] = useState(false);
-  const updateUser = UpdateUser();
+  const updateUser = PutUser();
 
   return (
     <Fragment>

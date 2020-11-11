@@ -7,11 +7,7 @@ import { getId, unprefix } from '../utils/jsonld';
 import HeaderBar from './header-bar';
 import { ORG } from '../constants';
 import { createModeratorQs } from '../utils/search';
-import {
-  GetGroups,
-  PostGroups,
-  UpdateUserRole, // #FIXME need to build this
-} from '../hooks/api-hooks.tsx';
+import { GetGroups, PostGroups, PutUser } from '../hooks/api-hooks.tsx';
 import Button from './button';
 import IconButton from './icon-button';
 import { RoleBadgeUI } from './role-badge';
@@ -234,7 +230,7 @@ AdminPanelAddModal.propTypes = {
 };
 
 function AdminPanelRemoveModal({ user, role, onClose, onSuccess }) {
-  const updateUserRole = UpdateUserRole();
+  const updateUserRole = PutUser();
   const [frame, setFrame] = useState('submit');
 
   return (

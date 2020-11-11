@@ -6,7 +6,7 @@ import { MdPerson } from 'react-icons/md';
 import Button from './button';
 import Controls from './controls';
 import TextInput from './text-input';
-import { UpdateUser } from '../hooks/api-hooks.tsx';
+import { PutUser } from '../hooks/api-hooks.tsx';
 
 export default function RoleEditor({ editor, user, onCancel, onSaved }) {
   const editorRef = useRef();
@@ -15,7 +15,7 @@ export default function RoleEditor({ editor, user, onCancel, onSaved }) {
   const [file, setFile] = useState(null);
   const [scale, setScale] = useState(1);
   const [rotate, setRotate] = useState(0);
-  const updateUser = UpdateUser();
+  const updateUser = PutUser();
 
   const onDrop = useCallback(acceptedFiles => {
     const [file] = acceptedFiles;

@@ -4,10 +4,10 @@ import Org from './org';
 import XLink from './xlink';
 import Controls from './controls';
 import Button from './button';
-import { UpdateKeys } from '../hooks/api-hooks.tsx'; // #FIXME need to build this
+import { GetUser } from '../hooks/api-hooks.tsx'; // #FIXME need to build UpdateKeys()
 
 export default function SettingsApi({ user }) {
-  const updateKeys = UpdateKeys();
+  const updateKeys = GetUser();
 
   const handleSubmit = () => {
     updateKeys(user)

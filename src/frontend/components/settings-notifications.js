@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { useLocation, useHistory } from 'react-router-dom';
 import { MdInfoOutline, MdWarning, MdCheck } from 'react-icons/md';
 import { unprefix } from '../utils/jsonld';
-import { UpdateUser } from '../hooks/api-hooks.tsx';
+import { PutUser } from '../hooks/api-hooks.tsx';
 import ToggleSwitch from './toggle-switch';
 import TextInput from './text-input';
 import Controls from './controls';
@@ -20,7 +20,7 @@ export default function SettingsNotifications({ user }) {
 
   const params = new URLSearchParams(location.search);
 
-  const updateUser = UpdateUser();
+  const updateUser = PutUser();
   const [modalType, setModalType] = useState(
     params.get('verified') === 'true' ? 'checked' : null,
   );

@@ -7,8 +7,7 @@ import { unversionDoi } from '../utils/ids';
 import { unprefix } from '../utils/jsonld';
 import {
   GetPreprint,
-  GetUserRequest, // #FIXME need to build this
-  GetUserReview, // #FIXME need to build this
+  GetUser, // #FIXME need to build GetUserReview and GetUserRequest
   PostPreprints,
   PostPrereview,
 } from '../hooks/api-hooks.tsx';
@@ -151,8 +150,8 @@ function StepPreprint({
 
   const [value, setValue] = useState(unprefix(identifier));
 
-  const hasReviewed = GetUserReview(user, preprint);
-  const hasRequested = GetUserRequest(user, preprint);
+  const hasReviewed = GetUser(user, preprint); // #FIXME
+  const hasRequested = GetUser(user, preprint); // #FIXME
 
   // Note: biorXiv use versioned DOI in URL but do not register those DOIs with
   // doi.org => they 404 when we dereference them

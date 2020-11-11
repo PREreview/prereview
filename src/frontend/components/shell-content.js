@@ -6,11 +6,9 @@ import { Helmet } from 'react-helmet-async';
 import { MenuLink } from '@reach/menu-button';
 import { useUser } from '../contexts/user-context';
 import {
-  GetUserPrereview, // #FIXME need to build this
-  GetUserRequest, // #FIXME need to build this
-  PostPrereview, // #FIXME need to build this
-  PostReport, // #FIXME need to build this
-  PostReviewRequest, // #FIXME need to build this
+  GetUser, // #FIXME need to build get user reviews, requests
+  PostPrereview, // #FIXME need to build PostReviewRequest
+  // PostReport, // #FIXME need to build this
 } from '../hooks/api-hooks.tsx';
 import { useLocalState } from '../hooks/ui-hooks';
 import Controls from './controls';
@@ -38,14 +36,14 @@ export default function ShellContent({
   const [user] = useUser();
 
   const postPrereview = PostPrereview();
-  const postReviewRequest = PostReviewRequest();
+  const postReviewRequest = PostPrereview(); // #FIXME PostReviewRequest();
 
   const [tab, setTab] = useState(defaultTab);
 
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
-  const hasReviewed = GetUserPrereview(user, preprint);
-  const hasRequested = GetUserRequest(user, preprint);
+  const hasReviewed = user.preprint ? user.preprint.review : false; // #FIXME
+  const hasRequested = user.preprint ? user.preprint.request : false; // #FIXME
 
   const counts = preprint.requests.length + preprint.reviews.length;
 
@@ -270,7 +268,7 @@ function ShellContentRead({ user, preprint, loading, counts }) {
   // the extension where it is shell driven
 
   const [moderatedReviewId, setModeratedReviewId] = useState(null);
-  const postReport = PostReport();
+  const postReport = PostPrereview(); // #FIXME should be PostReport() when built
 
   return (
     <div className="shell-content-read">
