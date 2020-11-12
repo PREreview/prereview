@@ -19,7 +19,7 @@ const authWrapper = groups => {
 
   roles.use('access private pages', ctx => ctx.isAuthenticated());
 
-  roles.use('access admin pages', () => {
+  roles.use('access admin pages', ctx => {
     log.debug('Checking if user can access admin pages.');
     if (!ctx.isAuthenticated()) return false;
 
