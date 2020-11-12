@@ -1,9 +1,9 @@
 import { Migration } from '@mikro-orm/migrations';
 
-export class Migration20201027184417 extends Migration {
+export class Migration20201112162042 extends Migration {
 
   async up(): Promise<void> {
-    this.addSql('create table `user` (`id` integer not null primary key autoincrement, `created_at` text not null, `updated_at` text not null, `username` varchar not null, `name` varchar not null, `email` varchar not null, `orcid` varchar not null);');
+    this.addSql('create table `user` (`id` integer not null primary key autoincrement, `created_at` text not null, `updated_at` text not null, `username` varchar null, `name` varchar null, `email` varchar null, `orcid` varchar not null);');
     this.addSql('create unique index `user_username_unique` on `user` (`username`);');
     this.addSql('create unique index `user_email_unique` on `user` (`email`);');
 
@@ -59,8 +59,21 @@ export class Migration20201027184417 extends Migration {
     this.addSql('create index `rapid_review_author_id_index` on `rapid_review` (`author_id`);');
     this.addSql('create index `rapid_review_preprint_id_index` on `rapid_review` (`preprint_id`);');
 
+    this.addSql('alter table `request` add column `author_id` integer null;');
+    this.addSql('alter table `request` add column `preprint_id` integer null;');
+    this.addSql('create index `request_author_id_index` on `request` (`author_id`);');
+    this.addSql('create index `request_preprint_id_index` on `request` (`preprint_id`);');
+
+    this.addSql('alter table `full_review` add column `preprint_id` integer null;');
+    this.addSql('create index `full_review_preprint_id_index` on `full_review` (`preprint_id`);');
+
     this.addSql('alter table `full_review_draft` add column `parent_id` integer null;');
     this.addSql('create index `full_review_draft_parent_id_index` on `full_review_draft` (`parent_id`);');
+
+    this.addSql('alter table `comment` add column `author_id` integer null;');
+    this.addSql('alter table `comment` add column `parent_id` integer null;');
+    this.addSql('create index `comment_author_id_index` on `comment` (`author_id`);');
+    this.addSql('create index `comment_parent_id_index` on `comment` (`parent_id`);');
   }
 
 }

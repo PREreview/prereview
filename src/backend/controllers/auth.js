@@ -1,13 +1,12 @@
 import passport from 'koa-passport';
 import { Strategy as OrcidStrategy } from 'passport-orcid';
-// import MockStrategy from '../utils/mockStrategy.js';
 import router from 'koa-joi-router';
 import { getLogger } from '../log.js';
 import merge from 'lodash.merge';
 
 const log = getLogger('backend:controllers:auth');
 
-export default function controller(users, config) {
+export default function controller(users, config, thisUser) {
   const authRouter = router();
   /**
    * Serialize user
@@ -64,36 +63,34 @@ export default function controller(users, config) {
     let user;
 
     try {
+      // if a user already exists
       user = await users.findOne({ orcid: params.orcid });
     } catch (err) {
       log.debug('Error fetching user.', err);
     }
 
     if (user) {
-      const completeUser = merge(profile, user);
-      log.debug('Authenticated user!', user, completeUser);
+      const completeUser = merge(profile, user); // including the access.token in the user that gets sent to the passport serializer
+      log.debug('Authenticated user.', completeUser);
       return done(null, completeUser);
     } else {
-      // mock user here
-      const userInsert = {
-        orcid: params.orcid,
-        username: 'unique',
-        email: 'unique@email.com',
-        name: params.name,
-      };
-
       let newUser;
+      let usersName;
+
+      params.name
+        ? (usersName = params.name)
+        : (usersName = 'Community member');
 
       try {
-        log.debug('User insert: ', userInsert);
-        newUser = users.create(userInsert);
+        log.debug('Creating new user.');
+        newUser = users.create({ orcid: params.orcid, name: usersName });
         await users.persistAndFlush(newUser);
       } catch (err) {
         log.debug('Error creating user.', err);
       }
 
       if (newUser) {
-        log.debug('Authenticated & created user!', newUser);
+        log.debug('Authenticated & created user.', newUser);
         const completeUser = merge(profile, newUser);
         return done(null, completeUser);
       } else {
@@ -102,20 +99,11 @@ export default function controller(users, config) {
     }
   };
 
-  /**
-   * Initialize passport strategy
-   *
-   * @param {string} username - Username
-   * @param {string} password - Password
-   * @param {function} done - 'Done' callback
-   */
-
-  let strategy;
   const callbackURL = `${config.appRootUrl ||
     process.env.APP_ROOT_URL ||
-    'http://127.0.0.1:3000'}/api/v2/auth/orcid/callback`;
+    'http://127.0.0.1:3000'}/api/v2/orcid/callback`;
 
-  strategy = new OrcidStrategy(
+  const strategy = new OrcidStrategy(
     {
       sandbox:
         config.orcid_sandbox ||
@@ -133,13 +121,15 @@ export default function controller(users, config) {
 
   passport.use(strategy);
 
+  // TODO: local strategy login
+
   // start ORCID authentication
-  authRouter.get('/auth/orcid/login', passport.authenticate('orcid'));
+  authRouter.get('/orcid/login', passport.authenticate('orcid'));
 
   //finish ORCID authentication
   authRouter.route({
     method: 'get',
-    path: '/auth/orcid/callback',
+    path: '/orcid/callback',
     handler: async ctx => {
       return passport.authenticate('orcid', (err, user) => {
         log.debug('Finishing authenticating with ORCID...');
@@ -170,34 +160,6 @@ export default function controller(users, config) {
     },
   });
 
-  // TODO: figure out non-ORCID login/authentication
-
-  // authRouter.route({
-  //   method: 'post',
-  //   path: '/login',
-  //   handler: async ctx => {
-  //     return passport.authenticate('orcid', (err, user) => {
-  //       if (!user) {
-  //         ctx.body = { success: false };
-  //         ctx.throw(401, 'Authentication failed.');
-  //       } else {
-  //         ctx.state.user = user;
-  //         if (ctx.request.body.remember === 'true') {
-  //           ctx.session.maxAge = 86400000; // 1 day
-  //         } else {
-  //           ctx.session.maxAge = 'session';
-  //         }
-  //         ctx.cookies.set('PRE_user', user.username, { httpOnly: false });
-  //         ctx.body = {
-  //           success: true,
-  //           user: user,
-  //         };
-  //         return ctx.login(user);
-  //       }
-  //     })(ctx);
-  //   }
-  // });
-
   authRouter.route({
     method: 'get',
     path: '/logout',
@@ -221,11 +183,15 @@ export default function controller(users, config) {
    * @param {Object} auth - Authentication middleware
    * @param {Object} ctx - Koa context object
    */
-  authRouter.get('/authenticated', async ctx => {
-    ctx.state.user
-      ? (ctx.body = { msg: 'Authenticated', user: ctx.state.user.id })
-      : (ctx.body = { msg: 'No user has been authenticated' });
-  });
+  authRouter.get(
+    '/authenticated',
+    thisUser.can('access private pages'),
+    async ctx => {
+      ctx.state.user
+        ? (ctx.body = { msg: 'Authenticated', user: ctx.state.user })
+        : (ctx.body = { msg: 'No user has been authenticated' });
+    },
+  );
 
   return authRouter;
 }
