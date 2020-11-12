@@ -17,17 +17,13 @@ const authWrapper = groups => {
     return groups.isMemberOf(group, id);
   };
 
-  // roles.use('access private pages', ctx => ctx.isAuthenticated());
-  roles.use('access private pages', () => {
-    return true;
-  });
+  roles.use('access private pages', ctx => ctx.isAuthenticated());
 
   roles.use('access admin pages', () => {
     log.debug('Checking if user can access admin pages.');
-    // if (!ctx.isAuthenticated()) return false;
+    if (!ctx.isAuthenticated()) return false;
 
-    // return groups.isMemberOf('admins', ctx.state.user.id);
-    return true;
+    return groups.isMemberOf('admins', ctx.state.user.id);
   });
 
   return roles;
