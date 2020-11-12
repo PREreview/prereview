@@ -75,17 +75,19 @@ export default function controller(users, config, thisUser) {
       return done(null, completeUser);
     } else {
       let newUser;
+      let usersName;
+
+      params.name ? usersName = params.name : usersName = "Community member"
 
       try {
         log.debug('Creating new user.');
-        newUser = users.create({ orcid: params.orcid });
+        newUser = users.create({ orcid: params.orcid, name: usersName });
         await users.persistAndFlush(newUser);
       } catch (err) {
         log.debug('Error creating user.', err);
       }
 
       if (newUser) {
-        log.debug('New user? ', newUser);
         log.debug('Authenticated & created user.', newUser);
         const completeUser = merge(profile, newUser);
         return done(null, completeUser);
