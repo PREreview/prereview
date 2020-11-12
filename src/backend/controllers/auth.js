@@ -77,7 +77,9 @@ export default function controller(users, config, thisUser) {
       let newUser;
       let usersName;
 
-      params.name ? usersName = params.name : usersName = "Community member"
+      params.name
+        ? (usersName = params.name)
+        : (usersName = 'Community member');
 
       try {
         log.debug('Creating new user.');
