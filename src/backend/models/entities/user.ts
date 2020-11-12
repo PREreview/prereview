@@ -28,16 +28,16 @@ export default class User {
   @Property({ onUpdate: () => new Date() })
   updatedAt = new Date();
 
-  @Property()
+  @Property({ nullable: true })
   @Unique()
-  username!: string;
+  username?: string;
 
-  @Property()
-  name!: string;
+  @Property({ nullable: true })
+  name?: string;
 
-  @Property()
+  @Property({ nullable: true })
   @Unique()
-  email!: string;
+  email?: string;
 
   @Property({ hidden: true })
   orcid!: string;
@@ -51,9 +51,7 @@ export default class User {
   @OneToMany('Persona', 'identity')
   personas = new Collection<Persona>(this);
 
-  constructor(username: string, email: string, orcid: string) {
-    this.username = username;
-    this.email = email;
+  constructor(orcid: string) {
     this.orcid = orcid;
   }
 }

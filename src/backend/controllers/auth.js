@@ -64,36 +64,30 @@ export default function controller(users, config) {
     let user;
 
     try {
+      // if a user already exists
       user = await users.findOne({ orcid: params.orcid });
     } catch (err) {
       log.debug('Error fetching user.', err);
     }
 
     if (user) {
-      const completeUser = merge(profile, user);
-      log.debug('Authenticated user!', user, completeUser);
+      const completeUser = merge(profile, user); // including the access.token in the user that gets sent to the passport serializer
+      log.debug('Authenticated user.', completeUser);
       return done(null, completeUser);
     } else {
-      // mock user here
-      const userInsert = {
-        orcid: params.orcid,
-        username: 'unique',
-        email: 'unique@email.com',
-        name: params.name,
-      };
-
       let newUser;
 
       try {
-        log.debug('User insert: ', userInsert);
-        newUser = users.create(userInsert);
+        log.debug('Creating new user.');
+        newUser = users.create({ orcid: params.orcid });
         await users.persistAndFlush(newUser);
       } catch (err) {
         log.debug('Error creating user.', err);
       }
 
       if (newUser) {
-        log.debug('Authenticated & created user!', newUser);
+        log.debug('New user? ', newUser);
+        log.debug('Authenticated & created user.', newUser);
         const completeUser = merge(profile, newUser);
         return done(null, completeUser);
       } else {
