@@ -6,11 +6,9 @@ type Middleware = (
   next: (...args: any[]) => Promise<void>,
 ) => Promise<void>;
 
-const dbWrapper = async (): Promise<[MikroORM, Middleware]> => {
+export async function dbWrapper(): Promise<[MikroORM, Middleware]> {
   const orm = await MikroORM.init();
   const dbMiddleware: Middleware = (_, next) =>
     RequestContext.createAsync(orm.em, next);
   return [orm, dbMiddleware];
-};
-
-export default dbWrapper;
+}

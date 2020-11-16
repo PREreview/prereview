@@ -4,7 +4,6 @@ import { Request } from './entities';
 @Repository(Request)
 export class RequestModel extends EntityRepository<Request> {}
 
-const requestModelWrapper = (db: MikroORM): RequestModel =>
-  db.em.getRepository(Request);
-
-export default requestModelWrapper;
+export function requestModelWrapper(db: MikroORM): RequestModel {
+  return db.em.getRepository(Request);
+}
