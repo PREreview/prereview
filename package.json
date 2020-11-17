@@ -91,9 +91,9 @@
     "@reach/tooltip": "^0.10.5",
     "@reach/visually-hidden": "^0.10.4",
     "@remirror/editor-wysiwyg": "^0.13.1",
-    "@remirror/pm": "^1.0.0-next.47",
-    "@remirror/preset-wysiwyg": "^1.0.0-next.48",
-    "@remirror/styles": "^1.0.0-next.42",
+    "@remirror/pm": "^1.0.0-next.53",
+    "@remirror/preset-wysiwyg": "^1.0.0-next.53",
+    "@remirror/styles": "^1.0.0-next.53",
     "@sendgrid/mail": "^7.2.1",
     "@storybook/addon-actions": "^5.3.19",
     "babel-polyfill": "^6.26.0",
@@ -164,7 +164,7 @@
     "react-prerendered-component": "^1.2.4",
     "react-router-dom": "^5.1.2",
     "reflect-metadata": "^0.1.13",
-    "remirror": "^1.0.0-next.46",
+    "remirror": "^1.0.0-next.53",
     "request-promise-native": "^1.0.8",
     "smoothscroll-polyfill": "^0.4.4",
     "socket.io-client": "^2.3.0",
@@ -172,7 +172,9 @@
     "url": "^0.11.0",
     "url-search-params-polyfill": "^8.1.0",
     "uuid": "^3.3.2",
-    "xmldom": "^0.3.0"
+    "xmldom": "^0.3.0",
+    "y-protocols": "^1.0.1",
+    "yjs": "^13.4.4"
   },
   "devDependencies": {
     "@babel/plugin-proposal-decorators": "^7.12.1",
