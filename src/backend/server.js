@@ -13,16 +13,18 @@ import { dbWrapper } from './db.ts';
 import cloudflareAccess from './middleware/cloudflare.js';
 import AuthController from './controllers/auth.js'; // authentication/logins
 import authWrapper from '../backend/middleware/auth.js'; // authorization/user roles
-import CommentModel from './models/comments.ts';
-import CommunityModel from './models/communities.ts';
-import FullReviewModel from './models/fullReviews.ts';
-import GroupModel from './models/groups.ts';
-import PersonaModel from './models/personas.ts';
-import PreprintModel from './models/preprints.ts';
-import RapidReviewModel from './models/rapidReviews.ts';
-import RequestModel from './models/requests.ts';
-import TagModel from './models/tags.ts';
-import UserModel from './models/users.ts';
+import {
+  commentModelWrapper,
+  communityModelWrapper,
+  fullReviewModelWrapper,
+  groupModelWrapper,
+  personaModelWrapper,
+  preprintModelWrapper,
+  rapidReviewModelWrapper,
+  requestModelWrapper,
+  tagModelWrapper,
+  userModelWrapper,
+} from './models/index.ts';
 import CommentController from './controllers/comment.js';
 import CommunityController from './controllers/community.js';
 import GroupController from './controllers/group.js';
@@ -135,14 +137,7 @@ export default async function configServer(config) {
     .use(passport.session())
     .use(cors())
     .use(mount('/api/v2', apiV2Router))
-    .use(mount('/static', serveStatic(STATIC_DIR)))
-    .use(
-      async (ctx, next) =>
-        await serveStatic(STATIC_DIR)(
-          Object.assign(ctx, { path: 'index.html' }),
-          next,
-        ),
-    );
+    .use(serveStatic(STATIC_DIR));
 
   return server.callback();
 }
