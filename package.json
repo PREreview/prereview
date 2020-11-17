@@ -305,7 +305,8 @@
         "parser": "@typescript-eslint/typescript-estree",
         "parserOptions": {
           "sourceType": "module",
-          "project": "./tsconfig.json"
+          "project": "./tsconfig.json",
+          "allowImportExportEverywhere": true
         },
         "extends": [
           "plugin:react/recommended",

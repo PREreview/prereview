@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { MdMenu } from 'react-icons/md';
 import { Link } from 'react-router-dom';
 import { MenuLink } from '@reach/menu-button';
+import { GetUser } from '../hooks/api-hooks.tsx';
 import RapidPreReviewLogo from './rapid-pre-review-logo';
 import IconButton from './icon-button';
 import { useUser } from '../contexts/user-context';
@@ -14,7 +15,7 @@ import { useIsMobile } from '../hooks/ui-hooks';
 
 export default function HeaderBar({ onClickMenuButton, closeGap }) {
   const [user] = useUser();
-  const [role] = user.role;
+  const [role] = user ? user.role : []; //GetUser(1);
 
   const showProfileNotice = checkIfRoleLacksMininmalData(role);
   const isMobile = useIsMobile();

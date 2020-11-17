@@ -297,6 +297,7 @@ export default function Home() {
             )}
             {/* Cloudant returns the same bookmark when it hits the end of the list */}
             {!!(
+              preprints.rows &&
               preprints.rows.length < preprints.total_rows &&
               preprints.bookmark !== (location.state && location.state.bookmark)
             ) && (

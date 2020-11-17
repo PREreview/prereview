@@ -1,4 +1,4 @@
-import React, { Suspense } from 'react';
+import React, { Suspense, lazy } from 'react';
 import PropTypes from 'prop-types';
 import mobile from 'is-mobile';
 import { HTML5Backend } from 'react-dnd-html5-backend';
@@ -27,9 +27,7 @@ import AdminPanel from './admin-panel';
 import BlockPanel from './block-panel';
 import SuspenseLoading from './suspense-loading';
 
-const Moderate = React.lazy(() =>
-  import(/* webpackChunkName: "moderate" */ './moderate'),
-);
+const Moderate = React.lazy(() => import('./moderate'));
 
 // kick off the polyfill!
 //smoothscroll.polyfill();
