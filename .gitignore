@@ -115,3 +115,6 @@ dev.sqlite3
 
 # Junk
 .DS_Store
+
+# development sqlite database
+/prereview
