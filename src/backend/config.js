@@ -31,7 +31,10 @@ const defaults = {
   orcid: {
     client_id: process.env.PREREVIEW_ORCID_CLIENT_ID,
     client_secret: process.env.PREREVIEW_ORCID_CLIENT_SECRET,
-    sandbox: process.env.PREREVIEW_ORCID_SANDBOX || 'false',
+    callback_url: process.env.PREREVIEW_ORCID_CALLBACK_URL,
+    sandbox:
+      process.env.PREREVIEW_ORCID_SANDBOX ||
+      process.env.NODE_ENV !== 'production',
   },
   secrets: process.env.PREREVIEW_SECRETS,
   server: {
@@ -259,31 +262,37 @@ export default program
     defaults.db.password,
   )
   .option(
-    '--cfaccess_url <url>',
+    '--cfaccess-url <url>',
     'Cloudflare Access URL',
     validateUrl,
     defaults.cfaccess.url,
   )
   .option(
-    '--cfaccess_audience <token>',
+    '--cfaccess-audience <token>',
     'Cloudflare Access Audience',
     validateToken,
     defaults.cfaccess.audience,
   )
   .option(
-    '--orcid_client_id <id>',
+    '--orcid-client-id <id>',
     'OrcID client ID',
     validateUser,
     defaults.orcid.client_id,
   )
   .option(
-    '--orcid_client_secret <secret>',
+    '--orcid-client-secret <secret>',
     'OrcID client secret',
     validatePassword,
     defaults.orcid.client_secret,
   )
   .option(
-    '--orcid_sandbox <bool>',
+    '--orcid-callback-url <url>',
+    'OrcID client secret',
+    validateUrl,
+    defaults.orcid.callback_url,
+  )
+  .option(
+    '--orcid-sandbox <bool>',
     'OrcID sandbox environment?',
     validateBool,
     defaults.orcid.sandbox,

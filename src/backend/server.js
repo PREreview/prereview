@@ -111,9 +111,9 @@ export default async function configServer(config) {
   // server.context.onerror = errorHandler;
 
   // If we're running behind Cloudflare, set the access parameters.
-  if (config.cfaccess_url) {
+  if (config.cfaccessUrl) {
     server.use(async (ctx, next) => {
-      let cfa = await cloudflareAccess();
+      let cfa = cloudflareAccess();
       await cfa(ctx, next);
     });
     server.use(async (ctx, next) => {

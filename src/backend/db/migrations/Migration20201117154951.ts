@@ -1,16 +1,9 @@
 import { Migration } from '@mikro-orm/migrations';
 
-<<<<<<< HEAD:src/backend/db/migrations/Migration20201112162042.ts
-export class Migration20201112162042 extends Migration {
+export class Migration20201117154951 extends Migration {
 
   async up(): Promise<void> {
-    this.addSql('create table `user` (`id` integer not null primary key autoincrement, `created_at` text not null, `updated_at` text not null, `username` varchar null, `name` varchar null, `email` varchar null, `orcid` varchar not null);');
-=======
-export class Migration20201109021835 extends Migration {
-
-  async up(): Promise<void> {
-    this.addSql('create table `user` (`id` integer not null primary key autoincrement, `created_at` datetime not null, `updated_at` datetime not null, `username` varchar not null, `name` varchar not null, `email` varchar not null, `orcid` varchar not null);');
->>>>>>> master:src/backend/db/migrations/Migration20201109021835.ts
+    this.addSql('create table `user` (`id` integer not null primary key autoincrement, `created_at` datetime not null, `updated_at` datetime not null, `username` varchar null, `name` varchar null, `email` varchar null, `orcid` varchar not null);');
     this.addSql('create unique index `user_username_unique` on `user` (`username`);');
     this.addSql('create unique index `user_email_unique` on `user` (`email`);');
 
