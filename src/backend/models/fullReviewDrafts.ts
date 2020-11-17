@@ -4,7 +4,8 @@ import { FullReviewDraft } from './entities';
 @Repository(FullReviewDraft)
 export class FullReviewDraftModel extends EntityRepository<FullReviewDraft> {}
 
-const fullReviewDraftModelWrapper = (db: MikroORM): FullReviewDraftModel =>
-  db.em.getRepository(FullReviewDraft);
-
-export default fullReviewDraftModelWrapper;
+export function fullReviewDraftModelWrapper(
+  db: MikroORM,
+): FullReviewDraftModel {
+  return db.em.getRepository(FullReviewDraft);
+}

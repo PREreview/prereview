@@ -4,7 +4,6 @@ import { Group } from './entities';
 @Repository(Group)
 export class GroupModel extends EntityRepository<Group> {}
 
-const groupModelWrapper = (db: MikroORM): GroupModel =>
-  db.em.getRepository(Group);
-
-export default groupModelWrapper;
+export function groupModelWrapper(db: MikroORM): GroupModel {
+  return db.em.getRepository(Group);
+}
