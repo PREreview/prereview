@@ -32,9 +32,9 @@ export default function Login() {
       <Banner />
       <HeaderBar />
       <div className="login__content">
-        <div className="login__logo-container">
-          <img src={AnimatedLogo} />
-        </div>
+        {/* <div className="login__logo-container">
+          <AnimatedLogo />
+        </div> */}
 
         <h2 className="login__header">
           To log in to <Org /> you will need an ORCID ID.
@@ -66,9 +66,7 @@ export default function Login() {
         <Button
           disabled={!hasAgreed}
           element={hasAgreed ? 'a' : 'button'}
-          href={`${process.env.API_URL}/auth/orcid${
-            next ? `?next=${encodeURIComponent(next)}` : ''
-          }`}
+          href={`/api/v2/orcid/login`}
           primary={true}
           className="login__login-button"
         >

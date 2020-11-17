@@ -121,7 +121,7 @@ const RoleBadgeUI = React.forwardRef(function RoleBadgeUI(
               className="menu__list__link-item"
               href={
                 process.env.IS_EXTENSION
-                  ? `${process.env.API_URL}/about/${unprefix(roleId)}`
+                  ? `about/${unprefix(roleId)}`
                   : undefined
               }
               target={process.env.IS_EXTENSION ? '_blank' : undefined}
@@ -144,7 +144,7 @@ const RoleBadgeUI = React.forwardRef(function RoleBadgeUI(
               className="menu__list__link-item"
               href={
                 process.env.IS_EXTENSION
-                  ? `${process.env.API_URL}/about/${unprefix(roleId)}`
+                  ? `about/${unprefix(roleId)}`
                   : undefined
               }
               target={process.env.IS_EXTENSION ? '_blank' : undefined}

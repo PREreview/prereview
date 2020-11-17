@@ -2,38 +2,106 @@ import path from 'path';
 import Koa from 'koa';
 import compose from 'koa-compose';
 import cors from '@koa/cors';
-import logger from 'koa-logger';
+import log4js from 'koa-log4';
 import bodyParser from 'koa-body';
 import mount from 'koa-mount';
 import serveStatic from 'koa-static';
 import session from 'koa-session';
 import passport from 'koa-passport';
-import errorHandler from 'koa-better-error-handler';
-import config from './config.js';
+// import errorHandler from 'koa-better-error-handler';
+import { dbWrapper } from './db.ts';
 import cloudflareAccess from './middleware/cloudflare.js';
-import ssr from './middleware/ssr.js';
-import AuthController from './controllers/auth.js';
-import UserModel from './models/user.js';
+import AuthController from './controllers/auth.js'; // authentication/logins
+import authWrapper from '../backend/middleware/auth.js'; // authorization/user roles
+import {
+  commentModelWrapper,
+  communityModelWrapper,
+  fullReviewModelWrapper,
+  groupModelWrapper,
+  personaModelWrapper,
+  preprintModelWrapper,
+  rapidReviewModelWrapper,
+  requestModelWrapper,
+  tagModelWrapper,
+  userModelWrapper,
+} from './models/index.ts';
+import CommentController from './controllers/comment.js';
+import CommunityController from './controllers/community.js';
+import GroupController from './controllers/group.js';
+import UserController from './controllers/user.js';
+import PreprintController from './controllers/preprint.js';
+import PrereviewController from './controllers/prereview.js';
+import DocsController from './controllers/docs.js';
 
 const __dirname = path.resolve();
 const STATIC_DIR = path.resolve(__dirname, 'dist', 'frontend');
-const ENTRYPOINT = path.resolve(STATIC_DIR, 'index.html');
 
-export default function configServer(config) {
+export default async function configServer(config) {
   // Initialize our application server
   const server = new Koa();
 
-  // Setup our API handlers
-  const users = new UserModel();
-  const auth = AuthController(users);
-  const apiV2Router = compose([auth.routes(), auth.allowedMethods()]);
+  // Configure logging
+  log4js.configure({
+    appenders: { console: { type: 'stdout', layout: { type: 'colored' } } },
+    categories: {
+      default: { appenders: ['console'], level: config.log_level },
+    },
+  });
+  server.use(log4js.koaLogger(log4js.getLogger('http'), { level: 'auto' }));
+
+  // Initialize database
+  const [db, dbMiddleware] = await dbWrapper();
+  server.use(dbMiddleware);
+
+  // Setup auth handlers
+  const userModel = userModelWrapper(db);
+  const groupModel = groupModelWrapper(db);
+  const authz = authWrapper(groupModel); // authorization, not authentication
+  server.use(authz.middleware());
+
+  // setup API handlers
+  const auth = AuthController(userModel, config, authz);
+  // eslint-disable-next-line no-unused-vars
+  const commentModel = commentModelWrapper(db);
+  const comments = CommentController(commentModel, authz);
+  const communityModel = communityModelWrapper(db);
+  const communities = CommunityController(communityModel, authz);
+  const fullReviewModel = fullReviewModelWrapper(db);
+  const fullReviews = PrereviewController(fullReviewModel, authz);
+  const groups = GroupController(groupModel, authz);
+  // eslint-disable-next-line no-unused-vars
+  const personaModel = personaModelWrapper(db);
+  const preprintModel = preprintModelWrapper(db);
+  const preprints = PreprintController(preprintModel, authz);
+  // eslint-disable-next-line no-unused-vars
+  const rapidReviewModel = rapidReviewModelWrapper(db);
+  // eslint-disable-next-line no-unused-vars
+  const requestModel = requestModelWrapper(db);
+  // eslint-disable-next-line no-unused-vars
+  const tagModel = tagModelWrapper(db);
+  const users = UserController(userModel, authz);
+
+  fullReviews.use('/prereviews/:pid', comments.middleware());
+
+  const apiV2Router = compose([
+    auth.middleware(),
+    comments.middleware(),
+    communities.middleware(),
+    fullReviews.middleware(),
+    groups.middleware(),
+    preprints.middleware(),
+    users.middleware(),
+  ]);
+
+  // set up router for API docs
+  const apiDocs = DocsController();
 
   // Add here only development middlewares
-  if (config.isDev) {
-    server.use(logger());
-  } else {
-    server.silent = true;
-  }
+  // if (config.isDev) {
+  //   server.use(logger());
+  // } else {
+  //   server.silent = true;
+  // }
 
   // Set session secrets
   server.keys = Array.isArray(config.secrets)
@@ -41,12 +109,12 @@ export default function configServer(config) {
     : [config.secrets];
 
   // Set custom error handler
-  server.context.onerror = errorHandler;
+  // server.context.onerror = errorHandler;
 
   // If we're running behind Cloudflare, set the access parameters.
-  if (config.cfaccess_url) {
+  if (config.cfaccessUrl) {
     server.use(async (ctx, next) => {
-      let cfa = await cloudflareAccess();
+      let cfa = cloudflareAccess();
       await cfa(ctx, next);
     });
     server.use(async (ctx, next) => {
@@ -69,12 +137,9 @@ export default function configServer(config) {
     .use(passport.initialize())
     .use(passport.session())
     .use(cors())
+    .use(mount('/api', apiDocs.middleware()))
     .use(mount('/api/v2', apiV2Router))
-    .use(mount('/static', serveStatic(STATIC_DIR)))
-    .use((ctx, next) => {
-      ctx.state.htmlEntrypoint = ENTRYPOINT;
-      ssr(ctx, next);
-    });
+    .use(serveStatic(STATIC_DIR));
 
   return server.callback();
 }

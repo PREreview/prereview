@@ -79,9 +79,7 @@ export default function PdfViewer({ docId, loading }) {
     <div className="pdf-viewer" ref={containerEl}>
       <div className="pdf-margin">
         <Document
-          file={`${process.env.API_URL}/api/pdf?preprintId=${encodeURIComponent(
-            docId,
-          )}`}
+          file={`api/v2/pdf?preprintId=${encodeURIComponent(docId)}`}
           loading={loading}
           onLoadSuccess={async pdf => {
             let dims = [];

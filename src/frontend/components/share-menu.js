@@ -30,7 +30,7 @@ export default function ShareMenu({ identifier, roleIds = [] }) {
         <MenuList>
           <MenuItem
             onSelect={() => {
-              setPermalink(`${process.env.API_URL}/${identifier}`);
+              setPermalink(`${identifier}`);
             }}
           >
             Permalink
@@ -43,9 +43,7 @@ export default function ShareMenu({ identifier, roleIds = [] }) {
                 const qs = new URLSearchParams();
                 qs.set('role', roleIds.map(unprefix));
 
-                setPermalink(
-                  `${process.env.API_URL}/${identifier}?${qs.toString()}`,
-                );
+                setPermalink(`${identifier}?${qs.toString()}`);
               }}
             >
               Permalink (for selected user{roleIds.length > 1 ? 's' : ''})
@@ -55,9 +53,7 @@ export default function ShareMenu({ identifier, roleIds = [] }) {
           <MenuLink
             className="menu__list__link-item"
             download="rapid-prereview-data.jsonld"
-            href={`${process.env.API_URL}/api/preprint/${unprefix(
-              createPreprintId(identifier),
-            )}`}
+            href={`api/v2/preprint/${unprefix(createPreprintId(identifier))}`}
           >
             Download data (JSON-LD)
           </MenuLink>

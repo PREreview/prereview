@@ -95,11 +95,7 @@ export default function HeaderBar({ onClickMenuButton, closeGap }) {
                 <MenuLink
                   as={process.env.IS_EXTENSION ? undefined : Link}
                   to={process.env.IS_EXTENSION ? undefined : '/settings'}
-                  href={
-                    process.env.IS_EXTENSION
-                      ? `${process.env.API_URL}/settings`
-                      : undefined
-                  }
+                  href={process.env.IS_EXTENSION ? `/settings` : undefined}
                   target={process.env.IS_EXTENSION ? '_blank' : undefined}
                 >
                   Complete Profile
@@ -112,11 +108,7 @@ export default function HeaderBar({ onClickMenuButton, closeGap }) {
               <MenuLink
                 as={process.env.IS_EXTENSION ? undefined : Link}
                 to={process.env.IS_EXTENSION ? undefined : '/settings'}
-                href={
-                  process.env.IS_EXTENSION
-                    ? `${process.env.API_URL}/settings`
-                    : undefined
-                }
+                href={process.env.IS_EXTENSION ? `settings` : undefined}
                 target={process.env.IS_EXTENSION ? '_blank' : undefined}
               >
                 User Settings
@@ -126,11 +118,7 @@ export default function HeaderBar({ onClickMenuButton, closeGap }) {
                 <MenuLink
                   as={process.env.IS_EXTENSION ? undefined : Link}
                   to={process.env.IS_EXTENSION ? undefined : '/admin'}
-                  href={
-                    process.env.IS_EXTENSION
-                      ? `${process.env.API_URL}/admin`
-                      : undefined
-                  }
+                  href={process.env.IS_EXTENSION ? `admin` : undefined}
                   target={process.env.IS_EXTENSION ? '_blank' : undefined}
                 >
                   Admin Settings
@@ -141,11 +129,7 @@ export default function HeaderBar({ onClickMenuButton, closeGap }) {
                 <MenuLink
                   as={process.env.IS_EXTENSION ? undefined : Link}
                   to={process.env.IS_EXTENSION ? undefined : '/block'}
-                  href={
-                    process.env.IS_EXTENSION
-                      ? `${process.env.API_URL}/block`
-                      : undefined
-                  }
+                  href={process.env.IS_EXTENSION ? `block` : undefined}
                   target={process.env.IS_EXTENSION ? '_blank' : undefined}
                 >
                   Moderate Users
@@ -156,19 +140,13 @@ export default function HeaderBar({ onClickMenuButton, closeGap }) {
                 <MenuLink
                   as={process.env.IS_EXTENSION ? undefined : Link}
                   to={process.env.IS_EXTENSION ? undefined : '/moderate'}
-                  href={
-                    process.env.IS_EXTENSION
-                      ? `${process.env.API_URL}/moderate`
-                      : undefined
-                  }
+                  href={process.env.IS_EXTENSION ? `moderate` : undefined}
                   target={process.env.IS_EXTENSION ? '_blank' : undefined}
                 >
                   Moderate Reviews
                 </MenuLink>
               )}
-              <MenuLink href={`${process.env.API_URL}/auth/logout`}>
-                Logout
-              </MenuLink>
+              <MenuLink href={`auth/logout`}>Logout</MenuLink>
             </UserBadge>
           ) : (
             <XLink to="/login" href="/login">

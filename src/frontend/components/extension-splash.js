@@ -6,6 +6,7 @@ import Button from './button';
 // import LabelStyle from './label-style';
 import { CONTACT_EMAIL_HREF, ORG } from '../constants';
 import Org from './org';
+import preview from '../assets/images/extension-preview.png';
 
 export default function ExtensionSplash() {
   useEffect(() => {
@@ -31,8 +32,10 @@ export default function ExtensionSplash() {
             to navigate to the Rapid PREreview homepage.
           </p>
           <img
-            src="/images/extension-preview.png"
+            src={preview}
             className="extension-splash__screenshot"
+            aria-hidden="true"
+            alt=""
           />
           <ul className="extension-splash__browser-list">
             <li className="extension-splash__browser-list-item">

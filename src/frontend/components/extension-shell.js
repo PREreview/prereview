@@ -78,7 +78,7 @@ function ExtensionShellContent({ onRequireScreen, preprint }) {
           setUser(null);
         } else {
           let controller = new AbortController();
-          const r = await fetch(`${process.env.API_URL}/auth/user`, {
+          const r = await fetch(`auth/user`, {
             method: 'GET',
             credential: 'include',
 

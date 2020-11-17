@@ -1,21 +1,23 @@
-import Router from '@koa/router';
+import router from 'koa-joi-router';
 import { getLogger } from '../log.js';
 
 const log = getLogger('backend:controllers:setting');
+const Joi = router.Joi;
 
 // eslint-disable-next-line no-unused-vars
 export default function controller(settings, thisUser) {
-  const router = new Router();
+  const settingsRoutes = router();
 
-  router.get(
-    '/settings/:key',
-    thisUser.can('access admin pages'),
-    async ctx => {
+  settingsRoutes.route({
+    method: 'get',
+    path: '/settings/:key',
+    // pre:thisUser.can('access admin pages'),
+    handler: async ctx => {
       log.debug(`Retrieving setting ${ctx.params.key}.`);
       let setting;
 
       try {
-        setting = await settings.findById(ctx.params.key);
+        setting = await settings.findOne(ctx.params.key);
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse query: ${err}`);
@@ -36,27 +38,43 @@ export default function controller(settings, thisUser) {
         );
       }
     },
-  );
-
-  router.get('/settings', thisUser.can('access private pages'), async ctx => {
-    log.debug(`Retrieving settings.`);
-    let setting;
-
-    try {
-      setting = await settings.findAll();
-    } catch (err) {
-      log.error('HTTP 400 Error: ', err);
-      ctx.throw(400, `Failed to parse query: ${err}`);
-    }
-
-    ctx.response.body = { statusCode: 200, status: 'ok', data: setting || [] };
-    ctx.response.status = 200;
   });
 
-  router.put(
-    '/settings/:key',
-    thisUser.can('access admin pages'),
-    async ctx => {
+  settingsRoutes.route({
+    method: 'get',
+    path: '/settings',
+    // pre:thisUser.can('access admin pages'),
+    handler: async ctx => {
+      log.debug(`Retrieving settings.`);
+      let setting;
+
+      try {
+        setting = await settings.findAll();
+      } catch (err) {
+        log.error('HTTP 400 Error: ', err);
+        ctx.throw(400, `Failed to parse query: ${err}`);
+      }
+
+      ctx.response.body = {
+        statusCode: 200,
+        status: 'ok',
+        data: setting || [],
+      };
+      ctx.response.status = 200;
+    },
+  });
+
+  settingsRoutes.route({
+    method: 'put',
+    path: '/settings/:key',
+    validate: {
+      body: {
+        value: Joi.string(), // #FIXME
+      },
+      type: 'json',
+    },
+    // pre:thisUser.can('access admin pages'),
+    handler: async ctx => {
       log.debug(`Updating setting ${ctx.params.key}.`);
       let setting;
 
@@ -84,12 +102,13 @@ export default function controller(settings, thisUser) {
         );
       }
     },
-  );
+  });
 
-  router.delete(
-    '/settings/:key',
-    thisUser.can('access admin pages'),
-    async ctx => {
+  settingsRoutes.route({
+    method: 'delete',
+    path: '/settings/:key',
+    // pre:thisUser.can('access admin pages'),
+    handler: async ctx => {
       log.debug(`Deleting setting ${ctx.params.key}.`);
       let setting;
 
@@ -115,7 +134,7 @@ export default function controller(settings, thisUser) {
         );
       }
     },
-  );
+  });
 
-  return router;
+  return settingsRoutes;
 }

@@ -14,7 +14,7 @@ async function bootstrap() {
    * await sequelize.authenticate()
    */
   config.parse(process.argv);
-  return createServer(configServer(config)).listen(config.port);
+  return createServer(await configServer(config)).listen(config.port);
 }
 
 bootstrap()
