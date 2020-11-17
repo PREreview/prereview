@@ -7,7 +7,7 @@ import { getId, unprefix } from '../utils/jsonld';
 import HeaderBar from './header-bar';
 import { ORG } from '../constants';
 import { createModeratorQs } from '../utils/search';
-import { GetGroups, PostGroups, PutUser } from '../hooks/api-hooks.tsx';
+import { GetGroups, PostGroup, PutUser } from '../hooks/api-hooks.tsx';
 import Button from './button';
 import IconButton from './icon-button';
 import { RoleBadgeUI } from './role-badge';
@@ -146,7 +146,7 @@ export default function AdminPanel() {
 
 function AdminPanelAddModal({ user, onClose, onSuccess }) {
   const [value, setValue] = useState('');
-  const postGroups = PostGroups();
+  const postGroup = PostGroup();
   const [frame, setFrame] = useState('input');
 
   const pattern =
@@ -163,7 +163,7 @@ function AdminPanelAddModal({ user, onClose, onSuccess }) {
               label={<span>Enter a role (persona) ID</span>}
               minimal={true}
               autoComplete="off"
-              disabled={postGroups.loading}
+              disabled={postGroup.loading}
               placeholder=""
               pattern={pattern}
               onChange={e => {
@@ -174,10 +174,10 @@ function AdminPanelAddModal({ user, onClose, onSuccess }) {
             />
 
             <Controls
-              error={postGroups.error} // #FIXME
+              error={postGroup.error} // #FIXME
             >
               <Button
-                disabled={postGroups.loading}
+                disabled={postGroup.loading}
                 onClick={() => {
                   onClose();
                 }}
@@ -185,10 +185,10 @@ function AdminPanelAddModal({ user, onClose, onSuccess }) {
                 Cancel
               </Button>
               <Button
-                disabled={postGroups.loading || !re.test(value)}
-                isWaiting={postGroups.loading}
+                disabled={postGroup.loading || !re.test(value)}
+                isWaiting={postGroup.loading}
                 onClick={() => {
-                  postGroups(user, value)
+                  postGroup(user, value)
                     .then(() => alert('Role posted successfully.'))
                     .catch(err => alert(`An error occurred: ${err}`));
                   onSuccess(value);
@@ -205,10 +205,10 @@ function AdminPanelAddModal({ user, onClose, onSuccess }) {
             </p>
 
             <Controls
-              error={postGroups.error} // #FIXME
+              error={postGroup.error} // #FIXME
             >
               <Button
-                disabled={postGroups.loading}
+                disabled={postGroup.loading}
                 onClick={() => {
                   onClose();
                 }}

@@ -8,7 +8,7 @@ import { unprefix } from '../utils/jsonld';
 import {
   GetPreprint,
   GetUser, // #FIXME need to build GetUserReview and GetUserRequest
-  PostPreprints,
+  PostPreprint,
   PostPrereview,
 } from '../hooks/api-hooks.tsx';
 import { useLocalState } from '../hooks/ui-hooks';
@@ -390,7 +390,7 @@ StepReview.propTypes = {
 };
 
 function StepRequest({ isSingleStep, preprint, onCancel }) {
-  const postPreprints = PostPreprints();
+  const postPreprint = PostPreprint();
 
   return (
     <div className="new-preprint__step-request">
@@ -398,28 +398,25 @@ function StepRequest({ isSingleStep, preprint, onCancel }) {
 
       <PreprintPreview preprint={preprint} />
 
-      <Controls
-        error={postPreprints.FIXME}
-        className="new-preprint__button-bar"
-      >
+      <Controls error={postPreprint.FIXME} className="new-preprint__button-bar">
         <Button
           onClick={() => {
             onCancel();
           }}
-          disabled={postPreprints.loading}
+          disabled={postPreprint.loading}
         >
           {isSingleStep ? 'Cancel' : 'Go Back'}
         </Button>
 
         <Button
           primary={true}
-          isWaiting={postPreprints.loading}
+          isWaiting={postPreprint.loading}
           onClick={() => {
-            postPreprints(preprint)
+            postPreprint(preprint)
               .then(() => alert('Preprint added successfully.'))
               .catch(err => alert(`An error occurred: ${err}`));
           }}
-          disabled={postPreprints.loading}
+          disabled={postPreprint.loading}
         >
           Submit
         </Button>

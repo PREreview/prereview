@@ -45,7 +45,9 @@ export default function Home() {
     location.search,
     location.state && location.state.bookmark,
   );
-  const preprints = GetPreprints(apiQs);
+  const { data: preprints } = GetPreprints({ lazy: true });
+
+  console.log('preprints: ', preprints);
 
   const [hoveredSortOption, setHoveredSortOption] = useState(null);
 

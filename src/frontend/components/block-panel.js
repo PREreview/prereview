@@ -8,7 +8,7 @@ import HeaderBar from './header-bar';
 import { ORG } from '../constants';
 import { createBlockedRolesQs } from '../utils/search';
 // import { useRolesSearchResults, usePostAction } from '../hooks/api-hooks.tsx';
-import { GetGroups, PostGroups } from '../hooks/api-hooks.tsx';
+import { GetGroups, PostGroup } from '../hooks/api-hooks.tsx';
 import Button from './button';
 import IconButton from './icon-button';
 import { RoleBadgeUI } from './role-badge';
@@ -146,7 +146,7 @@ export default function BlockPanel() {
 
 function BlockPanelAddModal({ user, onClose, onSuccess }) {
   const [value, setValue] = useState('');
-  const postGroups = PostGroups();
+  const postGroup = PostGroup();
   const [frame, setFrame] = useState('input');
 
   const pattern =
@@ -163,7 +163,7 @@ function BlockPanelAddModal({ user, onClose, onSuccess }) {
               label={<span>Enter a role (persona) ID</span>}
               minimal={true}
               autoComplete="off"
-              disabled={postGroups.loading}
+              disabled={postGroup.loading}
               placeholder=""
               pattern={pattern}
               onChange={e => {
@@ -174,10 +174,10 @@ function BlockPanelAddModal({ user, onClose, onSuccess }) {
             />
 
             <Controls
-              error={postGroups.error} // #FIXME
+              error={postGroup.error} // #FIXME
             >
               <Button
-                disabled={postGroups.loading}
+                disabled={postGroup.loading}
                 onClick={() => {
                   onClose();
                 }}
@@ -185,10 +185,10 @@ function BlockPanelAddModal({ user, onClose, onSuccess }) {
                 Cancel
               </Button>
               <Button
-                disabled={postGroups.loading || !re.test(value)}
-                isWaiting={postGroups.loading}
+                disabled={postGroup.loading || !re.test(value)}
+                isWaiting={postGroup.loading}
                 onClick={() => {
-                  postGroups(user, value)
+                  postGroup(user, value)
                     .then(() => alert('Role posted successfully.'))
                     .catch(err => alert(`An error occurred: ${err}`));
                   onSuccess(value);
@@ -203,10 +203,10 @@ function BlockPanelAddModal({ user, onClose, onSuccess }) {
             <p>The role (persona) has been successfully blocked.</p>
 
             <Controls
-              error={postGroups.error} // #FIXME
+              error={postGroup.error} // #FIXME
             >
               <Button
-                disabled={postGroups.loading}
+                disabled={postGroup.loading}
                 onClick={() => {
                   onClose();
                 }}
@@ -228,7 +228,7 @@ BlockPanelAddModal.propTypes = {
 };
 
 function BlockPanelRemoveModal({ user, role, onClose, onSuccess }) {
-  const postGroups = PostGroups();
+  const postGroup = PostGroup();
   const [frame, setFrame] = useState('submit');
 
   return (
@@ -242,10 +242,10 @@ function BlockPanelRemoveModal({ user, role, onClose, onSuccess }) {
             </p>
 
             <Controls
-              error={postGroups.error} // #FIXME
+              error={postGroup.error} // #FIXME
             >
               <Button
-                disabled={postGroups.loading}
+                disabled={postGroup.loading}
                 onClick={() => {
                   onClose();
                 }}
@@ -253,10 +253,10 @@ function BlockPanelRemoveModal({ user, role, onClose, onSuccess }) {
                 Cancel
               </Button>
               <Button
-                disabled={postGroups.loading}
-                isWaiting={postGroups.loading}
+                disabled={postGroup.loading}
+                isWaiting={postGroup.loading}
                 onClick={() => {
-                  postGroups(user, role)
+                  postGroup(user, role)
                     .then(() => alert('Role posted successfully.'))
                     .catch(err => alert(`An error occurred: ${err}`));
                   onSuccess(role);
@@ -274,10 +274,10 @@ function BlockPanelRemoveModal({ user, role, onClose, onSuccess }) {
             </p>
 
             <Controls
-              error={postGroups.error} // #FIXME
+              error={postGroup.error} // #FIXME
             >
               <Button
-                disabled={postGroups.loading}
+                disabled={postGroup.loading}
                 onClick={() => {
                   onClose();
                 }}
