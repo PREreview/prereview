@@ -8,7 +8,7 @@ import mount from 'koa-mount';
 import serveStatic from 'koa-static';
 import session from 'koa-session';
 import passport from 'koa-passport';
-import errorHandler from 'koa-better-error-handler';
+// import errorHandler from 'koa-better-error-handler';
 import { dbWrapper } from './db.ts';
 import cloudflareAccess from './middleware/cloudflare.js';
 import AuthController from './controllers/auth.js'; // authentication/logins
@@ -108,12 +108,12 @@ export default async function configServer(config) {
     : [config.secrets];
 
   // Set custom error handler
-  server.context.onerror = errorHandler;
+  // server.context.onerror = errorHandler;
 
   // If we're running behind Cloudflare, set the access parameters.
-  if (config.cfaccess_url) {
+  if (config.cfaccessUrl) {
     server.use(async (ctx, next) => {
-      let cfa = await cloudflareAccess();
+      let cfa = cloudflareAccess();
       await cfa(ctx, next);
     });
     server.use(async (ctx, next) => {
