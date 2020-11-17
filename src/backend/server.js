@@ -31,7 +31,7 @@ import GroupController from './controllers/group.js';
 import UserController from './controllers/user.js';
 import PreprintController from './controllers/preprint.js';
 import PrereviewController from './controllers/prereview.js';
-import DocsRouter from './docs/apiDocs.js';
+import DocsController from './controllers/docs.js';
 
 const __dirname = path.resolve();
 const STATIC_DIR = path.resolve(__dirname, 'dist', 'frontend');
@@ -94,8 +94,7 @@ export default async function configServer(config) {
   ]);
 
   // set up router for API docs
-  const apiDocs = DocsRouter();
-  const apiDocsRouter = compose([apiDocs.middleware()]);
+  const apiDocs = DocsController();
 
   // Add here only development middlewares
   // if (config.isDev) {
@@ -138,7 +137,7 @@ export default async function configServer(config) {
     .use(passport.initialize())
     .use(passport.session())
     .use(cors())
-    .use(mount('/api', apiDocsRouter))
+    .use(mount('/api', apiDocs.middleware()))
     .use(mount('/api/v2', apiV2Router))
     .use(serveStatic(STATIC_DIR));
 

@@ -3,10 +3,10 @@ import { SwaggerAPI } from 'koa-joi-router-docs';
 import preprintRoutes from '../controllers/preprint.js';
 import { getLogger } from '../log.js';
 import router from 'koa-joi-router';
-import userRoutes from '../controllers/user.js';
-import prereviewRoutes from '../controllers/prereview.js';
-import commentRoutes from '../controllers/comment.js';
-import groupRoutes from '../controllers/group.js';
+import userRoutes from './user.js';
+import prereviewRoutes from './prereview.js';
+import commentRoutes from './comment.js';
+import groupRoutes from './group.js';
 
 const log = getLogger('apiDocs:::');
 
@@ -27,7 +27,7 @@ export default function docs() {
         description: 'Review preprints & build community',
         version: '2.0',
       },
-      basePath: '/',
+      basePath: '/api/v2',
     },
     {
       defaultResponses: {
