@@ -31,7 +31,7 @@ import GroupController from './controllers/group.js';
 import UserController from './controllers/user.js';
 import PreprintController from './controllers/preprint.js';
 import PrereviewController from './controllers/prereview.js';
-import DocsRouter from './docs/apiDocs.js';
+import DocsController from './controllers/docs.js';
 
 const __dirname = path.resolve();
 const STATIC_DIR = path.resolve(__dirname, 'dist', 'frontend');
@@ -80,12 +80,10 @@ export default async function configServer(config) {
   // eslint-disable-next-line no-unused-vars
   const tagModel = tagModelWrapper(db);
   const users = UserController(userModel, authz);
-  const apiDocs = DocsRouter();
 
   fullReviews.use('/prereviews/:pid', comments.middleware());
 
   const apiV2Router = compose([
-    apiDocs.middleware(),
     auth.middleware(),
     comments.middleware(),
     communities.middleware(),
@@ -94,6 +92,9 @@ export default async function configServer(config) {
     preprints.middleware(),
     users.middleware(),
   ]);
+
+  // set up router for API docs
+  const apiDocs = DocsController();
 
   // Add here only development middlewares
   // if (config.isDev) {
@@ -136,6 +137,7 @@ export default async function configServer(config) {
     .use(passport.initialize())
     .use(passport.session())
     .use(cors())
+    .use(mount('/api', apiDocs.middleware()))
     .use(mount('/api/v2', apiV2Router))
     .use(serveStatic(STATIC_DIR));
 
