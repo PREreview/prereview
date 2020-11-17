@@ -29,7 +29,7 @@ const defaults = {
     timeout: process.env.PREREVIEW_DB_TIMEOUT || 0,
   },
   server: {
-    port: process.env.PREREVIEW_PORT || process.env.PORT || '3000',
+    port: process.env.PORT || process.env.PREREVIEW_PORT || '3000',
   },
 };
 
