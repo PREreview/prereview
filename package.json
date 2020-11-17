@@ -29,20 +29,22 @@
   ],
   "scripts": {
     "lint": "eslint --ignore-path .gitignore --fix ./src/backend",
-    "test": "jest --coverage --forceExit",
+    "test": "jest --coverage --forceExit --passWithNoTests",
     "doc": "jsdoc -d ./dist/doc/ -r ./src/backend ./src/frontend",
     "build": "rimraf dist && npm run build:backend && npm run build:frontend",
     "build:dev": "rimraf dist && npm run build:backend:dev && npm run build:frontend:dev",
-    "build:backend": "parcel build --target=backend --no-scope-hoist src/backend/index.js && npm run tsc",
-    "build:backend:dev": "parcel build --target=backend --no-minify --no-scope-hoist src/backend/index.js && npm run tsc",
+    "build:backend": "parcel build --target=backend --no-scope-hoist --no-cache src/backend/index.js",
+    "build:backend:dev": "parcel build --target=backend --no-minify --no-scope-hoist --no-cache src/backend/index.js",
     "build:frontend": "parcel build --target=frontend src/frontend/index.html",
     "build:frontend:dev": "parcel build --target=frontend --no-minify src/frontend/index.html",
-    "tsc": "tsc",
     "db": "mikro-orm",
-    "start:backend": "cross-env PREREVIEW_PORT=3001 node dist/backend/index.js",
+    "db:migrations": "mikro-orm migration:up",
+    "db:seeds": "ts-node src/backend/seeds.ts",
+    "start:backend": "node dist/backend/index.js",
+    "start:backend:dev": "node dist/backend/index.js -p 3001",
     "start": "npm run start:backend",
     "start:frontend": "parcel serve -p 3000 src/frontend/index.html",
-    "start:dev": "concurrently -p \"[{name}]\" -n \"BACKEND,FRONTEND\" -c \"bgBlue.bold,bgMagenta.bold\" \"npm run start:backend\" \"npm run start:frontend\""
+    "start:dev": "concurrently -p \"[{name}]\" -n \"BACKEND,FRONTEND\" -c \"bgBlue.bold,bgMagenta.bold\" \"npm run start:backend:dev\" \"npm run start:frontend\""
   },
   "backend": "dist/backend/index.js",
   "frontend": "dist/frontend/index.html",
@@ -169,19 +171,20 @@
     "@babel/plugin-proposal-decorators": "^7.12.1",
     "@babel/preset-typescript": "^7.12.1",
     "@mikro-orm/cli": "^4.2.3",
-    "@mikro-resources/fixtures": "^1.6.1",
+    "@mikro-resources/fixtures": "github:throneless-tech/mikro-resources#just-fixtures",
     "@parcel/transformer-typescript-tsc": "^2.0.0-nightly.432",
     "@parcel/validator-typescript": "^2.0.0-alpha.3",
     "@typescript-eslint/eslint-plugin": "^4.5.0",
     "@typescript-eslint/parser": "^4.5.0",
     "acorn-jsx": "^5.1.0",
     "babel-plugin-transform-inline-environment-variables": "^0.4.3",
+    "class-fixtures-factory": "github:throneless-tech/class-fixtures-factory",
     "concurrently": "^5.3.0",
-    "cross-env": "^7.0.2",
     "eslint": "^6.8.0",
     "eslint-config-prettier": "4.3.0",
     "eslint-plugin-import": "^2.20.0",
     "eslint-plugin-jest": "22.5.1",
+    "eslint-plugin-jest-formatting": "^2.0.0",
     "eslint-plugin-node": "9.0.1",
     "eslint-plugin-prettier": "3.1.0",
     "eslint-plugin-promise": "4.1.1",
@@ -264,16 +267,6 @@
         "jsx": true
       }
     },
-    "extends": [
-      "eslint:recommended",
-      "plugin:import/errors",
-      "plugin:import/warnings",
-      "plugin:jest/recommended",
-      "plugin:node/recommended-module",
-      "plugin:prettier/recommended",
-      "plugin:promise/recommended",
-      "plugin:react/recommended"
-    ],
     "env": {
       "es2017": true,
       "browser": true,
@@ -288,17 +281,35 @@
     "overrides": [
       {
         "files": [
+          "**/*.js",
+          "**/*.jsx"
+        ],
+        "extends": [
+          "eslint:recommended",
+          "plugin:import/errors",
+          "plugin:import/warnings",
+          "plugin:jest/recommended",
+          "plugin:node/recommended-module",
+          "plugin:prettier/recommended",
+          "plugin:promise/recommended",
+          "plugin:react/recommended"
+        ]
+      },
+      {
+        "files": [
           "**/*.ts",
           "**/*.tsx"
         ],
-        "parser": "@typescript-eslint/parser",
+        "parser": "@typescript-eslint/typescript-estree",
         "parserOptions": {
           "sourceType": "module",
           "project": "./tsconfig.json"
         },
         "extends": [
+          "plugin:react/recommended",
           "plugin:@typescript-eslint/recommended",
-          "prettier/@typescript-eslint"
+          "prettier/@typescript-eslint",
+          "plugin:prettier/recommended"
         ]
       }
     ],

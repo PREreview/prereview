@@ -9,7 +9,7 @@ import serveStatic from 'koa-static';
 import session from 'koa-session';
 import passport from 'koa-passport';
 // import errorHandler from 'koa-better-error-handler';
-import dbWrapper from './db.ts';
+import { dbWrapper } from './db.ts';
 import cloudflareAccess from './middleware/cloudflare.js';
 import AuthController from './controllers/auth.js'; // authentication/logins
 import authWrapper from '../backend/middleware/auth.js'; // authorization/user roles
@@ -48,56 +48,48 @@ export default async function configServer(config) {
   server.use(log4js.koaLogger(log4js.getLogger('http'), { level: 'auto' }));
 
   // Initialize database
-  const dbType = config.isProd ? 'postgresql' : 'sqlite';
-  const [db, dbMiddleware] = await dbWrapper(
-    dbType,
-    config.dbHost,
-    config.dbPort,
-    config.dbName,
-    config.dbUser,
-    config.dbPass,
-  );
+  const [db, dbMiddleware] = await dbWrapper();
   server.use(dbMiddleware);
 
   // Setup auth handlers
-  const userModel = UserModel(db);
-  const groupModel = GroupModel(db);
+  const userModel = userModelWrapper(db);
+  const groupModel = groupModelWrapper(db);
   const authz = authWrapper(groupModel); // authorization, not authentication
   server.use(authz.middleware());
 
   // setup API handlers
   const auth = AuthController(userModel, config, authz);
   // eslint-disable-next-line no-unused-vars
-  const commentModel = CommentModel(db);
+  const commentModel = commentModelWrapper(db);
   const comments = CommentController(commentModel, authz);
-  const communityModel = CommunityModel(db);
+  const communityModel = communityModelWrapper(db);
   const communities = CommunityController(communityModel, authz);
-  const fullReviewModel = FullReviewModel(db);
+  const fullReviewModel = fullReviewModelWrapper(db);
+  const fullReviews = PrereviewController(fullReviewModel, authz);
   const groups = GroupController(groupModel, authz);
-  const prereviews = PrereviewController(fullReviewModel, authz);
   // eslint-disable-next-line no-unused-vars
-  const personaModel = PersonaModel(db);
-  const preprintModel = PreprintModel(db);
+  const personaModel = personaModelWrapper(db);
+  const preprintModel = preprintModelWrapper(db);
   const preprints = PreprintController(preprintModel, authz);
   // eslint-disable-next-line no-unused-vars
-  const rapidReviewModel = RapidReviewModel(db);
+  const rapidReviewModel = rapidReviewModelWrapper(db);
   // eslint-disable-next-line no-unused-vars
-  const requestModel = RequestModel(db);
+  const requestModel = requestModelWrapper(db);
   // eslint-disable-next-line no-unused-vars
-  const tagModel = TagModel(db);
+  const tagModel = tagModelWrapper(db);
   const users = UserController(userModel, authz);
   const apiDocs = DocsRouter();
 
-  prereviews.use('/prereviews/:pid', comments.middleware());
+  fullReviews.use('/prereviews/:pid', comments.middleware());
 
   const apiV2Router = compose([
     apiDocs.middleware(),
     auth.middleware(),
     comments.middleware(),
     communities.middleware(),
+    fullReviews.middleware(),
     groups.middleware(),
     preprints.middleware(),
-    prereviews.middleware(),
     users.middleware(),
   ]);
 

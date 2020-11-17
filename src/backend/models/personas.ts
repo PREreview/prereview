@@ -1,10 +1,9 @@
 import { EntityRepository, MikroORM, Repository } from '@mikro-orm/core';
-import Persona from './entities/persona';
+import { Persona } from './entities';
 
 @Repository(Persona)
 export class PersonaModel extends EntityRepository<Persona> {}
 
-const personaModelWrapper = (db: MikroORM): PersonaModel =>
-  db.em.getRepository(Persona);
-
-export default personaModelWrapper;
+export function personaModelWrapper(db: MikroORM): PersonaModel {
+  return db.em.getRepository(Persona);
+}

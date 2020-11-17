@@ -35,7 +35,7 @@ const defaults = {
   },
   secrets: process.env.PREREVIEW_SECRETS,
   server: {
-    port: process.env.PREREVIEW_PORT || '3000',
+    port: process.env.PORT || process.env.PREREVIEW_PORT || '3000',
   },
 };
 
