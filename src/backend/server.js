@@ -137,14 +137,7 @@ export default async function configServer(config) {
     .use(passport.session())
     .use(cors())
     .use(mount('/api/v2', apiV2Router))
-    .use(mount('/static', serveStatic(STATIC_DIR)))
-    .use(
-      async (ctx, next) =>
-        await serveStatic(STATIC_DIR)(
-          Object.assign(ctx, { path: 'index.html' }),
-          next,
-        ),
-    );
+    .use(serveStatic(STATIC_DIR));
 
   return server.callback();
 }
