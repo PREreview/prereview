@@ -19,17 +19,17 @@ export class User extends BaseEntity {
   //eslint-disable-next-line
   [EntityRepositoryType]?: UserModel;
 
-  @Property()
+  @Property({ nullable: true })
   @Unique()
-  username!: string;
+  username?: string;
 
-  @Property()
-  name!: string;
+  @Property({ nullable: true })
+  name?: string;
 
   @Fixture(faker => faker.internet.email())
-  @Property()
+  @Property({ nullable: true })
   @Unique()
-  email!: string;
+  email?: string;
 
   @Property()
   orcid!: string;
@@ -43,7 +43,7 @@ export class User extends BaseEntity {
   @OneToMany({ entity: () => Persona, mappedBy: 'identity' })
   personas: Collection<Persona> = new Collection<Persona>(this);
 
-  constructor(username: string, email: string, orcid: string) {
+  constructor(orcid: string, username?: string, email?: string) {
     super();
     this.username = username;
     this.email = email;

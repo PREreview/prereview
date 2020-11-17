@@ -132,6 +132,7 @@
     "koa-static": "^5.0.0",
     "koa2-swagger-ui": "^5.0.3",
     "lodash": "^4.17.19",
+    "lodash.merge": "^4.6.2",
     "log4js": "^6.3.0",
     "lru-cache": "^6.0.0",
     "match-sorter": "^4.2.0",

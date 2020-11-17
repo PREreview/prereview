@@ -113,6 +113,9 @@ dev.sqlite3
 # MikroORM Cache
 .mikroorm-cache
 
+# MikroORM db
+prereview
+
 # Junk
 .DS_Store
 
