@@ -4,7 +4,6 @@ import { Community } from './entities';
 @Repository(Community)
 export class CommunityModel extends EntityRepository<Community> {}
 
-const communityModelWrapper = (db: MikroORM): CommunityModel =>
-  db.em.getRepository(Community);
-
-export default communityModelWrapper;
+export function communityModelWrapper(db: MikroORM): CommunityModel {
+  return db.em.getRepository(Community);
+}

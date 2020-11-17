@@ -4,7 +4,6 @@ import { Preprint } from './entities';
 @Repository(Preprint)
 export class PreprintModel extends EntityRepository<Preprint> {}
 
-const preprintModelWrapper = (db: MikroORM): PreprintModel =>
-  db.em.getRepository(Preprint);
-
-export default preprintModelWrapper;
+export function preprintModelWrapper(db: MikroORM): PreprintModel {
+  return db.em.getRepository(Preprint);
+}

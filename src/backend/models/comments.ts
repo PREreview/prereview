@@ -4,7 +4,6 @@ import { Comment } from './entities';
 @Repository(Comment)
 export class CommentModel extends EntityRepository<Comment> {}
 
-const commentModelWrapper = (db: MikroORM): CommentModel =>
-  db.em.getRepository(Comment);
-
-export default commentModelWrapper;
+export function commentModelWrapper(db: MikroORM): CommentModel {
+  return db.em.getRepository(Comment);
+}

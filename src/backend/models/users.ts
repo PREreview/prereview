@@ -4,6 +4,6 @@ import { User } from './entities';
 @Repository(User)
 export class UserModel extends EntityRepository<User> {}
 
-const userModelWrapper = (db: MikroORM): UserModel => db.em.getRepository(User);
-
-export default userModelWrapper;
+export function userModelWrapper(db: MikroORM): UserModel {
+  return db.em.getRepository(User);
+}
