@@ -107,9 +107,6 @@ dist
 # TernJS port file
 .tern-port
 
-# SQLite DB
-dev.sqlite3
-
 # MikroORM Cache
 .mikroorm-cache
 
@@ -119,5 +116,5 @@ prereview
 # Junk
 .DS_Store
 
-# development sqlite database
-/prereview
+# development sqlite database(s)
+/*.sqlite3

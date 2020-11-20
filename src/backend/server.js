@@ -44,7 +44,7 @@ export default async function configServer(config) {
   log4js.configure({
     appenders: { console: { type: 'stdout', layout: { type: 'colored' } } },
     categories: {
-      default: { appenders: ['console'], level: config.log_level },
+      default: { appenders: ['console'], level: config.logLevel },
     },
   });
   server.use(log4js.koaLogger(log4js.getLogger('http'), { level: 'auto' }));
