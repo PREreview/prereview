@@ -54,12 +54,6 @@ export default function controller(users, config, thisUser) {
       },
     };
 
-    if (req && req.session && req.session.cookie && params.expires_in) {
-      req.session.cookie.expires = new Date(
-        Date.now() + params.expires_in * 1000,
-      );
-    }
-
     let user;
 
     try {
@@ -99,20 +93,14 @@ export default function controller(users, config, thisUser) {
     }
   };
 
-  const callbackURL = `${config.appRootUrl ||
-    process.env.APP_ROOT_URL ||
-    'http://127.0.0.1:3000'}/api/v2/orcid/callback`;
+  const callbackURL = config.orcidCallbackUrl;
 
   const strategy = new OrcidStrategy(
     {
-      sandbox:
-        config.orcid_sandbox ||
-        process.env.PREREVIEW_ORCID_SANDBOX ||
-        process.env.NODE_ENV !== 'production', // use the sandbox for non-production environments if not specified otherwise
+      sandbox: config.orcidSandbox,
       state: true, // needed for sessions
-      clientID: config.orcid_client_id || process.env.PREREVIEW_ORCID_CLIENT_ID,
-      clientSecret:
-        config.orcid_client_secret || process.env.PREREVIEW_ORCID_CLIENT_SECRET,
+      clientID: config.orcidClientId,
+      clientSecret: config.orcidClientSecret,
       callbackURL: callbackURL,
       passReqToCallback: true,
     },
@@ -141,12 +129,11 @@ export default function controller(users, config, thisUser) {
 
           if (ctx.request.body.remember === 'true') {
             ctx.session.maxAge = 86400000; // 1 day
-            log.debug(ctx.cookies);
           } else {
             ctx.session.maxAge = 'session';
           }
 
-          ctx.cookies.set('PRE_user', user.username, { httpOnly: false });
+          ctx.cookies.set('PRE_user', ctx.state.user.name, { httpOnly: false });
           ctx.body = { success: true, user: user };
 
           try {

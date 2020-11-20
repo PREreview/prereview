@@ -2,26 +2,18 @@ import {
   Entity,
   EntityRepositoryType,
   ManyToOne,
-  PrimaryKey,
   Property,
 } from '@mikro-orm/core';
+import { Fixture } from 'class-fixtures-factory';
 import { FullReviewDraftModel } from '../fullReviewDrafts';
-import FullReview from './fullReview';
+import { BaseEntity } from './BaseEntity';
+import { FullReview } from './FullReview';
 
 @Entity()
-export default class FullReviewDraft {
+export class FullReviewDraft extends BaseEntity {
   [EntityRepositoryType]: FullReviewDraftModel;
 
-  @PrimaryKey()
-  id!: number;
-
-  @Property()
-  createdAt = new Date();
-
-  @Property({ onUpdate: () => new Date() })
-  updatedAt = new Date();
-
-  @ManyToOne()
+  @ManyToOne({ entity: () => FullReview })
   parent!: FullReview;
 
   @Property()
@@ -31,6 +23,7 @@ export default class FullReviewDraft {
   contents!: string;
 
   constructor(title: string, contents: string) {
+    super();
     this.title = title;
     this.contents = contents;
   }

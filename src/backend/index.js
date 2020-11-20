@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import figlet from 'figlet';
 import { createServer } from 'http';
-import config from './config.js';
+import config from './config.ts';
 import configServer from './server.js';
 
 /**
