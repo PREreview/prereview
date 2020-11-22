@@ -56,11 +56,12 @@ export default async function configServer(config) {
   // Setup auth handlers
   const userModel = userModelWrapper(db);
   const groupModel = groupModelWrapper(db);
+  const personaModel = personaModelWrapper(db);
   const authz = authWrapper(groupModel); // authorization, not authentication
   server.use(authz.middleware());
 
   // setup API handlers
-  const auth = AuthController(userModel, config, authz);
+  const auth = AuthController(userModel, personaModel, config, authz);
   // eslint-disable-next-line no-unused-vars
   const commentModel = commentModelWrapper(db);
   const comments = CommentController(commentModel, authz);
@@ -70,7 +71,6 @@ export default async function configServer(config) {
   const fullReviews = PrereviewController(fullReviewModel, authz);
   const groups = GroupController(groupModel, authz);
   // eslint-disable-next-line no-unused-vars
-  const personaModel = personaModelWrapper(db);
   const preprintModel = preprintModelWrapper(db);
   const preprints = PreprintController(preprintModel, authz);
   // eslint-disable-next-line no-unused-vars
