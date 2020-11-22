@@ -6,7 +6,7 @@ import merge from 'lodash.merge';
 
 const log = getLogger('backend:controllers:auth');
 
-export default function controller(users, config, thisUser) {
+export default function controller(users, personas, config, thisUser) {
   const authRouter = router();
   /**
    * Serialize user
@@ -83,6 +83,27 @@ export default function controller(users, config, thisUser) {
         log.debug('Error creating user.', err);
       }
 
+      // create personas
+      if (newUser) {
+        let anonPersona;
+        let defaultPersona;
+
+        try {
+          anonPersona = personas.create({
+            name: 'Anonymous',
+            identity: newUser,
+          });
+          defaultPersona = personas.create({
+            name: usersName,
+            identity: newUser,
+          });
+
+          await personas.persistAndFlush([anonPersona, defaultPersona]);
+        } catch (err) {
+          log.debug('Error creating personas.', err);
+        }
+      }
+
       if (newUser) {
         log.debug('Authenticated & created user.', newUser);
         const completeUser = merge(profile, newUser);
@@ -93,14 +114,20 @@ export default function controller(users, config, thisUser) {
     }
   };
 
-  const callbackURL = config.orcidCallbackUrl;
+  const callbackURL = `${config.appRootUrl ||
+    process.env.APP_ROOT_URL ||
+    'http://127.0.0.1:3000'}/api/v2/orcid/callback`;
 
   const strategy = new OrcidStrategy(
     {
-      sandbox: config.orcidSandbox,
+      sandbox:
+        config.orcid_sandbox ||
+        process.env.PREREVIEW_ORCID_SANDBOX ||
+        process.env.NODE_ENV !== 'production', // use the sandbox for non-production environments if not specified otherwise
       state: true, // needed for sessions
-      clientID: config.orcidClientId,
-      clientSecret: config.orcidClientSecret,
+      clientID: config.orcid_client_id || process.env.PREREVIEW_ORCID_CLIENT_ID,
+      clientSecret:
+        config.orcid_client_secret || process.env.PREREVIEW_ORCID_CLIENT_SECRET,
       callbackURL: callbackURL,
       passReqToCallback: true,
     },
