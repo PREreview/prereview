@@ -34,7 +34,7 @@ export default function controller(personas) {
     validate: {
       body: Joi.object({
         name: Joi.string(),
-        identity: Joi.integer(), // the ID of a user object
+        identity: Joi.number().integer(), // the ID of a user object
       }),
       type: 'json',
       params: Joi.object({

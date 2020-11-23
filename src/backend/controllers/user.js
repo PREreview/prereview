@@ -64,9 +64,9 @@ export default function controller(users) {
       failure: 400,
     },
     handler: async ctx => {
-      log.debug(`Retrieving user ${ctx.params.id}.`);
+      log.debug(`Retrieving user ${ctx.params.id}`);
 
-      const user = await users.findOne(ctx.params.id);
+      const user = await users.findOne(ctx.params.id, ['personas']);
 
       if (user) {
         ctx.status = 200;

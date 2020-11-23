@@ -27,7 +27,7 @@ export default function controller(fullReviews, thisUser) {
     // pre:thisUserthisUser.can('access private pages'),
     validate: {
       body: {
-        preprint: Joi.integer(),
+        preprint: Joi.number().integer(),
         authors: Joi.array(),
       },
       type: 'json',
@@ -56,7 +56,7 @@ export default function controller(fullReviews, thisUser) {
   fullReviewsRouter.route({
     method: 'get',
     path: '/fullReviews',
-    pre: thisUser.can('access private pages'),
+    // pre: thisUser.can('access private pages'),
     handler: async ctx => {
       log.debug(`Retrieving fullReviews.`);
 
