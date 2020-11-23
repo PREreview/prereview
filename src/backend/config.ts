@@ -83,8 +83,9 @@ function getEnvOrDefault(postfix: string) {
 
 // eslint-disable-next-line no-unused-vars
 function validateBool(value: string, previous: boolean): boolean {
-  const bool = value ? value : previous;
+  const bool = value ? String(value).toLowerCase() === 'true' : previous;
   Joi.assert(bool, Joi.boolean());
+  return bool;
 }
 
 function validateUser(value: string, previous: string): string {
@@ -185,8 +186,7 @@ function validatePort(value: string, previous: number): number {
 
 // eslint-disable-next-line no-unused-vars
 function validateArray(value: string, previous: Array<string>): Array<string> {
-  const strings = value ? value : previous;
-  const array = isString(strings) ? strings.split(',') : strings;
+  const array = value ? value.split(',') : previous;
   Joi.assert(
     array,
     Joi.array()
@@ -194,6 +194,10 @@ function validateArray(value: string, previous: Array<string>): Array<string> {
       .required(),
   );
   return array;
+}
+
+interface ParseOptions {
+  from: 'node' | 'electron' | 'user';
 }
 
 class Config extends Command {
@@ -209,7 +213,7 @@ class Config extends Command {
     this.isProd = this.env === 'production';
   }
 
-  parse(argv?: string[], options?: ParseOptions) {
+  parse(argv?: string[], options?: ParseOptions): any {
     super.parse(argv, options);
     if (!this.cfaccessUrl != !this.cfaccessAudience) {
       throw new Error(
@@ -223,7 +227,7 @@ class Config extends Command {
   }
 
   get dbUrl() {
-    let userpass;
+    let userpass: string;
     if (this.dbPass) {
       userpass = this.dbUser.concat(':', this.dbPass);
     } else {
@@ -263,7 +267,7 @@ export default program
     '-p, --port <number>',
     'Port for the app to listen on',
     validatePort,
-    getEnvOrDefault('port').asString(),
+    getEnvOrDefault('port').asInt(),
   )
   .option(
     '-l, --log-level <level>',
@@ -275,7 +279,7 @@ export default program
     '-s, --secrets <string>',
     'Session secret(s)',
     validateArray,
-    getEnvOrDefault('secrets').asString(),
+    getEnvOrDefault('secrets').asArray(),
   )
   .option('--no-proxy', 'Disable support for proxy headers')
   .option(
@@ -288,7 +292,7 @@ export default program
     '--db-port <port>',
     'Database port',
     validatePort,
-    getEnvOrDefault('db_port').asString(),
+    getEnvOrDefault('db_port').asPortNumber(),
   )
   .option(
     '--db-type <driver>',
@@ -300,19 +304,19 @@ export default program
     '--db-pool-min <connections>',
     'Minimum number of DB pool connections',
     validatePool,
-    getEnvOrDefault('db_pool_min').asString(),
+    getEnvOrDefault('db_pool_min').asInt(),
   )
   .option(
     '--db-pool-max <connections>',
     'Maximum number of DB pool connections',
     validatePool,
-    getEnvOrDefault('db_pool_max').asString(),
+    getEnvOrDefault('db_pool_max').asInt(),
   )
   .option(
     '--db-timeout <timeout>',
     'Database connection timeout in milliseconds',
     validateTimeout,
-    getEnvOrDefault('db_timeout').asString(),
+    getEnvOrDefault('db_timeout').asInt(),
   )
   .option(
     '--db-name <database>',
