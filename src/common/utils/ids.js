@@ -2,10 +2,10 @@ import orcidUtils from 'orcid-utils';
 import doiRegex from 'doi-regex';
 import identifiersArxiv from 'identifiers-arxiv';
 import { getId, unprefix } from '../utils/jsonld';
-import { createError } from './errors';
+import { createError } from '../errors.ts';
 
 export function createPreprintId(
-  value // doi or arXiv (prefixed or not) or preprint
+  value, // doi or arXiv (prefixed or not) or preprint
 ) {
   let id = getId(value);
 
@@ -37,7 +37,7 @@ export function createPreprintId(
   if (!vendor) {
     throw createError(
       500,
-      `invalid identifier for create preprint id (could not extract vendor)`
+      `invalid identifier for create preprint id (could not extract vendor)`,
     );
   }
 
@@ -45,7 +45,7 @@ export function createPreprintId(
 }
 
 export function createPreprintIdentifierCurie(
-  value // preprint or identifer (arXivId or DOI, unprefixed)
+  value, // preprint or identifer (arXivId or DOI, unprefixed)
 ) {
   if (!value) {
     throw createError(500, `invalid value for createIdentifierCurie`);

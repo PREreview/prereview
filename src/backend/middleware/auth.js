@@ -1,5 +1,8 @@
 import Roles from 'koa-roles';
+import config from '../config.ts';
 import { getLogger } from '../log.js';
+
+const log = getLogger('backend:middleware:auth');
 
 /**
  * Installs authorization middleware into the koa app.
@@ -7,8 +10,6 @@ import { getLogger } from '../log.js';
  * @param {Object} ctx - the koa context object
  * @param {funtion} next - continue to next middleware
  */
-
-const log = getLogger('backend:middleware:auth');
 
 const authWrapper = groups => {
   const roles = new Roles();
@@ -23,7 +24,10 @@ const authWrapper = groups => {
     log.debug('Checking if user can access admin pages.');
     if (!ctx.isAuthenticated()) return false;
 
-    return groups.isMemberOf('admins', ctx.state.user.id);
+    return (
+      config.adminUsers.includes(ctx.state.user.id) ||
+      groups.isMemberOf('admins', ctx.state.user.id)
+    );
   });
 
   return roles;

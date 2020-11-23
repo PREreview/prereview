@@ -1,9 +1,11 @@
 import { Command } from 'commander';
-import Joi from 'joi';
 import dotenv from 'dotenv';
 import { from } from 'env-var';
+import Joi from 'joi';
+import orcidUtils from 'orcid-utils';
 import log4js from 'koa-log4';
 import { isString } from '../common/utils';
+import { ServerError } from '../common/errors';
 
 // Configure logging
 
@@ -30,7 +32,7 @@ const env = from(process.env, {}, (varname, str) =>
 
 function getEnv(postfix: string, fallback?: string) {
   if (!isString(postfix)) {
-    throw new Error('Must specify an environment variable to fetch.');
+    throw new ServerError('Must specify an environment variable to fetch.');
   }
   if (fallback) {
     return env
@@ -70,7 +72,7 @@ const defaults = {
 
 function getEnvOrDefault(postfix: string) {
   if (!isString(postfix)) {
-    throw new Error('Must specify an environment variable to fetch.');
+    throw new ServerError('Must specify an environment variable to fetch.');
   }
   const defaultValue = defaults[postfix.toLowerCase()];
 
@@ -124,6 +126,25 @@ function validateToken(value: string, previous: string): string {
   const token = value ? value : previous;
   Joi.assert(token, Joi.string());
   return token;
+}
+
+function validateOrcids(value: string, previous: Array<string>): Array<string> {
+  const array = value ? value.split(',') : previous;
+  Joi.assert(
+    array,
+    Joi.array().items(
+      Joi.string()
+        .external(value => {
+          if (!orcidUtils.isValid(value)) {
+            throw new ServerError(`Invalid OrcID: ${value}`);
+          } else {
+            return value;
+          }
+        })
+        .required(),
+    ),
+  );
+  return array;
 }
 
 function validateDbtype(value: string, previous: string): string {
@@ -216,13 +237,15 @@ class Config extends Command {
   parse(argv?: string[], options?: ParseOptions): any {
     super.parse(argv, options);
     if (!this.cfaccessUrl != !this.cfaccessAudience) {
-      throw new Error(
+      throw new ServerError(
         'If using Cloudflare Access both the URL and the Audience must be specified.',
       );
     }
 
     if (this.dbType === 'postgresql' && !this.dbPass) {
-      throw new Error('If using Postgres you need to specify a password.');
+      throw new ServerError(
+        'If using Postgres you need to specify a password.',
+      );
     }
   }
 
@@ -252,16 +275,10 @@ export default program
   .description(process.env.npm_package_description)
   .version(process.env.npm_package_version)
   .option(
-    '--username <username>',
-    'Admin username',
-    validateUser,
-    getEnvOrDefault('admin_username').asString(),
-  )
-  .option(
-    '--password <password>',
-    'Admin password',
-    validatePassword,
-    getEnvOrDefault('admin_password').asString(),
+    '--admin-users <ids>',
+    'Admin users (comma-separated OrcIDs)',
+    validateOrcids,
+    getEnvOrDefault('admin_users').asArray(),
   )
   .option(
     '-p, --port <number>',

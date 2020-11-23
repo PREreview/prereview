@@ -1,19 +1,33 @@
+// Node modules
 import path from 'path';
+
+// Koa modules
 import Koa from 'koa';
+import bodyParser from 'koa-body';
 import compose from 'koa-compose';
 import cors from '@koa/cors';
 import log4js from 'koa-log4';
-import bodyParser from 'koa-body';
 import mount from 'koa-mount';
+import passport from 'koa-passport';
 import serveStatic from 'koa-static';
 import session from 'koa-session';
-import passport from 'koa-passport';
+
+// Lad modules
+import koa404Handler from 'koa-404-handler';
 import errorHandler from 'koa-better-error-handler';
+import xRequestId from 'koa-better-request-id';
+import xResponseTime from 'koa-better-response-time';
+import requestReceived from 'request-received';
+
+// Our modules
 import { createError } from '../common/errors.ts';
 import { dbWrapper } from './db.ts';
+
+// Our middlewares
 import cloudflareAccess from './middleware/cloudflare.js';
-import AuthController from './controllers/auth.js'; // authentication/logins
 import authWrapper from './middleware/auth.js'; // authorization/user roles
+
+// Our models
 import {
   commentModelWrapper,
   communityModelWrapper,
@@ -26,6 +40,9 @@ import {
   tagModelWrapper,
   userModelWrapper,
 } from './models/index.ts';
+
+// Our controllers
+import AuthController from './controllers/auth.js'; // authentication/logins
 import CommentController from './controllers/comment.js';
 import CommunityController from './controllers/community.js';
 import GroupController from './controllers/group.js';
@@ -37,9 +54,14 @@ import DocsController from './controllers/docs.js';
 const __dirname = path.resolve();
 const STATIC_DIR = path.resolve(__dirname, 'dist', 'frontend');
 
+const startAt = Symbol.for('request-received.startAt');
+const startTime = Symbol.for('request-received.startTime');
+
 export default async function configServer(config) {
   // Initialize our application server
   const server = new Koa();
+  server.use(xResponseTime());
+  server.use(xRequestId());
 
   // Configure logging
   log4js.configure({
@@ -134,7 +156,8 @@ export default async function configServer(config) {
     .use(cors())
     .use(mount('/api', apiDocs.middleware()))
     .use(mount('/api/v2', apiV2Router))
-    .use(serveStatic(STATIC_DIR));
+    .use(serveStatic(STATIC_DIR))
+    .use(koa404Handler);
 
   return server.callback();
 }
