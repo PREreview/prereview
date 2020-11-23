@@ -366,4 +366,4 @@ export default program
     validateUrl,
     getEnvOrDefault('orcid_callback_url').asString(),
   )
-  .option('--orcid-sandbox', 'Use the OrcID sandbox environment');
+  .option('--orcid-sandbox', 'Use the OrcID sandbox environment', true);
