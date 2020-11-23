@@ -9,10 +9,11 @@ import serveStatic from 'koa-static';
 import session from 'koa-session';
 import passport from 'koa-passport';
 import errorHandler from 'koa-better-error-handler';
+import { createError } from '../common/errors.ts';
 import { dbWrapper } from './db.ts';
 import cloudflareAccess from './middleware/cloudflare.js';
 import AuthController from './controllers/auth.js'; // authentication/logins
-import authWrapper from '../backend/middleware/auth.js'; // authorization/user roles
+import authWrapper from './middleware/auth.js'; // authorization/user roles
 import {
   commentModelWrapper,
   communityModelWrapper,
@@ -31,7 +32,7 @@ import GroupController from './controllers/group.js';
 import UserController from './controllers/user.js';
 import PreprintController from './controllers/preprint.js';
 import PrereviewController from './controllers/prereview.js';
-import DocsRouter from './docs/apiDocs.js';
+import DocsController from './controllers/docs.js';
 
 const __dirname = path.resolve();
 const STATIC_DIR = path.resolve(__dirname, 'dist', 'frontend');
@@ -44,7 +45,7 @@ export default async function configServer(config) {
   log4js.configure({
     appenders: { console: { type: 'stdout', layout: { type: 'colored' } } },
     categories: {
-      default: { appenders: ['console'], level: config.log_level },
+      default: { appenders: ['console'], level: config.logLevel },
     },
   });
   server.use(log4js.koaLogger(log4js.getLogger('http'), { level: 'auto' }));
@@ -80,12 +81,10 @@ export default async function configServer(config) {
   // eslint-disable-next-line no-unused-vars
   const tagModel = tagModelWrapper(db);
   const users = UserController(userModel, authz);
-  const apiDocs = DocsRouter();
 
   fullReviews.use('/prereviews/:pid', comments.middleware());
 
   const apiV2Router = compose([
-    apiDocs.middleware(),
     auth.middleware(),
     comments.middleware(),
     communities.middleware(),
@@ -95,12 +94,8 @@ export default async function configServer(config) {
     users.middleware(),
   ]);
 
-  // Add here only development middlewares
-  // if (config.isDev) {
-  //   server.use(logger());
-  // } else {
-  //   server.silent = true;
-  // }
+  // set up router for API docs
+  const apiDocs = DocsController();
 
   // Set session secrets
   server.keys = Array.isArray(config.secrets)
@@ -108,12 +103,13 @@ export default async function configServer(config) {
     : [config.secrets];
 
   // Set custom error handler
+  server.context.createError = createError;
   server.context.onerror = errorHandler;
 
   // If we're running behind Cloudflare, set the access parameters.
-  if (config.cfaccess_url) {
+  if (config.cfaccessUrl) {
     server.use(async (ctx, next) => {
-      let cfa = await cloudflareAccess();
+      let cfa = cloudflareAccess();
       await cfa(ctx, next);
     });
     server.use(async (ctx, next) => {
@@ -136,6 +132,7 @@ export default async function configServer(config) {
     .use(passport.initialize())
     .use(passport.session())
     .use(cors())
+    .use(mount('/api', apiDocs.middleware()))
     .use(mount('/api/v2', apiV2Router))
     .use(serveStatic(STATIC_DIR));
 

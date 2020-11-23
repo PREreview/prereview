@@ -1,6 +1,6 @@
 import { FixtureFactory } from '@mikro-resources/fixtures';
 import { MikroORM } from '@mikro-orm/core';
-import { Preprint } from './models/entities';
+import { Preprint } from '../models/entities';
 
 async function main() {
   try {

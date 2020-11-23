@@ -22,6 +22,7 @@ const querySchema = Joi.object({
 export default function controller(preprints) {
   const preprintRoutes = router();
 
+  // RESOLVE PREPRINT METADATA
   preprintRoutes.route({
     meta: {
       swagger: {
@@ -38,6 +39,7 @@ export default function controller(preprints) {
     },
   });
 
+  // POST
   preprintRoutes.route({
     meta: {
       swagger: {
@@ -47,30 +49,56 @@ export default function controller(preprints) {
     method: 'post',
     path: '/preprints',
     validate: {
-      body: {
-        doi: Joi.string(),
+      body: Joi.object({
         title: Joi.string(),
-        server: Joi.string(),
         url: Joi.string(),
-        pdfUrl: Joi.string(),
-      }, // #TODO
+        uuid: Joi.string().guid(),
+      }), // #TODO
       type: 'json',
+      continueOnError: true,
     },
     // pre:thisUserthisUser.can('access private pages'),
-    handler: async ctx => {
+    handler: async (ctx, next) => {
+      if (ctx.invalid) {
+        log.error(
+          'HTTP 400 Error. This is the error object: ',
+          '\n',
+          ctx.invalid,
+        );
+
+        ctx.response.status = 400;
+
+        ctx.body = {
+          statusCode: 400,
+          status: 'HTTP 400 error',
+          error: ctx.invalid.body ? ctx.invalid.body.name : ctx.invalid, // TODO: make dynamic
+          message: ` ${ctx.invalid.body.name}: ${ctx.invalid.body.msg}`,
+        };
+
+        return next();
+      }
+
       log.debug('Adding new preprint.');
       let preprint;
 
       try {
-        preprint = preprints.create(ctx.request.body);
+        preprint = preprints.create(ctx.request.body.data);
         await preprints.persistAndFlush(preprint);
+        ctx.response.status = 201;
+        ctx.body = {
+          statusCode: 201,
+          status: 'created',
+          data: preprint,
+        };
       } catch (err) {
+        log.debug('In the error block...');
         log.error('HTTP 400 Error: ', err);
-        ctx.throw(400, `Failed to parse preprint schema: ${err}`);
+        ctx.response.status = 400;
       }
     },
   });
 
+  // GET ALL
   preprintRoutes.route({
     meta: {
       swagger: {
@@ -89,17 +117,17 @@ export default function controller(preprints) {
               status: 'ok',
               data: Joi.array().items(
                 Joi.object({
-                  doi: Joi.string(),
                   title: Joi.string(),
-                  server: Joi.string(),
                   url: Joi.string(),
-                  pdfUrl: Joi.string(),
+                  uuid: Joi.string().guid({
+                    version: ['uuidv4', 'uuidv5'],
+                  }),
                 }).min(1),
               ),
             },
           },
         },
-        failure: 400,
+        continueOnError: true,
       },
     },
     handler: async ctx => {
@@ -108,7 +136,7 @@ export default function controller(preprints) {
       try {
         const allPreprints = await preprints.findAll();
         if (allPreprints) {
-          ctx.response.body = {
+          ctx.body = {
             statusCode: 200,
             status: 'ok',
             data: allPreprints,

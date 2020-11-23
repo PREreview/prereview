@@ -1,6 +1,6 @@
 import jwt from 'koa-jwt';
 import jwks from 'jwks-rsa';
-import config from '../config.js';
+import config from '../config.ts';
 
 /**
  * Installs the cloudflare access JWT middleware into the koa app.
