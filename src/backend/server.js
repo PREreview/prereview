@@ -31,7 +31,7 @@ import GroupController from './controllers/group.js';
 import UserController from './controllers/user.js';
 import PersonaController from './controllers/persona.js';
 import PreprintController from './controllers/preprint.js';
-import PrereviewController from './controllers/prereview.js';
+import FullReviewController from './controllers/fullReview.js';
 import DocsController from './controllers/docs.js';
 
 const __dirname = path.resolve();
@@ -69,7 +69,7 @@ export default async function configServer(config) {
   const communityModel = communityModelWrapper(db);
   const communities = CommunityController(communityModel, authz);
   const fullReviewModel = fullReviewModelWrapper(db);
-  const fullReviews = PrereviewController(fullReviewModel, authz);
+  const fullReviews = FullReviewController(fullReviewModel, authz);
   const groups = GroupController(groupModel, authz);
   // eslint-disable-next-line no-unused-vars
   const personas = PersonaController(personaModel, authz);

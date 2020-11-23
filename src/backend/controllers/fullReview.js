@@ -1,7 +1,7 @@
 import router from 'koa-joi-router';
 import { getLogger } from '../log.js';
 
-const log = getLogger('backend:controllers:prereview');
+const log = getLogger('backend:controllers:fullReviews');
 const Joi = router.Joi;
 
 // const querySchema = Joi.object({
@@ -18,19 +18,17 @@ const Joi = router.Joi;
 // });
 
 // eslint-disable-next-line no-unused-vars
-export default function controller(prereviews, thisUser) {
-  const prereviewRouter = router();
+export default function controller(fullReviews, thisUser) {
+  const fullReviewsRouter = router();
 
-  prereviewRouter.route({
+  fullReviewsRouter.route({
     method: 'post',
-    path: '/prereviews',
+    path: '/fullReviews',
     // pre:thisUserthisUser.can('access private pages'),
     validate: {
       body: {
-        doi: Joi.string().required(),
+        preprint: Joi.integer(),
         authors: Joi.array(),
-        is_hidden: Joi.boolean(),
-        content: Joi.array(),
       },
       type: 'json',
       failure: 400,
@@ -42,11 +40,11 @@ export default function controller(prereviews, thisUser) {
       // },
     },
     handler: async ctx => {
-      log.debug('Posting prereview...');
+      log.debug('Posting full review draft.');
 
       try {
-        const prereview = prereviews.create(ctx.request.body);
-        await prereviews.persistAndFlush(prereview);
+        const fullReviews = fullReviews.create(ctx.request.body);
+        await fullReviews.persistAndFlush(fullReviews);
       } catch (error) {
         return ctx.throw(400, { message: error.message });
       }
@@ -55,19 +53,20 @@ export default function controller(prereviews, thisUser) {
     },
   });
 
-  prereviewRouter.route({
+  fullReviewsRouter.route({
     method: 'get',
-    path: '/prereviews',
+    path: '/fullReviews',
+    pre: thisUser.can('access private pages'),
     handler: async ctx => {
-      log.debug(`Retrieving prereviews.`);
+      log.debug(`Retrieving fullReviews.`);
 
       try {
-        const allPrereviews = await prereviews.findAll();
-        if (allPrereviews) {
+        const all = await fullReviews.findAll();
+        if (all) {
           ctx.response.body = {
             statusCode: 200,
             status: 'ok',
-            data: allPrereviews,
+            data: all,
           };
         }
       } catch (err) {
@@ -77,22 +76,22 @@ export default function controller(prereviews, thisUser) {
     },
   });
 
-  prereviewRouter.route({
+  fullReviewsRouter.route({
     method: 'get',
-    path: '/prereviews/:id',
+    path: '/fullReviews/:id',
     handler: async ctx => {
-      log.debug(`Retrieving prereview ${ctx.params.id}.`);
-      let prereview;
+      log.debug(`Retrieving fullReviews ${ctx.params.id}.`);
+      let fullReview;
 
       try {
-        prereview = await prereviews.findOne(ctx.params.id);
+        fullReview = await fullReviews.findOne(ctx.params.id);
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse query: ${err}`);
       }
 
-      if (prereview.length) {
-        ctx.response.body = { statusCode: 200, status: 'ok', data: prereview };
+      if (fullReview.length) {
+        ctx.response.body = { statusCode: 200, status: 'ok', data: fullReview };
         ctx.response.status = 200;
       } else {
         log.error(
@@ -108,9 +107,9 @@ export default function controller(prereviews, thisUser) {
     },
   });
 
-  prereviewRouter.route({
+  fullReviewsRouter.route({
     method: 'put',
-    path: '/prereviews/:id',
+    path: '/fullReviews/:id',
     // pre:thisUserthisUser.can('access admin pages'),
     validate: {
       body: {
@@ -123,17 +122,17 @@ export default function controller(prereviews, thisUser) {
       failure: 400,
     },
     handler: async ctx => {
-      log.debug(`Updating prereview ${ctx.params.id}.`);
-      let prereview;
+      log.debug(`Updating fullReviews ${ctx.params.id}.`);
+      let fullReview;
 
       try {
-        prereview = prereviews.assign(ctx.params.id, ctx.request.body.data);
+        fullReview = fullReviews.assign(ctx.params.id, ctx.request.body);
 
-        prereviews.persistAndFlush(prereview);
+        fullReview.persistAndFlush(fullReviews);
 
         // workaround for sqlite
-        if (Number.isInteger(prereview)) {
-          prereview = await prereviews.findOne(ctx.params.id);
+        if (Number.isInteger(fullReviews)) {
+          fullReviews = await fullReviews.findOne(ctx.params.id);
         }
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
@@ -142,38 +141,38 @@ export default function controller(prereviews, thisUser) {
     },
   });
 
-  prereviewRouter.route({
+  fullReviewsRouter.route({
     method: 'delete',
-    path: '/prereviews/:id',
+    path: '/fullReviews/:id',
     // pre:thisUserthisUser.can('access admin pages'),
     handler: async ctx => {
-      log.debug(`Deleting prereview ${ctx.params.id}.`);
-      let prereview;
+      log.debug(`Deleting fullReview ${ctx.params.id}.`);
+      let fullReview;
 
       try {
-        prereview = prereviews.findOne(ctx.params.id);
-        await prereviews.removeAndFlush(prereview);
+        fullReview = fullReviews.findOne(ctx.params.id);
+        await fullReview.removeAndFlush(fullReviews);
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse query: ${err}`);
       }
 
-      if (prereview.length && prereview.length > 0) {
-        ctx.response.body = { status: 'success', data: prereview };
+      if (fullReviews.length && fullReviews.length > 0) {
+        ctx.response.body = { status: 'success', data: fullReview };
         ctx.response.status = 200;
       } else {
         log.error(
-          `HTTP 404 Error: That prereview with ID ${
+          `HTTP 404 Error: That fullReview with ID ${
             ctx.params.id
           } does not exist.`,
         );
         ctx.throw(
           404,
-          `That prereview with ID ${ctx.params.id} does not exist.`,
+          `That fullReviews with ID ${ctx.params.id} does not exist.`,
         );
       }
     },
   });
 
-  return prereviewRouter;
+  return fullReviewsRouter;
 }

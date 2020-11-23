@@ -81,15 +81,15 @@ export default function controller(preprints) {
         await preprints.persistAndFlush(preprint);
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
-        ctx.throw(400, `Failed to add preprint: ${err}`)
+        ctx.throw(400, `Failed to add preprint: ${err}`);
       }
 
       ctx.response.status = 201;
-        ctx.body = {
-          statusCode: 201,
-          status: 'created',
-          data: preprint,
-        };
+      ctx.body = {
+        statusCode: 201,
+        status: 'created',
+        data: preprint,
+      };
     },
   });
 
