@@ -121,6 +121,7 @@ export default function controller(users, config, thisUser) {
     handler: async ctx => {
       return passport.authenticate('orcid', (err, user) => {
         log.debug('Finishing authenticating with ORCID...');
+        log.debug('Received user object: ', user);
         if (!user) {
           ctx.body = { success: false };
           ctx.throw(401, 'Authentication failed.');
@@ -133,6 +134,7 @@ export default function controller(users, config, thisUser) {
             ctx.session.maxAge = 'session';
           }
 
+          log.debug(`Setting cookies for user ${ctx.state.user.name}`);
           ctx.cookies.set('PRE_user', ctx.state.user.name, { httpOnly: false });
           ctx.body = { success: true, user: user };
 

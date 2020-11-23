@@ -27,6 +27,10 @@ export class Preprint extends BaseEntity {
   @Property()
   uuid!: string;
 
+  @Fixture(
+    () =>
+      'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf',
+  )
   @Property()
   url!: string;
 
