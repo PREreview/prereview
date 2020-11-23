@@ -29,6 +29,7 @@ import CommentController from './controllers/comment.js';
 import CommunityController from './controllers/community.js';
 import GroupController from './controllers/group.js';
 import UserController from './controllers/user.js';
+import PersonaController from './controllers/persona.js';
 import PreprintController from './controllers/preprint.js';
 import PrereviewController from './controllers/prereview.js';
 import DocsController from './controllers/docs.js';
@@ -71,6 +72,7 @@ export default async function configServer(config) {
   const fullReviews = PrereviewController(fullReviewModel, authz);
   const groups = GroupController(groupModel, authz);
   // eslint-disable-next-line no-unused-vars
+  const personas = PersonaController(personaModel, authz);
   const preprintModel = preprintModelWrapper(db);
   const preprints = PreprintController(preprintModel, authz);
   // eslint-disable-next-line no-unused-vars
@@ -89,6 +91,7 @@ export default async function configServer(config) {
     communities.middleware(),
     fullReviews.middleware(),
     groups.middleware(),
+    personas.middleware(),
     preprints.middleware(),
     users.middleware(),
   ]);
