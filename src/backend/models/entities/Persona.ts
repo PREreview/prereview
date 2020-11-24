@@ -20,7 +20,7 @@ export class Persona extends BaseEntity {
   //eslint-disable-next-line
   [EntityRepositoryType]?: PersonaModel;
 
-  @Fixture(faker => faker.name.firstName())
+  @Fixture(faker => faker.name.findName())
   @Property()
   @Unique()
   name!: string;

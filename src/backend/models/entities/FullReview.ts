@@ -6,13 +6,16 @@ import {
   ManyToOne,
   OneToMany,
   Property,
+  Unique,
 } from '@mikro-orm/core';
 import { Fixture } from 'class-fixtures-factory';
 import { FullReviewModel } from '../fullReviews';
 import { BaseEntity } from './BaseEntity';
+import { Comment } from './Comment';
 import { FullReviewDraft } from './FullReviewDraft';
 import { Persona } from './Persona';
 import { Preprint } from './Preprint';
+import { createRandomDoi } from '../../../common/utils/ids';
 
 @Entity()
 export class FullReview extends BaseEntity {
@@ -24,9 +27,10 @@ export class FullReview extends BaseEntity {
   published: boolean = false;
 
   //eslint-disable-next-line
-  @Fixture({ get: () => "10.1101/19001834", optional: true })
+  @Fixture({ get: () => createRandomDoi(), optional: true })
   @Property({ nullable: true })
-  doi?: string = '10.1101/19001834';
+  @Unique()
+  doi?: string;
 
   @OneToMany({ entity: () => FullReviewDraft, mappedBy: 'parent' })
   drafts: Collection<FullReviewDraft> = new Collection<FullReviewDraft>(this);
@@ -36,6 +40,9 @@ export class FullReview extends BaseEntity {
 
   @ManyToOne({ entity: () => Preprint })
   preprint!: Preprint;
+
+  @OneToMany({ entity: () => Comment, mappedBy: 'parent' })
+  comments: Collection<Comment> = new Collection<Comment>(this);
 
   constructor(doi: string, published = false) {
     super();

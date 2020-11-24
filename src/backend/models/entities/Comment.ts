@@ -4,24 +4,26 @@ import {
   ManyToOne,
   Property,
 } from '@mikro-orm/core';
+import { Fixture } from 'class-fixtures-factory';
 import { CommentModel } from '../comments';
 import { BaseEntity } from './BaseEntity';
+import { FullReview } from './FullReview';
 import { Persona } from './Persona';
-import { Preprint } from './Preprint';
 
 @Entity()
 export class Comment extends BaseEntity {
   //eslint-disable-next-line
   [EntityRepositoryType]?: CommentModel;
 
+  @Fixture(faker => faker.lorem.sentences())
   @Property()
   contents!: string;
 
   @ManyToOne({ entity: () => Persona })
   author!: Persona;
 
-  @ManyToOne({ entity: () => Preprint })
-  parent!: Preprint;
+  @ManyToOne({ entity: () => FullReview })
+  parent!: FullReview;
 
   constructor(contents: string) {
     super();

@@ -1,7 +1,8 @@
 import orcidUtils from 'orcid-utils';
 import doiRegex from 'doi-regex';
 import identifiersArxiv from 'identifiers-arxiv';
-import { getId, unprefix } from '../utils/jsonld';
+import { randexp } from 'randexp';
+import { getId, unprefix } from './jsonld';
 import { createError } from '../errors.ts';
 
 export function createPreprintId(
@@ -91,4 +92,25 @@ export function createUserId(orcid) {
 
 export function createContactPointId(userId) {
   return `contact:${unprefix(getId(userId))}`;
+}
+
+export function createRandomDoi() {
+  return (
+    '10.' +
+    (Math.floor(Math.random() * 10000) + 10000).toString().substring(1) +
+    '/' +
+    (Math.floor(Math.random() * 1000) + 1000).toString().substring(1)
+  );
+}
+
+export function createRandomArxivId() {
+  return (
+    'arXiv:' +
+    String(Math.floor(Math.random() * 93) + 7).padStart(2, '0') +
+    String(Math.floor(Math.random() * 12) + 1).padStart(2, '0') +
+    '.' +
+    (Math.floor(Math.random() * 10000) + 10000).toString().substring(1) +
+    'v' +
+    String(Math.floor(Math.random() * 9) + 1)
+  );
 }

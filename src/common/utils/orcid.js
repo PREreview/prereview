@@ -1,6 +1,6 @@
 import orcidUtils from 'orcid-utils';
 import fetch from 'node-fetch';
-import { HttpError } from '../errors';
+import { HttpError } from '../errors.ts';
 
 /**
  * See https://support.orcid.org/hc/en-us/articles/360006897674-Structure-of-the-ORCID-Identifier
