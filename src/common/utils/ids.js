@@ -64,7 +64,7 @@ export function decodePreprintId(value) {
   }
 
   return {
-    id: `${scheme}:${value.slice(value.indexOf('-') + 1).replace('-', '/')}`,
+    id: `${value.slice(value.indexOf('-') + 1).replace('-', '/')}`,
     scheme: scheme,
   };
 }

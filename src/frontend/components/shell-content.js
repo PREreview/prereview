@@ -42,10 +42,20 @@ export default function ShellContent({
 
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
-  const hasReviewed = user.preprint ? user.preprint.review : false; // #FIXME
-  const hasRequested = user.preprint ? user.preprint.request : false; // #FIXME
+  const hasReviewed = user && user.preprint ? user.preprint.review : false; // #FIXME
+  const hasRequested = user && user.preprint ? user.preprint.request : false; // #FIXME
 
-  const counts = preprint.requests.length + preprint.reviews.length;
+  const counts = () => {
+    if (preprint.data[0].requests && preprint.data[0].reviews) {
+      return preprint.data[0].requests.length + preprint.data[0].reviews.length;
+    } else if (preprint.data[0].requests) {
+      return preprint.data[0].requests.length;
+    } else if (preprint.data[0].reviews) {
+      return preprint.data[0].reviews.length;
+    } else {
+      return 0;
+    }
+  };
 
   const loginUrl = process.env.IS_EXTENSION
     ? '/login'
@@ -208,8 +218,7 @@ export default function ShellContent({
           <ShellContentRead
             user={user}
             preprint={preprint}
-            loading={preprint.loading}
-            counts={counts}
+            counts={counts()}
           />
         ) : tab === 'request' ? (
           <ShellContentRequest
@@ -263,7 +272,7 @@ ShellContent.propTypes = {
   defaultTab: PropTypes.oneOf(['read', 'review', 'request']),
 };
 
-function ShellContentRead({ user, preprint, loading, counts }) {
+function ShellContentRead({ user, preprint, counts }) {
   // Note: !! this needs to work both in the webApp where it is URL driven and in
   // the extension where it is shell driven
 
@@ -275,15 +284,7 @@ function ShellContentRead({ user, preprint, loading, counts }) {
       <header className="shell-content-read__title">Reviews</header>
 
       <PreprintPreview preprint={preprint} />
-
-      {!loading && (
-        <ReviewReader
-          user={user}
-          identifier={preprint.doi || preprint.arXivId}
-          nRequests={counts}
-        />
-      )}
-
+      <ReviewReader user={user} preprint={preprint} nRequests={counts} />
       {!!moderatedReviewId && (
         <ModerationModal
           title={`Report review as violating the Code of Conduct`}
@@ -306,8 +307,6 @@ ShellContentRead.propTypes = {
   user: PropTypes.object,
   counts: PropTypes.number,
   preprint: PropTypes.object.isRequired,
-  actions: PropTypes.array.isRequired,
-  loading: PropTypes.bool.isRequired,
 };
 
 function ShellContentReview({ user, preprint, disabled, isPosting, error }) {
