@@ -22,13 +22,32 @@ export class Preprint extends BaseEntity {
   [EntityRepositoryType]?: PreprintModel;
 
   @Property()
-  title!: string;
+  name!: string;
 
-  @Property()
-  uuid!: string;
+  @Property({ nullable: true })
+  uuid?: string;
+
+  @Property({ nullable: true })
+  doi?: string;
+
+  @Property({ nullable: true })
+  arxivid?: string;
+
+  @Property({ nullable: true })
+  preprintServer?: string;
+
+  @Property({ nullable: true })
+  encodingFormat?: string;
+
+  @Property({ nullable: true })
+  datePosted?: string;
 
   @Property()
   url!: string;
+
+  @Property()
+  pdfUrl!: string;
+
 
   @OneToMany({ entity: () => RapidReview, mappedBy: 'preprint' })
   rapidReviews: Collection<RapidReview> = new Collection<RapidReview>(this);
@@ -48,9 +67,9 @@ export class Preprint extends BaseEntity {
   @OneToMany({ entity: () => Comment, mappedBy: 'parent' })
   comments: Collection<Comment> = new Collection<Comment>(this);
 
-  constructor(title: string, uuid: string, url: string) {
+  constructor(name: string, uuid: string, url: string) {
     super();
-    this.title = title;
+    this.name = title;
     this.uuid = uuid;
     this.url = url;
   }

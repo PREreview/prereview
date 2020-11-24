@@ -25,7 +25,7 @@ export class FullReview extends BaseEntity {
 
   //eslint-disable-next-line
   @Fixture({ get: () => "10.1101/19001834", optional: true })
-  @Property()
+  @Property({ nullable: true })
   doi?: string = '10.1101/19001834';
 
   @OneToMany({ entity: () => FullReviewDraft, mappedBy: 'parent' })

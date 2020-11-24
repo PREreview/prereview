@@ -47,8 +47,9 @@ import CommentController from './controllers/comment.js';
 import CommunityController from './controllers/community.js';
 import GroupController from './controllers/group.js';
 import UserController from './controllers/user.js';
+import PersonaController from './controllers/persona.js';
 import PreprintController from './controllers/preprint.js';
-import PrereviewController from './controllers/prereview.js';
+import FullReviewController from './controllers/fullReview.js';
 import DocsController from './controllers/docs.js';
 
 const __dirname = path.resolve();
@@ -85,21 +86,22 @@ export default async function configServer(config) {
   // Setup auth handlers
   const userModel = userModelWrapper(db);
   const groupModel = groupModelWrapper(db);
+  const personaModel = personaModelWrapper(db);
   const authz = authWrapper(groupModel); // authorization, not authentication
   server.use(authz.middleware());
 
   // setup API handlers
-  const auth = AuthController(userModel, config, authz);
+  const auth = AuthController(userModel, personaModel, config, authz);
   // eslint-disable-next-line no-unused-vars
   const commentModel = commentModelWrapper(db);
   const comments = CommentController(commentModel, authz);
   const communityModel = communityModelWrapper(db);
   const communities = CommunityController(communityModel, authz);
   const fullReviewModel = fullReviewModelWrapper(db);
-  const fullReviews = PrereviewController(fullReviewModel, authz);
+  const fullReviews = FullReviewController(fullReviewModel, authz);
   const groups = GroupController(groupModel, authz);
   // eslint-disable-next-line no-unused-vars
-  const personaModel = personaModelWrapper(db);
+  const personas = PersonaController(personaModel, authz);
   const preprintModel = preprintModelWrapper(db);
   const preprints = PreprintController(preprintModel, authz);
   // eslint-disable-next-line no-unused-vars
@@ -118,6 +120,7 @@ export default async function configServer(config) {
     communities.middleware(),
     fullReviews.middleware(),
     groups.middleware(),
+    personas.middleware(),
     preprints.middleware(),
     users.middleware(),
   ]);

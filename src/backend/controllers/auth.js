@@ -6,7 +6,7 @@ import merge from 'lodash.merge';
 
 const log = getLogger('backend:controllers:auth');
 
-export default function controller(users, config, thisUser) {
+export default function controller(users, personas, config, thisUser) {
   const authRouter = router();
   /**
    * Serialize user
@@ -90,8 +90,30 @@ export default function controller(users, config, thisUser) {
         log.error('Error creating user:', err);
       }
 
+      // create personas
       if (newUser) {
         log.debug('Authenticated & created user:', newUser);
+        let anonPersona;
+        let defaultPersona;
+
+        try {
+          anonPersona = personas.create({
+            name: 'Anonymous',
+            identity: newUser,
+          });
+          defaultPersona = personas.create({
+            name: usersName,
+            identity: newUser,
+          });
+
+          await personas.persistAndFlush([anonPersona, defaultPersona]);
+        } catch (err) {
+          log.debug('Error creating personas.', err);
+        }
+      }
+
+      if (newUser) {
+        log.debug('Authenticated & created user.', newUser);
         const completeUser = merge(profile, newUser);
         log.trace('verifyCallback() new completeUser:', completeUser);
         return done(null, completeUser);

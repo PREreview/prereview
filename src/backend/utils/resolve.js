@@ -5,10 +5,7 @@ import { DOMParser } from 'xmldom';
 import { JSDOM } from 'jsdom';
 import { unprefix, cleanup, arrayify } from '../../frontend/utils/jsonld';
 import { createError } from '../../frontend/utils/errors';
-import {
-  parseGoogleScholar,
-  getIdentifierFromPdfUrl,
-} from '../../frontend/utils/scholar.js';
+import { parseGoogleScholar, getIdentifierFromPdfUrl } from './scholar.js';
 
 /**
  * Get metadata for `identifier`
@@ -150,12 +147,8 @@ async function resolveArxivId(
   }
 
   const data = {
-    '@type': 'ScholarlyPreprint',
     arXivId: id,
-    preprintServer: {
-      '@type': 'PreprintServer',
-      name: 'arXiv',
-    },
+    preprintServer: 'arXiv',
   };
   const $metadata = doc.getElementsByTagName('metadata')[0];
   if ($metadata) {
@@ -188,7 +181,7 @@ async function resolveCrossRefDoi(
     throw createError(r.status);
   }
   const body = await r.json();
-  const data = { '@type': 'ScholarlyPreprint', doi: id };
+  const data = { doi: id };
   const { message } = body;
   const title = arrayify(message.title)[0];
   if (title) {
@@ -220,10 +213,7 @@ async function resolveCrossRefDoi(
   }
 
   if (message.institution && message.institution.name) {
-    data.preprintServer = {
-      '@type': 'PreprintServer',
-      name: message.institution.name.trim(),
-    };
+    data.preprintServer = message.institution.name.trim();
   }
 
   return data;
@@ -245,7 +235,7 @@ async function resolveOpenAireDoi(
   const text = await r.text();
   const doc = new DOMParser().parseFromString(text);
 
-  const data = { '@type': 'ScholarlyPreprint', doi: id };
+  const data = { doi: id };
 
   const $metadata = doc.getElementsByTagName('metadata')[0];
   if ($metadata) {
@@ -264,10 +254,7 @@ async function resolveOpenAireDoi(
       if ($el) {
         const name = $el.getAttribute('name');
         if (name) {
-          data.preprintServer = {
-            '@type': 'PreprintServer',
-            name: name.trim(),
-          };
+          data.preprintServer = name.trim();
           break;
         }
       }
