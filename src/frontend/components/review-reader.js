@@ -149,22 +149,7 @@ ReviewReader.propTypes = {
   preview: PropTypes.bool,
   identifier: PropTypes.string.isRequired, // DOI or arXivID
   onHighlighedRoleIdsChange: PropTypes.func,
-  actions: PropTypes.arrayOf(
-    PropTypes.shape({
-      '@type': PropTypes.oneOf(['RapidPREreviewAction']).isRequired,
-      actionStatus: PropTypes.oneOf(['CompletedActionStatus']).isRequired,
-      agent: PropTypes.string.isRequired,
-      moderationAction: PropTypes.arrayOf(
-        PropTypes.shape({
-          '@type': PropTypes.oneOf([
-            // !! `ModerateRapidPREreviewAction` cannot be present reviews with it must be excluded upstream
-            'ReportRapidPREreviewAction',
-            'IgnoreReportRapidPREreviewAction',
-          ]).isRequired,
-        }),
-      ),
-    }),
-  ).isRequired,
+  actions: PropTypes.arrayOf(PropTypes.object).isRequired,
   nRequests: PropTypes.number,
   defaultHighlightedRoleIds: PropTypes.arrayOf(PropTypes.string),
   isModerationInProgress: PropTypes.bool,

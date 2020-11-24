@@ -16,9 +16,11 @@ export class FullReviewDraft extends BaseEntity {
   @ManyToOne({ entity: () => FullReview })
   parent!: FullReview;
 
+  @Fixture(faker => `${faker.commerce.color()} ${faker.random.word()}`)
   @Property()
   title!: string;
 
+  @Fixture(faker => faker.lorem.paragraph())
   @Property()
   contents!: string;
 

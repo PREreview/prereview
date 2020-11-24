@@ -1,11 +1,11 @@
 import orcidUtils from 'orcid-utils';
 import doiRegex from 'doi-regex';
 import identifiersArxiv from 'identifiers-arxiv';
-import { getId, unprefix } from '../utils/jsonld';
-import { createError } from './errors';
+import { getId, unprefix } from './jsonld';
+import { createError } from '../errors.ts';
 
 export function createPreprintId(
-  value // doi or arXiv (prefixed or not) or preprint
+  value, // doi or arXiv (prefixed or not) or preprint
 ) {
   let id = getId(value);
 
@@ -37,7 +37,7 @@ export function createPreprintId(
   if (!vendor) {
     throw createError(
       500,
-      `invalid identifier for create preprint id (could not extract vendor)`
+      `invalid identifier for create preprint id (could not extract vendor)`,
     );
   }
 
@@ -45,7 +45,7 @@ export function createPreprintId(
 }
 
 export function createPreprintIdentifierCurie(
-  value // preprint or identifer (arXivId or DOI, unprefixed)
+  value, // preprint or identifer (arXivId or DOI, unprefixed)
 ) {
   if (!value) {
     throw createError(500, `invalid value for createIdentifierCurie`);
@@ -91,4 +91,25 @@ export function createUserId(orcid) {
 
 export function createContactPointId(userId) {
   return `contact:${unprefix(getId(userId))}`;
+}
+
+export function createRandomDoi() {
+  return (
+    '10.' +
+    (Math.floor(Math.random() * 10000) + 10000).toString().substring(1) +
+    '/' +
+    (Math.floor(Math.random() * 1000) + 1000).toString().substring(1)
+  );
+}
+
+export function createRandomArxivId() {
+  return (
+    'arXiv:' +
+    String(Math.floor(Math.random() * 93) + 7).padStart(2, '0') +
+    String(Math.floor(Math.random() * 12) + 1).padStart(2, '0') +
+    '.' +
+    (Math.floor(Math.random() * 10000) + 10000).toString().substring(1) +
+    'v' +
+    String(Math.floor(Math.random() * 9) + 1)
+  );
 }

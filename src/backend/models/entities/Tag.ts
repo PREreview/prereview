@@ -16,7 +16,7 @@ export class Tag extends BaseEntity {
   //eslint-disable-next-line
   [EntityRepositoryType]?: TagModel;
 
-  @Fixture(faker => faker.hacker.adjective())
+  @Fixture(faker => faker.random.word())
   @Property()
   @Unique()
   name!: string;

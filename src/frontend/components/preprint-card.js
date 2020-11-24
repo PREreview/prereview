@@ -43,7 +43,7 @@ export default function PreprintCard({
 }) {
   const [isOpened, setIsOpened] = useState(false);
 
-  const { name, preprintServer, doi, arXivId, datePosted } = preprint;
+  const { title, preprintServer, doi, arxivid, createdAt } = preprint;
 
   const reviews = useMemo(() => {
     return preprint.requests;
@@ -90,9 +90,9 @@ export default function PreprintCard({
           <div className="preprint-card__header">
             <div className="preprint-card__header__left">
               <XLink
-                href={`/${doi || arXivId}`}
+                href={`/${doi || arxivid}`}
                 to={{
-                  pathname: `/${doi || arXivId}`,
+                  pathname: `/${doi || arxivid}`,
                   state: {
                     preprint: omit(preprint, ['potentialAction']),
                     tab: 'read',
@@ -100,23 +100,22 @@ export default function PreprintCard({
                 }}
                 className="preprint-card__title"
               >
-                {!!name && (
+                {!!title && (
                   <Value tagName="h2" className="preprint-card__title-text">
-                    {name}
+                    {title}
                   </Value>
                 )}
-                <ShellIcon className="preprint-card__title__shell-icon" />
               </XLink>
             </div>
 
-            {!!datePosted && (
+            {!!createdAt && (
               <span
                 className={classNames('preprint-card__pub-date', {
                   'preprint-card__pub-date--highlighted':
                     hoveredSortOption === 'date',
                 })}
               >
-                {getFormattedDatePosted(datePosted)}
+                {getFormattedDatePosted(createdAt)}
               </span>
             )}
           </div>
@@ -124,7 +123,7 @@ export default function PreprintCard({
             <div className="preprint-card__info-row__left">
               {!!preprintServer && (
                 <Value tagName="span" className="preprint-card__server-name">
-                  {preprintServer.name}
+                  {preprintServer}
                 </Value>
               )}
               <MdChevronRight className="preprint-card__server-arrow-icon" />
@@ -139,11 +138,11 @@ export default function PreprintCard({
                   </a>
                 ) : (
                   <a
-                    href={`https://arxiv.org/abs/${arXivId}`}
+                    href={`https://arxiv.org/abs/${arxivid}`}
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    {arXivId}
+                    {arxivid}
                   </a>
                 )}
               </Value>
@@ -314,8 +313,8 @@ export default function PreprintCard({
         <div className="preprint-card-expansion">
           <ReviewReader
             user={user}
-            identifier={preprint.doi || preprint.arXivId}
-            actions={preprint.reviews}
+            identifier={preprint.doi || preprint.arxivid}
+            actions={preprint.fullReviews}
             preview={true}
           />
 
@@ -343,8 +342,8 @@ export default function PreprintCard({
 
               <Button
                 element="XLink"
-                to={`/${preprint.doi || preprint.arXivId}`}
-                href={`/${preprint.doi || preprint.arXivId}`}
+                to={`/${preprint.doi || preprint.arxivid}`}
+                href={`/${preprint.doi || preprint.arxivid}`}
               >
                 View More
               </Button>
@@ -360,18 +359,10 @@ PreprintCard.propTypes = {
   user: PropTypes.object,
   preprint: PropTypes.shape({
     doi: PropTypes.string,
-    arXivId: PropTypes.string,
-    datePosted: PropTypes.string,
+    arxivid: PropTypes.string,
+    createdAt: PropTypes.string,
     title: PropTypes.string.isRequired,
-    preprintServer: PropTypes.shape({
-      name: PropTypes.oneOfType([
-        PropTypes.string,
-        PropTypes.shape({
-          '@type': PropTypes.string.isRequired,
-          '@value': PropTypes.string.isRequired,
-        }).isRequired,
-      ]).isRequired,
-    }),
+    preprintServer: PropTypes.string.isRequired,
     reviews: PropTypes.array,
     requests: PropTypes.array,
   }).isRequired,

@@ -20,7 +20,7 @@ export class Persona extends BaseEntity {
   //eslint-disable-next-line
   [EntityRepositoryType]?: PersonaModel;
 
-  @Fixture(faker => faker.name.firstName())
+  @Fixture(faker => faker.name.findName())
   @Property()
   @Unique()
   name!: string;
@@ -30,7 +30,7 @@ export class Persona extends BaseEntity {
 
   //@Fixture({ get: faker => faker.image.avatar(), optional: true })
   @Fixture(faker => faker.image.avatar())
-  @Property()
+  @Property({ nullable: true })
   avatar?: Buffer;
 
   @OneToMany({ entity: () => RapidReview, mappedBy: 'author' })

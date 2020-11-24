@@ -1,9 +1,11 @@
 import { Command } from 'commander';
-import Joi from 'joi';
 import dotenv from 'dotenv';
 import { from } from 'env-var';
+import Joi from 'joi';
+import orcidUtils from 'orcid-utils';
 import log4js from 'koa-log4';
 import { isString } from '../common/utils';
+import { ServerError } from '../common/errors';
 
 // Configure logging
 
@@ -30,7 +32,7 @@ const env = from(process.env, {}, (varname, str) =>
 
 function getEnv(postfix: string, fallback?: string) {
   if (!isString(postfix)) {
-    throw new Error('Must specify an environment variable to fetch.');
+    throw new ServerError('Must specify an environment variable to fetch.');
   }
   if (fallback) {
     return env
@@ -64,13 +66,14 @@ const defaults = {
   db_type: defaultEnv === 'production' ? 'postgresql' : 'sqlite',
   db_user: process.env.npm_package_name.toLowerCase(),
   log_level: 'error',
-  orcid_sandbox: defaultEnv !== 'production',
+  no_proxy: 'false',
+  orcid_sandbox: String(defaultEnv !== 'production'),
   port: defaultPort,
 };
 
 function getEnvOrDefault(postfix: string) {
   if (!isString(postfix)) {
-    throw new Error('Must specify an environment variable to fetch.');
+    throw new ServerError('Must specify an environment variable to fetch.');
   }
   const defaultValue = defaults[postfix.toLowerCase()];
 
@@ -216,13 +219,15 @@ class Config extends Command {
   parse(argv?: string[], options?: ParseOptions): any {
     super.parse(argv, options);
     if (!this.cfaccessUrl != !this.cfaccessAudience) {
-      throw new Error(
+      throw new ServerError(
         'If using Cloudflare Access both the URL and the Audience must be specified.',
       );
     }
 
     if (this.dbType === 'postgresql' && !this.dbPass) {
-      throw new Error('If using Postgres you need to specify a password.');
+      throw new ServerError(
+        'If using Postgres you need to specify a password.',
+      );
     }
   }
 
@@ -281,7 +286,12 @@ export default program
     validateArray,
     getEnvOrDefault('secrets').asArray(),
   )
-  .option('--no-proxy', 'Disable support for proxy headers')
+  .option(
+    '--no-proxy',
+    'Disable support for proxy headers',
+    validateBool,
+    getEnvOrDefault('no_proxy').asBool(),
+  )
   .option(
     '--db-host <host>',
     'Database host',
@@ -366,4 +376,9 @@ export default program
     validateUrl,
     getEnvOrDefault('orcid_callback_url').asString(),
   )
-  .option('--orcid-sandbox', 'Use the OrcID sandbox environment', true);
+  .option(
+    '--orcid-sandbox',
+    'Use the OrcID sandbox environment',
+    validateBool,
+    getEnvOrDefault('orcid_sandbox').asBool(),
+  );

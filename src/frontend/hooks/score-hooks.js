@@ -5,6 +5,20 @@ import { useState, useEffect, useCallback } from 'react';
  * with reviews or requests for reviews are listed
  */
 export function useAnimatedScore(preprint, now = new Date().toISOString()) {
+  return {
+    nRequests: preprint.requests.length,
+    nReviews: preprint.fullReviews.length + preprint.rapidReviews.length,
+    now: now,
+    dateFirstActivity: now,
+    dateLastActivity: now,
+    lastActionType: 'RapidPrereviewAction',
+    dateLastReview: now,
+    dateLastRequest: now,
+    onStartAnim: () => {},
+    onStopAnim: () => {},
+    isAnimating: false,
+  };
+  console.log('***preprint***:', preprint);
   const sorted = preprint.reviews
     ? preprint.requests
       ? preprint.reviews.concat(preprint.requests).sort((a, b) => {
@@ -19,6 +33,7 @@ export function useAnimatedScore(preprint, now = new Date().toISOString()) {
         })
     : [];
 
+  console.log('***sorted***:', sorted);
   const [index, setIndex] = useState(null);
 
   const [isAnimating, setIsAnimating] = useState(false);

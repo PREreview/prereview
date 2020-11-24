@@ -5,6 +5,7 @@ import {
   ManyToMany,
   OneToMany,
   Property,
+  Unique,
 } from '@mikro-orm/core';
 import { Fixture } from 'class-fixtures-factory';
 import { PreprintModel } from '../preprints';
@@ -15,24 +16,73 @@ import { FullReview } from './FullReview';
 import { RapidReview } from './RapidReview';
 import { Request } from './Request';
 import { Tag } from './Tag';
+import {
+  createRandomArxivId,
+  createRandomDoi,
+} from '../../../common/utils/ids';
 
 @Entity()
 export class Preprint extends BaseEntity {
   //eslint-disable-next-line
   [EntityRepositoryType]?: PreprintModel;
 
+  @Fixture(faker => `${faker.commerce.color()} ${faker.random.word()}`)
   @Property()
   title!: string;
 
+  @Property({ nullable: true })
+  uuid?: string;
+
+  @Fixture({ get: () => createRandomDoi(), optional: true })
+  @Property({ nullable: true })
+  @Unique()
+  doi?: string;
+
+  @Fixture({ get: () => createRandomArxivId(), optional: true })
+  @Property({ nullable: true })
+  arxivid?: string;
+
+  @Fixture(faker => faker.random.arrayElement(['arxiv', 'biorxiv', 'medrxiv']))
+  @Property({ nullable: true })
+  preprintServer?: string;
+
+  @Fixture(faker =>
+    faker.random.arrayElement(['image/png', 'image/jpeg', 'application/pdf']),
+  )
+  @Property({ nullable: true })
+  encodingFormat?: string;
+
+  @Property({ nullable: true })
+  datePosted?: Date;
+
+  @Fixture(faker => faker.internet.url())
   @Property()
-  uuid!: string;
+  url!: string;
 
   @Fixture(
     () =>
       'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf',
   )
   @Property()
-  url!: string;
+  pdfUrl!: string;
+
+  //@Fixture({ ignore: true })
+  //@Property({ persist: false })
+  //get fullReviewCount(): number {
+  //  return this.fullReviews.count();
+  //}
+
+  //@Fixture({ ignore: true })
+  //@Property({ persist: false })
+  //get rapidReviewCount(): number {
+  //  return this.rapidReviews.count();
+  //}
+
+  //@Fixture({ ignore: true })
+  //@Property({ persist: false })
+  //get requestCount(): number {
+  //  return this.requests.count();
+  //}
 
   @OneToMany({ entity: () => RapidReview, mappedBy: 'preprint' })
   rapidReviews: Collection<RapidReview> = new Collection<RapidReview>(this);
@@ -48,9 +98,6 @@ export class Preprint extends BaseEntity {
 
   @ManyToMany({ entity: () => Tag, mappedBy: 'preprints' })
   tags: Collection<Tag> = new Collection<Tag>(this);
-
-  @OneToMany({ entity: () => Comment, mappedBy: 'parent' })
-  comments: Collection<Comment> = new Collection<Comment>(this);
 
   constructor(title: string, uuid: string, url: string) {
     super();

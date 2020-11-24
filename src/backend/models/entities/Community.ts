@@ -17,12 +17,13 @@ export class Community extends BaseEntity {
   //eslint-disable-next-line
   [EntityRepositoryType]?: CommunityModel;
 
+  @Fixture(faker => `${faker.commerce.color()} ${faker.random.word()}`)
   @Property()
   @Unique()
   name!: string;
 
   //@Fixture({ get: faker => faker.lorem.paragraph(), optional: true })
-  @Fixture(faker => faker.lorem.paragraph())
+  @Fixture(faker => faker.lorem.sentences())
   @Property()
   description?: string;
 
