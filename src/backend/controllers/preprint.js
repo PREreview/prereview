@@ -194,7 +194,11 @@ export default function controller(preprints) {
       let preprint;
 
       try {
-        preprint = await preprints.findOneByIdOrHandle(ctx.params.id);
+        preprint = await preprints.findOneByIdOrHandle(ctx.params.id, [
+          'fullReviews',
+          'rapidReviews',
+          'requests',
+        ]);
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse query: ${err}`);

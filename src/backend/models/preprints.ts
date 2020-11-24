@@ -6,20 +6,20 @@ import { ChainError } from '../../common/errors';
 
 @Repository(Preprint)
 export class PreprintModel extends EntityRepository<Preprint> {
-  findOneByHandle(value: string): any {
+  findOneByHandle(value: string, params: array): any {
     try {
       const { id } = decodePreprintId(value);
-      return this.findOne({ handle: id });
+      return this.findOne({ handle: id }, params);
     } catch (err) {
       throw new ChainError('Failed to parse handle.', err);
     }
   }
 
-  findOneByIdOrHandle(value: number | string): any {
+  findOneByIdOrHandle(value: number | string, params: array): any {
     if (Number.isInteger(value)) {
-      return this.findOne(value as number);
+      return this.findOne(value as number, params);
     } else if (isString(value)) {
-      return this.findOneByHandle(value as string);
+      return this.findOneByHandle(value as string, params);
     }
     throw new ChainError(`'${value}' is not a valid ID or Handle`);
   }
