@@ -46,17 +46,10 @@ export default function ShellContent({
   const hasReviewed = user && user.preprint ? user.preprint.review : false; // #FIXME
   const hasRequested = user && user.preprint ? user.preprint.request : false; // #FIXME
 
-  const counts = () => {
-    if (preprint.data[0].requests && preprint.data[0].reviews) {
-      return preprint.data[0].requests.length + preprint.data[0].reviews.length;
-    } else if (preprint.data[0].requests) {
-      return preprint.data[0].requests.length;
-    } else if (preprint.data[0].reviews) {
-      return preprint.data[0].reviews.length;
-    } else {
-      return 0;
-    }
-  };
+  const counts =
+    preprint.requests.length +
+    preprint.rapidReviews.length +
+    preprint.fullReviews.length;
 
   const loginUrl = process.env.IS_EXTENSION
     ? '/login'
@@ -219,7 +212,7 @@ export default function ShellContent({
           <ShellContentRead
             user={user}
             preprint={preprint}
-            counts={counts()}
+            counts={counts}
           />
         ) : tab === 'request' ? (
           <ShellContentRequest

@@ -117,7 +117,7 @@ export default function ExtensionFallback() {
             !!preprint && (
               <ShellContent
                 onRequireScreen={onRequireScreen}
-                preprint={preprint}
+                preprint={preprint.data[0]}
                 defaultTab={location.state && location.state.tab}
               />
             )

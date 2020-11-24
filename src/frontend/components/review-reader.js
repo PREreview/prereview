@@ -17,7 +17,6 @@ const ReviewReader = React.memo(function ReviewReader({
   role,
   preview,
   preprint,
-  nRequests,
   defaultHighlightedRoleIds,
   onHighlighedRoleIdsChange = noop,
   isModerationInProgress,
@@ -66,14 +65,21 @@ const ReviewReader = React.memo(function ReviewReader({
     >
       {!preview && (
         <h3 className="review-reader__title">
-          {preprint.reviews ? preprint.reviews.length : 0} review{preprint.reviews && preprint.reviews.length > 1 ? 's' : ''}
-          {nRequests != null
-            ? ` | ${nRequests} request${nRequests !== 1 ? 's' : ''}`
+          {preprint.rapidReviews.length > 0 ? preprint.rapidReviews.length : 0} rapid review{preprint.rapidReviews.length > 1 ? 's' : ''}
+          {preprint.fullReviews.length > 0
+            ? ` | ${preprint.fullReviews.length} full review${
+                preprint.fullReviews.length > 1 ? 's' : ''
+              }`
+            : ''}
+          {preprint.requests.length > 0
+            ? ` | ${preprint.requests.length} request${
+                preprint.requests.length > 1 ? 's' : ''
+              }`
             : ''}
         </h3>
       )}
 
-      {preprint.reviews && (
+      {(preprint.rapidReviews.length || preprint.fullReviews.length) && (
         <Fragment>
           {!preview && (
             <Fragment>
@@ -86,7 +92,7 @@ const ReviewReader = React.memo(function ReviewReader({
               <div className="review-reader__persona-selector">
                 <PotentialRoles
                   role={role}
-                  actions={preprint.reviews}
+                  preprint={preprint}
                   canModerate={!!user}
                   isModerationInProgress={isModerationInProgress}
                   onModerate={onModerate}
@@ -124,8 +130,12 @@ const ReviewReader = React.memo(function ReviewReader({
           <Barplot
             preview={preview}
             stats={getYesNoStats(highlightedActions)}
-            nHighlightedReviews={highlightedRoleIds.length || actions.length}
-            nTotalReviews={preprint.reviews.length}
+            nHighlightedReviews={
+              highlightedRoleIds.length || preprint.rapidReviews.length
+            }
+            nTotalReviews={
+              preprint.rapidReviews.length + preprint.fullReviews.length
+            }
           >
             <ShareMenu
               identifier={preprint.handle}
@@ -152,9 +162,8 @@ ReviewReader.propTypes = {
   user: PropTypes.object,
   role: PropTypes.object,
   preview: PropTypes.bool,
-  preprint: PropTypes.object.isRequired, // DOI or arXivID
+  preprint: PropTypes.object, // DOI or arXivID
   onHighlighedRoleIdsChange: PropTypes.func,
-  nRequests: PropTypes.number,
   defaultHighlightedRoleIds: PropTypes.arrayOf(PropTypes.string),
   isModerationInProgress: PropTypes.bool,
   onModerate: PropTypes.func,
