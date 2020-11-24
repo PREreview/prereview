@@ -157,7 +157,7 @@ export default function controller(preprints) {
     path: '/preprints/:id',
     validate: {
       params: {
-        id: Joi.number().integer(),
+        id: Joi.alternatives().try(Joi.number().integer(), Joi.string()),
       },
       output: {
         200: {
@@ -182,7 +182,7 @@ export default function controller(preprints) {
       let preprint;
 
       try {
-        preprint = await preprints.findOne(ctx.params.id);
+        preprint = await preprints.findOneByIdOrHandle(ctx.params.id);
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse query: ${err}`);
@@ -219,7 +219,7 @@ export default function controller(preprints) {
     path: '/preprints/:id',
     validate: {
       params: {
-        id: Joi.number().integer(),
+        id: Joi.alternatives().try(Joi.number().integer(), Joi.string()),
       },
       body: {
         data: preprintSchema,
@@ -234,7 +234,7 @@ export default function controller(preprints) {
       let preprint;
 
       try {
-        preprint = preprints.findOne(ctx.params.id);
+        preprint = preprints.findOneByIdOrHandle(ctx.params.id);
         await preprints.persistAndFlush(ctx.request.body.data[0]);
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
@@ -266,13 +266,18 @@ export default function controller(preprints) {
     },
     method: 'delete',
     path: '/preprints/:id',
+    validate: {
+      params: {
+        id: Joi.alternatives().try(Joi.number().integer(), Joi.string()),
+      },
+    },
     // pre:thisUserthisUser.can('access admin pages'),
     handler: async ctx => {
       log.debug(`Deleting preprint ${ctx.params.id}.`);
       let preprint;
 
       try {
-        preprint = preprints.findOne(ctx.params.id);
+        preprint = preprints.findOneByIdOrHandle(ctx.params.id);
         await preprints.removeAndFlush(preprint);
       } catch (err) {
         log.error('HTTP 400 Error: ', err);

@@ -64,7 +64,7 @@ export function decodePreprintId(value) {
   }
 
   return {
-    id: `${scheme}:${value.slice(value.findIndex('-') + 1).replace('-', '/')}`,
+    id: `${scheme}:${value.slice(value.indexOf('-') + 1).replace('-', '/')}`,
     scheme: scheme,
   };
 }
@@ -94,6 +94,14 @@ export function createPreprintIdentifierCurie(
       throw createError(500, `invalid value for createIdentifierCurie`);
     }
   }
+}
+
+export function getCanonicalDoiUrl(doi) {
+  return `https://doi.org/${unprefix(doi)}`;
+}
+
+export function getCanonicalArxivUrl(arXivId) {
+  return `https://arxiv.org/abs/${unprefix(arXivId)}`;
 }
 
 /**

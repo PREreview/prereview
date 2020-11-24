@@ -30,6 +30,12 @@ import Button from './button';
 import { useAnimatedScore } from '../hooks/score-hooks';
 import { getFormattedDatePosted } from '../utils/preprints';
 import AnimatedNumber from './animated-number';
+import {
+  createPreprintId,
+  decodePreprintId,
+  getCanonicalArxivUrl,
+  getCanonicalDoiUrl,
+} from '../../common/utils/ids.js';
 
 export default function PreprintCard({
   user,
@@ -43,7 +49,10 @@ export default function PreprintCard({
 }) {
   const [isOpened, setIsOpened] = useState(false);
 
-  const { title, preprintServer, doi, arxivid, createdAt } = preprint;
+  const { title, preprintServer, handle, createdAt } = preprint;
+
+  const preprintId = createPreprintId(handle);
+  const { id, scheme } = decodePreprintId(preprintId);
 
   const reviews = useMemo(() => {
     return preprint.requests;
@@ -90,9 +99,9 @@ export default function PreprintCard({
           <div className="preprint-card__header">
             <div className="preprint-card__header__left">
               <XLink
-                href={`/${doi || arxivid}`}
+                href={`/preprints/${preprintId}`}
                 to={{
-                  pathname: `/${doi || arxivid}`,
+                  pathname: `/preprints/${preprintId}`,
                   state: {
                     preprint: omit(preprint, ['potentialAction']),
                     tab: 'read',
@@ -128,21 +137,21 @@ export default function PreprintCard({
               )}
               <MdChevronRight className="preprint-card__server-arrow-icon" />
               <Value tagName="span" className="preprint-card__server-id">
-                {doi ? (
+                {scheme === 'doi' ? (
                   <a
-                    href={`https://doi.org/${doi}`}
+                    href={`${getCanonicalDoiUrl(id)}`}
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    {doi}
+                    {id}
                   </a>
                 ) : (
                   <a
-                    href={`https://arxiv.org/abs/${arxivid}`}
+                    href={`${getCanonicalArxivUrl(id)}`}
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    {arxivid}
+                    {id}
                   </a>
                 )}
               </Value>
@@ -313,7 +322,7 @@ export default function PreprintCard({
         <div className="preprint-card-expansion">
           <ReviewReader
             user={user}
-            identifier={preprint.doi || preprint.arxivid}
+            identifier={id}
             actions={preprint.fullReviews}
             preview={true}
           />
@@ -342,8 +351,8 @@ export default function PreprintCard({
 
               <Button
                 element="XLink"
-                to={`/${preprint.doi || preprint.arxivid}`}
-                href={`/${preprint.doi || preprint.arxivid}`}
+                to={`/preprints/${preprintId}`}
+                href={`/preprints/${preprintId}`}
               >
                 View More
               </Button>
@@ -358,8 +367,7 @@ export default function PreprintCard({
 PreprintCard.propTypes = {
   user: PropTypes.object,
   preprint: PropTypes.shape({
-    doi: PropTypes.string,
-    arxivid: PropTypes.string,
+    handle: PropTypes.string,
     createdAt: PropTypes.string,
     title: PropTypes.string.isRequired,
     preprintServer: PropTypes.string.isRequired,
