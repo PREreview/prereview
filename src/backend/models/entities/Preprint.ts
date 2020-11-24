@@ -69,7 +69,7 @@ export class Preprint extends BaseEntity {
 
   constructor(name: string, uuid: string, url: string) {
     super();
-    this.name = title;
+    this.name = name;
     this.uuid = uuid;
     this.url = url;
   }
