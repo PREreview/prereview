@@ -4,7 +4,7 @@ import { MdMenu } from 'react-icons/md';
 import { Link } from 'react-router-dom';
 import { MenuLink } from '@reach/menu-button';
 import { GetUser } from '../hooks/api-hooks.tsx';
-import RapidPreReviewLogo from './rapid-pre-review-logo';
+import PreReviewLogo from './pre-review-logo';
 import IconButton from './icon-button';
 import { useUser } from '../contexts/user-context';
 import UserBadge from './user-badge';
@@ -68,7 +68,7 @@ export default function HeaderBar({ onClickMenuButton, closeGap }) {
             />
           </IconButton>
         )}
-        <RapidPreReviewLogo />
+        <PreReviewLogo />
       </div>
 
       <div className="header-bar__right">

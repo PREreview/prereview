@@ -28,7 +28,7 @@ export default function SettingsRoles({ user }) {
       {isFirstTimeOnSettings && (
         <div className="settings__welcome">
           <h3 className="settings__title settings__title--center">
-            Welcome to Outbreak Science Rapid PREreview!
+            Welcome to PREreview!
           </h3>
           <p className="settings__large-text">
             As a new member of our community, please take a moment to set up
