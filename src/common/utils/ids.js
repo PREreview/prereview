@@ -41,7 +41,32 @@ export function createPreprintId(
     );
   }
 
-  return `preprint:${vendor}-${unprefix(id).replace('/', '-')}`;
+  return `${vendor}-${unprefix(id).replace('/', '-')}`;
+}
+
+export function decodePreprintId(value) {
+  if (!value) {
+    throw createError(500, 'You must provide a preprintId to decode');
+  }
+
+  let scheme;
+  if (value.startsWith('doi-')) {
+    scheme = 'doi';
+  } else if (value.startsWith('arxiv')) {
+    scheme = 'arxiv';
+  }
+
+  if (!scheme) {
+    throw createError(
+      500,
+      'String is not an encoded preprint ID (could not extract scheme)',
+    );
+  }
+
+  return {
+    id: `${scheme}:${value.slice(value.findIndex('-') + 1).replace('-', '/')}`,
+    scheme: scheme,
+  };
 }
 
 export function createPreprintIdentifierCurie(
@@ -86,11 +111,7 @@ export function unversionDoi(doi = '') {
 }
 
 export function createUserId(orcid) {
-  return `user:${orcidUtils.toDashFormat(unprefix(orcid))}`;
-}
-
-export function createContactPointId(userId) {
-  return `contact:${unprefix(getId(userId))}`;
+  return `${orcidUtils.toDashFormat(unprefix(orcid))}`;
 }
 
 export function createRandomDoi() {
