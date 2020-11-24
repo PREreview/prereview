@@ -30,6 +30,12 @@ import Button from './button';
 import { useAnimatedScore } from '../hooks/score-hooks';
 import { getFormattedDatePosted } from '../utils/preprints';
 import AnimatedNumber from './animated-number';
+import {
+  createPreprintId,
+  decodePreprintId,
+  getCanonicalArxivUrl,
+  getCanonicalDoiUrl,
+} from '../../common/utils/ids.js';
 
 export default function PreprintCard({
   user,
@@ -43,29 +49,23 @@ export default function PreprintCard({
 }) {
   const [isOpened, setIsOpened] = useState(false);
 
-  const { name, preprintServer, doi, arXivId, datePosted } = preprint;
+  const { title, preprintServer, handle, createdAt } = preprint;
+
+  const preprintId = createPreprintId(handle);
+  const { id, scheme } = decodePreprintId(preprintId);
 
   const reviews = useMemo(() => {
-    return preprint.potentialAction.filter(
-      action =>
-        !checkIfIsModerated(action) &&
-        action['@type'] === 'RapidPREreviewAction',
-    );
+    return preprint.requests;
   }, [preprint]);
 
   const safeActions = useMemo(() => {
-    return preprint.potentialAction.filter(
-      action =>
-        !checkIfIsModerated(action) &&
-        (action['@type'] === 'RequestForRapidPREreviewAction' ||
-          action['@type'] === 'RapidPREreviewAction'),
-    );
+    return preprint.reviews;
   }, [preprint]);
 
-  const hasReviewed = checkIfHasReviewed(user, preprint.potentialAction); // `actions` (_all_ of them including moderated ones) not `safeActions`
-  const hasRequested = checkIfHasRequested(user, preprint.potentialAction); // `actions` (_all_ of them including moderated ones) not `safeActions`
+  const hasReviewed = checkIfHasReviewed(user, preprint.reviews); // `actions` (_all_ of them including moderated ones) not `safeActions`
+  const hasRequested = checkIfHasRequested(user, preprint.requests); // `actions` (_all_ of them including moderated ones) not `safeActions`
 
-  const { hasData, hasCode, subjects } = getTags(safeActions);
+  const { hasData, hasCode, subjects } = getTags(preprint);
 
   const {
     nRequests,
@@ -79,7 +79,7 @@ export default function PreprintCard({
     dateLastReview,
     dateLastRequest,
     isAnimating,
-  } = useAnimatedScore(safeActions);
+  } = useAnimatedScore(preprint);
 
   const agoData = getAgoData(
     sortOption,
@@ -99,9 +99,9 @@ export default function PreprintCard({
           <div className="preprint-card__header">
             <div className="preprint-card__header__left">
               <XLink
-                href={`/${doi || arXivId}`}
+                href={`/preprints/${preprintId}`}
                 to={{
-                  pathname: `/${doi || arXivId}`,
+                  pathname: `/preprints/${preprintId}`,
                   state: {
                     preprint: omit(preprint, ['potentialAction']),
                     tab: 'read',
@@ -109,23 +109,22 @@ export default function PreprintCard({
                 }}
                 className="preprint-card__title"
               >
-                {!!name && (
+                {!!title && (
                   <Value tagName="h2" className="preprint-card__title-text">
-                    {name}
+                    {title}
                   </Value>
                 )}
-                <ShellIcon className="preprint-card__title__shell-icon" />
               </XLink>
             </div>
 
-            {!!datePosted && (
+            {!!createdAt && (
               <span
                 className={classNames('preprint-card__pub-date', {
                   'preprint-card__pub-date--highlighted':
                     hoveredSortOption === 'date',
                 })}
               >
-                {getFormattedDatePosted(datePosted)}
+                {getFormattedDatePosted(createdAt)}
               </span>
             )}
           </div>
@@ -133,26 +132,26 @@ export default function PreprintCard({
             <div className="preprint-card__info-row__left">
               {!!preprintServer && (
                 <Value tagName="span" className="preprint-card__server-name">
-                  {preprintServer.name}
+                  {preprintServer}
                 </Value>
               )}
               <MdChevronRight className="preprint-card__server-arrow-icon" />
               <Value tagName="span" className="preprint-card__server-id">
-                {doi ? (
+                {scheme === 'doi' ? (
                   <a
-                    href={`https://doi.org/${doi}`}
+                    href={`${getCanonicalDoiUrl(id)}`}
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    {doi}
+                    {id}
                   </a>
                 ) : (
                   <a
-                    href={`https://arxiv.org/abs/${arXivId}`}
+                    href={`${getCanonicalArxivUrl(id)}`}
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    {arXivId}
+                    {id}
                   </a>
                 )}
               </Value>
@@ -323,8 +322,8 @@ export default function PreprintCard({
         <div className="preprint-card-expansion">
           <ReviewReader
             user={user}
-            identifier={preprint.doi || preprint.arXivId}
-            actions={reviews}
+            identifier={id}
+            actions={preprint.fullReviews}
             preview={true}
           />
 
@@ -352,8 +351,8 @@ export default function PreprintCard({
 
               <Button
                 element="XLink"
-                to={`/${preprint.doi || preprint.arXivId}`}
-                href={`/${preprint.doi || preprint.arXivId}`}
+                to={`/preprints/${preprintId}`}
+                href={`/preprints/${preprintId}`}
               >
                 View More
               </Button>
@@ -368,35 +367,12 @@ export default function PreprintCard({
 PreprintCard.propTypes = {
   user: PropTypes.object,
   preprint: PropTypes.shape({
-    doi: PropTypes.string,
-    arXivId: PropTypes.string,
-    datePosted: PropTypes.string,
-    name: PropTypes.oneOfType([
-      PropTypes.string,
-      PropTypes.shape({
-        '@type': PropTypes.string.isRequired,
-        '@value': PropTypes.string.isRequired,
-      }).isRequired,
-    ]).isRequired,
-    preprintServer: PropTypes.shape({
-      name: PropTypes.oneOfType([
-        PropTypes.string,
-        PropTypes.shape({
-          '@type': PropTypes.string.isRequired,
-          '@value': PropTypes.string.isRequired,
-        }).isRequired,
-      ]).isRequired,
-    }).isRequired,
-    potentialAction: PropTypes.arrayOf(
-      PropTypes.oneOfType([
-        PropTypes.shape({
-          '@type': PropTypes.oneOf(['RequestForRapidPREreviewAction']),
-        }),
-        PropTypes.shape({
-          '@type': PropTypes.oneOf(['RapidPREreviewAction']),
-        }),
-      ]),
-    ).isRequired,
+    handle: PropTypes.string,
+    createdAt: PropTypes.string,
+    title: PropTypes.string.isRequired,
+    preprintServer: PropTypes.string.isRequired,
+    reviews: PropTypes.array,
+    requests: PropTypes.array,
   }).isRequired,
   onNewRequest: PropTypes.func.isRequired,
   onNewReview: PropTypes.func.isRequired,

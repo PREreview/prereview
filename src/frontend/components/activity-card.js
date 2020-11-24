@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { format, formatDistanceStrict } from 'date-fns';
 import { MdChevronRight } from 'react-icons/md';
@@ -6,23 +6,15 @@ import { getId } from '../utils/jsonld';
 import Value from './value';
 import LabelStyle from './label-style';
 import XLink from './xlink';
-import { usePreprintActions } from '../hooks/api-hooks';
-import { checkIfIsModerated } from '../utils/actions';
+// import {
+//   GetUserPreprint // #FIXME
+// } from '../hooks/api-hooks.tsx';
 import { useAnimatedScore } from '../hooks/score-hooks';
 import ScoreBadge from './score-badge';
 import AnimatedNumber from './animated-number';
 
-export default function ActivityCard({ action }) {
-  const [actions, fetchProgress] = usePreprintActions(getId(action.object));
-
-  const safeActions = useMemo(() => {
-    return actions.filter(
-      action =>
-        !checkIfIsModerated(action) &&
-        (action['@type'] === 'RequestForRapidPREreviewAction' ||
-          action['@type'] === 'RapidPREreviewAction'),
-    );
-  }, [actions]);
+export default function ActivityCard({ preprint }) {
+  // const userPreprint = GetUserPreprint(getId(preprint.object));
 
   const {
     nRequests,
@@ -32,51 +24,51 @@ export default function ActivityCard({ action }) {
     onStopAnim,
     dateFirstActivity,
     isAnimating,
-  } = useAnimatedScore(safeActions.length ? safeActions : [action]);
+  } = useAnimatedScore(preprint);
 
   return (
-    <div key={getId(action)} className="activity-card">
+    <div key={getId(preprint)} className="activity-card">
       <LabelStyle>
-        {format(new Date(action.startTime), 'MMM. d, yyyy')}{' '}
-        {action['@type'] === 'RequestForRapidPREreviewAction'
+        {format(new Date(preprint.startTime), 'MMM. d, yyyy')}{' '}
+        {preprint['@type'] === 'RequestForRapidPREreviewAction'
           ? 'requested feedback on'
           : 'reviewed'}
       </LabelStyle>
       <div>
         <XLink
-          to={`/${action.object.doi || action.object.arXivId}`}
-          href={`/${action.object.doi || action.object.arXivId}`}
+          to={`/${preprint.object.doi || preprint.object.arXivId}`}
+          href={`/${preprint.object.doi || preprint.object.arXivId}`}
         >
-          <Value tagName="span">{action.object.name}</Value>
+          <Value tagName="span">{preprint.object.name}</Value>
         </XLink>
 
         <div className="activity-card__server-info">
           <Value tagName="span" className="activity-card__server-name">
-            {(action.object.preprintServer || {}).name}
+            {(preprint.object.preprintServer || {}).name}
           </Value>
           <MdChevronRight className="activity-card__server-arrow-icon" />
           <Value tagName="span">
-            {action.object.doi ? (
+            {preprint.object.doi ? (
               <a
-                href={`https://doi.org/${action.object.doi}`}
+                href={`https://doi.org/${preprint.object.doi}`}
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                {action.object.doi}
+                {preprint.object.doi}
               </a>
             ) : (
               <a
-                href={`https://arxiv.org/abs/${action.object.arXivId}`}
+                href={`https://arxiv.org/abs/${preprint.object.arXivId}`}
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                {action.object.arXivId}
+                {preprint.object.arXivId}
               </a>
             )}
           </Value>
         </div>
 
-        {!fetchProgress.isActive && (
+        {!preprint.loading && (
           <div className="activity-card__stats">
             <ScoreBadge
               now={now}
@@ -114,5 +106,5 @@ export default function ActivityCard({ action }) {
 }
 
 ActivityCard.propTypes = {
-  action: PropTypes.object.isRequired,
+  preprint: PropTypes.object.isRequired,
 };

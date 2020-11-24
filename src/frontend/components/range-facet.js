@@ -113,7 +113,7 @@ export default function RangeFacet({
                 id={`${type}-${key}`}
                 name={i}
                 checked={checked}
-                disabled={isFetching || !eRange[key]}
+                disabled={isFetching || (eRange && !eRange[key])}
                 onChange={onChange}
               />
             </div>

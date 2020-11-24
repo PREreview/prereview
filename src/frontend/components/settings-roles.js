@@ -1,13 +1,13 @@
 import React, { Fragment, useState } from 'react';
 import PropTypes from 'prop-types';
 import { MdInfoOutline, MdPublic, MdStar, MdStarBorder } from 'react-icons/md';
-import { getId, unprefix, arrayify } from '../utils/jsonld';
+import { unprefix } from '../utils/jsonld';
 import Button from './button';
 import Modal from './modal';
 import RoleEditor from './role-editor';
 import { RoleBadgeUI } from './role-badge';
 import Controls from './controls';
-import { usePostAction, useUserRoles } from '../hooks/api-hooks';
+import { PutUser } from '../hooks/api-hooks.tsx';
 import { useIsFirstTimeOnSettings } from '../hooks/ui-hooks';
 import IncognitoIcon from '../svgs/incognito_icon.svg';
 import XLink from './xlink';
@@ -15,21 +15,13 @@ import XLink from './xlink';
 export default function SettingsRoles({ user }) {
   const isFirstTimeOnSettings = useIsFirstTimeOnSettings();
   const [editedRoleId, setEditedRoleId] = useState(null);
-  const [roles, fetchRolesProgress] = useUserRoles(user);
 
-  if (!roles) {
-    if (fetchRolesProgress.error) {
-      console.error(fetchRolesProgress.error);
+  if (!user) {
+    if (user.error) {
+      console.error(`Error: ${user.error}`);
     }
     return null;
   }
-
-  const allHaveNames = roles.every(
-    role => role.name && role.name !== unprefix(getId(role)),
-  );
-  const allHaveAvatars = roles.every(
-    role => role.avatar && role.avatar.contentUrl,
-  );
 
   return (
     <section className="settings-roles settings__section">
@@ -40,7 +32,7 @@ export default function SettingsRoles({ user }) {
           </h3>
           <p className="settings__large-text">
             As a new member of our community, please take a moment to set up
-            your public and anonymous persona profiles.
+            your persona profile.
           </p>
         </div>
       )}
@@ -55,29 +47,29 @@ export default function SettingsRoles({ user }) {
       </p>
 
       <p>
-        The <strong>active</strong> persona is the persona that will be used
+        The <strong>public</strong> persona is the persona that will be used
         when you write <em>new</em> reviews or <em>new</em> request for feedback
         on preprints. It can be changed at any time.
       </p>
 
-      {(!allHaveNames || !allHaveAvatars) && (
+      {(!user.name || !user.avatar) && (
         <p className="settings-roles__notice">
           <MdInfoOutline className="settings-roles__notice-icon" />
 
           <span>
             It is recommended that you set{' '}
-            {!allHaveNames && !allHaveAvatars
+            {!user.name && !user.avatar
               ? 'a display name and an avatar'
-              : !allHaveNames
+              : !user.name
               ? 'a display name'
               : 'an avatar'}{' '}
-            for each of your personas. Click on the <strong>Edit</strong>{' '}
-            buttons below to do so.
+            for your persona. Click on the <strong>Edit</strong> buttons below
+            to do so.
           </span>
         </p>
       )}
 
-      {/* TODO fix markup: make a table with proper header so it's accessible */}
+      {/* FIXME fix markup: make a table with proper header so it's accessible */}
       <ul className="settings__persona-list">
         <li className="settings__persona-list-header">
           <div className="settings__persona-list-header__active">
@@ -93,55 +85,51 @@ export default function SettingsRoles({ user }) {
           <hr />
         </li>
 
-        {arrayify(roles).map(role => (
-          <li key={getId(role)} className="settings__persona-list-item">
-            <div className="settings__persona-list-item__active-state">
-              {getId(role) === user.defaultRole ? (
-                <span className="settings__persona-list-item__is-active">
-                  <MdStar className="settings__persona-active-icon" />
-                  <span className="settings__persona-active-label">Active</span>
-                </span>
-              ) : (
-                <MakeActivePersonaModalButton user={user} role={role} />
-              )}
-            </div>
-            <div className="settings__persona-list-item__username">
-              <RoleBadgeUI role={role} className="settings__persona-badge" />
+        <li key={user.id} className="settings__persona-list-item">
+          <div className="settings__persona-list-item__active-state">
+            {!user.public ? (
+              <span className="settings__persona-list-item__is-active">
+                <MdStar className="settings__persona-active-icon" />
+                <span className="settings__persona-active-label">Active</span>
+              </span>
+            ) : (
+              <MakeActivePersonaModalButton user={user} />
+            )}
+          </div>
+          <div className="settings__persona-list-item__username">
+            <RoleBadgeUI user={user} className="settings__persona-badge" />
 
-              <XLink
-                href={`/about/${unprefix(getId(role))}`}
-                to={`/about/${unprefix(getId(role))}`}
-                className="settings__persona-link"
-              >
-                {role.name || unprefix(getId(role))}
-              </XLink>
-            </div>
-            <span className="settings__persona-status">
-              {role['@type'] === 'PublicReviewerRole' ? (
-                <div className="settings__persona-status__icon-container">
-                  <MdPublic className="settings__persona-status__icon" />{' '}
-                  <span className="settings__persona-status__label">
-                    Public
-                  </span>
-                </div>
-              ) : (
-                <div className="settings__persona-status__icon-container">
-                  <IncognitoIcon className="settings__persona-status__icon" />{' '}
-                  <span className="settings__persona-status__label">
-                    Anonymous
-                  </span>
-                </div>
-              )}
-            </span>
-            <Button
-              onClick={() => {
-                setEditedRoleId(getId(role));
-              }}
+            <XLink
+              href={`/about/${unprefix(user.id)}`}
+              to={`/about/${unprefix(user.id)}`}
+              className="settings__persona-link"
             >
-              Edit
-            </Button>
-          </li>
-        ))}
+              {user.name || unprefix(user.id)}
+            </XLink>
+          </div>
+          <span className="settings__persona-status">
+            {user.public ? (
+              <div className="settings__persona-status__icon-container">
+                <MdPublic className="settings__persona-status__icon" />{' '}
+                <span className="settings__persona-status__label">Public</span>
+              </div>
+            ) : (
+              <div className="settings__persona-status__icon-container">
+                <IncognitoIcon className="settings__persona-status__icon" />{' '}
+                <span className="settings__persona-status__label">
+                  Anonymous
+                </span>
+              </div>
+            )}
+          </span>
+          <Button
+            onClick={() => {
+              setEditedRoleId(user.id);
+            }}
+          >
+            Edit
+          </Button>
+        </li>
       </ul>
 
       <Controls className="settings-roles__body-controls">
@@ -161,11 +149,10 @@ export default function SettingsRoles({ user }) {
           <RoleEditor
             key={editedRoleId}
             user={user}
-            role={roles.find(role => getId(role) === editedRoleId)}
             onCancel={() => {
               setEditedRoleId(null);
             }}
-            onSaved={action => {
+            onSaved={() => {
               setEditedRoleId(null);
             }}
           />
@@ -177,32 +164,19 @@ export default function SettingsRoles({ user }) {
 
 SettingsRoles.propTypes = {
   user: PropTypes.shape({
+    id: PropTypes.string.isRequired,
     orcid: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
-    defaultRole(props, propName, componentName) {
-      if (
-        props[propName] &&
-        !arrayify(props.hasRole).some(
-          role => getId(role) === getId(props[propName]),
-        )
-      ) {
-        return new Error(
-          `Invalid prop ${propName} supplied to ${componentName}. Value must be one of ${arrayify(
-            props.hasRole,
-          )
-            .map(getId)
-            .filter(Boolean)
-            .join(', ')}`,
-        );
-      }
-    },
+    avatar: PropTypes.string.isRequired,
+    public: PropTypes.bool.isRequired,
     hasRole: PropTypes.arrayOf(PropTypes.string),
+    error: PropTypes.string,
   }).isRequired,
 };
 
-function MakeActivePersonaModalButton({ user, role }) {
+function MakeActivePersonaModalButton({ user }) {
   const [isOpen, setIsOpen] = useState(false);
-  const [post, postProgress] = usePostAction();
+  const updateUser = PutUser();
 
   return (
     <Fragment>
@@ -212,22 +186,25 @@ function MakeActivePersonaModalButton({ user, role }) {
         }}
       >
         <MdStarBorder className="settings__persona-active-icon settings__persona-active-icon--inactive" />
-        <span className="settings__persona-active-label">Activate…</span>
+        <span className="settings__persona-active-label">Make public</span>
       </Button>
 
       {isOpen && (
         <Modal
-          title={`Set active persona to ${role.name || unprefix(getId(role))}`}
+          title={`Set active persona to ${user.name || unprefix(user.id)}`}
         >
           <p>
-            The <strong>active</strong> persona is the persona that will be used
-            when you write <em>new</em> reviews or <em>new</em> request for
-            feedback on preprints. It can be changed at any time.
+            The <strong>public</strong> persona makes your information viewable
+            by other users when you write <em>new</em> reviews or <em>new</em>{' '}
+            request for feedback on preprints. Once your profile is public, it
+            cannot be changed.
           </p>
 
-          <Controls error={postProgress.error}>
+          <Controls
+            error={updateUser.error} // #FIXME
+          >
             <Button
-              disabled={postProgress.isActive}
+              disabled={updateUser.loading}
               onClick={() => {
                 setIsOpen(false);
               }}
@@ -235,23 +212,13 @@ function MakeActivePersonaModalButton({ user, role }) {
               Cancel
             </Button>
             <Button
-              isWaiting={postProgress.isActive}
-              disabled={postProgress.isActive}
+              isWaiting={updateUser.loading}
+              disabled={updateUser.loading}
               onClick={() => {
-                post(
-                  {
-                    '@type': 'UpdateUserAction',
-                    agent: getId(user),
-                    object: getId(user),
-                    actionStatus: 'CompletedActionStatus',
-                    payload: {
-                      defaultRole: getId(role),
-                    },
-                  },
-                  body => {
-                    setIsOpen(false);
-                  },
-                );
+                updateUser(user)
+                  .then(() => alert('User updated successfully.'))
+                  .catch(err => alert(`An error occurred: ${err}`));
+                setIsOpen(false);
               }}
             >
               Make active

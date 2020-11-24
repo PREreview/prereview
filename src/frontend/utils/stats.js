@@ -49,76 +49,83 @@ function isUnsure(textOrAnswer) {
 /**
  * Tags are computed following a majority rule
  */
-export function getTags(actions) {
-  const hasReviews = actions.some(
-    action => action['@type'] === 'RapidPREreviewAction',
-  );
+export function getTags(preprint) {
+  const hasReviews = preprint.reviews && preprint.reviews.length > 0;
 
-  const hasRequests = actions.some(
-    action => action['@type'] === 'RequestForRapidPREreviewAction',
-  );
+  const hasRequests = preprint.requests && preprint.requests.length > 0;
 
-  const reviewActions = actions.filter(
-    action => action['@type'] === 'RapidPREreviewAction',
-  );
+  const reviewActions = preprint.reviews && preprint.reviews.length;
 
-  const threshold = Math.ceil(reviewActions.length / 2);
+  const threshold = reviewActions ? Math.ceil(reviewActions.length / 2) : 0;
 
   // hasData
-  const reviewsWithData = reviewActions.filter(action => {
-    if (action.resultReview && action.resultReview.reviewAnswer) {
-      const answers = action.resultReview.reviewAnswer;
+  const reviewsWithData =
+    reviewActions &&
+    reviewActions.filter(preprint => {
+      if (preprint.reviews && preprint.reviews.reviewAnswer) {
+        const answers = preprint.reviews.reviewAnswer;
 
-      for (let i = 0; i < answers.length; i++) {
-        const answer = answers[i];
-        if (answer.parentItem) {
-          const questionId = getId(answer.parentItem);
-          if (questionId === 'question:ynAvailableData') {
-            return isYes(answer);
+        for (let i = 0; i < answers.length; i++) {
+          const answer = answers[i];
+          if (answer.parentItem) {
+            const questionId = getId(answer.parentItem);
+            if (questionId === 'question:ynAvailableData') {
+              return isYes(answer);
+            }
           }
         }
       }
-    }
-    return false;
-  });
+      return false;
+    });
 
-  const hasData = reviewsWithData.length && reviewsWithData.length >= threshold;
+  const hasData =
+    reviewsWithData &&
+    reviewsWithData.length &&
+    reviewsWithData.length >= threshold;
 
   // hasCode
-  const reviewsWithCode = reviewActions.filter(action => {
-    if (action.resultReview && action.resultReview.reviewAnswer) {
-      const answers = action.resultReview.reviewAnswer;
+  const reviewsWithCode =
+    reviewActions &&
+    reviewActions.filter(preprint => {
+      if (preprint.reviews && preprint.reviews.reviewAnswer) {
+        const answers = preprint.reviews.reviewAnswer;
 
-      for (let i = 0; i < answers.length; i++) {
-        const answer = answers[i];
-        if (answer.parentItem) {
-          const questionId = getId(answer.parentItem);
-          if (questionId === 'question:ynAvailableCode') {
-            return isYes(answer);
+        for (let i = 0; i < answers.length; i++) {
+          const answer = answers[i];
+          if (answer.parentItem) {
+            const questionId = getId(answer.parentItem);
+            if (questionId === 'question:ynAvailableCode') {
+              return isYes(answer);
+            }
           }
         }
       }
-    }
-    return false;
-  });
+      return false;
+    });
 
-  const hasCode = reviewsWithCode.length && reviewsWithCode.length >= threshold;
+  const hasCode =
+    reviewsWithCode &&
+    reviewsWithCode.length &&
+    reviewsWithCode.length >= threshold;
 
   // subjects
   const subjectCountMap = {};
-  reviewActions.forEach(action => {
-    if (action.resultReview && action.resultReview.about) {
-      action.resultReview.about.forEach(subject => {
-        if (typeof subject.name === 'string') {
-          if (subject.name in subjectCountMap) {
-            subjectCountMap[subject.name] += 1;
-          } else {
-            subjectCountMap[subject.name] = 1;
+
+  if (reviewActions) {
+    reviewActions.forEach(action => {
+      if (action.reviews && action.reviews.about) {
+        action.reviews.about.forEach(subject => {
+          if (typeof subject.name === 'string') {
+            if (subject.name in subjectCountMap) {
+              subjectCountMap[subject.name] += 1;
+            } else {
+              subjectCountMap[subject.name] = 1;
+            }
           }
-        }
-      });
-    }
-  });
+        });
+      }
+    });
+  }
 
   const subjects = Object.keys(subjectCountMap).filter(subjectName => {
     const count = subjectCountMap[subjectName];

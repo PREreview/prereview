@@ -16,6 +16,7 @@ export default function Diseases({ onSubmit, blacklist = [] }) {
   const [term, setTerm] = useState('');
   const [selected, setSelected] = useState(null);
 
+  // #FIXME return diseases from API, *not* from list object
   const options = useMemo(() => {
     return DISEASES.filter(
       subject =>

@@ -94,5 +94,5 @@ export default function SearchBar({ isFetching }) {
 }
 
 SearchBar.propTypes = {
-  isFetching: PropTypes.bool.isRequired,
+  isFetching: PropTypes.bool,
 };

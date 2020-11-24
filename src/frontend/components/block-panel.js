@@ -7,7 +7,8 @@ import { getId, unprefix } from '../utils/jsonld';
 import HeaderBar from './header-bar';
 import { ORG } from '../constants';
 import { createBlockedRolesQs } from '../utils/search';
-import { useRolesSearchResults, usePostAction } from '../hooks/api-hooks';
+// import { useRolesSearchResults, usePostAction } from '../hooks/api-hooks.tsx';
+import { GetGroups, PostGroup } from '../hooks/api-hooks.tsx';
 import Button from './button';
 import IconButton from './icon-button';
 import { RoleBadgeUI } from './role-badge';
@@ -22,7 +23,7 @@ export default function BlockPanel() {
 
   const search = createBlockedRolesQs({ bookmark });
 
-  const [results, progress] = useRolesSearchResults(search, !!bookmark);
+  const groups = GetGroups(search, !!bookmark);
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [unmoderatedRole, setUnmoderatedRole] = useState(null);
@@ -54,14 +55,14 @@ export default function BlockPanel() {
           </Button>
         </header>
 
-        {results.total_rows === 0 && !progress.isActive && !added.length ? (
+        {groups.total_rows === 0 && !groups.loading && !added.length ? (
           <div>No blocked persona.</div>
         ) : (
           <div>
             <ul className="block-panel__card-list">
               {added
                 .concat(
-                  results.rows
+                  groups.rows
                     .map(row => row.doc)
                     .filter(
                       role =>
@@ -97,15 +98,14 @@ export default function BlockPanel() {
         )}
 
         <div className="block-panel__page-nav">
-          {/* Cloudant returns the same bookmark when it hits the end of the list */}
           {!!(
-            results.rows.length < results.total_rows &&
-            results.bookmark !== bookmark
+            groups.rows.length < groups.total_rows &&
+            groups.bookmark !== bookmark
           ) && (
             <Button
               onClick={e => {
                 e.preventDefault();
-                setBookmark(results.bookmark);
+                setBookmark(groups.bookmark);
               }}
             >
               More
@@ -146,7 +146,7 @@ export default function BlockPanel() {
 
 function BlockPanelAddModal({ user, onClose, onSuccess }) {
   const [value, setValue] = useState('');
-  const [post, postProgress] = usePostAction();
+  const postGroup = PostGroup();
   const [frame, setFrame] = useState('input');
 
   const pattern =
@@ -163,7 +163,7 @@ function BlockPanelAddModal({ user, onClose, onSuccess }) {
               label={<span>Enter a role (persona) ID</span>}
               minimal={true}
               autoComplete="off"
-              disabled={postProgress.isActive}
+              disabled={postGroup.loading}
               placeholder=""
               pattern={pattern}
               onChange={e => {
@@ -173,9 +173,11 @@ function BlockPanelAddModal({ user, onClose, onSuccess }) {
               value={value}
             />
 
-            <Controls error={postProgress.error}>
+            <Controls
+              error={postGroup.error} // #FIXME
+            >
               <Button
-                disabled={postProgress.isActive}
+                disabled={postGroup.loading}
                 onClick={() => {
                   onClose();
                 }}
@@ -183,21 +185,13 @@ function BlockPanelAddModal({ user, onClose, onSuccess }) {
                 Cancel
               </Button>
               <Button
-                disabled={postProgress.isActive || !re.test(value)}
-                isWaiting={postProgress.isActive}
+                disabled={postGroup.loading || !re.test(value)}
+                isWaiting={postGroup.loading}
                 onClick={() => {
-                  post(
-                    {
-                      '@type': 'ModerateRoleAction',
-                      actionStatus: 'CompletedActionStatus',
-                      agent: user.defaultRole,
-                      object: `role:${value}`,
-                    },
-                    body => {
-                      setFrame('success');
-                      onSuccess(body);
-                    },
-                  );
+                  postGroup(user, value)
+                    .then(() => alert('Role posted successfully.'))
+                    .catch(err => alert(`An error occurred: ${err}`));
+                  onSuccess(value);
                 }}
               >
                 Block
@@ -208,9 +202,11 @@ function BlockPanelAddModal({ user, onClose, onSuccess }) {
           <Fragment>
             <p>The role (persona) has been successfully blocked.</p>
 
-            <Controls error={postProgress.error}>
+            <Controls
+              error={postGroup.error} // #FIXME
+            >
               <Button
-                disabled={postProgress.isActive}
+                disabled={postGroup.loading}
                 onClick={() => {
                   onClose();
                 }}
@@ -232,7 +228,7 @@ BlockPanelAddModal.propTypes = {
 };
 
 function BlockPanelRemoveModal({ user, role, onClose, onSuccess }) {
-  const [post, postProgress] = usePostAction();
+  const postGroup = PostGroup();
   const [frame, setFrame] = useState('submit');
 
   return (
@@ -245,9 +241,11 @@ function BlockPanelRemoveModal({ user, role, onClose, onSuccess }) {
               <em>{role.name || unprefix(getId(role))}</em>?
             </p>
 
-            <Controls error={postProgress.error}>
+            <Controls
+              error={postGroup.error} // #FIXME
+            >
               <Button
-                disabled={postProgress.isActive}
+                disabled={postGroup.loading}
                 onClick={() => {
                   onClose();
                 }}
@@ -255,21 +253,13 @@ function BlockPanelRemoveModal({ user, role, onClose, onSuccess }) {
                 Cancel
               </Button>
               <Button
-                disabled={postProgress.isActive}
-                isWaiting={postProgress.isActive}
+                disabled={postGroup.loading}
+                isWaiting={postGroup.loading}
                 onClick={() => {
-                  post(
-                    {
-                      '@type': 'UnmoderateRoleAction',
-                      actionStatus: 'CompletedActionStatus',
-                      agent: user.defaultRole,
-                      object: getId(role),
-                    },
-                    body => {
-                      setFrame('success');
-                      onSuccess(body);
-                    },
-                  );
+                  postGroup(user, role)
+                    .then(() => alert('Role posted successfully.'))
+                    .catch(err => alert(`An error occurred: ${err}`));
+                  onSuccess(role);
                 }}
               >
                 Unblock
@@ -283,9 +273,11 @@ function BlockPanelRemoveModal({ user, role, onClose, onSuccess }) {
               unblocked.
             </p>
 
-            <Controls error={postProgress.error}>
+            <Controls
+              error={postGroup.error} // #FIXME
+            >
               <Button
-                disabled={postProgress.isActive}
+                disabled={postGroup.loading}
                 onClick={() => {
                   onClose();
                 }}

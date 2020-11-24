@@ -4,7 +4,7 @@ import { Helmet } from 'react-helmet-async';
 import omit from 'lodash/omit';
 import { MdChevronRight, MdFirstPage } from 'react-icons/md';
 import PrivateRoute from './private-route';
-import { usePreprintSearchResults } from '../hooks/api-hooks';
+import { useGetPreprints } from '../hooks/api-hooks.tsx';
 import {
   useIsNewVisitor,
   useIsMobile,
@@ -41,17 +41,24 @@ export default function Home() {
   const [isWelcomeModalOpen, setIsWelcomeModalOpen] = useState(true);
   const [newPreprints, setNewPreprints] = useNewPreprints();
 
-  const apiQs = apifyPreprintQs(
-    location.search,
-    location.state && location.state.bookmark,
-  );
-  const [results, fetchResultsProgress] = usePreprintSearchResults(apiQs);
+  const apiQs = location.search;
+
+  const [loading, setLoading] = useState(true);
+
+  const { data: preprints, loadingPreprints, error } = useGetPreprints();
 
   const [hoveredSortOption, setHoveredSortOption] = useState(null);
 
   useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [apiQs]);
+    // console.log('loading: ', loading);
+    // console.log('preprints: ', preprints);
+    // console.log('error: ', error);
+    if (!loadingPreprints) {
+      if (preprints) {
+        setLoading(false);
+      }
+    }
+  }, [loadingPreprints, preprints]);
 
   const params = new URLSearchParams(location.search);
 
@@ -59,7 +66,7 @@ export default function Home() {
     preprint => {
       if (user) {
         history.push('/new', {
-          preprint: omit(preprint, ['potentialAction']),
+          preprint: omit(preprint, ['potentialAction']), // #FIXME, do we need omit?
           tab: 'review',
           isSingleStep: true,
         });
@@ -76,7 +83,7 @@ export default function Home() {
     preprint => {
       if (user) {
         history.push('/new', {
-          preprint: omit(preprint, ['potentialAction']),
+          preprint: omit(preprint, ['potentialAction']), // #FIXME, do we need omit?
           tab: 'request',
           isSingleStep: true,
         });
@@ -93,7 +100,7 @@ export default function Home() {
     preprint => {
       if (user) {
         history.push('/new', {
-          preprint: omit(preprint, ['potentialAction']),
+          preprint: omit(preprint, ['potentialAction']), // #FIXME, do we need omit?
         });
       } else {
         setLoginModalOpenNext(
@@ -104,232 +111,220 @@ export default function Home() {
     [user, history],
   );
 
-  return (
-    <div className="home">
-      <Helmet>
-        <title>{ORG} • Home</title>
-      </Helmet>
-      <Banner />
+  if (loading) {
+    return <div>Loading...</div>;
+  } else if (error) {
+    return <div>An error occurred: {error}</div>;
+  } else {
+    return (
+      <div className="home">
+        <Helmet>
+          <title>{ORG} • Home</title>
+        </Helmet>
+        <Banner />
 
-      {!!((isNewVisitor || params.get('welcome')) && isWelcomeModalOpen) && (
-        <WelcomeModal
-          onClose={() => {
-            setIsWelcomeModalOpen(false);
+        {!!((isNewVisitor || params.get('welcome')) && isWelcomeModalOpen) && (
+          <WelcomeModal
+            onClose={() => {
+              setIsWelcomeModalOpen(false);
+            }}
+          />
+        )}
+        <HeaderBar
+          onClickMenuButton={() => {
+            setShowLeftPanel(!showLeftPanel);
           }}
         />
-      )}
-      <HeaderBar
-        onClickMenuButton={e => {
-          setShowLeftPanel(!showLeftPanel);
-        }}
-      />
 
-      <SearchBar isFetching={fetchResultsProgress.isActive} />
+        <SearchBar />
 
-      <div className="home__main">
-        <LeftSidePanel
-          visible={showLeftPanel}
-          onClickOutside={() => {
-            setShowLeftPanel(false);
-          }}
-        >
-          <Facets
-            counts={
-              fetchResultsProgress.isActive || results.search !== apiQs
-                ? undefined
-                : results.counts
-            }
-            ranges={
-              fetchResultsProgress.isActive || results.search !== apiQs
-                ? undefined
-                : results.ranges
-            }
-            isFetching={
-              fetchResultsProgress.isActive || results.search !== apiQs
-            }
-          />
-        </LeftSidePanel>
-
-        <div className="home__content">
-          <div className="home__content-header">
-            <h3 className="home__content-title">
-              Preprints with reviews or requests for reviews
-            </h3>
-            <AddButton
-              onClick={e => {
-                if (user) {
-                  history.push('/new');
-                } else {
-                  setLoginModalOpenNext('/new');
-                }
-              }}
-              disabled={location.pathname === '/new'}
+        <div className="home__main">
+          <LeftSidePanel
+            visible={showLeftPanel}
+            onClickOutside={() => {
+              setShowLeftPanel(false);
+            }}
+          >
+            <Facets
+              counts={undefined}
+              ranges={undefined}
+              isFetching={loading}
             />
-          </div>
+          </LeftSidePanel>
 
-          <PrivateRoute path="/new" exact={true}>
-            <Modal
-              showCloseButton={true}
-              title="Add Entry"
-              onClose={() => {
-                history.push('/');
-              }}
-            >
-              <Helmet>
-                <title>Rapid PREreview • Add entry</title>
-              </Helmet>
-              <NewPreprint
-                user={user}
-                onCancel={() => {
-                  history.push('/');
-                }}
-                onSuccess={(preprint, isNew) => {
-                  history.push('/');
-                  if (
-                    isNew &&
-                    !newPreprints.some(
-                      _preprint => getId(_preprint) === getId(preprint),
-                    )
-                  ) {
-                    setNewPreprints(newPreprints.concat(preprint));
+          <div className="home__content">
+            <div className="home__content-header">
+              <h3 className="home__content-title">
+                Preprints with reviews or requests for reviews
+              </h3>
+              <AddButton
+                onClick={() => {
+                  if (user) {
+                    history.push('/new');
+                  } else {
+                    setLoginModalOpenNext('/new');
                   }
                 }}
-                onViewInContext={({ preprint, tab }, isNew) => {
-                  history.push(
-                    `/${unprefix(preprint.doi || preprint.arXivId)}`,
-                    {
-                      preprint: omit(preprint, ['potentialAction']),
-                      tab,
-                    },
-                  );
+                disabled={location.pathname === '/new'}
+              />
+            </div>
+
+            <PrivateRoute path="/new" exact={true}>
+              <Modal
+                showCloseButton={true}
+                title="Add Entry"
+                onClose={() => {
+                  history.push('/');
+                }}
+              >
+                <Helmet>
+                  <title>Rapid PREreview • Add entry</title>
+                </Helmet>
+                <NewPreprint
+                  user={user}
+                  onCancel={() => {
+                    history.push('/');
+                  }}
+                  onSuccess={preprint => {
+                    history.push('/');
+                    setNewPreprints(newPreprints.concat(preprint));
+                  }}
+                  onViewInContext={({ preprint, tab }) => {
+                    history.push(
+                      `/${unprefix(preprint.doi || preprint.arXivId)}`,
+                      {
+                        preprint: omit(preprint, ['potentialAction']),
+                        tab,
+                      }, // #FIXME, do we need omit?
+                    );
+                  }}
+                />
+              </Modal>
+            </PrivateRoute>
+
+            {loginModalOpenNext && (
+              <LoginRequiredModal
+                next={loginModalOpenNext}
+                onClose={() => {
+                  setLoginModalOpenNext(null);
                 }}
               />
-            </Modal>
-          </PrivateRoute>
+            )}
 
-          {loginModalOpenNext && (
-            <LoginRequiredModal
-              next={loginModalOpenNext}
-              onClose={() => {
-                setLoginModalOpenNext(null);
+            <SortOptions
+              value={params.get('sort') || 'score'}
+              onMouseEnterSortOption={sortOption => {
+                setHoveredSortOption(sortOption);
+              }}
+              onMouseLeaveSortOption={() => {
+                setHoveredSortOption(null);
+              }}
+              onChange={(
+                nextSortOption, // `score` | `new` | `date`
+              ) => {
+                const search = createPreprintQs(
+                  { sort: nextSortOption },
+                  location.search,
+                );
+                history.push({
+                  pathname: location.pathame,
+                  search,
+                });
               }}
             />
-          )}
 
-          <SortOptions
-            value={params.get('sort') || 'score'}
-            onMouseEnterSortOption={sortOption => {
-              setHoveredSortOption(sortOption);
-            }}
-            onMouseLeaveSortOption={sortOption => {
-              setHoveredSortOption(null);
-            }}
-            onChange={(
-              nextSortOption, // `score` | `new` | `date`
-            ) => {
-              const search = createPreprintQs(
-                { sort: nextSortOption },
-                location.search,
-              );
-              history.push({
-                pathname: location.pathame,
-                search,
-              });
-            }}
-          />
+            {newPreprints.length > 0 && (
+              <ul className="home__preprint-list home__preprint-list--new">
+                {newPreprints.map(preprint => (
+                  <li
+                    key={getId(preprint)}
+                    className="home__preprint-list__item"
+                  >
+                    <PreprintCard
+                      isNew={true}
+                      user={user}
+                      preprint={preprint}
+                      onNewRequest={handleNewRequest}
+                      onNew={handleNew}
+                      onNewReview={handleNewReview}
+                      hoveredSortOption={hoveredSortOption}
+                      sortOption={params.get('sort') || 'score'}
+                    />
+                  </li>
+                ))}
+              </ul>
+            )}
+            {preprints && preprints.length === 0 && !loading ? (
+              <div>
+                No preprints about this topic have been added to Rapid
+                PREreview.{' '}
+                {!!location.search && (
+                  <XLink to={location.pathname} href={location.pathname}>
+                    Clear search terms.
+                  </XLink>
+                )}
+              </div>
+            ) : preprints.length <= 0 ? (
+              <div>No more results.</div>
+            ) : (
+              <ul className="home__preprint-list">
+                {preprints &&
+                  preprints.data.map(row => (
+                    <li key={row.id} className="home__preprint-list__item">
+                      <PreprintCard
+                        isNew={false}
+                        user={user}
+                        preprint={row}
+                        onNewRequest={handleNewRequest}
+                        onNew={handleNew}
+                        onNewReview={handleNewReview}
+                        hoveredSortOption={hoveredSortOption}
+                        sortOption={params.get('sort') || 'score'}
+                      />
+                    </li>
+                  ))}
+              </ul>
+            )}
 
-          {newPreprints.length > 0 && (
-            <ul className="home__preprint-list home__preprint-list--new">
-              {newPreprints.map(preprint => (
-                <li key={getId(preprint)} className="home__preprint-list__item">
-                  <PreprintCard
-                    isNew={true}
-                    user={user}
-                    preprint={preprint}
-                    onNewRequest={handleNewRequest}
-                    onNew={handleNew}
-                    onNewReview={handleNewReview}
-                    hoveredSortOption={hoveredSortOption}
-                    sortOption={params.get('sort') || 'score'}
-                  />
-                </li>
-              ))}
-            </ul>
-          )}
-
-          {results.total_rows === 0 && !fetchResultsProgress.isActive ? (
-            <div>
-              No preprints about this topic have been added to Rapid PREreview.{' '}
-              {!!location.search && (
-                <XLink to={location.pathname} href={location.pathname}>
-                  Clear search terms.
-                </XLink>
+            <div className="home__pagination">
+              {!!(location.state && location.state.bookmark) && (
+                <Button
+                  onClick={() => {
+                    history.push({
+                      pathname: location.pathname,
+                      search: createPreprintQs(
+                        { text: params.get('q') },
+                        location.search,
+                      ),
+                    });
+                  }}
+                >
+                  <MdFirstPage /> First page
+                </Button>
+              )}
+              {/* Cloudant returns the same bookmark when it hits the end of the list */}
+              {(preprints && preprints.length > 0) && (
+                <Button
+                  className="home__next-page-button"
+                  onClick={() => {
+                    history.push({
+                      pathname: location.pathname,
+                      search: createPreprintQs(
+                        { text: params.get('q') },
+                        location.search,
+                      ),
+                    });
+                  }}
+                >
+                  Next Page <MdChevronRight />
+                </Button>
               )}
             </div>
-          ) : results.bookmark ===
-            (location.state && location.state.bookmark) ? (
-            <div>No more results.</div>
-          ) : (
-            <ul className="home__preprint-list">
-              {results.rows.map(row => (
-                <li key={row.id} className="home__preprint-list__item">
-                  <PreprintCard
-                    isNew={false}
-                    user={user}
-                    preprint={row.doc}
-                    onNewRequest={handleNewRequest}
-                    onNew={handleNew}
-                    onNewReview={handleNewReview}
-                    hoveredSortOption={hoveredSortOption}
-                    sortOption={params.get('sort') || 'score'}
-                  />
-                </li>
-              ))}
-            </ul>
-          )}
-
-          <div className="home__pagination">
-            {!!(location.state && location.state.bookmark) && (
-              <Button
-                onClick={() => {
-                  history.push({
-                    pathname: location.pathname,
-                    search: createPreprintQs(
-                      { text: params.get('q') },
-                      location.search,
-                    ),
-                  });
-                }}
-              >
-                <MdFirstPage /> First page
-              </Button>
-            )}
-            {/* Cloudant returns the same bookmark when it hits the end of the list */}
-            {!!(
-              results.rows.length < results.total_rows &&
-              results.bookmark !== (location.state && location.state.bookmark)
-            ) && (
-              <Button
-                className="home__next-page-button"
-                onClick={() => {
-                  history.push({
-                    pathname: location.pathname,
-                    search: createPreprintQs(
-                      { text: params.get('q') },
-                      location.search,
-                    ),
-                    state: { bookmark: results.bookmark },
-                  });
-                }}
-              >
-                Next Page <MdChevronRight />
-              </Button>
-            )}
           </div>
-        </div>
 
-        <div className="home__main__right" />
+          <div className="home__main__right" />
+        </div>
       </div>
-    </div>
-  );
+    );
+  }
 }

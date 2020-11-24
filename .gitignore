@@ -107,17 +107,19 @@ dist
 # TernJS port file
 .tern-port
 
-# SQLite DB
-dev.sqlite3
-
 # MikroORM Cache
 .mikroorm-cache
 
 # MikroORM db
 prereview
 
+# RESTful react docs
+hooks.json
+
 # Junk
 .DS_Store
 
 # development sqlite database
 /prereview
+prereview
+/*.sqlite3

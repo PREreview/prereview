@@ -1,3 +1,4 @@
+import { Options } from '@mikro-orm/core';
 import {
   BaseEntity,
   Comment,
@@ -12,14 +13,21 @@ import {
   Tag,
   User,
 } from './models/entities';
-import config from './config.js';
+import config from './config';
 
-const dbType = config.isDev ? 'sqlite' : 'postgres';
+type DbDrivers = 'postgresql' | 'sqlite' | 'mongo' | 'mysql' | 'mariadb';
+
+let dbType: DbDrivers;
+if (config.isDev) {
+  dbType = 'sqlite';
+} else {
+  dbType = 'postgresql';
+}
 const authString =
   config.dbUser && config.dbPass ? `${config.dbUser}:${config.dbPass}@` : '';
 const portString = config.dbPort ? `:${config.dbPort}` : '';
 
-export default {
+const options: Options = {
   entities: [
     BaseEntity,
     Comment,
@@ -48,3 +56,5 @@ export default {
     path: 'src/backend/db/migrations',
   },
 };
+
+export default options;

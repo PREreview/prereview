@@ -7,7 +7,7 @@ import { getId, unprefix } from '../utils/jsonld';
 import HeaderBar from './header-bar';
 import { ORG } from '../constants';
 import { createModeratorQs } from '../utils/search';
-import { useRolesSearchResults, usePostAction } from '../hooks/api-hooks';
+import { GetGroups, PostGroup, PutUser } from '../hooks/api-hooks.tsx';
 import Button from './button';
 import IconButton from './icon-button';
 import { RoleBadgeUI } from './role-badge';
@@ -22,7 +22,7 @@ export default function AdminPanel() {
 
   const search = createModeratorQs({ bookmark });
 
-  const [results, progress] = useRolesSearchResults(search, !!bookmark);
+  const groups = GetGroups(search, !!bookmark);
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [revokeRole, setRevokeRole] = useState(null);
@@ -54,14 +54,14 @@ export default function AdminPanel() {
           </Button>
         </header>
 
-        {results.total_rows === 0 && !progress.isActive && !added.length ? (
+        {groups.total_rows === 0 && !groups.loading && !added.length ? (
           <div>No moderators.</div>
         ) : (
           <div>
             <ul className="admin-panel__card-list">
               {added
                 .concat(
-                  results.rows
+                  groups.rows
                     .map(row => row.doc)
                     .filter(
                       role =>
@@ -99,13 +99,13 @@ export default function AdminPanel() {
         <div className="admin-panel__page-nav">
           {/* Cloudant returns the same bookmark when it hits the end of the list */}
           {!!(
-            results.rows.length < results.total_rows &&
-            results.bookmark !== bookmark
+            groups.rows.length < groups.total_rows &&
+            groups.bookmark !== bookmark
           ) && (
             <Button
               onClick={e => {
                 e.preventDefault();
-                setBookmark(results.bookmark);
+                setBookmark(groups.bookmark);
               }}
             >
               More
@@ -146,7 +146,7 @@ export default function AdminPanel() {
 
 function AdminPanelAddModal({ user, onClose, onSuccess }) {
   const [value, setValue] = useState('');
-  const [post, postProgress] = usePostAction();
+  const postGroup = PostGroup();
   const [frame, setFrame] = useState('input');
 
   const pattern =
@@ -163,7 +163,7 @@ function AdminPanelAddModal({ user, onClose, onSuccess }) {
               label={<span>Enter a role (persona) ID</span>}
               minimal={true}
               autoComplete="off"
-              disabled={postProgress.isActive}
+              disabled={postGroup.loading}
               placeholder=""
               pattern={pattern}
               onChange={e => {
@@ -173,9 +173,11 @@ function AdminPanelAddModal({ user, onClose, onSuccess }) {
               value={value}
             />
 
-            <Controls error={postProgress.error}>
+            <Controls
+              error={postGroup.error} // #FIXME
+            >
               <Button
-                disabled={postProgress.isActive}
+                disabled={postGroup.loading}
                 onClick={() => {
                   onClose();
                 }}
@@ -183,21 +185,13 @@ function AdminPanelAddModal({ user, onClose, onSuccess }) {
                 Cancel
               </Button>
               <Button
-                disabled={postProgress.isActive || !re.test(value)}
-                isWaiting={postProgress.isActive}
+                disabled={postGroup.loading || !re.test(value)}
+                isWaiting={postGroup.loading}
                 onClick={() => {
-                  post(
-                    {
-                      '@type': 'GrantModeratorRoleAction',
-                      actionStatus: 'CompletedActionStatus',
-                      agent: getId(user),
-                      object: `role:${value}`,
-                    },
-                    body => {
-                      setFrame('success');
-                      onSuccess(body);
-                    },
-                  );
+                  postGroup(user, value)
+                    .then(() => alert('Role posted successfully.'))
+                    .catch(err => alert(`An error occurred: ${err}`));
+                  onSuccess(value);
                 }}
               >
                 Add
@@ -210,9 +204,11 @@ function AdminPanelAddModal({ user, onClose, onSuccess }) {
               The role (persona) was successfully granted moderator permission.
             </p>
 
-            <Controls error={postProgress.error}>
+            <Controls
+              error={postGroup.error} // #FIXME
+            >
               <Button
-                disabled={postProgress.isActive}
+                disabled={postGroup.loading}
                 onClick={() => {
                   onClose();
                 }}
@@ -234,7 +230,7 @@ AdminPanelAddModal.propTypes = {
 };
 
 function AdminPanelRemoveModal({ user, role, onClose, onSuccess }) {
-  const [post, postProgress] = usePostAction();
+  const updateUserRole = PutUser();
   const [frame, setFrame] = useState('submit');
 
   return (
@@ -247,9 +243,11 @@ function AdminPanelRemoveModal({ user, role, onClose, onSuccess }) {
               (persona) <em>{role.name || unprefix(getId(role))}</em>?
             </p>
 
-            <Controls error={postProgress.error}>
+            <Controls
+              error={updateUserRole.error} // #FIXME
+            >
               <Button
-                disabled={postProgress.isActive}
+                disabled={updateUserRole.loading}
                 onClick={() => {
                   onClose();
                 }}
@@ -257,21 +255,13 @@ function AdminPanelRemoveModal({ user, role, onClose, onSuccess }) {
                 Cancel
               </Button>
               <Button
-                disabled={postProgress.isActive}
-                isWaiting={postProgress.isActive}
+                disabled={updateUserRole.loading}
+                isWaiting={updateUserRole.loading}
                 onClick={() => {
-                  post(
-                    {
-                      '@type': 'RevokeModeratorRoleAction',
-                      actionStatus: 'CompletedActionStatus',
-                      agent: getId(user),
-                      object: getId(role),
-                    },
-                    body => {
-                      setFrame('success');
-                      onSuccess(body);
-                    },
-                  );
+                  updateUserRole(user, role)
+                    .then(() => alert('User role updated successfully.'))
+                    .catch(err => alert(`An error occurred: ${err}`));
+                  onSuccess(role);
                 }}
               >
                 Revoke
@@ -285,9 +275,11 @@ function AdminPanelRemoveModal({ user, role, onClose, onSuccess }) {
               (persona) <em>{role.name || unprefix(getId(role))}</em>.
             </p>
 
-            <Controls error={postProgress.error}>
+            <Controls
+              error={updateUserRole.error} // #FIXME
+            >
               <Button
-                disabled={postProgress.isActive}
+                disabled={updateUserRole.loading}
                 onClick={() => {
                   onClose();
                 }}

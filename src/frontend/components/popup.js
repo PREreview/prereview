@@ -1,42 +1,22 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { MdChevronRight } from 'react-icons/md';
-import { usePreprintActions } from '../hooks/api-hooks';
 import Button from './button';
 import { useUser } from '../contexts/user-context';
 import { TOGGLE_SHELL_TAB } from '../constants';
 import RapidPreReviewLogo from './rapid-pre-review-logo';
-import {
-  checkIfHasReviewed,
-  checkIfHasRequested,
-  checkIfIsModerated,
-} from '../utils/actions';
+import { checkIfHasReviewed, checkIfHasRequested } from '../utils/actions';
 
-export default function Popup({ preprint, dispatch }) {
+export default function Popup(props) {
+  const { preprint, dispatch } = props;
   const [user] = useUser();
 
-  const [actions, fetchActionsProgress] = usePreprintActions(
-    preprint ? preprint.doi || preprint.arXivId : undefined,
-  );
+  const nRequests = preprint.requests.length;
 
-  const safeActions = actions.filter(action => !checkIfIsModerated(action));
+  const nReviews = preprint.reviews.length;
 
-  const nRequests = safeActions.reduce((count, action) => {
-    if (action['@type'] === 'RequestForRapidPREreviewAction') {
-      count++;
-    }
-    return count;
-  }, 0);
-
-  const nReviews = safeActions.reduce((count, action) => {
-    if (action['@type'] === 'RapidPREreviewAction') {
-      count++;
-    }
-    return count;
-  }, 0);
-
-  const hasReviewed = checkIfHasReviewed(user, actions); // `actions` (_all_ of them including moderated ones) not `safeActions`
-  const hasRequested = checkIfHasRequested(user, actions); // `actions` (_all_ of them including moderated ones) not `safeActions`
+  const hasReviewed = checkIfHasReviewed(user, preprint);
+  const hasRequested = checkIfHasRequested(user, preprint);
 
   return (
     <div className="popup">

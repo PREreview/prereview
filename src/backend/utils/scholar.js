@@ -1,9 +1,9 @@
 import doiRegex from 'doi-regex';
 import url from 'url';
 import identifiersArxiv from 'identifiers-arxiv';
-import { cleanup } from './jsonld';
+import { cleanup } from '../../frontend/utils/jsonld';
 import isUrl from 'is-url';
-import { unversionDoi } from './ids';
+import { unversionDoi } from '../../frontend/utils/ids.js';
 
 /**
  * Note: this is also used from the web extension code
@@ -28,13 +28,11 @@ export function parseGoogleScholar(head, { id, sourceUrl } = {}) {
 
   const isDoi = doiRegex().test(id);
   const isArxivId = !!identifiersArxiv.extract(id)[0];
-  const data = {
-    '@type': 'ScholarlyPreprint',
-  };
+  const data = {};
   if (isDoi) {
-    data.doi = id;
+    data.handle = `doi:${id}`;
   } else if (isArxivId) {
-    data.arXivId = id;
+    data.handle = `arxiv:${id}`;
   }
 
   // `name` (title)
@@ -50,7 +48,7 @@ export function parseGoogleScholar(head, { id, sourceUrl } = {}) {
     head.querySelector('meta[name="DC.Title"][content]') ||
     head.querySelector('meta[property="DC.Title"][content]');
   if ($title) {
-    data.name = $title.getAttribute('content');
+    data.title = $title.getAttribute('content');
   }
 
   // `preprintServer.name`
@@ -58,10 +56,7 @@ export function parseGoogleScholar(head, { id, sourceUrl } = {}) {
   // og:site_name
   // or: citation_dissertation_institution, citation_technical_report_institution or DC.publisher
   if (isArxivId) {
-    data.preprintServer = {
-      '@type': 'PreprintServer',
-      name: 'arXiv',
-    };
+    data.preprintServer = 'arXiv';
   } else {
     const $preprintServerName =
       head.querySelector('meta[name="citation_journal_title"][content]') ||
@@ -87,7 +82,7 @@ export function parseGoogleScholar(head, { id, sourceUrl } = {}) {
     if ($preprintServerName) {
       const name = $preprintServerName.getAttribute('content');
       if (name) {
-        data.preprintServer = { '@type': 'PreprintServer', name };
+        data.preprintServer = name;
       }
     }
   }
@@ -101,9 +96,8 @@ export function parseGoogleScholar(head, { id, sourceUrl } = {}) {
   let $datePosted;
   if (
     data.preprintServer &&
-    data.preprintServer.name &&
-    (data.preprintServer.name.toLowerCase().includes('biorxiv') ||
-      data.preprintServer.name.toLowerCase().includes('medrxiv'))
+    (data.preprintServer.toLowerCase().includes('biorxiv') ||
+      data.preprintServer.toLowerCase().includes('medrxiv'))
   ) {
     // handle biorXiv and medrXiv (as of Dec. 2019 `citation_publication_date` is off in bioRxiv)
     $datePosted =
@@ -183,7 +177,7 @@ export function parseGoogleScholar(head, { id, sourceUrl } = {}) {
   ) {
     data.url = urlFromLink;
   } else if (urlFromLink && sourceUrl) {
-    data.url = url.resolve(sourceUrl, urlFromLink);
+    data.url = url.URL(sourceUrl, urlFromLink);
   }
 
   // `encoding.contentUrl` (link to PDF)
@@ -218,25 +212,15 @@ export function parseGoogleScholar(head, { id, sourceUrl } = {}) {
   ) {
     pdfUrl = pdfUrlFromLink;
   } else if (pdfUrlFromLink && sourceUrl) {
-    pdfUrl = url.resolve(sourceUrl, pdfUrlFromLink);
+    pdfUrl = url.URL(sourceUrl, pdfUrlFromLink);
   }
 
   if (pdfUrl) {
-    data.encoding = [
-      {
-        '@type': 'MediaObject',
-        encodingFormat: 'application/pdf',
-        contentUrl: pdfUrl,
-      },
-    ];
+    data.contentEncoding = 'application/pdf';
+    data.contentUrl = pdfUrl;
   } else if (isArxivId) {
-    data.encoding = [
-      {
-        '@type': 'MediaObject',
-        encodingFormat: 'application/pdf',
-        contentUrl: `https://arxiv.org/pdf/${id}`,
-      },
-    ];
+    data.contentEncoding = 'application/pdf';
+    data.contentUrl = `https://arxiv.org/pdf/${id}`;
   }
 
   return cleanup(data);

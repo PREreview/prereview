@@ -13,7 +13,7 @@ import PreprintPreview from './preprint-preview';
 import { getTextAnswers, getActiveReports } from '../utils/stats';
 import RoleBadge from './role-badge';
 import Modal from './modal';
-import { usePostAction, useRole } from '../hooks/api-hooks';
+import { DeletePrereview, GetUser } from '../hooks/api-hooks.tsx';
 
 export default function ModerationCard({
   user,
@@ -25,10 +25,8 @@ export default function ModerationCard({
   onSuccess,
 }) {
   const [modalFrame, setModalFrame] = useState(null);
-  const [reviewActionAgent, fetchReviewActionAgentProgress] = useRole(
-    reviewAction.agent,
-  );
-  const [lockerRole, fetchLockerRole] = useRole(isLockedBy);
+  const reviewer = GetUser(reviewAction.agent);
+  const locker = GetUser(isLockedBy);
 
   const reports = getActiveReports(reviewAction);
   const textAnswers = getTextAnswers(reviewAction);
@@ -47,8 +45,7 @@ export default function ModerationCard({
             className="moderation-card__header-badge"
           />
           <span className="moderation-card__header-name">
-            {reviewActionAgent &&
-              (reviewActionAgent.name || unprefix(getId(reviewActionAgent)))}
+            {reviewer && (reviewer.name || unprefix(getId(reviewer)))}
           </span>
         </div>
         <div className="moderation-card__header__right">
@@ -93,7 +90,7 @@ export default function ModerationCard({
 
         <IconButton
           className="preprint-card__expansion-toggle"
-          onClick={e => {
+          onClick={() => {
             if (isOpened) {
               onClose();
             } else {
@@ -130,18 +127,16 @@ export default function ModerationCard({
           </ul>
 
           <Controls className="moderation-card__expansion-controls">
-            {user.isAdmin &&
-              reviewActionAgent &&
-              !reviewActionAgent.isModerated && (
-                <Button
-                  primary={true}
-                  onClick={() => {
-                    setModalFrame('ModerateRoleAction');
-                  }}
-                >
-                  Block user
-                </Button>
-              )}
+            {user.isAdmin && reviewer && !reviewer.isModerated && (
+              <Button
+                primary={true}
+                onClick={() => {
+                  setModalFrame('ModerateRoleAction');
+                }}
+              >
+                Block user
+              </Button>
+            )}
             <Button
               primary={true}
               onClick={() => {
@@ -173,7 +168,7 @@ export default function ModerationCard({
           </Controls>
         </div>
       </Collapse>
-      {!!lockerRole && (
+      {!!locker && (
         <div className="moderation-card__lock-overlay">
           <div className="moderation-card__lock-overal__content">
             <div className="moderation-card__lock-overlay__lock-icon-container">
@@ -184,11 +179,9 @@ export default function ModerationCard({
             </span>
 
             <span className="moderation-card__lock-overlay__agent">
-              <RoleBadge roleId={getId(lockerRole)} />
+              <RoleBadge roleId={getId(locker)} />
               <span className="moderation-card__lock-overlay__agent-name">
-                {lockerRole
-                  ? lockerRole.name || unprefix(getId(lockerRole))
-                  : null}
+                {locker ? locker.name || unprefix(getId(locker)) : null}
               </span>
             </span>
           </div>
@@ -237,7 +230,7 @@ function ModerationCardModal({
   defaultFrame,
 }) {
   const [frame, setFrame] = useState(defaultFrame);
-  const [post, postProgress] = usePostAction();
+  const deletePrereview = DeletePrereview();
   const ref = useRef();
 
   return (
@@ -259,9 +252,11 @@ function ModerationCardModal({
               rows="4"
             />
 
-            <Controls error={postProgress.error}>
+            <Controls
+              error={deletePrereview.error} // #FIXME
+            >
               <Button
-                disabled={postProgress.isActive}
+                disabled={deletePrereview.loading}
                 onClick={() => {
                   onClose();
                 }}
@@ -269,21 +264,14 @@ function ModerationCardModal({
                 Cancel
               </Button>
               <Button
-                disabled={postProgress.isActive}
-                isWaiting={postProgress.isActive}
+                disabled={deletePrereview.loading}
+                isWaiting={deletePrereview.loading}
                 onClick={() => {
-                  post(
-                    {
-                      '@type': 'ModerateRapidPREreviewAction',
-                      actionStatus: 'CompletedActionStatus',
-                      agent: getId(user.defaultRole),
-                      object: getId(reviewAction),
-                      moderationReason: ref.current.value,
-                    },
-                    body => {
-                      setFrame('success');
-                    },
-                  );
+                  deletePrereview(user, reviewAction)
+                    .then(() => alert('PREreview successfully deleted.'))
+                    .catch(err => {
+                      alert(`An error occurred: ${err}`);
+                    });
                 }}
               >
                 Confirm
@@ -306,9 +294,11 @@ function ModerationCardModal({
               rows="4"
             />
 
-            <Controls error={postProgress.error}>
+            <Controls
+              error={deletePrereview.error} // #FIXME
+            >
               <Button
-                disabled={postProgress.isActive}
+                disabled={deletePrereview.loading}
                 onClick={() => {
                   onClose();
                 }}
@@ -316,21 +306,14 @@ function ModerationCardModal({
                 Cancel
               </Button>
               <Button
-                disabled={postProgress.isActive}
-                isWaiting={postProgress.isActive}
+                disabled={deletePrereview.loading}
+                isWaiting={deletePrereview.loading}
                 onClick={() => {
-                  post(
-                    {
-                      '@type': 'ModerateRoleAction',
-                      actionStatus: 'CompletedActionStatus',
-                      agent: getId(user.defaultRole),
-                      object: getId(reviewAction.agent),
-                      moderationReason: ref.current.value,
-                    },
-                    body => {
-                      setFrame('success');
-                    },
-                  );
+                  deletePrereview(user, reviewAction)
+                    .then(() => alert('PREreview successfully deleted.'))
+                    .catch(err => {
+                      alert(`An error occurred: ${err}`);
+                    });
                 }}
               >
                 Confirm
@@ -354,9 +337,11 @@ function ModerationCardModal({
               rows="4"
             />
 
-            <Controls error={postProgress.error}>
+            <Controls
+              error={deletePrereview.error} // #FIXME
+            >
               <Button
-                disabled={postProgress.isActive}
+                disabled={deletePrereview.loading}
                 onClick={() => {
                   onClose();
                 }}
@@ -364,21 +349,14 @@ function ModerationCardModal({
                 Cancel
               </Button>
               <Button
-                disabled={postProgress.isActive}
-                isWaiting={postProgress.isActive}
+                disabled={deletePrereview.loading}
+                isWaiting={deletePrereview.loading}
                 onClick={() => {
-                  post(
-                    {
-                      '@type': 'IgnoreReportRapidPREreviewAction',
-                      actionStatus: 'CompletedActionStatus',
-                      agent: getId(user.defaultRole),
-                      object: getId(reviewAction),
-                      moderationReason: ref.current.value,
-                    },
-                    body => {
-                      setFrame('success');
-                    },
-                  );
+                  deletePrereview(user, reviewAction)
+                    .then(() => alert('PREreview successfully deleted.'))
+                    .catch(err => {
+                      alert(`An error occurred: ${err}`);
+                    });
                 }}
               >
                 Confirm
