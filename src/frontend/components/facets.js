@@ -11,6 +11,10 @@ export default function Facets({ counts = {}, ranges = {}, isFetching }) {
   const history = useHistory();
   const location = useLocation();
 
+  // console.log('counts: ', counts);
+  // console.log('ranges: ', ranges);
+  // console.log('isFetching: ', isFetching);
+
   const params = new URLSearchParams(location.search);
 
   return (

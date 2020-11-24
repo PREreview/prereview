@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import omit from 'lodash/omit';
@@ -41,31 +41,24 @@ export default function Home() {
   const [isWelcomeModalOpen, setIsWelcomeModalOpen] = useState(true);
   const [newPreprints, setNewPreprints] = useNewPreprints();
 
-  const apiQs = apifyPreprintQs(
-    location.search,
-    location.state && location.state.bookmark,
-  );
+  const apiQs = location.search;
 
-  // const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
 
-  const { data: preprints, loading, error } = useGetPreprints({
-    lazy: true,
-    queryParams: { apiQs },
-  });
-
-  console.log(useGetPreprints());
+  const { data: preprints, loadingPreprints, error } = useGetPreprints();
 
   const [hoveredSortOption, setHoveredSortOption] = useState(null);
 
-  // useEffect(() => {
-  //   console.log('loading: ', loadingPreprints);
-  //   console.log('preprints: ', preprints);
-  //   if (!loadingPreprints) {
-  //     if (preprints) {
-  //       setLoading(false);
-  //     }
-  //   }
-  // }, [loadingPreprints, preprints]);
+  useEffect(() => {
+    // console.log('loading: ', loading);
+    // console.log('preprints: ', preprints);
+    // console.log('error: ', error);
+    if (!loadingPreprints) {
+      if (preprints) {
+        setLoading(false);
+      }
+    }
+  }, [loadingPreprints, preprints]);
 
   const params = new URLSearchParams(location.search);
 
@@ -153,21 +146,9 @@ export default function Home() {
             }}
           >
             <Facets
-              counts={
-                preprints
-                  ? preprints.search !== apiQs
-                    ? undefined
-                    : preprints.counts
-                  : undefined
-              }
-              ranges={
-                preprints
-                  ? preprints.search !== apiQs
-                    ? undefined
-                    : preprints.ranges
-                  : undefined
-              }
-              isFetching={preprints && preprints.search !== apiQs}
+              counts={undefined}
+              ranges={undefined}
+              isFetching={loading}
             />
           </LeftSidePanel>
 
@@ -273,7 +254,7 @@ export default function Home() {
                 ))}
               </ul>
             )}
-            {preprints && preprints.total_rows === 0 && !preprints.loading ? (
+            {preprints && preprints.length === 0 && !loading ? (
               <div>
                 No preprints about this topic have been added to Rapid
                 PREreview.{' '}
@@ -283,19 +264,17 @@ export default function Home() {
                   </XLink>
                 )}
               </div>
-            ) : preprints &&
-              preprints.bookmark ===
-                (location.state && location.state.bookmark) ? (
+            ) : preprints.length <= 0 ? (
               <div>No more results.</div>
             ) : (
               <ul className="home__preprint-list">
                 {preprints &&
-                  preprints.rows.map(row => (
+                  preprints.data.map(row => (
                     <li key={row.id} className="home__preprint-list__item">
                       <PreprintCard
                         isNew={false}
                         user={user}
-                        preprint={row.doc}
+                        preprint={row}
                         onNewRequest={handleNewRequest}
                         onNew={handleNew}
                         onNewReview={handleNewReview}
@@ -324,13 +303,7 @@ export default function Home() {
                 </Button>
               )}
               {/* Cloudant returns the same bookmark when it hits the end of the list */}
-              {!!(
-                preprints &&
-                preprints.rows &&
-                preprints.rows.length < preprints.total_rows &&
-                preprints.bookmark !==
-                  (location.state && location.state.bookmark)
-              ) && (
+              {(preprints && preprints.length > 0) && (
                 <Button
                   className="home__next-page-button"
                   onClick={() => {
@@ -340,7 +313,6 @@ export default function Home() {
                         { text: params.get('q') },
                         location.search,
                       ),
-                      state: { bookmark: preprints && preprints.bookmark },
                     });
                   }}
                 >

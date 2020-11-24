@@ -46,26 +46,17 @@ export default function PreprintCard({
   const { name, preprintServer, doi, arXivId, datePosted } = preprint;
 
   const reviews = useMemo(() => {
-    return preprint.potentialAction.filter(
-      action =>
-        !checkIfIsModerated(action) &&
-        action['@type'] === 'RapidPREreviewAction',
-    );
+    return preprint.requests;
   }, [preprint]);
 
   const safeActions = useMemo(() => {
-    return preprint.potentialAction.filter(
-      action =>
-        !checkIfIsModerated(action) &&
-        (action['@type'] === 'RequestForRapidPREreviewAction' ||
-          action['@type'] === 'RapidPREreviewAction'),
-    );
+    return preprint.reviews;
   }, [preprint]);
 
-  const hasReviewed = checkIfHasReviewed(user, preprint.potentialAction); // `actions` (_all_ of them including moderated ones) not `safeActions`
-  const hasRequested = checkIfHasRequested(user, preprint.potentialAction); // `actions` (_all_ of them including moderated ones) not `safeActions`
+  const hasReviewed = checkIfHasReviewed(user, preprint.reviews); // `actions` (_all_ of them including moderated ones) not `safeActions`
+  const hasRequested = checkIfHasRequested(user, preprint.requests); // `actions` (_all_ of them including moderated ones) not `safeActions`
 
-  const { hasData, hasCode, subjects } = getTags(safeActions);
+  const { hasData, hasCode, subjects } = getTags(preprint);
 
   const {
     nRequests,
@@ -79,7 +70,7 @@ export default function PreprintCard({
     dateLastReview,
     dateLastRequest,
     isAnimating,
-  } = useAnimatedScore(safeActions);
+  } = useAnimatedScore(preprint);
 
   const agoData = getAgoData(
     sortOption,
@@ -324,7 +315,7 @@ export default function PreprintCard({
           <ReviewReader
             user={user}
             identifier={preprint.doi || preprint.arXivId}
-            actions={reviews}
+            actions={preprint.reviews}
             preview={true}
           />
 
@@ -371,13 +362,7 @@ PreprintCard.propTypes = {
     doi: PropTypes.string,
     arXivId: PropTypes.string,
     datePosted: PropTypes.string,
-    name: PropTypes.oneOfType([
-      PropTypes.string,
-      PropTypes.shape({
-        '@type': PropTypes.string.isRequired,
-        '@value': PropTypes.string.isRequired,
-      }).isRequired,
-    ]).isRequired,
+    title: PropTypes.string.isRequired,
     preprintServer: PropTypes.shape({
       name: PropTypes.oneOfType([
         PropTypes.string,
@@ -386,17 +371,9 @@ PreprintCard.propTypes = {
           '@value': PropTypes.string.isRequired,
         }).isRequired,
       ]).isRequired,
-    }).isRequired,
-    potentialAction: PropTypes.arrayOf(
-      PropTypes.oneOfType([
-        PropTypes.shape({
-          '@type': PropTypes.oneOf(['RequestForRapidPREreviewAction']),
-        }),
-        PropTypes.shape({
-          '@type': PropTypes.oneOf(['RapidPREreviewAction']),
-        }),
-      ]),
-    ).isRequired,
+    }),
+    reviews: PropTypes.array,
+    requests: PropTypes.array,
   }).isRequired,
   onNewRequest: PropTypes.func.isRequired,
   onNewReview: PropTypes.func.isRequired,

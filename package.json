@@ -51,7 +51,7 @@
     "postgenerate-fetcher": "prettier ./src/frontend/hooks/api-hooks.d.tsx --write"
   },
   "backend": "dist/backend/index.js",
-  "frontend": "src/frontend/index.html",
+  "frontend": "dist/frontend/index.html",
   "targets": {
     "backend": {
       "context": "node",
