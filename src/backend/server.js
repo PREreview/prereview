@@ -60,6 +60,12 @@ const startTime = Symbol.for('request-received.startTime');
 export default async function configServer(config) {
   // Initialize our application server
   const server = new Koa();
+  server.use(requestReceived);
+  server.use((ctx, next) => {
+    console.log('startAt', ctx[startAt]);
+    console.log('startTime', ctx[startTime]);
+    return next();
+  });
   server.use(xResponseTime());
   server.use(xRequestId());
 

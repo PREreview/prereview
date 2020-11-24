@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import session from 'koa-session';
-import { ServerError } from '../../common/errors.js';
+import { ServerError } from '../../common/errors.ts';
 import { getLogger } from '../log.js';
 
 const log = getLogger('backend:middleware:session');
