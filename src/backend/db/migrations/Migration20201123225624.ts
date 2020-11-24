@@ -1,6 +1,6 @@
 import { Migration } from '@mikro-orm/migrations';
 
-export class Migration20201122233311 extends Migration {
+export class Migration20201123225624 extends Migration {
 
   async up(): Promise<void> {
     this.addSql('create table `user` (`id` integer not null primary key autoincrement, `created_at` datetime not null, `updated_at` datetime not null, `username` varchar null, `name` varchar null, `email` varchar null, `orcid` varchar not null);');
@@ -10,7 +10,7 @@ export class Migration20201122233311 extends Migration {
     this.addSql('create table `tag` (`id` integer not null primary key autoincrement, `created_at` datetime not null, `updated_at` datetime not null, `name` varchar not null, `color` varchar not null);');
     this.addSql('create unique index `tag_name_unique` on `tag` (`name`);');
 
-    this.addSql('create table `preprint` (`id` integer not null primary key autoincrement, `created_at` datetime not null, `updated_at` datetime not null, `title` varchar not null, `uuid` varchar not null, `url` varchar not null);');
+    this.addSql('create table `preprint` (`id` integer not null primary key autoincrement, `created_at` datetime not null, `updated_at` datetime not null, `name` varchar not null, `uuid` varchar null, `doi` varchar null, `arxivid` varchar null, `url` varchar not null, `pdf_url` varchar not null);');
 
     this.addSql('create table `tag_preprints` (`tag_id` integer not null, `preprint_id` integer not null, primary key (`tag_id`, `preprint_id`));');
     this.addSql('create index `tag_preprints_tag_id_index` on `tag_preprints` (`tag_id`);');
@@ -30,7 +30,7 @@ export class Migration20201122233311 extends Migration {
     this.addSql('create index `group_members_group_id_index` on `group_members` (`group_id`);');
     this.addSql('create index `group_members_user_id_index` on `group_members` (`user_id`);');
 
-    this.addSql('create table `full_review` (`id` integer not null primary key autoincrement, `created_at` datetime not null, `updated_at` datetime not null, `published` integer not null, `doi` varchar not null);');
+    this.addSql('create table `full_review` (`id` integer not null primary key autoincrement, `created_at` datetime not null, `updated_at` datetime not null, `published` integer not null, `doi` varchar null);');
 
     this.addSql('create table `full_review_draft` (`id` integer not null primary key autoincrement, `created_at` datetime not null, `updated_at` datetime not null, `title` varchar not null, `contents` varchar not null);');
 
