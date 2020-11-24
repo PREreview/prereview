@@ -4,8 +4,8 @@ import { Group } from './entities';
 
 @Repository(Group)
 export class GroupModel extends EntityRepository<Group> {
-  isMemberOf(groupName: string, userId: number): boolean {
-    const group = this.findOne({ name: groupName }, ['members']);
+  async isMemberOf(groupName: string, userId: number): boolean {
+    const group = await this.findOne({ name: groupName }, ['members']);
     if (!group) {
       throw new NotFoundError(`No such group ${groupName}`);
     }

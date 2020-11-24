@@ -29,7 +29,8 @@ export class HttpError extends ChainError {
       console.warn('Use only 4xx or 5xx status codes for errors');
       status = 500;
     }
-    const cleanStack = properties.cleanStack ? properties.cleanStack : true;
+    const cleanStack =
+      properties && properties.cleanStack ? properties.cleanStack : true;
     super(`HTTP Error ${status}: ${message}`, cause, cleanStack);
     this.status = status;
     this.name = 'HttpError';

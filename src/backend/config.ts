@@ -66,7 +66,8 @@ const defaults = {
   db_type: defaultEnv === 'production' ? 'postgresql' : 'sqlite',
   db_user: process.env.npm_package_name.toLowerCase(),
   log_level: 'error',
-  orcid_sandbox: defaultEnv !== 'production',
+  no_proxy: 'false',
+  orcid_sandbox: String(defaultEnv !== 'production'),
   port: defaultPort,
 };
 
@@ -298,7 +299,12 @@ export default program
     validateArray,
     getEnvOrDefault('secrets').asArray(),
   )
-  .option('--no-proxy', 'Disable support for proxy headers')
+  .option(
+    '--no-proxy',
+    'Disable support for proxy headers',
+    validateBool,
+    getEnvOrDefault('no_proxy').asBool(),
+  )
   .option(
     '--db-host <host>',
     'Database host',
@@ -383,4 +389,9 @@ export default program
     validateUrl,
     getEnvOrDefault('orcid_callback_url').asString(),
   )
-  .option('--orcid-sandbox', 'Use the OrcID sandbox environment');
+  .option(
+    '--orcid-sandbox',
+    'Use the OrcID sandbox environment',
+    validateBool,
+    getEnvOrDefault('orcid_sandbox').asBool(),
+  );

@@ -15,6 +15,7 @@ export default function controller(users, config, thisUser) {
    * @param {function} done - 'Done' callback
    */
   passport.serializeUser((user, done) => {
+    log.trace('serializeUser() user:', user);
     done(null, user.id);
   });
 
@@ -25,11 +26,13 @@ export default function controller(users, config, thisUser) {
    * @param {function} done - 'Done' callback
    */
   passport.deserializeUser(async (id, done) => {
+    log.trace('deserializeUser() id:', id);
     try {
       const user = await users.findOne(id);
+      log.trace('deserializeUser() user:', user);
       done(null, user);
     } catch (err) {
-      log.debug();
+      log.error('Error deserializing user:', err);
       done(err);
     }
   });
@@ -54,18 +57,21 @@ export default function controller(users, config, thisUser) {
       },
     };
 
+    log.trace('verifyCallback() profile:', profile);
+
     let user;
 
     try {
       // if a user already exists
       user = await users.findOne({ orcid: params.orcid });
+      log.trace('verifyCallback() user:', user);
     } catch (err) {
-      log.debug('Error fetching user.', err);
+      log.error('Error fetching user:', err);
     }
 
     if (user) {
       const completeUser = merge(profile, user); // including the access.token in the user that gets sent to the passport serializer
-      log.debug('Authenticated user.', completeUser);
+      log.debug('Authenticated user:', completeUser);
       return done(null, completeUser);
     } else {
       let newUser;
@@ -78,14 +84,16 @@ export default function controller(users, config, thisUser) {
       try {
         log.debug('Creating new user.');
         newUser = users.create({ orcid: params.orcid, name: usersName });
+        log.trace('verifyCallback() newUser:', newUser);
         await users.persistAndFlush(newUser);
       } catch (err) {
-        log.debug('Error creating user.', err);
+        log.error('Error creating user:', err);
       }
 
       if (newUser) {
-        log.debug('Authenticated & created user.', newUser);
+        log.debug('Authenticated & created user:', newUser);
         const completeUser = merge(profile, newUser);
+        log.trace('verifyCallback() new completeUser:', completeUser);
         return done(null, completeUser);
       } else {
         return done(null, false);
@@ -93,15 +101,13 @@ export default function controller(users, config, thisUser) {
     }
   };
 
-  const callbackURL = config.orcidCallbackUrl;
-
   const strategy = new OrcidStrategy(
     {
       sandbox: config.orcidSandbox,
       state: true, // needed for sessions
       clientID: config.orcidClientId,
       clientSecret: config.orcidClientSecret,
-      callbackURL: callbackURL,
+      callbackURL: config.orcidCallbackUrl,
       passReqToCallback: true,
     },
     verifyCallback,
@@ -123,6 +129,7 @@ export default function controller(users, config, thisUser) {
         log.debug('Finishing authenticating with ORCID...');
         if (!user) {
           ctx.body = { success: false };
+          log.error('Authentication failed.');
           ctx.throw(401, 'Authentication failed.');
         } else {
           ctx.state.user = user;

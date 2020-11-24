@@ -25,7 +25,7 @@ const authWrapper = groups => {
     if (!ctx.isAuthenticated()) return false;
 
     return (
-      config.adminUsers.includes(ctx.state.user.id) ||
+      config.adminUsers.includes(ctx.state.user.orcid) ||
       groups.isMemberOf('admins', ctx.state.user.id)
     );
   });
