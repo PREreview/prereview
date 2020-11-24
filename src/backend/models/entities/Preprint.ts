@@ -11,15 +11,11 @@ import { Fixture } from 'class-fixtures-factory';
 import { PreprintModel } from '../preprints';
 import { BaseEntity } from './BaseEntity';
 import { Community } from './Community';
-import { Comment } from './Comment';
 import { FullReview } from './FullReview';
 import { RapidReview } from './RapidReview';
 import { Request } from './Request';
 import { Tag } from './Tag';
-import {
-  createRandomArxivId,
-  createRandomDoi,
-} from '../../../common/utils/ids';
+import { createRandomDoi } from '../../../common/utils/ids';
 
 @Entity()
 export class Preprint extends BaseEntity {
@@ -30,41 +26,36 @@ export class Preprint extends BaseEntity {
   @Property()
   title!: string;
 
-  @Property({ nullable: true })
-  uuid?: string;
-
-  @Fixture({ get: () => createRandomDoi(), optional: true })
-  @Property({ nullable: true })
+  @Fixture({ get: () => createRandomDoi() })
+  @Property()
   @Unique()
-  doi?: string;
+  handle!: string;
 
-  @Fixture({ get: () => createRandomArxivId(), optional: true })
-  @Property({ nullable: true })
-  arxivid?: string;
+  @Fixture(() => true)
+  @Property()
+  published!: boolean;
 
   @Fixture(faker => faker.random.arrayElement(['arxiv', 'biorxiv', 'medrxiv']))
   @Property({ nullable: true })
   preprintServer?: string;
 
-  @Fixture(faker =>
-    faker.random.arrayElement(['image/png', 'image/jpeg', 'application/pdf']),
-  )
-  @Property({ nullable: true })
-  encodingFormat?: string;
-
   @Property({ nullable: true })
   datePosted?: Date;
 
   @Fixture(faker => faker.internet.url())
-  @Property()
-  url!: string;
+  @Property({ nullable: true })
+  url?: string;
+
+  @Fixture(() => 'application/pdf')
+  @Property({ nullable: true })
+  contentEncoding?: string;
 
   @Fixture(
     () =>
       'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf',
   )
   @Property()
-  pdfUrl!: string;
+  contentUrl!: string;
 
   //@Fixture({ ignore: true })
   //@Property({ persist: false })
@@ -99,10 +90,11 @@ export class Preprint extends BaseEntity {
   @ManyToMany({ entity: () => Tag, mappedBy: 'preprints' })
   tags: Collection<Tag> = new Collection<Tag>(this);
 
-  constructor(title: string, uuid: string, url: string) {
+  constructor(title: string, handle: string, url: string, published = false) {
     super();
     this.title = title;
-    this.uuid = uuid;
+    this.handle = handle;
     this.url = url;
+    this.published = published;
   }
 }
