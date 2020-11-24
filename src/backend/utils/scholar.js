@@ -30,9 +30,9 @@ export function parseGoogleScholar(head, { id, sourceUrl } = {}) {
   const isArxivId = !!identifiersArxiv.extract(id)[0];
   const data = {};
   if (isDoi) {
-    data.doi = id;
+    data.handle = `doi:${id}`;
   } else if (isArxivId) {
-    data.arXivId = id;
+    data.handle = `arxiv:${id}`;
   }
 
   // `name` (title)
@@ -48,7 +48,7 @@ export function parseGoogleScholar(head, { id, sourceUrl } = {}) {
     head.querySelector('meta[name="DC.Title"][content]') ||
     head.querySelector('meta[property="DC.Title"][content]');
   if ($title) {
-    data.name = $title.getAttribute('content');
+    data.title = $title.getAttribute('content');
   }
 
   // `preprintServer.name`
@@ -216,11 +216,11 @@ export function parseGoogleScholar(head, { id, sourceUrl } = {}) {
   }
 
   if (pdfUrl) {
-    data.encodingFormat = 'application/pdf';
-    data.pdfUrl = pdfUrl;
+    data.contentEncoding = 'application/pdf';
+    data.contentUrl = pdfUrl;
   } else if (isArxivId) {
-    data.encodingFormat = 'application/pdf';
-    data.pdfUrl = `https://arxiv.org/pdf/${id}`;
+    data.contentEncoding = 'application/pdf';
+    data.contentUrl = `https://arxiv.org/pdf/${id}`;
   }
 
   return cleanup(data);

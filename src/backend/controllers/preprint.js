@@ -43,7 +43,19 @@ export default function controller(preprints) {
     handler: async ctx => {
       const { identifier } = ctx.query;
       log.debug(`Resolving preprint with ID: ${identifier}`);
-      const data = await resolve(identifier);
+      let data;
+      try {
+        data = await resolve(identifier);
+        if (data) {
+          const preprint = preprints.create(data);
+          await preprints.persistAndFlush(preprint);
+        }
+      } catch (err) {
+        log.error(`Preprint resolution failed: ${err}`);
+        ctx.throw(400, `Preprint resolution failed: ${err}`);
+      }
+
+      if (!data) ctx.throw(404, 'No preprint found.');
       ctx.body = data;
     },
   });
@@ -159,15 +171,15 @@ export default function controller(preprints) {
       params: {
         id: Joi.alternatives().try(Joi.number().integer(), Joi.string()),
       },
-      output: {
-        200: {
-          body: {
-            statusCode: 200,
-            status: 'ok',
-            data: preprintSchema,
-          },
-        },
-      },
+      //output: {
+      //  200: {
+      //    body: {
+      //      statusCode: 200,
+      //      status: 'ok',
+      //      data: preprintSchema,
+      //    },
+      //  },
+      //},
       failure: 400,
       continueOnError: true,
     },

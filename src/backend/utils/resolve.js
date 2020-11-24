@@ -3,8 +3,8 @@ import identifiersArxiv from 'identifiers-arxiv';
 import fetch from 'node-fetch';
 import { DOMParser } from 'xmldom';
 import { JSDOM } from 'jsdom';
-import { unprefix, cleanup, arrayify } from '../../frontend/utils/jsonld';
-import { createError } from '../../frontend/utils/errors';
+import { unprefix, cleanup, arrayify } from '../../common/utils/jsonld';
+import { createError } from '../../common/errors';
 import { parseGoogleScholar, getIdentifierFromPdfUrl } from './scholar.js';
 
 /**
@@ -50,7 +50,7 @@ export default async function resolve(
       if (
         strategy === 'htmlOnly' ||
         (htmlData &&
-          htmlData.name &&
+          htmlData.title &&
           htmlData.datePosted &&
           htmlData.preprintServer) // early return as the API won't have more
       ) {
@@ -147,14 +147,14 @@ async function resolveArxivId(
   }
 
   const data = {
-    arXivId: id,
+    handle: id,
     preprintServer: 'arXiv',
   };
   const $metadata = doc.getElementsByTagName('metadata')[0];
   if ($metadata) {
     const $title = $metadata.getElementsByTagName('dc:title')[0];
     if ($title) {
-      data.name = $title.textContent.trim();
+      data.title = $title.textContent.trim();
     }
 
     const $date = $metadata.getElementsByTagName('dc:date')[0];
@@ -181,11 +181,11 @@ async function resolveCrossRefDoi(
     throw createError(r.status);
   }
   const body = await r.json();
-  const data = { doi: id };
+  const data = { handle: id };
   const { message } = body;
   const title = arrayify(message.title)[0];
   if (title) {
-    data.name = title.trim();
+    data.title = title.trim();
   }
 
   const date = message.accepted || message.posted;
@@ -235,13 +235,13 @@ async function resolveOpenAireDoi(
   const text = await r.text();
   const doc = new DOMParser().parseFromString(text);
 
-  const data = { doi: id };
+  const data = { handle: id };
 
   const $metadata = doc.getElementsByTagName('metadata')[0];
   if ($metadata) {
     const $title = $metadata.getElementsByTagName('title')[0];
     if ($title) {
-      data.name = $title.textContent.trim();
+      data.title = $title.textContent.trim();
     }
 
     const $date = $metadata.getElementsByTagName('dateofacceptance')[0];

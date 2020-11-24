@@ -31,6 +31,10 @@ export class Preprint extends BaseEntity {
   @Unique()
   handle!: string;
 
+  @Fixture(() => true)
+  @Property()
+  published!: boolean;
+
   @Fixture(faker => faker.random.arrayElement(['arxiv', 'biorxiv', 'medrxiv']))
   @Property({ nullable: true })
   preprintServer?: string;
@@ -86,10 +90,11 @@ export class Preprint extends BaseEntity {
   @ManyToMany({ entity: () => Tag, mappedBy: 'preprints' })
   tags: Collection<Tag> = new Collection<Tag>(this);
 
-  constructor(title: string, handle: string, url: string) {
+  constructor(title: string, handle: string, url: string, published = false) {
     super();
     this.title = title;
     this.handle = handle;
     this.url = url;
+    this.published = published;
   }
 }
