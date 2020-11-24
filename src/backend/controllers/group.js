@@ -1,6 +1,7 @@
 import router from 'koa-joi-router';
 import moment from 'moment';
 import { getLogger } from '../log.js';
+import { wrap } from '@mikro-orm/core';
 
 const Joi = router.Joi;
 const log = getLogger('backend:controllers:group');
@@ -125,7 +126,7 @@ export default function controller(groups, thisUser) {
         ctx.throw(400, `Failed to parse query: ${err}`);
       }
 
-      if (group.length) {
+      if (group) {
         ctx.response.body = { statusCode: 200, status: 'ok', data: group };
         ctx.response.status = 200;
       } else {
@@ -150,30 +151,32 @@ export default function controller(groups, thisUser) {
     // pre:thisUser.can('access admin pages'),
     handler: async ctx => {
       log.debug(`Updating group ${ctx.params.id}.`);
+      log.debug('ctx.request.body', ctx.request.body);
       let group;
 
       try {
-        group = groups.assign(ctx.params.id, ctx.request.body.data);
-        groups.persistAndFlush(group);
+        group = await groups.findOne(ctx.params.id);
 
         // workaround for sqlite
         if (Number.isInteger(group)) {
-          group = await groups.findById(ctx.param.id);
+          group = await groups.findOne(ctx.param.id);
         }
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse query: ${err}`);
       }
 
-      if (group.length) {
-        ctx.response.body = { statusCode: 200, status: 'ok', data: group };
-        ctx.response.status = 200;
-      } else {
-        log.error(
-          `HTTP 404 Error: That group with ID ${ctx.params.id} does not exist.`,
-        );
-        ctx.throw(404, `That group with ID ${ctx.params.id} does not exist.`);
+      if (group) {
+        try {
+          wrap(group).assign(ctx.request.body);
+        } catch (err) {
+          log.error('HTTP 400 error', err);
+          ctx.throw(400, 'Failed to update group.');
+        }
       }
+
+      // success
+      ctx.response.status = 204;
     },
   });
 

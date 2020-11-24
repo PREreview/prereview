@@ -235,7 +235,8 @@ export default function controller(preprints) {
 
       try {
         preprint = preprints.findOne(ctx.params.id);
-        await preprints.persistAndFlush(ctx.request.body.data[0]);
+        preprint.assign(preprint, ctx.request.body);
+        await preprints.persistAndFlush(preprint);
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse query: ${err}`);

@@ -43,8 +43,8 @@ export default function controller(fullReviews, thisUser) {
       log.debug('Posting full review draft.');
 
       try {
-        const fullReviews = fullReviews.create(ctx.request.body);
-        await fullReviews.persistAndFlush(fullReviews);
+        const fullReview = fullReviews.create(ctx.request.body);
+        await fullReviews.persistAndFlush(fullReview);
       } catch (error) {
         return ctx.throw(400, { message: error.message });
       }

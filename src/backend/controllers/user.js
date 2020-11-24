@@ -38,17 +38,21 @@ export default function controller(users) {
     // pre:thisUserthisUser.can('access private pages'),
     handler: async ctx => {
       log.debug(`Retrieving users.`);
+      let allUsers;
+
       try {
-        const allUsers = await users.findAll();
-        ctx.body = {
-          statusCode: 200,
-          status: 'ok',
-          data: allUsers,
-        };
+        allUsers = await users.findAll();
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse query: ${err}`);
       }
+
+      ctx.body = {
+        statusCode: 200,
+        status: 'ok',
+        data: allUsers,
+      };
+      ctx.response.status = 200;
     },
   });
 
@@ -66,7 +70,7 @@ export default function controller(users) {
     handler: async ctx => {
       log.debug(`Retrieving user ${ctx.params.id}`);
 
-      const user = await users.findOne(ctx.params.id, ['personas']);
+      const user = await users.findOne(ctx.params.id, ['personas', 'groups']);
 
       if (user) {
         ctx.status = 200;

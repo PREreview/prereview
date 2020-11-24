@@ -104,24 +104,24 @@ export default async function configServer(config) {
   const communities = CommunityController(communityModel, authz);
   const fullReviewModel = fullReviewModelWrapper(db);
   const fullReviews = FullReviewController(fullReviewModel, authz);
-  const draftModel = fullReviewDraftModelWrapper(db)
+  const draftModel = fullReviewDraftModelWrapper(db);
   const fullReviewDrafts = DraftController(draftModel, authz);
   const groups = GroupController(groupModel, authz);
   const personas = PersonaController(personaModel, authz);
   const preprintModel = preprintModelWrapper(db);
   const preprints = PreprintController(preprintModel, authz);
   const rapidReviewModel = rapidReviewModelWrapper(db);
-  const rapidReviews = RapidController(rapidReviewModel, authz)
+  const rapidReviews = RapidController(rapidReviewModel, authz);
   const requestModel = requestModelWrapper(db);
-  const requests = RequestController(requestModel, authz)
+  const requests = RequestController(requestModel, authz);
   const tagModel = tagModelWrapper(db);
   const tags = TagController(tagModel, authz);
   const users = UserController(userModel, authz);
 
-  preprints.use('/preprints/:pid', fullReviews.middleware())
-  preprints.use('/preprints/:pid', fullReviewDrafts.middleware())
-  preprints.use('/preprints/:pid', rapidReviews.middleware())
-  preprints.use('/preprints/:pid', requests.middleware())
+  preprints.use('/preprints/:pid', fullReviews.middleware());
+  preprints.use('/preprints/:pid', fullReviewDrafts.middleware());
+  preprints.use('/preprints/:pid', rapidReviews.middleware());
+  preprints.use('/preprints/:pid', requests.middleware());
 
   fullReviews.use('/fullReviews/:fid', comments.middleware());
 
