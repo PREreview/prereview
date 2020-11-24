@@ -4,7 +4,7 @@ import fetch from 'node-fetch';
 import { DOMParser } from 'xmldom';
 import { JSDOM } from 'jsdom';
 import { unprefix, cleanup, arrayify } from '../../common/utils/jsonld';
-import { createError } from '../../common/errors';
+import { createError } from '../../common/errors.ts';
 import { parseGoogleScholar, getIdentifierFromPdfUrl } from './scholar.js';
 
 /**
