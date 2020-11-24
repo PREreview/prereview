@@ -32,6 +32,7 @@ export default function ShellContent({
   defaultTab = 'read',
   onRequireScreen,
 }) {
+  console.log(preprint);
   const location = useLocation();
   const [user] = useUser();
 

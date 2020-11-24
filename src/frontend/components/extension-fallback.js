@@ -4,7 +4,7 @@ import { Helmet } from 'react-helmet-async';
 import mobile from 'is-mobile';
 import { useGetPreprint } from '../hooks/api-hooks.tsx';
 import { useExtension } from '../hooks/extension-hooks';
-import { getPdfUrl, getCanonicalUrl } from '../utils/preprints';
+import { getCanonicalUrl } from '../utils/preprints';
 import Shell from './shell';
 import ShellContent from './shell-content';
 import NotFound from './not-found';
@@ -26,9 +26,6 @@ export default function ExtensionFallback() {
   const { data: preprint, loadingPreprint, error } = useGetPreprint({id: id});
 
   useEffect(() => {
-    // console.log('loading: ', loading);
-    // console.log('preprints: ', preprints);
-    // console.log('error: ', error);
     if (!loadingPreprint) {
       if (preprint) {
         setLoading(false);
@@ -45,7 +42,7 @@ export default function ExtensionFallback() {
 
   useExtension(preprint && id);
 
-  const pdfUrl = getPdfUrl(preprint);
+  const pdfUrl = preprint ? preprint.data[0].contentUrl : '';
   const canonicalUrl = getCanonicalUrl(preprint);
 
   useEffect(() => {

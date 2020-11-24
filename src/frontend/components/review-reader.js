@@ -17,7 +17,6 @@ const ReviewReader = React.memo(function ReviewReader({
   role,
   preview,
   preprint,
-  actions,
   nRequests,
   defaultHighlightedRoleIds,
   onHighlighedRoleIdsChange = noop,
@@ -48,15 +47,15 @@ const ReviewReader = React.memo(function ReviewReader({
               ),
           )
       : {};
-  }, [actions, highlightedRoleIds]);
+  }, [preprint.reviews, highlightedRoleIds]);
 
   const highlightedActions = useMemo(() => {
     return highlightedRoleIds.length
-      ? actions.filter(action =>
+      ? preprint.reviews.filter(action =>
           highlightedRoleIds.some(roleId => getId(action.agent) === roleId),
         )
-      : actions;
-  }, [actions, highlightedRoleIds]);
+      : preprint.reviews;
+  }, [preprint.reviews, highlightedRoleIds]);
 
   return (
     <div
@@ -87,7 +86,7 @@ const ReviewReader = React.memo(function ReviewReader({
               <div className="review-reader__persona-selector">
                 <PotentialRoles
                   role={role}
-                  actions={actions}
+                  actions={preprint.reviews}
                   canModerate={!!user}
                   isModerationInProgress={isModerationInProgress}
                   onModerate={onModerate}
@@ -105,7 +104,7 @@ const ReviewReader = React.memo(function ReviewReader({
 
                 <HighlightedRoles
                   role={role}
-                  actions={actions}
+                  actions={preprint.reviews}
                   canModerate={!!user}
                   isModerationInProgress={isModerationInProgress}
                   onModerate={onModerate}
@@ -126,7 +125,7 @@ const ReviewReader = React.memo(function ReviewReader({
             preview={preview}
             stats={getYesNoStats(highlightedActions)}
             nHighlightedReviews={highlightedRoleIds.length || actions.length}
-            nTotalReviews={actions.length}
+            nTotalReviews={preprint.reviews.length}
           >
             <ShareMenu
               identifier={preprint.handle}
@@ -155,7 +154,6 @@ ReviewReader.propTypes = {
   preview: PropTypes.bool,
   preprint: PropTypes.object.isRequired, // DOI or arXivID
   onHighlighedRoleIdsChange: PropTypes.func,
-  actions: PropTypes.arrayOf(PropTypes.object).isRequired,
   nRequests: PropTypes.number,
   defaultHighlightedRoleIds: PropTypes.arrayOf(PropTypes.string),
   isModerationInProgress: PropTypes.bool,
