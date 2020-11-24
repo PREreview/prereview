@@ -3,7 +3,7 @@ import url from 'url';
 import identifiersArxiv from 'identifiers-arxiv';
 import { cleanup } from '../../frontend/utils/jsonld';
 import isUrl from 'is-url';
-import { unversionDoi } from '../../frontend/utils/ids';
+import { unversionDoi } from '../../frontend/utils/ids.js';
 
 /**
  * Note: this is also used from the web extension code
@@ -216,8 +216,10 @@ export function parseGoogleScholar(head, { id, sourceUrl } = {}) {
   }
 
   if (pdfUrl) {
+    data.encodingFormat = 'application/pdf';
     data.pdfUrl = pdfUrl;
   } else if (isArxivId) {
+    data.encodingFormat = 'application/pdf';
     data.pdfUrl = `https://arxiv.org/pdf/${id}`;
   }
 
