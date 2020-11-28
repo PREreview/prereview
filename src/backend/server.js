@@ -123,7 +123,7 @@ export default async function configServer(config) {
   preprints.use('/preprints/:pid', rapidReviews.middleware());
   preprints.use('/preprints/:pid', requests.middleware());
 
-  fullReviews.use('/fullReviews/:fid', comments.middleware());
+  // fullReviews.use('/fullReviews/:fid', comments.middleware());
 
   const apiV2Router = compose([
     auth.middleware(),

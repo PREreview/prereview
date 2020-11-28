@@ -25,7 +25,7 @@ export default function controller(reviewModel, thisUser) {
   reviewsRouter.route({
     method: 'post',
     path: '/fullReviews',
-    // pre:thisUserthisUser.can('access private pages'),
+    // pre: thisUser.can('access private pages'),
     // validate: {
     //   body: querySchema,
     //   type: 'json',
@@ -44,14 +44,14 @@ export default function controller(reviewModel, thisUser) {
       try {
         review = reviewModel.create(ctx.request.body);
         await reviewModel.persistAndFlush(review);
-      } catch (error) {
+      } catch (err) {
         log.error('HTTP 400 Error: ', err);
-        ctx.throw(400, `Failed to parse full review schema: ${err}`);      
+        ctx.throw(400, `Failed to parse full review schema: ${err}`);
       }
-      
+
       ctx.body = {
-        statusCode: 201,
-        status: 'created',
+        status: 201,
+        message: 'created',
         data: review,
       };
       ctx.status = 201;
@@ -81,12 +81,12 @@ export default function controller(reviewModel, thisUser) {
         ctx.throw(400, `Failed to parse query: ${err}`);
       }
 
-      ctx.response.body = {
-        statusCode: 200,
-        status: 'ok',
+      ctx.body = {
+        status: 200,
+        message: 'ok',
         data: allReviews,
       };
-      ctx.response.status = 200;
+      ctx.status = 200;
     },
   });
 
@@ -100,7 +100,7 @@ export default function controller(reviewModel, thisUser) {
       try {
         fullReview = await reviewModel.findOne(ctx.params.id);
         if (!fullReview) {
-          ctx.throw(404, `Full review with ID ${ctx.params.id} doesn't exist`)
+          ctx.throw(404, `Full review with ID ${ctx.params.id} doesn't exist`);
         }
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
@@ -109,9 +109,9 @@ export default function controller(reviewModel, thisUser) {
 
       ctx.body = {
         status: 200,
-        message: "ok",
-        data: [fullReview]
-      }
+        message: 'ok',
+        data: [fullReview],
+      };
       ctx.status = 200;
     },
   });
@@ -128,10 +128,10 @@ export default function controller(reviewModel, thisUser) {
       try {
         fullReview = await reviewModel.findOne(ctx.params.id);
         if (!fullReview) {
-          ctx.throw(404, `Full review with ID ${ctx.params.id} doesn't exist`)
+          ctx.throw(404, `Full review with ID ${ctx.params.id} doesn't exist`);
         }
-        reviewModel.assign(fullReview, ctx.request.body)
-        await reviewModel.persistAndFlush(fullReview)
+        reviewModel.assign(fullReview, ctx.request.body);
+        await reviewModel.persistAndFlush(fullReview);
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse query: ${err}`);
@@ -153,7 +153,7 @@ export default function controller(reviewModel, thisUser) {
       try {
         fullReview = await reviewModel.findOne(ctx.params.id);
         if (!fullReview) {
-          ctx.throw(404, `Full review with ID ${ctx.params.id} doesn't exist`)
+          ctx.throw(404, `Full review with ID ${ctx.params.id} doesn't exist`);
         }
         await reviewModel.removeAndFlush(fullReview);
       } catch (err) {

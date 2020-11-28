@@ -40,7 +40,7 @@ export default function controller(groupModel, thisUser) {
 
       try {
         group = groupModel.create(ctx.request.body);
-        await groupModel.persistAndFlush(group)
+        await groupModel.persistAndFlush(group);
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse group schema: ${err}`);
@@ -117,20 +117,20 @@ export default function controller(groupModel, thisUser) {
       try {
         group = await groupModel.findOne(ctx.params.id);
         if (!group) {
-          ctx.throw(404, `Group with ID ${ctx.params.id} doesn't exist`)
+          ctx.throw(404, `Group with ID ${ctx.params.id} doesn't exist`);
         }
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse query: ${err}`);
       }
-      
+
       ctx.body = {
         status: 200,
         message: 'ok',
-        data: [group]
-      }
-      ctx.status = 200
-    }
+        data: [group],
+      };
+      ctx.status = 200;
+    },
   });
 
   groupsRouter.route({
@@ -150,8 +150,8 @@ export default function controller(groupModel, thisUser) {
 
       try {
         group = await groupModel.findOne(ctx.params.id);
-         if (!group) {
-          ctx.throw(404, `Group with ID ${ctx.params.id} doesn't exist`)
+        if (!group) {
+          ctx.throw(404, `Group with ID ${ctx.params.id} doesn't exist`);
         }
         groupModel.assign(group, ctx.request.body);
         await groupModel.persistAndFlush(group);
@@ -176,7 +176,7 @@ export default function controller(groupModel, thisUser) {
       try {
         group = await groupModel.findOne(ctx.params.id);
         if (!group) {
-          ctx.throw(404, `Group with ID ${ctx.params.id} doesn't exist`)
+          ctx.throw(404, `Group with ID ${ctx.params.id} doesn't exist`);
         }
         await groupModel.removeAndFlush(group);
       } catch (err) {
@@ -184,7 +184,7 @@ export default function controller(groupModel, thisUser) {
         ctx.throw(400, `Failed to parse query: ${err}`);
       }
 
-      ctx.status = 204
+      ctx.status = 204;
     },
   });
 

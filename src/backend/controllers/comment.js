@@ -28,7 +28,7 @@ export default function controller(commentModel, thisUser) {
       // eslint-disable-next-line no-unused-vars
       let newComment, fid;
 
-      ctx.params.fid ? fid = ctx.params.fid : null
+      ctx.params.fid ? (fid = ctx.params.fid) : null;
 
       try {
         newComment = commentModel.create(ctx.request.body);
@@ -37,13 +37,13 @@ export default function controller(commentModel, thisUser) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse comment schema: ${err}`);
       }
-    
+
       ctx.body = {
         status: 201,
-        message: 'created', 
-        data: newComment
-      }
-      ctx.status = 201; 
+        message: 'created',
+        data: newComment,
+      };
+      ctx.status = 201;
     },
   });
 
@@ -65,11 +65,11 @@ export default function controller(commentModel, thisUser) {
 
       ctx.response.body = {
         status: 200,
-        message: "ok", 
-        data: comments
-      }
+        message: 'ok',
+        data: comments,
+      };
       ctx.status = 200;
-    }
+    },
   });
 
   commentsRouter.route({
@@ -80,14 +80,13 @@ export default function controller(commentModel, thisUser) {
     handler: async ctx => {
       log.debug(`Retrieving comment ${ctx.params.id}.`);
       let comment;
-      
+
       try {
         comment = await commentModel.findOne(ctx.params.id);
-        
-        if (!comment) {
-          ctx.throw(404, `A comment with ID ${ctx.params.id} doesn't exist`)
-        }
 
+        if (!comment) {
+          ctx.throw(404, `Comment with ID ${ctx.params.id} doesn't exist`);
+        }
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse comment schema: ${err}`);
@@ -95,9 +94,9 @@ export default function controller(commentModel, thisUser) {
 
       ctx.response.body = {
         status: 200,
-        message: "ok",
-        data: comment
-      }
+        message: 'ok',
+        data: [comment],
+      };
       ctx.status = 200;
     },
   });
@@ -119,24 +118,23 @@ export default function controller(commentModel, thisUser) {
     handler: async ctx => {
       log.debug(`Updating comment ${ctx.params.id}.`);
       let comment;
-      
+
       try {
         comment = await commentModel.findOne(ctx.params.id);
 
         if (!comment) {
-          ctx.throw(404, `A comment with ID ${ctx.params.id} doesn't exist`)
+          ctx.throw(404, `A comment with ID ${ctx.params.id} doesn't exist`);
         }
-        
+
         commentModel.assign(comment, ctx.request.body);
         await commentModel.persistAndFlush(comment);
-
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse comment schema: ${err}`);
       }
 
       // if updated
-      ctx.status = 204; 
+      ctx.status = 204;
     },
   });
 
@@ -146,27 +144,26 @@ export default function controller(commentModel, thisUser) {
     // pre: thisUser.can('');
     // validate: {},
     handler: async ctx => {
-      log.debug(`Removing comment with ID ${ctx.params.id}`)
+      log.debug(`Removing comment with ID ${ctx.params.id}`);
       let comment;
 
       try {
         comment = await commentModel.findOne(ctx.params.id);
-        
+
         if (!comment) {
-          ctx.throw(404, `A comment with ID ${ctx.params.id} doesn't exist`)
+          ctx.throw(404, `A comment with ID ${ctx.params.id} doesn't exist`);
         }
 
-        await commentModel.removeAndFlush(comment)
-
+        await commentModel.removeAndFlush(comment);
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse comment schema: ${err}`);
       }
 
       // if deleted
-      ctx.status = 204
-    }
-  })
+      ctx.status = 204;
+    },
+  });
 
   return commentsRouter;
 }

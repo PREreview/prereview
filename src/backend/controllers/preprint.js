@@ -19,16 +19,10 @@ const querySchema = Joi.object({
   to: Joi.string(),
 });
 
-const preprintSchema = Joi.array().items(
-  Joi.object({
-    title: Joi.string(),
-    url: Joi.string(),
-    uuid: Joi.string(),
-  }).min(1),
-);
+const preprintSchema = {};
 
 // eslint-disable-next-line no-unused-vars
-export default function controller(preprints) {
+export default function controller(preprints, thisUser) {
   const preprintRoutes = router();
 
   // RESOLVE PREPRINT METADATA

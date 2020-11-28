@@ -6,7 +6,7 @@ const log = getLogger('backend:controllers:tags');
 
 // eslint-disable-next-line no-unused-vars
 export default function controller(tagModel, thisUser) {
-  const tagsRouter = router()
+  const tagsRouter = router();
 
   tagsRouter.route({
     method: 'post',
@@ -30,10 +30,9 @@ export default function controller(tagModel, thisUser) {
         message: 'created',
         data: [tag],
       };
-      ctx.status = 201
+      ctx.status = 201;
     },
   });
-
 
   tagsRouter.route({
     method: 'get',
@@ -45,7 +44,7 @@ export default function controller(tagModel, thisUser) {
       let allTags;
 
       try {
-        allTags = await tagModel.findAll(['preprints'])
+        allTags = await tagModel.findAll(['preprints']);
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse tag schema: ${err}`);
@@ -56,9 +55,9 @@ export default function controller(tagModel, thisUser) {
         message: 'ok',
         data: allTags,
       };
-      ctx.status = 200;      
-    }
-  })
+      ctx.status = 200;
+    },
+  });
 
   tagsRouter.route({
     method: 'get',
@@ -70,9 +69,9 @@ export default function controller(tagModel, thisUser) {
       let tag;
 
       try {
-        tag = await tagModel.findOne(ctx.params.id, ['preprints'])
+        tag = await tagModel.findOne(ctx.params.id, ['preprints']);
         if (!tag) {
-          ctx.throw(404, `tag with ID ${ctx.params.id} doesn't exist`)
+          ctx.throw(404, `tag with ID ${ctx.params.id} doesn't exist`);
         }
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
@@ -84,9 +83,9 @@ export default function controller(tagModel, thisUser) {
         message: 'ok',
         data: [tag],
       };
-      ctx.status = 200;      
-    }
-  })
+      ctx.status = 200;
+    },
+  });
 
   tagsRouter.route({
     method: 'put',
@@ -98,21 +97,21 @@ export default function controller(tagModel, thisUser) {
       let tag;
 
       try {
-        tag = await tagModel.findOne(ctx.params.id)
+        tag = await tagModel.findOne(ctx.params.id);
         if (!tag) {
-          ctx.throw(404, `Tag with ID ${ctx.params.id} doesn't exist`)
+          ctx.throw(404, `Tag with ID ${ctx.params.id} doesn't exist`);
         }
-        tagModel.assign(tag, ctx.request.body)
-        await tagModel.persistAndFlush(tag)
+        tagModel.assign(tag, ctx.request.body);
+        await tagModel.persistAndFlush(tag);
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse tag schema: ${err}`);
       }
 
       // if updated
-      ctx.status = 204;      
-    }
-  })
+      ctx.status = 204;
+    },
+  });
 
   tagsRouter.route({
     method: 'delete',
@@ -124,20 +123,20 @@ export default function controller(tagModel, thisUser) {
       let tag;
 
       try {
-        tag = await tagModel.findOne(ctx.params.id)
+        tag = await tagModel.findOne(ctx.params.id);
         if (!tag) {
-          ctx.throw(404, `Tag with ID ${ctx.params.id} doesn't exist`)
+          ctx.throw(404, `Tag with ID ${ctx.params.id} doesn't exist`);
         }
-        await tagModel.removeAndFlush(tag)
+        await tagModel.removeAndFlush(tag);
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse tag schema: ${err}`);
       }
 
       // if deleted
-      ctx.status = 204;      
-    }
-  })
+      ctx.status = 204;
+    },
+  });
 
   return tagsRouter;
 }

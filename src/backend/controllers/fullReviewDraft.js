@@ -2,6 +2,7 @@ import router from 'koa-joi-router';
 import { getLogger } from '../log.js';
 
 const log = getLogger('backend:controllers:fullReviewDrafts');
+// eslint-disable-next-line no-unused-vars
 const Joi = router.Joi;
 
 // eslint-disable-next-line no-unused-vars
@@ -36,8 +37,8 @@ export default function controller(draftModel, thisUser) {
       ctx.body = {
         status: 201,
         message: 'created',
-        data: [draft]
-      }
+        data: [draft],
+      };
       ctx.status = 201;
     },
   });
@@ -61,8 +62,8 @@ export default function controller(draftModel, thisUser) {
       ctx.body = {
         status: 200,
         message: 'ok',
-        data: [drafts]
-      }
+        data: [drafts],
+      };
       ctx.status = 200;
     },
   });
@@ -79,8 +80,8 @@ export default function controller(draftModel, thisUser) {
       try {
         draft = await draftModel.fidnOne(ctx.params.id);
         if (!draft) {
-          ctx.throw(404, `Draft with ID ${ctx.params.id} doesn't exist`)
-        }     
+          ctx.throw(404, `Draft with ID ${ctx.params.id} doesn't exist`);
+        }
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse schema: ${err}`);
@@ -89,8 +90,8 @@ export default function controller(draftModel, thisUser) {
       ctx.body = {
         status: 200,
         message: 'ok',
-        data: [draft]
-      }
+        data: [draft],
+      };
       ctx.status = 200;
     },
   });
@@ -113,9 +114,9 @@ export default function controller(draftModel, thisUser) {
       let draft;
 
       try {
-        draft = await draftModel.findOne(ctx.params.id)
+        draft = await draftModel.findOne(ctx.params.id);
         if (!draft) {
-          ctx.throw(404, `Draft with ID ${ctx.params.id} doesn't exist`)
+          ctx.throw(404, `Draft with ID ${ctx.params.id} doesn't exist`);
         }
         draftModel.assign(draft, ctx.request.body);
         await draftModel.persistAndFlush(draft);
@@ -137,9 +138,9 @@ export default function controller(draftModel, thisUser) {
       let draft;
 
       try {
-        draft = await draftModel.findOne(ctx.params.id)
+        draft = await draftModel.findOne(ctx.params.id);
         if (!draft) {
-          ctx.throw(404, `Draft with ID ${ctx.params.id} doesn't exist`)
+          ctx.throw(404, `Draft with ID ${ctx.params.id} doesn't exist`);
         }
         await draftModel.removeAndFlush(draft);
       } catch (err) {
@@ -151,8 +152,6 @@ export default function controller(draftModel, thisUser) {
       ctx.status = 204;
     },
   });
-
-  
 
   return draftsRouter;
 }

@@ -20,7 +20,7 @@ export default function controller(rapidReviews, thisUser) {
       try {
         rapidReview = rapidReviews.create(ctx.request.body);
         await rapidReviews.persistAndFlush(rapidReview);
-      } catch (error) {
+      } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse schema: ${err}`);
       }
@@ -81,9 +81,12 @@ export default function controller(rapidReviews, thisUser) {
       let rapid;
 
       try {
-        rapid = await rapidReviews.findOne(ctx.params.id, ['author', 'preprint']);
+        rapid = await rapidReviews.findOne(ctx.params.id, [
+          'author',
+          'preprint',
+        ]);
         if (!rapid) {
-          ctx.throw(404, `Rapid review with ID ${ctx.params.id} doesn't exist`)
+          ctx.throw(404, `Rapid review with ID ${ctx.params.id} doesn't exist`);
         }
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
@@ -93,8 +96,8 @@ export default function controller(rapidReviews, thisUser) {
       ctx.body = {
         status: 200,
         message: 'ok',
-        data: [rapid]
-      }
+        data: [rapid],
+      };
     },
   });
 
@@ -116,17 +119,17 @@ export default function controller(rapidReviews, thisUser) {
       try {
         rapid = await rapidReviews.findOne(ctx.params.id);
         if (!rapid) {
-          ctx.throw(404, `Rapid review with ID ${ctx.params.id} doesn't exist`)
+          ctx.throw(404, `Rapid review with ID ${ctx.params.id} doesn't exist`);
         }
-        rapidReviews.assign(rapid, ctx.request.body)
-        await rapidReviews.persistAndFlush(rapid)
+        rapidReviews.assign(rapid, ctx.request.body);
+        await rapidReviews.persistAndFlush(rapid);
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse schema: ${err}`);
       }
 
       // if updated
-      ctx.status = 204;  
+      ctx.status = 204;
     },
   });
 
@@ -142,16 +145,16 @@ export default function controller(rapidReviews, thisUser) {
       try {
         rapid = await rapidReviews.findOne(ctx.params.id);
         if (!rapid) {
-          ctx.throw(404, `Rapid review with ID ${ctx.params.id} doesn't exist`)
+          ctx.throw(404, `Rapid review with ID ${ctx.params.id} doesn't exist`);
         }
-        await rapidReviews.removeAndFlush(rapid)
+        await rapidReviews.removeAndFlush(rapid);
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse schema: ${err}`);
       }
 
       // if deleted
-      ctx.status = 204;  
+      ctx.status = 204;
     },
   });
 

@@ -2,11 +2,12 @@ import router from 'koa-joi-router';
 import { getLogger } from '../log.js';
 
 const log = getLogger('backend:controller:community');
+// eslint-disable-next-line no-unused-vars
 const Joi = router.Joi;
 
 // eslint-disable-next-line no-unused-vars
 export default function controller(communityModel, thisUser) {
-  const communities = router()
+  const communities = router();
 
   communities.route({
     method: 'post',
@@ -25,14 +26,14 @@ export default function controller(communityModel, thisUser) {
         ctx.throw(400, `Failed to parse community schema: ${err}`);
       }
 
-      ctx.response.body = {
-        statusCode: 201,
-        status: 'created',
-        data: community,
+      ctx.body = {
+        status: 201,
+        message: 'created',
+        data: [community],
       };
+      ctx.status = 201;
     },
   });
-
 
   communities.route({
     method: 'get',
@@ -44,7 +45,7 @@ export default function controller(communityModel, thisUser) {
       let allCommunities;
 
       try {
-        allCommunities = await communityModel.findAll(['members', 'preprints'])
+        allCommunities = await communityModel.findAll(['members', 'preprints']);
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse community schema: ${err}`);
@@ -55,9 +56,9 @@ export default function controller(communityModel, thisUser) {
         message: 'ok',
         data: allCommunities,
       };
-      ctx.status = 200;      
-    }
-  })
+      ctx.status = 200;
+    },
+  });
 
   communities.route({
     method: 'get',
@@ -69,9 +70,12 @@ export default function controller(communityModel, thisUser) {
       let community;
 
       try {
-        community = await communityModel.findOne(ctx.params.id, ['members', 'preprints'])
+        community = await communityModel.findOne(ctx.params.id, [
+          'members',
+          'preprints',
+        ]);
         if (!community) {
-          ctx.throw(404, `Community with ID ${ctx.params.id} doesn't exist`)
+          ctx.throw(404, `Community with ID ${ctx.params.id} doesn't exist`);
         }
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
@@ -81,11 +85,11 @@ export default function controller(communityModel, thisUser) {
       ctx.body = {
         status: 200,
         message: 'ok',
-        data: community,
+        data: [community],
       };
-      ctx.status = 200;      
-    }
-  })
+      ctx.status = 200;
+    },
+  });
 
   communities.route({
     method: 'put',
@@ -93,25 +97,25 @@ export default function controller(communityModel, thisUser) {
     // pre: thisUser.can(''),
     // validate: {},
     handler: async ctx => {
-      log.debug(`Retrieving community with id ${ctx.params.id}.`);
+      log.debug(`Updating community with id ${ctx.params.id}.`);
       let community;
 
       try {
-        community = await communityModel.findOne(ctx.params.id)
+        community = await communityModel.findOne(ctx.params.id);
         if (!community) {
-          ctx.throw(404, `Community with ID ${ctx.params.id} doesn't exist`)
+          ctx.throw(404, `Community with ID ${ctx.params.id} doesn't exist`);
         }
-        communityModel.assign(community, ctx.request.body)
-        await communityModel.removeAndFlush(community)
+        communityModel.assign(community, ctx.request.body);
+        await communityModel.persistAndFlush(community);
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse community schema: ${err}`);
       }
 
-      // if deleted
-      ctx.status = 204;      
-    }
-  })
+      // if updated
+      ctx.status = 204;
+    },
+  });
 
   communities.route({
     method: 'delete',
@@ -123,20 +127,20 @@ export default function controller(communityModel, thisUser) {
       let community;
 
       try {
-        community = await communityModel.findOne(ctx.params.id)
+        community = await communityModel.findOne(ctx.params.id);
         if (!community) {
-          ctx.throw(404, `Community with ID ${ctx.params.id} doesn't exist`)
+          ctx.throw(404, `Community with ID ${ctx.params.id} doesn't exist`);
         }
-        await communityModel.removeAndFlush(community)
+        await communityModel.removeAndFlush(community);
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse community schema: ${err}`);
       }
 
       // if deleted
-      ctx.status = 204;      
-    }
-  })
+      ctx.status = 204;
+    },
+  });
 
   return communities;
 }

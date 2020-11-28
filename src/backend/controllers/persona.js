@@ -21,17 +21,20 @@ export default function controller(personasModel, thisUser) {
       let allPersonas;
 
       try {
-        allPersonas = await personasModel.findAll(['fullReviews', 'rapidReviews']);
+        allPersonas = await personasModel.findAll([
+          'fullReviews',
+          'rapidReviews',
+        ]);
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse query: ${err}`);
       }
 
       ctx.body = {
-          status: 200,
-          message: 'ok',
-          data: allPersonas,
-        };
+        status: 200,
+        message: 'ok',
+        data: allPersonas,
+      };
     },
   });
 
@@ -45,9 +48,9 @@ export default function controller(personasModel, thisUser) {
       let persona;
 
       try {
-        persona = await personasModel.findOne(ctx.params.id)
+        persona = await personasModel.findOne(ctx.params.id);
         if (!persona) {
-          ctx.throw(404, `Persona with ID ${ctx.params.id} doesn't exist`)
+          ctx.throw(404, `Persona with ID ${ctx.params.id} doesn't exist`);
         }
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
@@ -56,13 +59,12 @@ export default function controller(personasModel, thisUser) {
 
       ctx.body = {
         status: 200,
-        message: ok,
-        data: [persona]
-      }
+        message: 'ok',
+        data: [persona],
+      };
       ctx.status = 200;
     },
   });
-
 
   personaRouter.route({
     method: 'put',
@@ -85,9 +87,12 @@ export default function controller(personasModel, thisUser) {
       let persona;
 
       try {
-        persona = await personasModel.findOne(ctx.params.id); 
+        persona = await personasModel.findOne(ctx.params.id);
         if (!persona) {
-          ctx.throw(404, `That persona with ID ${ctx.params.id} does not exist.`);
+          ctx.throw(
+            404,
+            `That persona with ID ${ctx.params.id} does not exist.`,
+          );
         }
         personasModel.assign(persona, ctx.request.body);
         await personasModel.persistAndFlush(persona);
@@ -95,7 +100,7 @@ export default function controller(personasModel, thisUser) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse schema: ${err}`);
       }
-      
+
       // if updated
       ctx.status = 204;
     },
