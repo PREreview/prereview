@@ -1,7 +1,6 @@
 import router from 'koa-joi-router';
 import moment from 'moment';
 import { getLogger } from '../log.js';
-import { wrap } from '@mikro-orm/core';
 
 const Joi = router.Joi;
 const log = getLogger('backend:controllers:group');
@@ -27,35 +26,31 @@ const querySchema = Joi.object({
  */
 
 // eslint-disable-next-line no-unused-vars
-export default function controller(groups, thisUser) {
-  const groupRoutes = router();
+export default function controller(groupModel, thisUser) {
+  const groupsRouter = router();
 
-  groupRoutes.route({
+  groupsRouter.route({
     method: 'post',
     path: '/groups',
-    validate: {
-      body: {
-        name: Joi.string(),
-      },
-      type: 'json',
-    },
+    // validate: {},
     // pre:thisUser.can('access admin pages'),
     handler: async ctx => {
       log.debug('Adding new group.');
       let group;
 
       try {
-        group = await groups.create(ctx.request.body.data);
+        group = groupModel.create(ctx.request.body);
+        await groupModel.persistAndFlush(group)
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse group schema: ${err}`);
       }
-      ctx.response.body = { statusCode: 201, status: 'created', data: group };
-      ctx.response.status = 201;
+      ctx.body = { status: 201, message: 'created', data: [group] };
+      ctx.status = 201;
     },
   });
 
-  groupRoutes.route({
+  groupsRouter.route({
     method: 'get',
     path: '/groups',
     // pre:thisUser.can('access admin pages'),
@@ -85,7 +80,7 @@ export default function controller(groups, thisUser) {
           }
           to = timestamp.toISOString();
         }
-        res = await groups.findAll({
+        res = await groupModel.findAll({
           start: query.start,
           end: query.end,
           asc: query.asc,
@@ -93,19 +88,19 @@ export default function controller(groups, thisUser) {
           from: from,
           to: to,
         });
-        ctx.response.body = {
-          statusCode: 200,
-          status: 'ok',
+        ctx.body = {
+          status: 200,
+          message: 'ok',
           data: res,
         };
-        ctx.response.status = 200;
+        ctx.status = 200;
       } catch (err) {
         ctx.throw(400, `Failed to parse query: ${err}`);
       }
     },
   });
 
-  groupRoutes.route({
+  groupsRouter.route({
     method: 'get',
     path: '/groups/:id',
     validate: {
@@ -120,25 +115,25 @@ export default function controller(groups, thisUser) {
       let group;
 
       try {
-        group = await groups.findOne(ctx.params.id);
+        group = await groupModel.findOne(ctx.params.id);
+        if (!group) {
+          ctx.throw(404, `Group with ID ${ctx.params.id} doesn't exist`)
+        }
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse query: ${err}`);
       }
-
-      if (group) {
-        ctx.response.body = { statusCode: 200, status: 'ok', data: group };
-        ctx.response.status = 200;
-      } else {
-        log.error(
-          `HTTP 404 Error: That group with ID ${ctx.params.id} does not exist.`,
-        );
-        ctx.throw(404, `That group with ID ${ctx.params.id} does not exist.`);
+      
+      ctx.body = {
+        status: 200,
+        message: 'ok',
+        data: [group]
       }
-    },
+      ctx.status = 200
+    }
   });
 
-  groupRoutes.route({
+  groupsRouter.route({
     method: 'put',
     path: '/groups/:id',
     validate: {
@@ -151,36 +146,26 @@ export default function controller(groups, thisUser) {
     // pre:thisUser.can('access admin pages'),
     handler: async ctx => {
       log.debug(`Updating group ${ctx.params.id}.`);
-      log.debug('ctx.request.body', ctx.request.body);
       let group;
 
       try {
-        group = await groups.findOne(ctx.params.id);
-
-        // workaround for sqlite
-        if (Number.isInteger(group)) {
-          group = await groups.findOne(ctx.param.id);
+        group = await groupModel.findOne(ctx.params.id);
+         if (!group) {
+          ctx.throw(404, `Group with ID ${ctx.params.id} doesn't exist`)
         }
+        groupModel.assign(group, ctx.request.body);
+        await groupModel.persistAndFlush(group);
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse query: ${err}`);
       }
 
-      if (group) {
-        try {
-          wrap(group).assign(ctx.request.body);
-        } catch (err) {
-          log.error('HTTP 400 error', err);
-          ctx.throw(400, 'Failed to update group.');
-        }
-      }
-
       // success
-      ctx.response.status = 204;
+      ctx.status = 204;
     },
   });
 
-  groupRoutes.route({
+  groupsRouter.route({
     method: 'delete',
     path: '/groups/:id',
     // pre:thisUser.can('access admin pages'),
@@ -189,26 +174,21 @@ export default function controller(groups, thisUser) {
       let group;
 
       try {
-        group = groups.remove(ctx.params.id);
-        await groups.persistAndFlush(group);
+        group = await groupModel.findOne(ctx.params.id);
+        if (!group) {
+          ctx.throw(404, `Group with ID ${ctx.params.id} doesn't exist`)
+        }
+        await groupModel.removeAndFlush(group);
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse query: ${err}`);
       }
 
-      if (group.length) {
-        ctx.response.body = { statusCode: 200, status: 'ok', data: group };
-        ctx.response.status = 200;
-      } else {
-        log.error(
-          `HTTP 404 Error: That group with ID ${ctx.params.id} does not exist.`,
-        );
-        ctx.throw(404, `That group with ID ${ctx.params.id} does not exist.`);
-      }
+      ctx.status = 204
     },
   });
 
-  groupRoutes.route({
+  groupsRouter.route({
     method: 'get',
     path: '/groups/:id/members',
     // pre:thisUser.can('access admin pages'),
@@ -218,7 +198,7 @@ export default function controller(groups, thisUser) {
 
       try {
         const query = ctx.query;
-        group = await groups.members({
+        group = await groupModel.members({
           gid: ctx.params.id,
           start: query.start,
           end: query.end,
@@ -241,7 +221,7 @@ export default function controller(groups, thisUser) {
     },
   });
 
-  groupRoutes.route({
+  groupsRouter.route({
     method: 'put',
     path: '/groups/:id/members/:uid',
     validate: {
@@ -262,7 +242,7 @@ export default function controller(groups, thisUser) {
       let res;
 
       try {
-        res = await groups.memberAdd(ctx.params.id, ctx.params.uid);
+        res = await groupModel.memberAdd(ctx.params.id, ctx.params.uid);
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse query: ${err}`);
@@ -287,7 +267,7 @@ export default function controller(groups, thisUser) {
     },
   });
 
-  groupRoutes.route({
+  groupsRouter.route({
     method: 'delete',
     path: '/groups/:id/members/:uid',
     // pre:thisUser.can('access admin pages'),
@@ -296,7 +276,7 @@ export default function controller(groups, thisUser) {
       let res;
 
       try {
-        res = await groups.memberRemove(ctx.params.id, ctx.params.uid);
+        res = await groupModel.memberRemove(ctx.params.id, ctx.params.uid);
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse query: ${err}`);
@@ -321,5 +301,5 @@ export default function controller(groups, thisUser) {
     },
   });
 
-  return groupRoutes;
+  return groupsRouter;
 }
