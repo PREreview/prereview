@@ -43,7 +43,7 @@ export default function controller(commentsModel, thisUser) {
         message: 'created', 
         data: newComment
       }
-      ctx.status = 201; // created
+      ctx.status = 201; 
     },
   });
 
@@ -63,12 +63,12 @@ export default function controller(commentsModel, thisUser) {
         ctx.throw(400, `Failed to retrieve comments`);
       }
 
-      ctx.status = 200;
       ctx.response.body = {
         status: 200,
         message: "ok", 
         data: comments
       }
+      ctx.status = 200;
     }
   });
 
@@ -93,12 +93,12 @@ export default function controller(commentsModel, thisUser) {
         ctx.throw(400, `Failed to parse comment schema: ${err}`);
       }
 
-      ctx.status = 200;
       ctx.response.body = {
         status: 200,
         message: "ok",
         data: comment
       }
+      ctx.status = 200;
     },
   });
 
