@@ -6,7 +6,7 @@ const log = getLogger('backend:controller:comment');
 const Joi = router.Joi;
 
 // eslint-disable-next-line no-unused-vars
-export default function controller(commentsModel, thisUser) {
+export default function controller(commentModel, thisUser) {
   const commentsRouter = router();
 
   commentsRouter.route({
@@ -31,8 +31,8 @@ export default function controller(commentsModel, thisUser) {
       ctx.params.fid ? fid = ctx.params.fid : null
 
       try {
-        newComment = commentsModel.create(ctx.request.body);
-        await commentsModel.persistAndFlush(newComment);
+        newComment = commentModel.create(ctx.request.body);
+        await commentModel.persistAndFlush(newComment);
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse comment schema: ${err}`);
@@ -57,7 +57,7 @@ export default function controller(commentsModel, thisUser) {
       let comments;
 
       try {
-        comments = await commentsModel.findAll();
+        comments = await commentModel.findAll();
       } catch (err) {
         log.error('HTTP 400 error: ', err);
         ctx.throw(400, `Failed to retrieve comments`);
@@ -82,7 +82,7 @@ export default function controller(commentsModel, thisUser) {
       let comment;
       
       try {
-        comment = await commentsModel.findOne(ctx.params.id);
+        comment = await commentModel.findOne(ctx.params.id);
         
         if (!comment) {
           ctx.throw(404, `A comment with ID ${ctx.params.id} doesn't exist`)
@@ -121,14 +121,14 @@ export default function controller(commentsModel, thisUser) {
       let comment;
       
       try {
-        comment = await commentsModel.findOne(ctx.params.id);
+        comment = await commentModel.findOne(ctx.params.id);
 
         if (!comment) {
           ctx.throw(404, `A comment with ID ${ctx.params.id} doesn't exist`)
         }
         
-        commentsModel.assign(comment, ctx.request.body);
-        await commentsModel.persistAndFlush(comment);
+        commentModel.assign(comment, ctx.request.body);
+        await commentModel.persistAndFlush(comment);
 
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
@@ -150,13 +150,13 @@ export default function controller(commentsModel, thisUser) {
       let comment;
 
       try {
-        comment = await commentsModel.findOne(ctx.params.id);
+        comment = await commentModel.findOne(ctx.params.id);
         
         if (!comment) {
           ctx.throw(404, `A comment with ID ${ctx.params.id} doesn't exist`)
         }
 
-        await commentsModel.removeAndFlush(comment)
+        await commentModel.removeAndFlush(comment)
 
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
