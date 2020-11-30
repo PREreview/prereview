@@ -1,23 +1,22 @@
 import React, { useEffect, useState } from 'react';
 
 // Remirror
-import { AllStyledComponent } from '@remirror/styles/emotion';
 import { RemirrorProvider, useManager, useRemirror } from 'remirror/react';
 import { fromHtml } from 'remirror/core';
 
 // Remirror extensions
-import { WysiwygPreset } from 'remirror/preset/wysiwyg';
-import { BoldExtension } from 'remirror/extension/bold';
-import { CollaborationExtension } from 'remirror/extension/collaboration';
-import { ItalicExtension } from 'remirror/extension/italic';
-import { UnderlineExtension } from 'remirror/extension/underline';
-import { YjsExtension } from 'remirror/extension/yjs';
+// import { WysiwygPreset } from 'remirror/preset/wysiwyg';
+// import { BoldExtension } from 'remirror/extension/bold';
+// import { CollaborationExtension } from 'remirror/extension/collaboration';
+// import { ItalicExtension } from 'remirror/extension/italic';
+// import { UnderlineExtension } from 'remirror/extension/underline';
+// import { YjsExtension } from 'remirror/extension/yjs';
 
 let EXTENSIONS = [
-  new BoldExtension(),
-  new ItalicExtension(),
-  new UnderlineExtension(),
-  new WysiwygPreset(),
+  // new BoldExtension(),
+  // new ItalicExtension(),
+  // new UnderlineExtension(),
+  // new WysiwygPreset(),
 ];
 
 const Menu = () => {
@@ -79,7 +78,7 @@ const EditorWrapper = () => {
 
   useEffect(() => {
     if (window) {
-      EXTENSIONS.push(new YjsExtension(), new CollaborationExtension());
+      // EXTENSIONS.push(new YjsExtension(), new CollaborationExtension());
 
       setIsLoaded(true);
     }
@@ -89,21 +88,19 @@ const EditorWrapper = () => {
     return <div>Loading...</div>;
   } else {
     return (
-      <AllStyledComponent>
-        <RemirrorProvider
-          manager={manager}
-          value={value}
-          onChange={parameter => {
-            // Update the state to the latest value.
-            setValue(parameter.state);
-          }}
-        >
-          <div>
-            <Menu />
-            <Editor />
-          </div>
-        </RemirrorProvider>
-      </AllStyledComponent>
+      <RemirrorProvider
+        manager={manager}
+        value={value}
+        onChange={parameter => {
+          // Update the state to the latest value.
+          setValue(parameter.state);
+        }}
+      >
+        <div>
+          <Menu />
+          <Editor />
+        </div>
+      </RemirrorProvider>
     );
   }
 };
