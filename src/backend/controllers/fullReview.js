@@ -24,10 +24,16 @@ export default function controller(reviewModel, thisUser) {
 
   // handler for GET multiple reviews methods
   const getHandler = async ctx => {
-    log.debug(`Retrieving full reviews.`);
-    let pid, allReviews;
+    let allReviews, pid; // fid = fullReview ID
 
-    ctx.params.pid ? (pid = ctx.params.pid) : null;
+    if (ctx.params.pid) {
+      pid = ctx.params.pid;
+      log.debug(
+        `Retrieving reviews associated with preprint ${ctx.params.pid}`,
+      );
+    } else {
+      log.debug(`Retrieving all reviews.`);
+    }
 
     try {
       if (pid) {

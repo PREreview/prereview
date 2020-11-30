@@ -9,10 +9,16 @@ export default function controller(rapidReviews, thisUser) {
   const rapidRouter = router();
 
   const getHandler = async ctx => {
-    log.debug('Retrieving rapid reviews.');
-    let all, pid; // pid = preprint ID
+    let all, pid; // fid = fullReview ID
 
-    ctx.params.pid ? (pid = ctx.params.pid) : null;
+    if (ctx.params.pid) {
+      pid = ctx.params.pid;
+      log.debug(
+        `Retrieving rapid reviews associated with preprint ${ctx.params.pid}`,
+      );
+    } else {
+      log.debug(`Retrieving all rapid reviews.`);
+    }
 
     try {
       if (pid) {

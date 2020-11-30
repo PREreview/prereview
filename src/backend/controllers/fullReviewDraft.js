@@ -9,6 +9,35 @@ const Joi = router.Joi;
 export default function controller(draftModel, thisUser) {
   const draftsRouter = router();
 
+  const getHandler = async ctx => {
+    let drafts, fid; // fid = fullReview ID
+    if (ctx.params.fid) {
+      fid = ctx.params.fid;
+      log.debug(
+        `Retrieving drafts associated with full review ID ${ctx.params.fid}`,
+      );
+    } else {
+      log.debug(`Retrieving review drafts.`);
+    }
+
+    try {
+      if (fid) {
+        drafts = await draftModel.find({ parent: fid });
+      } else {
+        drafts = await draftModel.findAll();
+      }
+    } catch (error) {
+      return ctx.throw(400, { message: error.message });
+    }
+
+    ctx.body = {
+      status: 200,
+      message: 'ok',
+      data: drafts,
+    };
+    ctx.status = 200;
+  };
+
   draftsRouter.route({
     method: 'post',
     path: '/fullReviewDrafts/',
@@ -48,24 +77,15 @@ export default function controller(draftModel, thisUser) {
     path: '/fullReviewDrafts/',
     // pre: thisUser.can('access admin pages'),
     // validate: {},
-    handler: async ctx => {
-      log.debug(`Retrieving review drafts.`);
-      let drafts;
+    handler: async ctx => getHandler(ctx),
+  });
 
-      try {
-        drafts = await draftModel.findAll();
-      } catch (err) {
-        log.error('HTTP 400 Error: ', err);
-        ctx.throw(400, `Failed to parse schema: ${err}`);
-      }
-
-      ctx.body = {
-        status: 200,
-        message: 'ok',
-        data: drafts,
-      };
-      ctx.status = 200;
-    },
+  draftsRouter.route({
+    method: 'get',
+    path: '/fullReviews/:fid/fullReviewDrafts/',
+    // pre: thisUser.can('access admin pages'),
+    // validate: {},
+    handler: async ctx => getHandler(ctx),
   });
 
   draftsRouter.route({
