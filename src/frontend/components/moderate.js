@@ -6,7 +6,7 @@ import { getId } from '../utils/jsonld';
 import HeaderBar from './header-bar';
 import { ORG } from '../constants';
 import { createModerationQs } from '../utils/search';
-import { GetPreprintReviews } from '../hooks/api-hooks.tsx';
+import { GetPreprint } from '../hooks/api-hooks.tsx';
 import Button from './button';
 import ModerationCard from './moderation-card';
 
@@ -37,7 +37,7 @@ export default function Moderate() {
 
   const search = createModerationQs({ bookmark });
 
-  const results = GetPreprintReviews(search, !!bookmark);
+  const results = GetPreprint(search, !!bookmark);
 
   const [isOpenedMap, setIsOpenedMap] = useState(
     results.rows.reduce((map, row) => {
