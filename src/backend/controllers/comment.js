@@ -9,6 +9,32 @@ const Joi = router.Joi;
 export default function controller(commentModel, thisUser) {
   const commentsRouter = router();
 
+  const getHandler = async ctx => {
+      let comments, fid; // fid = fullReview ID
+
+      ctx.params.fid ? fid = ctx.params.fid : null;
+
+      try {
+        if (fid) {
+          log.debug(`Retrieving comments related to review ${fid}.`);
+          comments = await commentModel.find({ parent: fid })          
+        } else {
+          log.debug(`Retrieving all comments.`)
+          comments = await commentModel.findAll();
+        }
+      } catch (err) {
+        log.error('HTTP 400 error: ', err);
+        ctx.throw(400, `Failed to retrieve comments`);
+      }
+
+      ctx.response.body = {
+        status: 200,
+        message: 'ok',
+        data: comments,
+      };
+      ctx.status = 200;
+  }
+
   commentsRouter.route({
     method: 'post',
     path: '/comments',
@@ -26,9 +52,7 @@ export default function controller(commentModel, thisUser) {
     handler: async ctx => {
       log.debug(`Posting a new comment.`);
       // eslint-disable-next-line no-unused-vars
-      let newComment, fid;
-
-      ctx.params.fid ? (fid = ctx.params.fid) : null;
+      let newComment;
 
       try {
         newComment = commentModel.create(ctx.request.body);
@@ -41,7 +65,7 @@ export default function controller(commentModel, thisUser) {
       ctx.body = {
         status: 201,
         message: 'created',
-        data: newComment,
+        data: [newComment],
       };
       ctx.status = 201;
     },
@@ -52,24 +76,15 @@ export default function controller(commentModel, thisUser) {
     path: '/comments',
     // pre: {},
     // validate: {},
-    handler: async ctx => {
-      log.debug(`Retrieving comments.`);
-      let comments;
+    handler: async ctx => getHandler(ctx),
+  });
 
-      try {
-        comments = await commentModel.findAll();
-      } catch (err) {
-        log.error('HTTP 400 error: ', err);
-        ctx.throw(400, `Failed to retrieve comments`);
-      }
-
-      ctx.response.body = {
-        status: 200,
-        message: 'ok',
-        data: comments,
-      };
-      ctx.status = 200;
-    },
+  commentsRouter.route({
+    method: 'get',
+    path: '/fullReviews/:fid/comments',
+    // pre: {},
+    // validate: {},
+    handler: async ctx => getHandler(ctx),
   });
 
   commentsRouter.route({
