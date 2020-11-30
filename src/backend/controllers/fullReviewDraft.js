@@ -62,7 +62,7 @@ export default function controller(draftModel, thisUser) {
       ctx.body = {
         status: 200,
         message: 'ok',
-        data: [drafts],
+        data: drafts,
       };
       ctx.status = 200;
     },

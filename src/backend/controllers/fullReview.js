@@ -22,6 +22,32 @@ const querySchema = Joi.object({
 export default function controller(reviewModel, thisUser) {
   const reviewsRouter = router();
 
+  // handler for GET multiple reviews methods
+  const getHandler = async ctx => {
+    log.debug(`Retrieving full reviews.`);
+    let pid, allReviews;
+
+    ctx.params.pid ? (pid = ctx.params.pid) : null;
+
+    try {
+      if (pid) {
+        allReviews = await reviewModel.find({ preprint: pid });
+      } else {
+        allReviews = await reviewModel.findAll();
+      }
+    } catch (err) {
+      log.error('HTTP 400 Error: ', err);
+      ctx.throw(400, `Failed to parse query: ${err}`);
+    }
+
+    ctx.body = {
+      status: 200,
+      message: 'ok',
+      data: allReviews,
+    };
+    ctx.status = 200;
+  };
+
   reviewsRouter.route({
     method: 'post',
     path: '/fullReviews',
@@ -60,34 +86,16 @@ export default function controller(reviewModel, thisUser) {
 
   reviewsRouter.route({
     method: 'get',
-    path: '/fullReviews',
+    path: '/preprints/:pid/fullReviews',
     // pre: thisUser.can('access private pages'),
-    handler: async ctx => {
-      log.debug(`Retrieving full reviews.`);
-      let pid, allReviews;
+    handler: async ctx => getHandler(ctx),
+  });
 
-      ctx.params.pid ? (pid = ctx.params.pid) : null;
-
-      log.debug('ctx.params.pid???', ctx.params.pid);
-
-      try {
-        if (pid) {
-          allReviews = await reviewModel.find({ preprint: pid });
-        } else {
-          allReviews = await reviewModel.findAll();
-        }
-      } catch (err) {
-        log.error('HTTP 400 Error: ', err);
-        ctx.throw(400, `Failed to parse query: ${err}`);
-      }
-
-      ctx.body = {
-        status: 200,
-        message: 'ok',
-        data: allReviews,
-      };
-      ctx.status = 200;
-    },
+  reviewsRouter.route({
+    method: 'get',
+    path: '/fullReviews',
+    // pre: thisUser.can(''),
+    handler: async ctx => getHandler(ctx),
   });
 
   reviewsRouter.route({

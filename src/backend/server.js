@@ -118,13 +118,6 @@ export default async function configServer(config) {
   const tags = TagController(tagModel, authz);
   const users = UserController(userModel, authz);
 
-  preprints.use('/preprints/:pid', fullReviews.middleware());
-  preprints.use('/preprints/:pid', fullReviewDrafts.middleware());
-  preprints.use('/preprints/:pid', rapidReviews.middleware());
-  preprints.use('/preprints/:pid', requests.middleware());
-
-  // fullReviews.use('/fullReviews/:fid', comments.middleware());
-
   const apiV2Router = compose([
     auth.middleware(),
     comments.middleware(),
@@ -134,6 +127,8 @@ export default async function configServer(config) {
     groups.middleware(),
     personas.middleware(),
     preprints.middleware(),
+    rapidReviews.middleware(),
+    requests.middleware(),
     tags.middleware(),
     users.middleware(),
   ]);

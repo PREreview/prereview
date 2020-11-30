@@ -8,6 +8,26 @@ const log = getLogger('backend:controllers:rapidReview');
 export default function controller(rapidReviews, thisUser) {
   const rapidRouter = router();
 
+  const getHandler = async ctx => {
+    log.debug('Retrieving rapid reviews.');
+    let all, pid; // pid = preprint ID
+
+    ctx.params.pid ? (pid = ctx.params.pid) : null;
+
+    try {
+      if (pid) {
+        all = await rapidReviews.find({ preprint: pid });
+      } else {
+        all = await rapidReviews.findAll();
+      }
+    } catch (error) {
+      return ctx.throw(400, { message: error.message });
+    }
+
+    ctx.body = { status: 200, message: 'ok', data: all };
+    ctx.status = 200;
+  };
+
   rapidRouter.route({
     method: 'post',
     path: '/rapidReviews',
@@ -44,25 +64,15 @@ export default function controller(rapidReviews, thisUser) {
     path: '/rapidReviews',
     // pre: thisUser.can('access private pages'),
     // validate: {},
-    handler: async ctx => {
-      log.debug('Retrieving rapid reviews.');
-      let all, pid; // pid = preprint ID
+    handler: async ctx => getHandler(ctx),
+  });
 
-      ctx.params.pid ? (pid = ctx.params.pid) : null;
-
-      try {
-        if (pid) {
-          all = await rapidReviews.find({ preprint: pid });
-        } else {
-          all = await rapidReviews.findAll();
-        }
-      } catch (error) {
-        return ctx.throw(400, { message: error.message });
-      }
-
-      ctx.response.body = { statusCode: 201, status: 'created', data: all };
-      ctx.response.status = 201;
-    },
+  rapidRouter.route({
+    method: 'get',
+    path: '/preprints/:pid/rapidReviews',
+    // pre: thisUser.can('access private pages'),
+    // validate: {},
+    handler: async ctx => getHandler(ctx),
   });
 
   rapidRouter.route({
