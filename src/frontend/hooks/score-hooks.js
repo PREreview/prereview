@@ -18,7 +18,7 @@ export function useAnimatedScore(preprint, now = new Date().toISOString()) {
     onStopAnim: () => {},
     isAnimating: false,
   };
-  console.log('***preprint***:', preprint);
+
   const sorted = preprint.reviews
     ? preprint.requests
       ? preprint.reviews.concat(preprint.requests).sort((a, b) => {
@@ -33,7 +33,6 @@ export function useAnimatedScore(preprint, now = new Date().toISOString()) {
         })
     : [];
 
-  console.log('***sorted***:', sorted);
   const [index, setIndex] = useState(null);
 
   const [isAnimating, setIsAnimating] = useState(false);

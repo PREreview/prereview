@@ -54,14 +54,6 @@ export default function PreprintCard({
   const preprintId = createPreprintId(handle);
   const { id, scheme } = decodePreprintId(preprintId);
 
-  const reviews = useMemo(() => {
-    return preprint.requests;
-  }, [preprint]);
-
-  const safeActions = useMemo(() => {
-    return preprint.reviews;
-  }, [preprint]);
-
   const hasReviewed = checkIfHasReviewed(user, preprint.reviews); // `actions` (_all_ of them including moderated ones) not `safeActions`
   const hasRequested = checkIfHasRequested(user, preprint.requests); // `actions` (_all_ of them including moderated ones) not `safeActions`
 

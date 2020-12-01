@@ -23,7 +23,6 @@ import About from './about';
 import CodeOfConduct from './code-of-conduct';
 import NotFound from './not-found';
 import API from './api';
-import Review from './review';
 import AdminPanel from './admin-panel';
 import BlockPanel from './block-panel';
 import SuspenseLoading from './suspense-loading';
@@ -67,10 +66,6 @@ export default function App({ user }) {
                 </ToCPage>
               </Route>
 
-              <Route exact={true} path="/review">
-                <Review />
-              </Route>
-
               <Route exact={true} path="/about/:roleId">
                 <Profile />
               </Route>
@@ -93,7 +88,7 @@ export default function App({ user }) {
               </ModeratorRoute>
               <Route
                 exact={true}
-                path="/preprint/:identifierPart1/:identifierPart2?"
+                path="/preprints/:id"
               >
                 <ExtensionFallback />
               </Route>
