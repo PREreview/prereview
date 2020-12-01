@@ -4,16 +4,18 @@ import { getErrorMessages } from '../utils/errors';
 
 const log = getLogger('backend:controller:comment');
 const Joi = router.Joi;
-const handleInvalid = ctx => {
-  log.debug('Validation error!');
-  log.error(ctx.invalid);
-  ctx.status = 400;
-  ctx.message = getErrorMessages(ctx.invalid);
-};
+
 const commentSchema = Joi.object({
   title: Joi.string().required(),
   contents: Joi.string().required(),
 });
+
+const handleInvalid = ctx => {
+  log.debug('Validation error!');
+  log.error('Error details ', ctx.invalid);
+  ctx.status = 400;
+  ctx.message = getErrorMessages(ctx.invalid);
+};
 
 // eslint-disable-next-line no-unused-vars
 export default function controller(commentModel, thisUser) {
