@@ -54,58 +54,62 @@ export default function controller(reviewModel, thisUser) {
     ctx.status = 200;
   };
 
+  // reviewsRouter.route({
+  //   method: 'post',
+  //   path: '/fullReviews',
+  //   // pre: thisUser.can('access private pages'),
+  //   handler: async ctx => {
+  //     log.debug('Posting full review.');
+  //     let review;
+
+  //     try {
+  //       review = reviewModel.create(ctx.request.body);
+  //       await reviewModel.persistAndFlush(review);
+  //     } catch (err) {
+  //       log.error('HTTP 400 Error: ', err);
+  //       ctx.throw(400, `Failed to parse full review schema: ${err}`);
+  //     }
+
+  //     ctx.body = {
+  //       status: 201,
+  //       message: 'created',
+  //       data: review,
+  //     };
+  //     ctx.status = 201;
+  //   },
+  // });
+
   reviewsRouter.route({
-    method: 'post',
-    path: '/fullReviews',
-    // pre: thisUser.can('access private pages'),
-    // validate: {
-    //   body: querySchema,
-    //   type: 'json',
-    //   failure: 400,
-    //   // output: {
-    //   //   201: {
-    //   //     // could even be a code range!
-    //   //     body: {},
-    //   //   },
-    //   // },
-    // },
-    handler: async ctx => {
-      log.debug('Posting full review.');
-      let review;
-
-      try {
-        review = reviewModel.create(ctx.request.body);
-        await reviewModel.persistAndFlush(review);
-      } catch (err) {
-        log.error('HTTP 400 Error: ', err);
-        ctx.throw(400, `Failed to parse full review schema: ${err}`);
-      }
-
-      ctx.body = {
-        status: 201,
-        message: 'created',
-        data: review,
-      };
-      ctx.status = 201;
+    meta: {
+      swagger: {
+        summary: 'Endpoint to GET full-length reviews of a specific preprint.',
+      },
     },
-  });
-
-  reviewsRouter.route({
-    method: 'get',
+    method: 'GET',
     path: '/preprints/:pid/fullReviews',
     // pre: thisUser.can('access private pages'),
     handler: async ctx => getHandler(ctx),
   });
 
   reviewsRouter.route({
-    method: 'get',
+    meta: {
+      swagger: {
+        summary: 'Endpoint to GET all full-length reviews.',
+      },
+    },
+    method: 'GET',
     path: '/fullReviews',
     // pre: thisUser.can(''),
     handler: async ctx => getHandler(ctx),
   });
 
   reviewsRouter.route({
-    method: 'get',
+    meta: {
+      swagger: {
+        summary: 'Endpoint to GET a specific full-length review.',
+      },
+    },
+    method: 'GET',
     path: '/fullReviews/:id',
     handler: async ctx => {
       log.debug(`Retrieving review ${ctx.params.id}.`);
@@ -131,33 +135,13 @@ export default function controller(reviewModel, thisUser) {
   });
 
   reviewsRouter.route({
-    method: 'put',
-    path: '/fullReviews/:id',
-    // pre: thisUser.can(''),
-    // validate: {},
-    handler: async ctx => {
-      log.debug(`Updating review ${ctx.params.id}.`);
-      let fullReview;
-
-      try {
-        fullReview = await reviewModel.findOne(ctx.params.id);
-        if (!fullReview) {
-          ctx.throw(404, `Full review with ID ${ctx.params.id} doesn't exist`);
-        }
-        reviewModel.assign(fullReview, ctx.request.body);
-        await reviewModel.persistAndFlush(fullReview);
-      } catch (err) {
-        log.error('HTTP 400 Error: ', err);
-        ctx.throw(400, `Failed to parse query: ${err}`);
-      }
-
-      // if updated
-      ctx.status = 204;
+    meta: {
+      swagger: {
+        summary:
+          'Endpoint to DELETE full-length reviews of a specific preprint. Admin users only.',
+      },
     },
-  });
-
-  reviewsRouter.route({
-    method: 'delete',
+    method: 'DELETE',
     path: '/fullReviews/:id',
     // pre:thisUserthisUser.can('access admin pages'),
     handler: async ctx => {
