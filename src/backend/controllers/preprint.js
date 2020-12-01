@@ -273,13 +273,6 @@ export default function controller(preprints, thisUser) {
       swagger: {
         operationId: 'DeletePreprint',
         summary: 'Endpoint to DELETE preprints',
-        parameters: [
-          {
-            path: {
-              required: true,
-            },
-          },
-        ],
       },
     },
     method: 'DELETE',
