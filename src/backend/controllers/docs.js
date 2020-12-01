@@ -5,6 +5,7 @@ import { getLogger } from '../log.js';
 import router from 'koa-joi-router';
 import userRoutes from './user.js';
 import fullReviewRoutes from './fullReview.js';
+import rapidReviewRoutes from './rapidReview.js';
 import commentRoutes from './comment.js';
 import communityRoutes from './community.js';
 import groupRoutes from './group.js';
@@ -19,6 +20,7 @@ export default function docs() {
   generator.addJoiRouter(preprintRoutes());
   generator.addJoiRouter(userRoutes());
   generator.addJoiRouter(fullReviewRoutes());
+  generator.addJoiRouter(rapidReviewRoutes());
   generator.addJoiRouter(groupRoutes());
   generator.addJoiRouter(commentRoutes());
   generator.addJoiRouter(communityRoutes());
