@@ -7,8 +7,9 @@ import { MenuLink } from '@reach/menu-button';
 import { useUser } from '../contexts/user-context';
 import {
   useGetUser,
-  // usePostFullReview,
-  // usePostRapidReview,
+  usePostFullReviews,
+  usePostRapidReviews,
+  usePostRequests,
   useGetTags,
 } from '../hooks/api-hooks.tsx';
 import { useLocalState } from '../hooks/ui-hooks';
@@ -35,11 +36,11 @@ export default function ShellContent({
   onRequireScreen,
 }) {
   const location = useLocation();
-  const [user] = useUser();
+  const [user, setUser] = useState({id: 1})
 
-  const postRapidReview = usePostRapidReview();
-  const postFullReview = usePostFullReview();
-  const postReviewRequest = usePostPrereview(); // #FIXME PostReviewRequest();
+  const postRapidReview = usePostRapidReviews();
+  const postFullReview = usePostFullReviews();
+  const postReviewRequest = usePostRequests();
 
   const [tab, setTab] = useState(defaultTab);
 
@@ -230,13 +231,13 @@ export default function ShellContent({
             user={user}
             preprint={preprint}
             onSubmit={() => {
-              postPrereview(user, preprint)
+              postReviewRequest(user, preprint)
                 .then(() => alert('PREreview request submitted successfully.'))
                 .catch(err => alert(`An error occurred: ${err}`));
             }}
-            isPosting={postPrereview.loading}
-            disabled={postPrereview.loading}
-            error={postPrereview.error} // #FIXME
+            isPosting={postFullReview.loading}
+            disabled={postFullReview.loading}
+            error={postFullReview.error} // #FIXME
           />
         ) : tab === 'review#success' ? (
           <ShellContentReviewSuccess
@@ -269,7 +270,7 @@ function ShellContentRead({ user, preprint, counts }) {
   // the extension where it is shell driven
 
   const [moderatedReviewId, setModeratedReviewId] = useState(null);
-  const postReport = usePostPrereview(); // #FIXME should be PostReport() when built
+  const postReport = usePostRequests(); // #FIXME should be PostReport() when built
 
   return (
     <div className="shell-content-read">
@@ -283,7 +284,7 @@ function ShellContentRead({ user, preprint, counts }) {
           moderationProgress={postReport}
           onSubmit={(moderationReason, onSuccess) => {
             postReport(moderatedReviewId, moderationReason)
-              .then(() => alert('Reort submitted successfully.'))
+              .then(() => alert('Report submitted successfully.'))
               .catch(err => alert(`An error occurred: ${err}`));
             onSuccess();
           }}
@@ -313,7 +314,14 @@ function ShellContentReview({ user, preprint, disabled, isPosting, error }) {
     {},
   );
 
-  const postPrereview = usePostPrereview();
+  const {
+    mutate: postRapidReview,
+    loadingPostRapidReview,
+  } = usePostRapidReviews();
+  const {
+    mutate: postFullReview,
+    loadingPostFullReview,
+  } = usePostFullReviews();
 
   const canSubmit = () => {
     // #TODO build function to check if all questions have been answered
@@ -365,7 +373,7 @@ function ShellContentReview({ user, preprint, disabled, isPosting, error }) {
             isWaiting={isPosting}
             disabled={disabled || !canSubmit}
             onClick={() => {
-              postPrereview(user, preprint)
+              postRapidReview(user.id, preprint.id)
                 .then(() => alert('Review submitted successfully.'))
                 .catch(err => alert(`An error occurred: ${err}`));
             }}
