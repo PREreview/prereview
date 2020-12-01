@@ -3,32 +3,39 @@ import PropTypes from 'prop-types';
 import { MdChevronRight } from 'react-icons/md';
 import Value from './value';
 import { getFormattedDatePosted } from '../utils/preprints';
+import { createPreprintId } from '../../common/utils/ids.js';
 import XLink from './xlink';
 import ShellIcon from '../svgs/shell_icon.svg';
 
-export default function PreprintPreview({ preprint, hyperlinkTitle }) {
+export default function PreprintPreview({ preprint }) {
+  console.log(createPreprintId(preprint.handle));
+
   return (
     <div className="preprint-preview">
       <div className="preprint-preview__header">
-        {!!preprint.name &&
-          (hyperlinkTitle ? (
-            <XLink
-              href={`/${preprint.doi || preprint.arXivId}`}
-              to={{
-                pathname: `/${preprint.doi || preprint.arXivId}`,
-              }}
-              className="preprint-preview__hyperlink"
-            >
-              <Value className="preprint-preview__title" tagName="h2">
-                {preprint.name}
-              </Value>
-              <ShellIcon className="preprint-preview__shell-icon" />
-            </XLink>
-          ) : (
+        {preprint.title ? (
+          <XLink
+            href={`/${createPreprintId(preprint.handle)}`}
+            to={{
+              pathname: `/${createPreprintId(preprint.handle)}`,
+            }}
+            className="preprint-preview__hyperlink"
+          >
             <Value className="preprint-preview__title" tagName="h2">
-              {preprint.name}
+              {preprint.title}
             </Value>
-          ))}
+            <img
+              src={ShellIcon}
+              className="preprint-preview__shell-icon"
+              aria-hidden="true"
+              alt=""
+            />
+          </XLink>
+        ) : (
+          <Value className="preprint-preview__title" tagName="h2">
+            {preprint.title}
+          </Value>
+        )}
 
         {!!preprint.datePosted && (
           <span className="preprint-preview__date">
@@ -38,21 +45,21 @@ export default function PreprintPreview({ preprint, hyperlinkTitle }) {
       </div>
 
       <div className="preprint-preview__info">
-        {!!(preprint.preprintServer && preprint.preprintServer.name) && (
+        {preprint.preprintServer && (
           <Value className="preprint-preview__server" tagName="span">
-            {preprint.preprintServer.name}
+            {preprint.preprintServer}
           </Value>
         )}
         <MdChevronRight className="preprint-preview__server-arrow-icon" />
-        {!!(preprint.doi || preprint.arXivId) && (
+        {preprint.handle && (
           <span className="preprint-preview__id">
-            {preprint.doi ? (
+            {preprint.handle ? (
               <a
-                href={`https://doi.org/${preprint.doi}`}
+                href={`https://doi.org/${preprint.handle}`}
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                {preprint.doi}
+                {preprint.handle}
               </a>
             ) : (
               <a
@@ -70,6 +77,5 @@ export default function PreprintPreview({ preprint, hyperlinkTitle }) {
   );
 }
 PreprintPreview.propTypes = {
-  hyperlinkTitle: PropTypes.bool,
   preprint: PropTypes.object.isRequired,
 };

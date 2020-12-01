@@ -97,7 +97,7 @@ export default function ShellContent({
                 })}
                 disabled={postReviewRequest.loading || hasReviewed}
                 onClick={() => {
-                  if (true) {
+                  if (user) {
                     onRequireScreen();
                     setTab('review');
                   } else {
