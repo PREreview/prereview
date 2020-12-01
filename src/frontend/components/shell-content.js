@@ -97,7 +97,7 @@ export default function ShellContent({
                 })}
                 disabled={postReviewRequest.loading || hasReviewed}
                 onClick={() => {
-                  if (user) {
+                  if (true) { // #FIXME
                     onRequireScreen();
                     setTab('review');
                   } else {
@@ -209,11 +209,7 @@ export default function ShellContent({
       )}
       <div className="shell-content__body">
         {tab === 'read' ? (
-          <ShellContentRead
-            user={user}
-            preprint={preprint}
-            counts={counts}
-          />
+          <ShellContentRead user={user} preprint={preprint} counts={counts} />
         ) : tab === 'request' ? (
           <ShellContentRequest
             user={user}
@@ -368,7 +364,7 @@ function ShellContentReview({ user, preprint, disabled, isPosting, error }) {
             disabled={disabled || !canSubmit}
             onClick={() => {
               postPrereview(user, preprint)
-                .then(() => alert('User updated successfully.'))
+                .then(() => alert('Review submitted successfully.'))
                 .catch(err => alert(`An error occurred: ${err}`));
             }}
           >
