@@ -273,7 +273,7 @@ export const PRODUCTION_DOMAIN = 'https://outbreaksci.prereview.org'; // 'https:
 export const CSS_HEADER_HEIGHT = 72;
 export const CSS_SCOPE_ID = 'rpos-ext'; // keep in sync with webpack-extension.config.js
 
-export const ORG = 'Outbreak Science Rapid PREreview';
+export const ORG = 'PREreview';
 
 export const ADMIN_ORCIDS = [
   '0000-0002-3708-3546', // Sam

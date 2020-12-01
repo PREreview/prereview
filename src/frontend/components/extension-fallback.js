@@ -2,9 +2,9 @@ import React, { Suspense, useEffect, useMemo, useState } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import mobile from 'is-mobile';
-import { GetPreprint } from '../hooks/api-hooks.tsx';
+import { useGetPreprint } from '../hooks/api-hooks.tsx';
 import { useExtension } from '../hooks/extension-hooks';
-import { getPdfUrl, getCanonicalUrl } from '../utils/preprints';
+import { getCanonicalUrl } from '../utils/preprints';
 import Shell from './shell';
 import ShellContent from './shell-content';
 import NotFound from './not-found';
@@ -21,10 +21,17 @@ const PdfViewer = React.lazy(() =>
 
 export default function ExtensionFallback() {
   const location = useLocation(); // location.state can be {preprint, tab} with tab being `request` or `review` (so that we know on which tab the shell should be activated with
-  const { identifierPart1, identifierPart2 } = useParams();
-  const identifier = [identifierPart1, identifierPart2]
-    .filter(Boolean)
-    .join('/');
+  const [loading, setLoading] = useState(true);
+  const { id } = useParams();
+  const { data: preprint, loadingPreprint, error } = useGetPreprint({id: id});
+
+  useEffect(() => {
+    if (!loadingPreprint) {
+      if (preprint) {
+        setLoading(false);
+      }
+    }
+  }, [loadingPreprint, preprint]);
 
   const isMobile = useMemo(() => mobile({ tablet: true }), []);
 
@@ -33,23 +40,9 @@ export default function ExtensionFallback() {
   // Bug is tracked here: https://bugs.chromium.org/p/chromium/issues/detail?id=984891&q=drag%20object&colspec=ID%20Pri%20M%20Stars%20ReleaseBlock%20Component%20Status%20Owner%20Summary%20OS%20Modified
   const [isChromeOnMac, setIsChroneOnMac] = useState(false);
 
-  const preprint = GetPreprint(
-    identifier,
-    location.state && location.state.preprint,
-    location.state && location.state.preprint && location.state.preprint.url,
-  );
-  useExtension(preprint && createPreprintId(preprint));
+  useExtension(preprint && id);
 
-  if (
-    preprint.error && // #FIXME
-    preprint.error.statusCode >= 400
-  ) {
-    return <NotFound />;
-  }
-
-  let preprintId = preprint && createPreprintId(preprint);
-  preprintId = preprintId && unprefix(preprintId);
-  const pdfUrl = getPdfUrl(preprint);
+  const pdfUrl = preprint ? preprint.data[0].contentUrl : '';
   const canonicalUrl = getCanonicalUrl(preprint);
 
   useEffect(() => {
@@ -58,73 +51,79 @@ export default function ExtensionFallback() {
     }
   }, []);
 
-  return (
-    <div className="extension-fallback">
-      <Helmet>
-        <title>
-          {ORG} • {identifier}
-        </title>
-      </Helmet>
+  if (loading) {
+    return <div>Loading...</div>;
+  } else if (error) {
+    return <NotFound />;
+  } else {
+    return (
+      <div className="extension-fallback">
+        <Helmet>
+          <title>
+            {ORG} • {id}
+          </title>
+        </Helmet>
 
-      {pdfUrl ? (
-        isMobile || isChromeOnMac ? (
-          /* for mobile devices we always use the fallback */
-          <Suspense fallback={<SuspenseLoading>Loading PDF</SuspenseLoading>}>
-            <PdfViewer
-              docId={preprintId}
-              loading={<SuspenseLoading>Loading PDF</SuspenseLoading>}
-            />
-          </Suspense>
-        ) : (
-          <object
-            key={pdfUrl}
-            data={pdfUrl}
-            // type="application/pdf" commented out as it seems to break pdf loading in safari
-            // typemustmatch="true" commented out as it doesn't seem to be currently supported by react
-          >
-            {/* fallback text in case we can't load the PDF */}
+        {pdfUrl ? (
+          isMobile || isChromeOnMac ? (
+            /* for mobile devices we always use the fallback */
             <Suspense fallback={<SuspenseLoading>Loading PDF</SuspenseLoading>}>
               <PdfViewer
-                docId={identifier}
+                docId={id}
                 loading={<SuspenseLoading>Loading PDF</SuspenseLoading>}
               />
             </Suspense>
-          </object>
-        )
-      ) : preprint && !pdfUrl && !preprint.loading ? (
-        <div className="extension-fallback__no-pdf-message">
-          <div>
-            No PDF available.
-            {!!canonicalUrl && (
-              <span>
-                {` `}You can visit{' '}
-                {
-                  <a
-                    href={canonicalUrl}
-                    target="_blank"
-                    rel="noreferrer noopener"
-                  >
-                    {canonicalUrl}
-                  </a>
-                }{' '}
-                for more information on the document.
-              </span>
-            )}
-          </div>
-        </div>
-      ) : null}
-
-      <Shell>
-        {onRequireScreen =>
-          !!preprint && (
-            <ShellContent
-              onRequireScreen={onRequireScreen}
-              preprint={preprint}
-              defaultTab={location.state && location.state.tab}
-            />
+          ) : (
+            <object
+              key={pdfUrl}
+              data={pdfUrl}
+              // type="application/pdf" commented out as it seems to break pdf loading in safari
+              // typemustmatch="true" commented out as it doesn't seem to be currently supported by react
+            >
+              {/* fallback text in case we can't load the PDF */}
+              <Suspense fallback={<SuspenseLoading>Loading PDF</SuspenseLoading>}>
+                <PdfViewer
+                  docId={id}
+                  loading={<SuspenseLoading>Loading PDF</SuspenseLoading>}
+                />
+              </Suspense>
+            </object>
           )
-        }
-      </Shell>
-    </div>
-  );
+        ) : preprint && !pdfUrl && !preprint.loading ? (
+          <div className="extension-fallback__no-pdf-message">
+            <div>
+              No PDF available.
+              {!!canonicalUrl && (
+                <span>
+                  {` `}You can visit{' '}
+                  {
+                    <a
+                      href={canonicalUrl}
+                      target="_blank"
+                      rel="noreferrer noopener"
+                    >
+                      {canonicalUrl}
+                    </a>
+                  }{' '}
+                  for more information on the document.
+                </span>
+              )}
+            </div>
+          </div>
+        ) : null}
+
+        <Shell>
+          {onRequireScreen =>
+            !!preprint && (
+              <ShellContent
+                onRequireScreen={onRequireScreen}
+                preprint={preprint.data[0]}
+                defaultTab={location.state && location.state.tab}
+              />
+            )
+          }
+        </Shell>
+      </div>
+    );
+  }
 }

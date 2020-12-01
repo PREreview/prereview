@@ -1,4 +1,4 @@
-import React, { Fragment, useState, useMemo } from 'react';
+import React, { Fragment, useState } from 'react';
 import PropTypes from 'prop-types';
 import omit from 'lodash/omit';
 import classNames from 'classnames';
@@ -13,16 +13,11 @@ import {
 import Tooltip from '@reach/tooltip';
 import Value from './value';
 import { getTags } from '../utils/stats';
-import {
-  checkIfHasReviewed,
-  checkIfHasRequested,
-  checkIfIsModerated,
-} from '../utils/actions';
+import { checkIfHasReviewed, checkIfHasRequested } from '../utils/actions';
 import ScoreBadge from './score-badge';
 import IconButton from './icon-button';
 import TagPill from './tag-pill';
 import addPrereviewIcon from '../svgs/add_prereview_icon.svg';
-import ShellIcon from '../svgs/shell_icon.svg';
 import Collapse from './collapse';
 import ReviewReader from './review-reader';
 import XLink from './xlink';

@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import noop from 'lodash/noop';
 import isEqual from 'lodash/isEqual';
 import classNames from 'classnames';
+import { useGetUser } from '../hooks/api-hooks.tsx';
 import Barplot from './barplot';
 import { getId } from '../utils/jsonld';
 import { getYesNoStats } from '../utils/stats';
@@ -15,9 +16,7 @@ const ReviewReader = React.memo(function ReviewReader({
   user,
   role,
   preview,
-  identifier,
-  actions,
-  nRequests,
+  preprint,
   defaultHighlightedRoleIds,
   onHighlighedRoleIdsChange = noop,
   isModerationInProgress,
@@ -37,23 +36,25 @@ const ReviewReader = React.memo(function ReviewReader({
   }, [defaultHighlightedRoleIds, highlightedRoleIds]);
 
   const roleIds = useMemo(() => {
-    return actions
-      .map(action => getId(action.agent))
-      .filter(
-        roleId =>
-          !highlightedRoleIds.some(
-            highlightedRoleId => roleId === highlightedRoleId,
-          ),
-      );
-  }, [actions, highlightedRoleIds]);
+    return preprint.reviews
+      ? preprint.reviews
+          .map(review => useGetUser(review.author))
+          .filter(
+            roleId =>
+              !highlightedRoleIds.some(
+                highlightedRoleId => roleId === highlightedRoleId,
+              ),
+          )
+      : {};
+  }, [preprint.reviews, highlightedRoleIds]);
 
   const highlightedActions = useMemo(() => {
     return highlightedRoleIds.length
-      ? actions.filter(action =>
+      ? preprint.reviews.filter(action =>
           highlightedRoleIds.some(roleId => getId(action.agent) === roleId),
         )
-      : actions;
-  }, [actions, highlightedRoleIds]);
+      : preprint.reviews;
+  }, [preprint.reviews, highlightedRoleIds]);
 
   return (
     <div
@@ -64,14 +65,21 @@ const ReviewReader = React.memo(function ReviewReader({
     >
       {!preview && (
         <h3 className="review-reader__title">
-          {actions.length} review{actions.length !== 1 ? 's' : ''}
-          {nRequests != null
-            ? ` | ${nRequests} request${nRequests !== 1 ? 's' : ''}`
+          {preprint.rapidReviews.length > 0 ? preprint.rapidReviews.length : 0} rapid review{preprint.rapidReviews.length > 1 ? 's' : ''}
+          {preprint.fullReviews.length > 0
+            ? ` | ${preprint.fullReviews.length} full review${
+                preprint.fullReviews.length > 1 ? 's' : ''
+              }`
+            : ''}
+          {preprint.requests.length > 0
+            ? ` | ${preprint.requests.length} request${
+                preprint.requests.length > 1 ? 's' : ''
+              }`
             : ''}
         </h3>
       )}
 
-      {!!actions.length && (
+      {(preprint.rapidReviews.length || preprint.fullReviews.length) && (
         <Fragment>
           {!preview && (
             <Fragment>
@@ -84,7 +92,7 @@ const ReviewReader = React.memo(function ReviewReader({
               <div className="review-reader__persona-selector">
                 <PotentialRoles
                   role={role}
-                  actions={actions}
+                  preprint={preprint}
                   canModerate={!!user}
                   isModerationInProgress={isModerationInProgress}
                   onModerate={onModerate}
@@ -102,7 +110,7 @@ const ReviewReader = React.memo(function ReviewReader({
 
                 <HighlightedRoles
                   role={role}
-                  actions={actions}
+                  actions={preprint.reviews}
                   canModerate={!!user}
                   isModerationInProgress={isModerationInProgress}
                   onModerate={onModerate}
@@ -122,10 +130,17 @@ const ReviewReader = React.memo(function ReviewReader({
           <Barplot
             preview={preview}
             stats={getYesNoStats(highlightedActions)}
-            nHighlightedReviews={highlightedRoleIds.length || actions.length}
-            nTotalReviews={actions.length}
+            nHighlightedReviews={
+              highlightedRoleIds.length || preprint.rapidReviews.length
+            }
+            nTotalReviews={
+              preprint.rapidReviews.length + preprint.fullReviews.length
+            }
           >
-            <ShareMenu identifier={identifier} roleIds={highlightedRoleIds} />
+            <ShareMenu
+              identifier={preprint.handle}
+              roleIds={highlightedRoleIds}
+            />
           </Barplot>
 
           {!preview && (
@@ -147,10 +162,8 @@ ReviewReader.propTypes = {
   user: PropTypes.object,
   role: PropTypes.object,
   preview: PropTypes.bool,
-  identifier: PropTypes.string.isRequired, // DOI or arXivID
+  preprint: PropTypes.object, // DOI or arXivID
   onHighlighedRoleIdsChange: PropTypes.func,
-  actions: PropTypes.arrayOf(PropTypes.object).isRequired,
-  nRequests: PropTypes.number,
   defaultHighlightedRoleIds: PropTypes.arrayOf(PropTypes.string),
   isModerationInProgress: PropTypes.bool,
   onModerate: PropTypes.func,
