@@ -47,9 +47,10 @@ export default function controller(commentModel, thisUser) {
   };
 
   commentsRouter.route({
-     meta: {
+    meta: {
       swagger: {
-        summary: 'Endpoint to POST comments on full-length reviews of preprints.',
+        summary:
+          'Endpoint to POST comments on full-length reviews of preprints.',
       },
     },
     method: 'POST',
@@ -89,7 +90,8 @@ export default function controller(commentModel, thisUser) {
   commentsRouter.route({
     meta: {
       swagger: {
-        summary: 'Endpoint to GET all comments on all full-length reviews of preprints.',
+        summary:
+          'Endpoint to GET all comments on all full-length reviews of preprints.',
       },
     },
     method: 'GET',
@@ -110,7 +112,8 @@ export default function controller(commentModel, thisUser) {
   commentsRouter.route({
     meta: {
       swagger: {
-        summary: 'Endpoint to GET all comments related to a specific full-length review of a preprint.',
+        summary:
+          'Endpoint to GET all comments related to a specific full-length review of a preprint.',
       },
     },
     method: 'GET',
