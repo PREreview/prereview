@@ -1,20 +1,48 @@
 import router from 'koa-joi-router';
 import { getLogger } from '../log.js';
+import { getErrorMessages } from '../utils/errors';
 
 const log = getLogger('backend:controller:community');
-// eslint-disable-next-line no-unused-vars
 const Joi = router.Joi;
+
+const communitySchema = Joi.object({
+  name: Joi.string().required(),
+  description: Joi.string(),
+  logo: Joi.string().uri(),
+});
+
+const handleInvalid = ctx => {
+  log.debug('Validation error!');
+  log.error(ctx.invalid);
+  ctx.status = 400;
+  ctx.message = getErrorMessages(ctx.invalid);
+};
 
 // eslint-disable-next-line no-unused-vars
 export default function controller(communityModel, thisUser) {
   const communities = router();
 
   communities.route({
-    method: 'post',
+    meta: {
+      swagger: {
+        summary:
+          'Endpoint to POST a new community to PREreview. Admin users only.',
+      },
+    },
+    method: 'POST',
     path: '/communities',
     // pre:thisUserthisUser.can('access admin pages'),
-    // validate: {},
+    validate: {
+      body: communitySchema,
+      type: 'json',
+      continueOnError: true,
+    },
     handler: async ctx => {
+      if (ctx.invalid) {
+        handleInvalid(ctx);
+        return;
+      }
+
       log.debug(`Adding a new community`);
       let community;
 
@@ -36,7 +64,13 @@ export default function controller(communityModel, thisUser) {
   });
 
   communities.route({
-    method: 'get',
+    meta: {
+      swagger: {
+        summary:
+          'Endpoint to GET all the communities registered on PREreview, as well as their associated members and preprints.',
+      },
+    },
+    method: 'GET',
     path: '/communities',
     // pre: thisUser.can(''),
     // validate: {},
@@ -61,7 +95,13 @@ export default function controller(communityModel, thisUser) {
   });
 
   communities.route({
-    method: 'get',
+    meta: {
+      swagger: {
+        summary:
+          'Endpoint to GET info on one community registered on PREreview, along with its associated members and preprints.',
+      },
+    },
+    method: 'GET',
     path: '/communities/:id',
     // pre: thisUser.can(''),
     // validate: {},
@@ -92,11 +132,26 @@ export default function controller(communityModel, thisUser) {
   });
 
   communities.route({
+    meta: {
+      swagger: {
+        summary:
+          'Endpoint to PUT updates on a community registered on PREreview. Admin users only.',
+      },
+    },
     method: 'put',
     path: '/communities/:id',
     // pre: thisUser.can(''),
-    // validate: {},
+    validate: {
+      body: communitySchema,
+      type: 'json',
+      continueOnError: true,
+    },
     handler: async ctx => {
+      if (ctx.invalid) {
+        handleInvalid(ctx);
+        return;
+      }
+
       log.debug(`Updating community with id ${ctx.params.id}.`);
       let community;
 
@@ -118,6 +173,11 @@ export default function controller(communityModel, thisUser) {
   });
 
   communities.route({
+    meta: {
+      swagger: {
+        summary: 'Endpoint to DELETE a community. Admin users only.',
+      },
+    },
     method: 'delete',
     path: '/communities/:id',
     // pre: thisUser.can(''),
