@@ -6,7 +6,7 @@ function getErrorTypes(errorObject) {
   return keys; // e.g. returns such an array as ['params', 'body']
 }
 
-function getErrorMessages(errorObject) {
+export function getErrorMessages(errorObject) {
   const keys = getErrorTypes(errorObject);
   let messages = 'Validation error: ';
 
@@ -15,12 +15,4 @@ function getErrorMessages(errorObject) {
   });
 
   return messages;
-}
-
-export default function handleErrorOutput(ctx) {
-  return (ctx.body = {
-    statusCode: 400,
-    status: 'HTTP 400 Error',
-    message: getErrorMessages(ctx.invalid),
-  });
 }

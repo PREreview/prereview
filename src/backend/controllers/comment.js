@@ -57,7 +57,10 @@ export default function controller(commentModel, thisUser) {
     },
     method: 'POST',
     path: '/comments',
-    // pre:thisUserthisUser.can('access private pages'),
+    pre: async (ctx, next) => {
+      await thisUser.can('access private pages');
+      return next();
+    },
     validate: {
       body: commentSchema,
       type: 'json',
@@ -98,7 +101,10 @@ export default function controller(commentModel, thisUser) {
     },
     method: 'GET',
     path: '/comments',
-    // pre: {},
+    pre: async (ctx, next) => {
+      await thisUser.can('access private pages');
+      return next();
+    },
     // validate: {
 
     // },
