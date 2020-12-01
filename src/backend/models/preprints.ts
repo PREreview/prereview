@@ -6,7 +6,7 @@ import { ChainError } from '../../common/errors';
 
 @Repository(Preprint)
 export class PreprintModel extends EntityRepository<Preprint> {
-  findOneByHandle(value: string, params: array): any {
+  findOneByHandle(value: string, params: string[]): any {
     try {
       const { id } = decodePreprintId(value);
       return this.findOne({ handle: id }, params);
@@ -15,7 +15,7 @@ export class PreprintModel extends EntityRepository<Preprint> {
     }
   }
 
-  findOneByIdOrHandle(value: number | string, params: array): any {
+  findOneByIdOrHandle(value: number | string, params: string[]): any {
     if (Number.isInteger(value)) {
       return this.findOne(value as number, params);
     } else if (isString(value)) {
