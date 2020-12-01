@@ -18,8 +18,14 @@ const querySchema = Joi.object({
   to: Joi.string(),
 });
 
-// eslint-disable-next-line no-unused-vars
-export default function controller(reviewModel, thisUser) {
+export default function controller(
+  reviewModel,
+  draftModel,
+  personaModel,
+  preprintModel,
+  // eslint-disable-next-line no-unused-vars
+  thisUser,
+) {
   const reviewsRouter = router();
 
   // handler for GET multiple reviews methods
@@ -37,9 +43,12 @@ export default function controller(reviewModel, thisUser) {
 
     try {
       if (pid) {
-        allReviews = await reviewModel.find({ preprint: pid });
+        allReviews = await reviewModel.find({ preprint: pid }, [
+          'authors',
+          'comments',
+        ]);
       } else {
-        allReviews = await reviewModel.findAll();
+        allReviews = await reviewModel.findAll(['authors', 'comments']);
       }
     } catch (err) {
       log.error('HTTP 400 Error: ', err);
@@ -54,30 +63,46 @@ export default function controller(reviewModel, thisUser) {
     ctx.status = 200;
   };
 
-  // reviewsRouter.route({
-  //   method: 'post',
-  //   path: '/fullReviews',
-  //   // pre: thisUser.can('access private pages'),
-  //   handler: async ctx => {
-  //     log.debug('Posting full review.');
-  //     let review;
+  reviewsRouter.route({
+    method: 'POST',
+    path: '/fullReviews',
+    handler: async ctx => {
+      log.debug('Posting full review.');
+      let review, draft, authorPersona, preprint;
 
-  //     try {
-  //       review = reviewModel.create(ctx.request.body);
-  //       await reviewModel.persistAndFlush(review);
-  //     } catch (err) {
-  //       log.error('HTTP 400 Error: ', err);
-  //       ctx.throw(400, `Failed to parse full review schema: ${err}`);
-  //     }
+      log.debug('ctx.request.body', ctx.request.body);
 
-  //     ctx.body = {
-  //       status: 201,
-  //       message: 'created',
-  //       data: review,
-  //     };
-  //     ctx.status = 201;
-  //   },
-  // });
+      try {
+        review = reviewModel.create(ctx.request.body);
+        await reviewModel.persistAndFlush(review);
+        await review.authors.init();
+
+        authorPersona = await personaModel.find(ctx.request.body.authors);
+        preprint = await preprintModel.find(ctx.request.body.preprint);
+
+        review.authors.add(authorPersona[0]);
+        review.preprint = preprint[0];
+
+        if (ctx.request.body.contents) {
+          draft = draftModel.create({
+            title: 'Review of a preprint',
+            contents: ctx.request.body.contents,
+            parent: review,
+          });
+          await draftModel.persistAndFlush(draft);
+        }
+      } catch (err) {
+        log.error('HTTP 400 Error: ', err);
+        ctx.throw(400, `Failed to parse full review schema: ${err}`);
+      }
+
+      ctx.body = {
+        status: 201,
+        message: 'created',
+      };
+      ctx.status = 201;
+    },
+  });
 
   reviewsRouter.route({
     meta: {
