@@ -373,8 +373,21 @@ function ShellContentReview({ user, preprint, disabled, isPosting, error }) {
             isWaiting={isPosting}
             disabled={disabled || !canSubmit}
             onClick={() => {
+              postFullReview(user.id, preprint.id)
+                .then(() => alert('Full review submitted successfully.'))
+                .catch(err => alert(`An error occurred: ${err}`));
+            }}
+          >
+            Save
+          </Button>
+          <Button
+            type="submit"
+            primary={true}
+            isWaiting={isPosting}
+            disabled={disabled || !canSubmit}
+            onClick={() => {
               postRapidReview(user.id, preprint.id)
-                .then(() => alert('Review submitted successfully.'))
+                .then(() => alert('Rapid review submitted successfully.'))
                 .catch(err => alert(`An error occurred: ${err}`));
             }}
           >
