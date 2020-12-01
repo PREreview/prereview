@@ -6,11 +6,12 @@ import { Helmet } from 'react-helmet-async';
 import { MenuLink } from '@reach/menu-button';
 import { useUser } from '../contexts/user-context';
 import {
-  GetUser, // #FIXME need to build get user reviews, requests
-  PostPrereview, // #FIXME need to build PostReviewRequest
-  // PostReport, // #FIXME need to build this
+  useGetUser,
+  usePostPrereview,
+  useGetTags,
 } from '../hooks/api-hooks.tsx';
 import { useLocalState } from '../hooks/ui-hooks';
+import { decodePreprintId } from '../../common/utils/ids.js';
 import Controls from './controls';
 import Button from './button';
 import RapidFormFragment from './rapid-form-fragment';
@@ -32,12 +33,11 @@ export default function ShellContent({
   defaultTab = 'read',
   onRequireScreen,
 }) {
-  console.log(preprint);
   const location = useLocation();
   const [user] = useUser();
 
-  const postPrereview = PostPrereview();
-  const postReviewRequest = PostPrereview(); // #FIXME PostReviewRequest();
+  const postPrereview = usePostPrereview();
+  const postReviewRequest = usePostPrereview(); // #FIXME PostReviewRequest();
 
   const [tab, setTab] = useState(defaultTab);
 
@@ -97,7 +97,6 @@ export default function ShellContent({
                 })}
                 disabled={postReviewRequest.loading || hasReviewed}
                 onClick={() => {
-                  // if (user) {
                   if (true) {
                     onRequireScreen();
                     setTab('review');
@@ -272,7 +271,7 @@ function ShellContentRead({ user, preprint, counts }) {
   // the extension where it is shell driven
 
   const [moderatedReviewId, setModeratedReviewId] = useState(null);
-  const postReport = PostPrereview(); // #FIXME should be PostReport() when built
+  const postReport = usePostPrereview(); // #FIXME should be PostReport() when built
 
   return (
     <div className="shell-content-read">
@@ -305,21 +304,18 @@ ShellContentRead.propTypes = {
 };
 
 function ShellContentReview({ user, preprint, disabled, isPosting, error }) {
-  const [subjects, setSubjects] = useLocalState(
-    'subjects',
-    user.defaultRole,
-    preprint.id,
-    [],
-  );
+
+  const { data: subjects, loadingSubjects, errorSubjects } = useGetTags();
+
   // const [answerMap, setAnswerMap] = useLocalState(
   const [answerMap, setAnswerMap] = useState(
     'answerMap',
-    user.defaultRole,
+    user ? user.defaultRole : '',
     preprint.id,
     {},
   );
 
-  const postPrereview = PostPrereview();
+  const postPrereview = usePostPrereview();
 
   const canSubmit = () => {
     // #TODO build function to check if all questions have been answered
