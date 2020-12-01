@@ -93,17 +93,14 @@ export default async function configServer(config) {
   const groupModel = groupModelWrapper(db);
   const personaModel = personaModelWrapper(db);
   const authz = authWrapper(groupModel); // authorization, not authentication
-  server.use(authz.middleware());
 
   // setup API handlers
   const auth = AuthController(userModel, personaModel, config, authz);
-  // eslint-disable-next-line no-unused-vars
   const commentModel = commentModelWrapper(db);
   const comments = CommentController(commentModel, authz);
   const communityModel = communityModelWrapper(db);
   const communities = CommunityController(communityModel, authz);
   const fullReviewModel = fullReviewModelWrapper(db);
-  const fullReviews = FullReviewController(fullReviewModel, authz);
   const draftModel = fullReviewDraftModelWrapper(db);
   const fullReviewDrafts = DraftController(draftModel, authz);
   const groups = GroupController(groupModel, authz);
@@ -114,9 +111,20 @@ export default async function configServer(config) {
   const rapidReviews = RapidController(rapidReviewModel, authz);
   const requestModel = requestModelWrapper(db);
   const requests = RequestController(requestModel, authz);
+  const fullReviews = FullReviewController(
+    fullReviewModel,
+    draftModel,
+    personaModel,
+    preprintModel,
+    authz,
+  );
   const tagModel = tagModelWrapper(db);
   const tags = TagController(tagModel, authz);
   const users = UserController(userModel, authz);
+
+  server.use(authz.middleware());
+
+  const apiDocs = DocsController(authz);
 
   const apiV2Router = compose([
     auth.middleware(),
@@ -132,9 +140,6 @@ export default async function configServer(config) {
     tags.middleware(),
     users.middleware(),
   ]);
-
-  // set up router for API docs
-  const apiDocs = DocsController();
 
   // Set session secrets
   server.keys = Array.isArray(config.secrets)
@@ -171,8 +176,8 @@ export default async function configServer(config) {
     .use(passport.initialize())
     .use(passport.session())
     .use(cors())
-    .use(mount('/api', apiDocs.middleware()))
     .use(mount('/api/v2', apiV2Router))
+    .use(mount('/api', apiDocs.middleware()))
     .use(serveStatic(STATIC_DIR))
     .use(koa404Handler);
 
