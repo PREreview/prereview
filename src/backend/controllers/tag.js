@@ -9,6 +9,12 @@ export default function controller(tagModel, thisUser) {
   const tagsRouter = router();
 
   tagsRouter.route({
+    meta: {
+      swagger: {
+        operationId: 'PostTags',
+        summary: 'Endpoint to POST a tag.',
+      },
+    },
     method: 'post',
     path: '/tags',
     // pre:thisUserthisUser.can('access admin pages'),
@@ -35,6 +41,12 @@ export default function controller(tagModel, thisUser) {
   });
 
   tagsRouter.route({
+    meta: {
+      swagger: {
+        operationId: 'GetTags',
+        summary: 'Endpoint to GET all tags.',
+      },
+    },
     method: 'get',
     path: '/tags',
     // pre: thisUser.can(''),
@@ -60,6 +72,13 @@ export default function controller(tagModel, thisUser) {
   });
 
   tagsRouter.route({
+    meta: {
+      swagger: {
+        operationId: 'GetTag',
+        summary: 'Endpoint to GET a single tag by ID.',
+        required: true,
+      },
+    },
     method: 'get',
     path: '/tags/:id',
     // pre: thisUser.can(''),
@@ -88,6 +107,13 @@ export default function controller(tagModel, thisUser) {
   });
 
   tagsRouter.route({
+    meta: {
+      swagger: {
+        operationId: 'PutTag',
+        summary: 'Endpoint to PUT a single tag by ID.',
+        required: true,
+      },
+    },
     method: 'put',
     path: '/tags/:id',
     // pre: thisUser.can(''),
@@ -114,6 +140,13 @@ export default function controller(tagModel, thisUser) {
   });
 
   tagsRouter.route({
+    meta: {
+      swagger: {
+        operationId: 'DeleteTag',
+        summary: 'Endpoint to DELETE a single tag by ID.',
+        required: true,
+      },
+    },
     method: 'delete',
     path: '/tags/:id',
     // pre: thisUser.can(''),

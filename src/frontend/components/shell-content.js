@@ -7,7 +7,8 @@ import { MenuLink } from '@reach/menu-button';
 import { useUser } from '../contexts/user-context';
 import {
   useGetUser,
-  usePostPrereview,
+  // usePostFullReview,
+  // usePostRapidReview,
   useGetTags,
 } from '../hooks/api-hooks.tsx';
 import { useLocalState } from '../hooks/ui-hooks';
@@ -36,7 +37,8 @@ export default function ShellContent({
   const location = useLocation();
   const [user] = useUser();
 
-  const postPrereview = usePostPrereview();
+  const postRapidReview = usePostRapidReview();
+  const postFullReview = usePostFullReview();
   const postReviewRequest = usePostPrereview(); // #FIXME PostReviewRequest();
 
   const [tab, setTab] = useState(defaultTab);

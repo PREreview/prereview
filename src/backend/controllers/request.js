@@ -36,6 +36,12 @@ export default function controller(reqModel, thisUser) {
   };
 
   requestRouter.route({
+    meta: {
+      swagger: {
+        operationId: 'PostRequests',
+        summary: 'Endpoint to POST a request for review.',
+      },
+    },
     method: 'post',
     path: '/requests',
     // pre: thisUser.can(''),
@@ -73,6 +79,14 @@ export default function controller(reqModel, thisUser) {
   });
 
   requestRouter.route({
+    meta: {
+      swagger: {
+        operationId: 'GetPreprintRequests',
+        summary:
+          'Endpoint to GET all requests for review of a single preprint.',
+        required: true,
+      },
+    },
     method: 'get',
     path: '/preprints/:pid/requests',
     // pre: thisUser.can('')
@@ -81,6 +95,13 @@ export default function controller(reqModel, thisUser) {
   });
 
   requestRouter.route({
+    meta: {
+      swagger: {
+        operationId: 'GetRequest',
+        summary: 'Endpoint to GET one request for review by ID.',
+        required: true,
+      },
+    },
     method: 'get',
     path: '/requests/:id',
     // pre: thisUser.can(''),
@@ -109,6 +130,13 @@ export default function controller(reqModel, thisUser) {
   });
 
   requestRouter.route({
+    meta: {
+      swagger: {
+        operationId: 'DeleteRequest',
+        summary: 'Endpoint to DELETE one request for review by ID.',
+        required: true,
+      },
+    },
     method: 'delete',
     path: '/requests/:id',
     // pre: thisUser.can(''),

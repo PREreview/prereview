@@ -35,6 +35,12 @@ export default function controller(rapidReviews, thisUser) {
   };
 
   rapidRouter.route({
+    meta: {
+      swagger: {
+        operationId: 'PostRapidReviews',
+        summary: 'Endpoint to POST a rapid review.',
+      },
+    },
     method: 'post',
     path: '/rapidReviews',
     // pre: thisUser.can('access private pages'),
@@ -66,6 +72,12 @@ export default function controller(rapidReviews, thisUser) {
   });
 
   rapidRouter.route({
+    meta: {
+      swagger: {
+        operationId: 'GetRapidReviews',
+        summary: 'Endpoint to GET all rapid reviews.',
+      },
+    },
     method: 'get',
     path: '/rapidReviews',
     // pre: thisUser.can('access private pages'),
@@ -74,6 +86,13 @@ export default function controller(rapidReviews, thisUser) {
   });
 
   rapidRouter.route({
+    meta: {
+      swagger: {
+        operationId: 'GetPreprintRapidReviews',
+        summary: 'Endpoint to GET all rapid reviews of a single preprint.',
+        required: true,
+      },
+    },
     method: 'get',
     path: '/preprints/:pid/rapidReviews',
     // pre: thisUser.can('access private pages'),
@@ -82,6 +101,13 @@ export default function controller(rapidReviews, thisUser) {
   });
 
   rapidRouter.route({
+    meta: {
+      swagger: {
+        operationId: 'GetRapidReview',
+        summary: 'Endpoint to GET one rapid review by ID.',
+        required: true,
+      },
+    },
     method: 'get',
     path: '/rapidReviews/:id',
     // pre: thisUser.can('access private pages'),
@@ -118,6 +144,13 @@ export default function controller(rapidReviews, thisUser) {
   });
 
   rapidRouter.route({
+    meta: {
+      swagger: {
+        operationId: 'PutRapidReview',
+        summary: 'Endpoint to PUT one rapid review by ID.',
+        required: true,
+      },
+    },
     method: 'put',
     path: '/rapidReviews/:id',
     // pre: thisUser.can('access private pages'),
@@ -150,6 +183,13 @@ export default function controller(rapidReviews, thisUser) {
   });
 
   rapidRouter.route({
+    meta: {
+      swagger: {
+        operationId: 'DeleteRapidReview',
+        summary: 'Endpoint to DELETE one rapid review by ID.',
+        required: true,
+      },
+    },
     method: 'delete',
     path: '/rapidReviews/:id',
     // pre: thisUser.can('access private pages'),

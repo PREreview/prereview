@@ -51,6 +51,7 @@ export default function controller(commentModel, thisUser) {
   commentsRouter.route({
     meta: {
       swagger: {
+        operationId: 'PostComments',
         summary:
           'Endpoint to POST comments on full-length reviews of preprints.',
       },
@@ -95,6 +96,7 @@ export default function controller(commentModel, thisUser) {
   commentsRouter.route({
     meta: {
       swagger: {
+        operationId: 'GetComments',
         summary:
           'Endpoint to GET all comments on all full-length reviews of preprints.',
       },
@@ -120,6 +122,7 @@ export default function controller(commentModel, thisUser) {
   commentsRouter.route({
     meta: {
       swagger: {
+        operationId: 'GetFullReviewComments',
         summary:
           'Endpoint to GET all comments related to a specific full-length review of a preprint.',
       },
@@ -134,7 +137,9 @@ export default function controller(commentModel, thisUser) {
   commentsRouter.route({
     meta: {
       swagger: {
+        operationId: 'GetComment',
         summary: 'Endpoint to GET a single specific comment.',
+        required: true,
       },
     },
     method: 'GET',
@@ -168,7 +173,9 @@ export default function controller(commentModel, thisUser) {
   commentsRouter.route({
     meta: {
       swagger: {
+        operationId: 'PutComment',
         summary: 'Endpoint to PUT changes on a specific comment.',
+        require: true,
       },
     },
     method: 'put',
@@ -210,7 +217,9 @@ export default function controller(commentModel, thisUser) {
   commentsRouter.route({
     meta: {
       swagger: {
+        operationId: 'DeleteComment',
         summary: 'Endpoint to DELETE a comment.',
+        required: true,
       },
     },
     method: 'delete',

@@ -44,6 +44,7 @@ export default function controller(groupModel, thisUser) {
   groupsRouter.route({
     meta: {
       swagger: {
+        operationId: 'PostGroups',
         summary:
           'Endpoint to POST a new user group (where each group have varying levels of authorizations) to PREreview. Admin users only.',
       },
@@ -83,6 +84,7 @@ export default function controller(groupModel, thisUser) {
   groupsRouter.route({
     meta: {
       swagger: {
+        operationId: 'GetGroups',
         summary:
           'Endpoint to GET a new user group (where each group have varying levels of authorizations) to PREreview. Admin users only.',
       },
@@ -144,6 +146,14 @@ export default function controller(groupModel, thisUser) {
   });
 
   groupsRouter.route({
+    meta: {
+      swagger: {
+        operationId: 'GetGroup',
+        summary:
+          'Endpoint to GET one user group by ID from PREreview. Admin users only.',
+        required: true,
+      },
+    },
     method: 'GET',
     path: '/groups/:id',
     validate: {
@@ -180,6 +190,14 @@ export default function controller(groupModel, thisUser) {
   });
 
   groupsRouter.route({
+    meta: {
+      swagger: {
+        operationId: 'PutGroup',
+        summary:
+          'Endpoint to PUT one user group by ID from PREreview. Admin users only.',
+        required: true,
+      },
+    },
     method: 'put',
     path: '/groups/:id',
     validate: {
@@ -212,6 +230,14 @@ export default function controller(groupModel, thisUser) {
   });
 
   groupsRouter.route({
+    meta: {
+      swagger: {
+        operationId: 'DeleteGroup',
+        summary:
+          'Endpoint to DELETE one user group by ID from PREreview. Admin users only.',
+        required: true,
+      },
+    },
     method: 'DELETE',
     path: '/groups/:id',
     pre: async (ctx, next) => {
@@ -238,6 +264,14 @@ export default function controller(groupModel, thisUser) {
   });
 
   groupsRouter.route({
+    meta: {
+      swagger: {
+        operationId: 'GetGroupMember',
+        summary:
+          'Endpoint to GET one user from a group by ID from PREreview. Admin users only.',
+        required: true,
+      },
+    },
     method: 'put',
     path: '/groups/:id/members/:uid',
     validate: {
@@ -287,6 +321,14 @@ export default function controller(groupModel, thisUser) {
   });
 
   groupsRouter.route({
+    meta: {
+      swagger: {
+        operationId: 'DeleteGroupMember',
+        summary:
+          'Endpoint to DELETE one user from a group by ID from PREreview. Admin users only.',
+        required: true,
+      },
+    },
     method: 'delete',
     path: '/groups/:id/members/:uid',
     pre: async (ctx, next) => {

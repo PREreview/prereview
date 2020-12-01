@@ -54,35 +54,37 @@ export default function controller(reviewModel, thisUser) {
     ctx.status = 200;
   };
 
-  // reviewsRouter.route({
-  //   method: 'post',
-  //   path: '/fullReviews',
-  //   // pre: thisUser.can('access private pages'),
-  //   handler: async ctx => {
-  //     log.debug('Posting full review.');
-  //     let review;
+  reviewsRouter.route({
+    method: 'post',
+    path: '/fullReviews',
+    // pre: thisUser.can('access private pages'),
+    handler: async ctx => {
+      log.debug('Posting full review.');
+      let review;
 
-  //     try {
-  //       review = reviewModel.create(ctx.request.body);
-  //       await reviewModel.persistAndFlush(review);
-  //     } catch (err) {
-  //       log.error('HTTP 400 Error: ', err);
-  //       ctx.throw(400, `Failed to parse full review schema: ${err}`);
-  //     }
+      try {
+        review = reviewModel.create(ctx.request.body);
+        await reviewModel.persistAndFlush(review);
+      } catch (err) {
+        log.error('HTTP 400 Error: ', err);
+        ctx.throw(400, `Failed to parse full review schema: ${err}`);
+      }
 
-  //     ctx.body = {
-  //       status: 201,
-  //       message: 'created',
-  //       data: review,
-  //     };
-  //     ctx.status = 201;
-  //   },
-  // });
+      ctx.body = {
+        status: 201,
+        message: 'created',
+        data: review,
+      };
+      ctx.status = 201;
+    },
+  });
 
   reviewsRouter.route({
     meta: {
       swagger: {
+        operationId: 'GetPreprintFullReviews',
         summary: 'Endpoint to GET full-length reviews of a specific preprint.',
+        required: true,
       },
     },
     method: 'GET',
@@ -94,6 +96,7 @@ export default function controller(reviewModel, thisUser) {
   reviewsRouter.route({
     meta: {
       swagger: {
+        operationId: 'GetFullReviews',
         summary: 'Endpoint to GET all full-length reviews.',
       },
     },
@@ -106,7 +109,9 @@ export default function controller(reviewModel, thisUser) {
   reviewsRouter.route({
     meta: {
       swagger: {
+        operationId: 'GetFullReview',
         summary: 'Endpoint to GET a specific full-length review.',
+        required: true,
       },
     },
     method: 'GET',
@@ -137,8 +142,10 @@ export default function controller(reviewModel, thisUser) {
   reviewsRouter.route({
     meta: {
       swagger: {
+        operationId: 'DeleteFullReview',
         summary:
           'Endpoint to DELETE full-length reviews of a specific preprint. Admin users only.',
+        required: true,
       },
     },
     method: 'DELETE',

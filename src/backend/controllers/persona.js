@@ -12,6 +12,12 @@ export default function controller(personasModel, thisUser) {
   // a new user first registers with PREreview
 
   personaRouter.route({
+    meta: {
+      swagger: {
+        operationId: 'GetPersonas',
+        summary: 'Endpoint to GET all personas. Admin users only.',
+      },
+    },
     method: 'get',
     path: '/personas',
     // pre:thisUser.can('access admin pages'),
@@ -39,6 +45,13 @@ export default function controller(personasModel, thisUser) {
   });
 
   personaRouter.route({
+    meta: {
+      swagger: {
+        operationId: 'GetPersona',
+        summary: 'Endpoint to GET one persona by ID. Admin users only.',
+        required: true,
+      },
+    },
     method: 'get',
     path: '/personas/:id',
     // validate: {}
@@ -67,6 +80,13 @@ export default function controller(personasModel, thisUser) {
   });
 
   personaRouter.route({
+    meta: {
+      swagger: {
+        operationId: 'PutPersona',
+        summary: 'Endpoint to PUT one persona by ID. Admin users only.',
+        required: true,
+      },
+    },
     method: 'put',
     path: '/personas/:id',
     validate: {

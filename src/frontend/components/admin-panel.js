@@ -7,7 +7,11 @@ import { getId, unprefix } from '../utils/jsonld';
 import HeaderBar from './header-bar';
 import { ORG } from '../constants';
 import { createModeratorQs } from '../utils/search';
-import { GetGroups, PostGroup, PutUser } from '../hooks/api-hooks.tsx';
+import {
+  useGetGroups,
+  usePostGroups,
+  usePutUser,
+} from '../hooks/api-hooks.tsx';
 import Button from './button';
 import IconButton from './icon-button';
 import { RoleBadgeUI } from './role-badge';
@@ -22,7 +26,7 @@ export default function AdminPanel() {
 
   const search = createModeratorQs({ bookmark });
 
-  const groups = GetGroups(search, !!bookmark);
+  const groups = useGetGroups(search, !!bookmark);
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [revokeRole, setRevokeRole] = useState(null);
@@ -146,7 +150,7 @@ export default function AdminPanel() {
 
 function AdminPanelAddModal({ user, onClose, onSuccess }) {
   const [value, setValue] = useState('');
-  const postGroup = PostGroup();
+  const postGroup = usePostGroups();
   const [frame, setFrame] = useState('input');
 
   const pattern =
@@ -230,7 +234,7 @@ AdminPanelAddModal.propTypes = {
 };
 
 function AdminPanelRemoveModal({ user, role, onClose, onSuccess }) {
-  const updateUserRole = PutUser();
+  const updateUserRole = usePutUser();
   const [frame, setFrame] = useState('submit');
 
   return (
