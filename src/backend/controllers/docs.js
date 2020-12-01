@@ -6,6 +6,7 @@ import router from 'koa-joi-router';
 import userRoutes from './user.js';
 import fullReviewRoutes from './fullReview.js';
 import commentRoutes from './comment.js';
+import communityRoutes from './community.js';
 import groupRoutes from './group.js';
 
 const log = getLogger('apiDocs:::');
@@ -19,6 +20,7 @@ export default function docs() {
   generator.addJoiRouter(fullReviewRoutes());
   generator.addJoiRouter(groupRoutes());
   generator.addJoiRouter(commentRoutes());
+  generator.addJoiRouter(communityRoutes());
 
   const spec = generator.generateSpec(
     {

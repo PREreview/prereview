@@ -32,6 +32,7 @@ import {
   commentModelWrapper,
   communityModelWrapper,
   fullReviewModelWrapper,
+  fullReviewDraftModelWrapper,
   groupModelWrapper,
   personaModelWrapper,
   preprintModelWrapper,
@@ -45,11 +46,15 @@ import {
 import AuthController from './controllers/auth.js'; // authentication/logins
 import CommentController from './controllers/comment.js';
 import CommunityController from './controllers/community.js';
+import FullReviewController from './controllers/fullReview.js';
+import DraftController from './controllers/fullReviewDraft.js';
 import GroupController from './controllers/group.js';
 import UserController from './controllers/user.js';
 import PersonaController from './controllers/persona.js';
 import PreprintController from './controllers/preprint.js';
-import FullReviewController from './controllers/fullReview.js';
+import RapidController from './controllers/rapidReview.js';
+import RequestController from './controllers/request.js';
+import TagController from './controllers/tag.js';
 import DocsController from './controllers/docs.js';
 
 const __dirname = path.resolve();
@@ -99,29 +104,32 @@ export default async function configServer(config) {
   const communities = CommunityController(communityModel, authz);
   const fullReviewModel = fullReviewModelWrapper(db);
   const fullReviews = FullReviewController(fullReviewModel, authz);
+  const draftModel = fullReviewDraftModelWrapper(db);
+  const fullReviewDrafts = DraftController(draftModel, authz);
   const groups = GroupController(groupModel, authz);
-  // eslint-disable-next-line no-unused-vars
   const personas = PersonaController(personaModel, authz);
   const preprintModel = preprintModelWrapper(db);
   const preprints = PreprintController(preprintModel, authz);
-  // eslint-disable-next-line no-unused-vars
   const rapidReviewModel = rapidReviewModelWrapper(db);
-  // eslint-disable-next-line no-unused-vars
+  const rapidReviews = RapidController(rapidReviewModel, authz);
   const requestModel = requestModelWrapper(db);
-  // eslint-disable-next-line no-unused-vars
+  const requests = RequestController(requestModel, authz);
   const tagModel = tagModelWrapper(db);
+  const tags = TagController(tagModel, authz);
   const users = UserController(userModel, authz);
-
-  fullReviews.use('/prereviews/:pid', comments.middleware());
 
   const apiV2Router = compose([
     auth.middleware(),
     comments.middleware(),
     communities.middleware(),
     fullReviews.middleware(),
+    fullReviewDrafts.middleware(),
     groups.middleware(),
     personas.middleware(),
     preprints.middleware(),
+    rapidReviews.middleware(),
+    requests.middleware(),
+    tags.middleware(),
     users.middleware(),
   ]);
 

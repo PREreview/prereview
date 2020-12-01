@@ -15,10 +15,14 @@ const authWrapper = groups => {
   const roles = new Roles();
 
   roles.isMemberOf = (group, id) => {
+    log.debug('Hello in isMemberOf?');
     return groups.isMemberOf(group, id);
   };
 
-  roles.use('access private pages', ctx => ctx.isAuthenticated());
+  roles.use('access private pages', ctx => {
+    log.debug('Is user logged in?', ctx.isAuthenticated());
+    return ctx.isAuthenticated();
+  });
 
   roles.use('access admin pages', ctx => {
     log.debug('Checking if user can access admin pages.');
