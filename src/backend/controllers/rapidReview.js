@@ -64,11 +64,6 @@ export default function controller(rapidReviews, thisUser) {
       };
       ctx.status = 201;
     },
-    meta: {
-      swagger: {
-        summary: 'Endpoint to POST rapid reviews of a preprint',
-      },
-    },
   });
 
   rapidRouter.route({

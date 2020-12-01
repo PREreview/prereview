@@ -68,7 +68,6 @@ export default function controller(preprints, thisUser) {
       swagger: {
         operationId: 'PostPreprints',
         summary: 'Endpoint to POST a new preprint',
-        operationId: 'PostPreprints',
       },
     },
     method: 'POST',
