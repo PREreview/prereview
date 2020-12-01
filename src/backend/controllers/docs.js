@@ -8,6 +8,7 @@ import fullReviewRoutes from './fullReview.js';
 import commentRoutes from './comment.js';
 import communityRoutes from './community.js';
 import groupRoutes from './group.js';
+import tagRoutes from './tag.js';
 
 const log = getLogger('apiDocs:::');
 
@@ -21,6 +22,7 @@ export default function docs() {
   generator.addJoiRouter(groupRoutes());
   generator.addJoiRouter(commentRoutes());
   generator.addJoiRouter(communityRoutes());
+  generator.addJoiRouter(tagRoutes());
 
   const spec = generator.generateSpec(
     {
