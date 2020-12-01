@@ -1,57 +1,72 @@
 import router from 'koa-joi-router';
 import { getLogger } from '../log.js';
+import { getErrorMessages } from '../utils/errors';
 
 const log = getLogger('backend:controller:comment');
-// eslint-disable-next-line no-unused-vars
 const Joi = router.Joi;
+const handleInvalid = ctx => {
+  log.debug('Validation error!');
+  log.error(ctx.invalid);
+  ctx.status = 400;
+  ctx.message = getErrorMessages(ctx.invalid);
+};
+const commentSchema = Joi.object({
+  title: Joi.string().required(),
+  contents: Joi.string().required(),
+});
 
 // eslint-disable-next-line no-unused-vars
 export default function controller(commentModel, thisUser) {
   const commentsRouter = router();
 
+  // handler for GET multiple comments
   const getHandler = async ctx => {
-      let comments, fid; // fid = fullReview ID
+    let comments, fid; // fid = fullReview ID
 
-      ctx.params.fid ? fid = ctx.params.fid : null;
+    ctx.params.fid ? (fid = ctx.params.fid) : null;
 
-      try {
-        if (fid) {
-          log.debug(`Retrieving comments related to review ${fid}.`);
-          comments = await commentModel.find({ parent: fid })          
-        } else {
-          log.debug(`Retrieving all comments.`)
-          comments = await commentModel.findAll();
-        }
-      } catch (err) {
-        log.error('HTTP 400 error: ', err);
-        ctx.throw(400, `Failed to retrieve comments`);
+    try {
+      if (fid) {
+        log.debug(`Retrieving comments related to review ${fid}.`);
+        comments = await commentModel.find({ parent: fid });
+      } else {
+        log.debug(`Retrieving all comments.`);
+        comments = await commentModel.findAll();
       }
+    } catch (err) {
+      log.error('HTTP 400 error: ', err);
+      ctx.throw(400, `Failed to retrieve comments`);
+    }
 
-      ctx.response.body = {
-        status: 200,
-        message: 'ok',
-        data: comments,
-      };
-      ctx.status = 200;
-  }
+    ctx.response.body = {
+      status: 200,
+      message: 'ok',
+      data: comments,
+    };
+    ctx.status = 200;
+  };
 
   commentsRouter.route({
-    method: 'post',
+     meta: {
+      swagger: {
+        summary: 'Endpoint to POST comments on full-length reviews of preprints.',
+      },
+    },
+    method: 'POST',
     path: '/comments',
     // pre:thisUserthisUser.can('access private pages'),
-    // validate: {
-    //   body: Joi.object({
-    //     title: Joi.string(),
-    //     contents: Joi.string(),
-    //     author: Joi.number().integer(),
-    //   }),
-    //   type: 'json',
-    //   failure: 400,
-    //   continueOnError: true,
-    // },
+    validate: {
+      body: commentSchema,
+      type: 'json',
+      continueOnError: true,
+    },
     handler: async ctx => {
-      log.debug(`Posting a new comment.`);
-      // eslint-disable-next-line no-unused-vars
+      if (ctx.invalid) {
+        handleInvalid(ctx);
+        return;
+      }
+
+      log.debug('Posting a comment.');
       let newComment;
 
       try {
@@ -72,15 +87,33 @@ export default function controller(commentModel, thisUser) {
   });
 
   commentsRouter.route({
-    method: 'get',
+    meta: {
+      swagger: {
+        summary: 'Endpoint to GET all comments on all full-length reviews of preprints.',
+      },
+    },
+    method: 'GET',
     path: '/comments',
     // pre: {},
-    // validate: {},
-    handler: async ctx => getHandler(ctx),
+    // validate: {
+
+    // },
+    handler: async ctx => {
+      if (ctx.invalid) {
+        handleInvalid(ctx);
+        return;
+      }
+      getHandler(ctx);
+    },
   });
 
   commentsRouter.route({
-    method: 'get',
+    meta: {
+      swagger: {
+        summary: 'Endpoint to GET all comments related to a specific full-length review of a preprint.',
+      },
+    },
+    method: 'GET',
     path: '/fullReviews/:fid/comments',
     // pre: {},
     // validate: {},
@@ -88,7 +121,12 @@ export default function controller(commentModel, thisUser) {
   });
 
   commentsRouter.route({
-    method: 'get',
+    meta: {
+      swagger: {
+        summary: 'Endpoint to GET a single specific comment.',
+      },
+    },
+    method: 'GET',
     path: '/comments/:id',
     // pre:thisUserthisUser.can('access private pages'),
     // validate: { },
@@ -117,20 +155,25 @@ export default function controller(commentModel, thisUser) {
   });
 
   commentsRouter.route({
+    meta: {
+      swagger: {
+        summary: 'Endpoint to PUT changes on a specific comment.',
+      },
+    },
     method: 'put',
     path: '/comments/:id',
     // pre:thisUserthisUser.can('access private pages'),
-    // validate: {
-    //   body: Joi.object({
-    //     title: Joi.string(),
-    //     contents: Joi.string(),
-    //     author: Joi.number().integer(),
-    //   }),
-    //   type: 'json',
-    //   failure: 400,
-    //   continueOnError: true,
-    // },
+    validate: {
+      body: commentSchema,
+      type: 'json',
+      continueOnError: true,
+    },
     handler: async ctx => {
+      if (ctx.invalid) {
+        handleInvalid(ctx);
+        return;
+      }
+
       log.debug(`Updating comment ${ctx.params.id}.`);
       let comment;
 
@@ -154,6 +197,11 @@ export default function controller(commentModel, thisUser) {
   });
 
   commentsRouter.route({
+    meta: {
+      swagger: {
+        summary: 'Endpoint to DELETE a comment.',
+      },
+    },
     method: 'delete',
     path: '/comments/:id',
     // pre: thisUser.can('');
