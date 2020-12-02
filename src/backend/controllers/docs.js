@@ -23,7 +23,7 @@ import {
   requestModelWrapper,
   tagModelWrapper,
   userModelWrapper,
-} from './models/index.ts';
+} from '../models/index.ts';
 
 const log = getLogger('apiDocs:::');
 
@@ -33,14 +33,21 @@ export default function docs(authz) {
 
   generator.addJoiRouter(preprintRoutes(preprintModelWrapper, authz));
   generator.addJoiRouter(userRoutes(userModelWrapper, authz));
-  generator.addJoiRouter(fullReviewRoutes(fullReviewModelWrapper, fullReviewDraftModelWrapper, personaModelWrapper, preprintModelWrapper, authz));
+  generator.addJoiRouter(
+    fullReviewRoutes(
+      fullReviewModelWrapper,
+      fullReviewDraftModelWrapper,
+      personaModelWrapper,
+      preprintModelWrapper,
+      authz,
+    ),
+  );
   generator.addJoiRouter(groupRoutes(groupModelWrapper, authz));
   generator.addJoiRouter(commentRoutes(commentModelWrapper, authz));
   generator.addJoiRouter(communityRoutes(communityModelWrapper, authz));
-  generator.addJoiRouter(rapidRoutes(rapidReviewModelWrapper, authz))
-  generator.addJoiRouter(requestRoutes(requestModelWrapper, authz))
-  generator.addJoiRouter(tagRouter(tagModelWrapper, authz))
-
+  generator.addJoiRouter(rapidRoutes(rapidReviewModelWrapper, authz));
+  generator.addJoiRouter(requestRoutes(requestModelWrapper, authz));
+  generator.addJoiRouter(tagRouter(tagModelWrapper, authz));
 
   const spec = generator.generateSpec(
     {
