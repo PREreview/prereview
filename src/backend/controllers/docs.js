@@ -8,19 +8,39 @@ import fullReviewRoutes from './fullReview.js';
 import commentRoutes from './comment.js';
 import communityRoutes from './community.js';
 import groupRoutes from './group.js';
+import rapidRoutes from './rapidReview.js';
+import requestRoutes from './request.js';
+import tagRouter from './tag.js';
+import {
+  commentModelWrapper,
+  communityModelWrapper,
+  fullReviewModelWrapper,
+  fullReviewDraftModelWrapper,
+  groupModelWrapper,
+  personaModelWrapper,
+  preprintModelWrapper,
+  rapidReviewModelWrapper,
+  requestModelWrapper,
+  tagModelWrapper,
+  userModelWrapper,
+} from './models/index.ts';
 
 const log = getLogger('apiDocs:::');
 
-export default function docs() {
+export default function docs(authz) {
   const routes = router();
   const generator = new SwaggerAPI();
 
-  generator.addJoiRouter(preprintRoutes());
-  generator.addJoiRouter(userRoutes());
-  generator.addJoiRouter(fullReviewRoutes());
-  generator.addJoiRouter(groupRoutes());
-  generator.addJoiRouter(commentRoutes());
-  generator.addJoiRouter(communityRoutes());
+  generator.addJoiRouter(preprintRoutes(preprintModelWrapper, authz));
+  generator.addJoiRouter(userRoutes(userModelWrapper, authz));
+  generator.addJoiRouter(fullReviewRoutes(fullReviewModelWrapper, fullReviewDraftModelWrapper, personaModelWrapper, preprintModelWrapper, authz));
+  generator.addJoiRouter(groupRoutes(groupModelWrapper, authz));
+  generator.addJoiRouter(commentRoutes(commentModelWrapper, authz));
+  generator.addJoiRouter(communityRoutes(communityModelWrapper, authz));
+  generator.addJoiRouter(rapidRoutes(rapidReviewModelWrapper, authz))
+  generator.addJoiRouter(requestRoutes(requestModelWrapper, authz))
+  generator.addJoiRouter(tagRouter(tagModelWrapper, authz))
+
 
   const spec = generator.generateSpec(
     {
