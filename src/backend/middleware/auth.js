@@ -15,7 +15,6 @@ const authWrapper = groups => {
   const roles = new Roles();
 
   roles.isMemberOf = (group, id) => {
-    log.debug('Hello in isMemberOf?');
     return groups.isMemberOf(group, id);
   };
 
@@ -28,10 +27,14 @@ const authWrapper = groups => {
     log.debug('Checking if user can access admin pages.');
     if (!ctx.isAuthenticated()) return false;
 
-    return (
-      config.adminUsers.includes(ctx.state.user.orcid) ||
-      groups.isMemberOf('admins', ctx.state.user.id)
-    );
+    if (config.adminUsers) {
+      return (
+        config.adminUsers.includes(ctx.state.user.orcid) ||
+        groups.isMemberOf('admins', ctx.state.user.id)
+      );
+    } else {
+      groups.isMemberOf('admins', ctx.state.user.id);
+    }
   });
 
   return roles;
