@@ -11,6 +11,19 @@ const communitySchema = Joi.object({
   logo: Joi.string().uri(),
 });
 
+const querySchema = Joi.object({
+  start: Joi.number()
+    .integer()
+    .greater(-1),
+  end: Joi.number()
+    .integer()
+    .positive(),
+  asc: Joi.boolean(),
+  sort_by: Joi.string(),
+  from: Joi.string(),
+  to: Joi.string(),
+});
+
 const handleInvalid = ctx => {
   log.debug('Validation error!');
   log.error(ctx.invalid);
@@ -23,15 +36,9 @@ export default function controller(communityModel, thisUser) {
   const communities = router();
 
   communities.route({
-    meta: {
-      swagger: {
-        summary:
-          'Endpoint to POST a new community to PREreview. Admin users only.',
-      },
-    },
     method: 'POST',
     path: '/communities',
-    // pre:thisUserthisUser.can('access admin pages'),
+    pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next),
     validate: {
       body: communitySchema,
       type: 'json',
@@ -61,19 +68,21 @@ export default function controller(communityModel, thisUser) {
       };
       ctx.status = 201;
     },
-  });
-
-  communities.route({
     meta: {
       swagger: {
         summary:
-          'Endpoint to GET all the communities registered on PREreview, as well as their associated members and preprints.',
+          'Endpoint to POST a new community to PREreview. Admin users only.',
       },
     },
+  });
+
+  communities.route({
     method: 'GET',
     path: '/communities',
-    // pre: thisUser.can(''),
-    // validate: {},
+    pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
+    validate: {
+      query: querySchema,
+    },
     handler: async ctx => {
       log.debug(`Retrieving communities.`);
       let allCommunities;
@@ -92,19 +101,22 @@ export default function controller(communityModel, thisUser) {
       };
       ctx.status = 200;
     },
-  });
-
-  communities.route({
     meta: {
       swagger: {
         summary:
-          'Endpoint to GET info on one community registered on PREreview, along with its associated members and preprints.',
+          'Endpoint to GET all the communities registered on PREreview, as well as their associated members and preprints.',
       },
     },
+  });
+
+  communities.route({
     method: 'GET',
     path: '/communities/:id',
-    // pre: thisUser.can(''),
-    // validate: {},
+    pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
+    validate: {
+      query: querySchema,
+      continueOnError: true,
+    },
     handler: async ctx => {
       log.debug(`Retrieving community with id ${ctx.params.id}.`);
       let community;
@@ -129,18 +141,18 @@ export default function controller(communityModel, thisUser) {
       };
       ctx.status = 200;
     },
-  });
-
-  communities.route({
     meta: {
       swagger: {
         summary:
-          'Endpoint to PUT updates on a community registered on PREreview. Admin users only.',
+          'Endpoint to GET info on one community registered on PREreview, along with its associated members and preprints.',
       },
     },
-    method: 'put',
+  });
+
+  communities.route({
+    method: 'PUT',
     path: '/communities/:id',
-    // pre: thisUser.can(''),
+    pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next),
     validate: {
       body: communitySchema,
       type: 'json',
@@ -170,18 +182,18 @@ export default function controller(communityModel, thisUser) {
       // if updated
       ctx.status = 204;
     },
+    meta: {
+      swagger: {
+        summary:
+          'Endpoint to PUT updates on a community registered on PREreview. Admin users only.',
+      },
+    },
   });
 
   communities.route({
-    meta: {
-      swagger: {
-        summary: 'Endpoint to DELETE a community. Admin users only.',
-      },
-    },
-    method: 'delete',
+    method: 'DELETE',
     path: '/communities/:id',
-    // pre: thisUser.can(''),
-    // validate: {},
+    pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next),
     handler: async ctx => {
       log.debug(`Retrieving community with id ${ctx.params.id}.`);
       let community;
@@ -199,6 +211,11 @@ export default function controller(communityModel, thisUser) {
 
       // if deleted
       ctx.status = 204;
+    },
+    meta: {
+      swagger: {
+        summary: 'Endpoint to DELETE a community. Admin users only.',
+      },
     },
   });
 
