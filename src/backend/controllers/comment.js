@@ -5,6 +5,19 @@ import { getErrorMessages } from '../utils/errors';
 const log = getLogger('backend:controller:comment');
 const Joi = router.Joi;
 
+const querySchema = Joi.object({
+  start: Joi.number()
+    .integer()
+    .greater(-1),
+  end: Joi.number()
+    .integer()
+    .positive(),
+  asc: Joi.boolean(),
+  sort_by: Joi.string(),
+  from: Joi.string(),
+  to: Joi.string(),
+});
+
 const commentSchema = Joi.object({
   title: Joi.string().required(),
   contents: Joi.string().required(),
@@ -49,18 +62,9 @@ export default function controller(commentModel, thisUser) {
   };
 
   commentsRouter.route({
-    meta: {
-      swagger: {
-        summary:
-          'Endpoint to POST comments on full-length reviews of preprints.',
-      },
-    },
     method: 'POST',
     path: '/comments',
-    pre: async (ctx, next) => {
-      await thisUser.can('access private pages');
-      return next();
-    },
+    pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
     validate: {
       body: commentSchema,
       type: 'json',
@@ -86,28 +90,24 @@ export default function controller(commentModel, thisUser) {
       ctx.body = {
         status: 201,
         message: 'created',
-        data: [newComment],
       };
       ctx.status = 201;
+    },
+    meta: {
+      swagger: {
+        summary:
+          'Endpoint to POST comments on full-length reviews of preprints. Returns a 201 if a comment has been successfully created.',
+      },
     },
   });
 
   commentsRouter.route({
-    meta: {
-      swagger: {
-        summary:
-          'Endpoint to GET all comments on all full-length reviews of preprints.',
-      },
-    },
     method: 'GET',
     path: '/comments',
-    pre: async (ctx, next) => {
-      await thisUser.can('access private pages');
-      return next();
+    pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
+    validate: {
+      query: querySchema,
     },
-    // validate: {
-
-    // },
     handler: async ctx => {
       if (ctx.invalid) {
         handleInvalid(ctx);
@@ -115,32 +115,41 @@ export default function controller(commentModel, thisUser) {
       }
       getHandler(ctx);
     },
+    meta: {
+      swagger: {
+        summary:
+          'Endpoint to GET all comments on all full-length reviews of preprints.',
+      },
+    },
   });
 
   commentsRouter.route({
+    method: 'GET',
+    path: '/fullReviews/:fid/comments',
+    pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
+    validate: {
+      query: querySchema,
+    },
+    handler: async ctx => {
+      if (ctx.invalid) {
+        handleInvalid(ctx);
+        return;
+      }
+      getHandler(ctx);
+    },
     meta: {
       swagger: {
         summary:
           'Endpoint to GET all comments related to a specific full-length review of a preprint.',
       },
     },
-    method: 'GET',
-    path: '/fullReviews/:fid/comments',
-    // pre: {},
-    // validate: {},
-    handler: async ctx => getHandler(ctx),
   });
 
   commentsRouter.route({
-    meta: {
-      swagger: {
-        summary: 'Endpoint to GET a single specific comment.',
-      },
-    },
     method: 'GET',
     path: '/comments/:id',
-    // pre:thisUserthisUser.can('access private pages'),
-    // validate: { },
+    pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
+    validate: {},
     handler: async ctx => {
       log.debug(`Retrieving comment ${ctx.params.id}.`);
       let comment;
@@ -163,17 +172,17 @@ export default function controller(commentModel, thisUser) {
       };
       ctx.status = 200;
     },
+    meta: {
+      swagger: {
+        summary: 'Endpoint to GET a specific comment.',
+      },
+    },
   });
 
   commentsRouter.route({
-    meta: {
-      swagger: {
-        summary: 'Endpoint to PUT changes on a specific comment.',
-      },
-    },
     method: 'put',
     path: '/comments/:id',
-    // pre:thisUserthisUser.can('access private pages'),
+    // pre: {},
     validate: {
       body: commentSchema,
       type: 'json',
@@ -208,14 +217,9 @@ export default function controller(commentModel, thisUser) {
   });
 
   commentsRouter.route({
-    meta: {
-      swagger: {
-        summary: 'Endpoint to DELETE a comment.',
-      },
-    },
     method: 'delete',
     path: '/comments/:id',
-    // pre: thisUser.can('');
+    pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next),
     // validate: {},
     handler: async ctx => {
       log.debug(`Removing comment with ID ${ctx.params.id}`);
@@ -236,6 +240,11 @@ export default function controller(commentModel, thisUser) {
 
       // if deleted
       ctx.status = 204;
+    },
+    meta: {
+      swagger: {
+        summary: 'Endpoint to DELETE a comment.',
+      },
     },
   });
 
