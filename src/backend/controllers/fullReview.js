@@ -66,26 +66,25 @@ export default function controller(
   reviewsRouter.route({
     method: 'POST',
     path: '/fullReviews',
+    pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
     handler: async ctx => {
       log.debug('Posting full review.');
       let review, draft, authorPersona, preprint;
-
-      log.debug('ctx.request.body', ctx.request.body);
-
+      
       try {
         review = reviewModel.create(ctx.request.body);
         await reviewModel.persistAndFlush(review);
+
         await review.authors.init();
-
         authorPersona = await personaModel.find(ctx.request.body.authors);
-        preprint = await preprintModel.find(ctx.request.body.preprint);
-
         review.authors.add(authorPersona[0]);
+
+        preprint = await preprintModel.find(ctx.request.body.preprint);
         review.preprint = preprint[0];
 
         if (ctx.request.body.contents) {
           draft = draftModel.create({
-            title: 'Review of a preprint',
+            title: 'Review of a preprint', //TODO: remove when we make title optional
             contents: ctx.request.body.contents,
             parent: review,
           });
@@ -102,38 +101,36 @@ export default function controller(
       };
       ctx.status = 201;
     },
+    meta : {
+      swagger: {
+        summary: 'Endpoint to POST full-length drafts of reviews. The text contents of a review must be in the `contents` property of the request body. Returns a 201 if successful.'
+      }
+    }
   });
 
   reviewsRouter.route({
-    meta: {
-      swagger: {
-        summary: 'Endpoint to GET full-length reviews of a specific preprint.',
-      },
-    },
     method: 'GET',
     path: '/preprints/:pid/fullReviews',
-    // pre: thisUser.can('access private pages'),
-    handler: async ctx => getHandler(ctx),
+    handler: async ctx => getHandler(ctx), 
+    meta: {
+      swagger: {
+        summary: 'Endpoint to GET all full-length reviews of a specific preprint. If successful, returns a 200 and an array of reviews in the `data` property of the response body.',
+      },
+    },
   });
 
   reviewsRouter.route({
-    meta: {
-      swagger: {
-        summary: 'Endpoint to GET all full-length reviews.',
-      },
-    },
     method: 'GET',
     path: '/fullReviews',
-    // pre: thisUser.can(''),
     handler: async ctx => getHandler(ctx),
+    meta: {
+      swagger: {
+        summary: 'Endpoint to GET all full-length reviews. If successful, returns a 200 and an array of reviews in the `data` property of the response body.',
+      },
+    },
   });
 
   reviewsRouter.route({
-    meta: {
-      swagger: {
-        summary: 'Endpoint to GET a specific full-length review.',
-      },
-    },
     method: 'GET',
     path: '/fullReviews/:id',
     handler: async ctx => {
@@ -157,6 +154,11 @@ export default function controller(
       };
       ctx.status = 200;
     },
+    meta: {
+      swagger: {
+        summary: 'Endpoint to GET a specific full-length review. If successful, returns a 200 and an array of reviews in the `data` property of the response body.',
+      },
+    },
   });
 
   reviewsRouter.route({
@@ -168,7 +170,7 @@ export default function controller(
     },
     method: 'DELETE',
     path: '/fullReviews/:id',
-    // pre:thisUserthisUser.can('access admin pages'),
+    pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next),
     handler: async ctx => {
       log.debug(`Deleting fullReview ${ctx.params.id}.`);
       let fullReview;

@@ -180,7 +180,7 @@ export default function controller(commentModel, thisUser) {
   });
 
   commentsRouter.route({
-    method: 'put',
+    method: 'PUT',
     path: '/comments/:id',
     // pre: {},
     validate: {
@@ -217,7 +217,7 @@ export default function controller(commentModel, thisUser) {
   });
 
   commentsRouter.route({
-    method: 'delete',
+    method: 'DELETE',
     path: '/comments/:id',
     pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next),
     // validate: {},

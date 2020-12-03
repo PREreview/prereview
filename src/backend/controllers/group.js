@@ -23,6 +23,13 @@ const groupSchema = Joi.object({
   name: Joi.string().required(),
 });
 
+const validationSchema = {
+  body: groupSchema,
+  query: querySchema,
+  type: 'json',
+  continueOnError: true,
+};
+
 const handleInvalid = ctx => {
   log.debug('Validation error!');
   log.error(ctx.invalid);
@@ -30,36 +37,15 @@ const handleInvalid = ctx => {
   ctx.message = getErrorMessages(ctx.invalid);
 };
 
-/**
- * Initialize the group auth controller
- *
- * @param {Object} groups - User model
- * @returns {Object} Auth controller Koa router
- */
-
 // eslint-disable-next-line no-unused-vars
 export default function controller(groupModel, thisUser) {
   const groupsRouter = router();
 
   groupsRouter.route({
-    meta: {
-      swagger: {
-        summary:
-          'Endpoint to POST a new user group (where each group have varying levels of authorizations) to PREreview. Admin users only.',
-      },
-    },
     method: 'POST',
     path: '/groups',
-    validate: {
-      body: groupSchema,
-      query: querySchema,
-      type: 'json',
-      continueOnError: true,
-    },
-    pre: async (ctx, next) => {
-      await thisUser.can('access admin pages');
-      return next();
-    },
+    pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next),
+    validate: validationSchema,
     handler: async ctx => {
       if (ctx.invalid) {
         handleInvalid(ctx);
@@ -81,18 +67,9 @@ export default function controller(groupModel, thisUser) {
   });
 
   groupsRouter.route({
-    meta: {
-      swagger: {
-        summary:
-          'Endpoint to GET a new user group (where each group have varying levels of authorizations) to PREreview. Admin users only.',
-      },
-    },
     method: 'GET',
     path: '/groups',
-    pre: async (ctx, next) => {
-      await thisUser.can('access admin pages');
-      return next();
-    },
+    pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next),
     validate: {
       query: querySchema,
     },
@@ -141,43 +118,40 @@ export default function controller(groupModel, thisUser) {
         ctx.throw(400, `Failed to parse query: ${err}`);
       }
     },
-  });
-
-  groupsRouter.route({
-    method: 'GET',
-    path: '/groups/:id',
-    validate: {
-      query: querySchema,
-      params: {
-        id: Joi.number().integer(),
+    meta: {
+      swagger: {
+        summary:
+          'Endpoint to GET user groups on PREreview. Different user groups have varying authorization levels of access to API methods.',
       },
     },
-    pre: async (ctx, next) => {
-      await thisUser.can('access admin pages');
-      return next();
-    },
-    handler: async ctx => {
-      log.debug(`Retrieving group ${ctx.params.id}.`);
-      let group;
-
-      try {
-        group = await groupModel.findOne(ctx.params.id, ['members']);
-        if (!group) {
-          ctx.throw(404, `Group with ID ${ctx.params.id} doesn't exist`);
-        }
-      } catch (err) {
-        log.error('HTTP 400 Error: ', err);
-        ctx.throw(400, `Failed to parse query: ${err}`);
-      }
-
-      ctx.body = {
-        status: 200,
-        message: 'ok',
-        data: [group],
-      };
-      ctx.status = 200;
-    },
   });
+
+  // groupsRouter.get(
+  //   '/groups/:id',
+  //   validation(),
+  //   // thisUser.can('access private pages'),
+  //   async ctx => {
+  //     log.debug(`Retrieving group ${ctx.params.id}.`);
+  //     let group;
+
+  //     try {
+  //       group = await groupModel.findOne(ctx.params.id, ['members']);
+  //       if (!group) {
+  //         ctx.throw(404, `Group with ID ${ctx.params.id} doesn't exist`);
+  //       }
+  //     } catch (err) {
+  //       log.error('HTTP 400 Error: ', err);
+  //       ctx.throw(400, `Failed to parse query: ${err}`);
+  //     }
+
+  //     ctx.body = {
+  //       status: 200,
+  //       message: 'ok',
+  //       data: [group],
+  //     };
+  //     ctx.status = 200;
+  //   },
+  // );
 
   groupsRouter.route({
     method: 'put',
@@ -214,10 +188,10 @@ export default function controller(groupModel, thisUser) {
   groupsRouter.route({
     method: 'DELETE',
     path: '/groups/:id',
-    pre: async (ctx, next) => {
-      await thisUser.can('access admin pages');
-      return next();
-    },
+    // pre: async () => {
+    //   await thisUser.can('access admin pages');
+    //   return next();
+    // },
     handler: async ctx => {
       log.debug(`Deleting group ${ctx.params.id}.`);
       let group;

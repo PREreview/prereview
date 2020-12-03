@@ -82,8 +82,14 @@ export default function controller(communityModel, thisUser) {
     pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
     validate: {
       query: querySchema,
+      continueOnError: true,
     },
     handler: async ctx => {
+       if (ctx.invalid) {
+        handleInvalid(ctx);
+        return;
+      }
+
       log.debug(`Retrieving communities.`);
       let allCommunities;
 
@@ -118,6 +124,12 @@ export default function controller(communityModel, thisUser) {
       continueOnError: true,
     },
     handler: async ctx => {
+
+       if (ctx.invalid) {
+        handleInvalid(ctx);
+        return;
+      }
+
       log.debug(`Retrieving community with id ${ctx.params.id}.`);
       let community;
 
@@ -144,7 +156,7 @@ export default function controller(communityModel, thisUser) {
     meta: {
       swagger: {
         summary:
-          'Endpoint to GET info on one community registered on PREreview, along with its associated members and preprints.',
+          'Endpoint to GET info on a community registered on PREreview, along with its associated members and preprints.',
       },
     },
   });
@@ -195,7 +207,13 @@ export default function controller(communityModel, thisUser) {
     path: '/communities/:id',
     pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next),
     handler: async ctx => {
-      log.debug(`Retrieving community with id ${ctx.params.id}.`);
+      
+      if (ctx.invalid) {
+        handleInvalid(ctx);
+        return;
+      }
+
+      log.debug(`Deleting community with id ${ctx.params.id}.`);
       let community;
 
       try {
