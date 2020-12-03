@@ -66,7 +66,7 @@ export default function controller(
   reviewsRouter.route({
     method: 'POST',
     path: '/fullReviews',
-    pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
+    // pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
     handler: async ctx => {
       log.debug('Adding full review.');
       let review, draft, authorPersona, preprint;
@@ -135,14 +135,56 @@ export default function controller(
   });
 
   reviewsRouter.route({
+    method: 'PUT',
+    path: '/fullReviews/:id',
+    handler: async ctx => {
+      log.debug(`Updating review ${ctx.params.id}.`);
+      let fullReview, draft;
+
+      try {
+        fullReview = await reviewModel.findOne(ctx.params.id);
+        if (!fullReview) {
+          ctx.throw(404, `Full review with ID ${ctx.params.id} doesn't exist`);
+        }
+
+        if (ctx.request.body.contents) {
+          log.debug(`Adding full review draft.`);
+          draft = draftModel.create({
+            title: 'Review of a preprint', //TODO: remove when we make title optional
+            contents: ctx.request.body.contents,
+            parent: fullReview,
+          });
+          await draftModel.persistAndFlush(draft);
+        }
+      } catch (err) {
+        log.error('HTTP 400 Error: ', err);
+        ctx.throw(400, `Failed to parse query: ${err}`);
+      }
+
+      // if updated
+      ctx.status = 204;
+    },
+    meta: {
+      swagger: {
+        summary:
+          'Endpoint to PUT updates to a specific full-length review. If successful, returns a 204.',
+      },
+    },
+  });
+
+  reviewsRouter.route({
     method: 'GET',
     path: '/fullReviews/:id',
     handler: async ctx => {
       log.debug(`Retrieving review ${ctx.params.id}.`);
-      let fullReview;
+      let fullReview, latestDraft;
 
       try {
-        fullReview = await reviewModel.findOne(ctx.params.id);
+        fullReview = await reviewModel.findOne(ctx.params.id, [
+          'drafts',
+          'authors',
+        ]);
+
         if (!fullReview) {
           ctx.throw(404, `Full review with ID ${ctx.params.id} doesn't exist`);
         }
@@ -151,12 +193,17 @@ export default function controller(
         ctx.throw(400, `Failed to parse query: ${err}`);
       }
 
-      ctx.body = {
-        status: 200,
-        message: 'ok',
-        data: [fullReview],
-      };
-      ctx.status = 200;
+      if (fullReview) {
+        // gets latest draft associated with this review
+        latestDraft = fullReview.drafts[fullReview.drafts.length - 1];
+
+        ctx.body = {
+          status: 200,
+          message: 'ok',
+          body: [{ ...fullReview, contents: latestDraft.contents }],
+        };
+        ctx.status = 200;
+      }
     },
     meta: {
       swagger: {
