@@ -85,7 +85,7 @@ export default function controller(communityModel, thisUser) {
       continueOnError: true,
     },
     handler: async ctx => {
-       if (ctx.invalid) {
+      if (ctx.invalid) {
         handleInvalid(ctx);
         return;
       }
@@ -124,8 +124,7 @@ export default function controller(communityModel, thisUser) {
       continueOnError: true,
     },
     handler: async ctx => {
-
-       if (ctx.invalid) {
+      if (ctx.invalid) {
         handleInvalid(ctx);
         return;
       }
@@ -207,7 +206,6 @@ export default function controller(communityModel, thisUser) {
     path: '/communities/:id',
     pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next),
     handler: async ctx => {
-      
       if (ctx.invalid) {
         handleInvalid(ctx);
         return;
