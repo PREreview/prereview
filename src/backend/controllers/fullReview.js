@@ -208,7 +208,7 @@ export default function controller(
     meta: {
       swagger: {
         summary:
-          'Endpoint to GET a specific full-length review. If successful, returns a 200 and a single-member array of the review in the `data` property of the response body.',
+          "Endpoint to GET a specific full-length review. If successful, returns a 200 and a single-member array of the review object in the `data` property of the response body. The contents of the review's latest draft is in the `contents` property of the review object.",
       },
     },
   });
