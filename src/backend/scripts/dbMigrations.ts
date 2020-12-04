@@ -1,17 +1,24 @@
 import { MikroORM } from '@mikro-orm/core';
-import { Migration } from '@mikro-orm/migrations';
 import options from '../mikro-orm.config';
 import * as sqliteMigrations from '../db/migrations/sqlite';
 import * as postgresqlMigrations from '../db/migrations/postgresql';
-import { SearchPostgresql } from '../db/migrations/searchIndexes';
+import { SearchPostgresql, SearchSqlite } from '../db/migrations/searchIndexes';
+
+interface SearchIndex {
+  name: string;
+  class: object;
+}
 
 async function main() {
   try {
     let migrations: object;
+    let searchIndex: SearchIndex;
     if (options.type === 'sqlite') {
       migrations = sqliteMigrations;
+      searchIndex = { name: 'SearchSqlite', class: SearchSqlite };
     } else if (options.type === 'postgresql') {
       migrations = postgresqlMigrations;
+      searchIndex = { name: 'SearchPostgresql', class: SearchPostgresql };
     } else {
       throw new Error('Unknown database type.');
     }
@@ -21,7 +28,7 @@ async function main() {
       class: migrations[migrationName],
     }));
 
-    migrationsList.push({ name: 'SearchPostgresql', class: SearchPostgresql });
+    migrationsList.push(searchIndex);
 
     const orm = await MikroORM.init({
       ...options,
