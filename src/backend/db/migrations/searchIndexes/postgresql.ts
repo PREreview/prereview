@@ -5,7 +5,7 @@ export class SearchPostgresql extends Migration {
     this.addSql('ALTER TABLE "preprint" ADD COLUMN "fts" TSVECTOR;');
     this.addSql(
       "CREATE FUNCTION preprint_fts_trigger() RETURNS trigger AS \
-                $$ BEGIN new.fts := to_tsvector('english', new.title); return new; END; $$ LANGUAGE plpgsql;",
+                $$ BEGIN new.fts := setweight(to_tsvector('english', new.title), 'A') || setweight(to_tsvector('english', new.handle), 'B'); return new; END; $$ LANGUAGE plpgsql;",
     );
     this.addSql(
       'CREATE TRIGGER preprint_fts_trigger_update \
