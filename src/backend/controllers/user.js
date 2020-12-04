@@ -4,32 +4,25 @@ import { getLogger } from '../log.js';
 const log = getLogger('backend:controllers:user');
 const Joi = router.Joi;
 
-// const query_schema = Joi.object({
-//   start: Joi.number()
-//     .integer()
-//     .greater(-1),
-//   end: Joi.number()
-//     .integer()
-//     .positive(),
-//   asc: Joi.boolean(),
-//   sort_by: Joi.string(),
-//   from: Joi.string(),
-//   to: Joi.string(),
-//   library: Joi.number()
-//     .integer()
-//     .positive(),
-//   group: Joi.number()
-//     .integer()
-//     .positive(),
-// });
+// eslint-disable-next-line no-unused-vars
+const querySchema = Joi.object({
+  start: Joi.number()
+    .integer()
+    .greater(-1),
+  end: Joi.number()
+    .integer()
+    .positive(),
+  asc: Joi.boolean(),
+  sort_by: Joi.string(),
+  from: Joi.string(),
+  to: Joi.string(),
+  group: Joi.number()
+    .integer()
+    .positive(),
+});
 
-/**
- * Initialize the user auth controller
- *
- * @param {Object} users - User model
- * @returns {Object} Auth controller Koa router
- */
-export default function controller(users) {
+// eslint-disable-next-line no-unused-vars
+export default function controller(users, thisUser) {
   const userRouter = router();
 
   userRouter.route({

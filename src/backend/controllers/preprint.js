@@ -1,7 +1,7 @@
 import router from 'koa-joi-router';
 import { getLogger } from '../log.js';
-import handleValidationError from '../utils/errors.js';
 import resolve from '../utils/resolve.js';
+import { getErrorMessages } from '../utils/errors';
 
 const log = getLogger('backend:controllers:preprint');
 const Joi = router.Joi;
@@ -19,16 +19,17 @@ const querySchema = Joi.object({
   to: Joi.string(),
 });
 
-const preprintSchema = Joi.array().items(
-  Joi.object({
-    title: Joi.string(),
-    url: Joi.string(),
-    uuid: Joi.string(),
-  }).min(1),
-);
+const preprintSchema = {};
+
+const handleInvalid = ctx => {
+  log.debug('Validation error!');
+  log.error(ctx.invalid);
+  ctx.status = 400;
+  ctx.message = getErrorMessages(ctx.invalid);
+};
 
 // eslint-disable-next-line no-unused-vars
-export default function controller(preprints) {
+export default function controller(preprints, thisUser) {
   const preprintRoutes = router();
 
   // RESOLVE PREPRINT METADATA
@@ -38,7 +39,7 @@ export default function controller(preprints) {
         summary: 'Endpoint to GET and resolve preprint metadata',
       },
     },
-    method: 'get',
+    method: 'GET',
     path: '/resolve',
     handler: async ctx => {
       const { identifier } = ctx.query;
@@ -67,22 +68,21 @@ export default function controller(preprints) {
         summary: 'Endpoint to POST a new preprint',
       },
     },
-    method: 'post',
+    method: 'POST',
     path: '/preprints',
     validate: {
-      body: Joi.object({
-        data: preprintSchema,
-      }), // #TODO
+      body: preprintSchema,
       type: 'json',
       continueOnError: true,
     },
-    // pre:thisUserthisUser.can('access private pages'),
-    handler: async (ctx, next) => {
+    pre: async (ctx, next) => {
+      await thisUser.can('access private pages');
+      return next();
+    },
+    handler: async ctx => {
       if (ctx.invalid) {
-        log.error('This is the error object', '\n', ctx.invalid);
-        ctx.response.status = 400;
-        handleValidationError(ctx);
-        return next();
+        handleInvalid(ctx);
+        return;
       }
 
       log.debug('Adding new preprint.');
@@ -109,32 +109,23 @@ export default function controller(preprints) {
   preprintRoutes.route({
     meta: {
       swagger: {
-        summary: 'Endpoint to GET multiple preprints',
+        summary:
+          'Endpoint to GET multiple preprints and their associated reviews (both full-length and rapid), as well as requests for review.',
       },
     },
-    method: 'get',
+    method: 'GET',
     path: '/preprints',
     validate: {
-      query: querySchema,
-      validate: {
-        output: {
-          200: {
-            body: {
-              statusCode: 200,
-              status: 'ok',
-              data: preprintSchema,
-            },
-          },
-        },
-        continueOnError: true,
-      },
+      query: querySchema, // #TODO
     },
-    handler: async (ctx, next) => {
+    pre: async (ctx, next) => {
+      await thisUser.can('access private pages');
+      return next();
+    },
+    handler: async ctx => {
       if (ctx.invalid) {
-        log.error('400 Error! This is the error object', '\n', ctx.invalid);
-        ctx.response.status = 400;
-        handleValidationError(ctx);
-        return next();
+        handleInvalid(ctx);
+        return;
       }
 
       log.debug(`Retrieving preprints.`);
@@ -162,32 +153,22 @@ export default function controller(preprints) {
   preprintRoutes.route({
     meta: {
       swagger: {
-        summary: 'Endpoint to GET a single preprint',
+        summary:
+          'Endpoint to GET a single preprint, as well as its full-length reviews, rapid reviews, and requests for review.',
       },
     },
-    method: 'get',
+    method: 'GET',
     path: '/preprints/:id',
     validate: {
       params: {
         id: Joi.alternatives().try(Joi.number().integer(), Joi.string()),
       },
-      //output: {
-      //  200: {
-      //    body: {
-      //      statusCode: 200,
-      //      status: 'ok',
-      //      data: preprintSchema,
-      //    },
-      //  },
-      //},
-      failure: 400,
       continueOnError: true,
     },
-    handler: async (ctx, next) => {
+    handler: async ctx => {
       if (ctx.invalid) {
-        log.error('400 Error! This is the error object', '\n', ctx.invalid);
-        handleValidationError(ctx);
-        return next();
+        handleInvalid(ctx);
+        return;
       }
 
       log.debug(`Retrieving preprint ${ctx.params.id}.`);
@@ -231,7 +212,7 @@ export default function controller(preprints) {
         summary: 'Endpoint to PUT updates on preprints',
       },
     },
-    method: 'put',
+    method: 'PUT',
     path: '/preprints/:id',
     validate: {
       params: {
@@ -244,8 +225,15 @@ export default function controller(preprints) {
       failure: 400,
       continueOnError: true,
     },
-    // pre:thisUserthisUser.can('access admin pages'),
+    pre: async (ctx, next) => {
+      await thisUser.can('access admin pages');
+      return next();
+    },
     handler: async ctx => {
+      if (ctx.invalid) {
+        handleInvalid(ctx);
+        return;
+      }
       log.debug(`Updating preprint ${ctx.params.id}.`);
       let preprint;
 
@@ -277,17 +265,20 @@ export default function controller(preprints) {
   preprintRoutes.route({
     meta: {
       swagger: {
-        summary: 'Endpoint to delete preprints',
+        summary: 'Endpoint to DELETE preprints',
       },
     },
-    method: 'delete',
+    method: 'DELETE',
     path: '/preprints/:id',
     validate: {
       params: {
         id: Joi.alternatives().try(Joi.number().integer(), Joi.string()),
       },
     },
-    // pre:thisUserthisUser.can('access admin pages'),
+    pre: async (ctx, next) => {
+      await thisUser.can('access admin pages');
+      return next();
+    },
     handler: async ctx => {
       log.debug(`Deleting preprint ${ctx.params.id}.`);
       let preprint;

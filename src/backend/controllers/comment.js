@@ -1,51 +1,252 @@
 import router from 'koa-joi-router';
 import { getLogger } from '../log.js';
+import { getErrorMessages } from '../utils/errors';
 
 const log = getLogger('backend:controller:comment');
 const Joi = router.Joi;
 
-export default function controller(comments) {
-  const commentRouter = router();
+const querySchema = Joi.object({
+  start: Joi.number()
+    .integer()
+    .greater(-1),
+  end: Joi.number()
+    .integer()
+    .positive(),
+  asc: Joi.boolean(),
+  sort_by: Joi.string(),
+  from: Joi.string(),
+  to: Joi.string(),
+});
 
-  commentRouter.route({
-    method: 'post',
+const commentSchema = Joi.object({
+  title: Joi.string().required(),
+  contents: Joi.string().required(),
+});
+
+const handleInvalid = ctx => {
+  log.debug('Validation error!');
+  log.error('Error details ', ctx.invalid);
+  ctx.status = 400;
+  ctx.message = getErrorMessages(ctx.invalid);
+};
+
+// eslint-disable-next-line no-unused-vars
+export default function controller(commentModel, thisUser) {
+  const commentsRouter = router();
+
+  // handler for GET multiple comments
+  const getHandler = async ctx => {
+    let comments, fid; // fid = fullReview ID
+
+    ctx.params.fid ? (fid = ctx.params.fid) : null;
+
+    try {
+      if (fid) {
+        log.debug(`Retrieving comments related to review ${fid}.`);
+        comments = await commentModel.find({ parent: fid });
+      } else {
+        log.debug(`Retrieving all comments.`);
+        comments = await commentModel.findAll();
+      }
+    } catch (err) {
+      log.error('HTTP 400 error: ', err);
+      ctx.throw(400, `Failed to retrieve comments`);
+    }
+
+    ctx.response.body = {
+      status: 200,
+      message: 'ok',
+      data: comments,
+    };
+    ctx.status = 200;
+  };
+
+  commentsRouter.route({
+    method: 'POST',
     path: '/comments',
-    // pre:thisUserthisUser.can('access private pages'),
+    pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
     validate: {
-      body: Joi.array()
-        .items(
-          Joi.object({
-            title: Joi.string(),
-            contents: Joi.string(),
-          }),
-        )
-        .min(1),
+      body: commentSchema,
       type: 'json',
-      failure: 400,
+      continueOnError: true,
     },
     handler: async ctx => {
-      log.debug(`Posting a new comment.`);
-      let comment, pid;
-
-      if (ctx.params.pid) {
-        pid = ctx.params.pid;
+      if (ctx.invalid) {
+        handleInvalid(ctx);
+        return;
       }
 
+      log.debug('Posting a comment.');
+      let newComment;
+
       try {
-        const comment = comments.create(ctx.request.body.data, pid);
-        await comments.persistAndFlush(comment);
+        newComment = commentModel.create(ctx.request.body);
+        await commentModel.persistAndFlush(newComment);
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse comment schema: ${err}`);
       }
 
       ctx.body = {
-        statusCode: 201,
-        status: 'created',
-        data: comment,
+        status: 201,
+        message: 'created',
       };
+      ctx.status = 201;
+    },
+    meta: {
+      swagger: {
+        summary:
+          'Endpoint to POST comments on full-length reviews of preprints. Returns a 201 if a comment has been successfully created.',
+      },
     },
   });
 
-  return commentRouter;
+  commentsRouter.route({
+    method: 'GET',
+    path: '/comments',
+    pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
+    validate: {
+      query: querySchema,
+    },
+    handler: async ctx => {
+      if (ctx.invalid) {
+        handleInvalid(ctx);
+        return;
+      }
+      getHandler(ctx);
+    },
+    meta: {
+      swagger: {
+        summary:
+          'Endpoint to GET all comments on all full-length reviews of preprints.',
+      },
+    },
+  });
+
+  commentsRouter.route({
+    method: 'GET',
+    path: '/fullReviews/:fid/comments',
+    pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
+    validate: {
+      query: querySchema,
+    },
+    handler: async ctx => {
+      if (ctx.invalid) {
+        handleInvalid(ctx);
+        return;
+      }
+      getHandler(ctx);
+    },
+    meta: {
+      swagger: {
+        summary:
+          'Endpoint to GET all comments related to a specific full-length review of a preprint.',
+      },
+    },
+  });
+
+  commentsRouter.route({
+    method: 'GET',
+    path: '/comments/:id',
+    pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
+    validate: {},
+    handler: async ctx => {
+      log.debug(`Retrieving comment ${ctx.params.id}.`);
+      let comment;
+
+      try {
+        comment = await commentModel.findOne(ctx.params.id);
+
+        if (!comment) {
+          ctx.throw(404, `Comment with ID ${ctx.params.id} doesn't exist`);
+        }
+      } catch (err) {
+        log.error('HTTP 400 Error: ', err);
+        ctx.throw(400, `Failed to parse comment schema: ${err}`);
+      }
+
+      ctx.response.body = {
+        status: 200,
+        message: 'ok',
+        data: [comment],
+      };
+      ctx.status = 200;
+    },
+    meta: {
+      swagger: {
+        summary: 'Endpoint to GET a specific comment.',
+      },
+    },
+  });
+
+  commentsRouter.route({
+    method: 'PUT',
+    path: '/comments/:id',
+    // pre: {},
+    validate: {
+      body: commentSchema,
+      type: 'json',
+      continueOnError: true,
+    },
+    handler: async ctx => {
+      if (ctx.invalid) {
+        handleInvalid(ctx);
+        return;
+      }
+
+      log.debug(`Updating comment ${ctx.params.id}.`);
+      let comment;
+
+      try {
+        comment = await commentModel.findOne(ctx.params.id);
+
+        if (!comment) {
+          ctx.throw(404, `A comment with ID ${ctx.params.id} doesn't exist`);
+        }
+
+        commentModel.assign(comment, ctx.request.body);
+        await commentModel.persistAndFlush(comment);
+      } catch (err) {
+        log.error('HTTP 400 Error: ', err);
+        ctx.throw(400, `Failed to parse comment schema: ${err}`);
+      }
+
+      // if updated
+      ctx.status = 204;
+    },
+  });
+
+  commentsRouter.route({
+    method: 'DELETE',
+    path: '/comments/:id',
+    pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next),
+    // validate: {},
+    handler: async ctx => {
+      log.debug(`Removing comment with ID ${ctx.params.id}`);
+      let comment;
+
+      try {
+        comment = await commentModel.findOne(ctx.params.id);
+
+        if (!comment) {
+          ctx.throw(404, `A comment with ID ${ctx.params.id} doesn't exist`);
+        }
+
+        await commentModel.removeAndFlush(comment);
+      } catch (err) {
+        log.error('HTTP 400 Error: ', err);
+        ctx.throw(400, `Failed to parse comment schema: ${err}`);
+      }
+
+      // if deleted
+      ctx.status = 204;
+    },
+    meta: {
+      swagger: {
+        summary: 'Endpoint to DELETE a comment.',
+      },
+    },
+  });
+
+  return commentsRouter;
 }

@@ -1,12 +1,38 @@
 import router from 'koa-joi-router';
 import { getLogger } from '../log.js';
 
-const log = getLogger('backend:controllers:rapidReviews');
+const log = getLogger('backend:controllers:rapidReview');
 // const Joi = router.Joi;
 
-export default function controller(rapidReviews) {
-  //thisUser
+// eslint-disable-next-line no-unused-vars
+export default function controller(rapidReviews, thisUser) {
   const rapidRouter = router();
+
+  const getHandler = async ctx => {
+    let all, pid; // fid = fullReview ID
+
+    if (ctx.params.pid) {
+      pid = ctx.params.pid;
+      log.debug(
+        `Retrieving rapid reviews associated with preprint ${ctx.params.pid}`,
+      );
+    } else {
+      log.debug(`Retrieving all rapid reviews.`);
+    }
+
+    try {
+      if (pid) {
+        all = await rapidReviews.find({ preprint: pid });
+      } else {
+        all = await rapidReviews.findAll();
+      }
+    } catch (error) {
+      return ctx.throw(400, { message: error.message });
+    }
+
+    ctx.body = { status: 200, message: 'ok', data: all };
+    ctx.status = 200;
+  };
 
   rapidRouter.route({
     method: 'post',
@@ -20,16 +46,22 @@ export default function controller(rapidReviews) {
       try {
         rapidReview = rapidReviews.create(ctx.request.body);
         await rapidReviews.persistAndFlush(rapidReview);
-      } catch (error) {
-        return ctx.throw(400, { message: error.message });
+      } catch (err) {
+        log.error('HTTP 400 Error: ', err);
+        ctx.throw(400, `Failed to parse schema: ${err}`);
       }
 
-      ctx.response.body = {
-        statusCode: 201,
-        status: 'created',
-        data: rapidReview,
+      ctx.body = {
+        status: 201,
+        message: 'created',
+        data: [rapidReview],
       };
-      ctx.response.status = 201;
+      ctx.status = 201;
+    },
+    meta: {
+      swagger: {
+        summary: 'Endpoint to POST rapid reviews of a preprint',
+      },
     },
   });
 
@@ -38,25 +70,15 @@ export default function controller(rapidReviews) {
     path: '/rapidReviews',
     // pre: thisUser.can('access private pages'),
     // validate: {},
-    handler: async ctx => {
-      log.debug('Retrieving rapid reviews.');
-      let all, pid;
+    handler: async ctx => getHandler(ctx),
+  });
 
-      ctx.params.pid ? (pid = ctx.params.pid) : null;
-
-      try {
-        if (pid) {
-          all = await rapidReviews.find({ preprint: pid });
-        } else {
-          all = await rapidReviews.findAll();
-        }
-      } catch (error) {
-        return ctx.throw(400, { message: error.message });
-      }
-
-      ctx.response.body = { statusCode: 201, status: 'created', data: all };
-      ctx.response.status = 201;
-    },
+  rapidRouter.route({
+    method: 'get',
+    path: '/preprints/:pid/rapidReviews',
+    // pre: thisUser.can('access private pages'),
+    // validate: {},
+    handler: async ctx => getHandler(ctx),
   });
 
   rapidRouter.route({
@@ -75,30 +97,23 @@ export default function controller(rapidReviews) {
       let rapid;
 
       try {
-        rapid = await rapidReviews.findOne(ctx.params.id);
+        rapid = await rapidReviews.findOne(ctx.params.id, [
+          'author',
+          'preprint',
+        ]);
+        if (!rapid) {
+          ctx.throw(404, `Rapid review with ID ${ctx.params.id} doesn't exist`);
+        }
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse query: ${err}`);
       }
 
-      if (rapid) {
-        ctx.response.body = { statusCode: 200, status: 'ok', data: rapid };
-        ctx.response.status = 200;
-      } else {
-        log.error(
-          `HTTP 404 Error: That rapid review with ID ${
-            ctx.params.id
-          } does not exist.`,
-        );
-
-        ctx.response.status = 404;
-
-        ctx.body = {
-          statusCode: 404,
-          status: `HTTP 404 Error.`,
-          message: `That rapid review with ID ${ctx.params.id} does not exist.`,
-        };
-      }
+      ctx.body = {
+        status: 200,
+        message: 'ok',
+        data: [rapid],
+      };
     },
   });
 
@@ -114,34 +129,48 @@ export default function controller(rapidReviews) {
       //   return next();
       // }
 
-      log.debug(`Retrieving rapid review ${ctx.params.id}`);
+      log.debug(`Updating rapid review ${ctx.params.id}`);
       let rapid;
 
       try {
         rapid = await rapidReviews.findOne(ctx.params.id);
+        if (!rapid) {
+          ctx.throw(404, `Rapid review with ID ${ctx.params.id} doesn't exist`);
+        }
+        rapidReviews.assign(rapid, ctx.request.body);
+        await rapidReviews.persistAndFlush(rapid);
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
-        ctx.throw(400, `Failed to parse query: ${err}`);
+        ctx.throw(400, `Failed to parse schema: ${err}`);
       }
 
-      if (rapid) {
-        ctx.response.body = { statusCode: 200, status: 'ok', data: rapid };
-        ctx.response.status = 200;
-      } else {
-        log.error(
-          `HTTP 404 Error: That rapid review with ID ${
-            ctx.params.id
-          } does not exist.`,
-        );
+      // if updated
+      ctx.status = 204;
+    },
+  });
 
-        ctx.response.status = 404;
+  rapidRouter.route({
+    method: 'delete',
+    path: '/rapidReviews/:id',
+    // pre: thisUser.can('access private pages'),
+    // validate: {},
+    handler: async ctx => {
+      log.debug(`Updating rapid review ${ctx.params.id}`);
+      let rapid;
 
-        ctx.body = {
-          statusCode: 404,
-          status: `HTTP 404 Error.`,
-          message: `That rapid review with ID ${ctx.params.id} does not exist.`,
-        };
+      try {
+        rapid = await rapidReviews.findOne(ctx.params.id);
+        if (!rapid) {
+          ctx.throw(404, `Rapid review with ID ${ctx.params.id} doesn't exist`);
+        }
+        await rapidReviews.removeAndFlush(rapid);
+      } catch (err) {
+        log.error('HTTP 400 Error: ', err);
+        ctx.throw(400, `Failed to parse schema: ${err}`);
       }
+
+      // if deleted
+      ctx.status = 204;
     },
   });
 

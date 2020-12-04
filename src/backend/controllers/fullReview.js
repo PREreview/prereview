@@ -4,186 +4,244 @@ import { getLogger } from '../log.js';
 const log = getLogger('backend:controllers:fullReviews');
 const Joi = router.Joi;
 
-// const querySchema = Joi.object({
-//   start: Joi.number()
-//     .integer()
-//     .greater(-1),
-//   end: Joi.number()
-//     .integer()
-//     .positive(),
-//   asc: Joi.boolean(),
-//   sort_by: Joi.string(),
-//   from: Joi.string(),
-//   to: Joi.string(),
-// });
-
 // eslint-disable-next-line no-unused-vars
-export default function controller(fullReviews, thisUser) {
-  const fullReviewsRouter = router();
+const querySchema = Joi.object({
+  start: Joi.number()
+    .integer()
+    .greater(-1),
+  end: Joi.number()
+    .integer()
+    .positive(),
+  asc: Joi.boolean(),
+  sort_by: Joi.string(),
+  from: Joi.string(),
+  to: Joi.string(),
+});
 
-  fullReviewsRouter.route({
-    method: 'post',
-    path: '/fullReviews',
-    // pre:thisUserthisUser.can('access private pages'),
-    validate: {
-      body: {
-        preprint: Joi.number().integer(),
-        authors: Joi.array(),
-      },
-      type: 'json',
-      failure: 400,
-      // output: {
-      //   201: {
-      //     // could even be a code range!
-      //     body: {},
-      //   },
-      // },
-    },
-    handler: async ctx => {
-      log.debug('Posting full review draft.');
+export default function controller(
+  reviewModel,
+  draftModel,
+  personaModel,
+  preprintModel,
+  // eslint-disable-next-line no-unused-vars
+  thisUser,
+) {
+  const reviewsRouter = router();
 
-      try {
-        const fullReview = fullReviews.create(ctx.request.body);
-        await fullReviews.persistAndFlush(fullReview);
-      } catch (error) {
-        return ctx.throw(400, { message: error.message });
-      }
+  // handler for GET multiple reviews methods
+  const getHandler = async ctx => {
+    let allReviews, pid; // fid = fullReview ID
 
-      ctx.response.status = 201;
-    },
-  });
+    if (ctx.params.pid) {
+      pid = ctx.params.pid;
+      log.debug(
+        `Retrieving reviews associated with preprint ${ctx.params.pid}`,
+      );
+    } else {
+      log.debug(`Retrieving all reviews.`);
+    }
 
-  fullReviewsRouter.route({
-    method: 'get',
-    path: '/fullReviews',
-    // pre: thisUser.can('access private pages'),
-    handler: async ctx => {
-      log.debug(`Retrieving fullReviews.`);
-      let pid, reviews;
-
-      ctx.params.pid ? (pid = ctx.params.pid) : null;
-
-      log.debug('ctx.params.pid???', ctx.params.pid);
-
-      try {
-        if (pid) {
-          log.debug('here i am here');
-          reviews = await fullReviews.find({ preprint: pid });
-        } else {
-          log.debug('here i am on the else');
-          reviews = await fullReviews.findAll();
-        }
-      } catch (err) {
-        log.error('HTTP 400 Error: ', err);
-        ctx.throw(400, `Failed to parse query: ${err}`);
-      }
-
-      ctx.response.body = {
-        statusCode: 200,
-        status: 'ok',
-        data: reviews,
-      };
-      ctx.response.status = 200;
-    },
-  });
-
-  fullReviewsRouter.route({
-    method: 'get',
-    path: '/fullReviews/:id',
-    handler: async ctx => {
-      log.debug(`Retrieving fullReviews ${ctx.params.id}.`);
-      let fullReview;
-
-      try {
-        fullReview = await fullReviews.findOne(ctx.params.id);
-      } catch (err) {
-        log.error('HTTP 400 Error: ', err);
-        ctx.throw(400, `Failed to parse query: ${err}`);
-      }
-
-      if (fullReview.length) {
-        ctx.response.body = { statusCode: 200, status: 'ok', data: fullReview };
-        ctx.response.status = 200;
+    try {
+      if (pid) {
+        allReviews = await reviewModel.find({ preprint: pid }, [
+          'authors',
+          'comments',
+        ]);
       } else {
-        log.error(
-          `HTTP 404 Error: That preprint with ID ${
-            ctx.params.id
-          } does not exist.`,
-        );
-        ctx.throw(
-          404,
-          `That preprint with ID ${ctx.params.id} does not exist.`,
-        );
+        allReviews = await reviewModel.findAll(['authors', 'comments']);
       }
+    } catch (err) {
+      log.error('HTTP 400 Error: ', err);
+      ctx.throw(400, `Failed to parse query: ${err}`);
+    }
+
+    ctx.body = {
+      status: 200,
+      message: 'ok',
+      data: allReviews,
+    };
+    ctx.status = 200;
+  };
+
+  reviewsRouter.route({
+    method: 'POST',
+    path: '/fullReviews',
+    // pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
+    handler: async ctx => {
+      log.debug('Adding full review.');
+      let review, draft, authorPersona, preprint;
+
+      try {
+        review = reviewModel.create(ctx.request.body);
+        await reviewModel.persistAndFlush(review);
+
+        await review.authors.init();
+        authorPersona = await personaModel.find(ctx.request.body.authors);
+        review.authors.add(authorPersona[0]);
+
+        preprint = await preprintModel.find(ctx.request.body.preprint);
+        review.preprint = preprint[0];
+
+        if (ctx.request.body.contents) {
+          log.debug(`Adding full review draft.`);
+          draft = draftModel.create({
+            title: 'Review of a preprint', //TODO: remove when we make title optional
+            contents: ctx.request.body.contents,
+            parent: review,
+          });
+          await draftModel.persistAndFlush(draft);
+        }
+      } catch (err) {
+        log.error('HTTP 400 Error: ', err);
+        ctx.throw(400, `Failed to parse full review schema: ${err}`);
+      }
+
+      ctx.body = {
+        status: 201,
+        message: 'created',
+      };
+      ctx.status = 201;
+    },
+    meta: {
+      swagger: {
+        summary:
+          'Endpoint to POST full-length drafts of reviews. The text contents of a review must be in the `contents` property of the request body. Returns a 201 if successful.',
+      },
     },
   });
 
-  fullReviewsRouter.route({
-    method: 'put',
-    path: '/fullReviews/:id',
-    // pre:thisUserthisUser.can('access admin pages'),
-    validate: {
-      body: {
-        doi: Joi.string().required(),
-        authors: Joi.array(),
-        is_hidden: Joi.boolean(),
-        content: Joi.array(),
+  reviewsRouter.route({
+    method: 'GET',
+    path: '/preprints/:pid/fullReviews',
+    handler: async ctx => getHandler(ctx),
+    meta: {
+      swagger: {
+        summary:
+          'Endpoint to GET all full-length reviews of a specific preprint. If successful, returns a 200 and an array of reviews in the `data` property of the response body.',
       },
-      type: 'json',
-      failure: 400,
     },
+  });
+
+  reviewsRouter.route({
+    method: 'GET',
+    path: '/fullReviews',
+    handler: async ctx => getHandler(ctx),
+    meta: {
+      swagger: {
+        summary:
+          'Endpoint to GET all full-length reviews. If successful, returns a 200 and an array of reviews in the `data` property of the response body.',
+      },
+    },
+  });
+
+  reviewsRouter.route({
+    method: 'PUT',
+    path: '/fullReviews/:id',
     handler: async ctx => {
-      log.debug(`Updating fullReviews ${ctx.params.id}.`);
-      let fullReview;
+      log.debug(`Updating review ${ctx.params.id}.`);
+      let fullReview, draft;
 
       try {
-        fullReview = fullReviews.assign(ctx.params.id, ctx.request.body);
+        fullReview = await reviewModel.findOne(ctx.params.id);
+        if (!fullReview) {
+          ctx.throw(404, `Full review with ID ${ctx.params.id} doesn't exist`);
+        }
 
-        fullReview.persistAndFlush(fullReviews);
-
-        // workaround for sqlite
-        if (Number.isInteger(fullReviews)) {
-          fullReviews = await fullReviews.findOne(ctx.params.id);
+        if (ctx.request.body.contents) {
+          log.debug(`Adding full review draft.`);
+          draft = draftModel.create({
+            title: 'Review of a preprint', //TODO: remove when we make title optional
+            contents: ctx.request.body.contents,
+            parent: fullReview,
+          });
+          await draftModel.persistAndFlush(draft);
         }
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse query: ${err}`);
       }
+
+      // if updated
+      ctx.status = 204;
+    },
+    meta: {
+      swagger: {
+        summary:
+          'Endpoint to PUT updates to a specific full-length review. If successful, returns a 204.',
+      },
     },
   });
 
-  fullReviewsRouter.route({
-    method: 'delete',
+  reviewsRouter.route({
+    method: 'GET',
     path: '/fullReviews/:id',
-    // pre:thisUserthisUser.can('access admin pages'),
+    handler: async ctx => {
+      log.debug(`Retrieving review ${ctx.params.id}.`);
+      let fullReview, latestDraft;
+
+      try {
+        fullReview = await reviewModel.findOne(ctx.params.id, [
+          'drafts',
+          'authors',
+        ]);
+
+        if (!fullReview) {
+          ctx.throw(404, `Full review with ID ${ctx.params.id} doesn't exist`);
+        }
+      } catch (err) {
+        log.error('HTTP 400 Error: ', err);
+        ctx.throw(400, `Failed to parse query: ${err}`);
+      }
+
+      if (fullReview) {
+        // gets latest draft associated with this review
+        latestDraft = fullReview.drafts[fullReview.drafts.length - 1];
+
+        ctx.body = {
+          status: 200,
+          message: 'ok',
+          body: [{ ...fullReview, contents: latestDraft.contents }],
+        };
+        ctx.status = 200;
+      }
+    },
+    meta: {
+      swagger: {
+        summary:
+          "Endpoint to GET a specific full-length review. If successful, returns a 200 and a single-member array of the review object in the `data` property of the response body. The contents of the review's latest draft is in the `contents` property of the review object.",
+      },
+    },
+  });
+
+  reviewsRouter.route({
+    method: 'DELETE',
+    path: '/fullReviews/:id',
+    pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next),
     handler: async ctx => {
       log.debug(`Deleting fullReview ${ctx.params.id}.`);
       let fullReview;
 
       try {
-        fullReview = fullReviews.findOne(ctx.params.id);
-        await fullReview.removeAndFlush(fullReviews);
+        fullReview = await reviewModel.findOne(ctx.params.id);
+        if (!fullReview) {
+          ctx.throw(404, `Full review with ID ${ctx.params.id} doesn't exist`);
+        }
+        await reviewModel.removeAndFlush(fullReview);
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse query: ${err}`);
       }
 
-      if (fullReviews.length && fullReviews.length > 0) {
-        ctx.response.body = { status: 'success', data: fullReview };
-        ctx.response.status = 200;
-      } else {
-        log.error(
-          `HTTP 404 Error: That fullReview with ID ${
-            ctx.params.id
-          } does not exist.`,
-        );
-        ctx.throw(
-          404,
-          `That fullReviews with ID ${ctx.params.id} does not exist.`,
-        );
-      }
+      // if deleted
+      ctx.status = 204;
+    },
+    meta: {
+      swagger: {
+        summary:
+          'Endpoint to DELETE full-length reviews of a specific preprint. Admin users only.',
+      },
     },
   });
 
-  return fullReviewsRouter;
+  return reviewsRouter;
 }

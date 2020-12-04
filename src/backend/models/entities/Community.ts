@@ -24,12 +24,12 @@ export class Community extends BaseEntity {
 
   //@Fixture({ get: faker => faker.lorem.paragraph(), optional: true })
   @Fixture(faker => faker.lorem.sentences())
-  @Property()
+  @Property({ nullable: true })
   description?: string;
 
   //@Fixture({ get: faker => faker.image.abstract(), optional: true })
   @Fixture(faker => faker.image.abstract())
-  @Property()
+  @Property({ nullable: true })
   logo?: Buffer;
 
   @ManyToMany({ entity: () => User, mappedBy: 'communities', owner: true })
