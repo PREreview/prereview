@@ -5,28 +5,26 @@ import { RemirrorProvider, useManager, useRemirror } from 'remirror/react';
 import { fromHtml } from 'remirror/core';
 
 // Remirror extensions
-// import { WysiwygPreset } from 'remirror/preset/wysiwyg';
-// import { BoldExtension } from 'remirror/extension/bold';
+import { WysiwygPreset } from 'remirror/preset/wysiwyg';
+import { BoldExtension } from 'remirror/extension/bold';
 // import { CollaborationExtension } from 'remirror/extension/collaboration';
-// import { ItalicExtension } from 'remirror/extension/italic';
-// import { UnderlineExtension } from 'remirror/extension/underline';
+import { ItalicExtension } from 'remirror/extension/italic';
+import { UnderlineExtension } from 'remirror/extension/underline';
 // import { YjsExtension } from 'remirror/extension/yjs';
 
 let EXTENSIONS = [
-  // new BoldExtension(),
-  // new ItalicExtension(),
-  // new UnderlineExtension(),
-  // new WysiwygPreset(),
+  new BoldExtension(),
+  new ItalicExtension(),
+  new UnderlineExtension(),
+  new WysiwygPreset(),
 ];
 
 const Menu = () => {
-  const { commands, active } = useRemirror({ autoUpdate: true });
+  const { active, commands } = useRemirror({ autoUpdate: true });
   const [isLoaded, setIsLoaded] = useState(false);
-  console.log('active: ', active);
-  console.log('commands: ', commands);
 
   useEffect(() => {
-    if (active.bold) {
+    if (active) {
       setIsLoaded(true);
     }
   }, []);

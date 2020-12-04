@@ -37,11 +37,25 @@ const handleInvalid = ctx => {
   ctx.message = getErrorMessages(ctx.invalid);
 };
 
+/**
+ * Initialize the group auth controller
+ *
+ * @param {Object} groups - User model
+ * @returns {Object} Auth controller Koa router
+ */
+
 // eslint-disable-next-line no-unused-vars
 export default function controller(groupModel, thisUser) {
   const groupsRouter = router();
 
   groupsRouter.route({
+    meta: {
+      swagger: {
+        operationId: 'PostGroups',
+        summary:
+          'Endpoint to POST a new user group (where each group have varying levels of authorizations) to PREreview. Admin users only.',
+      },
+    },
     method: 'POST',
     path: '/groups',
     pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next),
@@ -96,6 +110,7 @@ export default function controller(groupModel, thisUser) {
     },
     meta: {
       swagger: {
+        operationId: 'GetGroups',
         summary:
           'Endpoint to GET user groups on PREreview. Different user groups have varying authorization levels of access to API methods.',
       },
@@ -133,6 +148,14 @@ export default function controller(groupModel, thisUser) {
       };
       ctx.status = 200;
     },
+    meta: {
+      swagger: {
+        operationId: 'GetGroup',
+        summary:
+          'Endpoint to GET one user group by ID from PREreview. Admin users only.',
+        required: true,
+      },
+    },
   });
 
   groupsRouter.route({
@@ -164,6 +187,14 @@ export default function controller(groupModel, thisUser) {
       // success
       ctx.status = 204;
     },
+    meta: {
+      swagger: {
+        operationId: 'PutGroup',
+        summary:
+          'Endpoint to PUT one user group by ID from PREreview. Admin users only.',
+        required: true,
+      },
+    },
   });
 
   groupsRouter.route({
@@ -186,6 +217,14 @@ export default function controller(groupModel, thisUser) {
       }
 
       ctx.status = 204;
+    },
+    meta: {
+      swagger: {
+        operationId: 'DeleteGroup',
+        summary:
+          'Endpoint to DELETE one user group by ID from PREreview. Admin users only.',
+        required: true,
+      },
     },
   });
 
@@ -236,6 +275,14 @@ export default function controller(groupModel, thisUser) {
   //       );
   //     }
   //   },
+  //  meta: {
+  //    swagger: {
+  //      operationId: 'GetGroupMember',
+  //      summary:
+  //        'Endpoint to GET one user from a group by ID from PREreview. Admin users only.',
+  //      required: true,
+  //    },
+  //  },
   // });
 
   // groupsRouter.route({
@@ -273,6 +320,14 @@ export default function controller(groupModel, thisUser) {
   //       );
   //     }
   //   },
+  //  meta: {
+  //    swagger: {
+  //      operationId: 'DeleteGroupMember',
+  //      summary:
+  //        'Endpoint to DELETE one user from a group by ID from PREreview. Admin users only.',
+  //      required: true,
+  //    },
+  //  },
   // });
 
   return groupsRouter;

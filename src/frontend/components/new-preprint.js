@@ -6,10 +6,11 @@ import doiRegex from 'doi-regex';
 import { unversionDoi } from '../utils/ids';
 import { unprefix } from '../utils/jsonld';
 import {
-  GetPreprint,
-  GetUser, // #FIXME need to build GetUserReview and GetUserRequest
-  PostPreprint,
-  PostPrereview,
+  useGetPreprint,
+  useGetUser,
+  usePostPreprints,
+  // usePostRapidReview,
+  // usePostFullReview
 } from '../hooks/api-hooks.tsx';
 import { useLocalState } from '../hooks/ui-hooks';
 import SubjectEditor from './subject-editor';
@@ -48,7 +49,7 @@ export default function NewPreprint({
       null,
   });
 
-  const preprint = GetPreprint(
+  const preprint = useGetPreprint(
     identifier,
     location.state && location.state.preprint,
     url,
@@ -150,8 +151,8 @@ function StepPreprint({
 
   const [value, setValue] = useState(unprefix(identifier));
 
-  const hasReviewed = GetUser(user, preprint); // #FIXME
-  const hasRequested = GetUser(user, preprint); // #FIXME
+  const hasReviewed = useGetUser(user, preprint); // #FIXME
+  const hasRequested = useGetUser(user, preprint); // #FIXME
 
   // Note: biorXiv use versioned DOI in URL but do not register those DOIs with
   // doi.org => they 404 when we dereference them
@@ -286,7 +287,8 @@ StepPreprint.propTypes = {
 
 function StepReview({ preprint, onViewInContext, onCancel, isSingleStep }) {
   const [user] = useUser();
-  const postPrereview = PostPrereview();
+  const postRapidReview = usePostRapidReview();
+  const postFullReview = usePostFullReview();
   const [subjects, setSubjects] = useLocalState(
     'subjects',
     user.defaultRole,

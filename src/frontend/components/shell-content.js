@@ -6,11 +6,14 @@ import { Helmet } from 'react-helmet-async';
 import { MenuLink } from '@reach/menu-button';
 import { useUser } from '../contexts/user-context';
 import {
-  GetUser, // #FIXME need to build get user reviews, requests
-  PostPrereview, // #FIXME need to build PostReviewRequest
-  // PostReport, // #FIXME need to build this
+  useGetUser,
+  usePostFullReviews,
+  usePostRapidReviews,
+  usePostRequests,
+  useGetTags,
 } from '../hooks/api-hooks.tsx';
 import { useLocalState } from '../hooks/ui-hooks';
+import { decodePreprintId } from '../../common/utils/ids.js';
 import Controls from './controls';
 import Button from './button';
 import RapidFormFragment from './rapid-form-fragment';
@@ -33,19 +36,23 @@ export default function ShellContent({
   onRequireScreen,
 }) {
   const location = useLocation();
-  const [user] = useUser();
+  const [user, setUser] = useState({id: 1})
 
-  const postPrereview = PostPrereview();
-  const postReviewRequest = PostPrereview(); // #FIXME PostReviewRequest();
+  const postRapidReview = usePostRapidReviews();
+  const postFullReview = usePostFullReviews();
+  const postReviewRequest = usePostRequests();
 
   const [tab, setTab] = useState(defaultTab);
 
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
-  const hasReviewed = user.preprint ? user.preprint.review : false; // #FIXME
-  const hasRequested = user.preprint ? user.preprint.request : false; // #FIXME
+  const hasReviewed = user && user.preprint ? user.preprint.review : false; // #FIXME
+  const hasRequested = user && user.preprint ? user.preprint.request : false; // #FIXME
 
-  const counts = preprint.requests.length + preprint.reviews.length;
+  const counts =
+    preprint.requests.length +
+    preprint.rapidReviews.length +
+    preprint.fullReviews.length;
 
   const loginUrl = process.env.IS_EXTENSION
     ? '/login'
@@ -93,8 +100,7 @@ export default function ShellContent({
                 })}
                 disabled={postReviewRequest.loading || hasReviewed}
                 onClick={() => {
-                  // if (user) {
-                  if (true) {
+                  if (true) { // #FIXME
                     onRequireScreen();
                     setTab('review');
                   } else {
@@ -206,12 +212,7 @@ export default function ShellContent({
       )}
       <div className="shell-content__body">
         {tab === 'read' ? (
-          <ShellContentRead
-            user={user}
-            preprint={preprint}
-            loading={preprint.loading}
-            counts={counts}
-          />
+          <ShellContentRead user={user} preprint={preprint} counts={counts} />
         ) : tab === 'request' ? (
           <ShellContentRequest
             user={user}
@@ -230,13 +231,13 @@ export default function ShellContent({
             user={user}
             preprint={preprint}
             onSubmit={() => {
-              postPrereview(user, preprint)
+              postReviewRequest(user, preprint)
                 .then(() => alert('PREreview request submitted successfully.'))
                 .catch(err => alert(`An error occurred: ${err}`));
             }}
-            isPosting={postPrereview.loading}
-            disabled={postPrereview.loading}
-            error={postPrereview.error} // #FIXME
+            isPosting={postFullReview.loading}
+            disabled={postFullReview.loading}
+            error={postFullReview.error} // #FIXME
           />
         ) : tab === 'review#success' ? (
           <ShellContentReviewSuccess
@@ -264,34 +265,26 @@ ShellContent.propTypes = {
   defaultTab: PropTypes.oneOf(['read', 'review', 'request']),
 };
 
-function ShellContentRead({ user, preprint, loading, counts }) {
+function ShellContentRead({ user, preprint, counts }) {
   // Note: !! this needs to work both in the webApp where it is URL driven and in
   // the extension where it is shell driven
 
   const [moderatedReviewId, setModeratedReviewId] = useState(null);
-  const postReport = PostPrereview(); // #FIXME should be PostReport() when built
+  const postReport = usePostRequests(); // #FIXME should be PostReport() when built
 
   return (
     <div className="shell-content-read">
       <header className="shell-content-read__title">Reviews</header>
 
       <PreprintPreview preprint={preprint} />
-
-      {!loading && (
-        <ReviewReader
-          user={user}
-          identifier={preprint.doi || preprint.arXivId}
-          nRequests={counts}
-        />
-      )}
-
+      <ReviewReader user={user} preprint={preprint} nRequests={counts} />
       {!!moderatedReviewId && (
         <ModerationModal
           title={`Report review as violating the Code of Conduct`}
           moderationProgress={postReport}
           onSubmit={(moderationReason, onSuccess) => {
             postReport(moderatedReviewId, moderationReason)
-              .then(() => alert('Reort submitted successfully.'))
+              .then(() => alert('Report submitted successfully.'))
               .catch(err => alert(`An error occurred: ${err}`));
             onSuccess();
           }}
@@ -307,26 +300,28 @@ ShellContentRead.propTypes = {
   user: PropTypes.object,
   counts: PropTypes.number,
   preprint: PropTypes.object.isRequired,
-  actions: PropTypes.array.isRequired,
-  loading: PropTypes.bool.isRequired,
 };
 
 function ShellContentReview({ user, preprint, disabled, isPosting, error }) {
-  const [subjects, setSubjects] = useLocalState(
-    'subjects',
-    user.defaultRole,
-    preprint.id,
-    [],
-  );
+
+  const { data: subjects, loadingSubjects, errorSubjects } = useGetTags();
+
   // const [answerMap, setAnswerMap] = useLocalState(
   const [answerMap, setAnswerMap] = useState(
     'answerMap',
-    user.defaultRole,
+    user ? user.defaultRole : '',
     preprint.id,
     {},
   );
 
-  const postPrereview = PostPrereview();
+  const {
+    mutate: postRapidReview,
+    loadingPostRapidReview,
+  } = usePostRapidReviews();
+  const {
+    mutate: postFullReview,
+    loadingPostFullReview,
+  } = usePostFullReviews();
 
   const canSubmit = () => {
     // #TODO build function to check if all questions have been answered
@@ -378,8 +373,21 @@ function ShellContentReview({ user, preprint, disabled, isPosting, error }) {
             isWaiting={isPosting}
             disabled={disabled || !canSubmit}
             onClick={() => {
-              postPrereview(user, preprint)
-                .then(() => alert('User updated successfully.'))
+              postFullReview(user.id, preprint.id)
+                .then(() => alert('Full review submitted successfully.'))
+                .catch(err => alert(`An error occurred: ${err}`));
+            }}
+          >
+            Save
+          </Button>
+          <Button
+            type="submit"
+            primary={true}
+            isWaiting={isPosting}
+            disabled={disabled || !canSubmit}
+            onClick={() => {
+              postRapidReview(user.id, preprint.id)
+                .then(() => alert('Rapid review submitted successfully.'))
                 .catch(err => alert(`An error occurred: ${err}`));
             }}
           >

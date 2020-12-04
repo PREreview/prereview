@@ -26,6 +26,12 @@ export default function controller(users, thisUser) {
   const userRouter = router();
 
   userRouter.route({
+    meta: {
+      swagger: {
+        operationId: 'GetUsers',
+        summary: 'Endpoint to GET all users.',
+      },
+    },
     method: 'get',
     path: '/users',
     // pre:thisUserthisUser.can('access private pages'),
@@ -50,6 +56,13 @@ export default function controller(users, thisUser) {
   });
 
   userRouter.route({
+    meta: {
+      swagger: {
+        operationId: 'GetUser',
+        summary: 'Endpoint to GET a single user by ID.',
+        required: true,
+      },
+    },
     method: 'get',
     path: '/users/:id',
     // pre:thisUserthisUser.can('access private pages'),
@@ -77,6 +90,13 @@ export default function controller(users, thisUser) {
   });
 
   userRouter.route({
+    meta: {
+      swagger: {
+        operationId: 'PutUser',
+        summary: 'Endpoint to PUT a single user by ID.',
+        required: true,
+      },
+    },
     method: 'put',
     path: '/users/:id',
     validate: {
@@ -107,6 +127,13 @@ export default function controller(users, thisUser) {
   });
 
   userRouter.route({
+    meta: {
+      swagger: {
+        operationId: 'DeleteUser',
+        summary: 'Endpoint to DELETE a single user by ID.',
+        required: true,
+      },
+    },
     method: 'delete',
     path: '/users/:id',
     validate: {

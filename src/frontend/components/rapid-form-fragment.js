@@ -169,6 +169,7 @@ export default function RapidFormFragment({ answerMap = {}, onChange }) {
                 value="no"
                 checked={!isOpenedLongform}
                 onClick={() => {
+                  console.log('clicked');
                   setIsOpenedLongform(false);
                 }}
                 onChange={() => {

@@ -8,9 +8,9 @@ import fullReviewRoutes from './fullReview.js';
 import commentRoutes from './comment.js';
 import communityRoutes from './community.js';
 import groupRoutes from './group.js';
-import rapidRoutes from './rapidReview.js';
+import rapidReviewRoutes from './rapidReview.js';
 import requestRoutes from './request.js';
-import tagRouter from './tag.js';
+import tagRoutes from './tag.js';
 import {
   commentModelWrapper,
   communityModelWrapper,
@@ -45,9 +45,9 @@ export default function docs(authz) {
   generator.addJoiRouter(groupRoutes(groupModelWrapper, authz));
   generator.addJoiRouter(commentRoutes(commentModelWrapper, authz));
   generator.addJoiRouter(communityRoutes(communityModelWrapper, authz));
-  generator.addJoiRouter(rapidRoutes(rapidReviewModelWrapper, authz));
+  generator.addJoiRouter(rapidReviewRoutes(rapidReviewModelWrapper, authz));
   generator.addJoiRouter(requestRoutes(requestModelWrapper, authz));
-  generator.addJoiRouter(tagRouter(tagModelWrapper, authz));
+  generator.addJoiRouter(tagRoutes(tagModelWrapper, authz));
 
   const spec = generator.generateSpec(
     {

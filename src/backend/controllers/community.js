@@ -70,6 +70,7 @@ export default function controller(communityModel, thisUser) {
     },
     meta: {
       swagger: {
+        operationId: 'PostCommunities',
         summary:
           'Endpoint to POST a new community to PREreview. Admin users only.',
       },
@@ -109,6 +110,7 @@ export default function controller(communityModel, thisUser) {
     },
     meta: {
       swagger: {
+        operationId: 'GetCommunities',
         summary:
           'Endpoint to GET all the communities registered on PREreview, as well as their associated members and preprints.',
       },
@@ -154,6 +156,7 @@ export default function controller(communityModel, thisUser) {
     },
     meta: {
       swagger: {
+        operationId: 'GetCommunity',
         summary:
           'Endpoint to GET info on a community registered on PREreview, along with its associated members and preprints.',
       },
@@ -195,6 +198,7 @@ export default function controller(communityModel, thisUser) {
     },
     meta: {
       swagger: {
+        operationId: 'PutCommunity',
         summary:
           'Endpoint to PUT updates on a community registered on PREreview. Admin users only.',
       },
@@ -230,6 +234,7 @@ export default function controller(communityModel, thisUser) {
     },
     meta: {
       swagger: {
+        operationId: 'DeleteCommunity',
         summary: 'Endpoint to DELETE a community. Admin users only.',
       },
     },

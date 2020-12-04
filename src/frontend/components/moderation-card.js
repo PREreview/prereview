@@ -13,7 +13,11 @@ import PreprintPreview from './preprint-preview';
 import { getTextAnswers, getActiveReports } from '../utils/stats';
 import RoleBadge from './role-badge';
 import Modal from './modal';
-import { DeletePrereview, GetUser } from '../hooks/api-hooks.tsx';
+import {
+  // useDeleteRapidReview,
+  // useDeleteFullReview,
+  useGetUser,
+} from '../hooks/api-hooks.tsx';
 
 export default function ModerationCard({
   user,
@@ -25,8 +29,8 @@ export default function ModerationCard({
   onSuccess,
 }) {
   const [modalFrame, setModalFrame] = useState(null);
-  const reviewer = GetUser(reviewAction.agent);
-  const locker = GetUser(isLockedBy);
+  const reviewer = useGetUser(reviewAction.agent);
+  const locker = useGetUser(isLockedBy);
 
   const reports = getActiveReports(reviewAction);
   const textAnswers = getTextAnswers(reviewAction);
@@ -230,7 +234,8 @@ function ModerationCardModal({
   defaultFrame,
 }) {
   const [frame, setFrame] = useState(defaultFrame);
-  const deletePrereview = DeletePrereview();
+  const deleteRapidReview = DeleteRapidReview();
+  const deleteFullReview = DeleteFullReview();
   const ref = useRef();
 
   return (

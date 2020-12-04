@@ -8,7 +8,7 @@ import HeaderBar from './header-bar';
 import { ORG } from '../constants';
 import { createBlockedRolesQs } from '../utils/search';
 // import { useRolesSearchResults, usePostAction } from '../hooks/api-hooks.tsx';
-import { GetGroups, PostGroup } from '../hooks/api-hooks.tsx';
+import { useGetGroups, usePostGroups } from '../hooks/api-hooks.tsx';
 import Button from './button';
 import IconButton from './icon-button';
 import { RoleBadgeUI } from './role-badge';
@@ -23,7 +23,7 @@ export default function BlockPanel() {
 
   const search = createBlockedRolesQs({ bookmark });
 
-  const groups = GetGroups(search, !!bookmark);
+  const groups = useGetGroups(search, !!bookmark);
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [unmoderatedRole, setUnmoderatedRole] = useState(null);
@@ -146,7 +146,7 @@ export default function BlockPanel() {
 
 function BlockPanelAddModal({ user, onClose, onSuccess }) {
   const [value, setValue] = useState('');
-  const postGroup = PostGroup();
+  const postGroup = usePostGroups();
   const [frame, setFrame] = useState('input');
 
   const pattern =

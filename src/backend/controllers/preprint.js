@@ -36,6 +36,7 @@ export default function controller(preprints, thisUser) {
   preprintRoutes.route({
     meta: {
       swagger: {
+        operationId: 'GetResolvePreprints',
         summary: 'Endpoint to GET and resolve preprint metadata',
       },
     },
@@ -65,6 +66,7 @@ export default function controller(preprints, thisUser) {
   preprintRoutes.route({
     meta: {
       swagger: {
+        operationId: 'PostPreprints',
         summary: 'Endpoint to POST a new preprint',
       },
     },
@@ -109,6 +111,7 @@ export default function controller(preprints, thisUser) {
   preprintRoutes.route({
     meta: {
       swagger: {
+        operationId: 'GetPreprints',
         summary:
           'Endpoint to GET multiple preprints and their associated reviews (both full-length and rapid), as well as requests for review.',
       },
@@ -153,6 +156,7 @@ export default function controller(preprints, thisUser) {
   preprintRoutes.route({
     meta: {
       swagger: {
+        operationId: 'GetPreprint',
         summary:
           'Endpoint to GET a single preprint, as well as its full-length reviews, rapid reviews, and requests for review.',
       },
@@ -209,6 +213,7 @@ export default function controller(preprints, thisUser) {
   preprintRoutes.route({
     meta: {
       swagger: {
+        operationId: 'PutPreprint',
         summary: 'Endpoint to PUT updates on preprints',
       },
     },
@@ -265,6 +270,7 @@ export default function controller(preprints, thisUser) {
   preprintRoutes.route({
     meta: {
       swagger: {
+        operationId: 'DeletePreprint',
         summary: 'Endpoint to DELETE preprints',
       },
     },

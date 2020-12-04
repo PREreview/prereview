@@ -1,9 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
-import throttle from 'lodash/throttle';
 import { Document, Page } from 'react-pdf/dist/entry.parcel';
-
-const CSS_MAX_WIDTH = 900; // keep in sync with CSS
 
 /**
  * Fallback for `object` as on mobile <object /> doesn't work
@@ -13,45 +10,43 @@ const CSS_MAX_WIDTH = 900; // keep in sync with CSS
  */
 export default function PdfViewer({ docId, loading }) {
   const containerEl = useRef(null);
-  const getWidth = () => {
-    const el = containerEl.current;
-    const containerWidth = el
-      ? parseInt(getComputedStyle(el).width, 10)
-      : CSS_MAX_WIDTH;
-    return Math.min(containerWidth, CSS_MAX_WIDTH);
-  };
+  const [width, setWidth] = useState(-1);
+  useLayoutEffect(() => {
+    if (containerEl.current) {
+      setWidth(window.getComputedStyle(containerEl.current).width);
+    }
+  });
 
-  const [width, setWidth] = useState(getWidth());
   const [focused, setFocused] = useState(0);
   const [dims, setDims] = useState([]);
 
+  // useEffect(() => {
+  //   const throttled = throttle(
+  //     function handleResize() {
+  //       const nextWidth = getWidth();
+  //       setWidth(nextWidth);
+  //
+  //       const el = containerEl.current;
+  //       const bottomScroll = el.scrollTop + el.clientHeight;
+  //       setFocused(findFocused(bottomScroll, dims, nextWidth));
+  //     },
+  //     150,
+  //     {
+  //       trailing: true,
+  //       leading: false,
+  //     },
+  //   );
+  //
+  //   setWidth(getWidth());
+  //   window.addEventListener('resize', throttled);
+  //   return () => {
+  //     throttled.cancel();
+  //     window.removeEventListener('resize', throttled);
+  //   };
+  // }, [dims, width]);
+
   useEffect(() => {
-    const throttled = throttle(
-      function handleResize(e) {
-        const nextWidth = getWidth();
-        setWidth(nextWidth);
-
-        const el = containerEl.current;
-        const bottomScroll = el.scrollTop + el.clientHeight;
-        setFocused(findFocused(bottomScroll, dims, nextWidth));
-      },
-      150,
-      {
-        trailing: true,
-        leading: false,
-      },
-    );
-
-    setWidth(getWidth());
-    window.addEventListener('resize', throttled);
-    return () => {
-      throttled.cancel();
-      window.removeEventListener('resize', throttled);
-    };
-  }, [dims, width]);
-
-  useEffect(() => {
-    function handleScroll(e) {
+    function handleScroll() {
       const el = containerEl.current;
       const bottomScroll = el.scrollTop + el.clientHeight;
 

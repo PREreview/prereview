@@ -104,6 +104,7 @@ export default function controller(
     },
     meta: {
       swagger: {
+        operationId: 'PostFullReviews',
         summary:
           'Endpoint to POST full-length drafts of reviews. The text contents of a review must be in the `contents` property of the request body. Returns a 201 if successful.',
       },
@@ -116,6 +117,7 @@ export default function controller(
     handler: async ctx => getHandler(ctx),
     meta: {
       swagger: {
+        operationId: 'GetPreprintFullReviews',
         summary:
           'Endpoint to GET all full-length reviews of a specific preprint. If successful, returns a 200 and an array of reviews in the `data` property of the response body.',
       },
@@ -128,6 +130,7 @@ export default function controller(
     handler: async ctx => getHandler(ctx),
     meta: {
       swagger: {
+        operationId: 'GetFullReviews',
         summary:
           'Endpoint to GET all full-length reviews. If successful, returns a 200 and an array of reviews in the `data` property of the response body.',
       },
@@ -166,6 +169,7 @@ export default function controller(
     },
     meta: {
       swagger: {
+        operationId: 'PutFullReview',
         summary:
           'Endpoint to PUT updates to a specific full-length review. If successful, returns a 204.',
       },
@@ -207,8 +211,10 @@ export default function controller(
     },
     meta: {
       swagger: {
+        operationId: 'GetFullReview',
         summary:
           "Endpoint to GET a specific full-length review. If successful, returns a 200 and a single-member array of the review object in the `data` property of the response body. The contents of the review's latest draft is in the `contents` property of the review object.",
+        required: true,
       },
     },
   });
@@ -237,8 +243,10 @@ export default function controller(
     },
     meta: {
       swagger: {
+        operationId: 'DeleteFullReview',
         summary:
           'Endpoint to DELETE full-length reviews of a specific preprint. Admin users only.',
+        required: true,
       },
     },
   });

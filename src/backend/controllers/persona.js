@@ -45,6 +45,7 @@ export default function controller(personasModel, thisUser) {
     },
     meta: {
       swagger: {
+        operationId: 'GetPersonas',
         description:
           'Each user registered on the PREreview platform has two corresponding personas: one which has their public name and another that is anonymous. This endpoint GETs all personas on PREreview and the reviews attributed to each. Returns a 200 if successful, and an array of personas in the `data` attribute of the response body.',
       },
@@ -79,6 +80,7 @@ export default function controller(personasModel, thisUser) {
     },
     meta: {
       swagger: {
+        operationId: 'GetPersona',
         description:
           'GET a single user persona. Returns a 200 if successful, and a single-member array of the persona object in the `data` attribute of the response body.',
       },
@@ -127,6 +129,13 @@ export default function controller(personasModel, thisUser) {
 
       // if updated
       ctx.status = 204;
+    },
+    meta: {
+      swagger: {
+        operationId: 'PutPersona',
+        summary: 'Endpoint to PUT one persona by ID. Admin users only.',
+        required: true,
+      },
     },
   });
 

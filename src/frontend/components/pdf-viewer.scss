@@ -9,7 +9,7 @@
     max-width: 900px; /* Keep in sync with JS */
   }
 
-  @media (min-width: $wide-bp) {
+  @media (--wide-screen) {
     width: 60vw;
   }
 }

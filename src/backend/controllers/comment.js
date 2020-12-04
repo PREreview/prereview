@@ -95,6 +95,7 @@ export default function controller(commentModel, thisUser) {
     },
     meta: {
       swagger: {
+        operationId: 'PostComments',
         summary:
           'Endpoint to POST comments on full-length reviews of preprints. Returns a 201 if a comment has been successfully created.',
       },
@@ -117,6 +118,7 @@ export default function controller(commentModel, thisUser) {
     },
     meta: {
       swagger: {
+        operationId: 'GetComments',
         summary:
           'Endpoint to GET all comments on all full-length reviews of preprints.',
       },
@@ -139,6 +141,7 @@ export default function controller(commentModel, thisUser) {
     },
     meta: {
       swagger: {
+        operationId: 'GetFullReviewComments',
         summary:
           'Endpoint to GET all comments related to a specific full-length review of a preprint.',
       },
@@ -174,7 +177,9 @@ export default function controller(commentModel, thisUser) {
     },
     meta: {
       swagger: {
+        operationId: 'GetComment',
         summary: 'Endpoint to GET a specific comment.',
+        required: true,
       },
     },
   });
@@ -214,6 +219,13 @@ export default function controller(commentModel, thisUser) {
       // if updated
       ctx.status = 204;
     },
+    meta: {
+      swagger: {
+        operationId: 'PutComment',
+        summary: 'Endpoint to PUT changes on a specific comment.',
+        require: true,
+      },
+    },
   });
 
   commentsRouter.route({
@@ -243,7 +255,9 @@ export default function controller(commentModel, thisUser) {
     },
     meta: {
       swagger: {
+        operationId: 'DeleteComment',
         summary: 'Endpoint to DELETE a comment.',
+        required: true,
       },
     },
   });
