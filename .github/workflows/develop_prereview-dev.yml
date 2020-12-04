@@ -32,6 +32,7 @@ jobs:
         docker build . -t prereview.azurecr.io/prereview:${{ github.sha }}
         docker tag prereview.azurecr.io/prereview:${{ github.sha }} prereview.azurecr.io/prereview:latest
         docker push prereview.azurecr.io/prereview:${{ github.sha }}
+        docker push prereview.azurecr.io/prereview:latest
 
     - uses: azure/webapps-deploy@v2
       with:
