@@ -30,10 +30,10 @@ jobs:
 
     - run: |
         docker build . -t prereview.azurecr.io/prereview:${{ github.sha }}
-        docker tag prereview.azurecr.io/prereview:${{ github.sha }} prereview.azurecr.io/prereview:development
+        docker tag prereview.azurecr.io/prereview:${{ github.sha }} prereview.azurecr.io/prereview:latest
         docker push prereview.azurecr.io/prereview:${{ github.sha }}
 
     - uses: azure/webapps-deploy@v2
       with:
         app-name: 'prereview-dev'
-        images: 'prereview.azurecr.io/prereview:${{ github.sha }}'
+        configuration-file: './docker-compose-development.yml'

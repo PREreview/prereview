@@ -1,4 +1,4 @@
-version: "3"
+version: "3.2"
 services:
   prereview:
     image: prereview.azurecr.io/prereview:latest
@@ -8,7 +8,10 @@ services:
       - prereview-private
       - prereview-public
     ports:
-      - "3000:3000"
+      - target: ${PREREVIEW_PORT:-3000}
+        published: ${PORT}
+        protocol: tcp
+        mode: host
     environment:
       NODE_ENV: ${NODE_ENV:-production}
       PREREVIEW_LOG_LEVEL: ${PREREVIEW_LOG_LEVEL:-debug}
