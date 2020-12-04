@@ -21,7 +21,7 @@ export class FullReviewDraft extends BaseEntity {
   title!: string;
 
   @Fixture(faker => faker.lorem.paragraph())
-  @Property()
+  @Property({ columnType: 'text' })
   contents!: string;
 
   constructor(title: string, contents: string) {

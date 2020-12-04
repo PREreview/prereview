@@ -11,25 +11,29 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@master
+    # checkout the repo
+    - name: 'Checkout Github Action'
+      uses: actions/checkout@master
 
-    - name: Set up Node.js version
-      uses: actions/setup-node@v1
+    - name: 'Login via Azure CLI'
+      uses: azure/login@v1
       with:
-        node-version: '12.x'
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-    - name: npm install, build, and test
-      run: |
-        npm install
-        npm run build --if-present
-        npm run test --if-present
+    - name: 'Login to private registry'
+      uses: azure/docker-login@v1
+      with:
+        login-server: prereview.azurecr.io
+        username: ${{ secrets.REGISTRY_USERNAME }}
+        password: ${{ secrets.REGISTRY_PASSWORD }}
 
-    - name: 'Deploy to Azure Web App'
-      uses: azure/webapps-deploy@v2
+    - run: |
+        docker build . -t prereview.azurecr.io/prereview:${{ github.sha }}
+        docker tag prereview.azurecr.io/prereview:${{ github.sha }} prereview.azurecr.io/prereview:development
+        docker push prereview.azurecr.io/prereview:${{ github.sha }}
+
+    - uses: azure/webapps-deploy@v2
       with:
         app-name: 'prereview-dev'
-        slot-name: 'production'
-        publish-profile: ${{ secrets.AzureAppService_PublishProfile_b7dfcf1c0b5149c5a185f07b23c6c0f1 }}
-        package: .
+        images: 'prereview.azurecr.io/prereview:${{ github.sha }}'

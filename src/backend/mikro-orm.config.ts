@@ -17,12 +17,8 @@ import config from './config';
 
 type DbDrivers = 'postgresql' | 'sqlite' | 'mongo' | 'mysql' | 'mariadb';
 
-let dbType: DbDrivers;
-if (config.isDev) {
-  dbType = 'sqlite';
-} else {
-  dbType = 'postgresql';
-}
+const dbType: DbDrivers = config.dbType;
+
 const authString =
   config.dbUser && config.dbPass ? `${config.dbUser}:${config.dbPass}@` : '';
 const portString = config.dbPort ? `:${config.dbPort}` : '';
@@ -53,7 +49,7 @@ const options: Options = {
     },
   },
   migrations: {
-    path: 'src/backend/db/migrations',
+    path: `src/backend/db/migrations/${config.dbType}`,
   },
 };
 
