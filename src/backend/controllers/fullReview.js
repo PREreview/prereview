@@ -43,8 +43,8 @@ export default function controller(fullReviews, thisUser) {
       log.debug('Posting full review draft.');
 
       try {
-        const fullReviews = fullReviews.create(ctx.request.body);
-        await fullReviews.persistAndFlush(fullReviews);
+        const fullReview = fullReviews.create(ctx.request.body);
+        await fullReviews.persistAndFlush(fullReview);
       } catch (error) {
         return ctx.throw(400, { message: error.message });
       }
@@ -59,21 +59,32 @@ export default function controller(fullReviews, thisUser) {
     // pre: thisUser.can('access private pages'),
     handler: async ctx => {
       log.debug(`Retrieving fullReviews.`);
+      let pid, reviews;
+
+      ctx.params.pid ? pid = ctx.params.pid : null
+
+      log.debug("ctx.params.pid???", ctx.params.pid)
 
       try {
-        const all = await fullReviews.findAll();
-        if (all) {
-          ctx.response.body = {
-            statusCode: 200,
-            status: 'ok',
-            data: all,
-          };
+        if (pid) {
+          log.debug('here i am here')
+          reviews = await fullReviews.find({preprint: pid});
+        } else {
+          log.debug('here i am on the else')
+          reviews = await fullReviews.findAll()
         }
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse query: ${err}`);
       }
-    },
+
+        ctx.response.body = {
+            statusCode: 200,
+            status: 'ok',
+            data: reviews,
+        }
+        ctx.response.status = 200
+      }
   });
 
   fullReviewsRouter.route({
