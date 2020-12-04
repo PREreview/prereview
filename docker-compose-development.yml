@@ -9,7 +9,7 @@ services:
       - prereview-public
     ports:
       - target: ${PREREVIEW_PORT:-3000}
-        published: ${PORT}
+        published: ${PORT:-80}
         protocol: tcp
         mode: host
     environment:
