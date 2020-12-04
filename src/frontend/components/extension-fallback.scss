@@ -22,11 +22,11 @@
   & object {
     display: block; /* iframes are inline by default */
     border: none; /* Reset default border */
-    @media (--narrow-screen) {
+    @media (max-width: $wide-bp) {
       height: 100vh; /* Viewport-relative units */
       width: 100vw;
     }
-    @media (--wide-screen) {
+    @media (min-width: $wide-bp) {
       position:absolute;
       width:60vw;
       height:100%;

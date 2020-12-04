@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from 'react';
+import React, { Fragment, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { MdHelpOutline } from 'react-icons/md';
 import { QUESTIONS } from '../constants';
@@ -7,6 +7,7 @@ import RadioButton from './radio-button';
 import IconButton from './icon-button';
 import Collapse from './collapse';
 import NoticeBox from './notice-box';
+import CollabEditor from './collab-editor';
 
 export default function RapidFormFragment({ answerMap = {}, onChange }) {
   function handleChange(key, value) {
@@ -19,6 +20,8 @@ export default function RapidFormFragment({ answerMap = {}, onChange }) {
       return map;
     }, {}),
   );
+
+  const [isOpenedLongform, setIsOpenedLongform] = useState(false);
 
   return (
     <div className="rapid-form-fragment">
@@ -138,6 +141,50 @@ export default function RapidFormFragment({ answerMap = {}, onChange }) {
             </div>
           );
         })}
+
+        <Fragment key={'longform'}>
+          <div className="radid-form-fragment__question-row">
+            <div className="radid-form-fragment__question">
+              <Value tagName="p">Is this a longform review?</Value>
+            </div>
+
+            <div className="rapid-form-fragment__radio-group">
+              <RadioButton
+                inputId={`question-longform-yes`}
+                name="longform"
+                value="yes"
+                checked={!!isOpenedLongform}
+                onChange={() => {
+                  handleChange('longform', 'yes');
+                }}
+                onClick={() => {
+                  setIsOpenedLongform(true);
+                }}
+                label="Yes"
+              />
+
+              <RadioButton
+                inputId={`question-longform-no`}
+                name="longform"
+                value="no"
+                checked={!isOpenedLongform}
+                onClick={() => {
+                  setIsOpenedLongform(false);
+                }}
+                onChange={() => {
+                  handleChange('longform', 'no');
+                }}
+                label="No"
+              />
+            </div>
+
+            <Collapse isOpened={!!isOpenedLongform}>
+              <Value tagName="div" className="rapid-form-fragment__help-text">
+                <CollabEditor />
+              </Value>
+            </Collapse>
+          </div>
+        </Fragment>
       </fieldset>
       <NoticeBox type="warning">
         Beta Notice: Please note that any reviews submitted during the beta

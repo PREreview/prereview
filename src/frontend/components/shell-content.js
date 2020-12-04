@@ -93,7 +93,8 @@ export default function ShellContent({
                 })}
                 disabled={postReviewRequest.loading || hasReviewed}
                 onClick={() => {
-                  if (user) {
+                  // if (user) {
+                  if (true) {
                     onRequireScreen();
                     setTab('review');
                   } else {
@@ -317,7 +318,8 @@ function ShellContentReview({ user, preprint, disabled, isPosting, error }) {
     preprint.id,
     [],
   );
-  const [answerMap, setAnswerMap] = useLocalState(
+  // const [answerMap, setAnswerMap] = useLocalState(
+  const [answerMap, setAnswerMap] = useState(
     'answerMap',
     user.defaultRole,
     preprint.id,
@@ -342,7 +344,8 @@ function ShellContentReview({ user, preprint, disabled, isPosting, error }) {
         }}
       >
         <SubjectEditor
-          subjects={subjects}
+          // subjects={subjects}
+          subjects={[]}
           onAdd={subject => {
             setSubjects(
               subjects.concat(subject).sort((a, b) => {

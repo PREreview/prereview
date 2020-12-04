@@ -86,18 +86,11 @@
   "engines": {
     "node": ">=14.0"
   },
-  "browserslist": {
-    "production": [
-      "last 3 chrome versions",
-      "last 3 firefox versions",
-      "last 3 safari versions"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  },
+  "browserslist": [
+    "last 3 chrome versions",
+    "last 3 firefox versions",
+    "last 3 safari versions"
+  ],
   "@parcel/transformer-js": {
     "inlineFS": false,
     "inlineEnvironment": false
@@ -120,6 +113,7 @@
     "@reach/menu-button": "^0.10.5",
     "@reach/tooltip": "^0.10.5",
     "@reach/visually-hidden": "^0.10.4",
+    "@remirror/pm": "^1.0.0-next.58",
     "@sendgrid/mail": "^7.2.1",
     "@storybook/addon-actions": "^5.3.19",
     "@types/statuses": "^2.0.0",
@@ -195,6 +189,7 @@
     "react-prerendered-component": "^1.2.4",
     "react-router-dom": "^5.1.2",
     "reflect-metadata": "^0.1.13",
+    "remirror": "^1.0.0-next.58",
     "request-promise-native": "^1.0.8",
     "request-received": "0.0.3",
     "restful-react": "^15.1.1",
