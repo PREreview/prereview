@@ -43,10 +43,9 @@ export default function ExtensionFallback() {
   useExtension(preprint && id);
 
   const pdfUrl = preprint ? preprint.data[0].contentUrl : '';
-  const canonicalUrl = getCanonicalUrl(preprint.data[0]);
+  const canonicalUrl = getCanonicalUrl(preprint ? preprint.data[0] : null);
 
   useEffect(() => {
-    console.log(preprint);
     if (window) {
       setIsChroneOnMac(!!window.chrome && navigator.platform.includes('Mac'));
     }
@@ -94,7 +93,7 @@ export default function ExtensionFallback() {
           <div className="extension-fallback__no-pdf-message">
             <div>
               <h2>{preprint.data[0].title}</h2>
-              <div>{preprint.data[0].author ? preprint.data[0].author : ''}</div>
+              <div>{preprint.data[0].author}</div>
               <h3>Abstract</h3>
               <div>{preprint.data[0].abstract}</div>
               {!!canonicalUrl && (

@@ -85,7 +85,6 @@ export default function Shell({ children, defaultStatus = 'default' }) {
 
     function renderShellHeight() {
       // detect if the shell is docked right
-      console.log(getComputedStyle(ref.current).right);
       if (ref.current && getComputedStyle(ref.current).right === '0px') {
         setStatus('maximized');
       }

@@ -8,8 +8,6 @@ import XLink from './xlink';
 import ShellIcon from '../svgs/shell_icon.svg';
 
 export default function PreprintPreview({ preprint }) {
-  console.log(createPreprintId(preprint.handle));
-
   return (
     <div className="preprint-preview">
       <div className="preprint-preview__header">

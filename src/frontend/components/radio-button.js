@@ -33,7 +33,7 @@ export default function RadioButton({
           {...inputProps}
         />
 
-        <span className="radio-button__label">{label}</span>
+        <span className="radio-button__label vh">{label}</span>
       </label>
     </div>
   );
