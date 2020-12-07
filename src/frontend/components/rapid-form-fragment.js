@@ -62,8 +62,6 @@ export default function RapidFormFragment({ answerMap = {}, onChange }) {
     }, {}),
   );
 
-  const [isOpenedLongform, setIsOpenedLongform] = useState(false);
-
   return (
     <div className="rapid-form-fragment">
       <TableContainer>
@@ -216,52 +214,6 @@ export default function RapidFormFragment({ answerMap = {}, onChange }) {
           </TableBody>
         </Table>
     </TableContainer>
-      <fieldset className="rapid-form-fragment__text-response-questions">
-        <Fragment key={'longform'}>
-          <div className="radid-form-fragment__question-row">
-            <div className="radid-form-fragment__question">
-              <Value tagName="p">Is this a longform review?</Value>
-            </div>
-
-            <div className="rapid-form-fragment__radio-group">
-              <RadioButton
-                inputId={`question-longform-yes`}
-                name="longform"
-                value="yes"
-                checked={!!isOpenedLongform}
-                onChange={() => {
-                  handleChange('longform', 'yes');
-                }}
-                onClick={() => {
-                  setIsOpenedLongform(true);
-                }}
-                label="Yes"
-              />
-
-              <RadioButton
-                inputId={`question-longform-no`}
-                name="longform"
-                value="no"
-                checked={!isOpenedLongform}
-                onClick={() => {
-                  console.log('clicked');
-                  setIsOpenedLongform(false);
-                }}
-                onChange={() => {
-                  handleChange('longform', 'no');
-                }}
-                label="No"
-              />
-            </div>
-
-            <Collapse isOpened={!!isOpenedLongform}>
-              <Value tagName="div" className="rapid-form-fragment__help-text">
-                <CollabEditor />
-              </Value>
-            </Collapse>
-          </div>
-        </Fragment>
-      </fieldset>
       <NoticeBox type="warning">
         Beta Notice: Please note that any reviews submitted during the beta
         stage of Outbreak Science Rapid PREreview will be migrated over into
