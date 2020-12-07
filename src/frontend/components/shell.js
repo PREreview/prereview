@@ -27,19 +27,19 @@ export default function Shell({ children, defaultStatus = 'default' }) {
 
   // reposition shell when user "drag" the handle
   useEffect(() => {
-    function handleMouseUp(e) {
+    function handleMouseUp() {
       if (isDown) {
         setIsDown(false);
       }
     }
 
-    function handleTouchEnd(e) {
+    function handleTouchEnd() {
       if (isDown) {
         setIsDown(false);
       }
     }
 
-    function handleTouchCancel(e) {
+    function handleTouchCancel() {
       if (isDown) {
         setIsDown(false);
       }
@@ -85,6 +85,7 @@ export default function Shell({ children, defaultStatus = 'default' }) {
 
     function renderShellHeight() {
       // detect if the shell is docked right
+      console.log(getComputedStyle(ref.current).right);
       if (ref.current && getComputedStyle(ref.current).right === '0px') {
         setStatus('maximized');
       }
@@ -196,11 +197,11 @@ export default function Shell({ children, defaultStatus = 'default' }) {
     }
   }, [status, transition]);
 
-  const handleMouseDown = useCallback(e => {
+  const handleMouseDown = useCallback(() => {
     setIsDown(true);
   }, []);
 
-  const handleTouchStart = useCallback(e => {
+  const handleTouchStart = useCallback(() => {
     setIsDown(true);
   }, []);
 

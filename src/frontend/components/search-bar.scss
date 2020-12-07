@@ -24,7 +24,7 @@
     padding: var(--mgrd) 0;
   }
 
-  @media (--mobile) {
+  @media (max-width: $mobile-bp) {
     margin-top: calc(var(--announcement-bar-height--mobile) + var(--header-bar-height));
   }
 
@@ -33,7 +33,7 @@
     min-width: var(--left-panel-min-width);
     flex: 1 1 10%;
 
-    @media (--narrow-screen) {
+    @media (max-width: $wide-bp - 1px) {
       min-width: 0;
     }
   }

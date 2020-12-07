@@ -129,13 +129,9 @@
     var(--ui-button-font-leading--primary) var(--ui-font-family);
 }
 
-/* Media Queries */
-@custom-media --mobile screen and (0px <= width <= 420px);
-@custom-media --mobile-portrait screen and (0px <= width <= 420px) and (0px <= height <= 850px);
-@custom-media --mobile-landscape screen and (0px <= height <= 420px) and (0px <= width <= 850px);
 
-@custom-media --short-screen screen and (0px <= height <= 820px);
-
-@custom-media --narrow-screen screen and (0px <= width <= 900px);
-@custom-media --wide-screen screen and (width > 900px);
-$wide-bp: 900px;
+  /* Media Queries */
+  $mobile-bp: 420px;
+  $mobile-portrait-bp: 850px;
+  $short-bp: 820px;
+  $wide-bp: 900px;

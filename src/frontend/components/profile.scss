@@ -22,7 +22,7 @@
     display: flex;
     flex: 1 1 auto;
 
-    @media (--mobile-portrait) {
+    @media (max-width: $mobile-bp) and (max-height: $mobile-portrait-bp) {
       flex-wrap: wrap;
     }
   }
@@ -63,7 +63,7 @@
     flex: 1 1 auto;
 
     min-width: 100px;
-    @media (--narrow-screen) {
+    @media (max-width: $wide-bp - 1px) {
       flex-wrap: wrap;
     }
   }

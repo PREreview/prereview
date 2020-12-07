@@ -13,7 +13,7 @@
   vertical-align: middle;
   z-index: 1001;
 
-  @media (--mobile) {
+  @media (max-width: $mobile-bp) {
     height: var(--announcement-bar-height--mobile);
   }
 }

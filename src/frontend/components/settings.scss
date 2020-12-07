@@ -87,7 +87,7 @@
       padding: 0 var(--sgrd);
       flex: 0 0 128px;
       box-sizing: border-box;
-      @media (--mobile-portrait) {
+      @media (max-width: $mobile-bp) and (max-height: $mobile-portrait-bp) {
         flex: 0 1 auto;
       }
     }
@@ -164,7 +164,7 @@
   }
 
   & .settings__persona-active-label {
-    @media (--mobile-portrait) {
+    @media (max-width: $mobile-bp) and (max-height: $mobile-portrait-bp) {
       display: none;
     }
   }
@@ -193,7 +193,7 @@
       white-space: nowrap;
       text-overflow: ellipsis;
       overflow: hidden;
-      @media (--mobile-portrait) {
+      @media (max-width: $mobile-bp) and (max-height: $mobile-portrait-bp) {
         padding: 0;
         width: var(--mgrd);
       }
@@ -209,7 +209,7 @@
   }
   & .settings__persona-status__label {
     margin: 0 var(--xxsgrd);
-    @media (--mobile-portrait) {
+    @media (max-width: $mobile-bp) and (max-height: $mobile-portrait-bp) {
       display: none;
     }
   }

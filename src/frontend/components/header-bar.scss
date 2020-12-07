@@ -14,16 +14,16 @@
   box-shadow: 0 4px 4px rgba(0, 0, 0, 0.2);
   z-index: 1000;
 
-  @media (--narrow-screen) {
+  @media (max-width: $wide-bp - 1px) {
     padding-left: var(--sgrd);
   }
 
-  @media (--mobile) {
+  @media (max-width: $mobile-bp) {
     top: var(--announcement-bar-height--mobile);
   }
 
   & .rapid-pre-review-logo {
-    @media (--mobile) {
+    @media (max-width: $mobile-bp) {
       height: var(--lgrd);
     }
   }
@@ -57,7 +57,7 @@
     display: none;
     margin-right: var(--sgrd);
 
-    @media (--narrow-screen) {
+    @media (max-width: $wide-bp - 1px) {
       display: block;
     }
   }
@@ -101,7 +101,7 @@
       margin-right: 0;
     }
 
-    @media (--mobile) {
+    @media (max-width: $mobile-bp) {
       font: var(--ui-header-menu-font--small);
       margin-right: var(--sgrd);
     }

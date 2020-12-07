@@ -167,7 +167,7 @@
 
     padding: var(--sgrd) var(--sgrd) var(--xsgrd) var(--sgrd);
 
-    @media (--mobile-portrait) {
+    @media (max-width: $mobile-bp) and (max-height: $mobile-portrait-bp) {
       padding-left: var(--xsgrd);
       flex-wrap: wrap;
     }
@@ -222,7 +222,7 @@
   }
 
   & .preprint-card__pub-date {
-    @media (--wide-screen) {
+    @media (min-width: $wide-bp) {
     }
     white-space: nowrap;
     font: var(--ui-header-2-font);
@@ -240,7 +240,7 @@
     flex-wrap: wrap;
     justify-content: space-between;
 
-    @media (--mobile-portrait) {
+    @media (max-width: $mobile-bp) and (max-height: $mobile-portrait-bp) {
       padding-left: var(--xsgrd);
     }
 
@@ -381,7 +381,7 @@
       flex: 0 1 auto;
 
       & .preprint-card__days-ago__prefix {
-        @media (--mobile) {
+        @media (max-width: $mobile-bp) {
           display: none;
         }
       }
