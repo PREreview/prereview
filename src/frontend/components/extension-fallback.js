@@ -43,9 +43,10 @@ export default function ExtensionFallback() {
   useExtension(preprint && id);
 
   const pdfUrl = preprint ? preprint.data[0].contentUrl : '';
-  const canonicalUrl = getCanonicalUrl(preprint);
+  const canonicalUrl = getCanonicalUrl(preprint.data[0]);
 
   useEffect(() => {
+    console.log(preprint);
     if (window) {
       setIsChroneOnMac(!!window.chrome && navigator.platform.includes('Mac'));
     }
@@ -89,24 +90,27 @@ export default function ExtensionFallback() {
               </Suspense>
             </object>
           )
-        ) : preprint && !pdfUrl && !preprint.loading ? (
+        ) : preprint && !pdfUrl && !loadingPreprint ? (
           <div className="extension-fallback__no-pdf-message">
             <div>
-              No PDF available.
+              <h2>{preprint.data[0].title}</h2>
+              <div>{preprint.data[0].author ? preprint.data[0].author : ''}</div>
+              <h3>Abstract</h3>
+              <div>{preprint.data[0].abstract}</div>
               {!!canonicalUrl && (
-                <span>
-                  {` `}You can visit{' '}
+                <div>
+                  You can access the{' '}
                   {
                     <a
                       href={canonicalUrl}
                       target="_blank"
                       rel="noreferrer noopener"
                     >
-                      {canonicalUrl}
+                      full text of this preprint
                     </a>
                   }{' '}
-                  for more information on the document.
-                </span>
+                  at the preprint server's website.
+                </div>
               )}
             </div>
           </div>
