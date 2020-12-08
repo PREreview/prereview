@@ -72,8 +72,8 @@ export default function Home() {
           throw new Error(error);
         })
         .then(result => {
-          setUser(result);
-          console.log('***user***:', result);
+          setUser(result.data);
+          console.log('***user***:', result.data);
           return result;
         });
     }

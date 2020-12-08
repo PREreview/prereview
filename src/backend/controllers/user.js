@@ -65,7 +65,7 @@ export default function controller(users, thisUser) {
     },
     method: 'get',
     path: '/users/:id',
-    // pre:thisUserthisUser.can('access private pages'),
+    pre: thisUser.can('access private pages'),
     validate: {
       params: Joi.object({
         id: Joi.alternatives().try(Joi.number().integer(), Joi.string()),
@@ -76,8 +76,16 @@ export default function controller(users, thisUser) {
     handler: async ctx => {
       log.debug(`Retrieving user ${ctx.params.id}`);
 
-      const user = await users.findOne(ctx.params.id, ['personas', 'groups']);
-
+      const user = await users.findOneByIdOrOrcid(ctx.params.id, [
+        'personas',
+        'groups',
+      ]);
+      if (
+        thisUser.isMemberOf('admins', user.orcid) ||
+        user.groups.contains('admins')
+      ) {
+        user.isAdmin = true;
+      }
       if (user) {
         ctx.status = 200;
         ctx.body = {

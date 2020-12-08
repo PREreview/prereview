@@ -15,9 +15,10 @@ import { useIsMobile } from '../hooks/ui-hooks';
 
 export default function HeaderBar({ onClickMenuButton, closeGap }) {
   const [user] = useUser();
-  const [role] = user ? user.role : []; //GetUser(1);
+  const roles = user && user.groups ? user.groups : []; //GetUser(1);
 
-  const showProfileNotice = checkIfRoleLacksMininmalData(role);
+  //const showProfileNotice = checkIfRoleLacksMininmalData(role);
+  const showProfileNotice = false;
   const isMobile = useIsMobile();
 
   const [initialHeaderOffset, setinitialHeaderOffset] = useState(null);
@@ -136,7 +137,7 @@ export default function HeaderBar({ onClickMenuButton, closeGap }) {
                 </MenuLink>
               )}
 
-              {!!(role && role.isModerator && !role.isModerated) && (
+              {(roles.includes('moderators') && !user.isModerated) && (
                 <MenuLink
                   as={process.env.IS_EXTENSION ? undefined : Link}
                   to={process.env.IS_EXTENSION ? undefined : '/moderate'}

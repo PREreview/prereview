@@ -1,5 +1,7 @@
 import Roles from 'koa-roles';
+import orcidUtils from 'orcid-utils';
 import config from '../config.ts';
+import { isString } from '../../common/utils/strings';
 import { getLogger } from '../log.js';
 
 const log = getLogger('backend:middleware:auth');
@@ -15,7 +17,16 @@ const authWrapper = groups => {
   const roles = new Roles();
 
   roles.isMemberOf = (group, id) => {
-    return groups.isMemberOf(group, id);
+    if (
+      config.adminUsers &&
+      group === 'admins' &&
+      isString(id) &&
+      orcidUtils.isValid(id)
+    ) {
+      return config.adminUsers.includes(id) || groups.isMemberOf('admins', id);
+    } else {
+      return groups.isMemberOf(group, id);
+    }
   };
 
   roles.use('access private pages', ctx => {
@@ -27,14 +38,7 @@ const authWrapper = groups => {
     log.debug('Checking if user can access admin pages.');
     if (!ctx.isAuthenticated()) return false;
 
-    if (config.adminUsers) {
-      return (
-        config.adminUsers.includes(ctx.state.user.orcid) ||
-        groups.isMemberOf('admins', ctx.state.user.id)
-      );
-    } else {
-      groups.isMemberOf('admins', ctx.state.user.id);
-    }
+    return groups.isMemberOf('admins', ctx.state.user.orcid);
   });
 
   return roles;

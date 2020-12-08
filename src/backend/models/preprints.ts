@@ -40,7 +40,6 @@ export class PreprintModel extends EntityRepository<Preprint> {
     } else {
       throw new ChainError('Database type does not support full-text search');
     }
-    console.log('***res***:', res);
     return res;
   }
 }

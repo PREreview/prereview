@@ -1,8 +1,8 @@
 import passport from 'koa-passport';
 import { Strategy as OrcidStrategy } from 'passport-orcid';
 import router from 'koa-joi-router';
-import { getLogger } from '../log.js';
 import merge from 'lodash.merge';
+import { getLogger } from '../log.js';
 
 const log = getLogger('backend:controllers:auth');
 
@@ -159,7 +159,9 @@ export default function controller(users, personas, config, thisUser) {
           }
 
           log.debug(`Setting cookies for user ${ctx.state.user.name}`);
-          ctx.cookies.set('PRE_user', ctx.state.user.name, { httpOnly: false });
+          ctx.cookies.set('PRE_user', ctx.state.user.orcid, {
+            httpOnly: false,
+          });
           ctx.body = { success: true, user: user };
 
           try {

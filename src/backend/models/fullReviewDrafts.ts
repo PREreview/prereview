@@ -20,7 +20,6 @@ export class FullReviewDraftModel extends EntityRepository<FullReviewDraft> {
     } else {
       throw new ChainError('Database type does not support full-text search');
     }
-    console.log('***res***:', res);
     return res;
   }
 }
