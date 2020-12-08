@@ -22,7 +22,7 @@ const HIGHLIGHTED_ROLE_TYPE = Symbol('dnd:highlighted-role-type');
  */
 export function PotentialRoles({
   role,
-  preprint,
+  reviews,
   roleIds = [],
   onRemoved,
   onModerate,
@@ -45,47 +45,33 @@ export function PotentialRoles({
       })}
       ref={dropRef}
     >
-      {(!preprint.fullReviews.length || !preprint.rapidReviews.length) && (
-        <p className="role-list__tip-text">No Reviewers</p>
-      )}
+      {!reviews.length && <p className="role-list__tip-text">No Reviewers</p>}
 
       <ul className="role-list__list">
-        {roleIds.length
-          ? roleIds.map(roleId => {
-              const action = preprint.rapidReviews.find(review => {
-                const author = useGetUser(review.author);
-                return author.role === roleId;
-              });
-
+        {reviews.length
+          ? reviews.map(review => {
               return (
-                <li key={roleId}>
+                <li key={review.id}>
                   <DraggableRoleBadge
                     type={POTENTIAL_ROLE_TYPE}
-                    roleId={roleId}
-                    onDropped={roleId => {
-                      onRemoved(roleId);
+                    roleId={review.id}
+                    onDropped={review => {
+                      onRemoved(review.id);
                     }}
                   >
                     <MenuItem
                       onSelect={() => {
-                        onRemoved(roleId);
+                        onRemoved(review.id);
                       }}
                     >
                       Add to selection
                     </MenuItem>
 
-                    {!!canModerate && !!action && (
+                    {!!canModerate && (
                       <MenuItem
-                        disabled={
-                          isModerationInProgress ||
-                          arrayify(action.moderationAction).some(
-                            action =>
-                              action['@type'] === 'ReportRapidPREreviewAction' &&
-                              getId(action.agent) === getId(role),
-                          )
-                        }
+                        disabled={isModerationInProgress || review.author}
                         onSelect={() => {
-                          onModerate(getId(action));
+                          // onModerate(review.id);
                         }}
                       >
                         Report Review
@@ -103,7 +89,7 @@ export function PotentialRoles({
 
 PotentialRoles.propTypes = {
   role: PropTypes.object,
-  preprint: PropTypes.object.isRequired,
+  reviews: PropTypes.object.isRequired,
   canModerate: PropTypes.bool,
   onModerate: PropTypes.func,
   isModerationInProgress: PropTypes.bool,
@@ -156,7 +142,7 @@ DraggableRoleBadge.propTypes = {
  */
 export function HighlightedRoles({
   role,
-  actions,
+  reviews,
   roleIds = [],
   onRemoved,
   onModerate,
@@ -189,9 +175,7 @@ export function HighlightedRoles({
       <ul className="role-list__list">
         {roleIds.length
           ? roleIds.map(roleId => {
-              const action = actions.find(
-                action => getId(action.agent) === roleId,
-              );
+              const reviewer = reviews.find(review => review.id === roleId);
 
               return (
                 <li key={roleId}>
@@ -210,18 +194,11 @@ export function HighlightedRoles({
                       Remove
                     </MenuItem>
 
-                    {!!canModerate && !!action && (
+                    {!!canModerate && !!reviewer && (
                       <MenuItem
-                        disabled={
-                          isModerationInProgress ||
-                          arrayify(action.moderationAction).some(
-                            action =>
-                              action['@type'] === 'ReportRapidPREreviewAction' &&
-                              getId(action.agent) === getId(role),
-                          )
-                        }
+                        disabled={isModerationInProgress || reviewer}
                         onSelect={() => {
-                          onModerate(getId(action));
+                          onModerate(reviewer);
                         }}
                       >
                         Report Review
@@ -251,25 +228,10 @@ export function HighlightedRoles({
 
 HighlightedRoles.propTypes = {
   role: PropTypes.object,
-  actions: PropTypes.arrayOf(
-    PropTypes.shape({
-      '@type': PropTypes.oneOf(['RapidPREreviewAction']).isRequired,
-      actionStatus: PropTypes.oneOf(['CompletedActionStatus']).isRequired,
-      agent: PropTypes.string.isRequired,
-      moderationAction: PropTypes.arrayOf(
-        PropTypes.shape({
-          '@type': PropTypes.oneOf([
-            // !! `ModerateRapidPREreviewAction` cannot be present reviews with it must be excluded upstream
-            'ReportRapidPREreviewAction',
-            'IgnoreReportRapidPREreviewAction',
-          ]).isRequired,
-        }),
-      ),
-    }),
-  ).isRequired,
+  reviews: PropTypes.object.isRequired,
   canModerate: PropTypes.bool,
   onModerate: PropTypes.func.isRequired,
   isModerationInProgress: PropTypes.bool,
-  roleIds: PropTypes.arrayOf(PropTypes.string),
+  roleIds: PropTypes.arrayOf(PropTypes.number),
   onRemoved: PropTypes.func.isRequired,
 };

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import { MdPerson } from 'react-icons/md';
@@ -6,29 +6,44 @@ import { Menu, MenuList, MenuButton, MenuLink } from '@reach/menu-button';
 import classNames from 'classnames';
 import Tooltip from '@reach/tooltip';
 import { unprefix, getId } from '../utils/jsonld';
-import { GetUser } from '../hooks/api-hooks.tsx';
+import { useGetUser } from '../hooks/api-hooks.tsx';
 import NoticeBadge from './notice-badge';
 
 const RoleBadge = React.forwardRef(function RoleBadge(
   { roleId, children, className, tooltip, showNotice, disabled },
   ref,
 ) {
-  const user = GetUser(roleId);
+  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState({});
+  const { data: userData, loadingUser, error } = useGetUser({ id: roleId });
 
-  return (
-    <RoleBadgeUI
-      ref={ref}
-      tooltip={tooltip}
-      roleId={roleId}
-      user={user}
-      loading={user.loading}
-      className={className}
-      showNotice={showNotice}
-      disabled={disabled}
-    >
-      {children}
-    </RoleBadgeUI>
-  );
+  useEffect(() => {
+    if (!loadingUser) {
+      if (userData) {
+        setUser(userData.data)
+        setLoading(false);
+      }
+    }
+  }, [userData]);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  } else {
+    return (
+      <RoleBadgeUI
+        ref={ref}
+        tooltip={tooltip}
+        roleId={roleId}
+        user={user}
+        loading={user.loading}
+        className={className}
+        showNotice={showNotice}
+        disabled={disabled}
+      >
+        {children}
+      </RoleBadgeUI>
+    );
+  }
 });
 
 RoleBadge.propTypes = {
@@ -110,21 +125,13 @@ const RoleBadgeUI = React.forwardRef(function RoleBadgeUI(
             <MenuLink
               as={process.env.IS_EXTENSION ? undefined : Link}
               className="menu__list__link-item"
-              href={
-                process.env.IS_EXTENSION
-                  ? `about/${unprefix(roleId)}`
-                  : undefined
-              }
+              href={process.env.IS_EXTENSION ? `about/${roleId}` : undefined}
               target={process.env.IS_EXTENSION ? '_blank' : undefined}
-              to={
-                process.env.IS_EXTENSION
-                  ? undefined
-                  : `/about/${unprefix(roleId)}`
-              }
+              to={process.env.IS_EXTENSION ? undefined : `/about/${roleId}`}
             >
-              {user && user.name && user.name !== unprefix(roleId)
-                ? `${user.name} (${unprefix(roleId).substring(0, 5)}…)`
-                : `View Profile (${unprefix(roleId).substring(0, 5)}…)`}
+              {user && roleId && user.id !== roleId
+                ? `${user.name} (${user.id}…)`
+                : `View Profile (${user.id}…)`}
             </MenuLink>
             {children}
           </MenuList>
@@ -133,21 +140,13 @@ const RoleBadgeUI = React.forwardRef(function RoleBadgeUI(
             <MenuLink
               as={process.env.IS_EXTENSION ? undefined : Link}
               className="menu__list__link-item"
-              href={
-                process.env.IS_EXTENSION
-                  ? `about/${unprefix(roleId)}`
-                  : undefined
-              }
+              href={process.env.IS_EXTENSION ? `about/${roleId}` : undefined}
               target={process.env.IS_EXTENSION ? '_blank' : undefined}
-              to={
-                process.env.IS_EXTENSION
-                  ? undefined
-                  : `/about/${unprefix(roleId)}`
-              }
+              to={process.env.IS_EXTENSION ? undefined : `/about/${roleId}`}
             >
-              {user && user.name && user.name !== unprefix(roleId)
-                ? `${user.name} (${unprefix(roleId).substring(0, 5)}…)`
-                : `View Profile (${unprefix(roleId).substring(0, 5)}…)`}
+              {user && roleId && user.id !== roleId
+                ? `${user.name} (${roleId}…)`
+                : `View Profile (${roleId}…)`}
             </MenuLink>
           </MenuList>
         )}
@@ -159,11 +158,9 @@ const RoleBadgeUI = React.forwardRef(function RoleBadgeUI(
 RoleBadgeUI.propTypes = {
   showNotice: PropTypes.bool,
   tooltip: PropTypes.bool,
-  roleId: PropTypes.string,
+  roleId: PropTypes.number,
   user: PropTypes.shape({
-    '@id': PropTypes.string.isRequired,
-    '@type': PropTypes.oneOf(['PublicReviewerRole', 'AnonymousReviewerRole'])
-      .isRequired,
+    id: PropTypes.number,
     name: PropTypes.string,
     avatar: PropTypes.shape({
       '@type': PropTypes.oneOf(['ImageObject']).isRequired,
@@ -183,9 +180,9 @@ function Tooltipify({ tooltip, roleId, user, children }) {
   return tooltip ? (
     <Tooltip
       label={
-        user && user.name && user.name !== unprefix(roleId)
-          ? `${user.name} (${unprefix(roleId).substring(0, 5)}…)`
-          : unprefix(roleId)
+        user && roleId && user.id !== roleId
+          ? `${user.name} (${roleId}…)`
+          : roleId
       }
     >
       <div>{children}</div>
@@ -197,7 +194,7 @@ function Tooltipify({ tooltip, roleId, user, children }) {
 
 Tooltipify.propTypes = {
   tooltip: PropTypes.bool,
-  roleId: PropTypes.string,
+  roleId: PropTypes.number,
   user: PropTypes.shape({
     name: PropTypes.string,
   }),

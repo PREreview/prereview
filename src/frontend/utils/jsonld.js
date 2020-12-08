@@ -6,7 +6,11 @@ export function getId(doc) {
 }
 
 export function unprefix(uri = '') {
-  return uri.replace(/^.*:/, '');
+  if (uri && typeof uri === 'string') {
+    return uri.replace(/^.*:/, '');
+  } else {
+    return uri;
+  }
 }
 
 export function cleanup(doc, { removeEmptyArray = false } = {}) {

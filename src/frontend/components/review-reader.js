@@ -26,6 +26,8 @@ const ReviewReader = React.memo(function ReviewReader({
     defaultHighlightedRoleIds || [],
   );
 
+  const allReviews = preprint.fullReviews.concat(preprint.rapidReviews);
+
   useEffect(() => {
     if (
       defaultHighlightedRoleIds &&
@@ -35,10 +37,12 @@ const ReviewReader = React.memo(function ReviewReader({
     }
   }, [defaultHighlightedRoleIds, highlightedRoleIds]);
 
+  // #FIXME remove useMemo
   const roleIds = useMemo(() => {
-    return preprint.reviews
-      ? preprint.reviews
-          .map(review => useGetUser(review.author))
+    console.log(allReviews);
+    return allReviews.length
+      ? allReviews
+          .map(review => (review.author ? useGetUser(review.author) : null))
           .filter(
             roleId =>
               !highlightedRoleIds.some(
@@ -46,15 +50,16 @@ const ReviewReader = React.memo(function ReviewReader({
               ),
           )
       : {};
-  }, [preprint.reviews, highlightedRoleIds]);
+  }, [allReviews, highlightedRoleIds]);
 
+  // #FIXME remove useMemo
   const highlightedActions = useMemo(() => {
     return highlightedRoleIds.length
-      ? preprint.reviews.filter(action =>
+      ? allReviews.filter(action =>
           highlightedRoleIds.some(roleId => getId(action.agent) === roleId),
         )
-      : preprint.reviews;
-  }, [preprint.reviews, highlightedRoleIds]);
+      : allReviews;
+  }, [allReviews, highlightedRoleIds]);
 
   return (
     <div
@@ -92,7 +97,7 @@ const ReviewReader = React.memo(function ReviewReader({
               <div className="review-reader__persona-selector">
                 <PotentialRoles
                   role={role}
-                  preprint={preprint}
+                  reviews={allReviews}
                   canModerate={!!user}
                   isModerationInProgress={isModerationInProgress}
                   onModerate={onModerate}
@@ -110,7 +115,7 @@ const ReviewReader = React.memo(function ReviewReader({
 
                 <HighlightedRoles
                   role={role}
-                  actions={preprint.reviews}
+                  reviews={allReviews}
                   canModerate={!!user}
                   isModerationInProgress={isModerationInProgress}
                   onModerate={onModerate}
