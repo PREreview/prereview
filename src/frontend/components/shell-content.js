@@ -63,7 +63,7 @@ export default function ShellContent({
   const showProfileNotice = checkIfRoleLacksMininmalData(user);
 
   useEffect(() => {
-    
+
   }, [user]);
 
   return (
@@ -124,7 +124,7 @@ export default function ShellContent({
                 })}
                 disabled={postReviewRequest.loading || hasReviewed}
                 onClick={() => {
-                  if (user) { // #FIXME
+                  if (true) { // #FIXME
                     onRequireScreen();
                     setTab('longReview');
                   } else {
@@ -142,7 +142,7 @@ export default function ShellContent({
                 })}
                 disabled={postReviewRequest.loading || hasRequested}
                 onClick={() => {
-                  if (user) {
+                  if (true) { // #FIXME
                     onRequireScreen();
                     setTab('request');
                   } else {
