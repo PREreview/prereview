@@ -18,12 +18,8 @@ services:
       PREREVIEW_DB_HOST: prereview-db
       PREREVIEW_DB_PORT: 5432
       PREREVIEW_DB_USER: prereview
-      PREREVIEW_DB_PASS: ${secrets.DEV_DB_PASS}
       PREREVIEW_DB_NAME: prereview
       PREREVIEW_ORCID_SANDBOX: true
-      PREREVIEW_ORCID_CALLBACK_URL: https://prereview2-dev.azurewebsites.net/api/v2/orcid/callback
-      PREREVIEW_ORCID_CLIENT_ID: ${secrets.DEV_ORCID_CLIENT_ID}
-      PREREVIEW_ORCID_CLIENT_SECRET: ${secrets.DEV_ORCID_CLIENT_SECRET}
 
   prereview-db:
     image: postgres:12-alpine
@@ -34,8 +30,8 @@ services:
     environment:
       PGDATA: /var/lib/postgresql/data/pgdata
       POSTGRES_USER: prereview
-      POSTGRES_PASSWORD: prereview
-      POSTGRES_DB: ${secrets.DEV_DB_PASS}
+      POSTGRES_PASSWORD: ${PREREVIEW_DB_PASS}
+      POSTGRES_DB: prereview
 
 volumes:
   prereview-db_data: {}

@@ -36,6 +36,5 @@ jobs:
 
     - uses: azure/webapps-deploy@v2
       with:
-        app-name: 'prereview2'
-        slot-name: 'dev'
+        app-name: 'prereview-dev'
         configuration-file: './deploy/docker-compose-dev.yml'
