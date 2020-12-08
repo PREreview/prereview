@@ -1,7 +1,7 @@
 import { Command } from 'commander';
 import dotenv from 'dotenv';
 import { from } from 'env-var';
-import Joi from 'joi';
+import { Joi } from 'koa-joi-router';
 import orcidUtils from 'orcid-utils';
 import log4js from 'koa-log4';
 import { isString } from '../common/utils';
@@ -53,7 +53,7 @@ const defaultEnv = isString(process.env.NODE_ENV)
 const defaultPort = isString(process.env.PORT) ? process.env.PORT : '3000';
 
 const defaults = {
-  admin_username: 'admin',
+  admin_user: 'admin',
   db_name:
     defaultEnv !== 'production'
       ? `${process.env.npm_package_name.toLowerCase()}-${defaultEnv.toLowerCase()}.sqlite3`
@@ -84,7 +84,20 @@ function getEnvOrDefault(postfix: string) {
   return getEnv(postfix);
 }
 
-// eslint-disable-next-line no-unused-vars
+function validateOrcidArray(
+  value: string,
+  previous: Array<string>,
+): Array<string> {
+  const array = value ? value.split(',') : previous;
+  Joi.assert(
+    array,
+    Joi.array()
+      .items(Joi.string().external(value => orcidUtils.isValid(value)))
+      .required(),
+  );
+  return array;
+}
+
 function validateBool(value: string, previous: boolean): boolean {
   const bool = value ? String(value).toLowerCase() === 'true' : previous;
   Joi.assert(bool, Joi.boolean());
@@ -187,7 +200,6 @@ function validatePort(value: string, previous: number): number {
   return port;
 }
 
-// eslint-disable-next-line no-unused-vars
 function validateArray(value: string, previous: Array<string>): Array<string> {
   const array = value ? value.split(',') : previous;
   Joi.assert(
@@ -257,16 +269,22 @@ export default program
   .description(process.env.npm_package_description)
   .version(process.env.npm_package_version)
   .option(
+    '--admin-users <OrcIDs>',
+    'Admin OrcIDs',
+    validateOrcidArray,
+    getEnvOrDefault('admin_user').asArray(),
+  )
+  .option(
     '--username <username>',
     'Admin username',
     validateUser,
-    getEnvOrDefault('admin_username').asString(),
+    getEnvOrDefault('admin_user').asString(),
   )
   .option(
     '--password <password>',
     'Admin password',
     validatePassword,
-    getEnvOrDefault('admin_password').asString(),
+    getEnvOrDefault('admin_pass').asString(),
   )
   .option(
     '-p, --port <number>',
@@ -338,13 +356,13 @@ export default program
     '--db-user <user>',
     'Database user',
     validateUser,
-    getEnvOrDefault('db_name').asString(),
+    getEnvOrDefault('db_user').asString(),
   )
   .option(
     '--db-pass <password>',
     'Database password',
     validatePassword,
-    getEnvOrDefault('db_password').asString(),
+    getEnvOrDefault('db_pass').asString(),
   )
   .option(
     '--cfaccess-url <url>',

@@ -5,28 +5,30 @@ import { getLogger } from '../log.js';
 import router from 'koa-joi-router';
 import userRoutes from './user.js';
 import fullReviewRoutes from './fullReview.js';
-import rapidReviewRoutes from './rapidReview.js';
-import requestRoutes from './request.js';
 import commentRoutes from './comment.js';
 import communityRoutes from './community.js';
 import groupRoutes from './group.js';
+import rapidReviewRoutes from './rapidReview.js';
+import requestRoutes from './request.js';
+import searchesRoutes from './searches.js';
 import tagRoutes from './tag.js';
 
 const log = getLogger('apiDocs:::');
 
-export default function docs() {
+export default function docs(authz) {
   const routes = router();
   const generator = new SwaggerAPI();
 
-  generator.addJoiRouter(preprintRoutes());
-  generator.addJoiRouter(userRoutes());
-  generator.addJoiRouter(fullReviewRoutes());
-  generator.addJoiRouter(rapidReviewRoutes());
-  generator.addJoiRouter(requestRoutes());
-  generator.addJoiRouter(groupRoutes());
-  generator.addJoiRouter(commentRoutes());
-  generator.addJoiRouter(communityRoutes());
-  generator.addJoiRouter(tagRoutes());
+  generator.addJoiRouter(preprintRoutes({}, authz));
+  generator.addJoiRouter(userRoutes({}, authz));
+  generator.addJoiRouter(fullReviewRoutes({}, authz));
+  generator.addJoiRouter(groupRoutes({}, authz));
+  generator.addJoiRouter(commentRoutes({}, authz));
+  generator.addJoiRouter(communityRoutes({}, authz));
+  generator.addJoiRouter(rapidReviewRoutes({}, authz));
+  generator.addJoiRouter(requestRoutes({}, authz));
+  generator.addJoiRouter(searchesRoutes({}, authz));
+  generator.addJoiRouter(tagRoutes({}, authz));
 
   const spec = generator.generateSpec(
     {

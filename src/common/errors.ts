@@ -33,7 +33,6 @@ export class HttpError extends ChainError {
       properties && properties.cleanStack ? properties.cleanStack : true;
     super(`HTTP Error ${status}: ${message}`, cause, cleanStack);
     this.status = status;
-    this.name = 'HttpError';
     this.expose = properties.expose ? properties.expose : status < 500;
     this.headers = properties.headers;
   }
@@ -46,42 +45,36 @@ export class HttpError extends ChainError {
 export class BadRequestError extends HttpError {
   constructor(message: string, cause?: Error) {
     super(400, message, cause);
-    this.name = 'BadRequestError';
   }
 }
 
 export class UnauthorizedError extends HttpError {
   constructor(message: string, cause?: Error) {
     super(401, message, cause);
-    this.name = 'UnauthorizedError';
   }
 }
 
 export class ForbiddenError extends HttpError {
   constructor(message: string, cause?: Error) {
     super(403, message, cause);
-    this.name = 'ForbiddenError';
   }
 }
 
 export class NotFoundError extends HttpError {
   constructor(message: string, cause?: Error) {
     super(404, message, cause);
-    this.name = 'NotFoundError';
   }
 }
 
 export class UnprocessableError extends HttpError {
   constructor(message: string, cause?: Error) {
     super(422, message, cause);
-    this.name = 'UnprocessableError';
   }
 }
 
 export class ServerError extends HttpError {
   constructor(message: string, cause?: Error) {
     super(500, message, cause);
-    this.name = 'ServerError';
   }
 }
 
@@ -127,7 +120,6 @@ export function createError(...args: any[]): HttpError {
   const defaultProps = {
     expose: props.expose ? props.expose : status < 500,
     headers: props.headers,
-    name: 'HttpError',
     status: this.status,
     statusCode: this.statusCode,
   };

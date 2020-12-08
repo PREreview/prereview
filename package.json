@@ -31,27 +31,36 @@
     "lint": "eslint --ignore-path .gitignore --fix ./src/backend",
     "test": "jest --coverage --forceExit --passWithNoTests",
     "doc": "jsdoc -d ./dist/doc/ -r ./src/backend ./src/frontend",
-    "build": "rimraf dist && npm run build:backend && npm run build:frontend",
-    "build:dev": "rimraf dist && npm run build:backend:dev && npm run build:frontend:dev",
+    "build": "rimraf dist && npm run build:backend && npm run build:frontend && npm run build:scripts",
+    "build:dev": "rimraf dist && npm run build:backend:dev && npm run build:frontend:dev && npm run build:scripts",
     "build:backend": "parcel build --target=backend --no-scope-hoist --no-cache src/backend/index.js",
     "build:backend:dev": "parcel build --target=backend --no-minify --no-scope-hoist --no-cache src/backend/index.js",
     "watch:backend:dev": "parcel watch --target=backend --no-cache src/backend/index.js",
     "build:frontend": "parcel build --target=frontend src/frontend/index.html",
     "build:frontend:dev": "parcel build --target=frontend --no-minify src/frontend/index.html",
+    "build:scripts:migrations": "npm run scan:migrations && parcel build --target=migrations-script --no-scope-hoist --no-minify --no-cache src/backend/scripts/dbMigrations.ts",
+    "build:scripts:seeds": "parcel build --target=seeds-script --no-scope-hoist --no-minify --no-cache src/backend/scripts/dbSeeds.ts",
+    "build:scripts:init": "parcel build --target=init-script --no-scope-hoist --no-minify --no-cache src/backend/scripts/dbInit.ts",
+    "build:scripts": "rimraf dist/scripts && npm run build:scripts:migrations && npm run build:scripts:init",
     "db": "mikro-orm",
-    "db:migrations": "mikro-orm migration:up",
+    "db:migrations": "node dist/scripts/dbMigrations.js",
+    "db:migrations:test": "ts-node src/backend/scripts/dbMigrations.ts",
     "db:seeds": "ts-node src/backend/scripts/dbSeeds.ts",
-    "db:init": "ts-node src/backend/scripts/dbInit.ts",
+    "db:init": "node dist/scripts/dbInit.js",
+    "scan:migrations": "barrelsby --delete -l below -d src/backend/db/migrations",
     "start:backend": "node dist/backend/index.js",
     "start:backend:dev": "nodemon -w dist/backend --enable-source-maps dist/backend/index.js -p 3001",
     "start": "npm run start:backend",
     "start:frontend:dev": "parcel serve -p 3000 src/frontend/index.html",
     "start:dev": "concurrently -p \"[{name}]\" -n \"BACKEND,FRONTEND\" -c \"bgBlue.bold,bgMagenta.bold\" \"npm run start:backend:dev\" \"npm run start:frontend:dev\"",
-    "generate-fetcher": "restful-react import --file hooks.json --output ./src/frontend/hooks/api-hooks.tsx",
+    "generate-fetcher": "restful-react import --file openapi.json --output ./src/frontend/hooks/api-hooks.tsx",
     "postgenerate-fetcher": "prettier ./src/frontend/hooks/api-hooks.d.tsx --write"
   },
   "backend": "dist/backend/index.js",
   "frontend": "dist/frontend/index.html",
+  "migrations-script": "dist/scripts/dbMigrations.js",
+  "seeds-script": "dist/scripts/dbSeeds.js",
+  "init-script": "dist/scripts/dbInit.js",
   "targets": {
     "backend": {
       "context": "node",
@@ -60,6 +69,18 @@
     "frontend": {
       "context": "browser",
       "distDir": "dist/frontend"
+    },
+    "migrations-script": {
+      "context": "node",
+      "distDir": "dist/scripts"
+    },
+    "seeds-script": {
+      "context": "node",
+      "distDir": "dist/scripts"
+    },
+    "init-script": {
+      "context": "node",
+      "distDir": "dist/scripts"
     }
   },
   "engines": {
@@ -70,6 +91,10 @@
     "last 3 firefox versions",
     "last 3 safari versions"
   ],
+  "@parcel/transformer-js": {
+    "inlineFS": false,
+    "inlineEnvironment": false
+  },
   "dependencies": {
     "@date-io/date-fns": "^1.3.13",
     "@koa/cors": "2.2.3",
@@ -79,6 +104,7 @@
     "@material-ui/pickers": "^3.2.10",
     "@material-ui/styles": "^4.9.0",
     "@mikro-orm/core": "^4.3.1",
+    "@mikro-orm/migrations": "^4.3.2",
     "@mikro-orm/postgresql": "^4.3.1",
     "@mikro-orm/reflection": "^4.3.1",
     "@mikro-orm/sqlite": "^4.3.1",
@@ -93,6 +119,7 @@
     "@types/statuses": "^2.0.0",
     "babel-polyfill": "^6.26.0",
     "bcryptjs": "^2.4.3",
+    "class-fixtures-factory": "github:throneless-tech/class-fixtures-factory",
     "classnames": "^2.2.6",
     "clipboard-copy": "^3.1.0",
     "combined-stream": "^1.0.8",
@@ -108,7 +135,7 @@
     "ioredis": "^4.14.1",
     "is-mobile": "^2.2.2",
     "is-url": "^1.2.4",
-    "joi": "^17.1.1",
+    "js-cookie": "^2.2.1",
     "jsdom": "^16.3.0",
     "jwks-rsa": "^1.6.2",
     "knex": "^0.21.8",
@@ -123,8 +150,8 @@
     "koa-error": "^3.2.0",
     "koa-helmet": "4.1.0",
     "koa-http-request": "^2.2.1",
-    "koa-joi-router": "^6.0.2",
-    "koa-joi-router-docs": "^1.2.1",
+    "koa-joi-router": "^7.0.0",
+    "koa-joi-router-docs": "github:throneless-tech/koa-joi-router-docs",
     "koa-jwt": "^3.6.0",
     "koa-log4": "^2.3.2",
     "koa-logger": "3.2.0",
@@ -165,7 +192,7 @@
     "remirror": "^1.0.0-next.58",
     "request-promise-native": "^1.0.8",
     "request-received": "0.0.3",
-    "restful-react": "^15.1.1",
+    "restful-react": "^15.1.2",
     "smoothscroll-polyfill": "^0.4.4",
     "socket.io-client": "^2.3.0",
     "sqlite3": "^5.0.0",
@@ -187,7 +214,7 @@
     "@typescript-eslint/parser": "^4.5.0",
     "acorn-jsx": "^5.1.0",
     "babel-plugin-transform-inline-environment-variables": "^0.4.3",
-    "class-fixtures-factory": "github:throneless-tech/class-fixtures-factory",
+    "barrelsby": "^2.2.0",
     "concurrently": "^5.3.0",
     "eslint": "^6.8.0",
     "eslint-config-prettier": "4.3.0",
@@ -209,7 +236,8 @@
     "supertest": "^4.0.2",
     "supertest-session": "^4.0.0",
     "ts-node": "^9.0.0",
-    "typescript": "^4.0.5"
+    "typescript": "^4.0.5",
+    "typescript-eslint-language-service": "^4.1.2"
   },
   "husky": {
     "hooks": {

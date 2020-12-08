@@ -66,26 +66,26 @@ export default function controller(
   reviewsRouter.route({
     method: 'POST',
     path: '/fullReviews',
+    // pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
     handler: async ctx => {
-      log.debug('Posting full review.');
+      log.debug('Adding full review.');
       let review, draft, authorPersona, preprint;
-
-      log.debug('ctx.request.body', ctx.request.body);
 
       try {
         review = reviewModel.create(ctx.request.body);
         await reviewModel.persistAndFlush(review);
+
         await review.authors.init();
-
         authorPersona = await personaModel.find(ctx.request.body.authors);
-        preprint = await preprintModel.find(ctx.request.body.preprint);
-
         review.authors.add(authorPersona[0]);
+
+        preprint = await preprintModel.find(ctx.request.body.preprint);
         review.preprint = preprint[0];
 
         if (ctx.request.body.contents) {
+          log.debug(`Adding full review draft.`);
           draft = draftModel.create({
-            title: 'Review of a preprint',
+            title: 'Review of a preprint', //TODO: remove when we make title optional
             contents: ctx.request.body.contents,
             parent: review,
           });
@@ -102,51 +102,93 @@ export default function controller(
       };
       ctx.status = 201;
     },
+    meta: {
+      swagger: {
+        operationId: 'PostFullReviews',
+        summary:
+          'Endpoint to POST full-length drafts of reviews. The text contents of a review must be in the `contents` property of the request body. Returns a 201 if successful.',
+      },
+    },
   });
 
   reviewsRouter.route({
+    method: 'GET',
+    path: '/preprints/:pid/fullReviews',
+    handler: async ctx => getHandler(ctx),
     meta: {
       swagger: {
         operationId: 'GetPreprintFullReviews',
-        summary: 'Endpoint to GET full-length reviews of a specific preprint.',
-        required: true,
+        summary:
+          'Endpoint to GET all full-length reviews of a specific preprint. If successful, returns a 200 and an array of reviews in the `data` property of the response body.',
       },
     },
-    method: 'GET',
-    path: '/preprints/:pid/fullReviews',
-    // pre: thisUser.can('access private pages'),
-    handler: async ctx => getHandler(ctx),
   });
 
   reviewsRouter.route({
+    method: 'GET',
+    path: '/fullReviews',
+    handler: async ctx => getHandler(ctx),
     meta: {
       swagger: {
         operationId: 'GetFullReviews',
-        summary: 'Endpoint to GET all full-length reviews.',
+        summary:
+          'Endpoint to GET all full-length reviews. If successful, returns a 200 and an array of reviews in the `data` property of the response body.',
       },
     },
-    method: 'GET',
-    path: '/fullReviews',
-    // pre: thisUser.can(''),
-    handler: async ctx => getHandler(ctx),
   });
 
   reviewsRouter.route({
+    method: 'PUT',
+    path: '/fullReviews/:id',
+    handler: async ctx => {
+      log.debug(`Updating review ${ctx.params.id}.`);
+      let fullReview, draft;
+
+      try {
+        fullReview = await reviewModel.findOne(ctx.params.id);
+        if (!fullReview) {
+          ctx.throw(404, `Full review with ID ${ctx.params.id} doesn't exist`);
+        }
+
+        if (ctx.request.body.contents) {
+          log.debug(`Adding full review draft.`);
+          draft = draftModel.create({
+            title: 'Review of a preprint', //TODO: remove when we make title optional
+            contents: ctx.request.body.contents,
+            parent: fullReview,
+          });
+          await draftModel.persistAndFlush(draft);
+        }
+      } catch (err) {
+        log.error('HTTP 400 Error: ', err);
+        ctx.throw(400, `Failed to parse query: ${err}`);
+      }
+
+      // if updated
+      ctx.status = 204;
+    },
     meta: {
       swagger: {
-        operationId: 'GetFullReview',
-        summary: 'Endpoint to GET a specific full-length review.',
-        required: true,
+        operationId: 'PutFullReview',
+        summary:
+          'Endpoint to PUT updates to a specific full-length review. If successful, returns a 204.',
       },
     },
+  });
+
+  reviewsRouter.route({
     method: 'GET',
     path: '/fullReviews/:id',
     handler: async ctx => {
       log.debug(`Retrieving review ${ctx.params.id}.`);
-      let fullReview;
+      let fullReview, latestDraft;
 
       try {
-        fullReview = await reviewModel.findOne(ctx.params.id);
+        fullReview = await reviewModel.findOne(ctx.params.id, [
+          'drafts',
+          'authors',
+        ]);
+
         if (!fullReview) {
           ctx.throw(404, `Full review with ID ${ctx.params.id} doesn't exist`);
         }
@@ -155,27 +197,32 @@ export default function controller(
         ctx.throw(400, `Failed to parse query: ${err}`);
       }
 
-      ctx.body = {
-        status: 200,
-        message: 'ok',
-        data: [fullReview],
-      };
-      ctx.status = 200;
+      if (fullReview) {
+        // gets latest draft associated with this review
+        latestDraft = fullReview.drafts[fullReview.drafts.length - 1];
+
+        ctx.body = {
+          status: 200,
+          message: 'ok',
+          body: [{ ...fullReview, contents: latestDraft.contents }],
+        };
+        ctx.status = 200;
+      }
+    },
+    meta: {
+      swagger: {
+        operationId: 'GetFullReview',
+        summary:
+          "Endpoint to GET a specific full-length review. If successful, returns a 200 and a single-member array of the review object in the `data` property of the response body. The contents of the review's latest draft is in the `contents` property of the review object.",
+        required: true,
+      },
     },
   });
 
   reviewsRouter.route({
-    meta: {
-      swagger: {
-        operationId: 'DeleteFullReview',
-        summary:
-          'Endpoint to DELETE full-length reviews of a specific preprint. Admin users only.',
-        required: true,
-      },
-    },
     method: 'DELETE',
     path: '/fullReviews/:id',
-    // pre:thisUserthisUser.can('access admin pages'),
+    pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next),
     handler: async ctx => {
       log.debug(`Deleting fullReview ${ctx.params.id}.`);
       let fullReview;
@@ -193,6 +240,14 @@ export default function controller(
 
       // if deleted
       ctx.status = 204;
+    },
+    meta: {
+      swagger: {
+        operationId: 'DeleteFullReview',
+        summary:
+          'Endpoint to DELETE full-length reviews of a specific preprint. Admin users only.',
+        required: true,
+      },
     },
   });
 

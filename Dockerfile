@@ -5,6 +5,7 @@ RUN apk add --no-cache \
     build-base \
     python \
     g++ \
+    git \
     cairo-dev \
     jpeg-dev \
     pango-dev \
@@ -31,13 +32,17 @@ RUN npm prune --production
 # Main layer
 FROM node:14-alpine
 
-RUN apk add --update --no-cache curl
+RUN apk add --update --no-cache \
+    curl \
+    netcat-openbsd \
+    postgresql-client
 
 EXPOSE 3000
 
 WORKDIR /app
 
 COPY --from=build /src .
+COPY ./docker-entrypoint.sh .
 
 HEALTHCHECK --interval=5s \
             --timeout=5s \
@@ -48,4 +53,5 @@ ENV NODE_ENV=production
 
 USER node
 
-CMD ["node", "./dist/backend/index.js"]
+ENTRYPOINT ["./docker-entrypoint.sh"]
+CMD ["start"]

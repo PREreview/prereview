@@ -1,19 +1,14 @@
 import passport from 'koa-passport';
 import { Strategy as OrcidStrategy } from 'passport-orcid';
 import router from 'koa-joi-router';
-import { getLogger } from '../log.js';
 import merge from 'lodash.merge';
+import { getLogger } from '../log.js';
 
 const log = getLogger('backend:controllers:auth');
 
 export default function controller(users, personas, config, thisUser) {
   const authRouter = router();
-  /**
-   * Serialize user
-   *
-   * @param {Object} user - User info
-   * @param {function} done - 'Done' callback
-   */
+
   passport.serializeUser((user, done) => {
     log.trace('serializeUser() user:', user);
     done(null, user.id);
@@ -164,7 +159,9 @@ export default function controller(users, personas, config, thisUser) {
           }
 
           log.debug(`Setting cookies for user ${ctx.state.user.name}`);
-          ctx.cookies.set('PRE_user', ctx.state.user.name, { httpOnly: false });
+          ctx.cookies.set('PRE_user', ctx.state.user.orcid, {
+            httpOnly: false,
+          });
           ctx.body = { success: true, user: user };
 
           try {
@@ -182,8 +179,9 @@ export default function controller(users, personas, config, thisUser) {
     method: 'get',
     path: '/logout',
     handler: async ctx => {
-      log.debug('Logging out...');
+      log.debug('Starting log out.');
       if (ctx.isAuthenticated()) {
+        log.debug('Finishing logging out.');
         ctx.logout();
         ctx.session = null;
         ctx.cookies.set('PRE_user', '');

@@ -65,19 +65,36 @@ export default function controller(users, thisUser) {
     },
     method: 'get',
     path: '/users/:id',
-    // pre:thisUserthisUser.can('access private pages'),
+    pre: thisUser.can('access private pages'),
     validate: {
-      params: Joi.object({
-        id: Joi.number().integer(), // TODO should we be validating this?
-      }),
+      //params: {
+      //  id: Joi.alternatives()
+      //    .match('one')
+      //    .try(Joi.number().integer(), Joi.string())
+      //    .description('User id')
+      //    .required(),
+      //},
+      params: {
+        id: Joi.string()
+          .description('User id')
+          .required(),
+      },
       continueOnError: false,
       failure: 400,
     },
     handler: async ctx => {
       log.debug(`Retrieving user ${ctx.params.id}`);
 
-      const user = await users.findOne(ctx.params.id, ['personas', 'groups']);
-
+      const user = await users.findOneByIdOrOrcid(ctx.params.id, [
+        'personas',
+        'groups',
+      ]);
+      if (
+        thisUser.isMemberOf('admins', user.orcid) ||
+        user.groups.contains('admins')
+      ) {
+        user.isAdmin = true;
+      }
       if (user) {
         ctx.status = 200;
         ctx.body = {
@@ -94,7 +111,6 @@ export default function controller(users, thisUser) {
       swagger: {
         operationId: 'PutUser',
         summary: 'Endpoint to PUT a single user by ID.',
-        required: true,
       },
     },
     method: 'put',
@@ -105,9 +121,11 @@ export default function controller(users, thisUser) {
         email: Joi.string(),
       }),
       type: 'json',
-      params: Joi.object({
-        id: Joi.number().integer(),
-      }),
+      params: {
+        id: Joi.string()
+          .description('User id')
+          .required(),
+      },
       continueOnError: false,
       false: 400,
     },
@@ -137,11 +155,13 @@ export default function controller(users, thisUser) {
     method: 'delete',
     path: '/users/:id',
     validate: {
-      params: Joi.object({
-        id: Joi.number().integer(),
-      }),
+      params: {
+        id: Joi.string()
+          .description('User id')
+          .required(),
+      },
     },
-    // pre:thisUserthisUser.can('access admin pages'), // TODO: can users delete their own account?
+    pre: thisUser.can('access admin pages'), // TODO: can users delete their own account?
     handler: async ctx => {
       log.debug(`Deleting user ${ctx.params.id}.`);
 

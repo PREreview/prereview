@@ -1,0 +1,40 @@
+# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
+# More GitHub Actions for Azure: https://github.com/Azure/actions
+
+name: Build and deploy Node.js app to Azure Web App - prereview2-dev
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+    # checkout the repo
+    - name: 'Checkout Github Action'
+      uses: actions/checkout@master
+
+    - name: 'Login via Azure CLI'
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: 'Login to private registry'
+      uses: azure/docker-login@v1
+      with:
+        login-server: prereview.azurecr.io
+        username: ${{ secrets.REGISTRY_USERNAME }}
+        password: ${{ secrets.REGISTRY_PASSWORD }}
+
+    - run: |
+        docker build . -t prereview.azurecr.io/prereview:${{ github.sha }}
+        docker tag prereview.azurecr.io/prereview:${{ github.sha }} prereview.azurecr.io/prereview:develop
+        docker push prereview.azurecr.io/prereview:${{ github.sha }}
+        docker push prereview.azurecr.io/prereview:develop
+
+    - uses: azure/webapps-deploy@v2
+      with:
+        app-name: 'prereview-dev'
+        configuration-file: './deploy/docker-compose-dev.yml'

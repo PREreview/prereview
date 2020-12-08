@@ -17,11 +17,11 @@ export class FullReviewDraft extends BaseEntity {
   parent!: FullReview;
 
   @Fixture(faker => `${faker.commerce.color()} ${faker.random.word()}`)
-  @Property()
-  title!: string;
+  @Property({ nullable: true })
+  title?: string;
 
   @Fixture(faker => faker.lorem.paragraph())
-  @Property()
+  @Property({ columnType: 'text' })
   contents!: string;
 
   constructor(title: string, contents: string) {

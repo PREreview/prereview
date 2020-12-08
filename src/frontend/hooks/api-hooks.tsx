@@ -3,12 +3,6 @@
 import React from "react";
 import { Get, GetProps, useGet, UseGetProps, Mutate, MutateProps, useMutate, UseMutateProps } from "restful-react";
 
-export interface PostCommunitiesBodyRequestBody {
-  name: string;
-  description?: string;
-  logo?: string;
-}
-
 export interface PostGroupsBodyRequestBody {
   name: string;
 }
@@ -16,6 +10,12 @@ export interface PostGroupsBodyRequestBody {
 export interface PostCommentsBodyRequestBody {
   title: string;
   contents: string;
+}
+
+export interface PostCommunitiesBodyRequestBody {
+  name: string;
+  description?: string;
+  logo?: string;
 }
 
 export type GetResolvePreprintsProps = Omit<GetProps<void, unknown, void, void>, "path">;
@@ -94,7 +94,7 @@ export const useGetPreprints = (props: UseGetPreprintsProps) => useGet<void, unk
 
 
 export interface GetPreprintPathParams {
-  id: number
+  id: string
 }
 
 export type GetPreprintProps = Omit<GetProps<void, unknown, void, GetPreprintPathParams>, "path"> & GetPreprintPathParams;
@@ -119,7 +119,7 @@ export const useGetPreprint = ({id, ...props}: UseGetPreprintProps) => useGet<vo
 
 
 export interface PutPreprintPathParams {
-  id: number
+  id: string
 }
 
 export interface PutPreprintRequestBody {
@@ -148,13 +148,13 @@ export type UsePutPreprintProps = Omit<UseMutateProps<void, unknown, void, PutPr
 export const usePutPreprint = ({id, ...props}: UsePutPreprintProps) => useMutate<void, unknown, void, PutPreprintRequestBody, PutPreprintPathParams>("PUT", (paramsInPath: PutPreprintPathParams) => `/preprints/${paramsInPath.id}`, {  pathParams: { id }, ...props });
 
 
-export type DeletePreprintProps = Omit<MutateProps<void, unknown, void, number, void>, "path" | "verb">;
+export type DeletePreprintProps = Omit<MutateProps<void, unknown, void, string, void>, "path" | "verb">;
 
 /**
  * Endpoint to DELETE preprints
  */
 export const DeletePreprint = (props: DeletePreprintProps) => (
-  <Mutate<void, unknown, void, number, void>
+  <Mutate<void, unknown, void, string, void>
     verb="DELETE"
     path={`/preprints`}
     
@@ -162,12 +162,12 @@ export const DeletePreprint = (props: DeletePreprintProps) => (
   />
 );
 
-export type UseDeletePreprintProps = Omit<UseMutateProps<void, unknown, void, number, void>, "path" | "verb">;
+export type UseDeletePreprintProps = Omit<UseMutateProps<void, unknown, void, string, void>, "path" | "verb">;
 
 /**
  * Endpoint to DELETE preprints
  */
-export const useDeletePreprint = (props: UseDeletePreprintProps) => useMutate<void, unknown, void, number, void>("DELETE", `/preprints`, {   ...props });
+export const useDeletePreprint = (props: UseDeletePreprintProps) => useMutate<void, unknown, void, string, void>("DELETE", `/preprints`, {   ...props });
 
 
 export type GetUsersProps = Omit<GetProps<void, unknown, void, void>, "path">;
@@ -192,7 +192,10 @@ export const useGetUsers = (props: UseGetUsersProps) => useGet<void, unknown, vo
 
 
 export interface GetUserPathParams {
-  id: number
+  /**
+   * User id
+   */
+  id: string
 }
 
 export type GetUserProps = Omit<GetProps<void, unknown, void, GetUserPathParams>, "path"> & GetUserPathParams;
@@ -217,7 +220,10 @@ export const useGetUser = ({id, ...props}: UseGetUserProps) => useGet<void, unkn
 
 
 export interface PutUserPathParams {
-  id: number
+  /**
+   * User id
+   */
+  id: string
 }
 
 export interface PutUserRequestBody {
@@ -247,13 +253,13 @@ export type UsePutUserProps = Omit<UseMutateProps<void, unknown, void, PutUserRe
 export const usePutUser = ({id, ...props}: UsePutUserProps) => useMutate<void, unknown, void, PutUserRequestBody, PutUserPathParams>("PUT", (paramsInPath: PutUserPathParams) => `/users/${paramsInPath.id}`, {  pathParams: { id }, ...props });
 
 
-export type DeleteUserProps = Omit<MutateProps<void, unknown, void, number, void>, "path" | "verb">;
+export type DeleteUserProps = Omit<MutateProps<void, unknown, void, string, void>, "path" | "verb">;
 
 /**
  * Endpoint to DELETE a single user by ID.
  */
 export const DeleteUser = (props: DeleteUserProps) => (
-  <Mutate<void, unknown, void, number, void>
+  <Mutate<void, unknown, void, string, void>
     verb="DELETE"
     path={`/users`}
     
@@ -261,16 +267,19 @@ export const DeleteUser = (props: DeleteUserProps) => (
   />
 );
 
-export type UseDeleteUserProps = Omit<UseMutateProps<void, unknown, void, number, void>, "path" | "verb">;
+export type UseDeleteUserProps = Omit<UseMutateProps<void, unknown, void, string, void>, "path" | "verb">;
 
 /**
  * Endpoint to DELETE a single user by ID.
  */
-export const useDeleteUser = (props: UseDeleteUserProps) => useMutate<void, unknown, void, number, void>("DELETE", `/users`, {   ...props });
+export const useDeleteUser = (props: UseDeleteUserProps) => useMutate<void, unknown, void, string, void>("DELETE", `/users`, {   ...props });
 
 
 export type PostFullReviewsProps = Omit<MutateProps<void, unknown, void, void, void>, "path" | "verb">;
 
+/**
+ * Endpoint to POST full-length drafts of reviews. The text contents of a review must be in the `contents` property of the request body. Returns a 201 if successful.
+ */
 export const PostFullReviews = (props: PostFullReviewsProps) => (
   <Mutate<void, unknown, void, void, void>
     verb="POST"
@@ -282,13 +291,16 @@ export const PostFullReviews = (props: PostFullReviewsProps) => (
 
 export type UsePostFullReviewsProps = Omit<UseMutateProps<void, unknown, void, void, void>, "path" | "verb">;
 
+/**
+ * Endpoint to POST full-length drafts of reviews. The text contents of a review must be in the `contents` property of the request body. Returns a 201 if successful.
+ */
 export const usePostFullReviews = (props: UsePostFullReviewsProps) => useMutate<void, unknown, void, void, void>("POST", `/fullReviews`, props);
 
 
 export type GetFullReviewsProps = Omit<GetProps<void, unknown, void, void>, "path">;
 
 /**
- * Endpoint to GET all full-length reviews.
+ * Endpoint to GET all full-length reviews. If successful, returns a 200 and an array of reviews in the `data` property of the response body.
  */
 export const GetFullReviews = (props: GetFullReviewsProps) => (
   <Get<void, unknown, void, void>
@@ -301,7 +313,7 @@ export const GetFullReviews = (props: GetFullReviewsProps) => (
 export type UseGetFullReviewsProps = Omit<UseGetProps<void, unknown, void, void>, "path">;
 
 /**
- * Endpoint to GET all full-length reviews.
+ * Endpoint to GET all full-length reviews. If successful, returns a 200 and an array of reviews in the `data` property of the response body.
  */
 export const useGetFullReviews = (props: UseGetFullReviewsProps) => useGet<void, unknown, void, void>(`/fullReviews`, props);
 
@@ -313,7 +325,7 @@ export interface GetPreprintFullReviewsPathParams {
 export type GetPreprintFullReviewsProps = Omit<GetProps<void, unknown, void, GetPreprintFullReviewsPathParams>, "path"> & GetPreprintFullReviewsPathParams;
 
 /**
- * Endpoint to GET full-length reviews of a specific preprint.
+ * Endpoint to GET all full-length reviews of a specific preprint. If successful, returns a 200 and an array of reviews in the `data` property of the response body.
  */
 export const GetPreprintFullReviews = ({pid, ...props}: GetPreprintFullReviewsProps) => (
   <Get<void, unknown, void, GetPreprintFullReviewsPathParams>
@@ -326,9 +338,35 @@ export const GetPreprintFullReviews = ({pid, ...props}: GetPreprintFullReviewsPr
 export type UseGetPreprintFullReviewsProps = Omit<UseGetProps<void, unknown, void, GetPreprintFullReviewsPathParams>, "path"> & GetPreprintFullReviewsPathParams;
 
 /**
- * Endpoint to GET full-length reviews of a specific preprint.
+ * Endpoint to GET all full-length reviews of a specific preprint. If successful, returns a 200 and an array of reviews in the `data` property of the response body.
  */
 export const useGetPreprintFullReviews = ({pid, ...props}: UseGetPreprintFullReviewsProps) => useGet<void, unknown, void, GetPreprintFullReviewsPathParams>((paramsInPath: GetPreprintFullReviewsPathParams) => `/preprints/${paramsInPath.pid}/fullReviews`, {  pathParams: { pid }, ...props });
+
+
+export interface PutFullReviewPathParams {
+  id: string
+}
+
+export type PutFullReviewProps = Omit<MutateProps<void, unknown, void, void, PutFullReviewPathParams>, "path" | "verb"> & PutFullReviewPathParams;
+
+/**
+ * Endpoint to PUT updates to a specific full-length review. If successful, returns a 204.
+ */
+export const PutFullReview = ({id, ...props}: PutFullReviewProps) => (
+  <Mutate<void, unknown, void, void, PutFullReviewPathParams>
+    verb="PUT"
+    path={`/fullReviews/${id}`}
+    
+    {...props}
+  />
+);
+
+export type UsePutFullReviewProps = Omit<UseMutateProps<void, unknown, void, void, PutFullReviewPathParams>, "path" | "verb"> & PutFullReviewPathParams;
+
+/**
+ * Endpoint to PUT updates to a specific full-length review. If successful, returns a 204.
+ */
+export const usePutFullReview = ({id, ...props}: UsePutFullReviewProps) => useMutate<void, unknown, void, void, PutFullReviewPathParams>("PUT", (paramsInPath: PutFullReviewPathParams) => `/fullReviews/${paramsInPath.id}`, {  pathParams: { id }, ...props });
 
 
 export interface GetFullReviewPathParams {
@@ -338,7 +376,7 @@ export interface GetFullReviewPathParams {
 export type GetFullReviewProps = Omit<GetProps<void, unknown, void, GetFullReviewPathParams>, "path"> & GetFullReviewPathParams;
 
 /**
- * Endpoint to GET a specific full-length review.
+ * Endpoint to GET a specific full-length review. If successful, returns a 200 and a single-member array of the review object in the `data` property of the response body. The contents of the review's latest draft is in the `contents` property of the review object.
  */
 export const GetFullReview = ({id, ...props}: GetFullReviewProps) => (
   <Get<void, unknown, void, GetFullReviewPathParams>
@@ -351,7 +389,7 @@ export const GetFullReview = ({id, ...props}: GetFullReviewProps) => (
 export type UseGetFullReviewProps = Omit<UseGetProps<void, unknown, void, GetFullReviewPathParams>, "path"> & GetFullReviewPathParams;
 
 /**
- * Endpoint to GET a specific full-length review.
+ * Endpoint to GET a specific full-length review. If successful, returns a 200 and a single-member array of the review object in the `data` property of the response body. The contents of the review's latest draft is in the `contents` property of the review object.
  */
 export const useGetFullReview = ({id, ...props}: UseGetFullReviewProps) => useGet<void, unknown, void, GetFullReviewPathParams>((paramsInPath: GetFullReviewPathParams) => `/fullReviews/${paramsInPath.id}`, {  pathParams: { id }, ...props });
 
@@ -376,6 +414,451 @@ export type UseDeleteFullReviewProps = Omit<UseMutateProps<void, unknown, void, 
  * Endpoint to DELETE full-length reviews of a specific preprint. Admin users only.
  */
 export const useDeleteFullReview = (props: UseDeleteFullReviewProps) => useMutate<void, unknown, void, string, void>("DELETE", `/fullReviews`, {   ...props });
+
+
+export interface PostGroupsQueryParams {
+  start?: number;
+  end?: number;
+  asc?: boolean;
+  sort_by?: string;
+  from?: string;
+  to?: string;
+}
+
+export type PostGroupsProps = Omit<MutateProps<void, unknown, PostGroupsQueryParams, PostGroupsBodyRequestBody, void>, "path" | "verb">;
+
+/**
+ * Endpoint to POST a new user group (where each group have varying levels of authorizations) to PREreview. Admin users only.
+ */
+export const PostGroups = (props: PostGroupsProps) => (
+  <Mutate<void, unknown, PostGroupsQueryParams, PostGroupsBodyRequestBody, void>
+    verb="POST"
+    path={`/groups`}
+    
+    {...props}
+  />
+);
+
+export type UsePostGroupsProps = Omit<UseMutateProps<void, unknown, PostGroupsQueryParams, PostGroupsBodyRequestBody, void>, "path" | "verb">;
+
+/**
+ * Endpoint to POST a new user group (where each group have varying levels of authorizations) to PREreview. Admin users only.
+ */
+export const usePostGroups = (props: UsePostGroupsProps) => useMutate<void, unknown, PostGroupsQueryParams, PostGroupsBodyRequestBody, void>("POST", `/groups`, props);
+
+
+export interface GetGroupsQueryParams {
+  start?: number;
+  end?: number;
+  asc?: boolean;
+  sort_by?: string;
+  from?: string;
+  to?: string;
+}
+
+export type GetGroupsProps = Omit<GetProps<void, unknown, GetGroupsQueryParams, void>, "path">;
+
+/**
+ * Endpoint to GET user groups on PREreview. Different user groups have varying authorization levels of access to API methods.
+ */
+export const GetGroups = (props: GetGroupsProps) => (
+  <Get<void, unknown, GetGroupsQueryParams, void>
+    path={`/groups`}
+    
+    {...props}
+  />
+);
+
+export type UseGetGroupsProps = Omit<UseGetProps<void, unknown, GetGroupsQueryParams, void>, "path">;
+
+/**
+ * Endpoint to GET user groups on PREreview. Different user groups have varying authorization levels of access to API methods.
+ */
+export const useGetGroups = (props: UseGetGroupsProps) => useGet<void, unknown, GetGroupsQueryParams, void>(`/groups`, props);
+
+
+export interface GetGroupQueryParams {
+  start?: number;
+  end?: number;
+  asc?: boolean;
+  sort_by?: string;
+  from?: string;
+  to?: string;
+}
+
+export interface GetGroupPathParams {
+  id: string
+}
+
+export type GetGroupProps = Omit<GetProps<void, unknown, GetGroupQueryParams, GetGroupPathParams>, "path"> & GetGroupPathParams;
+
+/**
+ * Endpoint to GET one user group by ID from PREreview. Admin users only.
+ */
+export const GetGroup = ({id, ...props}: GetGroupProps) => (
+  <Get<void, unknown, GetGroupQueryParams, GetGroupPathParams>
+    path={`/groups/${id}`}
+    
+    {...props}
+  />
+);
+
+export type UseGetGroupProps = Omit<UseGetProps<void, unknown, GetGroupQueryParams, GetGroupPathParams>, "path"> & GetGroupPathParams;
+
+/**
+ * Endpoint to GET one user group by ID from PREreview. Admin users only.
+ */
+export const useGetGroup = ({id, ...props}: UseGetGroupProps) => useGet<void, unknown, GetGroupQueryParams, GetGroupPathParams>((paramsInPath: GetGroupPathParams) => `/groups/${paramsInPath.id}`, {  pathParams: { id }, ...props });
+
+
+export interface PutGroupQueryParams {
+  start?: number;
+  end?: number;
+  asc?: boolean;
+  sort_by?: string;
+  from?: string;
+  to?: string;
+}
+
+export interface PutGroupPathParams {
+  id: string
+}
+
+export type PutGroupProps = Omit<MutateProps<void, unknown, PutGroupQueryParams, PostGroupsBodyRequestBody, PutGroupPathParams>, "path" | "verb"> & PutGroupPathParams;
+
+/**
+ * Endpoint to PUT one user group by ID from PREreview. Admin users only.
+ */
+export const PutGroup = ({id, ...props}: PutGroupProps) => (
+  <Mutate<void, unknown, PutGroupQueryParams, PostGroupsBodyRequestBody, PutGroupPathParams>
+    verb="PUT"
+    path={`/groups/${id}`}
+    
+    {...props}
+  />
+);
+
+export type UsePutGroupProps = Omit<UseMutateProps<void, unknown, PutGroupQueryParams, PostGroupsBodyRequestBody, PutGroupPathParams>, "path" | "verb"> & PutGroupPathParams;
+
+/**
+ * Endpoint to PUT one user group by ID from PREreview. Admin users only.
+ */
+export const usePutGroup = ({id, ...props}: UsePutGroupProps) => useMutate<void, unknown, PutGroupQueryParams, PostGroupsBodyRequestBody, PutGroupPathParams>("PUT", (paramsInPath: PutGroupPathParams) => `/groups/${paramsInPath.id}`, {  pathParams: { id }, ...props });
+
+
+export type DeleteGroupProps = Omit<MutateProps<void, unknown, void, string, void>, "path" | "verb">;
+
+/**
+ * Endpoint to DELETE one user group by ID from PREreview. Admin users only.
+ */
+export const DeleteGroup = (props: DeleteGroupProps) => (
+  <Mutate<void, unknown, void, string, void>
+    verb="DELETE"
+    path={`/groups`}
+    
+    {...props}
+  />
+);
+
+export type UseDeleteGroupProps = Omit<UseMutateProps<void, unknown, void, string, void>, "path" | "verb">;
+
+/**
+ * Endpoint to DELETE one user group by ID from PREreview. Admin users only.
+ */
+export const useDeleteGroup = (props: UseDeleteGroupProps) => useMutate<void, unknown, void, string, void>("DELETE", `/groups`, {   ...props });
+
+
+export type PostCommentsProps = Omit<MutateProps<void, unknown, void, PostCommentsBodyRequestBody, void>, "path" | "verb">;
+
+/**
+ * Endpoint to POST comments on full-length reviews of preprints. Returns a 201 if a comment has been successfully created.
+ */
+export const PostComments = (props: PostCommentsProps) => (
+  <Mutate<void, unknown, void, PostCommentsBodyRequestBody, void>
+    verb="POST"
+    path={`/comments`}
+    
+    {...props}
+  />
+);
+
+export type UsePostCommentsProps = Omit<UseMutateProps<void, unknown, void, PostCommentsBodyRequestBody, void>, "path" | "verb">;
+
+/**
+ * Endpoint to POST comments on full-length reviews of preprints. Returns a 201 if a comment has been successfully created.
+ */
+export const usePostComments = (props: UsePostCommentsProps) => useMutate<void, unknown, void, PostCommentsBodyRequestBody, void>("POST", `/comments`, props);
+
+
+export interface GetCommentsQueryParams {
+  start?: number;
+  end?: number;
+  asc?: boolean;
+  sort_by?: string;
+  from?: string;
+  to?: string;
+}
+
+export type GetCommentsProps = Omit<GetProps<void, unknown, GetCommentsQueryParams, void>, "path">;
+
+/**
+ * Endpoint to GET all comments on all full-length reviews of preprints.
+ */
+export const GetComments = (props: GetCommentsProps) => (
+  <Get<void, unknown, GetCommentsQueryParams, void>
+    path={`/comments`}
+    
+    {...props}
+  />
+);
+
+export type UseGetCommentsProps = Omit<UseGetProps<void, unknown, GetCommentsQueryParams, void>, "path">;
+
+/**
+ * Endpoint to GET all comments on all full-length reviews of preprints.
+ */
+export const useGetComments = (props: UseGetCommentsProps) => useGet<void, unknown, GetCommentsQueryParams, void>(`/comments`, props);
+
+
+export interface GetFullReviewCommentsQueryParams {
+  start?: number;
+  end?: number;
+  asc?: boolean;
+  sort_by?: string;
+  from?: string;
+  to?: string;
+}
+
+export interface GetFullReviewCommentsPathParams {
+  fid: string
+}
+
+export type GetFullReviewCommentsProps = Omit<GetProps<void, unknown, GetFullReviewCommentsQueryParams, GetFullReviewCommentsPathParams>, "path"> & GetFullReviewCommentsPathParams;
+
+/**
+ * Endpoint to GET all comments related to a specific full-length review of a preprint.
+ */
+export const GetFullReviewComments = ({fid, ...props}: GetFullReviewCommentsProps) => (
+  <Get<void, unknown, GetFullReviewCommentsQueryParams, GetFullReviewCommentsPathParams>
+    path={`/fullReviews/${fid}/comments`}
+    
+    {...props}
+  />
+);
+
+export type UseGetFullReviewCommentsProps = Omit<UseGetProps<void, unknown, GetFullReviewCommentsQueryParams, GetFullReviewCommentsPathParams>, "path"> & GetFullReviewCommentsPathParams;
+
+/**
+ * Endpoint to GET all comments related to a specific full-length review of a preprint.
+ */
+export const useGetFullReviewComments = ({fid, ...props}: UseGetFullReviewCommentsProps) => useGet<void, unknown, GetFullReviewCommentsQueryParams, GetFullReviewCommentsPathParams>((paramsInPath: GetFullReviewCommentsPathParams) => `/fullReviews/${paramsInPath.fid}/comments`, {  pathParams: { fid }, ...props });
+
+
+export interface GetCommentPathParams {
+  id: string
+}
+
+export type GetCommentProps = Omit<GetProps<void, unknown, void, GetCommentPathParams>, "path"> & GetCommentPathParams;
+
+/**
+ * Endpoint to GET a specific comment.
+ */
+export const GetComment = ({id, ...props}: GetCommentProps) => (
+  <Get<void, unknown, void, GetCommentPathParams>
+    path={`/comments/${id}`}
+    
+    {...props}
+  />
+);
+
+export type UseGetCommentProps = Omit<UseGetProps<void, unknown, void, GetCommentPathParams>, "path"> & GetCommentPathParams;
+
+/**
+ * Endpoint to GET a specific comment.
+ */
+export const useGetComment = ({id, ...props}: UseGetCommentProps) => useGet<void, unknown, void, GetCommentPathParams>((paramsInPath: GetCommentPathParams) => `/comments/${paramsInPath.id}`, {  pathParams: { id }, ...props });
+
+
+export interface PutCommentPathParams {
+  id: string
+}
+
+export type PutCommentProps = Omit<MutateProps<void, unknown, void, PostCommentsBodyRequestBody, PutCommentPathParams>, "path" | "verb"> & PutCommentPathParams;
+
+/**
+ * Endpoint to PUT changes on a specific comment.
+ */
+export const PutComment = ({id, ...props}: PutCommentProps) => (
+  <Mutate<void, unknown, void, PostCommentsBodyRequestBody, PutCommentPathParams>
+    verb="PUT"
+    path={`/comments/${id}`}
+    
+    {...props}
+  />
+);
+
+export type UsePutCommentProps = Omit<UseMutateProps<void, unknown, void, PostCommentsBodyRequestBody, PutCommentPathParams>, "path" | "verb"> & PutCommentPathParams;
+
+/**
+ * Endpoint to PUT changes on a specific comment.
+ */
+export const usePutComment = ({id, ...props}: UsePutCommentProps) => useMutate<void, unknown, void, PostCommentsBodyRequestBody, PutCommentPathParams>("PUT", (paramsInPath: PutCommentPathParams) => `/comments/${paramsInPath.id}`, {  pathParams: { id }, ...props });
+
+
+export type DeleteCommentProps = Omit<MutateProps<void, unknown, void, string, void>, "path" | "verb">;
+
+/**
+ * Endpoint to DELETE a comment.
+ */
+export const DeleteComment = (props: DeleteCommentProps) => (
+  <Mutate<void, unknown, void, string, void>
+    verb="DELETE"
+    path={`/comments`}
+    
+    {...props}
+  />
+);
+
+export type UseDeleteCommentProps = Omit<UseMutateProps<void, unknown, void, string, void>, "path" | "verb">;
+
+/**
+ * Endpoint to DELETE a comment.
+ */
+export const useDeleteComment = (props: UseDeleteCommentProps) => useMutate<void, unknown, void, string, void>("DELETE", `/comments`, {   ...props });
+
+
+export type PostCommunitiesProps = Omit<MutateProps<void, unknown, void, PostCommunitiesBodyRequestBody, void>, "path" | "verb">;
+
+/**
+ * Endpoint to POST a new community to PREreview. Admin users only.
+ */
+export const PostCommunities = (props: PostCommunitiesProps) => (
+  <Mutate<void, unknown, void, PostCommunitiesBodyRequestBody, void>
+    verb="POST"
+    path={`/communities`}
+    
+    {...props}
+  />
+);
+
+export type UsePostCommunitiesProps = Omit<UseMutateProps<void, unknown, void, PostCommunitiesBodyRequestBody, void>, "path" | "verb">;
+
+/**
+ * Endpoint to POST a new community to PREreview. Admin users only.
+ */
+export const usePostCommunities = (props: UsePostCommunitiesProps) => useMutate<void, unknown, void, PostCommunitiesBodyRequestBody, void>("POST", `/communities`, props);
+
+
+export interface GetCommunitiesQueryParams {
+  start?: number;
+  end?: number;
+  asc?: boolean;
+  sort_by?: string;
+  from?: string;
+  to?: string;
+}
+
+export type GetCommunitiesProps = Omit<GetProps<void, unknown, GetCommunitiesQueryParams, void>, "path">;
+
+/**
+ * Endpoint to GET all the communities registered on PREreview, as well as their associated members and preprints.
+ */
+export const GetCommunities = (props: GetCommunitiesProps) => (
+  <Get<void, unknown, GetCommunitiesQueryParams, void>
+    path={`/communities`}
+    
+    {...props}
+  />
+);
+
+export type UseGetCommunitiesProps = Omit<UseGetProps<void, unknown, GetCommunitiesQueryParams, void>, "path">;
+
+/**
+ * Endpoint to GET all the communities registered on PREreview, as well as their associated members and preprints.
+ */
+export const useGetCommunities = (props: UseGetCommunitiesProps) => useGet<void, unknown, GetCommunitiesQueryParams, void>(`/communities`, props);
+
+
+export interface GetCommunityQueryParams {
+  start?: number;
+  end?: number;
+  asc?: boolean;
+  sort_by?: string;
+  from?: string;
+  to?: string;
+}
+
+export interface GetCommunityPathParams {
+  id: string
+}
+
+export type GetCommunityProps = Omit<GetProps<void, unknown, GetCommunityQueryParams, GetCommunityPathParams>, "path"> & GetCommunityPathParams;
+
+/**
+ * Endpoint to GET info on a community registered on PREreview, along with its associated members and preprints.
+ */
+export const GetCommunity = ({id, ...props}: GetCommunityProps) => (
+  <Get<void, unknown, GetCommunityQueryParams, GetCommunityPathParams>
+    path={`/communities/${id}`}
+    
+    {...props}
+  />
+);
+
+export type UseGetCommunityProps = Omit<UseGetProps<void, unknown, GetCommunityQueryParams, GetCommunityPathParams>, "path"> & GetCommunityPathParams;
+
+/**
+ * Endpoint to GET info on a community registered on PREreview, along with its associated members and preprints.
+ */
+export const useGetCommunity = ({id, ...props}: UseGetCommunityProps) => useGet<void, unknown, GetCommunityQueryParams, GetCommunityPathParams>((paramsInPath: GetCommunityPathParams) => `/communities/${paramsInPath.id}`, {  pathParams: { id }, ...props });
+
+
+export interface PutCommunityPathParams {
+  id: string
+}
+
+export type PutCommunityProps = Omit<MutateProps<void, unknown, void, PostCommunitiesBodyRequestBody, PutCommunityPathParams>, "path" | "verb"> & PutCommunityPathParams;
+
+/**
+ * Endpoint to PUT updates on a community registered on PREreview. Admin users only.
+ */
+export const PutCommunity = ({id, ...props}: PutCommunityProps) => (
+  <Mutate<void, unknown, void, PostCommunitiesBodyRequestBody, PutCommunityPathParams>
+    verb="PUT"
+    path={`/communities/${id}`}
+    
+    {...props}
+  />
+);
+
+export type UsePutCommunityProps = Omit<UseMutateProps<void, unknown, void, PostCommunitiesBodyRequestBody, PutCommunityPathParams>, "path" | "verb"> & PutCommunityPathParams;
+
+/**
+ * Endpoint to PUT updates on a community registered on PREreview. Admin users only.
+ */
+export const usePutCommunity = ({id, ...props}: UsePutCommunityProps) => useMutate<void, unknown, void, PostCommunitiesBodyRequestBody, PutCommunityPathParams>("PUT", (paramsInPath: PutCommunityPathParams) => `/communities/${paramsInPath.id}`, {  pathParams: { id }, ...props });
+
+
+export type DeleteCommunityProps = Omit<MutateProps<void, unknown, void, string, void>, "path" | "verb">;
+
+/**
+ * Endpoint to DELETE a community. Admin users only.
+ */
+export const DeleteCommunity = (props: DeleteCommunityProps) => (
+  <Mutate<void, unknown, void, string, void>
+    verb="DELETE"
+    path={`/communities`}
+    
+    {...props}
+  />
+);
+
+export type UseDeleteCommunityProps = Omit<UseMutateProps<void, unknown, void, string, void>, "path" | "verb">;
+
+/**
+ * Endpoint to DELETE a community. Admin users only.
+ */
+export const useDeleteCommunity = (props: UseDeleteCommunityProps) => useMutate<void, unknown, void, string, void>("DELETE", `/communities`, {   ...props });
 
 
 export type PostRapidReviewsProps = Omit<MutateProps<void, unknown, void, void, void>, "path" | "verb">;
@@ -543,6 +1026,9 @@ export const usePostRequests = (props: UsePostRequestsProps) => useMutate<void, 
 
 export type GetRequestsProps = Omit<GetProps<void, unknown, void, void>, "path">;
 
+/**
+ * Endpoint to GET all requests for review.
+ */
 export const GetRequests = (props: GetRequestsProps) => (
   <Get<void, unknown, void, void>
     path={`/requests`}
@@ -553,6 +1039,9 @@ export const GetRequests = (props: GetRequestsProps) => (
 
 export type UseGetRequestsProps = Omit<UseGetProps<void, unknown, void, void>, "path">;
 
+/**
+ * Endpoint to GET all requests for review.
+ */
 export const useGetRequests = (props: UseGetRequestsProps) => useGet<void, unknown, void, void>(`/requests`, props);
 
 
@@ -628,467 +1117,35 @@ export type UseDeleteRequestProps = Omit<UseMutateProps<void, unknown, void, str
 export const useDeleteRequest = (props: UseDeleteRequestProps) => useMutate<void, unknown, void, string, void>("DELETE", `/requests`, {   ...props });
 
 
-export interface PostGroupsQueryParams {
+export interface SearchQueryParams {
   start?: number;
   end?: number;
   asc?: boolean;
   sort_by?: string;
   from?: string;
   to?: string;
+  query?: string;
 }
 
-export type PostGroupsProps = Omit<MutateProps<void, unknown, PostGroupsQueryParams, PostGroupsBodyRequestBody, void>, "path" | "verb">;
+export type SearchProps = Omit<GetProps<void, unknown, SearchQueryParams, void>, "path">;
 
 /**
- * Endpoint to POST a new user group (where each group have varying levels of authorizations) to PREreview. Admin users only.
+ * Perform a full-text search query across supported tables.
  */
-export const PostGroups = (props: PostGroupsProps) => (
-  <Mutate<void, unknown, PostGroupsQueryParams, PostGroupsBodyRequestBody, void>
-    verb="POST"
-    path={`/groups`}
+export const Search = (props: SearchProps) => (
+  <Get<void, unknown, SearchQueryParams, void>
+    path={`/searches`}
     
     {...props}
   />
 );
 
-export type UsePostGroupsProps = Omit<UseMutateProps<void, unknown, PostGroupsQueryParams, PostGroupsBodyRequestBody, void>, "path" | "verb">;
+export type UseSearchProps = Omit<UseGetProps<void, unknown, SearchQueryParams, void>, "path">;
 
 /**
- * Endpoint to POST a new user group (where each group have varying levels of authorizations) to PREreview. Admin users only.
+ * Perform a full-text search query across supported tables.
  */
-export const usePostGroups = (props: UsePostGroupsProps) => useMutate<void, unknown, PostGroupsQueryParams, PostGroupsBodyRequestBody, void>("POST", `/groups`, props);
-
-
-export interface GetGroupsQueryParams {
-  start?: number;
-  end?: number;
-  asc?: boolean;
-  sort_by?: string;
-  from?: string;
-  to?: string;
-}
-
-export type GetGroupsProps = Omit<GetProps<void, unknown, GetGroupsQueryParams, void>, "path">;
-
-/**
- * Endpoint to GET a new user group (where each group have varying levels of authorizations) to PREreview. Admin users only.
- */
-export const GetGroups = (props: GetGroupsProps) => (
-  <Get<void, unknown, GetGroupsQueryParams, void>
-    path={`/groups`}
-    
-    {...props}
-  />
-);
-
-export type UseGetGroupsProps = Omit<UseGetProps<void, unknown, GetGroupsQueryParams, void>, "path">;
-
-/**
- * Endpoint to GET a new user group (where each group have varying levels of authorizations) to PREreview. Admin users only.
- */
-export const useGetGroups = (props: UseGetGroupsProps) => useGet<void, unknown, GetGroupsQueryParams, void>(`/groups`, props);
-
-
-export interface GetGroupQueryParams {
-  start?: number;
-  end?: number;
-  asc?: boolean;
-  sort_by?: string;
-  from?: string;
-  to?: string;
-}
-
-export interface GetGroupPathParams {
-  id: number
-}
-
-export type GetGroupProps = Omit<GetProps<void, unknown, GetGroupQueryParams, GetGroupPathParams>, "path"> & GetGroupPathParams;
-
-/**
- * Endpoint to GET one user group by ID from PREreview. Admin users only.
- */
-export const GetGroup = ({id, ...props}: GetGroupProps) => (
-  <Get<void, unknown, GetGroupQueryParams, GetGroupPathParams>
-    path={`/groups/${id}`}
-    
-    {...props}
-  />
-);
-
-export type UseGetGroupProps = Omit<UseGetProps<void, unknown, GetGroupQueryParams, GetGroupPathParams>, "path"> & GetGroupPathParams;
-
-/**
- * Endpoint to GET one user group by ID from PREreview. Admin users only.
- */
-export const useGetGroup = ({id, ...props}: UseGetGroupProps) => useGet<void, unknown, GetGroupQueryParams, GetGroupPathParams>((paramsInPath: GetGroupPathParams) => `/groups/${paramsInPath.id}`, {  pathParams: { id }, ...props });
-
-
-export interface PutGroupPathParams {
-  id: string
-}
-
-export type PutGroupProps = Omit<MutateProps<void, unknown, void, PostGroupsBodyRequestBody, PutGroupPathParams>, "path" | "verb"> & PutGroupPathParams;
-
-/**
- * Endpoint to PUT one user group by ID from PREreview. Admin users only.
- */
-export const PutGroup = ({id, ...props}: PutGroupProps) => (
-  <Mutate<void, unknown, void, PostGroupsBodyRequestBody, PutGroupPathParams>
-    verb="PUT"
-    path={`/groups/${id}`}
-    
-    {...props}
-  />
-);
-
-export type UsePutGroupProps = Omit<UseMutateProps<void, unknown, void, PostGroupsBodyRequestBody, PutGroupPathParams>, "path" | "verb"> & PutGroupPathParams;
-
-/**
- * Endpoint to PUT one user group by ID from PREreview. Admin users only.
- */
-export const usePutGroup = ({id, ...props}: UsePutGroupProps) => useMutate<void, unknown, void, PostGroupsBodyRequestBody, PutGroupPathParams>("PUT", (paramsInPath: PutGroupPathParams) => `/groups/${paramsInPath.id}`, {  pathParams: { id }, ...props });
-
-
-export type DeleteGroupProps = Omit<MutateProps<void, unknown, void, string, void>, "path" | "verb">;
-
-/**
- * Endpoint to DELETE one user group by ID from PREreview. Admin users only.
- */
-export const DeleteGroup = (props: DeleteGroupProps) => (
-  <Mutate<void, unknown, void, string, void>
-    verb="DELETE"
-    path={`/groups`}
-    
-    {...props}
-  />
-);
-
-export type UseDeleteGroupProps = Omit<UseMutateProps<void, unknown, void, string, void>, "path" | "verb">;
-
-/**
- * Endpoint to DELETE one user group by ID from PREreview. Admin users only.
- */
-export const useDeleteGroup = (props: UseDeleteGroupProps) => useMutate<void, unknown, void, string, void>("DELETE", `/groups`, {   ...props });
-
-
-export interface GetGroupMemberPathParams {
-  id: string;
-  uid: string
-}
-
-export interface GetGroupMemberRequestBody {
-  username?: string;
-  password?: string;
-  id?: number;
-  firstName?: string;
-  lastName?: string;
-  email?: string;
-  role?: number;
-}
-
-export type GetGroupMemberProps = Omit<MutateProps<void, unknown, void, GetGroupMemberRequestBody, GetGroupMemberPathParams>, "path" | "verb"> & GetGroupMemberPathParams;
-
-/**
- * Endpoint to GET one user from a group by ID from PREreview. Admin users only.
- */
-export const GetGroupMember = ({id, uid, ...props}: GetGroupMemberProps) => (
-  <Mutate<void, unknown, void, GetGroupMemberRequestBody, GetGroupMemberPathParams>
-    verb="PUT"
-    path={`/groups/${id}/members/${uid}`}
-    
-    {...props}
-  />
-);
-
-export type UseGetGroupMemberProps = Omit<UseMutateProps<void, unknown, void, GetGroupMemberRequestBody, GetGroupMemberPathParams>, "path" | "verb"> & GetGroupMemberPathParams;
-
-/**
- * Endpoint to GET one user from a group by ID from PREreview. Admin users only.
- */
-export const useGetGroupMember = ({id, uid, ...props}: UseGetGroupMemberProps) => useMutate<void, unknown, void, GetGroupMemberRequestBody, GetGroupMemberPathParams>("PUT", (paramsInPath: GetGroupMemberPathParams) => `/groups/${paramsInPath.id}/members/${paramsInPath.uid}`, {  pathParams: { id, uid }, ...props });
-
-
-export interface DeleteGroupMemberPathParams {
-  id: string
-}
-
-export type DeleteGroupMemberProps = Omit<MutateProps<void, unknown, void, string, DeleteGroupMemberPathParams>, "path" | "verb"> & DeleteGroupMemberPathParams;
-
-/**
- * Endpoint to DELETE one user from a group by ID from PREreview. Admin users only.
- */
-export const DeleteGroupMember = ({id, ...props}: DeleteGroupMemberProps) => (
-  <Mutate<void, unknown, void, string, DeleteGroupMemberPathParams>
-    verb="DELETE"
-    path={`/groups/${id}/members`}
-    
-    {...props}
-  />
-);
-
-export type UseDeleteGroupMemberProps = Omit<UseMutateProps<void, unknown, void, string, DeleteGroupMemberPathParams>, "path" | "verb"> & DeleteGroupMemberPathParams;
-
-/**
- * Endpoint to DELETE one user from a group by ID from PREreview. Admin users only.
- */
-export const useDeleteGroupMember = ({id, ...props}: UseDeleteGroupMemberProps) => useMutate<void, unknown, void, string, DeleteGroupMemberPathParams>("DELETE", (paramsInPath: DeleteGroupMemberPathParams) => `/groups/${paramsInPath.id}/members`, {  pathParams: { id }, ...props });
-
-
-export type PostCommentsProps = Omit<MutateProps<void, unknown, void, PostCommentsBodyRequestBody, void>, "path" | "verb">;
-
-/**
- * Endpoint to POST comments on full-length reviews of preprints.
- */
-export const PostComments = (props: PostCommentsProps) => (
-  <Mutate<void, unknown, void, PostCommentsBodyRequestBody, void>
-    verb="POST"
-    path={`/comments`}
-    
-    {...props}
-  />
-);
-
-export type UsePostCommentsProps = Omit<UseMutateProps<void, unknown, void, PostCommentsBodyRequestBody, void>, "path" | "verb">;
-
-/**
- * Endpoint to POST comments on full-length reviews of preprints.
- */
-export const usePostComments = (props: UsePostCommentsProps) => useMutate<void, unknown, void, PostCommentsBodyRequestBody, void>("POST", `/comments`, props);
-
-
-export type GetCommentsProps = Omit<GetProps<void, unknown, void, void>, "path">;
-
-/**
- * Endpoint to GET all comments on all full-length reviews of preprints.
- */
-export const GetComments = (props: GetCommentsProps) => (
-  <Get<void, unknown, void, void>
-    path={`/comments`}
-    
-    {...props}
-  />
-);
-
-export type UseGetCommentsProps = Omit<UseGetProps<void, unknown, void, void>, "path">;
-
-/**
- * Endpoint to GET all comments on all full-length reviews of preprints.
- */
-export const useGetComments = (props: UseGetCommentsProps) => useGet<void, unknown, void, void>(`/comments`, props);
-
-
-export interface GetFullReviewCommentsPathParams {
-  fid: string
-}
-
-export type GetFullReviewCommentsProps = Omit<GetProps<void, unknown, void, GetFullReviewCommentsPathParams>, "path"> & GetFullReviewCommentsPathParams;
-
-/**
- * Endpoint to GET all comments related to a specific full-length review of a preprint.
- */
-export const GetFullReviewComments = ({fid, ...props}: GetFullReviewCommentsProps) => (
-  <Get<void, unknown, void, GetFullReviewCommentsPathParams>
-    path={`/fullReviews/${fid}/comments`}
-    
-    {...props}
-  />
-);
-
-export type UseGetFullReviewCommentsProps = Omit<UseGetProps<void, unknown, void, GetFullReviewCommentsPathParams>, "path"> & GetFullReviewCommentsPathParams;
-
-/**
- * Endpoint to GET all comments related to a specific full-length review of a preprint.
- */
-export const useGetFullReviewComments = ({fid, ...props}: UseGetFullReviewCommentsProps) => useGet<void, unknown, void, GetFullReviewCommentsPathParams>((paramsInPath: GetFullReviewCommentsPathParams) => `/fullReviews/${paramsInPath.fid}/comments`, {  pathParams: { fid }, ...props });
-
-
-export interface GetCommentPathParams {
-  id: string
-}
-
-export type GetCommentProps = Omit<GetProps<void, unknown, void, GetCommentPathParams>, "path"> & GetCommentPathParams;
-
-/**
- * Endpoint to GET a single specific comment.
- */
-export const GetComment = ({id, ...props}: GetCommentProps) => (
-  <Get<void, unknown, void, GetCommentPathParams>
-    path={`/comments/${id}`}
-    
-    {...props}
-  />
-);
-
-export type UseGetCommentProps = Omit<UseGetProps<void, unknown, void, GetCommentPathParams>, "path"> & GetCommentPathParams;
-
-/**
- * Endpoint to GET a single specific comment.
- */
-export const useGetComment = ({id, ...props}: UseGetCommentProps) => useGet<void, unknown, void, GetCommentPathParams>((paramsInPath: GetCommentPathParams) => `/comments/${paramsInPath.id}`, {  pathParams: { id }, ...props });
-
-
-export interface PutCommentPathParams {
-  id: string
-}
-
-export type PutCommentProps = Omit<MutateProps<void, unknown, void, PostCommentsBodyRequestBody, PutCommentPathParams>, "path" | "verb"> & PutCommentPathParams;
-
-/**
- * Endpoint to PUT changes on a specific comment.
- */
-export const PutComment = ({id, ...props}: PutCommentProps) => (
-  <Mutate<void, unknown, void, PostCommentsBodyRequestBody, PutCommentPathParams>
-    verb="PUT"
-    path={`/comments/${id}`}
-    
-    {...props}
-  />
-);
-
-export type UsePutCommentProps = Omit<UseMutateProps<void, unknown, void, PostCommentsBodyRequestBody, PutCommentPathParams>, "path" | "verb"> & PutCommentPathParams;
-
-/**
- * Endpoint to PUT changes on a specific comment.
- */
-export const usePutComment = ({id, ...props}: UsePutCommentProps) => useMutate<void, unknown, void, PostCommentsBodyRequestBody, PutCommentPathParams>("PUT", (paramsInPath: PutCommentPathParams) => `/comments/${paramsInPath.id}`, {  pathParams: { id }, ...props });
-
-
-export type DeleteCommentProps = Omit<MutateProps<void, unknown, void, string, void>, "path" | "verb">;
-
-/**
- * Endpoint to DELETE a comment.
- */
-export const DeleteComment = (props: DeleteCommentProps) => (
-  <Mutate<void, unknown, void, string, void>
-    verb="DELETE"
-    path={`/comments`}
-    
-    {...props}
-  />
-);
-
-export type UseDeleteCommentProps = Omit<UseMutateProps<void, unknown, void, string, void>, "path" | "verb">;
-
-/**
- * Endpoint to DELETE a comment.
- */
-export const useDeleteComment = (props: UseDeleteCommentProps) => useMutate<void, unknown, void, string, void>("DELETE", `/comments`, {   ...props });
-
-
-export type PostCommunitiesProps = Omit<MutateProps<void, unknown, void, PostCommunitiesBodyRequestBody, void>, "path" | "verb">;
-
-/**
- * Endpoint to POST a new community to PREreview. Admin users only.
- */
-export const PostCommunities = (props: PostCommunitiesProps) => (
-  <Mutate<void, unknown, void, PostCommunitiesBodyRequestBody, void>
-    verb="POST"
-    path={`/communities`}
-    
-    {...props}
-  />
-);
-
-export type UsePostCommunitiesProps = Omit<UseMutateProps<void, unknown, void, PostCommunitiesBodyRequestBody, void>, "path" | "verb">;
-
-/**
- * Endpoint to POST a new community to PREreview. Admin users only.
- */
-export const usePostCommunities = (props: UsePostCommunitiesProps) => useMutate<void, unknown, void, PostCommunitiesBodyRequestBody, void>("POST", `/communities`, props);
-
-
-export type GetCommunitiesProps = Omit<GetProps<void, unknown, void, void>, "path">;
-
-/**
- * Endpoint to GET all the communities registered on PREreview, as well as their associated members and preprints.
- */
-export const GetCommunities = (props: GetCommunitiesProps) => (
-  <Get<void, unknown, void, void>
-    path={`/communities`}
-    
-    {...props}
-  />
-);
-
-export type UseGetCommunitiesProps = Omit<UseGetProps<void, unknown, void, void>, "path">;
-
-/**
- * Endpoint to GET all the communities registered on PREreview, as well as their associated members and preprints.
- */
-export const useGetCommunities = (props: UseGetCommunitiesProps) => useGet<void, unknown, void, void>(`/communities`, props);
-
-
-export interface GetCommunityPathParams {
-  id: string
-}
-
-export type GetCommunityProps = Omit<GetProps<void, unknown, void, GetCommunityPathParams>, "path"> & GetCommunityPathParams;
-
-/**
- * Endpoint to GET info on one community registered on PREreview, along with its associated members and preprints.
- */
-export const GetCommunity = ({id, ...props}: GetCommunityProps) => (
-  <Get<void, unknown, void, GetCommunityPathParams>
-    path={`/communities/${id}`}
-    
-    {...props}
-  />
-);
-
-export type UseGetCommunityProps = Omit<UseGetProps<void, unknown, void, GetCommunityPathParams>, "path"> & GetCommunityPathParams;
-
-/**
- * Endpoint to GET info on one community registered on PREreview, along with its associated members and preprints.
- */
-export const useGetCommunity = ({id, ...props}: UseGetCommunityProps) => useGet<void, unknown, void, GetCommunityPathParams>((paramsInPath: GetCommunityPathParams) => `/communities/${paramsInPath.id}`, {  pathParams: { id }, ...props });
-
-
-export interface PutCommunityPathParams {
-  id: string
-}
-
-export type PutCommunityProps = Omit<MutateProps<void, unknown, void, PostCommunitiesBodyRequestBody, PutCommunityPathParams>, "path" | "verb"> & PutCommunityPathParams;
-
-/**
- * Endpoint to PUT updates on a community registered on PREreview. Admin users only.
- */
-export const PutCommunity = ({id, ...props}: PutCommunityProps) => (
-  <Mutate<void, unknown, void, PostCommunitiesBodyRequestBody, PutCommunityPathParams>
-    verb="PUT"
-    path={`/communities/${id}`}
-    
-    {...props}
-  />
-);
-
-export type UsePutCommunityProps = Omit<UseMutateProps<void, unknown, void, PostCommunitiesBodyRequestBody, PutCommunityPathParams>, "path" | "verb"> & PutCommunityPathParams;
-
-/**
- * Endpoint to PUT updates on a community registered on PREreview. Admin users only.
- */
-export const usePutCommunity = ({id, ...props}: UsePutCommunityProps) => useMutate<void, unknown, void, PostCommunitiesBodyRequestBody, PutCommunityPathParams>("PUT", (paramsInPath: PutCommunityPathParams) => `/communities/${paramsInPath.id}`, {  pathParams: { id }, ...props });
-
-
-export type DeleteCommunityProps = Omit<MutateProps<void, unknown, void, string, void>, "path" | "verb">;
-
-/**
- * Endpoint to DELETE a community. Admin users only.
- */
-export const DeleteCommunity = (props: DeleteCommunityProps) => (
-  <Mutate<void, unknown, void, string, void>
-    verb="DELETE"
-    path={`/communities`}
-    
-    {...props}
-  />
-);
-
-export type UseDeleteCommunityProps = Omit<UseMutateProps<void, unknown, void, string, void>, "path" | "verb">;
-
-/**
- * Endpoint to DELETE a community. Admin users only.
- */
-export const useDeleteCommunity = (props: UseDeleteCommunityProps) => useMutate<void, unknown, void, string, void>("DELETE", `/communities`, {   ...props });
+export const useSearch = (props: UseSearchProps) => useGet<void, unknown, SearchQueryParams, void>(`/searches`, props);
 
 
 export type PostTagsProps = Omit<MutateProps<void, unknown, void, void, void>, "path" | "verb">;

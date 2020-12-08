@@ -1,26 +1,27 @@
 import router from 'koa-joi-router';
 import { getLogger } from '../log.js';
+import { getErrorMessages } from '../utils/errors';
 
 const log = getLogger('backend:controllers:persona');
 const Joi = router.Joi;
 
-// eslint-disable-next-line no-unused-vars
+const handleInvalid = ctx => {
+  log.debug('Validation error!');
+  log.error(ctx.invalid);
+  ctx.status = 400;
+  ctx.message = getErrorMessages(ctx.invalid);
+};
+
 export default function controller(personasModel, thisUser) {
   const personaRouter = router();
 
-  // no POST because persona is created by the auth controller when
+  // no POST because personas are only created by the auth controller when
   // a new user first registers with PREreview
 
   personaRouter.route({
-    meta: {
-      swagger: {
-        operationId: 'GetPersonas',
-        summary: 'Endpoint to GET all personas. Admin users only.',
-      },
-    },
-    method: 'get',
+    method: 'GET',
     path: '/personas',
-    // pre:thisUser.can('access admin pages'),
+    pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
     // validate: {},
     handler: async ctx => {
       log.debug(`Retrieving personas.`);
@@ -42,20 +43,20 @@ export default function controller(personasModel, thisUser) {
         data: allPersonas,
       };
     },
+    meta: {
+      swagger: {
+        operationId: 'GetPersonas',
+        description:
+          'Each user registered on the PREreview platform has two corresponding personas: one which has their public name and another that is anonymous. This endpoint GETs all personas on PREreview and the reviews attributed to each. Returns a 200 if successful, and an array of personas in the `data` attribute of the response body.',
+      },
+    },
   });
 
   personaRouter.route({
-    meta: {
-      swagger: {
-        operationId: 'GetPersona',
-        summary: 'Endpoint to GET one persona by ID. Admin users only.',
-        required: true,
-      },
-    },
-    method: 'get',
+    method: 'GET',
     path: '/personas/:id',
     // validate: {}
-    // pre: thisUser.can('access private pages'), // TODO: can edit self only no?
+    pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
     handler: async ctx => {
       log.debug(`Retrieving persona ${ctx.params.id}.`);
       let persona;
@@ -77,17 +78,17 @@ export default function controller(personasModel, thisUser) {
       };
       ctx.status = 200;
     },
+    meta: {
+      swagger: {
+        operationId: 'GetPersona',
+        description:
+          'GET a single user persona. Returns a 200 if successful, and a single-member array of the persona object in the `data` attribute of the response body.',
+      },
+    },
   });
 
   personaRouter.route({
-    meta: {
-      swagger: {
-        operationId: 'PutPersona',
-        summary: 'Endpoint to PUT one persona by ID. Admin users only.',
-        required: true,
-      },
-    },
-    method: 'put',
+    method: 'PUT',
     path: '/personas/:id',
     validate: {
       body: Joi.object({
@@ -98,11 +99,16 @@ export default function controller(personasModel, thisUser) {
       params: Joi.object({
         id: Joi.number().integer(),
       }),
-      continueOnError: false,
+      continueOnError: true,
       false: 400,
     },
-    // pre:thisUserthisUser.can('access private pages'), // TODO: can edit self only no?
+    pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next), // TODO: can edit self only no?
     handler: async ctx => {
+      if (ctx.invalid) {
+        handleInvalid(ctx);
+        return;
+      }
+
       log.debug(`Updating persona ${ctx.params.id}.`);
       let persona;
 
@@ -124,9 +130,16 @@ export default function controller(personasModel, thisUser) {
       // if updated
       ctx.status = 204;
     },
+    meta: {
+      swagger: {
+        operationId: 'PutPersona',
+        summary: 'Endpoint to PUT one persona by ID. Admin users only.',
+        required: true,
+      },
+    },
   });
 
-  // FIXME: do we need delete?
+  // TODO: do we need delete?
 
   return personaRouter;
 }
