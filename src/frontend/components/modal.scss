@@ -1,4 +1,7 @@
 [data-reach-dialog-overlay] {
+  left: 0;
+  position: fixed;
+  top: 0;
   z-index: 100000;
 }
 
@@ -7,9 +10,9 @@
   left: 50%;
   max-width: 800px;
   min-width: 400px;
-  position: absolute;
-  top: 35%;
-  transform: translateX(-50%);
+  position: fixed;
+  top: 50%;
+  transform: translate(-50%, -50%);
   width: fit-content !important;
   z-index: 1005;
 
