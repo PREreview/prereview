@@ -94,7 +94,7 @@ PotentialRoles.propTypes = {
   onModerate: PropTypes.func,
   isModerationInProgress: PropTypes.bool,
   onRemoved: PropTypes.func.isRequired,
-  roleIds: PropTypes.arrayOf(PropTypes.number),
+  roleIds: PropTypes.arrayOf(PropTypes.object),
 };
 
 function DraggableRoleBadge({ roleId, onDropped, children, type }) {

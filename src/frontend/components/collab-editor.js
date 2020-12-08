@@ -89,12 +89,13 @@ const EditorWrapper = () => {
   } else {
     return (
       <RemirrorProvider
+        placeholder={'Start typing...'}
         manager={manager}
         value={value}
         onChange={parameter => {
-          // Update the state to the latest value.
-          setValue(parameter.state);
-        }}
+          // Update to new value
+          setValue(parameter.getHTML());
+      }}
       >
         <div>
           <Menu />

@@ -51,8 +51,8 @@ const useStyles = makeStyles({
 export default function LongFormFragment({ onChange }) {
   const classes = useStyles();
 
-  function handleChange(key, value) {
-    onChange(key, value);
+  const handleTyping = value => {
+    onChange(value);
   }
 
   return (
@@ -60,15 +60,10 @@ export default function LongFormFragment({ onChange }) {
       <fieldset className="rapid-form-fragment__text-response-questions">
         <Fragment key={'longform'}>
           <div className="remirror-container">
-            <CollabEditor />
+            <CollabEditor onTypingChange={handleTyping} />
           </div>
         </Fragment>
       </fieldset>
-      <NoticeBox type="warning">
-        Beta Notice: Please note that any reviews submitted during the beta
-        stage of Outbreak Science Rapid PREreview will be migrated over into
-        future updates.
-      </NoticeBox>
     </div>
   );
 }

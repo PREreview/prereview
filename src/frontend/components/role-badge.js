@@ -19,7 +19,6 @@ const RoleBadge = React.forwardRef(function RoleBadge(
     roleId !== undefined ? useGetUser({ id: parseInt(roleId) }) : null;
 
   useEffect(() => {
-    console.log('role id: ', roleId);
     if (!loadingUser) {
       if (userData) {
         setUser(userData.data)
