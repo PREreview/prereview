@@ -71,7 +71,7 @@
     letter-spacing: 0.04em;
     border-radius: 16px;
     background-color: var(--button-background-color--primary);
-    color: var(--button-foreground-color--primary);
+    color: var(--button-foreground-color--primary) !important;
     font: var(--ui-button-font--primary);
     height: var(--lgrd);
     white-space: pre;
