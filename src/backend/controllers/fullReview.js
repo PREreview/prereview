@@ -159,8 +159,8 @@ export default function controller(
           });
           await draftModel.persistAndFlush(draft);
         }
-        reviewModel.assign(fullReview, ctx.request.body)
-        await reviewModel.persistAndFlush(reviewModel)
+        reviewModel.assign(fullReview, ctx.request.body);
+        await reviewModel.persistAndFlush(reviewModel);
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse query: ${err}`);
@@ -199,7 +199,7 @@ export default function controller(
         ctx.throw(400, `Failed to parse query: ${err}`);
       }
 
-      if (fullRevienpw) {
+      if (fullReview) {
         // gets latest draft associated with this review
         latestDraft = fullReview.drafts[fullReview.drafts.length - 1];
 
