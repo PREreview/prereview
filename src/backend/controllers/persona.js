@@ -21,7 +21,6 @@ export default function controller(personasModel, thisUser) {
   personaRouter.route({
     method: 'GET',
     path: '/personas',
-    pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
     // validate: {},
     handler: async ctx => {
       log.debug(`Retrieving personas.`);
@@ -56,7 +55,6 @@ export default function controller(personasModel, thisUser) {
     method: 'GET',
     path: '/personas/:id',
     // validate: {}
-    pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
     handler: async ctx => {
       log.debug(`Retrieving persona ${ctx.params.id}.`);
       let persona;
