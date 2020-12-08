@@ -10,9 +10,11 @@ import { BoldExtension } from 'remirror/extension/bold';
 // import { CollaborationExtension } from 'remirror/extension/collaboration';
 import { ItalicExtension } from 'remirror/extension/italic';
 import { UnderlineExtension } from 'remirror/extension/underline';
+import { PlaceholderExtension } from 'remirror/extension/placeholder';
 // import { YjsExtension } from 'remirror/extension/yjs';
 
 let EXTENSIONS = [
+  new PlaceholderExtension(),
   new BoldExtension(),
   new ItalicExtension(),
   new UnderlineExtension(),
@@ -69,7 +71,7 @@ const EditorWrapper = () => {
   const [value, setValue] = useState(() =>
     // Use the `remirror` manager to create the state.
     manager.createState({
-      content: '<p>This is the initial value</p>',
+      content: '',
       stringHandler: fromHtml,
     }),
   );

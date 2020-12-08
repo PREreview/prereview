@@ -37,29 +37,22 @@ const ReviewReader = React.memo(function ReviewReader({
     }
   }, [defaultHighlightedRoleIds, highlightedRoleIds]);
 
-  // #FIXME remove useMemo
-  const roleIds = useMemo(() => {
-    console.log(allReviews);
-    return allReviews.length
-      ? allReviews
-          .map(review => (review.author ? useGetUser(review.author) : null))
-          .filter(
-            roleId =>
-              !highlightedRoleIds.some(
-                highlightedRoleId => roleId === highlightedRoleId,
-              ),
-          )
-      : {};
-  }, [allReviews, highlightedRoleIds]);
-
-  // #FIXME remove useMemo
-  const highlightedActions = useMemo(() => {
-    return highlightedRoleIds.length
-      ? allReviews.filter(action =>
-          highlightedRoleIds.some(roleId => getId(action.agent) === roleId),
+  const roleIds = allReviews.length
+    ? allReviews
+        .map(review => (review.author ? useGetUser(review.author) : null))
+        .filter(
+          roleId =>
+            !highlightedRoleIds.some(
+              highlightedRoleId => roleId === highlightedRoleId,
+            ),
         )
-      : allReviews;
-  }, [allReviews, highlightedRoleIds]);
+    : {};
+
+  const highlightedActions = highlightedRoleIds.length
+    ? allReviews.filter(action =>
+        highlightedRoleIds.some(roleId => getId(action.agent) === roleId),
+      )
+    : allReviews;
 
   return (
     <div

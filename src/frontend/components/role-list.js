@@ -89,12 +89,12 @@ export function PotentialRoles({
 
 PotentialRoles.propTypes = {
   role: PropTypes.object,
-  reviews: PropTypes.object.isRequired,
+  reviews: PropTypes.array.isRequired,
   canModerate: PropTypes.bool,
   onModerate: PropTypes.func,
   isModerationInProgress: PropTypes.bool,
   onRemoved: PropTypes.func.isRequired,
-  roleIds: PropTypes.arrayOf(PropTypes.string),
+  roleIds: PropTypes.arrayOf(PropTypes.number),
 };
 
 function DraggableRoleBadge({ roleId, onDropped, children, type }) {
@@ -129,7 +129,7 @@ function DraggableRoleBadge({ roleId, onDropped, children, type }) {
 }
 
 DraggableRoleBadge.propTypes = {
-  roleId: PropTypes.string.isRequired,
+  roleId: PropTypes.number.isRequired,
   onDropped: PropTypes.func.isRequired,
   children: PropTypes.any,
   type: PropTypes.oneOf([POTENTIAL_ROLE_TYPE, HIGHLIGHTED_ROLE_TYPE]),
@@ -141,7 +141,6 @@ DraggableRoleBadge.propTypes = {
  *`PotentialRoles`
  */
 export function HighlightedRoles({
-  role,
   reviews,
   roleIds = [],
   onRemoved,
@@ -227,10 +226,9 @@ export function HighlightedRoles({
 }
 
 HighlightedRoles.propTypes = {
-  role: PropTypes.object,
-  reviews: PropTypes.object.isRequired,
+  reviews: PropTypes.array.isRequired,
   canModerate: PropTypes.bool,
-  onModerate: PropTypes.func.isRequired,
+  onModerate: PropTypes.func,
   isModerationInProgress: PropTypes.bool,
   roleIds: PropTypes.arrayOf(PropTypes.number),
   onRemoved: PropTypes.func.isRequired,

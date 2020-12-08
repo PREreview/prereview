@@ -1,0 +1,14 @@
+.remirror {
+
+  &-container {
+    display: flex;
+  }
+
+  &-editor {
+    border: 1px solid #ccc;
+    margin-top: 10px;
+    min-width: 415px;
+    padding: 10px;
+    width: 100%;
+  }
+}

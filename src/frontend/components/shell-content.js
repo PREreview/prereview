@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Link, useLocation } from 'react-router-dom';
 import classNames from 'classnames';
@@ -38,7 +38,7 @@ export default function ShellContent({
   onRequireScreen,
 }) {
   const location = useLocation();
-  const [user, setUser] = useState({id: 1})
+  const [user, setUser] = useState(null);
 
   const postRapidReview = usePostRapidReviews();
   const postFullReview = usePostFullReviews();
@@ -61,6 +61,10 @@ export default function ShellContent({
     : `/login?next=${encodeURIComponent(location.pathname)}`;
 
   const showProfileNotice = checkIfRoleLacksMininmalData(user);
+
+  useEffect(() => {
+    
+  }, [user]);
 
   return (
     <div className="shell-content">
@@ -102,7 +106,7 @@ export default function ShellContent({
                 })}
                 disabled={postReviewRequest.loading || hasReviewed}
                 onClick={() => {
-                  if (true) { // #FIXME
+                  if (user) { // #FIXME
                     onRequireScreen();
                     setTab('rapidReview');
                   } else {
@@ -120,7 +124,7 @@ export default function ShellContent({
                 })}
                 disabled={postReviewRequest.loading || hasReviewed}
                 onClick={() => {
-                  if (true) { // #FIXME
+                  if (user) { // #FIXME
                     onRequireScreen();
                     setTab('longReview');
                   } else {

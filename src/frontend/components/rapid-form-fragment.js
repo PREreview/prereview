@@ -22,7 +22,6 @@ import RadioButton from './radio-button';
 import IconButton from './icon-button';
 import Collapse from './collapse';
 import NoticeBox from './notice-box';
-import CollabEditor from './collab-editor';
 
 const StyledTableCell = withStyles((theme) => ({
   body: {

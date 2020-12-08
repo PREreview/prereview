@@ -59,7 +59,7 @@ export default function LongFormFragment({ onChange }) {
     <div className="rapid-form-fragment">
       <fieldset className="rapid-form-fragment__text-response-questions">
         <Fragment key={'longform'}>
-          <div className="radid-form-fragment__question-row">
+          <div className="remirror-container">
             <CollabEditor />
           </div>
         </Fragment>
