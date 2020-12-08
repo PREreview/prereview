@@ -159,16 +159,17 @@ export default function controller(preprints, thisUser) {
         operationId: 'GetPreprint',
         summary:
           'Endpoint to GET a single preprint, as well as its full-length reviews, rapid reviews, and requests for review.',
+        required: true,
       },
     },
     method: 'GET',
     path: '/preprints/:id',
-    validate: {
-      params: {
-        id: Joi.alternatives().try(Joi.number().integer(), Joi.string()),
-      },
-      continueOnError: true,
-    },
+    //validate: {
+    //  params: {
+    //    id: Joi.alternatives().try(Joi.number().integer(), Joi.string()),
+    //  },
+    //  continueOnError: true,
+    //},
     handler: async ctx => {
       if (ctx.invalid) {
         handleInvalid(ctx);
@@ -215,14 +216,15 @@ export default function controller(preprints, thisUser) {
       swagger: {
         operationId: 'PutPreprint',
         summary: 'Endpoint to PUT updates on preprints',
+        required: true,
       },
     },
     method: 'PUT',
     path: '/preprints/:id',
     validate: {
-      params: {
-        id: Joi.alternatives().try(Joi.number().integer(), Joi.string()),
-      },
+      //params: {
+      //  id: Joi.alternatives().try(Joi.number().integer(), Joi.string()),
+      //},
       body: {
         data: preprintSchema,
       },
@@ -272,14 +274,15 @@ export default function controller(preprints, thisUser) {
       swagger: {
         operationId: 'DeletePreprint',
         summary: 'Endpoint to DELETE preprints',
+        required: true,
       },
     },
     method: 'DELETE',
     path: '/preprints/:id',
     validate: {
-      params: {
-        id: Joi.alternatives().try(Joi.number().integer(), Joi.string()),
-      },
+      //params: {
+      //  id: Joi.alternatives().try(Joi.number().integer(), Joi.string()),
+      //},
     },
     pre: async (ctx, next) => {
       await thisUser.can('access admin pages');

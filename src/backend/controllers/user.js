@@ -67,9 +67,18 @@ export default function controller(users, thisUser) {
     path: '/users/:id',
     pre: thisUser.can('access private pages'),
     validate: {
-      params: Joi.object({
-        id: Joi.alternatives().try(Joi.number().integer(), Joi.string()),
-      }),
+      //params: {
+      //  id: Joi.alternatives()
+      //    .match('one')
+      //    .try(Joi.number().integer(), Joi.string())
+      //    .description('User id')
+      //    .required(),
+      //},
+      params: {
+        id: Joi.string()
+          .description('User id')
+          .required(),
+      },
       continueOnError: false,
       failure: 400,
     },
@@ -102,7 +111,6 @@ export default function controller(users, thisUser) {
       swagger: {
         operationId: 'PutUser',
         summary: 'Endpoint to PUT a single user by ID.',
-        required: true,
       },
     },
     method: 'put',
@@ -113,9 +121,11 @@ export default function controller(users, thisUser) {
         email: Joi.string(),
       }),
       type: 'json',
-      params: Joi.object({
-        id: Joi.number().integer(),
-      }),
+      params: {
+        id: Joi.string()
+          .description('User id')
+          .required(),
+      },
       continueOnError: false,
       false: 400,
     },
@@ -145,11 +155,13 @@ export default function controller(users, thisUser) {
     method: 'delete',
     path: '/users/:id',
     validate: {
-      params: Joi.object({
-        id: Joi.number().integer(),
-      }),
+      params: {
+        id: Joi.string()
+          .description('User id')
+          .required(),
+      },
     },
-    // pre:thisUserthisUser.can('access admin pages'), // TODO: can users delete their own account?
+    pre: thisUser.can('access admin pages'), // TODO: can users delete their own account?
     handler: async ctx => {
       log.debug(`Deleting user ${ctx.params.id}.`);
 

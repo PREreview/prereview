@@ -1,7 +1,7 @@
 import { Command } from 'commander';
 import dotenv from 'dotenv';
 import { from } from 'env-var';
-import Joi from 'joi';
+import { Joi } from 'koa-joi-router';
 import orcidUtils from 'orcid-utils';
 import log4js from 'koa-log4';
 import { isString } from '../common/utils';

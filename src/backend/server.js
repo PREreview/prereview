@@ -56,7 +56,7 @@ import RapidController from './controllers/rapidReview.js';
 import RequestController from './controllers/request.js';
 import TagController from './controllers/tag.js';
 import DocsController from './controllers/docs.js';
-import SearchController from './controllers/search.js';
+import SearchesController from './controllers/searches.js';
 
 const __dirname = path.resolve();
 const STATIC_DIR = path.resolve(__dirname, 'dist', 'frontend');
@@ -122,7 +122,7 @@ export default async function configServer(config) {
   const tagModel = tagModelWrapper(db);
   const tags = TagController(tagModel, authz);
   const users = UserController(userModel, authz);
-  const search = SearchController(preprintModel, draftModel, authz);
+  const searches = SearchesController(preprintModel, draftModel, authz);
 
   server.use(authz.middleware());
 
@@ -139,7 +139,7 @@ export default async function configServer(config) {
     preprints.middleware(),
     rapidReviews.middleware(),
     requests.middleware(),
-    search.middleware(),
+    searches.middleware(),
     tags.middleware(),
     users.middleware(),
   ]);

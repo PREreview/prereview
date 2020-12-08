@@ -10,20 +10,8 @@ import communityRoutes from './community.js';
 import groupRoutes from './group.js';
 import rapidReviewRoutes from './rapidReview.js';
 import requestRoutes from './request.js';
+import searchesRoutes from './searches.js';
 import tagRoutes from './tag.js';
-import {
-  commentModelWrapper,
-  communityModelWrapper,
-  fullReviewModelWrapper,
-  fullReviewDraftModelWrapper,
-  groupModelWrapper,
-  personaModelWrapper,
-  preprintModelWrapper,
-  rapidReviewModelWrapper,
-  requestModelWrapper,
-  tagModelWrapper,
-  userModelWrapper,
-} from '../models/index.ts';
 
 const log = getLogger('apiDocs:::');
 
@@ -31,23 +19,16 @@ export default function docs(authz) {
   const routes = router();
   const generator = new SwaggerAPI();
 
-  generator.addJoiRouter(preprintRoutes(preprintModelWrapper, authz));
-  generator.addJoiRouter(userRoutes(userModelWrapper, authz));
-  generator.addJoiRouter(
-    fullReviewRoutes(
-      fullReviewModelWrapper,
-      fullReviewDraftModelWrapper,
-      personaModelWrapper,
-      preprintModelWrapper,
-      authz,
-    ),
-  );
-  generator.addJoiRouter(groupRoutes(groupModelWrapper, authz));
-  generator.addJoiRouter(commentRoutes(commentModelWrapper, authz));
-  generator.addJoiRouter(communityRoutes(communityModelWrapper, authz));
-  generator.addJoiRouter(rapidReviewRoutes(rapidReviewModelWrapper, authz));
-  generator.addJoiRouter(requestRoutes(requestModelWrapper, authz));
-  generator.addJoiRouter(tagRoutes(tagModelWrapper, authz));
+  generator.addJoiRouter(preprintRoutes({}, authz));
+  generator.addJoiRouter(userRoutes({}, authz));
+  generator.addJoiRouter(fullReviewRoutes({}, authz));
+  generator.addJoiRouter(groupRoutes({}, authz));
+  generator.addJoiRouter(commentRoutes({}, authz));
+  generator.addJoiRouter(communityRoutes({}, authz));
+  generator.addJoiRouter(rapidReviewRoutes({}, authz));
+  generator.addJoiRouter(requestRoutes({}, authz));
+  generator.addJoiRouter(searchesRoutes({}, authz));
+  generator.addJoiRouter(tagRoutes({}, authz));
 
   const spec = generator.generateSpec(
     {

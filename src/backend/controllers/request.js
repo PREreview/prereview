@@ -2,8 +2,6 @@ import router from 'koa-joi-router';
 import { getLogger } from '../log.js';
 
 const log = getLogger('backend:controllers:tags');
-// eslint-disable-next-line no-unused-vars
-// const Joi = router.Joi;
 
 // eslint-disable-next-line no-unused-vars
 export default function controller(reqModel, thisUser) {
@@ -71,6 +69,12 @@ export default function controller(reqModel, thisUser) {
   });
 
   requestRouter.route({
+    meta: {
+      swagger: {
+        operationId: 'GetRequests',
+        summary: 'Endpoint to GET all requests for review.',
+      },
+    },
     method: 'get',
     path: '/requests',
     // pre: thisUser.can('')

@@ -5,7 +5,7 @@ import omit from 'lodash/omit';
 import { MdChevronRight, MdFirstPage } from 'react-icons/md';
 import Cookies from 'js-cookie';
 import PrivateRoute from './private-route';
-import { useGetPreprints, useGetUser } from '../hooks/api-hooks.tsx';
+import { useGetPreprints, useGetUser, useSearch } from '../hooks/api-hooks.tsx';
 import {
   useIsNewVisitor,
   useIsMobile,
@@ -47,6 +47,7 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
 
   const { data: preprints, loadingPreprints, error } = useGetPreprints();
+  //const { data: preprints, loadingPreprints, error } = useSearch();
 
   const [hoveredSortOption, setHoveredSortOption] = useState(null);
 
@@ -286,24 +287,24 @@ export default function Home() {
             ) : preprints.length <= 0 ? (
               <div>No more results.</div>
             ) : (
-              <ul className="home__preprint-list">
-                {preprints &&
-                  preprints.data.map(row => (
-                    <li key={row.id} className="home__preprint-list__item">
-                      <PreprintCard
-                        isNew={false}
-                        user={user}
-                        preprint={row}
-                        onNewRequest={handleNewRequest}
-                        onNew={handleNew}
-                        onNewReview={handleNewReview}
-                        hoveredSortOption={hoveredSortOption}
-                        sortOption={params.get('sort') || 'score'}
-                      />
-                    </li>
-                  ))}
-              </ul>
-            )}
+                  <ul className="home__preprint-list">
+                    {preprints &&
+                      preprints.data.map(row => (
+                        <li key={row.id} className="home__preprint-list__item">
+                          <PreprintCard
+                            isNew={false}
+                            user={user}
+                            preprint={row}
+                            onNewRequest={handleNewRequest}
+                            onNew={handleNew}
+                            onNewReview={handleNewReview}
+                            hoveredSortOption={hoveredSortOption}
+                            sortOption={params.get('sort') || 'score'}
+                          />
+                        </li>
+                      ))}
+                  </ul>
+                )}
 
             <div className="home__pagination">
               {!!(location.state && location.state.bookmark) && (

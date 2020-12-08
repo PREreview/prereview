@@ -39,7 +39,7 @@ export default function controller(preprints, fullReviews, thisUser) {
       },
     },
     method: 'GET',
-    path: '/search',
+    path: '/searches',
     validate: {
       query: querySchema, // #TODO
     },
