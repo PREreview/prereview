@@ -80,7 +80,8 @@ export function PotentialRoles({
                           isModerationInProgress ||
                           arrayify(action.moderationAction).some(
                             action =>
-                              action['@type'] === 'ReportRapidPREreviewAction' &&
+                              action['@type'] ===
+                                'ReportRapidPREreviewAction' &&
                               getId(action.agent) === getId(role),
                           )
                         }
@@ -216,7 +217,8 @@ export function HighlightedRoles({
                           isModerationInProgress ||
                           arrayify(action.moderationAction).some(
                             action =>
-                              action['@type'] === 'ReportRapidPREreviewAction' &&
+                              action['@type'] ===
+                                'ReportRapidPREreviewAction' &&
                               getId(action.agent) === getId(role),
                           )
                         }

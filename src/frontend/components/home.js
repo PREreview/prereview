@@ -3,8 +3,9 @@ import { useHistory, useLocation } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import omit from 'lodash/omit';
 import { MdChevronRight, MdFirstPage } from 'react-icons/md';
+import Cookies from 'js-cookie';
 import PrivateRoute from './private-route';
-import { useGetPreprints } from '../hooks/api-hooks.tsx';
+import { useGetPreprints, useGetUser } from '../hooks/api-hooks.tsx';
 import {
   useIsNewVisitor,
   useIsMobile,
@@ -33,7 +34,7 @@ export default function Home() {
   const history = useHistory();
   const location = useLocation();
 
-  const [user] = useUser();
+  const [user, setUser] = useUser();
   const isMobile = useIsMobile();
   const [showLeftPanel, setShowLeftPanel] = useState(!isMobile);
   const [loginModalOpenNext, setLoginModalOpenNext] = useState(null);
@@ -59,6 +60,24 @@ export default function Home() {
       }
     }
   }, [loadingPreprints, preprints]);
+
+  useEffect(() => {
+    const username = Cookies.get('PRE_user');
+    if (username) {
+      fetch(`api/v2/users/${username}`)
+        .then(response => {
+          if (response.status === 200) {
+            return response.json();
+          }
+          throw new Error(error);
+        })
+        .then(result => {
+          setUser(result);
+          console.log('***user***:', result);
+          return result;
+        });
+    }
+  }, []);
 
   const params = new URLSearchParams(location.search);
 
@@ -303,7 +322,7 @@ export default function Home() {
                 </Button>
               )}
               {/* Cloudant returns the same bookmark when it hits the end of the list */}
-              {(preprints && preprints.length > 0) && (
+              {preprints && preprints.length > 0 && (
                 <Button
                   className="home__next-page-button"
                   onClick={() => {

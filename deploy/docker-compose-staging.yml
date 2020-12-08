@@ -1,7 +1,7 @@
 version: "3"
 services:
   prereview:
-    image: prereview.azurecr.io/prereview:latest
+    image: prereview.azurecr.io/prereview:staging
     depends_on:
       - prereview-db
     networks:
@@ -18,8 +18,12 @@ services:
       PREREVIEW_DB_HOST: prereview-db
       PREREVIEW_DB_PORT: 5432
       PREREVIEW_DB_USER: prereview
-      PREREVIEW_DB_PASS: prereview
+      PREREVIEW_DB_PASS: ${secrets.STAGING_DB_PASS}
       PREREVIEW_DB_NAME: prereview
+      PREREVIEW_ORCID_SANDBOX: true
+      PREREVIEW_ORCID_CALLBACK_URL: https://prereview2-staging.azurewebsites.net/api/v2/orcid/callback
+      PREREVIEW_ORCID_CLIENT_ID: ${secrets.DEV_ORCID_CLIENT_ID}
+      PREREVIEW_ORCID_CLIENT_SECRET: ${secrets.DEV_ORCID_CLIENT_SECRET}
 
   prereview-db:
     image: postgres:12-alpine
@@ -31,7 +35,7 @@ services:
       PGDATA: /var/lib/postgresql/data/pgdata
       POSTGRES_USER: prereview
       POSTGRES_PASSWORD: prereview
-      POSTGRES_DB: prereview
+      POSTGRES_DB: ${secrets.STAGING_DB_PASS}
 
 volumes:
   prereview-db_data: {}

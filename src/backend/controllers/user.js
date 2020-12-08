@@ -68,7 +68,7 @@ export default function controller(users, thisUser) {
     // pre:thisUserthisUser.can('access private pages'),
     validate: {
       params: Joi.object({
-        id: Joi.number().integer(), // TODO should we be validating this?
+        id: Joi.alternatives().try(Joi.number().integer(), Joi.string()),
       }),
       continueOnError: false,
       failure: 400,

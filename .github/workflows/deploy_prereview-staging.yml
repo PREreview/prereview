@@ -1,12 +1,12 @@
 # Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 
-name: Build and deploy Node.js app to Azure Web App - prereview-dev
+name: Build and deploy Node.js app to Azure Web App - prereview2-dev
 
 on:
   push:
     branches:
-      - develop
+      - main
 
 jobs:
   build-and-deploy:
@@ -30,11 +30,12 @@ jobs:
 
     - run: |
         docker build . -t prereview.azurecr.io/prereview:${{ github.sha }}
-        docker tag prereview.azurecr.io/prereview:${{ github.sha }} prereview.azurecr.io/prereview:latest
+        docker tag prereview.azurecr.io/prereview:${{ github.sha }} prereview.azurecr.io/prereview:staging
         docker push prereview.azurecr.io/prereview:${{ github.sha }}
-        docker push prereview.azurecr.io/prereview:latest
+        docker push prereview.azurecr.io/prereview:staging
 
     - uses: azure/webapps-deploy@v2
       with:
-        app-name: 'prereview-dev'
-        configuration-file: './docker-compose-development.yml'
+        app-name: 'prereview2'
+        slot-name: 'staging'
+        configuration-file: './deploy/docker-compose-staging.yml'
