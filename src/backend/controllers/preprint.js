@@ -135,8 +135,8 @@ export default function controller(preprints, thisUser) {
 
       try {
         const allPreprints = await preprints.findAll([
-          'fullReviews',
-          'rapidReviews',
+          'fullReviews.authors',
+          'rapidReviews.author',
           'requests',
         ]);
         if (allPreprints) {
@@ -181,8 +181,8 @@ export default function controller(preprints, thisUser) {
 
       try {
         preprint = await preprints.findOneByIdOrHandle(ctx.params.id, [
-          'fullReviews',
-          'rapidReviews',
+          'fullReviews.authors',
+          'rapidReviews.author',
           'requests',
         ]);
       } catch (err) {
