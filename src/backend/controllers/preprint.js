@@ -134,16 +134,21 @@ export default function controller(preprints, thisUser) {
       log.debug(`Retrieving preprints.`);
 
       try {
-        const allPreprints = await preprints.findAll([
-          'fullReviews',
-          'rapidReviews',
-          'requests',
-        ]);
-        if (allPreprints) {
+        let foundPreprints;
+        if (ctx.query.query) {
+          foundPreprints = await preprints.search(ctx.query.query);
+        } else {
+          foundPreprints = await preprints.findAll([
+            'fullReviews',
+            'rapidReviews',
+            'requests',
+          ]);
+        }
+        if (foundPreprints) {
           ctx.body = {
             statusCode: 200,
             status: 'ok',
-            data: allPreprints,
+            data: foundPreprints,
           };
         }
       } catch (err) {

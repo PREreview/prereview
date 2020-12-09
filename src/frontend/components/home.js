@@ -33,6 +33,7 @@ import Banner from './banner';
 export default function Home() {
   const history = useHistory();
   const location = useLocation();
+  const params = new URLSearchParams(location.search);
 
   const [user, setUser] = useUser();
   const isMobile = useIsMobile();
@@ -42,12 +43,11 @@ export default function Home() {
   const [isWelcomeModalOpen, setIsWelcomeModalOpen] = useState(true);
   const [newPreprints, setNewPreprints] = useNewPreprints();
 
-  const apiQs = location.search;
-
   const [loading, setLoading] = useState(true);
 
-  const { data: preprints, loadingPreprints, error } = useGetPreprints();
-  //const { data: preprints, loadingPreprints, error } = useSearch();
+  const { data: preprints, loading: loadingPreprints, error } = useGetPreprints({
+    queryParams: params.entries(),
+  });
 
   const [hoveredSortOption, setHoveredSortOption] = useState(null);
 
@@ -79,8 +79,6 @@ export default function Home() {
         });
     }
   }, []);
-
-  const params = new URLSearchParams(location.search);
 
   const handleNewReview = useCallback(
     preprint => {

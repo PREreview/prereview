@@ -26,13 +26,7 @@ export default function SearchBar() {
   }, [defaultValue]);
 
   function handleSubmit(value) {
-    const search = createPreprintQs(
-      {
-        text: value || null,
-      },
-      location.search,
-    );
-
+    const search = `?query=${value}`;
     if (search !== location.search) {
       history.push({
         pathname: location.pathame,
