@@ -106,7 +106,7 @@ export default function ShellContent({
                 })}
                 disabled={postReviewRequest.loading || hasReviewed}
                 onClick={() => {
-                  if (user) { // #FIXME
+                  if (true) { // #FIXME
                     onRequireScreen();
                     setTab('rapidReview');
                   } else {
@@ -124,7 +124,7 @@ export default function ShellContent({
                 })}
                 disabled={postReviewRequest.loading || hasReviewed}
                 onClick={() => {
-                  if (user) { // #FIXME
+                  if (true) { // #FIXME
                     onRequireScreen();
                     setTab('longReview');
                   } else {
@@ -440,14 +440,18 @@ function ShellContentLongReview({
   isPosting,
   error,
 }) {
+  const [content, setContent] = useState('');
   const {
     mutate: postDraftReview,
     loadingPostDraftReview,
-  } = usePostFullReviews(); // #FIXME should be usePostDraftReviews
-  const {
-    mutate: postLongReview,
-    loadingPostLongReview,
-  } = usePostFullReviews();
+  } = usePostFullReviews({ content: content }); // #FIXME should be usePostDraftReviews
+  const { mutate: postLongReview, loadingPostLongReview } = usePostFullReviews({
+    content: content,
+  });
+
+  const onContentChange = value => {
+    setContent(value);
+  }
 
   const canSubmit = () => {
     // #TODO build function to check if all questions have been answered
@@ -466,11 +470,7 @@ function ShellContentLongReview({
           e.preventDefault();
         }}
       >
-        <LongFormFragment
-          onChange={(key, value) => {
-            console.log(`Key: ${key}; value: ${value}`);
-          }}
-        />
+        <LongFormFragment onContentChange={onContentChange} />
 
         <Controls error={error}>
           <Button

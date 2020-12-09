@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
 
 // Remirror
 import { RemirrorProvider, useManager, useRemirror } from 'remirror/react';
@@ -65,7 +66,7 @@ const Editor = () => {
   return <div {...getRootProps()} />;
 };
 
-const EditorWrapper = () => {
+const EditorWrapper = ({ handleContentChange }) => {
   const manager = useManager(EXTENSIONS);
   const [isLoaded, setIsLoaded] = useState(false);
   const [value, setValue] = useState(() =>
@@ -93,9 +94,10 @@ const EditorWrapper = () => {
         manager={manager}
         value={value}
         onChange={parameter => {
-          // Update to new value
-          setValue(parameter.getHTML());
-      }}
+          // Update the state to the latest value.
+          setValue(parameter.state);
+          handleContentChange(parameter.getHTML());
+        }}
       >
         <div>
           <Menu />
@@ -104,6 +106,10 @@ const EditorWrapper = () => {
       </RemirrorProvider>
     );
   }
+};
+
+EditorWrapper.propTypes = {
+  handleContentChange: PropTypes.func.isRequired,
 };
 
 export default EditorWrapper;

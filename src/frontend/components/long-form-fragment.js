@@ -1,4 +1,4 @@
-import React, { Fragment, useState, useEffect } from 'react';
+import React, { Fragment } from 'react';
 import { makeStyles, withStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
 
@@ -17,27 +17,7 @@ import { MdHelpOutline } from 'react-icons/md';
 import { QUESTIONS } from '../constants';
 
 // components
-import Value from './value';
-import RadioButton from './radio-button';
-import IconButton from './icon-button';
-import Collapse from './collapse';
-import NoticeBox from './notice-box';
 import CollabEditor from './collab-editor';
-
-const StyledTableCell = withStyles((theme) => ({
-  body: {
-    fontSize: 14,
-    minWidth: '250px',
-  },
-}))(TableCell);
-
-const StyledTableRow = withStyles((theme) => ({
-  root: {
-    '&:nth-of-type(odd)': {
-      backgroundColor: theme.palette.action.hover,
-    },
-  },
-}))(TableRow);
 
 const useStyles = makeStyles({
   relative: {
@@ -48,11 +28,9 @@ const useStyles = makeStyles({
   },
 });
 
-export default function LongFormFragment({ onChange }) {
-  const classes = useStyles();
-
-  const handleTyping = value => {
-    onChange(value);
+export default function LongFormFragment({ onContentChange }) {
+  const handleContentChange = value => {
+    onContentChange(value);
   }
 
   return (
@@ -60,7 +38,7 @@ export default function LongFormFragment({ onChange }) {
       <fieldset className="rapid-form-fragment__text-response-questions">
         <Fragment key={'longform'}>
           <div className="remirror-container">
-            <CollabEditor onTypingChange={handleTyping} />
+            <CollabEditor handleContentChange={handleContentChange} />
           </div>
         </Fragment>
       </fieldset>
@@ -69,6 +47,6 @@ export default function LongFormFragment({ onChange }) {
 }
 
 LongFormFragment.propTypes = {
-  onChange: PropTypes.func.isRequired,
+  onContentChange: PropTypes.func.isRequired,
   answerMap: PropTypes.object,
 };
