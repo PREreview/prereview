@@ -106,7 +106,7 @@ export default function ShellContent({
                 })}
                 disabled={postReviewRequest.loading || hasReviewed}
                 onClick={() => {
-                  if (true) { // #FIXME
+                  if (user) {
                     onRequireScreen();
                     setTab('rapidReview');
                   } else {
@@ -124,7 +124,7 @@ export default function ShellContent({
                 })}
                 disabled={postReviewRequest.loading || hasReviewed}
                 onClick={() => {
-                  if (true) { // #FIXME
+                  if (user) {
                     onRequireScreen();
                     setTab('longReview');
                   } else {
@@ -142,7 +142,7 @@ export default function ShellContent({
                 })}
                 disabled={postReviewRequest.loading || hasRequested}
                 onClick={() => {
-                  if (true) { // #FIXME
+                  if (user) {
                     onRequireScreen();
                     setTab('request');
                   } else {
@@ -441,13 +441,7 @@ function ShellContentLongReview({
   error,
 }) {
   const [content, setContent] = useState('');
-  const {
-    mutate: postDraftReview,
-    loadingPostDraftReview,
-  } = usePostFullReviews({ content: content }); // #FIXME should be usePostDraftReviews
-  const { mutate: postLongReview, loadingPostLongReview } = usePostFullReviews({
-    content: content,
-  });
+  const { mutate: postLongReview, loadingPostLongReview } = usePostFullReviews();
 
   const onContentChange = value => {
     setContent(value);
@@ -465,11 +459,7 @@ function ShellContentLongReview({
 
       <PreprintPreview preprint={preprint} />
 
-      <form
-        onSubmit={e => {
-          e.preventDefault();
-        }}
-      >
+      <form>
         <LongFormFragment onContentChange={onContentChange} />
 
         <Controls error={error}>
@@ -478,8 +468,13 @@ function ShellContentLongReview({
             primary={true}
             isWaiting={isPosting}
             disabled={disabled || !canSubmit}
-            onClick={() => {
-              postDraftReview(user.id, preprint.id)
+            onClick={event => {
+              event.preventDefault();
+              postLongReview({
+                author: user.id,
+                preprint: preprint.id,
+                content: content,
+              })
                 .then(() => alert('Draft updated successfully.'))
                 .catch(err => alert(`An error occurred: ${err}`));
             }}

@@ -65,7 +65,7 @@ export default function controller(users, thisUser) {
     },
     method: 'get',
     path: '/users/:id',
-    // pre: thisUser.can('access private pages'),
+    pre: thisUser.can('access private pages'),
     validate: {
       //params: {
       //  id: Joi.alternatives()
@@ -85,13 +85,10 @@ export default function controller(users, thisUser) {
     handler: async ctx => {
       log.debug(`Retrieving user ${ctx.params.id}`);
 
-      let id = ctx.params.id;
-
-      if (!isNaN(ctx.params.id) && !isNaN(parseInt(ctx.params.id))) {
-        id = parseInt(ctx.params.id);
-      }
-
-      const user = await users.findOneByIdOrOrcid(id, ['personas', 'groups']);
+      const user = await users.findOneByIdOrOrcid(ctx.params.id, [
+        'personas',
+        'groups',
+      ]);
       if (
         thisUser.isMemberOf('admins', user.orcid) ||
         user.groups.contains('admins')
