@@ -1,6 +1,6 @@
 import { Migration } from '@mikro-orm/migrations';
 
-export class Migration20201204033420 extends Migration {
+export class Migration20201209210327 extends Migration {
 
   async up(): Promise<void> {
     this.addSql('create table `user` (`id` integer not null primary key autoincrement, `created_at` datetime not null, `updated_at` datetime not null, `name` varchar null, `email` varchar null, `orcid` varchar not null);');
@@ -19,7 +19,7 @@ export class Migration20201204033420 extends Migration {
     this.addSql('create table `persona` (`id` integer not null primary key autoincrement, `created_at` datetime not null, `updated_at` datetime not null, `name` varchar not null, `avatar` blob null);');
     this.addSql('create unique index `persona_name_unique` on `persona` (`name`);');
 
-    this.addSql('create table `rapid_review` (`id` integer not null primary key autoincrement, `created_at` datetime not null, `updated_at` datetime not null, `contents` json not null);');
+    this.addSql('create table `rapid_review` (`id` integer not null primary key autoincrement, `created_at` datetime not null, `updated_at` datetime not null, `yn_novel` text check (`yn_novel` in (\'yes\', \'no\', \'N/A\', \'unsure\')) not null, `yn_future` text check (`yn_future` in (\'yes\', \'no\', \'N/A\', \'unsure\')) not null, `yn_reproducibility` text check (`yn_reproducibility` in (\'yes\', \'no\', \'N/A\', \'unsure\')) not null, `yn_methods` text check (`yn_methods` in (\'yes\', \'no\', \'N/A\', \'unsure\')) not null, `yn_coherent` text check (`yn_coherent` in (\'yes\', \'no\', \'N/A\', \'unsure\')) not null, `yn_limitations` text check (`yn_limitations` in (\'yes\', \'no\', \'N/A\', \'unsure\')) not null, `yn_ethics` text check (`yn_ethics` in (\'yes\', \'no\', \'N/A\', \'unsure\')) not null, `yn_new_data` text check (`yn_new_data` in (\'yes\', \'no\', \'N/A\', \'unsure\')) not null, `yn_recommend` text check (`yn_recommend` in (\'yes\', \'no\', \'N/A\', \'unsure\')) not null, `yn_peer_review` text check (`yn_peer_review` in (\'yes\', \'no\', \'N/A\', \'unsure\')) not null, `yn_available_code` text check (`yn_available_code` in (\'yes\', \'no\', \'N/A\', \'unsure\')) not null, `yn_available_data` text check (`yn_available_data` in (\'yes\', \'no\', \'N/A\', \'unsure\')) not null, `link_to_data` text not null);');
 
     this.addSql('create table `request` (`id` integer not null primary key autoincrement, `created_at` datetime not null, `updated_at` datetime not null);');
 
@@ -33,13 +33,13 @@ export class Migration20201204033420 extends Migration {
     this.addSql('create table `full_review` (`id` integer not null primary key autoincrement, `created_at` datetime not null, `updated_at` datetime not null, `published` integer not null, `doi` varchar null);');
     this.addSql('create unique index `full_review_doi_unique` on `full_review` (`doi`);');
 
-    this.addSql('create table `full_review_draft` (`id` integer not null primary key autoincrement, `created_at` datetime not null, `updated_at` datetime not null, `title` varchar not null, `contents` text not null);');
+    this.addSql('create table `full_review_draft` (`id` integer not null primary key autoincrement, `created_at` datetime not null, `updated_at` datetime not null, `title` varchar null, `contents` text not null);');
 
     this.addSql('create table `full_review_authors` (`full_review_id` integer not null, `persona_id` integer not null, primary key (`full_review_id`, `persona_id`));');
     this.addSql('create index `full_review_authors_full_review_id_index` on `full_review_authors` (`full_review_id`);');
     this.addSql('create index `full_review_authors_persona_id_index` on `full_review_authors` (`persona_id`);');
 
-    this.addSql('create table `community` (`id` integer not null primary key autoincrement, `created_at` datetime not null, `updated_at` datetime not null, `name` varchar not null, `description` varchar not null, `logo` blob not null);');
+    this.addSql('create table `community` (`id` integer not null primary key autoincrement, `created_at` datetime not null, `updated_at` datetime not null, `name` varchar not null, `description` varchar null, `logo` blob null);');
     this.addSql('create unique index `community_name_unique` on `community` (`name`);');
 
     this.addSql('create table `community_members` (`community_id` integer not null, `user_id` integer not null, primary key (`community_id`, `user_id`));');
