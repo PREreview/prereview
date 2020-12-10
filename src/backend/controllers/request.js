@@ -33,22 +33,36 @@ export default function controller(reqModel, thisUser) {
     ctx.status = 200;
   };
 
-  // const postHandler = async ctx => {
-  //   let request, pid, author; // pid = preprint ID
+  const postHandler = async ctx => {
+    let request, pid, author; // pid = preprint ID
 
-  //   ctx.params.pid ? (pid = ctx.params.pid) : null
+    ctx.params.pid ? (pid = ctx.params.pid) : null;
 
-  //   log.debug(`Adding a request.`)
+    author = await ctx.state.user.personas.init({ where: { isActive: true } });
 
-  //   try {
-  //     if (pid) {
-  //       request = await reqModel.create({ preprint: pid, })
-  //     } else {
+    log.debug(`Adding a request.`);
 
-  //     }
-  //   }
+    try {
+      if (pid) {
+        request = reqModel.create({ preprint: pid, author: author });
+      } else {
+        request = reqModel.create({
+          preprint: ctx.request.body.preprint,
+          author: author,
+        });
+      }
+      await reqModel.persistAndFlush(request);
+    } catch (err) {
+      log.error('HTTP 400 Error: ', err);
+      ctx.throw(400, `Failed to create request: ${err}`);
+    }
 
-  // }
+    ctx.body = {
+      status: 201,
+      message: 'created',
+    };
+    ctx.status = 201;
+  };
 
   requestRouter.route({
     meta: {
@@ -58,31 +72,22 @@ export default function controller(reqModel, thisUser) {
       },
     },
     method: 'POST',
-    path: '/requests',
-    // pre: thisUser.can(''),
+    path: 'preprints/:pid/requests',
+    // pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
     // validate: {},
-    handler: async ctx => {
-      log.debug(`Posting a request.`);
-      // eslint-disable-next-line no-unused-vars
-      let newReq, pid; // pid = preprint ID
+    handler: async ctx => postHandler(ctx),
+  });
 
-      ctx.params.pid ? (pid = ctx.params.pid) : null;
-
-      try {
-        newReq = reqModel.create(ctx.request.body); // need to figure out how the user ID is passed thru
-        await reqModel.persistAndFlush(newReq);
-      } catch (err) {
-        log.error('HTTP 400 Error: ', err);
-        ctx.throw(400, `Failed to parse schema: ${err}`);
-      }
-
-      ctx.body = {
-        status: 201,
-        message: 'created',
-        data: [newReq],
-      };
-      ctx.status = 201;
+  requestRouter.route({
+    meta: {
+      swagger: {
+        operationId: 'PostRequests',
+      },
     },
+    method: 'POST',
+    path: '/requests',
+    // pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
+    handler: async ctx => postHandler(ctx),
   });
 
   requestRouter.route({

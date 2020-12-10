@@ -58,7 +58,11 @@ export default function controller(users, personas, config, thisUser) {
 
     try {
       // if a user already exists
-      user = await users.findOne({ orcid: params.orcid }, ['personas', 'communities', 'groups']);
+      user = await users.findOne({ orcid: params.orcid }, [
+        'personas',
+        'communities',
+        'groups',
+      ]);
       log.trace('verifyCallback() user:', user);
     } catch (err) {
       log.error('Error fetching user:', err);

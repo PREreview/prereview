@@ -50,7 +50,7 @@ export default function controller(preprints, thisUser) {
       try {
         data = await resolve(identifier);
         if (data) {
-          log.debug(`Adding a preprint & its resolved metadata to database.`)
+          log.debug(`Adding a preprint & its resolved metadata to database.`);
           const preprint = preprints.create(data);
           await preprints.persistAndFlush(preprint);
         }
@@ -122,7 +122,6 @@ export default function controller(preprints, thisUser) {
       }
 
       log.debug(`Retrieving preprints.`);
-      log.debug('ctx.user', ctx.state.user)
 
       try {
         const populate = ['fullReviews', 'rapidReviews', 'requests'];
@@ -176,7 +175,6 @@ export default function controller(preprints, thisUser) {
       let preprint;
 
       try {
-        log.debug(`Trying this!`)
         preprint = await preprints.findOneByIdOrHandle(ctx.params.id, [
           'fullReviews',
           'rapidReviews',
