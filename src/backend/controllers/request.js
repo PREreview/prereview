@@ -34,6 +34,19 @@ export default function controller(reqModel, thisUser) {
   };
 
   // const postHandler = async ctx => {
+  //   let request, pid, author; // pid = preprint ID
+
+  //   ctx.params.pid ? (pid = ctx.params.pid) : null
+
+  //   log.debug(`Adding a request.`)
+
+  //   try {
+  //     if (pid) {
+  //       request = await reqModel.create({ preprint: pid, })
+  //     } else {
+
+  //     }
+  //   }
 
   // }
 

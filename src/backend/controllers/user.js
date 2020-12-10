@@ -86,6 +86,7 @@ export default function controller(users, thisUser) {
 
       let user;
       try {
+        log.debug(`Trying.`)
         user = await users.findOneByIdOrOrcid(ctx.params.id, [
           'personas',
           'groups',

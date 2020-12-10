@@ -122,6 +122,7 @@ export default function controller(preprints, thisUser) {
       }
 
       log.debug(`Retrieving preprints.`);
+      log.debug('ctx.user', ctx.state.user)
 
       try {
         const populate = ['fullReviews', 'rapidReviews', 'requests'];
