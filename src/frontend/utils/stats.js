@@ -32,7 +32,7 @@ function isNa(textOrAnswer) {
       ? textOrAnswer.text
       : '';
 
-  return (text || '').toLowerCase().trim() === 'n.a.';
+  return (text || '').toLowerCase().trim() === 'n/a';
 }
 
 function isUnsure(textOrAnswer) {
@@ -136,16 +136,14 @@ export function getTags(preprint) {
 }
 
 export function getYesNoStats(reviews = []) {
-  const nReviews = reviews.length;
-
-  return reviews.map(review => {
-    if (review.author) {
-      console.log(review);
+  return reviews
+    .filter(review => review.author)
+    .map(review => {
       return QUESTIONS.filter(({ type }) => type === 'YesNoQuestion').map(
         ({ identifier, question }) => {
           return {
             questionId: `${identifier}`,
-            nReviews,
+            nReviews: reviews.length,
             question,
             yes: isYes(review[identifier]),
             no: isNo(review[identifier]),
@@ -154,8 +152,7 @@ export function getYesNoStats(reviews = []) {
           };
         },
       );
-    }
-  })
+    });
 }
 
 export function getTextAnswers(actions = []) {
