@@ -26,7 +26,7 @@ export class PreprintModel extends EntityRepository<Preprint> {
     throw new ChainError(`'${value}' is not a valid ID or Handle`);
   }
 
-  async search(query: string): Promise<any> {
+  async search(query: string, params?: string[]): Promise<any> {
     const connection = this.em.getConnection();
     let res: Array<object>;
     if (connection instanceof PostgreSqlConnection) {
@@ -35,12 +35,17 @@ export class PreprintModel extends EntityRepository<Preprint> {
       );
     } else if (connection instanceof SqliteConnection) {
       res = await connection.execute(
-        `SELECT * FROM preprint_fts WHERE preprint_fts MATCH '${query}' ORDER BY rank;`,
+        `SELECT rowid AS id,* FROM preprint_fts WHERE preprint_fts MATCH '${query}' ORDER BY rank;`,
       );
     } else {
       throw new ChainError('Database type does not support full-text search');
     }
-    return res;
+    const preprints = res.map(row => this.map(row)); // Map rows to full objects
+    if (params) {
+      await this.em.populate(preprints, params);
+    }
+
+    return preprints;
   }
 }
 

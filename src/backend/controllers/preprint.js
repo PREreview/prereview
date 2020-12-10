@@ -17,6 +17,7 @@ const querySchema = Joi.object({
   sort_by: Joi.string(),
   from: Joi.string(),
   to: Joi.string(),
+  query: Joi.string(),
 });
 
 const preprintSchema = {};
@@ -134,16 +135,18 @@ export default function controller(preprints, thisUser) {
       log.debug(`Retrieving preprints.`);
 
       try {
-        const allPreprints = await preprints.findAll([
-          'fullReviews',
-          'rapidReviews',
-          'requests',
-        ]);
-        if (allPreprints) {
+        const populate = ['fullReviews', 'rapidReviews', 'requests'];
+        let foundPreprints;
+        if (ctx.query.query) {
+          foundPreprints = await preprints.search(ctx.query.query, populate);
+        } else {
+          foundPreprints = await preprints.findAll(populate);
+        }
+        if (foundPreprints) {
           ctx.body = {
             statusCode: 200,
             status: 'ok',
-            data: allPreprints,
+            data: foundPreprints,
           };
         }
       } catch (err) {
