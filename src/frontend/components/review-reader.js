@@ -81,41 +81,17 @@ const ReviewReader = React.memo(function ReviewReader({
         <Fragment>
           {!preview && (
             <Fragment>
-              <NoticeBox>
-                View only the reviews you are interested in by
-                dragging-and-dropping user badges to the filter bubble below.
-              </NoticeBox>
-
               <h4 className="review-reader__sub-header">Reviewers</h4>
               <div className="review-reader__persona-selector">
                 <PotentialRoles
                   role={role}
                   reviews={allReviews}
-                  canModerate={!!user}
+                  canModerate={user}
                   isModerationInProgress={isModerationInProgress}
                   onModerate={onModerate}
-                  roleIds={roleIds}
                   onRemoved={roleId => {
                     const nextHighlightedRoleIds = highlightedRoleIds.concat(
                       roleId,
-                    );
-                    onHighlighedRoleIdsChange(nextHighlightedRoleIds);
-                    setHighlightedRoleIds(nextHighlightedRoleIds);
-                  }}
-                />
-
-                <h4 className="review-reader__sub-header">Reviewers Filter</h4>
-
-                <HighlightedRoles
-                  role={role}
-                  reviews={allReviews}
-                  canModerate={!!user}
-                  isModerationInProgress={isModerationInProgress}
-                  onModerate={onModerate}
-                  roleIds={highlightedRoleIds}
-                  onRemoved={ids => {
-                    const nextHighlightedRoleIds = highlightedRoleIds.filter(
-                      roleId => !ids.some(id => roleId === id),
                     );
                     onHighlighedRoleIdsChange(nextHighlightedRoleIds);
                     setHighlightedRoleIds(nextHighlightedRoleIds);
@@ -126,11 +102,7 @@ const ReviewReader = React.memo(function ReviewReader({
           )}
 
           <Barplot
-            preview={preview}
-            stats={getYesNoStats(highlightedActions)}
-            nHighlightedReviews={
-              highlightedRoleIds.length || preprint.rapidReviews.length
-            }
+            stats={getYesNoStats(allReviews)}
             nTotalReviews={
               preprint.rapidReviews.length + preprint.fullReviews.length
             }

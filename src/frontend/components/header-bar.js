@@ -6,15 +6,13 @@ import { MenuLink } from '@reach/menu-button';
 import { GetUser } from '../hooks/api-hooks.tsx';
 import PreReviewLogo from './pre-review-logo';
 import IconButton from './icon-button';
-import { useUser } from '../contexts/user-context';
 import UserBadge from './user-badge';
 import XLink from './xlink';
 import NoticeBadge from './notice-badge';
 import { checkIfRoleLacksMininmalData } from '../utils/roles';
 import { useIsMobile } from '../hooks/ui-hooks';
 
-export default function HeaderBar({ onClickMenuButton, closeGap }) {
-  const [user] = useUser();
+export default function HeaderBar({ onClickMenuButton, closeGap, user }) {
   const roles = user && user.groups ? user.groups : []; //GetUser(1);
 
   //const showProfileNotice = checkIfRoleLacksMininmalData(role);
@@ -173,4 +171,5 @@ export default function HeaderBar({ onClickMenuButton, closeGap }) {
 HeaderBar.propTypes = {
   onClickMenuButton: PropTypes.func,
   closeGap: PropTypes.bool,
+  user: PropTypes.object,
 };

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Link, useLocation } from 'react-router-dom';
 import classNames from 'classnames';
+import Cookies from 'js-cookie';
 import { Helmet } from 'react-helmet-async';
 import { MenuLink } from '@reach/menu-button';
 import { useUser } from '../contexts/user-context';
@@ -40,6 +41,10 @@ export default function ShellContent({
   const location = useLocation();
   const [user, setUser] = useState(null);
 
+  const { data: userData, loadingUser, error } = useGetUser({
+    id: Cookies.get('PRE_user'),
+  });
+
   const postRapidReview = usePostRapidReviews();
   const postFullReview = usePostFullReviews();
   const postReviewRequest = usePostRequests();
@@ -63,8 +68,12 @@ export default function ShellContent({
   const showProfileNotice = checkIfRoleLacksMininmalData(user);
 
   useEffect(() => {
-
-  }, [user]);
+    if (!loadingUser) {
+      if (userData) {
+        setUser(userData.data);
+      }
+    }
+  }, [loadingUser, userData]);
 
   return (
     <div className="shell-content">
@@ -346,8 +355,13 @@ ShellContentRead.propTypes = {
   preprint: PropTypes.object.isRequired,
 };
 
-function ShellContentRapidReview({ user, preprint, disabled, isPosting, error }) {
-
+function ShellContentRapidReview({
+  user,
+  preprint,
+  disabled,
+  isPosting,
+  error,
+}) {
   const { data: subjects, loadingSubjects, errorSubjects } = useGetTags();
 
   // const [answerMap, setAnswerMap] = useLocalState(
@@ -378,25 +392,6 @@ function ShellContentRapidReview({ user, preprint, disabled, isPosting, error })
           e.preventDefault();
         }}
       >
-        <SubjectEditor
-          // subjects={subjects}
-          subjects={[]}
-          onAdd={subject => {
-            setSubjects(
-              subjects.concat(subject).sort((a, b) => {
-                return (a.alternateName || a.name).localeCompare(
-                  b.alternateName || b.name,
-                );
-              }),
-            );
-          }}
-          onDelete={subject => {
-            setSubjects(
-              subjects.filter(_subject => _subject.name !== subject.name),
-            );
-          }}
-        />
-
         <RapidFormFragment
           answerMap={answerMap}
           onChange={(key, value) => {

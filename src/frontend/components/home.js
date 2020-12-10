@@ -42,19 +42,13 @@ export default function Home() {
   const [isWelcomeModalOpen, setIsWelcomeModalOpen] = useState(true);
   const [newPreprints, setNewPreprints] = useNewPreprints();
 
-  const apiQs = location.search;
-
   const [loading, setLoading] = useState(true);
 
   const { data: preprints, loadingPreprints, error } = useGetPreprints();
-  //const { data: preprints, loadingPreprints, error } = useSearch();
 
   const [hoveredSortOption, setHoveredSortOption] = useState(null);
 
   useEffect(() => {
-    // console.log('loading: ', loading);
-    // console.log('preprints: ', preprints);
-    // console.log('error: ', error);
     if (!loadingPreprints) {
       if (preprints) {
         setLoading(false);
@@ -70,12 +64,14 @@ export default function Home() {
           if (response.status === 200) {
             return response.json();
           }
-          throw new Error(error);
+          throw new Error(response);
         })
         .then(result => {
           setUser(result.data);
-          console.log('***user***:', result.data);
           return result;
+        })
+        .catch(err => {
+          console.log('Error: ', err);
         });
     }
   }, []);
@@ -151,6 +147,7 @@ export default function Home() {
           />
         )}
         <HeaderBar
+          user={user}
           onClickMenuButton={() => {
             setShowLeftPanel(!showLeftPanel);
           }}
@@ -262,7 +259,6 @@ export default function Home() {
                   >
                     <PreprintCard
                       isNew={true}
-                      user={user}
                       preprint={preprint}
                       onNewRequest={handleNewRequest}
                       onNew={handleNew}

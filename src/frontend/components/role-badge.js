@@ -10,46 +10,28 @@ import { useGetUser } from '../hooks/api-hooks.tsx';
 import NoticeBadge from './notice-badge';
 
 const RoleBadge = React.forwardRef(function RoleBadge(
-  { roleId, children, className, tooltip, showNotice, disabled },
+  { children, className, tooltip, showNotice, disabled, roleId, user },
   ref,
 ) {
-  const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState({});
-  const { data: userData, loadingUser, error } =
-    roleId !== undefined ? useGetUser({ id: parseInt(roleId) }) : null;
-
-  useEffect(() => {
-    if (!loadingUser) {
-      if (userData) {
-        setUser(userData.data)
-        setLoading(false);
-      }
-    }
-  }, [userData]);
-
-  if (loading) {
-    return <div>Loading...</div>;
-  } else {
-    return (
-      <RoleBadgeUI
-        ref={ref}
-        tooltip={tooltip}
-        roleId={roleId}
-        user={user}
-        loading={user.loading}
-        className={className}
-        showNotice={showNotice}
-        disabled={disabled}
-      >
-        {children}
-      </RoleBadgeUI>
-    );
-  }
+  return (
+    <RoleBadgeUI
+      ref={ref}
+      tooltip={tooltip}
+      roleId={roleId}
+      user={user}
+      className={className}
+      showNotice={showNotice}
+      disabled={disabled}
+    >
+      {children}
+    </RoleBadgeUI>
+  );
 });
 
 RoleBadge.propTypes = {
   tooltip: PropTypes.bool,
-  roleId: PropTypes.string.isRequired,
+  roleId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
+  user: PropTypes.object.isRequired,
   children: PropTypes.any,
   className: PropTypes.string,
   showNotice: PropTypes.bool,
@@ -65,7 +47,6 @@ const RoleBadgeUI = React.forwardRef(function RoleBadgeUI(
   {
     roleId,
     user,
-    loading,
     className,
     children,
     tooltip,
@@ -74,7 +55,7 @@ const RoleBadgeUI = React.forwardRef(function RoleBadgeUI(
   },
   ref,
 ) {
-  if (roleId == null && loading == null && !!user) {
+  if (roleId == null && !!user) {
     roleId = getId(user);
   }
 
@@ -83,9 +64,7 @@ const RoleBadgeUI = React.forwardRef(function RoleBadgeUI(
       <div className="role-badge-menu-container">
         {showNotice && <NoticeBadge />}
         <MenuButton
-          className={classNames('role-badge-menu', className, {
-            'role-badge-menu--loading': loading,
-          })}
+          className={classNames('role-badge-menu', className)}
           disabled={disabled}
         >
           {/*NOTE: the `ref` is typically used for Drag and Drop: we need 1 DOM element that will be used as the drag preview */}
@@ -102,7 +81,7 @@ const RoleBadgeUI = React.forwardRef(function RoleBadgeUI(
               <div
                 className={classNames('role-badge-menu__avatar', {
                   'role-badge-menu__avatar--loaded':
-                    !!user && user.avatar && user.avatar.contentUrl && !loading,
+                    !!user && user.avatar && user.avatar.contentUrl,
                 })}
                 style={
                   user && user.avatar && user.avatar.contentUrl
@@ -159,7 +138,7 @@ const RoleBadgeUI = React.forwardRef(function RoleBadgeUI(
 RoleBadgeUI.propTypes = {
   showNotice: PropTypes.bool,
   tooltip: PropTypes.bool,
-  roleId: PropTypes.number,
+  roleId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
   user: PropTypes.shape({
     id: PropTypes.number,
     name: PropTypes.string,
@@ -169,7 +148,6 @@ RoleBadgeUI.propTypes = {
       contentUrl: PropTypes.string.isRequired,
     }),
   }),
-  loading: PropTypes.bool,
   children: PropTypes.any,
   className: PropTypes.string,
   disabled: PropTypes.bool,
@@ -181,7 +159,7 @@ function Tooltipify({ tooltip, roleId, user, children }) {
   return tooltip ? (
     <Tooltip
       label={
-        user && roleId && user.id !== roleId
+        user && roleId && user.identity !== roleId
           ? `${user.name} (${roleId}…)`
           : roleId
       }
@@ -195,9 +173,10 @@ function Tooltipify({ tooltip, roleId, user, children }) {
 
 Tooltipify.propTypes = {
   tooltip: PropTypes.bool,
-  roleId: PropTypes.number,
+  roleId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
   user: PropTypes.shape({
     name: PropTypes.string,
+    identity: PropTypes.number.required,
   }),
   children: PropTypes.any,
 };

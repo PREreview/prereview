@@ -74,7 +74,7 @@ export default function ShareMenu({ identifier, roleIds = [] }) {
 
 ShareMenu.propTypes = {
   identifier: PropTypes.string.isRequired,
-  roleIds: PropTypes.arrayOf(PropTypes.string),
+  roleIds: PropTypes.arrayOf(PropTypes.number),
 };
 
 function PermalinkModal({ permalink, onClose }) {
