@@ -1,21 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-export default function Barplot({
-  preview,
-  nTotalReviews,
-  nHighlightedReviews,
-  stats,
-  children,
-}) {
+export default function Barplot({ nTotalReviews, stats, children }) {
   return (
     <div className="barplot">
       <div className="barplot__question-list-header">
         <div className="barplot__question-list-header__left">
-          <span>
-            Showing {!preview ? nHighlightedReviews : 'results'} of{' '}
-            {nTotalReviews} Reviews
-          </span>
+          <span>Showing {nTotalReviews} Reviews</span>
         </div>
 
         <div className="barplot__question-list-header__right">
@@ -137,9 +128,7 @@ export default function Barplot({
 }
 
 Barplot.propTypes = {
-  preview: PropTypes.bool,
   nTotalReviews: PropTypes.number.isRequired,
-  nHighlightedReviews: PropTypes.number.isRequired,
   stats: PropTypes.arrayOf(
     PropTypes.shape({
       questionId: PropTypes.string.isRequired,

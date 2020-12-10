@@ -42,19 +42,13 @@ export default function Home() {
   const [isWelcomeModalOpen, setIsWelcomeModalOpen] = useState(true);
   const [newPreprints, setNewPreprints] = useNewPreprints();
 
-  const apiQs = location.search;
-
   const [loading, setLoading] = useState(true);
 
   const { data: preprints, loadingPreprints, error } = useGetPreprints();
-  //const { data: preprints, loadingPreprints, error } = useSearch();
 
   const [hoveredSortOption, setHoveredSortOption] = useState(null);
 
   useEffect(() => {
-    // console.log('loading: ', loading);
-    // console.log('preprints: ', preprints);
-    // console.log('error: ', error);
     if (!loadingPreprints) {
       if (preprints) {
         setLoading(false);
@@ -67,7 +61,6 @@ export default function Home() {
     if (username) {
       fetch(`api/v2/users/${username}`)
         .then(response => {
-          console.log(response);
           if (response.status === 200) {
             return response.json();
           }

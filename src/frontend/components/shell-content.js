@@ -41,6 +41,10 @@ export default function ShellContent({
   const location = useLocation();
   const [user, setUser] = useState(null);
 
+  const { data: userData, loadingUser, error } = useGetUser({
+    id: Cookies.get('PRE_user'),
+  });
+
   const postRapidReview = usePostRapidReviews();
   const postFullReview = usePostFullReviews();
   const postReviewRequest = usePostRequests();
@@ -64,25 +68,12 @@ export default function ShellContent({
   const showProfileNotice = checkIfRoleLacksMininmalData(user);
 
   useEffect(() => {
-    const username = Cookies.get('PRE_user');
-    // if (username) {
-    //   fetch(`api/v2/users/${username}`)
-    //     .then(response => {
-    //       if (response.status === 200) {
-    //         return response.json();
-    //       }
-    //       throw new Error(response);
-    //     })
-    //     .then(result => {
-    //       setUser(result.data);
-    //       console.log('***user***:', result.data);
-    //       return result;
-    //     })
-    //     .catch(err => {
-    //       console.log('Error: ', err);
-    //     });
-    // }
-  }, []);
+    if (!loadingUser) {
+      if (userData) {
+        setUser(userData.data);
+      }
+    }
+  }, [loadingUser, userData]);
 
   return (
     <div className="shell-content">
@@ -401,25 +392,6 @@ function ShellContentRapidReview({
           e.preventDefault();
         }}
       >
-        <SubjectEditor
-          // subjects={subjects}
-          subjects={[]}
-          onAdd={subject => {
-            setSubjects(
-              subjects.concat(subject).sort((a, b) => {
-                return (a.alternateName || a.name).localeCompare(
-                  b.alternateName || b.name,
-                );
-              }),
-            );
-          }}
-          onDelete={subject => {
-            setSubjects(
-              subjects.filter(_subject => _subject.name !== subject.name),
-            );
-          }}
-        />
-
         <RapidFormFragment
           answerMap={answerMap}
           onChange={(key, value) => {

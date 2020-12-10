@@ -60,14 +60,6 @@ export function PotentialRoles({
                           onRemoved(author.identity);
                         }}
                       >
-                        <MenuItem
-                          onSelect={() => {
-                            onRemoved(author.identity);
-                          }}
-                        >
-                          Add to selection
-                        </MenuItem>
-
                         {!!canModerate && (
                           <MenuItem
                             disabled={isModerationInProgress || author.identity}
@@ -92,14 +84,6 @@ export function PotentialRoles({
                         onRemoved(review.author.identity);
                       }}
                     >
-                      <MenuItem
-                        onSelect={() => {
-                          onRemoved(review.author.identity);
-                        }}
-                      >
-                        Add to selection
-                      </MenuItem>
-
                       {!!canModerate && (
                         <MenuItem
                           disabled={
@@ -135,7 +119,7 @@ PotentialRoles.propTypes = {
 
 function DraggableRoleBadge({ roleId, onDropped, children, type }) {
   const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState({});
+  const [user, setUser] = useState(null);
 
   const { data: userData, loadingUser, error } = useGetUser({ id: roleId });
 
@@ -184,7 +168,7 @@ function DraggableRoleBadge({ roleId, onDropped, children, type }) {
 }
 
 DraggableRoleBadge.propTypes = {
-  roleId: PropTypes.number.isRequired,
+  roleId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
   onDropped: PropTypes.func.isRequired,
   children: PropTypes.any,
   type: PropTypes.oneOf([POTENTIAL_ROLE_TYPE, HIGHLIGHTED_ROLE_TYPE]),

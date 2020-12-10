@@ -9,7 +9,7 @@ import classNames from 'classnames';
 import PropTypes from 'prop-types';
 import { MdDragHandle, MdUnfoldMore, MdUnfoldLess } from 'react-icons/md';
 import IconButton from './icon-button';
-import RapidPreReviewLogo from './rapid-pre-review-logo';
+import PreReviewLogo from './pre-review-logo';
 import debounce from 'lodash/debounce';
 
 const SHELL_HEADER_HEIGHT = 40; // !! keep in sync with CSS
@@ -225,7 +225,7 @@ export default function Shell({ children, defaultStatus = 'default' }) {
         <div className="shell__control-bar">
           <div className="shell__controls">
             <div className="shell__controls__left">
-              <RapidPreReviewLogo short={true} />
+              <PreReviewLogo short={true} />
             </div>
             <div className="shell__controls__center">
               <IconButton
