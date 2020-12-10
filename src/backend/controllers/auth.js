@@ -95,10 +95,12 @@ export default function controller(users, personas, config, thisUser) {
           anonPersona = personas.create({
             name: 'Anonymous',
             identity: newUser,
+            isActive: false,
           });
           defaultPersona = personas.create({
             name: usersName,
             identity: newUser,
+            isActive: true,
           });
 
           await personas.persistAndFlush([anonPersona, defaultPersona]);
