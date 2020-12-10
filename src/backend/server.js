@@ -83,7 +83,12 @@ export default async function configServer(config) {
       default: { appenders: ['console'], level: config.logLevel },
     },
   });
-  server.use(log4js.koaLogger(log4js.getLogger('http'), { level: 'auto' }));
+  const logger = log4js.getLogger('http');
+  server.use(log4js.koaLogger(logger, { level: 'auto' }));
+  //server.use(async (ctx, next) => {
+  //  ctx.logger = logger;
+  //  await next();
+  //});
 
   // Initialize database
   const [db, dbMiddleware] = await dbWrapper();
@@ -151,7 +156,8 @@ export default async function configServer(config) {
 
   // Set custom error handler
   server.context.createError = createError;
-  server.context.onerror = errorHandler;
+  server.context.onerror = errorHandler('koa.sess', logger);
+  server.context.api = true;
 
   // If we're running behind Cloudflare, set the access parameters.
   if (config.cfaccessUrl) {

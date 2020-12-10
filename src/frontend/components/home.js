@@ -5,7 +5,7 @@ import omit from 'lodash/omit';
 import { MdChevronRight, MdFirstPage } from 'react-icons/md';
 import Cookies from 'js-cookie';
 import PrivateRoute from './private-route';
-import { useGetPreprints, useGetUser, useSearch } from '../hooks/api-hooks.tsx';
+import { useGetPreprints, useGetUser } from '../hooks/api-hooks.tsx';
 import {
   useIsNewVisitor,
   useIsMobile,
@@ -30,6 +30,14 @@ import AddButton from './add-button';
 import { ORG } from '../constants';
 import Banner from './banner';
 
+const searchParamsToObject = params => {
+  const obj = {};
+  for (const [key, value] of params) {
+    obj[key] = value;
+  }
+  return obj;
+};
+
 export default function Home() {
   const history = useHistory();
   const location = useLocation();
@@ -46,21 +54,24 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
 
   const { data: preprints, loading: loadingPreprints, error } = useGetPreprints({
-    queryParams: params.entries(),
+    queryParams: searchParamsToObject(params),
   });
+
+  console.log('***queryParams***:', Array.from(params.entries()));
+  console.log('***loadingPreprints***:', loadingPreprints);
 
   const [hoveredSortOption, setHoveredSortOption] = useState(null);
 
-  useEffect(() => {
-    // console.log('loading: ', loading);
-    // console.log('preprints: ', preprints);
-    // console.log('error: ', error);
-    if (!loadingPreprints) {
-      if (preprints) {
-        setLoading(false);
-      }
-    }
-  }, [loadingPreprints, preprints]);
+  //useEffect(() => {
+  //  // console.log('loading: ', loading);
+  //  // console.log('preprints: ', preprints);
+  //  // console.log('error: ', error);
+  //  if (!loadingPreprints) {
+  //    if (preprints) {
+  //      setLoading(false);
+  //    }
+  //  }
+  //}, []);
 
   useEffect(() => {
     const username = Cookies.get('PRE_user');
@@ -129,7 +140,7 @@ export default function Home() {
     [user, history],
   );
 
-  if (loading) {
+  if (loadingPreprints) {
     return <div>Loading...</div>;
   } else if (error) {
     return <div>An error occurred: {error}</div>;
@@ -154,7 +165,7 @@ export default function Home() {
           }}
         />
 
-        <SearchBar />
+        <SearchBar isFetching={loadingPreprints} />
 
         <div className="home__main">
           <LeftSidePanel

@@ -7,11 +7,11 @@ import IconButton from './icon-button';
 import { useIsMobile } from '../hooks/ui-hooks';
 import { useSearch } from '../hooks/api-hooks.tsx';
 
-export default function SearchBar() {
+export default function SearchBar({ isFetching }) {
   const history = useHistory();
   const location = useLocation();
   const isMobile = useIsMobile();
-  const { data: searchResults, loading, refetch } = useSearch({ lazy: true });
+  //const { data: searchResults, loading, refetch } = useSearch({ lazy: true });
 
   const defaultValue = '';
   const prevDefaultValueRef = useRef(null);
@@ -49,7 +49,7 @@ export default function SearchBar() {
               ? 'Search by DOI, arXiv ID or title'
               : 'Search preprints with reviews or requests for reviews by DOI, arXiv ID or title'
           }
-          disabled={loading}
+          disabled={isFetching}
           onKeyDown={e => {
             if (e.key === 'Enter') {
               handleSubmit(e.target.value);
@@ -62,7 +62,7 @@ export default function SearchBar() {
             handleSubmit(e.target.value);
           }}
         />
-        {!loading && defaultValue && defaultValue === value ? (
+        {!isFetching && defaultValue && defaultValue === value ? (
           <IconButton
             className="search-bar__search-box__button"
             onClick={e => {
