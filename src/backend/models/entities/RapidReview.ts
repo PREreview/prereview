@@ -1,7 +1,7 @@
 import {
   Entity,
   EntityRepositoryType,
-  JsonType,
+  Enum,
   ManyToOne,
   Property,
 } from '@mikro-orm/core';
@@ -10,6 +10,13 @@ import { RapidReviewModel } from '../rapidReviews';
 import { BaseEntity } from './BaseEntity';
 import { Persona } from './Persona';
 import { Preprint } from './Preprint';
+
+enum Checkboxes {
+  yes = 'yes',
+  no = 'no',
+  na = 'N/A',
+  unsure = 'unsure',
+}
 
 @Entity()
 export class RapidReview extends BaseEntity {
@@ -22,14 +29,55 @@ export class RapidReview extends BaseEntity {
   @ManyToOne({ entity: () => Preprint })
   preprint!: Preprint;
 
-  @Fixture(() => ({
-    data: 'Test data',
-  }))
-  @Property({ type: JsonType })
-  contents!: Record<string, unknown>;
+  @Fixture({ enum: Checkboxes })
+  @Enum(() => Checkboxes)
+  ynNovel = Checkboxes.na;
 
-  constructor(contents: Record<string, unknown>) {
-    super();
-    this.contents = contents;
-  }
+  @Fixture({ enum: Checkboxes })
+  @Enum(() => Checkboxes)
+  ynFuture = Checkboxes.na;
+
+  @Fixture({ enum: Checkboxes })
+  @Enum(() => Checkboxes)
+  ynReproducibility = Checkboxes.na;
+
+  @Fixture({ enum: Checkboxes })
+  @Enum(() => Checkboxes)
+  ynMethods = Checkboxes.na;
+
+  @Fixture({ enum: Checkboxes })
+  @Enum(() => Checkboxes)
+  ynCoherent = Checkboxes.na;
+
+  @Fixture({ enum: Checkboxes })
+  @Enum(() => Checkboxes)
+  ynLimitations = Checkboxes.na;
+
+  @Fixture({ enum: Checkboxes })
+  @Enum(() => Checkboxes)
+  ynEthics = Checkboxes.na;
+
+  @Fixture({ enum: Checkboxes })
+  @Enum(() => Checkboxes)
+  ynNewData = Checkboxes.na;
+
+  @Fixture({ enum: Checkboxes })
+  @Enum(() => Checkboxes)
+  ynRecommend = Checkboxes.na;
+
+  @Fixture({ enum: Checkboxes })
+  @Enum(() => Checkboxes)
+  ynPeerReview = Checkboxes.na;
+
+  @Fixture({ enum: Checkboxes })
+  @Enum(() => Checkboxes)
+  ynAvailableCode = Checkboxes.na;
+
+  @Fixture({ enum: Checkboxes })
+  @Enum(() => Checkboxes)
+  ynAvailableData = Checkboxes.na;
+
+  @Fixture(faker => faker.lorem.sentence())
+  @Property({ columnType: 'text' })
+  linkToData?: string;
 }
