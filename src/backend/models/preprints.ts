@@ -11,6 +11,7 @@ export class PreprintModel extends EntityRepository<Preprint> {
   findOneByHandle(value: string, params: string[]): any {
     try {
       const { id } = decodePreprintId(value);
+      console.log('***INVALID***');
       return this.findOne({ handle: id }, params);
     } catch (err) {
       throw new ChainError('Failed to parse handle.', err);

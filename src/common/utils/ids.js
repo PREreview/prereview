@@ -2,7 +2,7 @@ import orcidUtils from 'orcid-utils';
 import doiRegex from 'doi-regex';
 import identifiersArxiv from 'identifiers-arxiv';
 import { getId, unprefix } from './jsonld';
-import { createError } from '../errors.ts';
+import { ChainError } from '../errors.ts';
 
 export function createPreprintId(
   value, // doi or arXiv (prefixed or not) or preprint
@@ -15,7 +15,7 @@ export function createPreprintId(
       id = value.doi || value.arXivId;
     }
     if (!id) {
-      throw createError(500, `invalid identifier for create preprint id`);
+      throw new ChainError('Invalid identifier for create preprint id');
     }
   }
 
@@ -35,9 +35,8 @@ export function createPreprintId(
   }
 
   if (!vendor) {
-    throw createError(
-      500,
-      `invalid identifier for create preprint id (could not extract vendor)`,
+    throw new ChainError(
+      'Invalid identifier for create preprint id (could not extract vendor)',
     );
   }
 
@@ -46,7 +45,7 @@ export function createPreprintId(
 
 export function decodePreprintId(value) {
   if (!value) {
-    throw createError(500, 'You must provide a preprintId to decode');
+    throw new ChainError('You must provide a preprintId to decode');
   }
 
   let scheme;
@@ -57,8 +56,7 @@ export function decodePreprintId(value) {
   }
 
   if (!scheme) {
-    throw createError(
-      500,
+    throw new ChainError(
       'String is not an encoded preprint ID (could not extract scheme)',
     );
   }
@@ -73,7 +71,7 @@ export function createPreprintIdentifierCurie(
   value, // preprint or identifer (arXivId or DOI, unprefixed)
 ) {
   if (!value) {
-    throw createError(500, `invalid value for createIdentifierCurie`);
+    throw new ChainError('invalid value for createIdentifierCurie');
   }
 
   if (value.doi) {
@@ -83,7 +81,7 @@ export function createPreprintIdentifierCurie(
   } else {
     const id = getId(value);
     if (!id) {
-      throw createError(500, `invalid value for createIdentifierCurie`);
+      throw new ChainError('invalid value for createIdentifierCurie');
     }
 
     if (doiRegex().test(id)) {
@@ -91,7 +89,7 @@ export function createPreprintIdentifierCurie(
     } else if (identifiersArxiv.extract(id)[0]) {
       return `arXiv:${value.arXivId}`;
     } else {
-      throw createError(500, `invalid value for createIdentifierCurie`);
+      throw new ChainError('invalid value for createIdentifierCurie');
     }
   }
 }

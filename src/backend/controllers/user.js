@@ -93,6 +93,7 @@ export default function controller(users, thisUser) {
       } catch (err) {
         ctx.throw(400, err);
       }
+
       if (user) {
         if (
           thisUser.isMemberOf('admins', user.orcid) ||
@@ -126,10 +127,16 @@ export default function controller(users, thisUser) {
       }),
       type: 'json',
       params: {
-        id: Joi.string()
+        id: Joi.alternatives()
+          .try(Joi.number().integer(), Joi.string())
           .description('User id')
           .required(),
       },
+      //params: {
+      //  id: Joi.string()
+      //    .description('User id')
+      //    .required(),
+      //},
       continueOnError: false,
       false: 400,
     },
@@ -137,7 +144,15 @@ export default function controller(users, thisUser) {
     handler: async ctx => {
       log.debug(`Updating user ${ctx.params.id}.`);
 
-      const user = await users.findOne(ctx.params.id);
+      let user;
+      try {
+        user = await users.findOneByIdOrOrcid(ctx.params.id, [
+          'personas',
+          'groups',
+        ]);
+      } catch (err) {
+        ctx.throw(400, err);
+      }
 
       if (!user) {
         ctx.throw(404, `That user with ID ${ctx.params.id} does not exist.`);
@@ -160,10 +175,16 @@ export default function controller(users, thisUser) {
     path: '/users/:id',
     validate: {
       params: {
-        id: Joi.string()
+        id: Joi.alternatives()
+          .try(Joi.number().integer(), Joi.string())
           .description('User id')
           .required(),
       },
+      //params: {
+      //  id: Joi.string()
+      //    .description('User id')
+      //    .required(),
+      //},
     },
     pre: thisUser.can('access admin pages'), // TODO: can users delete their own account?
     handler: async ctx => {

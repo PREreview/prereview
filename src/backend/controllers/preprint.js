@@ -167,12 +167,15 @@ export default function controller(preprints, thisUser) {
     },
     method: 'GET',
     path: '/preprints/:id',
-    //validate: {
-    //  params: {
-    //    id: Joi.alternatives().try(Joi.number().integer(), Joi.string()),
-    //  },
-    //  continueOnError: true,
-    //},
+    validate: {
+      params: {
+        id: Joi.alternatives()
+          .try(Joi.number().integer(), Joi.string())
+          .description('Preprint ID')
+          .required(),
+      },
+      continueOnError: true,
+    },
     handler: async ctx => {
       if (ctx.invalid) {
         handleInvalid(ctx);
@@ -190,7 +193,7 @@ export default function controller(preprints, thisUser) {
         ]);
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
-        ctx.throw(400, `Failed to parse query: ${err}`);
+        ctx.throw(400, err);
       }
 
       if (preprint) {
@@ -228,6 +231,12 @@ export default function controller(preprints, thisUser) {
       //params: {
       //  id: Joi.alternatives().try(Joi.number().integer(), Joi.string()),
       //},
+      params: {
+        id: Joi.alternatives()
+          .try(Joi.number().integer(), Joi.string())
+          .description('Preprint ID')
+          .required(),
+      },
       body: {
         data: preprintSchema,
       },
@@ -286,6 +295,12 @@ export default function controller(preprints, thisUser) {
       //params: {
       //  id: Joi.alternatives().try(Joi.number().integer(), Joi.string()),
       //},
+      params: {
+        id: Joi.alternatives()
+          .try(Joi.number().integer(), Joi.string())
+          .description('Preprint ID')
+          .required(),
+      },
     },
     pre: async (ctx, next) => {
       await thisUser.can('access admin pages');
