@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React, { Fragment, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useDrag, useDrop } from 'react-dnd';
 import classNames from 'classnames';
@@ -23,7 +23,6 @@ const HIGHLIGHTED_ROLE_TYPE = Symbol('dnd:highlighted-role-type');
 export function PotentialRoles({
   role,
   reviews,
-  roleIds = [],
   onRemoved,
   onModerate,
   canModerate,
@@ -50,36 +49,73 @@ export function PotentialRoles({
       <ul className="role-list__list">
         {reviews.length
           ? reviews.map(review => {
-              return (
-                <li key={review.id}>
-                  <DraggableRoleBadge
-                    type={POTENTIAL_ROLE_TYPE}
-                    roleId={review.id}
-                    onDropped={review => {
-                      onRemoved(review.id);
-                    }}
-                  >
-                    <MenuItem
-                      onSelect={() => {
-                        onRemoved(review.id);
-                      }}
-                    >
-                      Add to selection
-                    </MenuItem>
-
-                    {!!canModerate && (
-                      <MenuItem
-                        disabled={isModerationInProgress || review.author}
-                        onSelect={() => {
-                          // onModerate(review.id);
+              if (review.authors) {
+                return review.authors.map(author => {
+                  return (
+                    <li key={author.identity}>
+                      <DraggableRoleBadge
+                        type={POTENTIAL_ROLE_TYPE}
+                        roleId={author.identity}
+                        onDropped={author => {
+                          onRemoved(author.identity);
                         }}
                       >
-                        Report Review
+                        <MenuItem
+                          onSelect={() => {
+                            onRemoved(author.identity);
+                          }}
+                        >
+                          Add to selection
+                        </MenuItem>
+
+                        {!!canModerate && (
+                          <MenuItem
+                            disabled={isModerationInProgress || author.identity}
+                            onSelect={() => {
+                              onModerate(author.identity);
+                            }}
+                          >
+                            Report Review
+                          </MenuItem>
+                        )}
+                      </DraggableRoleBadge>
+                    </li>
+                  );
+                })
+              } else {
+                return (
+                  <li key={review.author.identity}>
+                    <DraggableRoleBadge
+                      type={POTENTIAL_ROLE_TYPE}
+                      roleId={review.author.identity}
+                      onDropped={review => {
+                        onRemoved(review.author.identity);
+                      }}
+                    >
+                      <MenuItem
+                        onSelect={() => {
+                          onRemoved(review.author.identity);
+                        }}
+                      >
+                        Add to selection
                       </MenuItem>
-                    )}
-                  </DraggableRoleBadge>
-                </li>
-              );
+
+                      {!!canModerate && (
+                        <MenuItem
+                          disabled={
+                            isModerationInProgress || review.author.identity
+                          }
+                          onSelect={() => {
+                            onModerate(review.author.identity);
+                          }}
+                        >
+                          Report Review
+                        </MenuItem>
+                      )}
+                    </DraggableRoleBadge>
+                  </li>
+                );
+              }
             })
           : null}
       </ul>
@@ -98,6 +134,11 @@ PotentialRoles.propTypes = {
 };
 
 function DraggableRoleBadge({ roleId, onDropped, children, type }) {
+  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState({});
+
+  const { data: userData, loadingUser, error } = useGetUser({ id: roleId });
+
   const [{ isDragging }, dragRef] = useDrag({
     item: { roleId, type },
     end(item, monitor) {
@@ -111,21 +152,35 @@ function DraggableRoleBadge({ roleId, onDropped, children, type }) {
     }),
   });
 
-  return (
-    <Fragment>
-      <RoleBadge
-        tooltip={true}
-        ref={dragRef}
-        roleId={roleId}
-        className={classNames('draggable-role-badge', {
-          'draggable-role-badge--dragging': isDragging,
-        })}
-        disabled={isDragging}
-      >
-        {children}
-      </RoleBadge>
-    </Fragment>
-  );
+  useEffect(() => {
+    if (!loadingUser) {
+      if (userData) {
+        setUser(userData.data);
+        setLoading(false);
+      }
+    }
+  }, [loadingUser, userData, roleId]);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  } else {
+    return (
+      <Fragment>
+        <RoleBadge
+          user={user}
+          tooltip={true}
+          ref={dragRef}
+          roleId={roleId}
+          className={classNames('draggable-role-badge', {
+            'draggable-role-badge--dragging': isDragging,
+          })}
+          disabled={isDragging}
+        >
+          {children}
+        </RoleBadge>
+      </Fragment>
+    );
+  }
 }
 
 DraggableRoleBadge.propTypes = {

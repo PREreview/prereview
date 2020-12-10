@@ -91,10 +91,9 @@ const ReviewReader = React.memo(function ReviewReader({
                 <PotentialRoles
                   role={role}
                   reviews={allReviews}
-                  canModerate={!!user}
+                  canModerate={user}
                   isModerationInProgress={isModerationInProgress}
                   onModerate={onModerate}
-                  roleIds={roleIds}
                   onRemoved={roleId => {
                     const nextHighlightedRoleIds = highlightedRoleIds.concat(
                       roleId,
@@ -109,7 +108,7 @@ const ReviewReader = React.memo(function ReviewReader({
                 <HighlightedRoles
                   role={role}
                   reviews={allReviews}
-                  canModerate={!!user}
+                  canModerate={user}
                   isModerationInProgress={isModerationInProgress}
                   onModerate={onModerate}
                   roleIds={highlightedRoleIds}

@@ -67,15 +67,18 @@ export default function Home() {
     if (username) {
       fetch(`api/v2/users/${username}`)
         .then(response => {
+          console.log(response);
           if (response.status === 200) {
             return response.json();
           }
-          throw new Error(error);
+          throw new Error(response);
         })
         .then(result => {
           setUser(result.data);
-          console.log('***user***:', result.data);
           return result;
+        })
+        .catch(err => {
+          console.log('Error: ', err);
         });
     }
   }, []);
@@ -151,6 +154,7 @@ export default function Home() {
           />
         )}
         <HeaderBar
+          user={user}
           onClickMenuButton={() => {
             setShowLeftPanel(!showLeftPanel);
           }}
@@ -262,7 +266,6 @@ export default function Home() {
                   >
                     <PreprintCard
                       isNew={true}
-                      user={user}
                       preprint={preprint}
                       onNewRequest={handleNewRequest}
                       onNew={handleNew}

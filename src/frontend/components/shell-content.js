@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Link, useLocation } from 'react-router-dom';
 import classNames from 'classnames';
+import Cookies from 'js-cookie';
 import { Helmet } from 'react-helmet-async';
 import { MenuLink } from '@reach/menu-button';
 import { useUser } from '../contexts/user-context';
@@ -63,8 +64,25 @@ export default function ShellContent({
   const showProfileNotice = checkIfRoleLacksMininmalData(user);
 
   useEffect(() => {
-
-  }, [user]);
+    const username = Cookies.get('PRE_user');
+    // if (username) {
+    //   fetch(`api/v2/users/${username}`)
+    //     .then(response => {
+    //       if (response.status === 200) {
+    //         return response.json();
+    //       }
+    //       throw new Error(response);
+    //     })
+    //     .then(result => {
+    //       setUser(result.data);
+    //       console.log('***user***:', result.data);
+    //       return result;
+    //     })
+    //     .catch(err => {
+    //       console.log('Error: ', err);
+    //     });
+    // }
+  }, []);
 
   return (
     <div className="shell-content">
@@ -346,8 +364,13 @@ ShellContentRead.propTypes = {
   preprint: PropTypes.object.isRequired,
 };
 
-function ShellContentRapidReview({ user, preprint, disabled, isPosting, error }) {
-
+function ShellContentRapidReview({
+  user,
+  preprint,
+  disabled,
+  isPosting,
+  error,
+}) {
   const { data: subjects, loadingSubjects, errorSubjects } = useGetTags();
 
   // const [answerMap, setAnswerMap] = useLocalState(

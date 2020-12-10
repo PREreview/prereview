@@ -7,6 +7,7 @@ export default function UserBadge({ user, children, ...others }) {
     <RoleBadge
       {...others}
       roleId={user.defaultRole ? user.defaultRole : 'contributor'}
+      user={user}
     >
       {children}
     </RoleBadge>
