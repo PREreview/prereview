@@ -118,7 +118,8 @@ export function createError(...args: any[]): HttpError {
   }
 
   const defaultProps = {
-    expose: props.expose ? props.expose : status < 500,
+    //expose: props && props.expose ? props.expose : status < 500,
+    expose: true,
     headers: props.headers,
     status: this.status,
     statusCode: this.statusCode,
