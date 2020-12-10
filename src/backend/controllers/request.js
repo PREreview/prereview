@@ -33,6 +33,10 @@ export default function controller(reqModel, thisUser) {
     ctx.status = 200;
   };
 
+  // const postHandler = async ctx => {
+
+  // }
+
   requestRouter.route({
     meta: {
       swagger: {
@@ -40,7 +44,7 @@ export default function controller(reqModel, thisUser) {
         summary: 'Endpoint to POST a request for review.',
       },
     },
-    method: 'post',
+    method: 'POST',
     path: '/requests',
     // pre: thisUser.can(''),
     // validate: {},
@@ -77,7 +81,6 @@ export default function controller(reqModel, thisUser) {
     },
     method: 'get',
     path: '/requests',
-    // pre: thisUser.can('')
     // validate: {}
     handler: async ctx => getHandler(ctx),
   });
@@ -93,7 +96,6 @@ export default function controller(reqModel, thisUser) {
     },
     method: 'get',
     path: '/preprints/:pid/requests',
-    // pre: thisUser.can('')
     //validate: {}
     handler: async ctx => getHandler(ctx),
   });

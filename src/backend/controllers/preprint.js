@@ -50,6 +50,7 @@ export default function controller(preprints, thisUser) {
       try {
         data = await resolve(identifier);
         if (data) {
+          log.debug(`Adding a preprint & its resolved metadata to database.`)
           const preprint = preprints.create(data);
           await preprints.persistAndFlush(preprint);
         }
@@ -73,15 +74,7 @@ export default function controller(preprints, thisUser) {
     },
     method: 'POST',
     path: '/preprints',
-    validate: {
-      body: preprintSchema,
-      type: 'json',
-      continueOnError: true,
-    },
-    pre: async (ctx, next) => {
-      await thisUser.can('access private pages');
-      return next();
-    },
+    pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
     handler: async ctx => {
       if (ctx.invalid) {
         handleInvalid(ctx);
@@ -92,7 +85,7 @@ export default function controller(preprints, thisUser) {
       let preprint;
 
       try {
-        preprint = preprints.create(ctx.request.body.data[0]);
+        preprint = preprints.create(ctx.request.body);
         await preprints.persistAndFlush(preprint);
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
@@ -121,10 +114,6 @@ export default function controller(preprints, thisUser) {
     path: '/preprints',
     validate: {
       query: querySchema, // #TODO
-    },
-    pre: async (ctx, next) => {
-      await thisUser.can('access private pages');
-      return next();
     },
     handler: async ctx => {
       if (ctx.invalid) {
@@ -183,6 +172,7 @@ export default function controller(preprints, thisUser) {
       let preprint;
 
       try {
+        log.debug(`Trying this!`)
         preprint = await preprints.findOneByIdOrHandle(ctx.params.id, [
           'fullReviews',
           'rapidReviews',
