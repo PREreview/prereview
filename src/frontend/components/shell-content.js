@@ -398,7 +398,7 @@ function ShellContentRapidReview({ preprint, disabled }) {
             onClick={event => {
               event.preventDefault();
               if (canSubmit(answerMap)) {
-                postRapidReview(answerMap)
+                postRapidReview({...answerMap, preprint: preprint.id})
                   .then(() => alert('Rapid review submitted successfully.'))
                   .catch(err => alert(`An error occurred: ${err.message}`));
               } else {
@@ -466,7 +466,7 @@ function ShellContentLongReview({
                 postLongReview({
                   author: user.id,
                   preprint: preprint.id,
-                  content: content,
+                  contents: content,
                 })
                   .then(() => alert('Draft updated successfully.'))
                   .catch(err => alert(`An error occurred: ${err}`));
@@ -493,7 +493,7 @@ function ShellContentLongReview({
                   postLongReview({
                     author: user.id,
                     preprint: preprint.id,
-                    content: content,
+                    contents: content,
                     published: true,
                   })
                     .then(() => alert('Rapid review submitted successfully.'))

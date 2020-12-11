@@ -69,6 +69,7 @@ export default function controller(
     // pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
     handler: async ctx => {
       log.debug('Adding full review.');
+      log.debug('ctx.body,', ctx.request.body);
       let review, draft, authorPersona, preprint;
 
       try {

@@ -47,10 +47,25 @@ export default function controller(rapidReviews, thisUser) {
     // validate: {},
     handler: async ctx => {
       log.debug('Posting a rapid review.');
-      let rapidReview;
+      log.debug('ctx.request.body', ctx.request.body);
+      let rapidReview, authorPersona;
 
       try {
-        rapidReview = rapidReviews.create(ctx.request.body);
+        const personas = await ctx.state.user.personas.loadItems({
+          where: { isActive: true },
+        });
+        authorPersona = personas[0];
+      } catch (err) {
+        log.error('Failed to load user personas.');
+        ctx.throw(400, err);
+      }
+
+      try {
+        log.debug('authorPersona', authorPersona)
+        rapidReview = rapidReviews.create({
+          ...ctx.request.body,
+          author: authorPersona,
+        });
         await rapidReviews.persistAndFlush(rapidReview);
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
