@@ -57,21 +57,18 @@ export default function Home() {
     queryParams: searchParamsToObject(params),
   });
 
-  console.log('***queryParams***:', Array.from(params.entries()));
-  console.log('***loadingPreprints***:', loadingPreprints);
-
   const [hoveredSortOption, setHoveredSortOption] = useState(null);
 
-  //useEffect(() => {
-  //  // console.log('loading: ', loading);
-  //  // console.log('preprints: ', preprints);
-  //  // console.log('error: ', error);
-  //  if (!loadingPreprints) {
-  //    if (preprints) {
-  //      setLoading(false);
-  //    }
-  //  }
-  //}, []);
+  useEffect(() => {
+   // console.log('loading: ', loading);
+   // console.log('preprints: ', preprints);
+   // console.log('error: ', error);
+   if (!loadingPreprints) {
+     if (preprints) {
+       setLoading(false);
+     }
+   }
+  }, []);
 
   useEffect(() => {
     const username = Cookies.get('PRE_user');
@@ -85,7 +82,6 @@ export default function Home() {
         })
         .then(result => {
           setUser(result.data);
-          console.log('***user***:', result.data);
           return result;
         });
     }
@@ -168,19 +164,6 @@ export default function Home() {
         <SearchBar isFetching={loadingPreprints} />
 
         <div className="home__main">
-          <LeftSidePanel
-            visible={showLeftPanel}
-            onClickOutside={() => {
-              setShowLeftPanel(false);
-            }}
-          >
-            <Facets
-              counts={undefined}
-              ranges={undefined}
-              isFetching={loading}
-            />
-          </LeftSidePanel>
-
           <div className="home__content">
             <div className="home__content-header">
               <h3 className="home__content-title">
@@ -350,8 +333,6 @@ export default function Home() {
               )}
             </div>
           </div>
-
-          <div className="home__main__right" />
         </div>
       </div>
     );
