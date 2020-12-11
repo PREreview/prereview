@@ -26,7 +26,7 @@ export class Preprint extends BaseEntity {
   @Property()
   title!: string;
 
-  @Fixture({ get: () => createRandomDoi() })
+  @Fixture({ get: () => `doi:${createRandomDoi()}` })
   @Property()
   @Unique()
   handle!: string;

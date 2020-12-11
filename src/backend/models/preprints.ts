@@ -17,8 +17,8 @@ interface PreprintQuery {
 export class PreprintModel extends EntityRepository<Preprint> {
   findOneByHandle(value: string, params: string[]): any {
     try {
-      const { id } = decodePreprintId(value);
-      return this.findOne({ handle: id }, params);
+      const { id, scheme } = decodePreprintId(value);
+      return this.findOne({ handle: `${scheme}:${id}` }, params);
     } catch (err) {
       throw new ChainError('Failed to parse handle.', err);
     }
