@@ -1,7 +1,7 @@
 import router from 'koa-joi-router';
 import { getLogger } from '../log.js';
 
-const log = getLogger('backend:controllers:tags');
+const log = getLogger('backend:controllers:requests');
 
 // eslint-disable-next-line no-unused-vars
 export default function controller(reqModel, thisUser) {
@@ -38,7 +38,15 @@ export default function controller(reqModel, thisUser) {
 
     ctx.params.pid ? (pid = ctx.params.pid) : null;
 
-    author = await ctx.state.user.personas.init({ where: { isActive: true } });
+    try {
+      const personas = await ctx.state.user.personas.loadItems({
+        where: { isActive: true },
+      });
+      author = personas[0];
+    } catch (err) {
+      log.error('Failed to load user personas.');
+      ctx.throw(400, err);
+    }
 
     log.debug(`Adding a request.`);
 
@@ -72,10 +80,10 @@ export default function controller(reqModel, thisUser) {
       },
     },
     method: 'POST',
-    path: 'preprints/:pid/requests',
-    // pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
+    path: '/preprints/:pid/requests',
+    pre: thisUser.can('access private pages'),
     // validate: {},
-    handler: async ctx => postHandler(ctx),
+    handler: postHandler,
   });
 
   requestRouter.route({
