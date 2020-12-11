@@ -1,4 +1,5 @@
 import router from 'koa-joi-router';
+import { QueryOrder } from '@mikro-orm/core';
 import { getLogger } from '../log.js';
 import resolve from '../utils/resolve.js';
 import { getErrorMessages } from '../utils/errors';
@@ -7,17 +8,14 @@ const log = getLogger('backend:controllers:preprint');
 const Joi = router.Joi;
 
 const querySchema = Joi.object({
-  start: Joi.number()
+  limit: Joi.number()
     .integer()
     .greater(-1),
-  end: Joi.number()
+  offset: Joi.number()
     .integer()
     .positive(),
-  asc: Joi.boolean(),
-  sort_by: Joi.string(),
-  from: Joi.string(),
-  to: Joi.string(),
-  query: Joi.string(),
+  desc: Joi.boolean(),
+  search: Joi.string().allow(''),
 });
 
 const preprintSchema = {};
@@ -121,6 +119,7 @@ export default function controller(preprints, thisUser) {
     path: '/preprints',
     validate: {
       query: querySchema, // #TODO
+      continueOnError: true,
     },
     pre: async (ctx, next) => {
       await thisUser.can('access private pages');
@@ -136,16 +135,25 @@ export default function controller(preprints, thisUser) {
 
       try {
         const populate = ['fullReviews', 'rapidReviews', 'requests'];
-        let foundPreprints;
-        if (ctx.query.query) {
-          foundPreprints = await preprints.search(ctx.query.query, populate);
+        let foundPreprints, count;
+        if (ctx.query.search && ctx.query.search !== '') {
+          [foundPreprints, count] = await preprints.search(ctx.query, populate);
         } else {
-          foundPreprints = await preprints.findAll(populate);
+          const order = ctx.query.desc ? QueryOrder.DESC : QueryOrder.ASC;
+
+          foundPreprints = await preprints.findAll(
+            populate,
+            { createdAt: order },
+            ctx.query.limit,
+            ctx.query.offset,
+          );
+          count = await preprints.count();
         }
         if (foundPreprints) {
           ctx.body = {
             statusCode: 200,
             status: 'ok',
+            totalCount: count,
             data: foundPreprints,
           };
         }

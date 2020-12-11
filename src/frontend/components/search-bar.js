@@ -26,7 +26,7 @@ export default function SearchBar({ isFetching }) {
   }, [defaultValue]);
 
   function handleSubmit(value) {
-    const search = `?query=${value}`;
+    const search = `?search=${value}`;
     if (search !== location.search) {
       history.push({
         pathname: location.pathame,
