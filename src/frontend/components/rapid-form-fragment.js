@@ -23,14 +23,14 @@ import IconButton from './icon-button';
 import Collapse from './collapse';
 import NoticeBox from './notice-box';
 
-const StyledTableCell = withStyles((theme) => ({
+const StyledTableCell = withStyles(theme => ({
   body: {
     fontSize: 14,
     minWidth: '250px',
   },
 }))(TableCell);
 
-const StyledTableRow = withStyles((theme) => ({
+const StyledTableRow = withStyles(theme => ({
   root: {
     '&:nth-of-type(odd)': {
       backgroundColor: theme.palette.action.hover,

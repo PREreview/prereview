@@ -1,8 +1,5 @@
-import React, { useState, createRef, useEffect } from 'react';
+import React, { createRef } from 'react';
 import PropTypes from 'prop-types';
-import VisuallyHidden from '@reach/visually-hidden';
-import noop from 'lodash/noop';
-import { MdRadioButtonUnchecked, MdRadioButtonChecked } from 'react-icons/md';
 import classNames from 'classnames';
 
 export default function RadioButton({
@@ -10,7 +7,7 @@ export default function RadioButton({
   label,
   className,
   disabled = false,
-
+  required = false,
   ...inputProps
 }) {
   const inputRef = createRef();
@@ -24,17 +21,17 @@ export default function RadioButton({
       {/*  The label element is responsible for triggering the onChange callback
       of the radio-button since the native radio-button element will be visually hidden. */}
       <label htmlFor={inputId} className="radio-button__contents">
-        <input
-          className="radio-button__input"
-          disabled={disabled}
-          id={inputId}
-          type="radio"
-          ref={inputRef}
-          {...inputProps}
-        />
-
         <span className="radio-button__label vh">{label}</span>
       </label>
+      <input
+        className="radio-button__input"
+        disabled={disabled}
+        required={required}
+        id={inputId}
+        type="radio"
+        ref={inputRef}
+        {...inputProps}
+      />
     </div>
   );
 }
@@ -44,4 +41,5 @@ RadioButton.propTypes = {
   label: PropTypes.any,
   className: PropTypes.string,
   disabled: PropTypes.bool,
+  required: PropTypes.bool,
 };

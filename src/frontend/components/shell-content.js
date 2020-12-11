@@ -8,11 +8,11 @@ import { MenuLink } from '@reach/menu-button';
 import { useUser } from '../contexts/user-context';
 import {
   useGetUser,
-  // usePostDraftReviews, #FIXME build this
+  useGetFullReview,
+  useGetRapidReview,
   usePostFullReviews,
   usePostRapidReviews,
   usePostRequests,
-  useGetTags,
 } from '../hooks/api-hooks.tsx';
 import { useLocalState } from '../hooks/ui-hooks';
 import { decodePreprintId } from '../../common/utils/ids.js';
@@ -22,13 +22,15 @@ import RapidFormFragment from './rapid-form-fragment';
 import LongFormFragment from './long-form-fragment';
 import LoginRequiredModal from './login-required-modal';
 import UserBadge from './user-badge';
-import SubjectEditor from './subject-editor';
 import ReviewReader from './review-reader';
 import PreprintPreview from './preprint-preview';
 import XLink from './xlink';
 import ModerationModal from './moderation-modal';
 import { checkIfRoleLacksMininmalData } from '../utils/roles';
 import NoticeBadge from './notice-badge';
+
+// constants
+import { QUESTIONS } from '../constants';
 
 // !! this needs to work both in web and extension use
 // `process.env.IS_EXTENSION` to assess the environment we are in.
@@ -45,9 +47,20 @@ export default function ShellContent({
     id: Cookies.get('PRE_user'),
   });
 
-  const postRapidReview = usePostRapidReviews();
-  const postFullReview = usePostFullReviews();
   const postReviewRequest = usePostRequests();
+
+  const { data: rapidReview, loadingRapid, errorRapid } = useGetRapidReview({
+    author: user ? user.id : null,
+    preprint: preprint ? preprint.id : null,
+  });
+
+  const { data: longReview, loadingLong, errorLong } = useGetFullReview({
+    author: user ? user.id : null,
+    preprint: preprint ? preprint.id : null,
+  });
+
+  const [disabledRapidReview, setDisabledRapidReview] = useState(false);
+  const [disabledLongReview, setDisabledLongReview] = useState(false);
 
   const [tab, setTab] = useState(defaultTab);
 
@@ -66,6 +79,22 @@ export default function ShellContent({
     : `/login?next=${encodeURIComponent(location.pathname)}`;
 
   const showProfileNotice = checkIfRoleLacksMininmalData(user);
+
+  useEffect(() => {
+    if (!loadingRapid) {
+      if (rapidReview) {
+        setDisabledRapidReview(true);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!loadingLong) {
+      if (longReview) {
+        setDisabledLongReview(true);
+      }
+    }
+  }, []);
 
   useEffect(() => {
     if (!loadingUser) {
@@ -267,10 +296,10 @@ export default function ShellContent({
               postReviewRequest(user, preprint)
                 .then(() => alert('PREreview request submitted successfully.'))
                 .catch(err => alert(`An error occurred: ${err}`));
+              setTab('rapidReview#success');
+
             }}
-            isPosting={postFullReview.loading}
-            disabled={postFullReview.loading}
-            error={postFullReview.error} // #FIXME
+            disabled={disabledRapidReview}
           />
         ) : tab === 'rapidReview#success' ? (
           <ShellContentReviewSuccess
@@ -287,10 +316,9 @@ export default function ShellContent({
               postReviewRequest(user, preprint)
                 .then(() => alert('PREreview request submitted successfully.'))
                 .catch(err => alert(`An error occurred: ${err}`));
+              setTab('longReview#success');
             }}
-            isPosting={postFullReview.loading}
-            disabled={postFullReview.loading}
-            error={postFullReview.error} // #FIXME
+            disabled={disabledLongReview}
           />
         ) : tab === 'longReview#success' ? (
           <ShellContentReviewSuccess
@@ -355,30 +383,15 @@ ShellContentRead.propTypes = {
   preprint: PropTypes.object.isRequired,
 };
 
-function ShellContentRapidReview({
-  user,
-  preprint,
-  disabled,
-  isPosting,
-  error,
-}) {
-  const { data: subjects, loadingSubjects, errorSubjects } = useGetTags();
+function ShellContentRapidReview({ preprint, disabled }) {
+  const [answerMap, setAnswerMap] = useState({});
 
-  // const [answerMap, setAnswerMap] = useLocalState(
-  const [answerMap, setAnswerMap] = useState(
-    'answerMap',
-    user ? user.defaultRole : '',
-    preprint.id,
-    {},
-  );
+  const { mutate: postRapidReview, loading, error } = usePostRapidReviews();
 
-  const {
-    mutate: postRapidReview,
-    loadingPostRapidReview,
-  } = usePostRapidReviews();
-
-  const canSubmit = () => {
-    // #TODO build function to check if all questions have been answered
+  const canSubmit = answerMap => {
+    return QUESTIONS.filter(q => q.type == 'YesNoQuestion').every(
+      question => question.identifier in answerMap,
+    );
   };
 
   return (
@@ -387,29 +400,30 @@ function ShellContentRapidReview({
 
       <PreprintPreview preprint={preprint} />
 
-      <form
-        onSubmit={e => {
-          e.preventDefault();
-        }}
-      >
+      <form>
         <RapidFormFragment
           answerMap={answerMap}
           onChange={(key, value) => {
-            setAnswerMap(prev => {
-              return Object.assign({}, prev, { [key]: value });
-            });
+            setAnswerMap(answerMap => ({ ...answerMap, [key]: value }));
           }}
         />
         <Controls error={error}>
           <Button
             type="submit"
             primary={true}
-            isWaiting={isPosting}
+            isWaiting={loading}
             disabled={disabled || !canSubmit}
-            onClick={() => {
-              postRapidReview(user.id, preprint.id)
-                .then(() => alert('Rapid review submitted successfully.'))
-                .catch(err => alert(`An error occurred: ${err}`));
+            onClick={event => {
+              event.preventDefault();
+              if (canSubmit(answerMap)) {
+                postRapidReview(answerMap)
+                  .then(() => alert('Rapid review submitted successfully.'))
+                  .catch(err => alert(`An error occurred: ${err.message}`));
+              } else {
+                alert(
+                  'Please complete the required fields. All multiple choice questions are required.',
+                );
+              }
             }}
           >
             Submit
@@ -423,9 +437,7 @@ ShellContentRapidReview.propTypes = {
   user: PropTypes.object,
   preprint: PropTypes.object.isRequired,
   onSubmit: PropTypes.func.isRequired,
-  isPosting: PropTypes.bool,
   disabled: PropTypes.bool,
-  error: PropTypes.instanceOf(Error),
 };
 
 function ShellContentLongReview({
@@ -436,7 +448,10 @@ function ShellContentLongReview({
   error,
 }) {
   const [content, setContent] = useState('');
-  const { mutate: postLongReview, loadingPostLongReview } = usePostFullReviews();
+  const {
+    mutate: postLongReview,
+    loadingPostLongReview,
+  } = usePostFullReviews();
 
   const onContentChange = value => {
     setContent(value);
@@ -465,13 +480,18 @@ function ShellContentLongReview({
             disabled={disabled || !canSubmit}
             onClick={event => {
               event.preventDefault();
-              postLongReview({
-                author: user.id,
-                preprint: preprint.id,
-                content: content,
-              })
-                .then(() => alert('Draft updated successfully.'))
-                .catch(err => alert(`An error occurred: ${err}`));
+              console.log(content);
+              if (content && content !== '<p></p>') {
+                postLongReview({
+                  author: user.id,
+                  preprint: preprint.id,
+                  content: content,
+                })
+                  .then(() => alert('Draft updated successfully.'))
+                  .catch(err => alert(`An error occurred: ${err}`));
+              } else {
+                alert('Review cannot be blank.');
+              }
             }}
           >
             Save
@@ -481,15 +501,20 @@ function ShellContentLongReview({
             primary={true}
             isWaiting={isPosting}
             disabled={disabled || !canSubmit}
-            onClick={() => {
-              if (
-                alert(
-                  'Are you sure you want to submit this review? This action cannot be undone.',
-                )
-              ) {
-                postLongReview(user.id, preprint.id)
-                  .then(() => alert('Rapid review submitted successfully.'))
-                  .catch(err => alert(`An error occurred: ${err}`));
+            onClick={event => {
+              event.preventDefault();
+              if (content && content !== '<p></p>') {
+                if (
+                  alert(
+                    'Are you sure you want to submit this review? This action cannot be undone.',
+                  )
+                ) {
+                  postLongReview(user.id, preprint.id)
+                    .then(() => alert('Rapid review submitted successfully.'))
+                    .catch(err => alert(`An error occurred: ${err}`));
+                }
+              } else {
+                alert('Review cannot be blank.');
               }
             }}
           >
@@ -555,7 +580,7 @@ function ShellContentReviewSuccess({ preprint, onClose }) {
 
       <PreprintPreview preprint={preprint} />
 
-      <p>Your review has been successfully posted.</p>
+      <p>Your longform review has been successfully posted.</p>
 
       <Controls>
         <Button onClick={onClose}>View</Button>

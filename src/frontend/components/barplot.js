@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 export default function Barplot({ nTotalReviews, stats, children }) {
-  console.log(stats);
   return (
     <div className="barplot">
       <div className="barplot__question-list-header">
