@@ -41,8 +41,8 @@ export default function ShellContent({
   const postReviewRequest = usePostRequests();
 
   const { data: rapidReview, loadingRapid, errorRapid } = useGetRapidReview({
-    author: user.id,
-    preprint: preprint.id,
+    author: user ? user.id : null,
+    preprint: preprint ? preprint.id : null,
   });
 
   const { data: longReview, loadingLong, errorLong } = useGetFullReview({
@@ -324,7 +324,7 @@ export default function ShellContent({
 ShellContent.propTypes = {
   onRequireScreen: PropTypes.func.isRequired,
   preprint: PropTypes.object.isRequired,
-  user: PropTypes.object.isRequired,
+  user: PropTypes.object,
   defaultTab: PropTypes.oneOf(['read', 'review', 'request']),
 };
 
