@@ -38,19 +38,28 @@ const Menu = () => {
     return (
       <div>
         <button
-          onClick={() => commands.toggleBold()}
+          onClick={event => {
+            event.preventDefault();
+            commands.toggleBold();
+          }}
           style={{ fontWeight: active.bold() ? 'bold' : undefined }}
         >
           B
         </button>
         <button
-          onClick={() => commands.toggleItalic()}
+          onClick={event => {
+            event.preventDefault();
+            commands.toggleItalic();
+          }}
           style={{ fontWeight: active.italic() ? 'bold' : undefined }}
         >
           I
         </button>
         <button
-          onClick={() => commands.toggleUnderline()}
+          onClick={event => {
+            event.preventDefault();
+            commands.toggleUnderline();
+          }}
           style={{ fontWeight: active.underline() ? 'bold' : undefined }}
         >
           U
