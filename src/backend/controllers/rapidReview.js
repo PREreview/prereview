@@ -61,7 +61,7 @@ export default function controller(rapidReviews, thisUser) {
       }
 
       try {
-        log.debug('authorPersona', authorPersona)
+        log.debug('authorPersona', authorPersona);
         rapidReview = rapidReviews.create({
           ...ctx.request.body,
           author: authorPersona,
