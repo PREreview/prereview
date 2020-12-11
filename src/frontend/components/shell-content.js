@@ -38,8 +38,6 @@ export default function ShellContent({
 }) {
   const location = useLocation();
 
-  const postReviewRequest = usePostRequests();
-
   const { data: rapidReview, loadingRapid, errorRapid } = useGetRapidReview({
     author: user ? user.id : null,
     preprint: preprint ? preprint.id : null,
@@ -49,6 +47,12 @@ export default function ShellContent({
     author: user ? user.id : null,
     preprint: preprint ? preprint.id : null,
   });
+
+  const {
+    mutate: postReviewRequest,
+    loadingPostReviewRequest,
+    errorPostReviewRequest,
+  } = usePostRequests();
 
   const [hasRapidReviewed, setHasRapidReviewed] = useState(false);
   const [hasLongReviewed, setHasLongReviewed] = useState(false);
@@ -159,7 +163,7 @@ export default function ShellContent({
                 className={classNames('shell-content__tab-button', {
                   'shell-content__tab-button--active': tab === 'request',
                 })}
-                disabled={postReviewRequest.loading || hasRequested}
+                disabled={loadingPostReviewRequest || hasRequested}
                 onClick={() => {
                   if (user) {
                     onRequireScreen();
@@ -260,14 +264,14 @@ export default function ShellContent({
           <ShellContentRequest
             user={user}
             preprint={preprint}
-            onSubmit={() => {
-              postReviewRequest(user, preprint)
+            onSubmit={(preprint, user) => {
+              postReviewRequest({ preprint: preprint, user: user.id })
                 .then(() => alert('PREreview request submitted successfully.'))
-                .catch(err => alert(`An error occurred: ${err}`));
+                .catch(err => alert(`An error occurred: ${err.message}`));
             }}
-            isPosting={postReviewRequest.loading}
-            disabled={postReviewRequest.loading}
-            error={postReviewRequest.error} // #FIXME
+            isPosting={loadingPostReviewRequest}
+            disabled={hasRequested}
+            error={errorPostReviewRequest} // #FIXME
           />
         ) : tab === 'rapidReview' ? (
           <ShellContentRapidReview
@@ -276,7 +280,7 @@ export default function ShellContent({
             onSubmit={() => {
               postReviewRequest(user, preprint)
                 .then(() => alert('PREreview request submitted successfully.'))
-                .catch(err => alert(`An error occurred: ${err}`));
+                .catch(err => alert(`An error occurred: ${err.message}`));
               setTab('rapidReview#success');
 
             }}
@@ -296,7 +300,7 @@ export default function ShellContent({
             onSubmit={() => {
               postReviewRequest(user, preprint)
                 .then(() => alert('PREreview request submitted successfully.'))
-                .catch(err => alert(`An error occurred: ${err}`));
+                .catch(err => alert(`An error occurred: ${err.message}`));
               setTab('longReview#success');
             }}
             disabled={hasLongReviewed}
@@ -348,7 +352,7 @@ function ShellContentRead({ user, preprint, counts }) {
           onSubmit={(moderationReason, onSuccess) => {
             postReport(moderatedReviewId, moderationReason)
               .then(() => alert('Report submitted successfully.'))
-              .catch(err => alert(`An error occurred: ${err}`));
+              .catch(err => alert(`An error occurred: ${err.message}`));
             onSuccess();
           }}
           onCancel={() => {
@@ -398,7 +402,7 @@ function ShellContentRapidReview({ preprint, disabled }) {
             onClick={event => {
               event.preventDefault();
               if (canSubmit(answerMap)) {
-                postRapidReview({...answerMap, preprint: preprint.id})
+                postRapidReview({ ...answerMap, preprint: preprint.id })
                   .then(() => alert('Rapid review submitted successfully.'))
                   .catch(err => alert(`An error occurred: ${err.message}`));
               } else {
@@ -469,7 +473,7 @@ function ShellContentLongReview({
                   contents: content,
                 })
                   .then(() => alert('Draft updated successfully.'))
-                  .catch(err => alert(`An error occurred: ${err}`));
+                  .catch(err => alert(`An error occurred: ${err.message}`));
               } else {
                 alert('Review cannot be blank.');
               }
@@ -493,7 +497,7 @@ function ShellContentLongReview({
                     published: true,
                   })
                     .then(() => alert('Full review submitted successfully.'))
-                    .catch(err => alert(`An error occurred: ${err}`));
+                    .catch(err => alert(`An error occurred: ${err.message}`));
                 }
               } else {
                 alert('Review cannot be blank.');
@@ -518,6 +522,7 @@ ShellContentLongReview.propTypes = {
 
 function ShellContentRequest({
   preprint,
+  user,
   onSubmit,
   disabled,
   isPosting,
@@ -537,7 +542,7 @@ function ShellContentRequest({
           isWaiting={isPosting}
           disabled={disabled}
           onClick={() => {
-            onSubmit(preprint);
+            onSubmit(preprint, user);
           }}
         >
           Submit
@@ -547,7 +552,7 @@ function ShellContentRequest({
   );
 }
 ShellContentRequest.propTypes = {
-  user: PropTypes.object,
+  user: PropTypes.object.isRequired,
   preprint: PropTypes.object.isRequired,
   onSubmit: PropTypes.func.isRequired,
   disabled: PropTypes.bool,
