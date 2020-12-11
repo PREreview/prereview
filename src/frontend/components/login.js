@@ -29,7 +29,6 @@ export default function Login() {
       <Helmet>
         <title>{ORG} • Login</title>
       </Helmet>
-      <Banner />
       <HeaderBar />
       <div className="login__content">
         {/* <div className="login__logo-container">

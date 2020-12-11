@@ -146,7 +146,6 @@ export default function Home() {
         <Helmet>
           <title>{ORG} • Home</title>
         </Helmet>
-        <Banner />
 
         {!!((isNewVisitor || params.get('welcome')) && isWelcomeModalOpen) && (
           <WelcomeModal
