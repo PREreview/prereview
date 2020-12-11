@@ -494,6 +494,7 @@ function ShellContentLongReview({
                     author: user.id,
                     preprint: preprint.id,
                     content: content,
+                    published: true,
                   })
                     .then(() => alert('Rapid review submitted successfully.'))
                     .catch(err => alert(`An error occurred: ${err}`));
