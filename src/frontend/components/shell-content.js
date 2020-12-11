@@ -2,20 +2,15 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Link, useLocation } from 'react-router-dom';
 import classNames from 'classnames';
-import Cookies from 'js-cookie';
 import { Helmet } from 'react-helmet-async';
 import { MenuLink } from '@reach/menu-button';
-import { useUser } from '../contexts/user-context';
 import {
-  useGetUser,
   useGetFullReview,
   useGetRapidReview,
   usePostFullReviews,
   usePostRapidReviews,
   usePostRequests,
 } from '../hooks/api-hooks.tsx';
-import { useLocalState } from '../hooks/ui-hooks';
-import { decodePreprintId } from '../../common/utils/ids.js';
 import Controls from './controls';
 import Button from './button';
 import RapidFormFragment from './rapid-form-fragment';
@@ -37,21 +32,17 @@ import { QUESTIONS } from '../constants';
 
 export default function ShellContent({
   preprint,
+  user,
   defaultTab = 'read',
   onRequireScreen,
 }) {
   const location = useLocation();
-  const [user, setUser] = useState(null);
-
-  const { data: userData, loadingUser, error } = useGetUser({
-    id: Cookies.get('PRE_user'),
-  });
 
   const postReviewRequest = usePostRequests();
 
   const { data: rapidReview, loadingRapid, errorRapid } = useGetRapidReview({
-    author: user ? user.id : null,
-    preprint: preprint ? preprint.id : null,
+    author: user.id,
+    preprint: preprint.id,
   });
 
   const { data: longReview, loadingLong, errorLong } = useGetFullReview({
@@ -59,15 +50,13 @@ export default function ShellContent({
     preprint: preprint ? preprint.id : null,
   });
 
-  const [disabledRapidReview, setDisabledRapidReview] = useState(false);
-  const [disabledLongReview, setDisabledLongReview] = useState(false);
+  const [hasRapidReviewed, setHasRapidReviewed] = useState(false);
+  const [hasLongReviewed, setHasLongReviewed] = useState(false);
+  const [hasRequested, setHasRequested] = useState(false);
 
   const [tab, setTab] = useState(defaultTab);
 
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-
-  const hasReviewed = user && user.preprint ? user.preprint.review : false; // #FIXME
-  const hasRequested = user && user.preprint ? user.preprint.request : false; // #FIXME
 
   const counts =
     preprint.requests.length +
@@ -83,7 +72,7 @@ export default function ShellContent({
   useEffect(() => {
     if (!loadingRapid) {
       if (rapidReview) {
-        setDisabledRapidReview(true);
+        setHasRapidReviewed(true);
       }
     }
   }, []);
@@ -91,18 +80,10 @@ export default function ShellContent({
   useEffect(() => {
     if (!loadingLong) {
       if (longReview) {
-        setDisabledLongReview(true);
+        setHasLongReviewed(true);
       }
     }
   }, []);
-
-  useEffect(() => {
-    if (!loadingUser) {
-      if (userData) {
-        setUser(userData.data);
-      }
-    }
-  }, [loadingUser, userData]);
 
   return (
     <div className="shell-content">
@@ -128,7 +109,7 @@ export default function ShellContent({
                 className={classNames('shell-content__tab-button', {
                   'shell-content__tab-button--active': tab === 'read',
                 })}
-                disabled={postReviewRequest.loading}
+                disabled={!preprint}
                 onClick={() => {
                   onRequireScreen();
                   setTab('read');
@@ -142,7 +123,7 @@ export default function ShellContent({
                 className={classNames('shell-content__tab-button', {
                   'shell-content__tab-button--active': tab === 'rapidReview',
                 })}
-                disabled={postReviewRequest.loading || hasReviewed}
+                disabled={loadingRapid || hasRapidReviewed}
                 onClick={() => {
                   if (user) {
                     onRequireScreen();
@@ -160,7 +141,7 @@ export default function ShellContent({
                 className={classNames('shell-content__tab-button', {
                   'shell-content__tab-button--active': tab === 'longReview',
                 })}
-                disabled={postReviewRequest.loading || hasReviewed}
+                disabled={loadingLong || hasLongReviewed}
                 onClick={() => {
                   if (user) {
                     onRequireScreen();
@@ -299,7 +280,7 @@ export default function ShellContent({
               setTab('rapidReview#success');
 
             }}
-            disabled={disabledRapidReview}
+            disabled={hasRapidReviewed}
           />
         ) : tab === 'rapidReview#success' ? (
           <ShellContentReviewSuccess
@@ -318,7 +299,7 @@ export default function ShellContent({
                 .catch(err => alert(`An error occurred: ${err}`));
               setTab('longReview#success');
             }}
-            disabled={disabledLongReview}
+            disabled={hasLongReviewed}
           />
         ) : tab === 'longReview#success' ? (
           <ShellContentReviewSuccess
@@ -343,6 +324,7 @@ export default function ShellContent({
 ShellContent.propTypes = {
   onRequireScreen: PropTypes.func.isRequired,
   preprint: PropTypes.object.isRequired,
+  user: PropTypes.object.isRequired,
   defaultTab: PropTypes.oneOf(['read', 'review', 'request']),
 };
 
@@ -480,7 +462,6 @@ function ShellContentLongReview({
             disabled={disabled || !canSubmit}
             onClick={event => {
               event.preventDefault();
-              console.log(content);
               if (content && content !== '<p></p>') {
                 postLongReview({
                   author: user.id,
@@ -509,7 +490,11 @@ function ShellContentLongReview({
                     'Are you sure you want to submit this review? This action cannot be undone.',
                   )
                 ) {
-                  postLongReview(user.id, preprint.id)
+                  postLongReview({
+                    author: user.id,
+                    preprint: preprint.id,
+                    content: content,
+                  })
                     .then(() => alert('Rapid review submitted successfully.'))
                     .catch(err => alert(`An error occurred: ${err}`));
                 }
