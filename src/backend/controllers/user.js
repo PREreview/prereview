@@ -67,35 +67,40 @@ export default function controller(users, thisUser) {
     path: '/users/:id',
     pre: thisUser.can('access private pages'),
     validate: {
-      //params: {
-      //  id: Joi.alternatives()
-      //    .match('one')
-      //    .try(Joi.number().integer(), Joi.string())
-      //    .description('User id')
-      //    .required(),
-      //},
       params: {
-        id: Joi.string()
+        id: Joi.alternatives()
+          .try(Joi.number().integer(), Joi.string())
           .description('User id')
           .required(),
       },
+      //params: {
+      //  id: Joi.string()
+      //    .description('User id')
+      //    .required(),
+      //},
       continueOnError: false,
       failure: 400,
     },
     handler: async ctx => {
       log.debug(`Retrieving user ${ctx.params.id}`);
 
-      const user = await users.findOneByIdOrOrcid(ctx.params.id, [
-        'personas',
-        'groups',
-      ]);
-      if (
-        thisUser.isMemberOf('admins', user.orcid) ||
-        user.groups.contains('admins')
-      ) {
-        user.isAdmin = true;
+      let user;
+      try {
+        user = await users.findOneByIdOrOrcid(ctx.params.id, [
+          'personas',
+          'groups',
+        ]);
+      } catch (err) {
+        ctx.throw(400, err);
       }
+
       if (user) {
+        if (
+          thisUser.isMemberOf('admins', user.orcid) ||
+          user.groups.contains('admins')
+        ) {
+          user.isAdmin = true;
+        }
         ctx.status = 200;
         ctx.body = {
           data: user,
@@ -122,10 +127,16 @@ export default function controller(users, thisUser) {
       }),
       type: 'json',
       params: {
-        id: Joi.string()
+        id: Joi.alternatives()
+          .try(Joi.number().integer(), Joi.string())
           .description('User id')
           .required(),
       },
+      //params: {
+      //  id: Joi.string()
+      //    .description('User id')
+      //    .required(),
+      //},
       continueOnError: false,
       false: 400,
     },
@@ -133,7 +144,15 @@ export default function controller(users, thisUser) {
     handler: async ctx => {
       log.debug(`Updating user ${ctx.params.id}.`);
 
-      const user = await users.findOne(ctx.params.id);
+      let user;
+      try {
+        user = await users.findOneByIdOrOrcid(ctx.params.id, [
+          'personas',
+          'groups',
+        ]);
+      } catch (err) {
+        ctx.throw(400, err);
+      }
 
       if (!user) {
         ctx.throw(404, `That user with ID ${ctx.params.id} does not exist.`);
@@ -156,10 +175,16 @@ export default function controller(users, thisUser) {
     path: '/users/:id',
     validate: {
       params: {
-        id: Joi.string()
+        id: Joi.alternatives()
+          .try(Joi.number().integer(), Joi.string())
           .description('User id')
           .required(),
       },
+      //params: {
+      //  id: Joi.string()
+      //    .description('User id')
+      //    .required(),
+      //},
     },
     pre: thisUser.can('access admin pages'), // TODO: can users delete their own account?
     handler: async ctx => {

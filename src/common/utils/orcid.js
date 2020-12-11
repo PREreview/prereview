@@ -20,7 +20,7 @@ export function createRandomOrcid(nTry = 0) {
     return createRandomOrcid(++nTry);
   }
 
-  return orcid;
+  return orcidUtils.toDashFormat(orcid);
 }
 
 /**

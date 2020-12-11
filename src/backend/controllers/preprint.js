@@ -1,4 +1,5 @@
 import router from 'koa-joi-router';
+import { QueryOrder } from '@mikro-orm/core';
 import { getLogger } from '../log.js';
 import resolve from '../utils/resolve.js';
 import { getErrorMessages } from '../utils/errors';
@@ -7,16 +8,14 @@ const log = getLogger('backend:controllers:preprint');
 const Joi = router.Joi;
 
 const querySchema = Joi.object({
-  start: Joi.number()
+  limit: Joi.number()
     .integer()
     .greater(-1),
-  end: Joi.number()
+  offset: Joi.number()
     .integer()
     .positive(),
-  asc: Joi.boolean(),
-  sort_by: Joi.string(),
-  from: Joi.string(),
-  to: Joi.string(),
+  desc: Joi.boolean(),
+  search: Joi.string().allow(''),
 });
 
 const preprintSchema = {};
@@ -49,6 +48,7 @@ export default function controller(preprints, thisUser) {
       try {
         data = await resolve(identifier);
         if (data) {
+          log.debug(`Adding a preprint & its resolved metadata to database.`);
           const preprint = preprints.create(data);
           await preprints.persistAndFlush(preprint);
         }
@@ -72,15 +72,7 @@ export default function controller(preprints, thisUser) {
     },
     method: 'POST',
     path: '/preprints',
-    validate: {
-      body: preprintSchema,
-      type: 'json',
-      continueOnError: true,
-    },
-    pre: async (ctx, next) => {
-      await thisUser.can('access private pages');
-      return next();
-    },
+    pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
     handler: async ctx => {
       if (ctx.invalid) {
         handleInvalid(ctx);
@@ -91,7 +83,7 @@ export default function controller(preprints, thisUser) {
       let preprint;
 
       try {
-        preprint = preprints.create(ctx.request.body.data[0]);
+        preprint = preprints.create(ctx.request.body);
         await preprints.persistAndFlush(preprint);
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
@@ -120,10 +112,7 @@ export default function controller(preprints, thisUser) {
     path: '/preprints',
     validate: {
       query: querySchema, // #TODO
-    },
-    pre: async (ctx, next) => {
-      await thisUser.can('access private pages');
-      return next();
+      continueOnError: true,
     },
     handler: async ctx => {
       if (ctx.invalid) {
@@ -134,16 +123,27 @@ export default function controller(preprints, thisUser) {
       log.debug(`Retrieving preprints.`);
 
       try {
-        const allPreprints = await preprints.findAll([
-          'fullReviews',
-          'rapidReviews',
-          'requests',
-        ]);
-        if (allPreprints) {
+        const populate = ['fullReviews', 'rapidReviews', 'requests'];
+        let foundPreprints, count;
+        if (ctx.query.search && ctx.query.search !== '') {
+          [foundPreprints, count] = await preprints.search(ctx.query, populate);
+        } else {
+          const order = ctx.query.desc ? QueryOrder.DESC : QueryOrder.ASC;
+
+          foundPreprints = await preprints.findAll(
+            populate,
+            { createdAt: order },
+            ctx.query.limit,
+            ctx.query.offset,
+          );
+          count = await preprints.count();
+        }
+        if (foundPreprints) {
           ctx.body = {
             statusCode: 200,
             status: 'ok',
-            data: allPreprints,
+            totalCount: count,
+            data: foundPreprints,
           };
         }
       } catch (err) {
@@ -164,12 +164,15 @@ export default function controller(preprints, thisUser) {
     },
     method: 'GET',
     path: '/preprints/:id',
-    //validate: {
-    //  params: {
-    //    id: Joi.alternatives().try(Joi.number().integer(), Joi.string()),
-    //  },
-    //  continueOnError: true,
-    //},
+    validate: {
+      params: {
+        id: Joi.alternatives()
+          .try(Joi.number().integer(), Joi.string())
+          .description('Preprint ID')
+          .required(),
+      },
+      continueOnError: true,
+    },
     handler: async ctx => {
       if (ctx.invalid) {
         handleInvalid(ctx);
@@ -187,7 +190,7 @@ export default function controller(preprints, thisUser) {
         ]);
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
-        ctx.throw(400, `Failed to parse query: ${err}`);
+        ctx.throw(400, err);
       }
 
       if (preprint) {
@@ -225,6 +228,12 @@ export default function controller(preprints, thisUser) {
       //params: {
       //  id: Joi.alternatives().try(Joi.number().integer(), Joi.string()),
       //},
+      params: {
+        id: Joi.alternatives()
+          .try(Joi.number().integer(), Joi.string())
+          .description('Preprint ID')
+          .required(),
+      },
       body: {
         data: preprintSchema,
       },
@@ -283,6 +292,12 @@ export default function controller(preprints, thisUser) {
       //params: {
       //  id: Joi.alternatives().try(Joi.number().integer(), Joi.string()),
       //},
+      params: {
+        id: Joi.alternatives()
+          .try(Joi.number().integer(), Joi.string())
+          .description('Preprint ID')
+          .required(),
+      },
     },
     pre: async (ctx, next) => {
       await thisUser.can('access admin pages');

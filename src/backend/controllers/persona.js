@@ -47,7 +47,7 @@ export default function controller(personasModel, thisUser) {
       swagger: {
         operationId: 'GetPersonas',
         description:
-          'Each user registered on the PREreview platform has two corresponding personas: one which has their public name and another that is anonymous. This endpoint GETs all personas on PREreview and the reviews attributed to each. Returns a 200 if successful, and an array of personas in the `data` attribute of the response body.',
+          'Each user registered on the PREreview platform has two corresponding personas: one which has their public name and another which is anonymous. This endpoint GETs all personas on PREreview and the reviews attributed to each. Returns a 200 if successful, and an array of personas in the `data` attribute of the response body.',
       },
     },
   });
@@ -93,7 +93,6 @@ export default function controller(personasModel, thisUser) {
     validate: {
       body: Joi.object({
         name: Joi.string(),
-        identity: Joi.number().integer(), // the ID of a user object
       }),
       type: 'json',
       params: Joi.object({

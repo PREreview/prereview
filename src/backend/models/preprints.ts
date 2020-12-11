@@ -6,12 +6,19 @@ import { isString } from '../../common/utils/strings';
 import { decodePreprintId } from '../../common/utils/ids';
 import { ChainError } from '../../common/errors';
 
+interface PreprintQuery {
+  limit: number;
+  offset: number;
+  desc: boolean;
+  search: string;
+}
+
 @Repository(Preprint)
 export class PreprintModel extends EntityRepository<Preprint> {
   findOneByHandle(value: string, params: string[]): any {
     try {
-      const { id } = decodePreprintId(value);
-      return this.findOne({ handle: id }, params);
+      const { id, scheme } = decodePreprintId(value);
+      return this.findOne({ handle: `${scheme}:${id}` }, params);
     } catch (err) {
       throw new ChainError('Failed to parse handle.', err);
     }
@@ -26,21 +33,67 @@ export class PreprintModel extends EntityRepository<Preprint> {
     throw new ChainError(`'${value}' is not a valid ID or Handle`);
   }
 
-  async search(query: string): Promise<any> {
+  async search(query: PreprintQuery, params?: string[]): Promise<any> {
     const connection = this.em.getConnection();
     let res: Array<object>;
+    let count: string | number;
     if (connection instanceof PostgreSqlConnection) {
-      res = await connection.execute(
-        `SELECT * FROM preprint WHERE fts @@ websearch_to_tsquery('english'::regconfig, '${query}') LIMIT 10000;`,
-      );
+      const knex = connection.getKnex();
+      res = await knex
+        .table('preprint')
+        .select('*')
+        .whereRaw("fts @@ websearch_to_tsquery('english'::regconfig, ?)", [
+          query.search,
+        ])
+        .modify(qb => {
+          if (query.desc) {
+            qb.orderBy('created_at', 'desc');
+          } else {
+            qb.orderBy('created_at', 'asc');
+          }
+
+          if (query.limit) {
+            qb.limit(query.limit);
+          }
+
+          if (query.offset) {
+            qb.offset(query.offset);
+          }
+        });
+      count = await knex.table('preprint').count();
+      count = count[0]['count'];
     } else if (connection instanceof SqliteConnection) {
-      res = await connection.execute(
-        `SELECT * FROM preprint_fts WHERE preprint_fts MATCH '${query}' ORDER BY rank;`,
-      );
+      const knex = connection.getKnex();
+      res = await knex
+        .table('preprint_fts')
+        .select(['rowid AS id', '*'])
+        .whereRaw('preprint_fts MATCH ?', [query.search])
+        .modify(qb => {
+          if (query.desc) {
+            qb.orderBy('rank', 'desc');
+          } else {
+            qb.orderBy('rank', 'asc');
+          }
+
+          if (query.limit) {
+            qb.limit(query.limit);
+          }
+
+          if (query.offset) {
+            qb.offset(query.offset);
+          }
+        });
+      count = await knex.table('preprint').count();
+      count = count[0]['count(*)'];
     } else {
       throw new ChainError('Database type does not support full-text search');
     }
-    return res;
+    const preprints = res.map(row => this.map(row)); // Map rows to full objects
+    if (params) {
+      await this.em.populate(preprints, params);
+    }
+
+    return [preprints, count as number];
   }
 }
 
