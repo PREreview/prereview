@@ -485,18 +485,14 @@ function ShellContentLongReview({
             onClick={event => {
               event.preventDefault();
               if (content && content !== '<p></p>') {
-                if (
-                  alert(
-                    'Are you sure you want to submit this review? This action cannot be undone.',
-                  )
-                ) {
+               {
                   postLongReview({
                     author: user.id,
                     preprint: preprint.id,
                     contents: content,
                     published: true,
                   })
-                    .then(() => alert('Rapid review submitted successfully.'))
+                    .then(() => alert('Full review submitted successfully.'))
                     .catch(err => alert(`An error occurred: ${err}`));
                 }
               } else {
