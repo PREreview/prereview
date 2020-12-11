@@ -38,6 +38,7 @@
     "watch:backend:dev": "parcel watch --target=backend --no-cache src/backend/index.js",
     "build:frontend": "parcel build --target=frontend src/frontend/index.html",
     "build:frontend:dev": "parcel build --target=frontend --no-minify src/frontend/index.html",
+    "build:scripts:import": "parcel build --target=import-script --no-scope-hoist --no-minify --no-cache src/backend/scripts/dbImport.js",
     "build:scripts:migrations": "npm run scan:migrations && parcel build --target=migrations-script --no-scope-hoist --no-minify --no-cache src/backend/scripts/dbMigrations.ts",
     "build:scripts:seeds": "parcel build --target=seeds-script --no-scope-hoist --no-minify --no-cache src/backend/scripts/dbSeeds.ts",
     "build:scripts:init": "parcel build --target=init-script --no-scope-hoist --no-minify --no-cache src/backend/scripts/dbInit.ts",
@@ -47,6 +48,7 @@
     "db:migrations:test": "ts-node src/backend/scripts/dbMigrations.ts",
     "db:seeds": "ts-node src/backend/scripts/dbSeeds.ts",
     "db:init": "node dist/scripts/dbInit.js",
+    "db:import": "node dist/scripts/dbImport.js",
     "scan:migrations": "barrelsby --delete -l below -d src/backend/db/migrations",
     "start:backend": "node dist/backend/index.js",
     "start:backend:dev": "nodemon -w dist/backend --enable-source-maps dist/backend/index.js -p 3001",
@@ -58,6 +60,7 @@
   },
   "backend": "dist/backend/index.js",
   "frontend": "dist/frontend/index.html",
+  "import-script": "dist/scripts/dbImport.js",
   "migrations-script": "dist/scripts/dbMigrations.js",
   "seeds-script": "dist/scripts/dbSeeds.js",
   "init-script": "dist/scripts/dbInit.js",
@@ -69,6 +72,10 @@
     "frontend": {
       "context": "browser",
       "distDir": "dist/frontend"
+    },
+    "import-script": {
+      "context": "node",
+      "distDir": "dist/scripts"
     },
     "migrations-script": {
       "context": "node",
