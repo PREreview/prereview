@@ -28,7 +28,7 @@ async function main() {
       class: migrations[migrationName],
     }));
 
-    migrationsList.push(searchIndex);
+    migrationsList.splice(1, 0, searchIndex);
 
     const orm = await MikroORM.init({
       ...options,
