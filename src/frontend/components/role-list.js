@@ -2,10 +2,8 @@ import React, { Fragment, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useDrag, useDrop } from 'react-dnd';
 import classNames from 'classnames';
-import { useGetUser } from '../hooks/api-hooks.tsx';
 import { MdClear } from 'react-icons/md';
 import { MenuItem } from '@reach/menu-button';
-import { getId, arrayify } from '../utils/jsonld';
 import RoleBadge from './role-badge';
 import IconButton from './icon-button';
 
@@ -21,7 +19,6 @@ const HIGHLIGHTED_ROLE_TYPE = Symbol('dnd:highlighted-role-type');
  * so that dragged role can be dragged back
  */
 export function PotentialRoles({
-  role,
   reviews,
   onRemoved,
   onModerate,
@@ -55,7 +52,7 @@ export function PotentialRoles({
                     <li key={author.identity}>
                       <DraggableRoleBadge
                         type={POTENTIAL_ROLE_TYPE}
-                        roleId={author.identity}
+                        author={author}
                         onDropped={author => {
                           onRemoved(author.identity);
                         }}
@@ -79,7 +76,7 @@ export function PotentialRoles({
                   <li key={review.author.identity}>
                     <DraggableRoleBadge
                       type={POTENTIAL_ROLE_TYPE}
-                      roleId={review.author.identity}
+                      author={review.author}
                       onDropped={review => {
                         onRemoved(review.author.identity);
                       }}
@@ -108,7 +105,6 @@ export function PotentialRoles({
 }
 
 PotentialRoles.propTypes = {
-  role: PropTypes.object,
   reviews: PropTypes.array.isRequired,
   canModerate: PropTypes.bool,
   onModerate: PropTypes.func,
@@ -117,11 +113,8 @@ PotentialRoles.propTypes = {
   roleIds: PropTypes.arrayOf(PropTypes.object),
 };
 
-function DraggableRoleBadge({ roleId, onDropped, children, type }) {
-  const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState(null);
-
-  const { data: userData, loadingUser, error } = useGetUser({ id: roleId });
+function DraggableRoleBadge({ author, onDropped, children, type }) {
+  const roleId = author.identity;
 
   const [{ isDragging }, dragRef] = useDrag({
     item: { roleId, type },
@@ -136,39 +129,26 @@ function DraggableRoleBadge({ roleId, onDropped, children, type }) {
     }),
   });
 
-  useEffect(() => {
-    if (!loadingUser) {
-      if (userData) {
-        setUser(userData.data);
-        setLoading(false);
-      }
-    }
-  }, [loadingUser, userData, roleId]);
-
-  if (loading) {
-    return <div>Loading...</div>;
-  } else {
-    return (
-      <Fragment>
-        <RoleBadge
-          user={user}
-          tooltip={true}
-          ref={dragRef}
-          roleId={roleId}
-          className={classNames('draggable-role-badge', {
-            'draggable-role-badge--dragging': isDragging,
-          })}
-          disabled={isDragging}
-        >
-          {children}
-        </RoleBadge>
-      </Fragment>
-    );
-  }
+  return (
+    <Fragment>
+      <RoleBadge
+        user={author}
+        tooltip={true}
+        ref={dragRef}
+        roleId={roleId}
+        className={classNames('draggable-role-badge', {
+          'draggable-role-badge--dragging': isDragging,
+        })}
+        disabled={isDragging}
+      >
+        {children}
+      </RoleBadge>
+    </Fragment>
+  );
 }
 
 DraggableRoleBadge.propTypes = {
-  roleId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
+  author: PropTypes.object.isRequired,
   onDropped: PropTypes.func.isRequired,
   children: PropTypes.any,
   type: PropTypes.oneOf([POTENTIAL_ROLE_TYPE, HIGHLIGHTED_ROLE_TYPE]),

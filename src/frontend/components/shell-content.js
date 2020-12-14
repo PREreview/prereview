@@ -5,8 +5,6 @@ import classNames from 'classnames';
 import { Helmet } from 'react-helmet-async';
 import { MenuLink } from '@reach/menu-button';
 import {
-  useGetFullReview,
-  useGetRapidReview,
   usePostFullReviews,
   usePostRapidReviews,
   usePostRequests,
@@ -38,16 +36,6 @@ export default function ShellContent({
 }) {
   const location = useLocation();
 
-  const { data: rapidReview, loadingRapid, errorRapid } = useGetRapidReview({
-    author: user ? user.id : null,
-    preprint: preprint ? preprint.id : null,
-  });
-
-  const { data: longReview, loadingLong, errorLong } = useGetFullReview({
-    author: user ? user.id : null,
-    preprint: preprint ? preprint.id : null,
-  });
-
   const {
     mutate: postReviewRequest,
     loadingPostReviewRequest,
@@ -73,21 +61,29 @@ export default function ShellContent({
 
   const showProfileNotice = checkIfRoleLacksMininmalData(user);
 
-  useEffect(() => {
-    if (!loadingRapid) {
-      if (rapidReview) {
-        setHasRapidReviewed(true);
-      }
-    }
-  }, []);
+  const onCloseRapid = review => {
+    console.log('review', review);
+  };
 
   useEffect(() => {
-    if (!loadingLong) {
-      if (longReview) {
-        setHasLongReviewed(true);
-      }
-    }
-  }, []);
+    preprint.fullReviews.map(review => {
+      review.authors.map(author => {
+        user.personas.some(persona => {
+          if (persona.identity === author.identity) {
+            setHasLongReviewed(true);
+          }
+        });
+      });
+    });
+
+    preprint.rapidReviews.map(review => {
+      user.personas.some(persona => {
+        if (persona.identity === review.author.identity) {
+          setHasRapidReviewed(true);
+        }
+      });
+    });
+  }, [preprint, user]);
 
   return (
     <div className="shell-content">
@@ -96,11 +92,11 @@ export default function ShellContent({
           {/* Data for the extension popup menu */}
           <meta
             name="rapid-prereview-extension-nreviews"
-            content={counts.nReviews}
+            content={preprint.rapidReviews.length + preprint.fullReviews.length}
           />
           <meta
             name="rapid-prereview-extension-nrequests"
-            content={counts.nRequests}
+            content={preprint.requests.length}
           />
         </Helmet>
       )}
@@ -127,7 +123,7 @@ export default function ShellContent({
                 className={classNames('shell-content__tab-button', {
                   'shell-content__tab-button--active': tab === 'rapidReview',
                 })}
-                disabled={loadingRapid || hasRapidReviewed}
+                disabled={!preprint || hasRapidReviewed}
                 onClick={() => {
                   if (user) {
                     onRequireScreen();
@@ -145,7 +141,7 @@ export default function ShellContent({
                 className={classNames('shell-content__tab-button', {
                   'shell-content__tab-button--active': tab === 'longReview',
                 })}
-                disabled={loadingLong || hasLongReviewed}
+                disabled={!preprint || hasLongReviewed}
                 onClick={() => {
                   if (user) {
                     onRequireScreen();
@@ -264,8 +260,8 @@ export default function ShellContent({
           <ShellContentRequest
             user={user}
             preprint={preprint}
-            onSubmit={(preprint, user) => {
-              postReviewRequest({ preprint: preprint, user: user.id })
+            onSubmit={preprint => {
+              postReviewRequest({ preprint: preprint})
                 .then(() => alert('PREreview request submitted successfully.'))
                 .catch(err => alert(`An error occurred: ${err.message}`));
             }}
@@ -277,14 +273,8 @@ export default function ShellContent({
           <ShellContentRapidReview
             user={user}
             preprint={preprint}
-            onSubmit={() => {
-              postReviewRequest(user, preprint)
-                .then(() => alert('PREreview request submitted successfully.'))
-                .catch(err => alert(`An error occurred: ${err.message}`));
-              setTab('rapidReview#success');
-
-            }}
             disabled={hasRapidReviewed}
+            onClose={onCloseRapid}
           />
         ) : tab === 'rapidReview#success' ? (
           <ShellContentReviewSuccess
@@ -369,7 +359,7 @@ ShellContentRead.propTypes = {
   preprint: PropTypes.object.isRequired,
 };
 
-function ShellContentRapidReview({ preprint, disabled }) {
+function ShellContentRapidReview({ preprint, disabled, onClose }) {
   const [answerMap, setAnswerMap] = useState({});
 
   const { mutate: postRapidReview, loading, error } = usePostRapidReviews();
@@ -403,7 +393,10 @@ function ShellContentRapidReview({ preprint, disabled }) {
               event.preventDefault();
               if (canSubmit(answerMap)) {
                 postRapidReview({ ...answerMap, preprint: preprint.id })
-                  .then(() => alert('Rapid review submitted successfully.'))
+                  .then(() => {
+                    alert('Rapid review submitted successfully.');
+                    return onClose(answerMap);
+                  })
                   .catch(err => alert(`An error occurred: ${err.message}`));
               } else {
                 alert(
@@ -422,12 +415,11 @@ function ShellContentRapidReview({ preprint, disabled }) {
 ShellContentRapidReview.propTypes = {
   user: PropTypes.object,
   preprint: PropTypes.object.isRequired,
-  onSubmit: PropTypes.func.isRequired,
+  onClose: PropTypes.func.isRequired,
   disabled: PropTypes.bool,
 };
 
 function ShellContentLongReview({
-  user,
   preprint,
   disabled,
   isPosting,
@@ -441,10 +433,10 @@ function ShellContentLongReview({
 
   const onContentChange = value => {
     setContent(value);
-  }
+  };
 
-  const canSubmit = () => {
-    // #TODO build function to check if all questions have been answered
+  const canSubmit = content => {
+    return content && content !== '<p></p>';
   };
 
   return (
@@ -463,12 +455,11 @@ function ShellContentLongReview({
             type="submit"
             primary={true}
             isWaiting={isPosting}
-            disabled={disabled || !canSubmit}
+            disabled={disabled || !canSubmit(content)}
             onClick={event => {
               event.preventDefault();
-              if (content && content !== '<p></p>') {
+              if (canSubmit(content)) {
                 postLongReview({
-                  author: user.id,
                   preprint: preprint.id,
                   contents: content,
                 })
@@ -485,13 +476,16 @@ function ShellContentLongReview({
             type="submit"
             primary={true}
             isWaiting={isPosting}
-            disabled={disabled || !canSubmit}
+            disabled={disabled || !canSubmit(content)}
             onClick={event => {
               event.preventDefault();
-              if (content && content !== '<p></p>') {
-               {
+              if (canSubmit(content)) {
+                if (
+                  confirm(
+                    'Are you sure you want to publish this review? This action cannot be undone.',
+                  )
+                ) {
                   postLongReview({
-                    author: user.id,
                     preprint: preprint.id,
                     contents: content,
                     published: true,
@@ -512,7 +506,6 @@ function ShellContentLongReview({
   );
 }
 ShellContentLongReview.propTypes = {
-  user: PropTypes.object,
   preprint: PropTypes.object.isRequired,
   onSubmit: PropTypes.func.isRequired,
   isPosting: PropTypes.bool,
@@ -522,7 +515,6 @@ ShellContentLongReview.propTypes = {
 
 function ShellContentRequest({
   preprint,
-  user,
   onSubmit,
   disabled,
   isPosting,
@@ -542,7 +534,7 @@ function ShellContentRequest({
           isWaiting={isPosting}
           disabled={disabled}
           onClick={() => {
-            onSubmit(preprint, user);
+            onSubmit(preprint);
           }}
         >
           Submit
@@ -552,7 +544,6 @@ function ShellContentRequest({
   );
 }
 ShellContentRequest.propTypes = {
-  user: PropTypes.object.isRequired,
   preprint: PropTypes.object.isRequired,
   onSubmit: PropTypes.func.isRequired,
   disabled: PropTypes.bool,

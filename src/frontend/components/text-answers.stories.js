@@ -34,7 +34,7 @@ export function Random() {
               parentItem: `question:${question.identifier}`,
               text:
                 question.type === 'YesNoQuestion'
-                  ? sample(['yes', 'no', 'n.a.', 'unsure'])
+                  ? sample(['yes', 'no', 'N/A', 'unsure'])
                   : faker.lorem.paragraph(),
             };
           }),

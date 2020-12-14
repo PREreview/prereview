@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import noop from 'lodash/noop';
 import isEqual from 'lodash/isEqual';
 import classNames from 'classnames';
-import { useGetUser } from '../hooks/api-hooks.tsx';
 import Barplot from './barplot';
 import { getId } from '../utils/jsonld';
 import { getYesNoStats } from '../utils/stats';
@@ -36,17 +35,6 @@ const ReviewReader = React.memo(function ReviewReader({
       setHighlightedRoleIds(defaultHighlightedRoleIds);
     }
   }, [defaultHighlightedRoleIds, highlightedRoleIds]);
-
-  const roleIds = allReviews.length
-    ? allReviews
-        .map(review => (review.author ? useGetUser(review.author) : null))
-        .filter(
-          roleId =>
-            !highlightedRoleIds.some(
-              highlightedRoleId => roleId === highlightedRoleId,
-            ),
-        )
-    : {};
 
   const highlightedActions = highlightedRoleIds.length
     ? allReviews.filter(action =>

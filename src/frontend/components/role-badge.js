@@ -142,11 +142,7 @@ RoleBadgeUI.propTypes = {
   user: PropTypes.shape({
     id: PropTypes.number,
     name: PropTypes.string,
-    avatar: PropTypes.shape({
-      '@type': PropTypes.oneOf(['ImageObject']).isRequired,
-      encodingFormat: PropTypes.oneOf(['image/jpeg', 'image/png']).isRequired,
-      contentUrl: PropTypes.string.isRequired,
-    }),
+    avatar: PropTypes.object,
   }),
   children: PropTypes.any,
   className: PropTypes.string,
@@ -157,13 +153,7 @@ export { RoleBadgeUI };
 
 function Tooltipify({ tooltip, roleId, user, children }) {
   return tooltip ? (
-    <Tooltip
-      label={
-        user && roleId && user.identity !== roleId
-          ? `${user.name} (${roleId}…)`
-          : roleId
-      }
-    >
+    <Tooltip label={`${user.name}`}>
       <div>{children}</div>
     </Tooltip>
   ) : (

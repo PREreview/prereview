@@ -73,12 +73,22 @@ export default function controller(
       let review, draft, authorPersona, preprint;
 
       try {
+        const personas = await ctx.state.user.personas.loadItems({
+          where: { isActive: true },
+        });
+        authorPersona = personas[0];
+      } catch (err) {
+        log.error('Failed to load user personas.');
+        ctx.throw(400, err);
+      }
+
+      try {
         review = reviewModel.create(ctx.request.body);
         await reviewModel.persistAndFlush(review);
 
         await review.authors.init();
-        authorPersona = await personaModel.find(ctx.request.body.authors);
-        review.authors.add(authorPersona[0]);
+
+        review.authors.add(authorPersona);
 
         preprint = await preprintModel.find(ctx.request.body.preprint);
         review.preprint = preprint[0];

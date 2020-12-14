@@ -147,12 +147,12 @@ export default function RapidFormFragment({ answerMap = {}, onChange }) {
                       required={required}
                       inputId={`question-${identifier}-na`}
                       name={identifier}
-                      value="n.a."
-                      checked={answer === 'n.a.'}
+                      value="N/A"
+                      checked={answer === 'N/A'}
                       onChange={e => {
-                        handleChange(identifier, 'n.a.');
+                        handleChange(identifier, 'N/A');
                       }}
-                      label={<abbr title="Not Applicable">N.A.</abbr>}
+                      label={<abbr title="Not Applicable">N/A</abbr>}
                     />
                   </TableCell>
                   <TableCell align="right">

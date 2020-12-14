@@ -4,7 +4,10 @@ import PropTypes from 'prop-types';
 export default function Barplot({ nTotalReviews, stats, children }) {
   return (
     <div className="barplot">
-      <div className="barplot__question-list-header">
+      {stats[0] ? (
+        <div>
+        <div className="barplot__question-list-header">
+        {}
         <div className="barplot__question-list-header__left">
           <span>Showing {nTotalReviews} Reviews</span>
         </div>
@@ -34,8 +37,11 @@ export default function Barplot({ nTotalReviews, stats, children }) {
           {!!children && <div className="barplot__share">{children}</div>}
         </div>
       </div>
+      </div>
+    ) : null}
+
       <ul className="barplot__question-list">
-        {stats[0].map(
+        {stats[0] ? stats[0].map(
           ({ questionId, nReviews, question, yes, no, na, unsure }) => (
             <li
               className="barplot__question-list__item"
@@ -66,7 +72,7 @@ export default function Barplot({ nTotalReviews, stats, children }) {
                       className="barplot__segment-title"
                       style={{ width: `${(stats.length / nReviews) * 100}%` }}
                     >
-                      {na ? 'n.a.' : ''}
+                      {na ? 'N/A' : ''}
                     </th>
 
                     <th
@@ -121,7 +127,7 @@ export default function Barplot({ nTotalReviews, stats, children }) {
               </table>
             </li>
           ),
-        )}
+        ) : (<div>No rapid reviews. Would you like to leave one?</div>)}
       </ul>
     </div>
   );
