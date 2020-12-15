@@ -140,19 +140,26 @@ export default function controller(users, personas, config, thisUser) {
   // TODO: local strategy login
 
   // start ORCID authentication
-  authRouter.get('/orcid/login', passport.authenticate('orcid'), req => {
-    console.log('+++++++++++++++++++++++++');
-    console.log(req);
-    console.log('+++++++++++++++++++++++++');
-  });
+  authRouter.get(
+    '/orcid/login',
+    (ctx, next) => {
+      if (ctx.query.next) {
+        ctx.session.next = ctx.query.next;
+      } else {
+        delete ctx.session.next;
+      }
+      next();
+    },
+    passport.authenticate('orcid'),
+  );
 
   //finish ORCID authentication
   authRouter.route({
-    method: 'get',
+    method: 'GET',
     path: '/orcid/callback',
     handler: async ctx => {
       return passport.authenticate('orcid', (err, user) => {
-        log.debug('Finishing authenticating with ORCID...');
+        log.debug('Finishing authenticating with ORCID.');
         log.debug('Received user object: ', user);
         if (!user) {
           ctx.body = { success: false };
@@ -175,7 +182,14 @@ export default function controller(users, personas, config, thisUser) {
 
           try {
             ctx.login(user);
-            return ctx.redirect('/');
+
+            if (ctx.session.next) {
+              ctx.redirect(ctx.session.next);
+              delete ctx.session.next;
+              return;
+            }
+
+            ctx.redirect('/');
           } catch (err) {
             ctx.throw(401, err);
           }
