@@ -2,43 +2,44 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 export default function Barplot({ nTotalReviews, stats, children }) {
+  console.log(stats);
   return (
     <div className="barplot">
       {stats[0] ? (
         <div>
-        <div className="barplot__question-list-header">
-        {}
-        <div className="barplot__question-list-header__left">
-          <span>Showing {nTotalReviews} Reviews</span>
-        </div>
-
-        <div className="barplot__question-list-header__right">
-          <div className="barplot__key">
-            <div className="barplot__key-item">
-              <div className="barplot__key-color-chip barplot__key-color-chip--yes" />
-              <span className="barplot__key-label">Yes</span>
+          <div className="barplot__question-list-header">
+            {}
+            <div className="barplot__question-list-header__left">
+              <span>Showing {nTotalReviews} Reviews</span>
             </div>
 
-            <div className="barplot__key-item">
-              <div className="barplot__key-color-chip barplot__key-color-chip--unsure" />
-              <span className="barplot__key-label">Unsure</span>
-            </div>
+            <div className="barplot__question-list-header__right">
+              <div className="barplot__key">
+                <div className="barplot__key-item">
+                  <div className="barplot__key-color-chip barplot__key-color-chip--yes" />
+                  <span className="barplot__key-label">Yes</span>
+                </div>
 
-            <div className="barplot__key-item">
-              <div className="barplot__key-color-chip barplot__key-color-chip--na" />
-              <span className="barplot__key-label">N/A</span>
-            </div>
+                <div className="barplot__key-item">
+                  <div className="barplot__key-color-chip barplot__key-color-chip--unsure" />
+                  <span className="barplot__key-label">Unsure</span>
+                </div>
 
-            <div className="barplot__key-item">
-              <div className="barplot__key-color-chip barplot__key-color-chip--no" />
-              <span className="barplot__key-label">No</span>
+                <div className="barplot__key-item">
+                  <div className="barplot__key-color-chip barplot__key-color-chip--na" />
+                  <span className="barplot__key-label">N/A</span>
+                </div>
+
+                <div className="barplot__key-item">
+                  <div className="barplot__key-color-chip barplot__key-color-chip--no" />
+                  <span className="barplot__key-label">No</span>
+                </div>
+              </div>
+              {!!children && <div className="barplot__share">{children}</div>}
             </div>
           </div>
-          {!!children && <div className="barplot__share">{children}</div>}
         </div>
-      </div>
-      </div>
-    ) : null}
+      ) : null}
 
       <ul className="barplot__question-list">
         {stats[0] ? stats[0].map(
@@ -135,16 +136,6 @@ export default function Barplot({ nTotalReviews, stats, children }) {
 
 Barplot.propTypes = {
   nTotalReviews: PropTypes.number.isRequired,
-  stats: PropTypes.arrayOf(
-    PropTypes.shape({
-      questionId: PropTypes.string.isRequired,
-      nReviews: PropTypes.number.isRequired,
-      question: PropTypes.string.isRequired,
-      yes: PropTypes.arrayOf(PropTypes.string).isRequired, // roleIds
-      no: PropTypes.arrayOf(PropTypes.string).isRequired, // roleIds
-      na: PropTypes.arrayOf(PropTypes.string).isRequired, // roleIds
-      unsure: PropTypes.arrayOf(PropTypes.string).isRequired, // roleIds
-    }),
-  ).isRequired,
+  stats: PropTypes.array.isRequired,
   children: PropTypes.element, // share menu
 };

@@ -74,7 +74,7 @@ export function PotentialRoles({
                     </li>
                   );
                 });
-              } else {
+              } else if (review.author) {
                 return (
                   <li key={review.author.identity}>
                     <DraggableRoleBadge
@@ -136,7 +136,7 @@ PotentialRoles.propTypes = {
   isModerationInProgress: PropTypes.bool,
   onRemoved: PropTypes.func.isRequired,
   roleIds: PropTypes.arrayOf(PropTypes.object),
-  hasReviewed: PropTypes.bool,
+  hasReviewed: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]),
 };
 
 function DraggableRoleBadge({ author, onDropped, children, type }) {

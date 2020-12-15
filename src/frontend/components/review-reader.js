@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, Fragment } from 'react';
+import React, { useState, useEffect, Fragment } from 'react';
 import PropTypes from 'prop-types';
 import noop from 'lodash/noop';
 import isEqual from 'lodash/isEqual';
@@ -7,9 +7,8 @@ import Barplot from './barplot';
 import { getId } from '../utils/jsonld';
 import { getYesNoStats } from '../utils/stats';
 import TextAnswers from './text-answers';
-import { PotentialRoles, HighlightedRoles } from './role-list';
+import { PotentialRoles } from './role-list';
 import ShareMenu from './share-menu';
-import NoticeBox from './notice-box';
 
 const ReviewReader = React.memo(function ReviewReader({
   user,
