@@ -131,7 +131,7 @@ export default function Popup(props) {
 
           <li className="popup__nav__list-item">
             {user ? (
-              <a href={`auth/logout`} target="_blank" rel="noopener noreferrer">
+              <a href={`/logout`} target="_blank" rel="noopener noreferrer">
                 Logout
               </a>
             ) : (

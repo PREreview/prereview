@@ -145,7 +145,7 @@ export default function HeaderBar({ onClickMenuButton, closeGap, user }) {
                   Moderate Reviews
                 </MenuLink>
               )}
-              <MenuLink href={`auth/logout`}>Logout</MenuLink>
+              <MenuLink href={`/logout`}>Logout</MenuLink>
             </UserBadge>
           ) : (
             <XLink to="/login" href="/login">

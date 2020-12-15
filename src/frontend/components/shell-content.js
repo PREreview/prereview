@@ -55,9 +55,12 @@ export default function ShellContent({
     preprint.rapidReviews.length +
     preprint.fullReviews.length;
 
+  const extensionNextURL = new URL(window.location.href);
+  extensionNextURL.hash = '#osrpre-shell';
+
   const loginUrl = process.env.IS_EXTENSION
-    ? '/login'
-    : `/login?next=${encodeURIComponent(location.pathname)}`;
+    ? `/login?next=${encodeURIComponent(extensionNextURL)}`
+    : `/login?next=${location.pathname}`;
 
   const showProfileNotice = checkIfRoleLacksMininmalData(user);
 
@@ -66,23 +69,25 @@ export default function ShellContent({
   };
 
   useEffect(() => {
-    preprint.fullReviews.map(review => {
-      review.authors.map(author => {
+    if (user) {
+      preprint.fullReviews.map(review => {
+        review.authors.map(author => {
+          user.personas.some(persona => {
+            if (persona.identity === author.identity) {
+              setHasLongReviewed(true);
+            }
+          });
+        });
+      });
+
+      preprint.rapidReviews.map(review => {
         user.personas.some(persona => {
-          if (persona.identity === author.identity) {
-            setHasLongReviewed(true);
+          if (persona.identity === review.author.identity) {
+            setHasRapidReviewed(true);
           }
         });
       });
-    });
-
-    preprint.rapidReviews.map(review => {
-      user.personas.some(persona => {
-        if (persona.identity === review.author.identity) {
-          setHasRapidReviewed(true);
-        }
-      });
-    });
+    }
   }, [preprint, user]);
 
   return (
@@ -237,7 +242,7 @@ export default function ShellContent({
               </MenuLink>
             )}
 
-            <MenuLink href={`auth/logout`}>Logout</MenuLink>
+            <MenuLink href={`/logout`}>Logout</MenuLink>
           </UserBadge>
         ) : (
           <XLink href={loginUrl} to={loginUrl}>
