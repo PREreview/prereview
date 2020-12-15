@@ -66,7 +66,17 @@ export default function ShellContent({
 
   const onCloseRapid = review => {
     console.log('review', review);
+    setHasRapidReviewed(true);
+    setTab('read');
   };
+
+  const onCloseLong = review => {
+    console.log('review', review);
+    setHasLongReviewed(true);
+    setTab('read');
+  };
+
+  const [longContent, setLongContent] = useState('');
 
   useEffect(() => {
     if (user) {
@@ -74,7 +84,11 @@ export default function ShellContent({
         review.authors.map(author => {
           user.personas.some(persona => {
             if (persona.identity === author.identity) {
-              setHasLongReviewed(true);
+              if (review.published === true) {
+                setHasLongReviewed(true);
+              } else {
+                setLongContent(review.drafts[review.drafts.length - 1].contents);
+              }
             }
           });
         });
@@ -267,7 +281,10 @@ export default function ShellContent({
             preprint={preprint}
             onSubmit={preprint => {
               postReviewRequest({ preprint: preprint})
-                .then(() => alert('PREreview request submitted successfully.'))
+                .then(() => {
+                  alert('PREreview request submitted successfully.');
+                  return setTab('read');
+                })
                 .catch(err => alert(`An error occurred: ${err.message}`));
             }}
             isPosting={loadingPostReviewRequest}
@@ -292,13 +309,9 @@ export default function ShellContent({
           <ShellContentLongReview
             user={user}
             preprint={preprint}
-            onSubmit={() => {
-              postReviewRequest(user, preprint)
-                .then(() => alert('PREreview request submitted successfully.'))
-                .catch(err => alert(`An error occurred: ${err.message}`));
-              setTab('longReview#success');
-            }}
+            onClose={onCloseLong}
             disabled={hasLongReviewed}
+            initialContent={longContent}
           />
         ) : tab === 'longReview#success' ? (
           <ShellContentReviewSuccess
@@ -425,10 +438,12 @@ ShellContentRapidReview.propTypes = {
 };
 
 function ShellContentLongReview({
+  initialContent,
   preprint,
   disabled,
   isPosting,
   error,
+  onClose,
 }) {
   const [content, setContent] = useState('');
   const {
@@ -453,7 +468,10 @@ function ShellContentLongReview({
       <PreprintPreview preprint={preprint} />
 
       <form>
-        <LongFormFragment onContentChange={onContentChange} />
+        <LongFormFragment
+          onContentChange={onContentChange}
+          content={initialContent}
+        />
 
         <Controls error={error}>
           <Button
@@ -495,7 +513,10 @@ function ShellContentLongReview({
                     contents: content,
                     published: true,
                   })
-                    .then(() => alert('Full review submitted successfully.'))
+                    .then(() => {
+                      alert('Full review submitted successfully.');
+                      return onClose(content);
+                    })
                     .catch(err => alert(`An error occurred: ${err.message}`));
                 }
               } else {
@@ -512,10 +533,11 @@ function ShellContentLongReview({
 }
 ShellContentLongReview.propTypes = {
   preprint: PropTypes.object.isRequired,
-  onSubmit: PropTypes.func.isRequired,
   isPosting: PropTypes.bool,
   disabled: PropTypes.bool,
   error: PropTypes.instanceOf(Error),
+  onClose: PropTypes.func.isRequired,
+  initialContent: PropTypes.string.isRequired,
 };
 
 function ShellContentRequest({

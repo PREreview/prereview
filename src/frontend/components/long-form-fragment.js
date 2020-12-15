@@ -28,7 +28,7 @@ const useStyles = makeStyles({
   },
 });
 
-export default function LongFormFragment({ onContentChange }) {
+export default function LongFormFragment({ content, onContentChange }) {
   const handleContentChange = value => {
     onContentChange(value);
   }
@@ -38,7 +38,10 @@ export default function LongFormFragment({ onContentChange }) {
       <fieldset className="rapid-form-fragment__text-response-questions">
         <Fragment key={'longform'}>
           <div className="remirror-container">
-            <CollabEditor handleContentChange={handleContentChange} />
+            <CollabEditor
+              initialContent={content}
+              handleContentChange={handleContentChange}
+            />
           </div>
         </Fragment>
       </fieldset>
@@ -47,6 +50,7 @@ export default function LongFormFragment({ onContentChange }) {
 }
 
 LongFormFragment.propTypes = {
+  content: PropTypes.string.isRequired,
   onContentChange: PropTypes.func.isRequired,
   answerMap: PropTypes.object,
 };

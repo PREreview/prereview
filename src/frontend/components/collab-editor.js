@@ -75,13 +75,13 @@ const Editor = () => {
   return <div {...getRootProps()} />;
 };
 
-const EditorWrapper = ({ handleContentChange }) => {
+const EditorWrapper = ({ initialContent, handleContentChange }) => {
   const manager = useManager(EXTENSIONS);
   const [isLoaded, setIsLoaded] = useState(false);
   const [value, setValue] = useState(() =>
     // Use the `remirror` manager to create the state.
     manager.createState({
-      content: '',
+      content: initialContent,
       stringHandler: fromHtml,
     }),
   );
@@ -118,6 +118,7 @@ const EditorWrapper = ({ handleContentChange }) => {
 };
 
 EditorWrapper.propTypes = {
+  initialContent: PropTypes.string.isRequired,
   handleContentChange: PropTypes.func.isRequired,
 };
 

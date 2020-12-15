@@ -65,11 +65,6 @@ export default function controller(users, personas, config, thisUser) {
     }
 
     if (user) {
-      console.log('***********************');
-      console.log(req);
-      console.log('***********************');
-      console.log(params);
-      console.log('***********************');
       const completeUser = merge(profile, user); // including the access.token in the user that gets sent to the passport serializer
       log.debug('Authenticated user:', completeUser);
       return done(null, completeUser);
