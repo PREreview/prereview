@@ -20,12 +20,14 @@ const ReviewReader = React.memo(function ReviewReader({
   onHighlighedRoleIdsChange = noop,
   isModerationInProgress,
   onModerate,
+  rapidContent,
+  longContent,
 }) {
   const [highlightedRoleIds, setHighlightedRoleIds] = useState(
     defaultHighlightedRoleIds || [],
   );
 
-  const allReviews = preprint.fullReviews.concat(preprint.rapidReviews);
+  let allReviews = preprint.fullReviews.concat(preprint.rapidReviews);
 
   useEffect(() => {
     if (
@@ -74,7 +76,10 @@ const ReviewReader = React.memo(function ReviewReader({
                 <PotentialRoles
                   role={role}
                   reviews={allReviews}
-                  canModerate={user}
+                  hasReviewed={
+                    rapidContent || (longContent && longContent.length)
+                  }
+                  user={user}
                   isModerationInProgress={isModerationInProgress}
                   onModerate={onModerate}
                   onRemoved={roleId => {
@@ -125,6 +130,8 @@ ReviewReader.propTypes = {
   defaultHighlightedRoleIds: PropTypes.arrayOf(PropTypes.string),
   isModerationInProgress: PropTypes.bool,
   onModerate: PropTypes.func,
+  rapidContent: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]),
+  longContent: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]),
 };
 
 export default ReviewReader;

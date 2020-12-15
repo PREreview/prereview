@@ -30,7 +30,7 @@ const RoleBadge = React.forwardRef(function RoleBadge(
 
 RoleBadge.propTypes = {
   tooltip: PropTypes.bool,
-  roleId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
+  roleId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   user: PropTypes.object.isRequired,
   children: PropTypes.any,
   className: PropTypes.string,
@@ -138,7 +138,7 @@ const RoleBadgeUI = React.forwardRef(function RoleBadgeUI(
 RoleBadgeUI.propTypes = {
   showNotice: PropTypes.bool,
   tooltip: PropTypes.bool,
-  roleId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
+  roleId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   user: PropTypes.shape({
     id: PropTypes.number,
     name: PropTypes.string,
@@ -163,7 +163,7 @@ function Tooltipify({ tooltip, roleId, user, children }) {
 
 Tooltipify.propTypes = {
   tooltip: PropTypes.bool,
-  roleId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
+  roleId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   user: PropTypes.shape({
     name: PropTypes.string,
     identity: PropTypes.number.required,

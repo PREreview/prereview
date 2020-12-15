@@ -19,11 +19,12 @@ const HIGHLIGHTED_ROLE_TYPE = Symbol('dnd:highlighted-role-type');
  * so that dragged role can be dragged back
  */
 export function PotentialRoles({
+  user,
   reviews,
   onRemoved,
   onModerate,
-  canModerate,
   isModerationInProgress,
+  hasReviewed,
 }) {
   const [{ canDrop, isOver }, dropRef] = useDrop({
     accept: HIGHLIGHTED_ROLE_TYPE,
@@ -32,6 +33,8 @@ export function PotentialRoles({
       canDrop: monitor.canDrop(),
     }),
   });
+
+  // const [reviewsList, setReviewsList] = useState(reviews);
 
   return (
     <div
@@ -57,7 +60,7 @@ export function PotentialRoles({
                           onRemoved(author.identity);
                         }}
                       >
-                        {!!canModerate && (
+                        {user.isAdmin && (
                           <MenuItem
                             disabled={isModerationInProgress || author.identity}
                             onSelect={() => {
@@ -70,7 +73,7 @@ export function PotentialRoles({
                       </DraggableRoleBadge>
                     </li>
                   );
-                })
+                });
               } else {
                 return (
                   <li key={review.author.identity}>
@@ -81,7 +84,7 @@ export function PotentialRoles({
                         onRemoved(review.author.identity);
                       }}
                     >
-                      {!!canModerate && (
+                      {user.isAdmin && (
                         <MenuItem
                           disabled={
                             isModerationInProgress || review.author.identity
@@ -99,18 +102,41 @@ export function PotentialRoles({
               }
             })
           : null}
+        {user && hasReviewed ? (
+          <li key={user.identity}>
+            <DraggableRoleBadge
+              type={POTENTIAL_ROLE_TYPE}
+              author={user}
+              onDropped={() => {
+                onRemoved(user.identity);
+              }}
+            >
+              {user.isAdmin && (
+                <MenuItem
+                  disabled={isModerationInProgress || user.identity}
+                  onSelect={() => {
+                    onModerate(user.identity);
+                  }}
+                >
+                  Report Review
+                </MenuItem>
+              )}
+            </DraggableRoleBadge>
+          </li>
+        ) : null}
       </ul>
     </div>
   );
 }
 
 PotentialRoles.propTypes = {
+  user: PropTypes.object.isRequired,
   reviews: PropTypes.array.isRequired,
-  canModerate: PropTypes.bool,
   onModerate: PropTypes.func,
   isModerationInProgress: PropTypes.bool,
   onRemoved: PropTypes.func.isRequired,
   roleIds: PropTypes.arrayOf(PropTypes.object),
+  hasReviewed: PropTypes.bool,
 };
 
 function DraggableRoleBadge({ author, onDropped, children, type }) {

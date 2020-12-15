@@ -64,19 +64,21 @@ export default function ShellContent({
 
   const showProfileNotice = checkIfRoleLacksMininmalData(user);
 
+  const [rapidContent, setRapidContent] = useState(null);
+
   const onCloseRapid = review => {
-    console.log('review', review);
+    setRapidContent(review);
     setHasRapidReviewed(true);
     setTab('read');
   };
 
+  const [longContent, setLongContent] = useState('');
+
   const onCloseLong = review => {
-    console.log('review', review);
+    setLongContent(review);
     setHasLongReviewed(true);
     setTab('read');
   };
-
-  const [longContent, setLongContent] = useState('');
 
   useEffect(() => {
     if (user) {
@@ -274,7 +276,13 @@ export default function ShellContent({
       )}
       <div className="shell-content__body">
         {tab === 'read' ? (
-          <ShellContentRead user={user} preprint={preprint} counts={counts} />
+          <ShellContentRead
+            user={user}
+            preprint={preprint}
+            counts={counts}
+            rapidContent={rapidContent || hasRapidReviewed}
+            longContent={longContent || hasLongReviewed}
+          />
         ) : tab === 'request' ? (
           <ShellContentRequest
             user={user}
@@ -340,7 +348,13 @@ ShellContent.propTypes = {
   defaultTab: PropTypes.oneOf(['read', 'review', 'request']),
 };
 
-function ShellContentRead({ user, preprint, counts }) {
+function ShellContentRead({
+  user,
+  preprint,
+  counts,
+  rapidContent,
+  longContent,
+}) {
   // Note: !! this needs to work both in the webApp where it is URL driven and in
   // the extension where it is shell driven
 
@@ -352,7 +366,13 @@ function ShellContentRead({ user, preprint, counts }) {
       <header className="shell-content-read__title">Reviews</header>
 
       <PreprintPreview preprint={preprint} />
-      <ReviewReader user={user} preprint={preprint} nRequests={counts} />
+      <ReviewReader
+        user={user}
+        preprint={preprint}
+        nRequests={counts}
+        rapidContent={rapidContent}
+        longContent={longContent}
+      />
       {!!moderatedReviewId && (
         <ModerationModal
           title={`Report review as violating the Code of Conduct`}
@@ -375,6 +395,8 @@ ShellContentRead.propTypes = {
   user: PropTypes.object,
   counts: PropTypes.number,
   preprint: PropTypes.object.isRequired,
+  rapidContent: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]),
+  longContent: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]),
 };
 
 function ShellContentRapidReview({ preprint, disabled, onClose }) {
