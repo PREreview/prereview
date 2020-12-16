@@ -58,7 +58,11 @@ export default function controller(users, personas, config, thisUser) {
 
     try {
       // if a user already exists
-      user = await users.findOne({ orcid: params.orcid });
+      user = await users.findOne({ orcid: params.orcid }, [
+        'personas',
+        'communities',
+        'groups',
+      ]);
       log.trace('verifyCallback() user:', user);
     } catch (err) {
       log.error('Error fetching user:', err);
@@ -66,7 +70,7 @@ export default function controller(users, personas, config, thisUser) {
 
     if (user) {
       const completeUser = merge(profile, user); // including the access.token in the user that gets sent to the passport serializer
-      log.debug('Authenticated user:', completeUser);
+      log.debug('Authenticated user: ', completeUser);
       return done(null, completeUser);
     } else {
       let newUser;
@@ -95,10 +99,12 @@ export default function controller(users, personas, config, thisUser) {
           anonPersona = personas.create({
             name: 'Anonymous',
             identity: newUser,
+            isActive: false,
           });
           defaultPersona = personas.create({
             name: usersName,
             identity: newUser,
+            isActive: true,
           });
 
           await personas.persistAndFlush([anonPersona, defaultPersona]);

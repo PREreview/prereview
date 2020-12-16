@@ -1,7 +1,7 @@
 import router from 'koa-joi-router';
 import { getLogger } from '../log.js';
 
-const log = getLogger('backend:controllers:tags');
+const log = getLogger('backend:controllers:requests');
 
 // eslint-disable-next-line no-unused-vars
 export default function controller(reqModel, thisUser) {
@@ -33,6 +33,45 @@ export default function controller(reqModel, thisUser) {
     ctx.status = 200;
   };
 
+  const postHandler = async ctx => {
+    let request, pid, author; // pid = preprint ID
+
+    ctx.params.pid ? (pid = ctx.params.pid) : null;
+
+    try {
+      const personas = await ctx.state.user.personas.loadItems({
+        where: { isActive: true },
+      });
+      author = personas[0];
+    } catch (err) {
+      log.error('Failed to load user personas.');
+      ctx.throw(400, err);
+    }
+
+    log.debug(`Adding a request.`);
+
+    try {
+      if (pid) {
+        request = reqModel.create({ preprint: pid, author: author });
+      } else {
+        request = reqModel.create({
+          preprint: ctx.request.body.preprint,
+          author: author,
+        });
+      }
+      await reqModel.persistAndFlush(request);
+    } catch (err) {
+      log.error('HTTP 400 Error: ', err);
+      ctx.throw(400, `Failed to create request: ${err}`);
+    }
+
+    ctx.body = {
+      status: 201,
+      message: 'created',
+    };
+    ctx.status = 201;
+  };
+
   requestRouter.route({
     meta: {
       swagger: {
@@ -40,32 +79,23 @@ export default function controller(reqModel, thisUser) {
         summary: 'Endpoint to POST a request for review.',
       },
     },
-    method: 'post',
-    path: '/requests',
-    // pre: thisUser.can(''),
+    method: 'POST',
+    path: '/preprints/:pid/requests',
+    pre: thisUser.can('access private pages'),
     // validate: {},
-    handler: async ctx => {
-      log.debug(`Posting a request.`);
-      // eslint-disable-next-line no-unused-vars
-      let newReq, pid; // pid = preprint ID
+    handler: postHandler,
+  });
 
-      ctx.params.pid ? (pid = ctx.params.pid) : null;
-
-      try {
-        newReq = reqModel.create(ctx.request.body); // need to figure out how the user ID is passed thru
-        await reqModel.persistAndFlush(newReq);
-      } catch (err) {
-        log.error('HTTP 400 Error: ', err);
-        ctx.throw(400, `Failed to parse schema: ${err}`);
-      }
-
-      ctx.body = {
-        status: 201,
-        message: 'created',
-        data: [newReq],
-      };
-      ctx.status = 201;
+  requestRouter.route({
+    meta: {
+      swagger: {
+        operationId: 'PostRequests',
+      },
     },
+    method: 'POST',
+    path: '/requests',
+    // pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
+    handler: async ctx => postHandler(ctx),
   });
 
   requestRouter.route({
@@ -77,7 +107,6 @@ export default function controller(reqModel, thisUser) {
     },
     method: 'get',
     path: '/requests',
-    // pre: thisUser.can('')
     // validate: {}
     handler: async ctx => getHandler(ctx),
   });
@@ -93,7 +122,6 @@ export default function controller(reqModel, thisUser) {
     },
     method: 'get',
     path: '/preprints/:pid/requests',
-    // pre: thisUser.can('')
     //validate: {}
     handler: async ctx => getHandler(ctx),
   });

@@ -1,6 +1,10 @@
 import { Migration } from '@mikro-orm/migrations';
 
+<<<<<<< HEAD:src/backend/db/migrations/sqlite/Migration20201211000534.ts
 export class Migration20201211000534 extends Migration {
+=======
+export class Migration20201210195300 extends Migration {
+>>>>>>> origin:src/backend/db/migrations/sqlite/Migration20201210195300.ts
 
   async up(): Promise<void> {
     this.addSql('create table `user` (`id` integer not null primary key autoincrement, `created_at` datetime not null, `updated_at` datetime not null, `name` varchar null, `email` varchar null, `orcid` varchar not null);');
@@ -16,10 +20,14 @@ export class Migration20201211000534 extends Migration {
     this.addSql('create index `tag_preprints_tag_id_index` on `tag_preprints` (`tag_id`);');
     this.addSql('create index `tag_preprints_preprint_id_index` on `tag_preprints` (`preprint_id`);');
 
-    this.addSql('create table `persona` (`id` integer not null primary key autoincrement, `created_at` datetime not null, `updated_at` datetime not null, `name` varchar not null, `avatar` blob null);');
+    this.addSql('create table `persona` (`id` integer not null primary key autoincrement, `created_at` datetime not null, `updated_at` datetime not null, `name` varchar not null, `is_active` integer not null, `avatar` blob null);');
     this.addSql('create unique index `persona_name_unique` on `persona` (`name`);');
 
+<<<<<<< HEAD:src/backend/db/migrations/sqlite/Migration20201211000534.ts
     this.addSql('create table `rapid_review` (`id` integer not null primary key autoincrement, `created_at` datetime not null, `updated_at` datetime not null, `yn_novel` text check (`yn_novel` in (\'yes\', \'no\', \'N/A\', \'unsure\')) not null, `yn_future` text check (`yn_future` in (\'yes\', \'no\', \'N/A\', \'unsure\')) not null, `yn_reproducibility` text check (`yn_reproducibility` in (\'yes\', \'no\', \'N/A\', \'unsure\')) not null, `yn_methods` text check (`yn_methods` in (\'yes\', \'no\', \'N/A\', \'unsure\')) not null, `yn_coherent` text check (`yn_coherent` in (\'yes\', \'no\', \'N/A\', \'unsure\')) not null, `yn_limitations` text check (`yn_limitations` in (\'yes\', \'no\', \'N/A\', \'unsure\')) not null, `yn_ethics` text check (`yn_ethics` in (\'yes\', \'no\', \'N/A\', \'unsure\')) not null, `yn_new_data` text check (`yn_new_data` in (\'yes\', \'no\', \'N/A\', \'unsure\')) not null, `yn_recommend` text check (`yn_recommend` in (\'yes\', \'no\', \'N/A\', \'unsure\')) not null, `yn_peer_review` text check (`yn_peer_review` in (\'yes\', \'no\', \'N/A\', \'unsure\')) not null, `yn_available_code` text check (`yn_available_code` in (\'yes\', \'no\', \'N/A\', \'unsure\')) not null, `yn_available_data` text check (`yn_available_data` in (\'yes\', \'no\', \'N/A\', \'unsure\')) not null, `link_to_data` text null);');
+=======
+    this.addSql('create table `rapid_review` (`id` integer not null primary key autoincrement, `created_at` datetime not null, `updated_at` datetime not null, `yn_novel` text check (`yn_novel` in (\'yes\', \'no\', \'N/A\', \'unsure\')) not null, `yn_future` text check (`yn_future` in (\'yes\', \'no\', \'N/A\', \'unsure\')) not null, `yn_reproducibility` text check (`yn_reproducibility` in (\'yes\', \'no\', \'N/A\', \'unsure\')) not null, `yn_methods` text check (`yn_methods` in (\'yes\', \'no\', \'N/A\', \'unsure\')) not null, `yn_coherent` text check (`yn_coherent` in (\'yes\', \'no\', \'N/A\', \'unsure\')) not null, `yn_limitations` text check (`yn_limitations` in (\'yes\', \'no\', \'N/A\', \'unsure\')) not null, `yn_ethics` text check (`yn_ethics` in (\'yes\', \'no\', \'N/A\', \'unsure\')) not null, `yn_new_data` text check (`yn_new_data` in (\'yes\', \'no\', \'N/A\', \'unsure\')) not null, `yn_recommend` text check (`yn_recommend` in (\'yes\', \'no\', \'N/A\', \'unsure\')) not null, `yn_peer_review` text check (`yn_peer_review` in (\'yes\', \'no\', \'N/A\', \'unsure\')) not null, `yn_available_code` text check (`yn_available_code` in (\'yes\', \'no\', \'N/A\', \'unsure\')) not null, `yn_available_data` text check (`yn_available_data` in (\'yes\', \'no\', \'N/A\', \'unsure\')) not null, `link_to_data` text not null);');
+>>>>>>> origin:src/backend/db/migrations/sqlite/Migration20201210195300.ts
 
     this.addSql('create table `request` (`id` integer not null primary key autoincrement, `created_at` datetime not null, `updated_at` datetime not null);');
 

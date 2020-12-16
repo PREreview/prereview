@@ -24,6 +24,7 @@ export default function HeaderBar({ onClickMenuButton, closeGap, user }) {
     null,
   );
 
+  closeGap = true;
   useEffect(() => {
     if (document) {
       document.documentElement.style.setProperty(
@@ -71,22 +72,31 @@ export default function HeaderBar({ onClickMenuButton, closeGap, user }) {
       </div>
 
       <div className="header-bar__right">
-        <Link className="header-bar__nav-item" to="/about">
+        <a className="header-bar__nav-item" href="https://content.prereview.org/about">
           About
-        </Link>
-        <Link className="header-bar__nav-item" to="/code-of-conduct">
+        </a>
+        <a className="header-bar__nav-item" href="https://content.prereview.org/people">
+          People
+        </a>
+        <a className="header-bar__nav-item" href="https://content.prereview.org/programs">
+          Programs
+        </a>
+        <a className="header-bar__nav-item" href="https://content.prereview.org/resources">
+          Resources
+        </a>
+        <a className="header-bar__nav-item" href="https://content.prereview.org/coc">
           {isMobile ? (
             <abbr title="Code of Conduct">CoC</abbr>
           ) : (
             <span>Code of Conduct</span>
           )}
-        </Link>
-        <Link className="header-bar__nav-item" to="/extension">
-          Extension
-        </Link>
-        <Link className="header-bar__nav-item" to="/api">
+        </a>
+        <a className="header-bar__nav-item" href="https://content.prereview.org">
+          Blog
+        </a>
+        <a className="header-bar__nav-item" href="/api/docs">
           API
-        </Link>
+        </a>
         <span className="header-bar__nav-item header-bar__nav-item--user-badge">
           {user ? (
             <UserBadge user={user} showNotice={showProfileNotice}>

@@ -28,6 +28,9 @@ export class Persona extends BaseEntity {
   @ManyToOne({ entity: () => User })
   identity!: User;
 
+  @Property()
+  isActive!: boolean;
+
   //@Fixture({ get: faker => faker.image.avatar(), optional: true })
   @Fixture(faker => faker.image.avatar())
   @Property({ nullable: true })

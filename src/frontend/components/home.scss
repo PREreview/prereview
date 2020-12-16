@@ -12,10 +12,16 @@
   & .home__main {
     display: flex;
     width: 100vw;
-    padding-top: calc(var(--header-bar-height) + var(--search-bar-height) + var(--announcement-bar-height));
+    padding-top: calc(
+      var(--header-bar-height) + var(--search-bar-height) +
+        var(--announcement-bar-height)
+    );
 
-    @media (max-width: $mobile-bp) {
-      padding-top: calc(var(--header-bar-height) + var(--search-bar-height) + var(--announcement-bar-height--mobile));
+    @media (--mobile) {
+      padding-top: calc(
+        var(--header-bar-height) + var(--search-bar-height) +
+          var(--announcement-bar-height--mobile)
+      );
     }
 
     @media (--short-screen) {
@@ -38,7 +44,8 @@
     flex: 0 0 var(--middle-column-default-width);
     width: var(--middle-column-default-width);
     max-width: calc(100vw - var(--left-panel-min-width));
-
+    margin-left: auto;
+    margin-right: auto;
     position: relative;
     box-sizing: border-box;
     @media (max-width: $wide-bp - 1px) {

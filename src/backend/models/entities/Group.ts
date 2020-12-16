@@ -16,7 +16,7 @@ export class Group extends BaseEntity {
   //eslint-disable-next-line
   [EntityRepositoryType]?: GroupModel;
 
-  @Fixture(faker => faker.random.word())
+  @Fixture(faker => `${faker.commerce.color()} ${faker.random.word()}`)
   @Property()
   @Unique()
   name!: string;
