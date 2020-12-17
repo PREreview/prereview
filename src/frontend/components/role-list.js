@@ -60,7 +60,7 @@ export function PotentialRoles({
                           onRemoved(author.identity);
                         }}
                       >
-                        {user.isAdmin && (
+                        {user && user.isAdmin && (
                           <MenuItem
                             disabled={isModerationInProgress || author.identity}
                             onSelect={() => {
@@ -84,7 +84,7 @@ export function PotentialRoles({
                         onRemoved(review.author.identity);
                       }}
                     >
-                      {user.isAdmin && (
+                      {user && user.isAdmin && (
                         <MenuItem
                           disabled={
                             isModerationInProgress || review.author.identity
@@ -130,7 +130,7 @@ export function PotentialRoles({
 }
 
 PotentialRoles.propTypes = {
-  user: PropTypes.object.isRequired,
+  user: PropTypes.object,
   reviews: PropTypes.array.isRequired,
   onModerate: PropTypes.func,
   isModerationInProgress: PropTypes.bool,
