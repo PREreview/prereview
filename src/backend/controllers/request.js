@@ -1,5 +1,6 @@
 import router from 'koa-joi-router';
 import { getLogger } from '../log.js';
+import getActivePersona from '../utils/persona.js';
 
 const log = getLogger('backend:controllers:requests');
 
@@ -39,14 +40,7 @@ export default function controller(reqModel, thisUser) {
     ctx.params.pid ? (pid = ctx.params.pid) : null;
 
     try {
-      if (ctx.state.user) {
-        const personas = await ctx.state.user.personas.loadItems();
-        authorPersona = personas.filter(
-          persona => persona.isActive === true,
-        )[0];
-      } else {
-        authorPersona = ctx.request.body.author;
-      }
+      authorPersona = await getActivePersona(ctx.state.user);
     } catch (err) {
       log.error('Failed to load user personas.');
       ctx.throw(400, err);
@@ -58,6 +52,8 @@ export default function controller(reqModel, thisUser) {
       if (pid) {
         request = reqModel.create({ preprint: pid, author: authorPersona });
       } else {
+        log.debug('ctx.request.body.preprint', ctx.request.body.preprint);
+        log.debug('authorPersona', authorPersona);
         request = reqModel.create({
           preprint: ctx.request.body.preprint.id, // TODO: figure out ensuring preprint id gets passed this way
           author: authorPersona,

@@ -1,5 +1,6 @@
 import router from 'koa-joi-router';
 import { getLogger } from '../log.js';
+import getActivePersona from '../utils/persona.js';
 
 const log = getLogger('backend:controllers:fullReviews');
 const Joi = router.Joi;
@@ -73,10 +74,7 @@ export default function controller(
       let review, draft, authorPersona, preprint;
 
       try {
-        const personas = await ctx.state.user.personas.loadItems({
-          where: { isActive: true },
-        });
-        authorPersona = personas[0];
+        authorPersona = await getActivePersona(ctx.state.user);
       } catch (err) {
         log.error('Failed to load user personas.');
         ctx.throw(400, err);
