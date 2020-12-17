@@ -34,15 +34,19 @@ export default function controller(reqModel, thisUser) {
   };
 
   const postHandler = async ctx => {
-    let request, pid, author; // pid = preprint ID
+    let request, pid, authorPersona; // pid = preprint ID
 
     ctx.params.pid ? (pid = ctx.params.pid) : null;
 
     try {
-      const personas = await ctx.state.user.personas.loadItems({
-        where: { isActive: true },
-      });
-      author = personas[0];
+      if (ctx.state.user) {
+        const personas = await ctx.state.user.personas.loadItems();
+        authorPersona = personas.filter(
+          persona => persona.isActive === true,
+        )[0];
+      } else {
+        authorPersona = ctx.request.body.author;
+      }
     } catch (err) {
       log.error('Failed to load user personas.');
       ctx.throw(400, err);
@@ -52,11 +56,11 @@ export default function controller(reqModel, thisUser) {
 
     try {
       if (pid) {
-        request = reqModel.create({ preprint: pid, author: author });
+        request = reqModel.create({ preprint: pid, author: authorPersona });
       } else {
         request = reqModel.create({
-          preprint: ctx.request.body.preprint,
-          author: author,
+          preprint: ctx.request.body.preprint.id, // TODO: figure out ensuring preprint id gets passed this way
+          author: authorPersona,
         });
       }
       await reqModel.persistAndFlush(request);
@@ -95,7 +99,7 @@ export default function controller(reqModel, thisUser) {
     method: 'POST',
     path: '/requests',
     // pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
-    handler: async ctx => postHandler(ctx),
+    handler: postHandler,
   });
 
   requestRouter.route({
@@ -108,7 +112,7 @@ export default function controller(reqModel, thisUser) {
     method: 'get',
     path: '/requests',
     // validate: {}
-    handler: async ctx => getHandler(ctx),
+    handler: getHandler,
   });
 
   requestRouter.route({
@@ -123,7 +127,7 @@ export default function controller(reqModel, thisUser) {
     method: 'get',
     path: '/preprints/:pid/requests',
     //validate: {}
-    handler: async ctx => getHandler(ctx),
+    handler: getHandler,
   });
 
   requestRouter.route({

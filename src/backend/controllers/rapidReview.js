@@ -43,18 +43,17 @@ export default function controller(rapidReviews, thisUser) {
     },
     method: 'post',
     path: '/rapidReviews',
-    // pre: thisUser.can('access private pages'),
+    // pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
     // validate: {},
     handler: async ctx => {
       log.debug('Posting a rapid review.');
-      log.debug('ctx.request.body', ctx.request.body);
       let rapidReview, authorPersona;
 
       try {
-        const personas = await ctx.state.user.personas.loadItems({
-          where: { isActive: true },
-        });
-        authorPersona = personas[0];
+        const personas = await ctx.state.user.personas.loadItems();
+        authorPersona = personas.filter(
+          persona => persona.isActive === true,
+        )[0];
       } catch (err) {
         log.error('Failed to load user personas.');
         ctx.throw(400, err);
@@ -90,9 +89,8 @@ export default function controller(rapidReviews, thisUser) {
     },
     method: 'get',
     path: '/rapidReviews',
-    // pre: thisUser.can('access private pages'),
     // validate: {},
-    handler: async ctx => getHandler(ctx),
+    handler: getHandler,
   });
 
   rapidRouter.route({
@@ -105,9 +103,8 @@ export default function controller(rapidReviews, thisUser) {
     },
     method: 'get',
     path: '/preprints/:pid/rapidReviews',
-    // pre: thisUser.can('access private pages'),
     // validate: {},
-    handler: async ctx => getHandler(ctx),
+    handler: getHandler,
   });
 
   rapidRouter.route({
