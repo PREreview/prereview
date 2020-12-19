@@ -8,43 +8,42 @@ import Button from './button';
 import LabelStyle from './label-style';
 import ActivityCard from './activity-card';
 
-export default function RoleActivity({ roleId }) {
-  const [bookmark, setBookmark] = useState(null);
-
-  const search = createActivityQs({ roleId, bookmark });
-
-  const results = GetPreprints(search);
+export default function RoleActivity({ persona }) {
 
   return (
     <div className="role-activity">
-      {!!results.counts && (
+      {(persona.rapidReviews || persona.fullReviews) && (
         <dl className="role-activity__summary">
           <dt className="role-activity__summary__label">
             <LabelStyle>Total number of requests</LabelStyle>
           </dt>
           <dd className="role-activity__summary__stat">
-            {results.requests || 0}
+            {persona.requests ? persona.requests.length : 0}
           </dd>
           <dt className="role-activity__summary__label">
-            <LabelStyle>Total number of reviews</LabelStyle>
+            <LabelStyle>Total number of rapid reviews</LabelStyle>
           </dt>
           <dd className="role-activity__summary__stat">
-            {results.reviews || 0}
+            {persona.rapidReviews.length || 0}
+          </dd>
+          <dt className="role-activity__summary__label">
+            <LabelStyle>Total number of longform reviews</LabelStyle>
+          </dt>
+          <dd className="role-activity__summary__stat">
+            {persona.fullReviews.length || 0}
           </dd>
         </dl>
       )}
 
-      {results.total_rows === 0 && !results.loading ? (
+      {!persona.requests && !persona.fullReviews && !persona.rapidReviews ? (
         <div>No activity yet.</div>
-      ) : bookmark && results.bookmark === bookmark && !results.loading ? (
-        <div>No more activity.</div>
       ) : (
         <section className="role-activity__history">
           <h3 className="role-activity__sub-title">History</h3>
           <ul className="role-activity__list">
-            {results.rows.map(({ doc }) => (
-              <li key={getId(doc)} className="role-activity__list-item">
-                <ActivityCard preprint={doc} />
+            {persona.rapidReviews.map(review => (
+              <li key={review.id} className="role-activity__list-item">
+                <ActivityCard preprint={review} />
               </li>
             ))}
           </ul>
@@ -52,34 +51,26 @@ export default function RoleActivity({ roleId }) {
       )}
 
       <div className="role-activity__pagination">
-        {/* Cloudant returns the same bookmark when it hits the end of the list */}
-        {!!bookmark && (
-          <Button
-            onClick={() => {
-              setBookmark(null);
-            }}
-          >
-            <MdFirstPage /> First page
-          </Button>
-        )}
+        <Button
+          onClick={() => {
+            // #FIXME pagination
+          }}
+        >
+          <MdFirstPage /> First page
+        </Button>
 
-        {!!(
-          results.rows.length < results.total_rows &&
-          results.bookmark !== bookmark
-        ) && (
-          <Button
-            onClick={() => {
-              setBookmark(results.bookmark);
-            }}
-          >
-            Next Page <MdChevronRight />
-          </Button>
-        )}
+        <Button
+          onClick={() => {
+            // #FIXME pagination
+          }}
+        >
+          Next Page <MdChevronRight />
+        </Button>
       </div>
     </div>
   );
 }
 
 RoleActivity.propTypes = {
-  roleId: PropTypes.string.isRequired,
+  persona: PropTypes.object.isRequired,
 };

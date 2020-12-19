@@ -31,6 +31,7 @@ export default function controller(personasModel, thisUser) {
         allPersonas = await personasModel.findAll([
           'fullReviews',
           'rapidReviews',
+          // 'requests',
         ]);
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
@@ -62,7 +63,11 @@ export default function controller(personasModel, thisUser) {
       let persona;
 
       try {
-        persona = await personasModel.findOne(ctx.params.id);
+        persona = await personasModel.findOne(ctx.params.id, [
+          // 'requests',
+          'fullReviews',
+          'rapidReviews',
+        ]);
         if (!persona) {
           ctx.throw(404, `Persona with ID ${ctx.params.id} doesn't exist`);
         }

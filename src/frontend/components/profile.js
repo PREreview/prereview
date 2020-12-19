@@ -17,7 +17,7 @@ export default function Profile() {
 
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
-  const [identity, setIdentity] = useState(null);
+  const [persona, setPersona] = useState(null);
 
   const { roleId: unprefixedRoleId } = useParams();
   const roleId = `role:${unprefixedRoleId}`;
@@ -32,7 +32,7 @@ export default function Profile() {
       if (userData) {
         console.log(userData.data);
         userData.data.personas.filter(persona => {
-          persona.isActive ? setIdentity(persona) : null;
+          persona.isActive ? setPersona(persona) : null;
         });
         setLoading(false);
         setUser(userData.data);
@@ -52,13 +52,13 @@ export default function Profile() {
 
         <Helmet>
           <title>
-            {ORG} • Profile {identity.name}
+            {ORG} • Profile {persona.name}
           </title>
         </Helmet>
 
         <section className="profile__content">
           <header className="profile__header">
-            {identity && identity.avatar && identity.avatar.contentUrl ? (
+            {persona && persona.avatar && persona.avatar.contentUrl ? (
               <img
                 src={user.avatar.contentUrl}
                 alt="avatar"
@@ -69,11 +69,11 @@ export default function Profile() {
             <section className="profile__identity-info">
               <header className="profile__indentity-info-header">
                 <h2 className="profile__username">
-                  {identity && identity.name ? identity.name : user.name}
+                  {persona && persona.name ? persona.name : user.name}
                 </h2>
                 {user && (
                   <span className="profile__persona-status">
-                    {identity && identity.name != 'Anonymous' ? (
+                    {persona && persona.name != 'Anonymous' ? (
                       <div className="profile__persona-status__icon-container">
                         <MdPublic className="profile__persona-status__icon" />{' '}
                         Public
@@ -106,7 +106,7 @@ export default function Profile() {
                       <LabelStyle>Identity</LabelStyle>
                     </dt>
                     <dd>
-                      {identity && identity.name == 'Anonymous'
+                      {persona && persona.name == 'Anonymous'
                         ? 'Anonymous'
                         : 'Public'}
                     </dd>
@@ -140,7 +140,7 @@ export default function Profile() {
           <section className="profile__activity-section">
             <h2 className="profile__section-title">Activity</h2>
 
-            <RoleActivity roleId={user.id} />
+            <RoleActivity persona={persona} />
           </section>
         </section>
       </div>
