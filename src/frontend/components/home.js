@@ -5,7 +5,7 @@ import omit from 'lodash/omit';
 import { MdChevronRight, MdFirstPage } from 'react-icons/md';
 import Cookies from 'js-cookie';
 import PrivateRoute from './private-route';
-import { useGetPreprints, useGetUser } from '../hooks/api-hooks.tsx';
+import { useGetPreprints } from '../hooks/api-hooks.tsx';
 import {
   useIsNewVisitor,
   useIsMobile,
@@ -15,15 +15,13 @@ import { useUser } from '../contexts/user-context';
 import { unprefix, getId } from '../utils/jsonld';
 import HeaderBar from './header-bar';
 import SearchBar from './search-bar';
-import LeftSidePanel from './left-side-panel';
 import PreprintCard from './preprint-card';
-import Facets from './facets';
 import SortOptions from './sort-options';
 import NewPreprint from './new-preprint';
 import Modal from './modal';
 import Button from './button';
 import LoginRequiredModal from './login-required-modal';
-import { createPreprintQs, apifyPreprintQs } from '../utils/search';
+import { createPreprintQs } from '../utils/search';
 import WelcomeModal from './welcome-modal';
 import XLink from './xlink';
 import AddButton from './add-button';
@@ -55,19 +53,17 @@ export default function Home() {
 
   const { data: preprints, loading: loadingPreprints, error } = useGetPreprints({
     queryParams: searchParamsToObject(params),
-  });
+    },
+  );
 
   const [hoveredSortOption, setHoveredSortOption] = useState(null);
 
   useEffect(() => {
-   // console.log('loading: ', loading);
-   // console.log('preprints: ', preprints);
-   // console.log('error: ', error);
-   if (!loadingPreprints) {
-     if (preprints) {
-       setLoading(false);
-     }
-   }
+    if (!loadingPreprints) {
+      if (preprints) {
+        setLoading(false);
+      }
+    }
   }, []);
 
   useEffect(() => {

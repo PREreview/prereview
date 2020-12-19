@@ -145,7 +145,7 @@ export default function HeaderBar({ onClickMenuButton, closeGap, user }) {
                 </MenuLink>
               )}
 
-              {(roles.includes('moderators') && !user.isModerated) && (
+              {roles.includes('moderators') && !user.isModerated && (
                 <MenuLink
                   as={process.env.IS_EXTENSION ? undefined : Link}
                   to={process.env.IS_EXTENSION ? undefined : '/moderate'}

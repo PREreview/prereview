@@ -67,7 +67,7 @@ export default function App({ user }) {
                 </ToCPage>
               </Route>
 
-              <Route exact={true} path="/about/:roleId">
+              <Route exact={true} path="/about/:id">
                 <Profile />
               </Route>
               <Route exact={true} path="/extension">
