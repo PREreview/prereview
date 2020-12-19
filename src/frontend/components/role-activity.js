@@ -41,9 +41,9 @@ export default function RoleActivity({ persona }) {
         <section className="role-activity__history">
           <h3 className="role-activity__sub-title">History</h3>
           <ul className="role-activity__list">
-            {persona.rapidReviews.map(review => (
+            {persona.rapidReviews.length && persona.rapidReviews.map(review => (
               <li key={review.id} className="role-activity__list-item">
-                <ActivityCard preprint={review} />
+                  <ActivityCard preprintId={review.preprint} />
               </li>
             ))}
           </ul>
@@ -52,6 +52,7 @@ export default function RoleActivity({ persona }) {
 
       <div className="role-activity__pagination">
         <Button
+          disabled
           onClick={() => {
             // #FIXME pagination
           }}
@@ -60,6 +61,7 @@ export default function RoleActivity({ persona }) {
         </Button>
 
         <Button
+          disabled
           onClick={() => {
             // #FIXME pagination
           }}

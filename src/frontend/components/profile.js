@@ -30,7 +30,6 @@ export default function Profile() {
     // window.scrollTo(0, 0);
     if (!loadingUser) {
       if (userData) {
-        console.log(userData.data);
         userData.data.personas.filter(persona => {
           persona.isActive ? setPersona(persona) : null;
         });
