@@ -2,18 +2,16 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { format, formatDistanceStrict } from 'date-fns';
 import { useGetPreprint } from '../hooks/api-hooks.tsx';
-import { MdChevronRight } from 'react-icons/md';
 import { getId } from '../utils/jsonld';
+import { createPreprintId } from '../../common/utils/ids.js';
 import Value from './value';
 import LabelStyle from './label-style';
 import XLink from './xlink';
-// import {
-//   GetUserPreprint // #FIXME
-// } from '../hooks/api-hooks.tsx';
 import { useAnimatedScore } from '../hooks/score-hooks';
 import ScoreBadge from './score-badge';
 import AnimatedNumber from './animated-number';
 import NotFound from './not-found';
+import { MdChevronRight } from 'react-icons/md';
 
 export default function ActivityCard({ preprintId }) {
   const [loading, setLoading] = useState(true);
@@ -31,7 +29,6 @@ export default function ActivityCard({ preprintId }) {
   useEffect(() => {
     if (!loadingPreprint) {
       if (preprintData) {
-        console.log(preprintData.data[0]);
         setActivity(useAnimatedScore(preprintData.data[0]));
         setPreprint(preprintData.data[0]);
         setLoading(false);
@@ -54,7 +51,10 @@ export default function ActivityCard({ preprintId }) {
             : 'reviewed'}
         </LabelStyle>
         <div>
-          <XLink to={`/${preprint.handle}`} href={`/${preprint.handle}`}>
+          <XLink
+            to={`/preprints/${createPreprintId(preprint.handle)}`}
+            href={`/preprints/${createPreprintId(preprint.handle)}`}
+          >
             <Value tagName="span">{preprint.title}</Value>
           </XLink>
 

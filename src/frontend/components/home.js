@@ -1,17 +1,16 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useContext, useCallback, useEffect, useState } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import omit from 'lodash/omit';
 import { MdChevronRight, MdFirstPage } from 'react-icons/md';
-import Cookies from 'js-cookie';
 import PrivateRoute from './private-route';
+import { UserContext } from '../contexts/user-context';
 import { useGetPreprints } from '../hooks/api-hooks.tsx';
 import {
   useIsNewVisitor,
   useIsMobile,
   useNewPreprints,
 } from '../hooks/ui-hooks';
-import { useUser } from '../contexts/user-context';
 import { unprefix, getId } from '../utils/jsonld';
 import HeaderBar from './header-bar';
 import SearchBar from './search-bar';
@@ -26,7 +25,6 @@ import WelcomeModal from './welcome-modal';
 import XLink from './xlink';
 import AddButton from './add-button';
 import { ORG } from '../constants';
-import Banner from './banner';
 
 const searchParamsToObject = params => {
   const obj = {};
@@ -41,7 +39,7 @@ export default function Home() {
   const location = useLocation();
   const params = new URLSearchParams(location.search);
 
-  const [user, setUser] = useUser();
+  const [thisUser] = useContext(UserContext);
   const isMobile = useIsMobile();
   const [showLeftPanel, setShowLeftPanel] = useState(!isMobile);
   const [loginModalOpenNext, setLoginModalOpenNext] = useState(null);
@@ -66,29 +64,11 @@ export default function Home() {
     }
   }, []);
 
-  useEffect(() => {
-    const username = Cookies.get('PRE_user');
-    if (username) {
-      fetch(`api/v2/users/${username}`)
-        .then(response => {
-          if (response.status === 200) {
-            return response.json();
-          }
-          throw new Error(response);
-        })
-        .then(result => {
-          setUser(result.data);
-          return result;
-        })
-        .catch(err => {
-          console.log('Error: ', err.message);
-        });
-    }
-  }, []);
+  useEffect(() => {}, [thisUser])
 
   const handleNewReview = useCallback(
     preprint => {
-      if (user) {
+      if (thisUser) {
         history.push('/new', {
           preprint: omit(preprint, ['potentialAction']), // #FIXME, do we need omit?
           tab: 'review',
@@ -100,12 +80,12 @@ export default function Home() {
         );
       }
     },
-    [user, history],
+    [thisUser, history],
   );
 
   const handleNewRequest = useCallback(
     preprint => {
-      if (user) {
+      if (thisUser) {
         history.push('/new', {
           preprint: omit(preprint, ['potentialAction']), // #FIXME, do we need omit?
           tab: 'request',
@@ -117,12 +97,12 @@ export default function Home() {
         );
       }
     },
-    [user, history],
+    [thisUser, history],
   );
 
   const handleNew = useCallback(
     preprint => {
-      if (user) {
+      if (thisUser) {
         history.push('/new', {
           preprint: omit(preprint, ['potentialAction']), // #FIXME, do we need omit?
         });
@@ -132,7 +112,7 @@ export default function Home() {
         );
       }
     },
-    [user, history],
+    [thisUser, history],
   );
 
   if (loadingPreprints) {
@@ -154,7 +134,7 @@ export default function Home() {
           />
         )}
         <HeaderBar
-          user={user}
+          thisUser={thisUser}
           onClickMenuButton={() => {
             setShowLeftPanel(!showLeftPanel);
           }}
@@ -170,7 +150,7 @@ export default function Home() {
               </h3>
               <AddButton
                 onClick={() => {
-                  if (user) {
+                  if (thisUser) {
                     history.push('/new');
                   } else {
                     setLoginModalOpenNext('/new');
@@ -192,7 +172,7 @@ export default function Home() {
                   <title>Rapid PREreview • Add entry</title>
                 </Helmet>
                 <NewPreprint
-                  user={user}
+                  user={thisUser}
                   onCancel={() => {
                     history.push('/');
                   }}
@@ -283,7 +263,7 @@ export default function Home() {
                         <li key={row.id} className="home__preprint-list__item">
                           <PreprintCard
                             isNew={false}
-                            user={user}
+                            user={thisUser}
                             preprint={row}
                             onNewRequest={handleNewRequest}
                             onNew={handleNew}

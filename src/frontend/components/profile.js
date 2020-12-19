@@ -1,6 +1,7 @@
-import React, { Fragment, useEffect, useState } from 'react';
-import { useParams, useLocation } from 'react-router-dom';
+import React, { Fragment, useContext, useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { format } from 'date-fns';
+import { UserContext } from '../contexts/user-context';
 import { MdPublic } from 'react-icons/md';
 import { Helmet } from 'react-helmet-async';
 import IncognitoIcon from '../svgs/incognito_icon.svg';
@@ -14,13 +15,10 @@ import { ORG } from '../constants';
 
 export default function Profile() {
   const location = useLocation();
-
+  const [thisUser] = useContext(UserContext);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
   const [persona, setPersona] = useState(null);
-
-  const { roleId: unprefixedRoleId } = useParams();
-  const roleId = `role:${unprefixedRoleId}`;
 
   const { data: userData, loading: loadingUser, error } = useGetUser({
     id: location.pathname.slice(7),
@@ -47,7 +45,7 @@ export default function Profile() {
   } else {
     return (
       <div className="profile">
-        <HeaderBar closeGap />
+        <HeaderBar user={thisUser} closeGap />
 
         <Helmet>
           <title>

@@ -12,8 +12,8 @@ import NoticeBadge from './notice-badge';
 import { checkIfRoleLacksMininmalData } from '../utils/roles';
 import { useIsMobile } from '../hooks/ui-hooks';
 
-export default function HeaderBar({ onClickMenuButton, closeGap, user }) {
-  const roles = user && user.groups ? user.groups : []; //GetUser(1);
+export default function HeaderBar({ onClickMenuButton, closeGap, thisUser }) {
+  const roles = thisUser && thisUser.groups ? thisUser.groups : []; //GetUser(1);
 
   //const showProfileNotice = checkIfRoleLacksMininmalData(role);
   const showProfileNotice = false;
@@ -72,34 +72,48 @@ export default function HeaderBar({ onClickMenuButton, closeGap, user }) {
       </div>
 
       <div className="header-bar__right">
-        <a className="header-bar__nav-item" href="https://content.prereview.org/about">
+        <a
+          className="header-bar__nav-item"
+          href="https://content.prereview.org/about"
+        >
           About
         </a>
-        <a className="header-bar__nav-item" href="https://content.prereview.org/people">
+        <a
+          className="header-bar__nav-item"
+          href="https://content.prereview.org/people"
+        >
           People
         </a>
-        <a className="header-bar__nav-item" href="https://content.prereview.org/programs">
+        <a
+          className="header-bar__nav-item" href="https://content.prereview.org/programs"
+        >
           Programs
         </a>
-        <a className="header-bar__nav-item" href="https://content.prereview.org/resources">
+        <a
+          className="header-bar__nav-item" href="https://content.prereview.org/resources"
+        >
           Resources
         </a>
-        <a className="header-bar__nav-item" href="https://content.prereview.org/coc">
+        <a
+          className="header-bar__nav-item" href="https://content.prereview.org/coc"
+        >
           {isMobile ? (
             <abbr title="Code of Conduct">CoC</abbr>
           ) : (
             <span>Code of Conduct</span>
           )}
         </a>
-        <a className="header-bar__nav-item" href="https://content.prereview.org">
+        <a
+          className="header-bar__nav-item" href="https://content.prereview.org"
+        >
           Blog
         </a>
         <a className="header-bar__nav-item" href="/api/docs">
           API
         </a>
         <span className="header-bar__nav-item header-bar__nav-item--user-badge">
-          {user ? (
-            <UserBadge user={user} showNotice={showProfileNotice}>
+          {thisUser ? (
+            <UserBadge user={thisUser} showNotice={showProfileNotice}>
               {showProfileNotice && (
                 <MenuLink
                   as={process.env.IS_EXTENSION ? undefined : Link}
@@ -123,7 +137,7 @@ export default function HeaderBar({ onClickMenuButton, closeGap, user }) {
                 User Settings
               </MenuLink>
 
-              {user.isAdmin && (
+              {thisUser.isAdmin && (
                 <MenuLink
                   as={process.env.IS_EXTENSION ? undefined : Link}
                   to={process.env.IS_EXTENSION ? undefined : '/admin'}
@@ -134,7 +148,7 @@ export default function HeaderBar({ onClickMenuButton, closeGap, user }) {
                 </MenuLink>
               )}
 
-              {user.isAdmin && (
+              {thisUser.isAdmin && (
                 <MenuLink
                   as={process.env.IS_EXTENSION ? undefined : Link}
                   to={process.env.IS_EXTENSION ? undefined : '/block'}
@@ -145,7 +159,7 @@ export default function HeaderBar({ onClickMenuButton, closeGap, user }) {
                 </MenuLink>
               )}
 
-              {roles.includes('moderators') && !user.isModerated && (
+              {roles.includes('moderators') && !thisUser.isModerated && (
                 <MenuLink
                   as={process.env.IS_EXTENSION ? undefined : Link}
                   to={process.env.IS_EXTENSION ? undefined : '/moderate'}
@@ -181,5 +195,5 @@ export default function HeaderBar({ onClickMenuButton, closeGap, user }) {
 HeaderBar.propTypes = {
   onClickMenuButton: PropTypes.func,
   closeGap: PropTypes.bool,
-  user: PropTypes.object,
+  thisUser: PropTypes.object,
 };

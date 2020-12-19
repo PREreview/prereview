@@ -45,7 +45,6 @@ const RoleBadgeUI = React.forwardRef(function RoleBadgeUI(
   { user, className, children, tooltip, showNotice = false, disabled = false },
   ref,
 ) {
-  console.log(user);
   return (
     <Menu>
       <div className="role-badge-menu-container">

@@ -22,7 +22,7 @@ export default function ExtensionShell({
           preprintsWithActionsStore={preprintsWithActionsStore}
           roleStore={roleStore}
         >
-          <UserProvider user={user}>
+          <UserProvider thisUser={user}>
             <div className="extension-shell">
               <Shell defaultStatus="minimized">
                 {onRequireScreen => (
