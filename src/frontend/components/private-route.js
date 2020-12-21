@@ -17,7 +17,7 @@ PrivateRoute.propTypes = {
 };
 
 export function AdminRoute({ children, ...rest }) {
-  const [user] = useUser();
+  const [user] = UserProvider();
 
   return (
     <Route {...rest}>

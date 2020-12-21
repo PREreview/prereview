@@ -50,7 +50,7 @@ ExtensionShell.propTypes = {
 
 function ExtensionShellContent({ onRequireScreen, preprint }) {
   const [defaultTab, setDefaultTab] = useState('read');
-  const [, setUser] = useUser();
+  const [, setUser] = UserProvider();
 
   // handle tab toggling comming from the popup
   useEffect(() => {
