@@ -80,6 +80,11 @@ export default function ShellContent({
     setTab('read');
   };
 
+  const onCloseRequest = () => {
+    setHasRequested(true)
+    setTab('read')
+  }
+
   useEffect(() => {
     if (user) {
       preprint.fullReviews.map(review => {
@@ -103,6 +108,13 @@ export default function ShellContent({
           }
         });
       });
+
+      let author;
+
+      preprint.requests.map(request => {
+        request.author.id ? author = request.author.id : author = request.author
+        setHasRequested((user.personas.some(persona => persona.id === author)))
+      })
     }
   }, [preprint, user]);
 
@@ -291,7 +303,7 @@ export default function ShellContent({
               postReviewRequest({ preprint: preprint})
                 .then(() => {
                   alert('PREreview request submitted successfully.');
-                  return setTab('read');
+                  return onCloseRequest();
                 })
                 .catch(err => alert(`An error occurred: ${err.message}`));
             }}
