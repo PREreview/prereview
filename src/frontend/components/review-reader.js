@@ -4,11 +4,15 @@ import noop from 'lodash/noop';
 import isEqual from 'lodash/isEqual';
 import classNames from 'classnames';
 import Barplot from './barplot';
+import Controls from './controls';
+import Button from './button';
 import { getId } from '../utils/jsonld';
 import { getYesNoStats } from '../utils/stats';
 import TextAnswers from './text-answers';
 import { PotentialRoles } from './role-list';
 import ShareMenu from './share-menu';
+import CollabEditor from './collab-editor';
+import { usePostComments } from '../hooks/api-hooks.tsx';
 
 const ReviewReader = React.memo(function ReviewReader({
   user,
@@ -22,6 +26,19 @@ const ReviewReader = React.memo(function ReviewReader({
   rapidContent,
   longContent,
 }) {
+  const [content, setContent] = useState('');
+  const [commentTitle, setCommentTitle] = useState('');
+
+  const { mutate: postComment, loadingPostComment, errorPostComment } = usePostComments();
+
+  const handleCommentChange = value => {
+    setContent(value);
+  }
+
+  const canSubmit = content => {
+    return content && content !== '<p></p>';
+  };
+
   const [highlightedRoleIds, setHighlightedRoleIds] = useState(
     defaultHighlightedRoleIds || [],
   );
@@ -134,10 +151,55 @@ const ReviewReader = React.memo(function ReviewReader({
                         <div>
                           <div>Comments</div>
                           {review.comments.map(comment => {
-                            return <div key={comment.id}>{comment.contents}</div>
+                            return (
+                              <div key={comment.id}>{comment.contents}</div>
+                            );
                           })}
                         </div>
                       )}
+                      <form>
+                        <div>Add a comment</div>
+                        <input
+                          type="text"
+                          value={commentTitle}
+                          onChange={event =>
+                            setCommentTitle(event.target.value)
+                          }
+                          required
+                        />
+                        <div className="remirror-container">
+                          <CollabEditor initialContent={''}
+                            handleContentChange={handleCommentChange}
+                          />
+                        </div>
+                        <Controls error={errorPostComment}>
+                          <Button
+                            type="submit"
+                            primary={true}
+                            isWaiting={loadingPostComment}
+                            disabled={!canSubmit(content)}
+                            onClick={event => {
+                              event.preventDefault();
+                              if (canSubmit(content)) {
+                                postComment({
+                                  title: commentTitle,
+                                  contents: content,
+                                })
+                                  .then(() =>
+                                    alert('Comment submitted successfully.'),
+                                  )
+                                  .catch(err =>
+                                    alert(`An error occurred: ${err.message}`),
+                                  );
+                              } else {
+                                alert('Review cannot be blank.');
+                              }
+                            }}
+                          >
+                            Save
+                          </Button>
+                        </Controls>
+                      </form>
                     </div>
                   )
                 }
