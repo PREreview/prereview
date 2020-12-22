@@ -95,9 +95,7 @@ const ReviewReader = React.memo(function ReviewReader({
 
           <Barplot
             stats={getYesNoStats(highlightedActions)}
-            nTotalReviews={
-              preprint.rapidReviews.length + preprint.fullReviews.length
-            }
+            nTotalReviews={preprint.rapidReviews.length}
           >
             <ShareMenu
               identifier={preprint.handle}
@@ -113,6 +111,38 @@ const ReviewReader = React.memo(function ReviewReader({
               isModerationInProgress={isModerationInProgress}
               onModerate={onModerate}
             />
+          )}
+
+          {preprint.fullReviews.length && (
+            <div className="text-answers">
+              {preprint.fullReviews.map(review => {
+                if (review.published) {
+                  return (
+                    <div>
+                      <div className="text-answers__question">
+                        {review.drafts[review.drafts.length - 1].title}
+                      </div>
+                      <div className="text-answers__response-row">
+                        {review.authors.map(author => (
+                          <span key={author.id}>by {author.name}</span>
+                        ))}
+                      </div>
+                      <div className="text-answers__response-row">
+                        {review.drafts[review.drafts.length - 1].contents}
+                      </div>
+                      {review.comments && (
+                        <div>
+                          <div>Comments</div>
+                          {review.comments.map(comment => {
+                            return <div key={comment.id}>{comment.contents}</div>
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  )
+                }
+              })}
+            </div>
           )}
 
           {preprint.tags && (

@@ -42,8 +42,6 @@ export default function ShellContent({
     errorPostReviewRequest,
   } = usePostRequests();
 
-  console.log(preprint);
-
   const [hasRapidReviewed, setHasRapidReviewed] = useState(false);
   const [hasLongReviewed, setHasLongReviewed] = useState(false);
   const [hasRequested, setHasRequested] = useState(false);
@@ -373,7 +371,7 @@ function ShellContentRead({
         preprint={preprint}
         nRequests={counts}
         rapidContent={rapidContent}
-        preview={longContent}
+        longContent={longContent}
       />
       {!!moderatedReviewId && (
         <ModerationModal
