@@ -36,4 +36,22 @@
   & .barplot {
     margin-top: var(--mgrd);
   }
+
+  .tags {
+    display: flex;
+    margin-left: -10px;
+
+    &__title {
+      font-weight: bold;
+      margin-bottom: 1.5em;
+      margin-top: 1.5em;
+    }
+
+    &__tag {
+      background-color: var(--prereview-blue);
+      color: var(--prereview-white);
+      margin-left: 10px;
+      padding: 5px;
+    }
+  }
 }

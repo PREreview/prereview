@@ -114,6 +114,19 @@ const ReviewReader = React.memo(function ReviewReader({
               onModerate={onModerate}
             />
           )}
+
+          {preprint.tags && (
+            <div>
+              <div className="tags__title">Subject Tags</div>
+              <div className="tags">
+              {preprint.tags.map(tag => {
+                return (
+                  <div className="tags__tag">{tag.name}</div>
+                )
+              })}
+              </div>
+            </div>
+          )}
         </Fragment>
       )}
     </div>
