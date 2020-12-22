@@ -120,9 +120,11 @@ const ReviewReader = React.memo(function ReviewReader({
               <div className="tags__title">Subject Tags</div>
               <div className="tags">
               {preprint.tags.map(tag => {
-                return (
-                  <div className="tags__tag">{tag.name}</div>
-                )
+                  return (
+                    <div key={tag.name} className="tags__tag">
+                      {tag.name}
+                    </div>
+                  );
               })}
               </div>
             </div>
