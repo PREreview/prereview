@@ -1,24 +1,30 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { MdChevronRight, MdFirstPage } from 'react-icons/md';
-import { getId } from '../utils/jsonld';
-import { createActivityQs } from '../utils/search';
-import { GetPreprints } from '../hooks/api-hooks.tsx';
 import Button from './button';
 import LabelStyle from './label-style';
 import ActivityCard from './activity-card';
 
 export default function RoleActivity({ persona }) {
+  const [activity, setActivity] = useState(null);
+
+  useEffect(() => {
+    const fullReviews = persona.fullReviews
+      ? persona.fullReviews.filter(item => item.published)
+      : null;
+
+    setActivity(() => [fullReviews, persona.rapidReviews].flat());
+  }, []);
 
   return (
     <div className="role-activity">
-      {(persona.rapidReviews || persona.fullReviews) && (
+      {activity && activity.length && (
         <dl className="role-activity__summary">
           <dt className="role-activity__summary__label">
             <LabelStyle>Total number of requests</LabelStyle>
           </dt>
           <dd className="role-activity__summary__stat">
-            {persona.requests ? persona.requests.length : 0}
+            {persona.requests.length || 0}
           </dd>
           <dt className="role-activity__summary__label">
             <LabelStyle>Total number of rapid reviews</LabelStyle>
@@ -35,15 +41,15 @@ export default function RoleActivity({ persona }) {
         </dl>
       )}
 
-      {!persona.requests && !persona.fullReviews && !persona.rapidReviews ? (
+      {!activity || !activity.length ? (
         <div>No activity yet.</div>
       ) : (
         <section className="role-activity__history">
           <h3 className="role-activity__sub-title">History</h3>
           <ul className="role-activity__list">
-            {persona.rapidReviews.length && persona.rapidReviews.map(review => (
-              <li key={review.id} className="role-activity__list-item">
-                  <ActivityCard preprintId={review.preprint} />
+            {activity.length && activity.map(activity => (
+              <li key={activity.id} className="role-activity__list-item">
+                  <ActivityCard activity={activity} />
               </li>
             ))}
           </ul>

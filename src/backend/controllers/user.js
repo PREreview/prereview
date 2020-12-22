@@ -90,10 +90,11 @@ export default function controller(users, thisUser) {
           'personas',
           'personas.fullReviews',
           'personas.rapidReviews',
-          // 'personas.requests', // #FIXME
+          'personas.requests',
           'groups',
         ]);
       } catch (err) {
+        log.debug(err);
         ctx.throw(400, err);
       }
 

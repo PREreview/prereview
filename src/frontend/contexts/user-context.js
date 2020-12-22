@@ -16,7 +16,7 @@ export function UserProvider({ user = null, children }) {
           if (response.status === 200) {
             return response.json();
           }
-          throw new Error(response);
+          throw new Error(response.message);
         })
         .then(result => {
           setThisUser(result.data);

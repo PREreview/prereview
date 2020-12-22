@@ -2,34 +2,31 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { format, formatDistanceStrict } from 'date-fns';
 import { useGetPreprint } from '../hooks/api-hooks.tsx';
-import { getId } from '../utils/jsonld';
 import { createPreprintId } from '../../common/utils/ids.js';
 import Value from './value';
 import LabelStyle from './label-style';
 import XLink from './xlink';
-import { useAnimatedScore } from '../hooks/score-hooks';
 import ScoreBadge from './score-badge';
 import AnimatedNumber from './animated-number';
 import NotFound from './not-found';
 import { MdChevronRight } from 'react-icons/md';
 
-export default function ActivityCard({ preprintId }) {
+export default function ActivityCard({ activity }) {
   const [loading, setLoading] = useState(true);
   const [preprint, setPreprint] = useState(null);
-  const [activity, setActivity] = useState(null);
 
   const {
     data: preprintData,
     loading: loadingPreprint,
     error,
   } = useGetPreprint({
-    id: preprintId,
+    id: activity.preprint,
   });
 
   useEffect(() => {
+    console.log(activity);
     if (!loadingPreprint) {
       if (preprintData) {
-        setActivity(useAnimatedScore(preprintData.data[0]));
         setPreprint(preprintData.data[0]);
         setLoading(false);
       }
@@ -86,31 +83,42 @@ export default function ActivityCard({ preprintId }) {
 
           <div className="activity-card__stats">
             <ScoreBadge
-              now={activity.now}
-              nRequests={activity.nRequests}
-              nReviews={activity.nReviews}
-              dateFirstActivity={activity.dateFirstActivity}
+              now={new Date()}
+              nRequests={preprint.requests.length}
+              nReviews={
+                preprint.fullReviews.length + preprint.rapidReviews.length
+              }
+              dateFirstActivity={activity.createdAt}
               onMouseEnter={activity.onStartAnim}
               onMouseLeave={activity.onStopAnim}
-              isAnimating={activity.isAnimating}
+              isAnimating={false}// #FIXME
             />
             <div className="activity-card__count">
               <div className="activity-card__count-badge">
                 <AnimatedNumber
-                  value={activity.nReviews}
-                  isAnimating={activity.isAnimating}
+                  value={preprint.rapidReviews.length}
+                  isAnimating={false}// #FIXME
                 />
               </div>
-              Review{activity.nReviews > 1 ? 's' : ''}
+              Rapid Review{preprint.rapidReviews.length > 1 ? 's' : ''}
             </div>
             <div className="activity-card__count">
               <div className="activity-card__count-badge">
                 <AnimatedNumber
-                  value={activity.nRequests}
-                  isAnimating={activity.isAnimating}
+                  value={preprint.fullReviews.length}
+                  isAnimating={false}// #FIXME
+                />
+              </div>
+              Longform Review{preprint.fullReviews.length > 1 ? 's' : ''}
+            </div>
+            <div className="activity-card__count">
+              <div className="activity-card__count-badge">
+                <AnimatedNumber
+                  value={preprint.requests.length}
+                  isAnimating={false}// #FIXME
                 />{' '}
               </div>
-              Request{activity.nRequests > 1 ? 's' : ''}
+              Request{preprint.requests.length > 1 ? 's' : ''}
             </div>
             {activity.isAnimating && (
               <div className="activity-card__count">
@@ -130,5 +138,5 @@ export default function ActivityCard({ preprintId }) {
 }
 
 ActivityCard.propTypes = {
-  preprintId: PropTypes.number.isRequired,
+  activity: PropTypes.object.isRequired,
 };

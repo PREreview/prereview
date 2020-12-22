@@ -37,7 +37,7 @@ export default function Profile() {
     }
   }, [loadingUser, userData]);
 
-  if (error) {
+  if (error || !persona) {
     // #FIXME
     return <NotFound />;
   } else if (loading) {
@@ -45,7 +45,7 @@ export default function Profile() {
   } else {
     return (
       <div className="profile">
-        <HeaderBar user={thisUser} closeGap />
+        <HeaderBar thisUser={thisUser} closeGap />
 
         <Helmet>
           <title>

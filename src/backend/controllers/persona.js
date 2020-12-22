@@ -31,7 +31,7 @@ export default function controller(personasModel, thisUser) {
         allPersonas = await personasModel.findAll([
           'fullReviews',
           'rapidReviews',
-          // 'requests',
+          'requests',
         ]);
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
@@ -64,7 +64,7 @@ export default function controller(personasModel, thisUser) {
 
       try {
         persona = await personasModel.findOne(ctx.params.id, [
-          // 'requests',
+          'requests',
           'fullReviews',
           'rapidReviews',
         ]);
