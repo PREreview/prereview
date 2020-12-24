@@ -10,7 +10,6 @@ import _ from 'lodash';
 import { dbWrapper } from '../db.ts';
 import {
   fullReviewModelWrapper,
-  fullReviewDraftModelWrapper,
   personaModelWrapper,
   preprintModelWrapper,
   userModelWrapper,
@@ -19,15 +18,12 @@ import { Client } from 'pg';
 import anonymus from 'anonymus';
 import { resolvePreprint } from '../utils/resolve.ts';
 import { getOrcidPerson, getOrcidWorks } from '../utils/orcid.js';
-import getMetadata from '../utils/getMetadata.js';
 import {
   Contact,
   FullReview,
   FullReviewDraft,
   Persona,
   Preprint,
-  RapidRequest,
-  Request,
   User,
   Work,
 } from '../models/entities/index.ts';
@@ -67,6 +63,7 @@ const processJsonDump = (path, cb) => {
     .on('data', obj => cb(obj));
 };
 
+// eslint-disable-next-line no-unused-vars
 const processJson = path => {
   const users = new Map();
   const roles = new Map();
@@ -168,6 +165,7 @@ const getAllPreprints = async () => {
   return results;
 };
 
+// eslint-disable-next-line no-unused-vars
 const OSrPREImportAll = async () => {
   const roles = await getAllRoles();
   const rolesMap = roles.reduce((rolesMap, role) => {
@@ -361,7 +359,6 @@ async function prereviewOrgImportUsers(db, client, usersMap) {
     );
     console.log('PREreview.org: Queried user database');
 
-    const allUsers = [];
     for (let r of oldUsers.rows) {
       r.createdAt = new Date(r.createdAt);
       let person, works;
@@ -551,7 +548,6 @@ async function prereviewOrgImportUsers(db, client, usersMap) {
 
 async function prereviewOrgImportReviews(db, client, usersMap, preprintsMap) {
   const fullReviewModel = fullReviewModelWrapper(db);
-  const fullReviewDraftModel = fullReviewDraftModelWrapper(db);
   try {
     const oldReviews = await client.query(
       'SELECT preprint_id,doi,date_created,content,author_id,is_hidden FROM prereviews',

@@ -59,7 +59,7 @@ const scrapeURL = (url, publicationId, type) =>
         if (
           highwirePress &&
           highwirePress.author &&
-          typeof highwirePress.author === 'array'
+          highwirePress.author instanceof Array
         ) {
           highwirePress.author.forEach(author => {
             if (author.includes(',')) {
@@ -143,12 +143,15 @@ const searchCrossref = publicationId =>
           };
 
           resolve(preprint);
+          return;
         }
         resolve(null);
+        return;
       })
       .catch(err => {
         console.log('err', err);
         resolve(null);
+        return;
       }),
   );
 
