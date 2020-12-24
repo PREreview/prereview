@@ -13,9 +13,9 @@ export default function PreprintPreview({ preprint }) {
       <div className="preprint-preview__header">
         {preprint.title ? (
           <XLink
-            href={`/${createPreprintId(preprint.handle)}`}
+            href={`/preprints/${preprint.handle}`}
             to={{
-              pathname: `/${createPreprintId(preprint.handle)}`,
+              pathname: `/preprints/${preprint.handle}`,
             }}
             className="preprint-preview__hyperlink"
           >
@@ -48,7 +48,7 @@ export default function PreprintPreview({ preprint }) {
             {preprint.preprintServer}
           </Value>
         )}
-        <MdChevronRight className="preprint-preview__server-arrow-icon" />
+        {/* <MdChevronRight className="preprint-preview__server-arrow-icon" />
         {preprint.handle && (
           <span className="preprint-preview__id">
             {preprint.handle ? (
@@ -69,7 +69,7 @@ export default function PreprintPreview({ preprint }) {
               </a>
             )}
           </span>
-        )}
+        )} */}
       </div>
     </div>
   );

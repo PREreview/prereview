@@ -5,6 +5,7 @@ import { unprefix, getId, arrayify } from '../utils/jsonld';
 import { createPreprintId } from '../utils/ids';
 import { useStores } from '../contexts/store-context';
 import { useUser } from '../contexts/user-context';
+import { useGetResolvePreprints } from '../hooks/api-hooks.tsx'
 
 const DEFAULT_SEARCH_RESULTS = {
   bookmark: null,
@@ -61,7 +62,7 @@ export function usePostAction() {
       }
       controllerRef.current = controller;
 
-      fetch(`api/v2/v2/action`, {
+      fetch(`api/v2/action`, {
         signal: controller.signal,
         method: 'POST',
         body: JSON.stringify(action),

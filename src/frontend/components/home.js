@@ -5,7 +5,7 @@ import omit from 'lodash/omit';
 import { MdChevronRight, MdFirstPage } from 'react-icons/md';
 import Cookies from 'js-cookie';
 import PrivateRoute from './private-route';
-import { useGetPreprints, useGetUser } from '../hooks/api-hooks.tsx';
+import { useGetPreprints, useGetResolvePreprints,useGetUser } from '../hooks/api-hooks.tsx';
 import {
   useIsNewVisitor,
   useIsMobile,

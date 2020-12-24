@@ -44,21 +44,29 @@ export default function controller(preprints, thisUser) {
     handler: async ctx => {
       const { identifier } = ctx.query;
       log.debug(`Resolving preprint with ID: ${identifier}`);
-      let data;
+      let preprint, data;
       try {
         data = await resolve(identifier);
         if (data) {
           log.debug(`Adding a preprint & its resolved metadata to database.`);
-          const preprint = preprints.create(data);
+          preprint = preprints.create(data);
           await preprints.persistAndFlush(preprint);
         }
       } catch (err) {
         log.error(`Preprint resolution failed: ${err}`);
         ctx.throw(400, `Preprint resolution failed: ${err}`);
       }
-
       if (!data) ctx.throw(404, 'No preprint found.');
-      ctx.body = data;
+      log.debug("preprint********", preprint)
+      ctx.body = {
+        title: preprint.title,
+        handle: preprint.handle,
+        preprintServer: preprint.preprintServer,
+        contentUrl: preprint.contentUrl,
+        url: preprint.url,
+        datePosted: preprint.datePosted,
+        contentEncoding: preprint.contentEncoding,
+      };
     },
   });
 
