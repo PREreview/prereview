@@ -111,7 +111,6 @@ export default function ShellContent({
           />
         </Helmet>
       )}
-      <PreprintPreview preprint={preprint} />
 
       <header className="shell-content__header">
         <nav>
@@ -133,19 +132,37 @@ export default function ShellContent({
             <li>
               <Button
                 className={classNames('shell-content__tab-button', {
-                  'shell-content__tab-button--active': tab === 'reviews',
+                  'shell-content__tab-button--active': tab === 'rapidReview',
                 })}
                 disabled={!preprint || hasRapidReviewed}
                 onClick={() => {
                   if (user) {
                     onRequireScreen();
-                    setTab('reviews');
+                    setTab('rapidReview');
                   } else {
                     setIsLoginModalOpen(true);
                   }
                 }}
               >
-                Add Review(s)
+                Add Rapid Review
+              </Button>
+            </li>
+            <li>
+              <Button
+                className={classNames('shell-content__tab-button', {
+                  'shell-content__tab-button--active': tab === 'longReview',
+                })}
+                disabled={!preprint || hasLongReviewed}
+                onClick={() => {
+                  if (user) {
+                    onRequireScreen();
+                    setTab('longReview');
+                  } else {
+                    setIsLoginModalOpen(true);
+                  }
+                }}
+              >
+                Add Longform Review
               </Button>
             </li>
             <li>
@@ -202,7 +219,7 @@ export default function ShellContent({
             disabled={hasRequested}
             error={errorPostReviewRequest} // #FIXME
           />
-        ) : tab === 'reviews' ? (
+        ) : tab === 'rapidReview' ? (
           <ShellContentRapidReview
             user={user}
             preprint={preprint}
@@ -267,6 +284,8 @@ function ShellContentRead({
   return (
     <div className="shell-content-read">
       <header className="shell-content-read__title">Reviews</header>
+
+      <PreprintPreview preprint={preprint} />
       <ReviewReader
         user={user}
         preprint={preprint}
