@@ -1,13 +1,13 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
 import { Route, Redirect } from 'react-router-dom';
-import { useUser } from '../contexts/user-context';
+import { UserContext } from '../contexts/user-context';
 import NotFound from './not-found';
 
 // A wrapper for <Route> that redirects to the login
 // screen if you're not yet authenticated.
 export default function PrivateRoute({ children, ...rest }) {
-  const [user] = useUser();
+  const [user] = useContext(UserContext);
 
   return <Route {...rest}>{user ? children : <Redirect to="/login" />}</Route>;
 }
@@ -17,7 +17,7 @@ PrivateRoute.propTypes = {
 };
 
 export function AdminRoute({ children, ...rest }) {
-  const [user] = useUser();
+  const [user] = UserProvider();
 
   return (
     <Route {...rest}>

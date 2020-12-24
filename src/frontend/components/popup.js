@@ -2,14 +2,14 @@ import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { MdChevronRight } from 'react-icons/md';
 import Button from './button';
-import { useUser } from '../contexts/user-context';
+import { UserProvider } from '../contexts/user-context';
 import { TOGGLE_SHELL_TAB } from '../constants';
 import PreReviewLogo from './pre-review-logo';
 import { checkIfHasReviewed, checkIfHasRequested } from '../utils/actions';
 
 export default function Popup(props) {
   const { preprint, dispatch } = props;
-  const [user] = useUser();
+  const [user] = UserProvider();
 
   const nRequests = preprint.requests.length;
 

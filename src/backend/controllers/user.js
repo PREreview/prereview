@@ -88,9 +88,13 @@ export default function controller(users, thisUser) {
       try {
         user = await users.findOneByIdOrOrcid(ctx.params.id, [
           'personas',
+          'personas.fullReviews',
+          'personas.rapidReviews',
+          'personas.requests',
           'groups',
         ]);
       } catch (err) {
+        log.debug(err);
         ctx.throw(400, err);
       }
 

@@ -2,7 +2,7 @@ import React, { Fragment, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Helmet } from 'react-helmet-async';
 import { MdClose } from 'react-icons/md';
-import { useUser } from '../contexts/user-context';
+import { UserProvider } from '../contexts/user-context';
 import { getId, unprefix } from '../utils/jsonld';
 import HeaderBar from './header-bar';
 import { ORG } from '../constants';
@@ -18,7 +18,7 @@ import TextInput from './text-input';
 import Controls from './controls';
 
 export default function BlockPanel() {
-  const [user] = useUser();
+  const [user] = UserProvider();
   const [bookmark, setBookmark] = useState(null);
 
   const search = createBlockedRolesQs({ bookmark });

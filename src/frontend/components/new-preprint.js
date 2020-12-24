@@ -15,7 +15,7 @@ import {
 import { useLocalState } from '../hooks/ui-hooks';
 import SubjectEditor from './subject-editor';
 import RapidFormFragment from './rapid-form-fragment';
-import { useUser } from '../contexts/user-context';
+import { UserProvider } from '../contexts/user-context';
 import Controls from './controls';
 import Button from './button';
 import TextInput from './text-input';
@@ -286,7 +286,7 @@ StepPreprint.propTypes = {
 };
 
 function StepReview({ preprint, onViewInContext, onCancel, isSingleStep }) {
-  const [user] = useUser();
+  const [user] = UserProvider();
   const postRapidReview = usePostRapidReview();
   const postFullReview = usePostFullReview();
   const [subjects, setSubjects] = useLocalState(
