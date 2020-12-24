@@ -13,6 +13,7 @@ import { PersonaModel } from '../personas';
 import { BaseEntity } from './BaseEntity';
 import { FullReview } from './FullReview';
 import { RapidReview } from './RapidReview';
+import { Request } from './Request';
 import { User } from './User';
 
 @Entity()
@@ -29,9 +30,15 @@ export class Persona extends BaseEntity {
   identity!: User;
 
   @Property()
-  isActive!: boolean;
+  isActive = true;
 
-  //@Fixture({ get: faker => faker.image.avatar(), optional: true })
+  @Property()
+  isAnonymous = false;
+
+  @Fixture({ get: faker => faker.lorem.paragraph(), optional: true })
+  @Property({ columnType: 'text', nullable: true })
+  bio?: string;
+
   @Fixture(faker => faker.image.avatar())
   @Property({ nullable: true })
   avatar?: Buffer;
@@ -42,9 +49,22 @@ export class Persona extends BaseEntity {
   @ManyToMany({ entity: () => FullReview, mappedBy: 'authors' })
   fullReviews: Collection<FullReview> = new Collection<FullReview>(this);
 
-  constructor(name: string, avatar: Buffer) {
+  @OneToMany({ entity: () => Request, mappedBy: 'author' })
+  requests: Collection<Request> = new Collection<Request>(this);
+
+  constructor(
+    name: string,
+    identity: User,
+    isAnonymous = false,
+    bio: string,
+    avatar?: Buffer,
+  ) {
     super();
     this.name = name;
+    this.identity = identity;
+    this.isAnonymous = isAnonymous;
+    this.bio = bio;
     this.avatar = avatar;
+    this.isActive = true;
   }
 }

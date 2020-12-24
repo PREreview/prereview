@@ -4,15 +4,17 @@ import {
   EntityRepositoryType,
   ManyToMany,
   OneToMany,
+  OneToOne,
   Property,
-  Unique,
 } from '@mikro-orm/core';
 import { Fixture } from 'class-fixtures-factory';
 import { UserModel } from '../users';
 import { BaseEntity } from './BaseEntity';
 import { Community } from './Community';
+import { Contact } from './Contact';
 import { Group } from './Group';
 import { Persona } from './Persona';
+import { Work } from './Work';
 import { createRandomOrcid } from '../../../common/utils/orcid.js';
 
 @Entity()
@@ -20,18 +22,19 @@ export class User extends BaseEntity {
   //eslint-disable-next-line
   [EntityRepositoryType]?: UserModel;
 
+  @Fixture(() => createRandomOrcid())
+  @Property()
+  orcid!: string;
+
   @Fixture(faker => faker.name.findName())
   @Property({ nullable: true })
   name?: string;
 
-  @Fixture(faker => faker.internet.email())
-  @Property({ nullable: true })
-  @Unique()
-  email?: string;
+  @OneToOne({ entity: () => Persona })
+  defaultPersona?: Persona;
 
-  @Fixture(() => createRandomOrcid())
   @Property()
-  orcid!: string;
+  isPrivate = false;
 
   @ManyToMany({ entity: () => Group, mappedBy: 'members' })
   groups: Collection<Group> = new Collection<Group>(this);
@@ -42,9 +45,22 @@ export class User extends BaseEntity {
   @OneToMany({ entity: () => Persona, mappedBy: 'identity' })
   personas: Collection<Persona> = new Collection<Persona>(this);
 
-  constructor(orcid: string, email?: string) {
+  @OneToMany({ entity: () => Contact, mappedBy: 'identity' })
+  contacts: Collection<Contact> = new Collection<Contact>(this);
+
+  @OneToMany({ entity: () => Work, mappedBy: 'author' })
+  works: Collection<Work> = new Collection<Work>(this);
+
+  constructor(
+    orcid: string,
+    isPrivate = false,
+    name?: string,
+    defaultPersona?: Persona,
+  ) {
     super();
-    this.email = email;
     this.orcid = orcid;
+    this.isPrivate = isPrivate;
+    this.name = name;
+    this.defaultPersona = defaultPersona;
   }
 }

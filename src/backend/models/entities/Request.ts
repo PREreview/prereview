@@ -15,4 +15,10 @@ export class Request extends BaseEntity {
 
   @ManyToOne({ entity: () => Preprint })
   preprint!: Preprint;
+
+  constructor(author: Persona, preprint: Preprint) {
+    super();
+    this.author = author;
+    this.preprint = preprint;
+  }
 }

@@ -2,6 +2,8 @@ import orcidUtils from 'orcid-utils';
 import fetch from 'node-fetch';
 import { createError } from '../../frontend/utils/errors';
 
+const ORCID_API_VERSION = 'v3.0';
+
 /**
  * See https://support.orcid.org/hc/en-us/articles/360006897674-Structure-of-the-ORCID-Identifier
  */
@@ -26,17 +28,29 @@ export function createRandomOrcid(nTry = 0) {
 /**
  * See https://members.orcid.org/api/tutorial/read-orcid-records
  */
-export async function getOrcidProfile(orcid, token) {
-  const r = await fetch(`https://pub.orcid.org/v2.1/${orcid}/person`, {
-    headers: {
-      Accept: 'application/json',
-      Authorization: `${token.tokenType} ${token.accessToken}`,
+async function getOrcidData(orcid, endpoint, token) {
+  const headers = { Accept: 'application/json' };
+  if (token) {
+    headers.Authorization = `${token.tokenType} ${token.accessToken}`;
+  }
+  const r = await fetch(
+    `https://pub.orcid.org/${ORCID_API_VERSION}/${orcid}/${endpoint}`,
+    {
+      headers: headers,
     },
-  });
+  );
 
   if (r.ok) {
     return await r.json();
   } else {
     throw createError(r.status);
   }
+}
+
+export async function getOrcidPerson(orcid, token) {
+  return getOrcidData(orcid, 'person', token);
+}
+
+export async function getOrcidWorks(orcid, token) {
+  return getOrcidData(orcid, 'works', token);
 }
