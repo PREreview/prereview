@@ -1,50 +1,47 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-export default function Barplot({
-  preview,
-  nTotalReviews,
-  nHighlightedReviews,
-  stats,
-  children,
-}) {
+export default function Barplot({ nTotalReviews, stats, children }) {
   return (
     <div className="barplot">
-      <div className="barplot__question-list-header">
-        <div className="barplot__question-list-header__left">
-          <span>
-            Showing {!preview ? nHighlightedReviews : 'results'} of{' '}
-            {nTotalReviews} Reviews
-          </span>
-        </div>
-
-        <div className="barplot__question-list-header__right">
-          <div className="barplot__key">
-            <div className="barplot__key-item">
-              <div className="barplot__key-color-chip barplot__key-color-chip--yes" />
-              <span className="barplot__key-label">Yes</span>
+      {stats[0] ? (
+        <div>
+          <div className="barplot__question-list-header">
+            {}
+            <div className="barplot__question-list-header__left">
+              <span>Showing {nTotalReviews} Reviews</span>
             </div>
 
-            <div className="barplot__key-item">
-              <div className="barplot__key-color-chip barplot__key-color-chip--unsure" />
-              <span className="barplot__key-label">Unsure</span>
-            </div>
+            <div className="barplot__question-list-header__right">
+              <div className="barplot__key">
+                <div className="barplot__key-item">
+                  <div className="barplot__key-color-chip barplot__key-color-chip--yes" />
+                  <span className="barplot__key-label">Yes</span>
+                </div>
 
-            <div className="barplot__key-item">
-              <div className="barplot__key-color-chip barplot__key-color-chip--na" />
-              <span className="barplot__key-label">N/A</span>
-            </div>
+                <div className="barplot__key-item">
+                  <div className="barplot__key-color-chip barplot__key-color-chip--unsure" />
+                  <span className="barplot__key-label">Unsure</span>
+                </div>
 
-            <div className="barplot__key-item">
-              <div className="barplot__key-color-chip barplot__key-color-chip--no" />
-              <span className="barplot__key-label">No</span>
+                <div className="barplot__key-item">
+                  <div className="barplot__key-color-chip barplot__key-color-chip--na" />
+                  <span className="barplot__key-label">N/A</span>
+                </div>
+
+                <div className="barplot__key-item">
+                  <div className="barplot__key-color-chip barplot__key-color-chip--no" />
+                  <span className="barplot__key-label">No</span>
+                </div>
+              </div>
+              {!!children && <div className="barplot__share">{children}</div>}
             </div>
           </div>
-          {!!children && <div className="barplot__share">{children}</div>}
         </div>
-      </div>
+      ) : null}
+
       <ul className="barplot__question-list">
-        {stats.map(
+        {stats[0] ? stats[0].map(
           ({ questionId, nReviews, question, yes, no, na, unsure }) => (
             <li
               className="barplot__question-list__item"
@@ -57,32 +54,32 @@ export default function Barplot({
                   <tr className="barplot__segment-titles">
                     <th
                       className="barplot__segment-title"
-                      style={{ width: `${(yes.length / nReviews) * 100}%` }}
+                      style={{ width: `${(stats.length / nReviews) * 100}%` }}
                     >
-                      {yes.length > 0 ? 'yes' : ''}
+                      {yes ? 'yes' : ''}
                     </th>
 
                     <th
                       className="barplot__segment-title"
                       style={{
-                        width: `${(unsure.length / nReviews) * 100}%`,
+                        width: `${(stats.length / nReviews) * 100}%`,
                       }}
                     >
-                      {unsure.length > 0 ? 'unsure' : ''}
+                      {unsure ? 'unsure' : ''}
                     </th>
 
                     <th
                       className="barplot__segment-title"
-                      style={{ width: `${(na.length / nReviews) * 100}%` }}
+                      style={{ width: `${(stats.length / nReviews) * 100}%` }}
                     >
-                      {na.length > 0 ? 'n.a.' : ''}
+                      {na ? 'N/A' : ''}
                     </th>
 
                     <th
                       className="barplot__segment-title"
-                      style={{ width: `${(no.length / nReviews) * 100}%` }}
+                      style={{ width: `${(stats.length / nReviews) * 100}%` }}
                     >
-                      {no.length > 0 ? 'no' : ''}
+                      {no ? 'no' : ''}
                     </th>
                   </tr>
                 </thead>
@@ -90,39 +87,39 @@ export default function Barplot({
                   <tr className="barplot__bar-segments">
                     <td
                       className="barplot__bar-segment barplot__bar-segment--yes"
-                      style={{ width: `${(yes.length / nReviews) * 100}%` }}
+                      style={{ width: `${(stats.length / nReviews) * 100}%` }}
                     >
                       <span className="barplot__bar-segment__number">
-                        {yes.length}
+                        {yes ? 1 : 0}
                       </span>
                     </td>
 
                     <td
                       className="barplot__bar-segment barplot__bar-segment--unsure"
                       style={{
-                        width: `${(unsure.length / nReviews) * 100}%`,
+                        width: `${(stats.length / nReviews) * 100}%`,
                       }}
                     >
                       <span className="barplot__bar-segment__number">
-                        {unsure.length}
+                        {unsure ? 1 : 0}
                       </span>
                     </td>
 
                     <td
                       className="barplot__bar-segment barplot__bar-segment--na"
-                      style={{ width: `${(na.length / nReviews) * 100}%` }}
+                      style={{ width: `${(stats.length / nReviews) * 100}%` }}
                     >
                       <span className="barplot__bar-segment__number">
-                        {na.length}
+                        {na ? 1 : 0}
                       </span>
                     </td>
 
                     <td
                       className="barplot__bar-segment barplot__bar-segment--no"
-                      style={{ width: `${(no.length / nReviews) * 100}%` }}
+                      style={{ width: `${(stats.length / nReviews) * 100}%` }}
                     >
                       <span className="barplot__bar-segment__number">
-                        {no.length}
+                        {no ? 1 : 0}
                       </span>
                     </td>
                   </tr>
@@ -130,26 +127,14 @@ export default function Barplot({
               </table>
             </li>
           ),
-        )}
+        ) : (<div>No rapid reviews. Would you like to leave one?</div>)}
       </ul>
     </div>
   );
 }
 
 Barplot.propTypes = {
-  preview: PropTypes.bool,
   nTotalReviews: PropTypes.number.isRequired,
-  nHighlightedReviews: PropTypes.number.isRequired,
-  stats: PropTypes.arrayOf(
-    PropTypes.shape({
-      questionId: PropTypes.string.isRequired,
-      nReviews: PropTypes.number.isRequired,
-      question: PropTypes.string.isRequired,
-      yes: PropTypes.arrayOf(PropTypes.string).isRequired, // roleIds
-      no: PropTypes.arrayOf(PropTypes.string).isRequired, // roleIds
-      na: PropTypes.arrayOf(PropTypes.string).isRequired, // roleIds
-      unsure: PropTypes.arrayOf(PropTypes.string).isRequired, // roleIds
-    }),
-  ).isRequired,
+  stats: PropTypes.array.isRequired,
   children: PropTypes.element, // share menu
 };

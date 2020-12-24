@@ -184,8 +184,9 @@ export default function controller(preprints, thisUser) {
 
       try {
         preprint = await preprints.findOneByIdOrHandle(ctx.params.id, [
-          'fullReviews',
-          'rapidReviews',
+          'fullReviews.authors',
+          'fullReviews.drafts',
+          'rapidReviews.author',
           'requests',
         ]);
       } catch (err) {

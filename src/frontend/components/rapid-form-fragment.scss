@@ -32,11 +32,12 @@
     margin: 0;
     padding-right: var(--sgrd);
     box-sizing: border-box;
+    position: relative;
 
     align-items: center;
     hyphens: auto;
     & p {
-      display: inline;
+      display: inline-block;
       hyphens: auto;
       padding-right: var(--mgrd); /* reserve space for help icon */
     }
@@ -49,7 +50,7 @@
     flex: 0 0 var(--mgrd);
     color: var(--ui-basic-font-color--light);
     position: absolute;
-    margin-top: -2px;
+    margin-top: 11px;
     margin-left: -24px; /* position within padding of help text */
     & svg {
       width: 16px;
@@ -61,12 +62,12 @@
     width: 100%;
   }
   & .rapid-form-fragment__help-text {
-    color: var(--ui-basic-font-color--light);
+    background-color: rgba(255, 255, 255, 0.8);
     border: 1px solid var(--ruling-color);
+    box-sizing: border-box;
+    color: var(--ui-basic-font-color--light);
     padding: var(--xsgrd);
     width: 100%;
-    box-sizing: border-box;
-    background-color: rgba(255, 255, 255, 0.8);
   }
 
   & .rapid-form-fragment__radio-group {
@@ -92,9 +93,12 @@
   }
 
   & .radid-form-fragment__text-answer {
-    width: calc(100% - var(--xsgrd));
-    max-width: calc(100% - var(--xsgrd));
+    left: 0;
     min-height: 6em;
+    min-width: 250px;
+    position: absolute;
     resize: vertical;
+    top: 50%;
+    transform: translateY(-50%);
   }
 }

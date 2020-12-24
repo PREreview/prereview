@@ -78,6 +78,6 @@ export class RapidReview extends BaseEntity {
   ynAvailableData = Checkboxes.na;
 
   @Fixture(faker => faker.lorem.sentence())
-  @Property({ columnType: 'text' })
+  @Property({ columnType: 'text', nullable: true })
   linkToData?: string;
 }

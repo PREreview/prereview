@@ -16,11 +16,11 @@
   box-shadow: -2px 0 8px rgba(0, 0, 0, 0.3);
   bottom: 0;
 
-  @media (--narrow-screen) {
+  @media (max-width: ($wide-bp - 1px)) {
     left: 0;
     width: 100vw;
   }
-  @media (--wide-screen) {
+  @media (min-width: $wide-bp) {
     right: 0;
     width: 40vw;
   }
@@ -72,7 +72,7 @@
   }
 
   /* on wide screens, use right-docked shell layout, hiding shell controls */
-  @media (--wide-screen) {
+  @media (min-width: $wide-bp) {
   /* left: calc(50vw - var(--shell-control-icon-width) - var(--shell-control-icon-width) / 2); */
     right: 0;
     width: 40vw;
@@ -87,7 +87,7 @@
   }
 
   /* enable shell controls in narrow mode (mobile) */
-  @media (--narrow-screen) {
+  @media (max-width: ($wide-bp - 1px)) {
     left: 0;
     width: 100vw;
 

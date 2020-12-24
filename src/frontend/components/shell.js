@@ -9,7 +9,7 @@ import classNames from 'classnames';
 import PropTypes from 'prop-types';
 import { MdDragHandle, MdUnfoldMore, MdUnfoldLess } from 'react-icons/md';
 import IconButton from './icon-button';
-import RapidPreReviewLogo from './rapid-pre-review-logo';
+import PreReviewLogo from './pre-review-logo';
 import debounce from 'lodash/debounce';
 
 const SHELL_HEADER_HEIGHT = 40; // !! keep in sync with CSS
@@ -27,19 +27,19 @@ export default function Shell({ children, defaultStatus = 'default' }) {
 
   // reposition shell when user "drag" the handle
   useEffect(() => {
-    function handleMouseUp(e) {
+    function handleMouseUp() {
       if (isDown) {
         setIsDown(false);
       }
     }
 
-    function handleTouchEnd(e) {
+    function handleTouchEnd() {
       if (isDown) {
         setIsDown(false);
       }
     }
 
-    function handleTouchCancel(e) {
+    function handleTouchCancel() {
       if (isDown) {
         setIsDown(false);
       }
@@ -196,11 +196,11 @@ export default function Shell({ children, defaultStatus = 'default' }) {
     }
   }, [status, transition]);
 
-  const handleMouseDown = useCallback(e => {
+  const handleMouseDown = useCallback(() => {
     setIsDown(true);
   }, []);
 
-  const handleTouchStart = useCallback(e => {
+  const handleTouchStart = useCallback(() => {
     setIsDown(true);
   }, []);
 
@@ -225,7 +225,7 @@ export default function Shell({ children, defaultStatus = 'default' }) {
         <div className="shell__control-bar">
           <div className="shell__controls">
             <div className="shell__controls__left">
-              <RapidPreReviewLogo short={true} />
+              <PreReviewLogo short={true} />
             </div>
             <div className="shell__controls__center">
               <IconButton

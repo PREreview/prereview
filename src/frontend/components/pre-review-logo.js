@@ -5,7 +5,7 @@ import XLink from './xlink';
 
 import preReviewLogo from '../svgs/prereview-logo.svg';
 
-export default function RapidPreReviewLogo({
+export default function PreReviewLogo({
   short = false,
   responsive = true,
 }) {
@@ -33,7 +33,7 @@ export default function RapidPreReviewLogo({
   );
 }
 
-RapidPreReviewLogo.propTypes = {
+PreReviewLogo.propTypes = {
   short: PropTypes.bool,
   responsive: PropTypes.bool,
 };

@@ -11,15 +11,15 @@
   -ms-overflow-style: -ms-autohiding-scrollbar;
   overflow-y: auto;
   overflow-x: hidden;
-  left: 10vw;
+  // left: 10vw;
   /* note we use width here instead of setting right position so we can inherit it int he shell content */
-  width: 80vw;
+  // width: 80vw;
   border-top: 1px solid var(--ruling-color);
   border-left: 1px solid var(--ruling-color);
   border-right: 1px solid var(--ruling-color);
   box-shadow: -2px 0 8px rgba(0, 0, 0, 0.3);
 
-  @media (--narrow-screen) {
+  @media (max-width: ($wide-bp - 1px)) {
     left: 0;
     width: 100vw;
   }
@@ -59,15 +59,15 @@
   box-sizing: border-box;
   position: fixed;
   /* left: calc(50vw - var(--shell-control-icon-width) - var(--shell-control-icon-width) / 2); */
-  left: 10vw;
-  width: 80vw;
+  // left: 10vw;
+  // width: 80vw;
   overflow: hidden;
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: var(--xsgrd) var(--sgrd);
 
-  @media (--narrow-screen) {
+  @media (max-width: ($wide-bp - 1px)) {
     left: 0;
     width: 100vw;
   }
@@ -116,7 +116,7 @@
     }
 
     /* Add enough space so that finger fits on mobile (otherwise minimize and maximize are too close */
-    @media (--narrow-screen) {
+    @media (max-width: ($wide-bp - 1px)) {
       &.shell__controls__button--maximize {
       }
     }

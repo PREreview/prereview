@@ -1,5 +1,6 @@
 import router from 'koa-joi-router';
 import { getLogger } from '../log.js';
+import getActivePersona from '../utils/persona.js';
 
 const log = getLogger('backend:controllers:rapidReview');
 // const Joi = router.Joi;
@@ -43,14 +44,25 @@ export default function controller(rapidReviews, thisUser) {
     },
     method: 'post',
     path: '/rapidReviews',
-    // pre: thisUser.can('access private pages'),
+    // pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
     // validate: {},
     handler: async ctx => {
       log.debug('Posting a rapid review.');
-      let rapidReview;
+      let rapidReview, authorPersona;
 
       try {
-        rapidReview = rapidReviews.create(ctx.request.body);
+        authorPersona = await getActivePersona(ctx.state.user);
+      } catch (err) {
+        log.error('Failed to load user personas.');
+        ctx.throw(400, err);
+      }
+
+      try {
+        log.debug('authorPersona', authorPersona);
+        rapidReview = rapidReviews.create({
+          ...ctx.request.body,
+          author: authorPersona,
+        });
         await rapidReviews.persistAndFlush(rapidReview);
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
@@ -75,9 +87,8 @@ export default function controller(rapidReviews, thisUser) {
     },
     method: 'get',
     path: '/rapidReviews',
-    // pre: thisUser.can('access private pages'),
     // validate: {},
-    handler: async ctx => getHandler(ctx),
+    handler: getHandler,
   });
 
   rapidRouter.route({
@@ -90,9 +101,8 @@ export default function controller(rapidReviews, thisUser) {
     },
     method: 'get',
     path: '/preprints/:pid/rapidReviews',
-    // pre: thisUser.can('access private pages'),
     // validate: {},
-    handler: async ctx => getHandler(ctx),
+    handler: getHandler,
   });
 
   rapidRouter.route({

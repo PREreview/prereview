@@ -25,7 +25,7 @@
     }
   }
 
-  @media (--narrow-screen) {
+  @media (max-width: $wide-bp - 1px) {
     position: fixed;
     top: calc(var(--header-bar-height) + var(--announcement-bar-height) + var(--search-bar-height));
     box-shadow: 3px 4px 4px rgba(0, 0, 0, 0.2);

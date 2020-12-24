@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
 
 // Remirror
 import { RemirrorProvider, useManager, useRemirror } from 'remirror/react';
@@ -10,9 +11,11 @@ import { BoldExtension } from 'remirror/extension/bold';
 // import { CollaborationExtension } from 'remirror/extension/collaboration';
 import { ItalicExtension } from 'remirror/extension/italic';
 import { UnderlineExtension } from 'remirror/extension/underline';
+import { PlaceholderExtension } from 'remirror/extension/placeholder';
 // import { YjsExtension } from 'remirror/extension/yjs';
 
 let EXTENSIONS = [
+  new PlaceholderExtension(),
   new BoldExtension(),
   new ItalicExtension(),
   new UnderlineExtension(),
@@ -35,19 +38,28 @@ const Menu = () => {
     return (
       <div>
         <button
-          onClick={() => commands.toggleBold()}
+          onClick={event => {
+            event.preventDefault();
+            commands.toggleBold();
+          }}
           style={{ fontWeight: active.bold() ? 'bold' : undefined }}
         >
           B
         </button>
         <button
-          onClick={() => commands.toggleItalic()}
+          onClick={event => {
+            event.preventDefault();
+            commands.toggleItalic();
+          }}
           style={{ fontWeight: active.italic() ? 'bold' : undefined }}
         >
           I
         </button>
         <button
-          onClick={() => commands.toggleUnderline()}
+          onClick={event => {
+            event.preventDefault();
+            commands.toggleUnderline();
+          }}
           style={{ fontWeight: active.underline() ? 'bold' : undefined }}
         >
           U
@@ -63,13 +75,13 @@ const Editor = () => {
   return <div {...getRootProps()} />;
 };
 
-const EditorWrapper = () => {
+const EditorWrapper = ({ initialContent, handleContentChange }) => {
   const manager = useManager(EXTENSIONS);
   const [isLoaded, setIsLoaded] = useState(false);
   const [value, setValue] = useState(() =>
     // Use the `remirror` manager to create the state.
     manager.createState({
-      content: '<p>This is the initial value</p>',
+      content: initialContent,
       stringHandler: fromHtml,
     }),
   );
@@ -87,11 +99,13 @@ const EditorWrapper = () => {
   } else {
     return (
       <RemirrorProvider
+        placeholder={'Start typing...'}
         manager={manager}
         value={value}
         onChange={parameter => {
           // Update the state to the latest value.
           setValue(parameter.state);
+          handleContentChange(parameter.getHTML());
         }}
       >
         <div>
@@ -101,6 +115,11 @@ const EditorWrapper = () => {
       </RemirrorProvider>
     );
   }
+};
+
+EditorWrapper.propTypes = {
+  initialContent: PropTypes.string.isRequired,
+  handleContentChange: PropTypes.func.isRequired,
 };
 
 export default EditorWrapper;

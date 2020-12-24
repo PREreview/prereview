@@ -1,5 +1,6 @@
 import router from 'koa-joi-router';
 import { getLogger } from '../log.js';
+import getActivePersona from '../utils/persona.js';
 
 const log = getLogger('backend:controllers:fullReviews');
 const Joi = router.Joi;
@@ -69,15 +70,23 @@ export default function controller(
     // pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
     handler: async ctx => {
       log.debug('Adding full review.');
+      log.debug('ctx.body,', ctx.request.body);
       let review, draft, authorPersona, preprint;
+
+      try {
+        authorPersona = await getActivePersona(ctx.state.user);
+      } catch (err) {
+        log.error('Failed to load user personas.');
+        ctx.throw(400, err);
+      }
 
       try {
         review = reviewModel.create(ctx.request.body);
         await reviewModel.persistAndFlush(review);
 
         await review.authors.init();
-        authorPersona = await personaModel.find(ctx.request.body.authors);
-        review.authors.add(authorPersona[0]);
+
+        review.authors.add(authorPersona);
 
         preprint = await preprintModel.find(ctx.request.body.preprint);
         review.preprint = preprint[0];

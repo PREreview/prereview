@@ -44,7 +44,7 @@
 
   &.rapid-pre-review-logo--responsive {
     & .rapid-pre-review-logo__type {
-      @media (--narrow-screen) {
+      @media (max-width: $wide-bp - 1px) {
         display: none;
       }
     }
@@ -78,7 +78,7 @@
     height: 11px;
     box-sizing: border-box;
     line-height: 1em;
-    @media (--narrow-screen) {
+    @media (max-width: $wide-bp - 1px) {
       display: none;
     }
   }

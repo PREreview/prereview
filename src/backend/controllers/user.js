@@ -65,7 +65,7 @@ export default function controller(users, thisUser) {
     },
     method: 'get',
     path: '/users/:id',
-    pre: thisUser.can('access private pages'),
+    // pre: thisUser.can('access private pages'),
     validate: {
       params: {
         id: Joi.alternatives()

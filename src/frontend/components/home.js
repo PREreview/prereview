@@ -78,11 +78,14 @@ export default function Home() {
           if (response.status === 200) {
             return response.json();
           }
-          throw new Error(error);
+          throw new Error(response);
         })
         .then(result => {
           setUser(result.data);
           return result;
+        })
+        .catch(err => {
+          console.log('Error: ', err.message);
         });
     }
   }, []);
@@ -155,6 +158,7 @@ export default function Home() {
           />
         )}
         <HeaderBar
+          user={user}
           onClickMenuButton={() => {
             setShowLeftPanel(!showLeftPanel);
           }}
@@ -253,7 +257,6 @@ export default function Home() {
                   >
                     <PreprintCard
                       isNew={true}
-                      user={user}
                       preprint={preprint}
                       onNewRequest={handleNewRequest}
                       onNew={handleNew}

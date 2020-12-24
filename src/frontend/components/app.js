@@ -47,6 +47,7 @@ export default function App({ user }) {
               <Route exact={true} path="/login">
                 <Login />
               </Route>
+              <Route exact={true} path="/logout" />
 
               <Route exact={true} path="/about">
                 <ToCPage>

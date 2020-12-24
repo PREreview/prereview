@@ -40,5 +40,5 @@ Value.propTypes = {
       '@type': PropTypes.string,
       '@value': PropTypes.string,
     }),
-  ]).isRequired,
+  ]),
 };

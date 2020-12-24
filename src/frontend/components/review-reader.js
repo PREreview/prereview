@@ -1,16 +1,14 @@
-import React, { useState, useEffect, useMemo, Fragment } from 'react';
+import React, { useState, useEffect, Fragment } from 'react';
 import PropTypes from 'prop-types';
 import noop from 'lodash/noop';
 import isEqual from 'lodash/isEqual';
 import classNames from 'classnames';
-import { useGetUser } from '../hooks/api-hooks.tsx';
 import Barplot from './barplot';
 import { getId } from '../utils/jsonld';
 import { getYesNoStats } from '../utils/stats';
 import TextAnswers from './text-answers';
-import { PotentialRoles, HighlightedRoles } from './role-list';
+import { PotentialRoles } from './role-list';
 import ShareMenu from './share-menu';
-import NoticeBox from './notice-box';
 
 const ReviewReader = React.memo(function ReviewReader({
   user,
@@ -21,10 +19,14 @@ const ReviewReader = React.memo(function ReviewReader({
   onHighlighedRoleIdsChange = noop,
   isModerationInProgress,
   onModerate,
+  rapidContent,
+  longContent,
 }) {
   const [highlightedRoleIds, setHighlightedRoleIds] = useState(
     defaultHighlightedRoleIds || [],
   );
+
+  let allReviews = preprint.fullReviews.concat(preprint.rapidReviews);
 
   useEffect(() => {
     if (
@@ -35,26 +37,11 @@ const ReviewReader = React.memo(function ReviewReader({
     }
   }, [defaultHighlightedRoleIds, highlightedRoleIds]);
 
-  const roleIds = useMemo(() => {
-    return preprint.reviews
-      ? preprint.reviews
-          .map(review => useGetUser(review.author))
-          .filter(
-            roleId =>
-              !highlightedRoleIds.some(
-                highlightedRoleId => roleId === highlightedRoleId,
-              ),
-          )
-      : {};
-  }, [preprint.reviews, highlightedRoleIds]);
-
-  const highlightedActions = useMemo(() => {
-    return highlightedRoleIds.length
-      ? preprint.reviews.filter(action =>
-          highlightedRoleIds.some(roleId => getId(action.agent) === roleId),
-        )
-      : preprint.reviews;
-  }, [preprint.reviews, highlightedRoleIds]);
+  const highlightedActions = highlightedRoleIds.length
+    ? allReviews.filter(action =>
+        highlightedRoleIds.some(roleId => getId(action.agent) === roleId),
+      )
+    : allReviews;
 
   return (
     <div
@@ -83,41 +70,20 @@ const ReviewReader = React.memo(function ReviewReader({
         <Fragment>
           {!preview && (
             <Fragment>
-              <NoticeBox>
-                View only the reviews you are interested in by
-                dragging-and-dropping user badges to the filter bubble below.
-              </NoticeBox>
-
               <h4 className="review-reader__sub-header">Reviewers</h4>
               <div className="review-reader__persona-selector">
                 <PotentialRoles
                   role={role}
-                  preprint={preprint}
-                  canModerate={!!user}
+                  reviews={allReviews}
+                  hasReviewed={
+                    rapidContent || (longContent && longContent.length)
+                  }
+                  user={user}
                   isModerationInProgress={isModerationInProgress}
                   onModerate={onModerate}
-                  roleIds={roleIds}
                   onRemoved={roleId => {
                     const nextHighlightedRoleIds = highlightedRoleIds.concat(
                       roleId,
-                    );
-                    onHighlighedRoleIdsChange(nextHighlightedRoleIds);
-                    setHighlightedRoleIds(nextHighlightedRoleIds);
-                  }}
-                />
-
-                <h4 className="review-reader__sub-header">Reviewers Filter</h4>
-
-                <HighlightedRoles
-                  role={role}
-                  actions={preprint.reviews}
-                  canModerate={!!user}
-                  isModerationInProgress={isModerationInProgress}
-                  onModerate={onModerate}
-                  roleIds={highlightedRoleIds}
-                  onRemoved={ids => {
-                    const nextHighlightedRoleIds = highlightedRoleIds.filter(
-                      roleId => !ids.some(id => roleId === id),
                     );
                     onHighlighedRoleIdsChange(nextHighlightedRoleIds);
                     setHighlightedRoleIds(nextHighlightedRoleIds);
@@ -128,11 +94,7 @@ const ReviewReader = React.memo(function ReviewReader({
           )}
 
           <Barplot
-            preview={preview}
             stats={getYesNoStats(highlightedActions)}
-            nHighlightedReviews={
-              highlightedRoleIds.length || preprint.rapidReviews.length
-            }
             nTotalReviews={
               preprint.rapidReviews.length + preprint.fullReviews.length
             }
@@ -167,6 +129,8 @@ ReviewReader.propTypes = {
   defaultHighlightedRoleIds: PropTypes.arrayOf(PropTypes.string),
   isModerationInProgress: PropTypes.bool,
   onModerate: PropTypes.func,
+  rapidContent: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]),
+  longContent: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]),
 };
 
 export default ReviewReader;

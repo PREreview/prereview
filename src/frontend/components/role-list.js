@@ -1,11 +1,9 @@
-import React, { Fragment } from 'react';
+import React, { Fragment, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useDrag, useDrop } from 'react-dnd';
 import classNames from 'classnames';
-import { useGetUser } from '../hooks/api-hooks.tsx';
 import { MdClear } from 'react-icons/md';
 import { MenuItem } from '@reach/menu-button';
-import { getId, arrayify } from '../utils/jsonld';
 import RoleBadge from './role-badge';
 import IconButton from './icon-button';
 
@@ -21,13 +19,12 @@ const HIGHLIGHTED_ROLE_TYPE = Symbol('dnd:highlighted-role-type');
  * so that dragged role can be dragged back
  */
 export function PotentialRoles({
-  role,
-  preprint,
-  roleIds = [],
+  user,
+  reviews,
   onRemoved,
   onModerate,
-  canModerate,
   isModerationInProgress,
+  hasReviewed,
 }) {
   const [{ canDrop, isOver }, dropRef] = useDrop({
     accept: HIGHLIGHTED_ROLE_TYPE,
@@ -37,6 +34,8 @@ export function PotentialRoles({
     }),
   });
 
+  // const [reviewsList, setReviewsList] = useState(reviews);
+
   return (
     <div
       className={classNames('role-list role-list--potential', {
@@ -45,74 +44,104 @@ export function PotentialRoles({
       })}
       ref={dropRef}
     >
-      {(!preprint.fullReviews.length || !preprint.rapidReviews.length) && (
-        <p className="role-list__tip-text">No Reviewers</p>
-      )}
+      {!reviews.length && <p className="role-list__tip-text">No Reviewers</p>}
 
       <ul className="role-list__list">
-        {roleIds.length
-          ? roleIds.map(roleId => {
-              const action = preprint.rapidReviews.find(review => {
-                const author = useGetUser(review.author);
-                return author.role === roleId;
-              });
-
-              return (
-                <li key={roleId}>
-                  <DraggableRoleBadge
-                    type={POTENTIAL_ROLE_TYPE}
-                    roleId={roleId}
-                    onDropped={roleId => {
-                      onRemoved(roleId);
-                    }}
-                  >
-                    <MenuItem
-                      onSelect={() => {
-                        onRemoved(roleId);
-                      }}
-                    >
-                      Add to selection
-                    </MenuItem>
-
-                    {!!canModerate && !!action && (
-                      <MenuItem
-                        disabled={
-                          isModerationInProgress ||
-                          arrayify(action.moderationAction).some(
-                            action =>
-                              action['@type'] ===
-                                'ReportRapidPREreviewAction' &&
-                              getId(action.agent) === getId(role),
-                          )
-                        }
-                        onSelect={() => {
-                          onModerate(getId(action));
+        {reviews.length
+          ? reviews.map(review => {
+              if (review.authors) {
+                return review.authors.map(author => {
+                  return (
+                    <li key={author.identity}>
+                      <DraggableRoleBadge
+                        type={POTENTIAL_ROLE_TYPE}
+                        author={author}
+                        onDropped={author => {
+                          onRemoved(author.identity);
                         }}
                       >
-                        Report Review
-                      </MenuItem>
-                    )}
-                  </DraggableRoleBadge>
-                </li>
-              );
+                        {user && user.isAdmin && (
+                          <MenuItem
+                            disabled={isModerationInProgress || author.identity}
+                            onSelect={() => {
+                              onModerate(author.identity);
+                            }}
+                          >
+                            Report Review
+                          </MenuItem>
+                        )}
+                      </DraggableRoleBadge>
+                    </li>
+                  );
+                });
+              } else if (review.author) {
+                return (
+                  <li key={review.author.identity}>
+                    <DraggableRoleBadge
+                      type={POTENTIAL_ROLE_TYPE}
+                      author={review.author}
+                      onDropped={review => {
+                        onRemoved(review.author.identity);
+                      }}
+                    >
+                      {user && user.isAdmin && (
+                        <MenuItem
+                          disabled={
+                            isModerationInProgress || review.author.identity
+                          }
+                          onSelect={() => {
+                            onModerate(review.author.identity);
+                          }}
+                        >
+                          Report Review
+                        </MenuItem>
+                      )}
+                    </DraggableRoleBadge>
+                  </li>
+                );
+              }
             })
           : null}
+        {user && hasReviewed ? (
+          <li key={user.identity}>
+            <DraggableRoleBadge
+              type={POTENTIAL_ROLE_TYPE}
+              author={user}
+              onDropped={() => {
+                onRemoved(user.identity);
+              }}
+            >
+              {user.isAdmin && (
+                <MenuItem
+                  disabled={isModerationInProgress || user.identity}
+                  onSelect={() => {
+                    onModerate(user.identity);
+                  }}
+                >
+                  Report Review
+                </MenuItem>
+              )}
+            </DraggableRoleBadge>
+          </li>
+        ) : null}
       </ul>
     </div>
   );
 }
 
 PotentialRoles.propTypes = {
-  role: PropTypes.object,
-  preprint: PropTypes.object.isRequired,
-  canModerate: PropTypes.bool,
+  user: PropTypes.object,
+  reviews: PropTypes.array.isRequired,
   onModerate: PropTypes.func,
   isModerationInProgress: PropTypes.bool,
   onRemoved: PropTypes.func.isRequired,
-  roleIds: PropTypes.arrayOf(PropTypes.string),
+  roleIds: PropTypes.arrayOf(PropTypes.object),
+  hasReviewed: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]),
 };
 
-function DraggableRoleBadge({ roleId, onDropped, children, type }) {
+function DraggableRoleBadge({ author, onDropped, children, type }) {
+  const roleId = author.identity;
+
   const [{ isDragging }, dragRef] = useDrag({
     item: { roleId, type },
     end(item, monitor) {
@@ -129,6 +158,7 @@ function DraggableRoleBadge({ roleId, onDropped, children, type }) {
   return (
     <Fragment>
       <RoleBadge
+        user={author}
         tooltip={true}
         ref={dragRef}
         roleId={roleId}
@@ -144,7 +174,7 @@ function DraggableRoleBadge({ roleId, onDropped, children, type }) {
 }
 
 DraggableRoleBadge.propTypes = {
-  roleId: PropTypes.string.isRequired,
+  author: PropTypes.object.isRequired,
   onDropped: PropTypes.func.isRequired,
   children: PropTypes.any,
   type: PropTypes.oneOf([POTENTIAL_ROLE_TYPE, HIGHLIGHTED_ROLE_TYPE]),
@@ -156,8 +186,7 @@ DraggableRoleBadge.propTypes = {
  *`PotentialRoles`
  */
 export function HighlightedRoles({
-  role,
-  actions,
+  reviews,
   roleIds = [],
   onRemoved,
   onModerate,
@@ -190,9 +219,7 @@ export function HighlightedRoles({
       <ul className="role-list__list">
         {roleIds.length
           ? roleIds.map(roleId => {
-              const action = actions.find(
-                action => getId(action.agent) === roleId,
-              );
+              const reviewer = reviews.find(review => review.id === roleId);
 
               return (
                 <li key={roleId}>
@@ -211,19 +238,11 @@ export function HighlightedRoles({
                       Remove
                     </MenuItem>
 
-                    {!!canModerate && !!action && (
+                    {!!canModerate && !!reviewer && (
                       <MenuItem
-                        disabled={
-                          isModerationInProgress ||
-                          arrayify(action.moderationAction).some(
-                            action =>
-                              action['@type'] ===
-                                'ReportRapidPREreviewAction' &&
-                              getId(action.agent) === getId(role),
-                          )
-                        }
+                        disabled={isModerationInProgress || reviewer}
                         onSelect={() => {
-                          onModerate(getId(action));
+                          onModerate(reviewer);
                         }}
                       >
                         Report Review
@@ -252,26 +271,10 @@ export function HighlightedRoles({
 }
 
 HighlightedRoles.propTypes = {
-  role: PropTypes.object,
-  actions: PropTypes.arrayOf(
-    PropTypes.shape({
-      '@type': PropTypes.oneOf(['RapidPREreviewAction']).isRequired,
-      actionStatus: PropTypes.oneOf(['CompletedActionStatus']).isRequired,
-      agent: PropTypes.string.isRequired,
-      moderationAction: PropTypes.arrayOf(
-        PropTypes.shape({
-          '@type': PropTypes.oneOf([
-            // !! `ModerateRapidPREreviewAction` cannot be present reviews with it must be excluded upstream
-            'ReportRapidPREreviewAction',
-            'IgnoreReportRapidPREreviewAction',
-          ]).isRequired,
-        }),
-      ),
-    }),
-  ).isRequired,
+  reviews: PropTypes.array.isRequired,
   canModerate: PropTypes.bool,
-  onModerate: PropTypes.func.isRequired,
+  onModerate: PropTypes.func,
   isModerationInProgress: PropTypes.bool,
-  roleIds: PropTypes.arrayOf(PropTypes.string),
+  roleIds: PropTypes.arrayOf(PropTypes.number),
   onRemoved: PropTypes.func.isRequired,
 };

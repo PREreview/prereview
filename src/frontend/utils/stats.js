@@ -32,7 +32,7 @@ function isNa(textOrAnswer) {
       ? textOrAnswer.text
       : '';
 
-  return (text || '').toLowerCase().trim() === 'n.a.';
+  return (text || '').toLowerCase().trim() === 'n/a';
 }
 
 function isUnsure(textOrAnswer) {
@@ -135,47 +135,24 @@ export function getTags(preprint) {
   return { hasReviews, hasRequests, hasData, hasCode, subjects };
 }
 
-export function getYesNoStats(actions = []) {
-  const pairs = actions
-    .filter(action => action['@type'] === 'RapidPREreviewAction')
-    .map(action => {
-      return {
-        roleId: getId(action.agent),
-        answerMap: getAnswerMap(action),
-      };
+export function getYesNoStats(reviews = []) {
+  return reviews
+    .filter(review => review.author)
+    .map(review => {
+      return QUESTIONS.filter(({ type }) => type === 'YesNoQuestion').map(
+        ({ identifier, question }) => {
+          return {
+            questionId: `${identifier}`,
+            nReviews: reviews.length,
+            question,
+            yes: isYes(review[identifier]),
+            no: isNo(review[identifier]),
+            na: isNa(review[identifier]),
+            unsure: isUnsure(review[identifier]),
+          };
+        },
+      );
     });
-
-  const nReviews = pairs.length;
-
-  return QUESTIONS.filter(({ type }) => type === 'YesNoQuestion').map(
-    ({ identifier, type, question }) => {
-      return {
-        questionId: `question:${identifier}`,
-        nReviews,
-        question,
-        yes: pairs
-          .filter(({ answerMap }) => {
-            return isYes(answerMap[identifier]);
-          })
-          .map(({ roleId }) => roleId),
-        no: pairs
-          .filter(({ answerMap }) => {
-            return isNo(answerMap[identifier]);
-          })
-          .map(({ roleId }) => roleId),
-        na: pairs
-          .filter(({ answerMap }) => {
-            return isNa(answerMap[identifier]);
-          })
-          .map(({ roleId }) => roleId),
-        unsure: pairs
-          .filter(({ answerMap }) => {
-            return isUnsure(answerMap[identifier]);
-          })
-          .map(({ roleId }) => roleId),
-      };
-    },
-  );
 }
 
 export function getTextAnswers(actions = []) {

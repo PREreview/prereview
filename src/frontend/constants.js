@@ -114,20 +114,6 @@ export const QUESTIONS = [
     type: 'YesNoQuestion',
     required: true,
   },
-
-  {
-    identifier: 'cRelevance',
-    question: 'Editorial comments on novelty, importance, relevance',
-    type: 'Question',
-    required: false,
-  },
-
-  {
-    identifier: 'cMethods',
-    question: 'Technical comments on methods, data, limitations',
-    type: 'Question',
-    required: false,
-  },
 ];
 
 export const INDEXED_PREPRINT_PROPS = [

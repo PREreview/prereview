@@ -4,7 +4,7 @@ import { MdChevronRight } from 'react-icons/md';
 import Button from './button';
 import { useUser } from '../contexts/user-context';
 import { TOGGLE_SHELL_TAB } from '../constants';
-import RapidPreReviewLogo from './rapid-pre-review-logo';
+import PreReviewLogo from './pre-review-logo';
 import { checkIfHasReviewed, checkIfHasRequested } from '../utils/actions';
 
 export default function Popup(props) {
@@ -21,7 +21,7 @@ export default function Popup(props) {
   return (
     <div className="popup">
       <div className="popup__logo-row">
-        <RapidPreReviewLogo
+        <PreReviewLogo
           className="popup__logo"
           short={true}
           responsive={false}
@@ -131,7 +131,7 @@ export default function Popup(props) {
 
           <li className="popup__nav__list-item">
             {user ? (
-              <a href={`auth/logout`} target="_blank" rel="noopener noreferrer">
+              <a href={`/logout`} target="_blank" rel="noopener noreferrer">
                 Logout
               </a>
             ) : (
@@ -156,7 +156,7 @@ export function LocalPopup({ counts, hasGscholar }) {
   return (
     <div className="local-popup popup">
       <div className="popup__logo-row">
-        <RapidPreReviewLogo
+        <PreReviewLogo
           className="popup__logo"
           short={true}
           responsive={false}

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import { MdPerson } from 'react-icons/md';
@@ -6,22 +6,19 @@ import { Menu, MenuList, MenuButton, MenuLink } from '@reach/menu-button';
 import classNames from 'classnames';
 import Tooltip from '@reach/tooltip';
 import { unprefix, getId } from '../utils/jsonld';
-import { GetUser } from '../hooks/api-hooks.tsx';
+import { useGetUser } from '../hooks/api-hooks.tsx';
 import NoticeBadge from './notice-badge';
 
 const RoleBadge = React.forwardRef(function RoleBadge(
-  { roleId, children, className, tooltip, showNotice, disabled },
+  { children, className, tooltip, showNotice, disabled, roleId, user },
   ref,
 ) {
-  const user = GetUser(roleId);
-
   return (
     <RoleBadgeUI
       ref={ref}
       tooltip={tooltip}
       roleId={roleId}
       user={user}
-      loading={user.loading}
       className={className}
       showNotice={showNotice}
       disabled={disabled}
@@ -33,7 +30,8 @@ const RoleBadge = React.forwardRef(function RoleBadge(
 
 RoleBadge.propTypes = {
   tooltip: PropTypes.bool,
-  roleId: PropTypes.string.isRequired,
+  roleId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+  user: PropTypes.object.isRequired,
   children: PropTypes.any,
   className: PropTypes.string,
   showNotice: PropTypes.bool,
@@ -49,7 +47,6 @@ const RoleBadgeUI = React.forwardRef(function RoleBadgeUI(
   {
     roleId,
     user,
-    loading,
     className,
     children,
     tooltip,
@@ -58,7 +55,7 @@ const RoleBadgeUI = React.forwardRef(function RoleBadgeUI(
   },
   ref,
 ) {
-  if (roleId == null && loading == null && !!user) {
+  if (roleId == null && !!user) {
     roleId = getId(user);
   }
 
@@ -67,9 +64,7 @@ const RoleBadgeUI = React.forwardRef(function RoleBadgeUI(
       <div className="role-badge-menu-container">
         {showNotice && <NoticeBadge />}
         <MenuButton
-          className={classNames('role-badge-menu', className, {
-            'role-badge-menu--loading': loading,
-          })}
+          className={classNames('role-badge-menu', className)}
           disabled={disabled}
         >
           {/*NOTE: the `ref` is typically used for Drag and Drop: we need 1 DOM element that will be used as the drag preview */}
@@ -86,7 +81,7 @@ const RoleBadgeUI = React.forwardRef(function RoleBadgeUI(
               <div
                 className={classNames('role-badge-menu__avatar', {
                   'role-badge-menu__avatar--loaded':
-                    !!user && user.avatar && user.avatar.contentUrl && !loading,
+                    !!user && user.avatar && user.avatar.contentUrl,
                 })}
                 style={
                   user && user.avatar && user.avatar.contentUrl
@@ -110,21 +105,13 @@ const RoleBadgeUI = React.forwardRef(function RoleBadgeUI(
             <MenuLink
               as={process.env.IS_EXTENSION ? undefined : Link}
               className="menu__list__link-item"
-              href={
-                process.env.IS_EXTENSION
-                  ? `about/${unprefix(roleId)}`
-                  : undefined
-              }
+              href={process.env.IS_EXTENSION ? `about/${roleId}` : undefined}
               target={process.env.IS_EXTENSION ? '_blank' : undefined}
-              to={
-                process.env.IS_EXTENSION
-                  ? undefined
-                  : `/about/${unprefix(roleId)}`
-              }
+              to={process.env.IS_EXTENSION ? undefined : `/about/${roleId}`}
             >
-              {user && user.name && user.name !== unprefix(roleId)
-                ? `${user.name} (${unprefix(roleId).substring(0, 5)}…)`
-                : `View Profile (${unprefix(roleId).substring(0, 5)}…)`}
+              {user && roleId && user.id !== roleId
+                ? `${user.name} (${user.id}…)`
+                : `View Profile (${user.id}…)`}
             </MenuLink>
             {children}
           </MenuList>
@@ -133,21 +120,13 @@ const RoleBadgeUI = React.forwardRef(function RoleBadgeUI(
             <MenuLink
               as={process.env.IS_EXTENSION ? undefined : Link}
               className="menu__list__link-item"
-              href={
-                process.env.IS_EXTENSION
-                  ? `about/${unprefix(roleId)}`
-                  : undefined
-              }
+              href={process.env.IS_EXTENSION ? `about/${roleId}` : undefined}
               target={process.env.IS_EXTENSION ? '_blank' : undefined}
-              to={
-                process.env.IS_EXTENSION
-                  ? undefined
-                  : `/about/${unprefix(roleId)}`
-              }
+              to={process.env.IS_EXTENSION ? undefined : `/about/${roleId}`}
             >
-              {user && user.name && user.name !== unprefix(roleId)
-                ? `${user.name} (${unprefix(roleId).substring(0, 5)}…)`
-                : `View Profile (${unprefix(roleId).substring(0, 5)}…)`}
+              {user && roleId && user.id !== roleId
+                ? `${user.name} (${roleId}…)`
+                : `View Profile (${roleId}…)`}
             </MenuLink>
           </MenuList>
         )}
@@ -159,19 +138,12 @@ const RoleBadgeUI = React.forwardRef(function RoleBadgeUI(
 RoleBadgeUI.propTypes = {
   showNotice: PropTypes.bool,
   tooltip: PropTypes.bool,
-  roleId: PropTypes.string,
+  roleId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   user: PropTypes.shape({
-    '@id': PropTypes.string.isRequired,
-    '@type': PropTypes.oneOf(['PublicReviewerRole', 'AnonymousReviewerRole'])
-      .isRequired,
+    id: PropTypes.number,
     name: PropTypes.string,
-    avatar: PropTypes.shape({
-      '@type': PropTypes.oneOf(['ImageObject']).isRequired,
-      encodingFormat: PropTypes.oneOf(['image/jpeg', 'image/png']).isRequired,
-      contentUrl: PropTypes.string.isRequired,
-    }),
+    avatar: PropTypes.object,
   }),
-  loading: PropTypes.bool,
   children: PropTypes.any,
   className: PropTypes.string,
   disabled: PropTypes.bool,
@@ -181,13 +153,7 @@ export { RoleBadgeUI };
 
 function Tooltipify({ tooltip, roleId, user, children }) {
   return tooltip ? (
-    <Tooltip
-      label={
-        user && user.name && user.name !== unprefix(roleId)
-          ? `${user.name} (${unprefix(roleId).substring(0, 5)}…)`
-          : unprefix(roleId)
-      }
-    >
+    <Tooltip label={`${user.name}`}>
       <div>{children}</div>
     </Tooltip>
   ) : (
@@ -197,9 +163,10 @@ function Tooltipify({ tooltip, roleId, user, children }) {
 
 Tooltipify.propTypes = {
   tooltip: PropTypes.bool,
-  roleId: PropTypes.string,
+  roleId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   user: PropTypes.shape({
     name: PropTypes.string,
+    identity: PropTypes.number.required,
   }),
   children: PropTypes.any,
 };
