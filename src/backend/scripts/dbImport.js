@@ -17,7 +17,7 @@ import {
 } from '../models/index.ts';
 import { Client } from 'pg';
 import anonymus from 'anonymus';
-import { resolvePreprint } from '../utils/resolve2.ts';
+import { resolvePreprint } from '../utils/resolve.ts';
 import { getOrcidPerson, getOrcidWorks } from '../utils/orcid.js';
 import getMetadata from '../utils/getMetadata.js';
 import {
