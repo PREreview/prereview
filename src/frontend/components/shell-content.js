@@ -1,24 +1,24 @@
+// base imports
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useLocation } from 'react-router-dom';
 import classNames from 'classnames';
 import { Helmet } from 'react-helmet-async';
+
+// utils
 import {
   usePostFullReviews,
-  usePostRapidReviews,
   usePostRequests,
 } from '../hooks/api-hooks.tsx';
-import Controls from './controls';
-import Button from './button';
-import RapidFormFragment from './rapid-form-fragment';
-import LongFormFragment from './long-form-fragment';
-import LoginRequiredModal from './login-required-modal';
-import ReviewReader from './review-reader';
-import PreprintPreview from './preprint-preview';
-import ModerationModal from './moderation-modal';
 
-// constants
-import { QUESTIONS } from '../constants';
+// components
+import Button from './button';
+import Controls from './controls';
+import LoginRequiredModal from './login-required-modal';
+import ModerationModal from './moderation-modal';
+import PreprintPreview from './preprint-preview';
+import ReviewReader from './review-reader';
+import ReviewStepper from './review-stepper';
 
 // !! this needs to work both in web and extension use
 // `process.env.IS_EXTENSION` to assess the environment we are in.
@@ -111,7 +111,10 @@ export default function ShellContent({
           />
         </Helmet>
       )}
-      <PreprintPreview preprint={preprint} />
+
+      <div className="shell-content__preview">
+        <PreprintPreview preprint={preprint} />
+      </div>
 
       <header className="shell-content__header">
         <nav>
@@ -203,28 +206,13 @@ export default function ShellContent({
             error={errorPostReviewRequest} // #FIXME
           />
         ) : tab === 'reviews' ? (
-          <ShellContentRapidReview
+          <ShellContentReviews
             user={user}
             preprint={preprint}
             disabled={hasRapidReviewed}
             onClose={onCloseRapid}
           />
         ) : tab === 'rapidReview#success' ? (
-          <ShellContentReviewSuccess
-            preprint={preprint}
-            onClose={() => {
-              setTab('read');
-            }}
-          />
-        ) : tab === 'longReview' ? (
-          <ShellContentLongReview
-            user={user}
-            preprint={preprint}
-            onClose={onCloseLong}
-            disabled={hasLongReviewed}
-            initialContent={longContent}
-          />
-        ) : tab === 'longReview#success' ? (
           <ShellContentReviewSuccess
             preprint={preprint}
             onClose={() => {
@@ -266,7 +254,6 @@ function ShellContentRead({
 
   return (
     <div className="shell-content-read">
-      <header className="shell-content-read__title">Reviews</header>
       <ReviewReader
         user={user}
         preprint={preprint}
@@ -300,167 +287,26 @@ ShellContentRead.propTypes = {
   longContent: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]),
 };
 
-function ShellContentRapidReview({ preprint, disabled, onClose }) {
-  const [answerMap, setAnswerMap] = useState({});
+function ShellContentReviews({ preprint, disabled, onClose }) {
 
-  const { mutate: postRapidReview, loading, error } = usePostRapidReviews();
 
-  const canSubmit = answerMap => {
-    return QUESTIONS.filter(q => q.type == 'YesNoQuestion').every(
-      question => question.identifier in answerMap,
-    );
-  };
+
 
   return (
     <div className="shell-content-review">
-      <header className="shell-content-review__title">Add a review</header>
-
-      <PreprintPreview preprint={preprint} />
-
-      <form>
-        <RapidFormFragment
-          answerMap={answerMap}
-          onChange={(key, value) => {
-            setAnswerMap(answerMap => ({ ...answerMap, [key]: value }));
-          }}
-        />
-        <Controls error={error}>
-          <Button
-            type="submit"
-            primary={true}
-            isWaiting={loading}
-            disabled={disabled || !canSubmit}
-            onClick={event => {
-              event.preventDefault();
-              if (canSubmit(answerMap)) {
-                postRapidReview({ ...answerMap, preprint: preprint.id })
-                  .then(() => {
-                    alert('Rapid review submitted successfully.');
-                    return onClose(answerMap);
-                  })
-                  .catch(err => alert(`An error occurred: ${err.message}`));
-              } else {
-                alert(
-                  'Please complete the required fields. All multiple choice questions are required.',
-                );
-              }
-            }}
-          >
-            Submit
-          </Button>
-        </Controls>
-      </form>
+      <ReviewStepper
+        preprint={preprint}
+        disabled={disabled}
+        onClose={onClose}
+       />
     </div>
   );
 }
-ShellContentRapidReview.propTypes = {
+ShellContentReviews.propTypes = {
   user: PropTypes.object,
   preprint: PropTypes.object.isRequired,
   onClose: PropTypes.func.isRequired,
   disabled: PropTypes.bool,
-};
-
-function ShellContentLongReview({
-  initialContent,
-  preprint,
-  disabled,
-  isPosting,
-  error,
-  onClose,
-}) {
-  const [content, setContent] = useState('');
-  const {
-    mutate: postLongReview,
-    loadingPostLongReview,
-  } = usePostFullReviews();
-
-  const onContentChange = value => {
-    setContent(value);
-  };
-
-  const canSubmit = content => {
-    return content && content !== '<p></p>';
-  };
-
-  return (
-    <div className="shell-content-review">
-      <header className="shell-content-review__title">
-        Add a longform review
-      </header>
-
-      <PreprintPreview preprint={preprint} />
-
-      <form>
-        <LongFormFragment
-          onContentChange={onContentChange}
-          content={initialContent}
-        />
-
-        <Controls error={error}>
-          <Button
-            type="submit"
-            primary={true}
-            isWaiting={isPosting}
-            disabled={disabled || !canSubmit(content)}
-            onClick={event => {
-              event.preventDefault();
-              if (canSubmit(content)) {
-                postLongReview({
-                  preprint: preprint.id,
-                  contents: content,
-                })
-                  .then(() => alert('Draft updated successfully.'))
-                  .catch(err => alert(`An error occurred: ${err.message}`));
-              } else {
-                alert('Review cannot be blank.');
-              }
-            }}
-          >
-            Save
-          </Button>
-          <Button
-            type="submit"
-            primary={true}
-            isWaiting={isPosting}
-            disabled={disabled || !canSubmit(content)}
-            onClick={event => {
-              event.preventDefault();
-              if (canSubmit(content)) {
-                if (
-                  confirm(
-                    'Are you sure you want to publish this review? This action cannot be undone.',
-                  )
-                ) {
-                  postLongReview({
-                    preprint: preprint.id,
-                    contents: content,
-                    published: true,
-                  })
-                    .then(() => {
-                      alert('Full review submitted successfully.');
-                      return onClose(content);
-                    })
-                    .catch(err => alert(`An error occurred: ${err.message}`));
-                }
-              } else {
-                alert('Review cannot be blank.');
-              }
-            }}
-          >
-            Submit
-          </Button>
-        </Controls>
-      </form>
-    </div>
-  );
-}
-ShellContentLongReview.propTypes = {
-  preprint: PropTypes.object.isRequired,
-  isPosting: PropTypes.bool,
-  disabled: PropTypes.bool,
-  error: PropTypes.instanceOf(Error),
-  onClose: PropTypes.func.isRequired,
-  initialContent: PropTypes.string.isRequired,
 };
 
 function ShellContentRequest({
@@ -475,8 +321,6 @@ function ShellContentRequest({
       <header className="shell-content-request__title">
         Add a request for review
       </header>
-
-      <PreprintPreview preprint={preprint} />
 
       <Controls error={error}>
         <Button
