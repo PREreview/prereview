@@ -123,7 +123,7 @@ export default function controller(preprints, thisUser) {
       log.debug(`Retrieving preprints.`);
 
       try {
-        const populate = ['fullReviews', 'rapidReviews', 'requests'];
+        const populate = ['fullReviews', 'rapidReviews', 'requests', 'tags'];
         let foundPreprints, count;
         if (ctx.query.search && ctx.query.search !== '') {
           [foundPreprints, count] = await preprints.search(ctx.query, populate);
@@ -188,6 +188,7 @@ export default function controller(preprints, thisUser) {
           'fullReviews.drafts',
           'rapidReviews.author',
           'requests',
+          'tags',
         ]);
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
