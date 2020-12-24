@@ -6,10 +6,9 @@ import { JSDOM } from 'jsdom';
 import { unprefix, cleanup, arrayify } from '../../common/utils/jsonld';
 import { createError } from '../../common/errors.ts';
 import { parseGoogleScholar, getIdentifierFromPdfUrl } from './scholar.js';
-import { getLogger } from '../log.js'
+import { getLogger } from '../log.js';
 
 const log = getLogger('backend:utils:resolve');
-
 
 /**
  * Get metadata for `identifier`
@@ -118,7 +117,7 @@ export default async function resolve(
     throw createError(404);
   }
 
-  log.debug("collected", collected)
+  log.debug('collected', collected);
   // return the one with the most metadata
   return collected.sort((a, b) => {
     return Object.keys(b).length - Object.keys(a).length;
@@ -221,8 +220,8 @@ async function resolveCrossRefDoi(
     data.preprintServer = message.institution.name.trim();
   }
 
-  log.debug('data in resolve crossrefdoi function')
-  log.debug(data)
+  log.debug('data in resolve crossrefdoi function');
+  log.debug(data);
 
   return data;
 }

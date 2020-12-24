@@ -57,7 +57,7 @@ export default function controller(preprints, thisUser) {
         ctx.throw(400, `Preprint resolution failed: ${err}`);
       }
       if (!data) ctx.throw(404, 'No preprint found.');
-      log.debug("preprint********", preprint)
+      log.debug('preprint********', preprint);
       ctx.body = {
         title: preprint.title,
         handle: preprint.handle,
