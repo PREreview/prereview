@@ -21,19 +21,25 @@ import Value from './value';
 import RadioButton from './radio-button';
 import IconButton from './icon-button';
 import Collapse from './collapse';
-import NoticeBox from './notice-box';
 
 const StyledTableCell = withStyles(theme => ({
+  root: {
+    borderBottom: 'none',
+  },
   body: {
     fontSize: 14,
-    minWidth: '250px',
+    // minWidth: '250px',
   },
 }))(TableCell);
 
 const StyledTableRow = withStyles(theme => ({
   root: {
+    borderBottom: 'none',
     '&:nth-of-type(odd)': {
       backgroundColor: theme.palette.action.hover,
+    },
+    '&:last-child': {
+      backgroundColor: '#fff',
     },
   },
 }))(TableRow);
@@ -43,7 +49,11 @@ const useStyles = makeStyles({
     position: 'relative',
   },
   table: {
+    borderBottom: 'none',
     maxHeight: 650,
+  },
+  textAnswer: {
+    display: 'inline-block',
   },
 });
 
@@ -71,13 +81,13 @@ export default function RapidFormFragment({ answerMap = {}, onChange }) {
         >
           <TableHead>
             <TableRow>
-              <TableCell>
+              <StyledTableCell>
                 <div className="vh">Question</div>
-              </TableCell>
-              <TableCell align="right">Yes</TableCell>
-              <TableCell align="right">No</TableCell>
-              <TableCell align="right">N/A</TableCell>
-              <TableCell align="right">Unsure</TableCell>
+              </StyledTableCell>
+              <StyledTableCell align="left">Yes</StyledTableCell>
+              <StyledTableCell align="left">No</StyledTableCell>
+              <StyledTableCell align="left">N/A</StyledTableCell>
+              <StyledTableCell align="left">Unsure</StyledTableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -116,7 +126,7 @@ export default function RapidFormFragment({ answerMap = {}, onChange }) {
                       </Value>
                     </Collapse>
                   </StyledTableCell>
-                  <TableCell align="right">
+                  <StyledTableCell align="right">
                     <RadioButton
                       required={required}
                       inputId={`question-${identifier}-yes`}
@@ -128,8 +138,8 @@ export default function RapidFormFragment({ answerMap = {}, onChange }) {
                       }}
                       label="Yes"
                     />
-                  </TableCell>
-                  <TableCell align="right">
+                  </StyledTableCell>
+                  <StyledTableCell align="right">
                     <RadioButton
                       required={required}
                       inputId={`question-${identifier}-no`}
@@ -141,8 +151,8 @@ export default function RapidFormFragment({ answerMap = {}, onChange }) {
                       }}
                       label="No"
                     />
-                  </TableCell>
-                  <TableCell align="right">
+                  </StyledTableCell>
+                  <StyledTableCell align="right">
                     <RadioButton
                       required={required}
                       inputId={`question-${identifier}-na`}
@@ -154,8 +164,8 @@ export default function RapidFormFragment({ answerMap = {}, onChange }) {
                       }}
                       label={<abbr title="Not Applicable">N/A</abbr>}
                     />
-                  </TableCell>
-                  <TableCell align="right">
+                  </StyledTableCell>
+                  <StyledTableCell align="right">
                     <RadioButton
                       required={required}
                       inputId={`question-${identifier}-unsure`}
@@ -167,10 +177,10 @@ export default function RapidFormFragment({ answerMap = {}, onChange }) {
                       }}
                       label="Unsure"
                     />
-                  </TableCell>
+                  </StyledTableCell>
                 </StyledTableRow>
               ) : (
-                <StyledTableRow key={identifier}>
+                <StyledTableRow key={identifier} className={classes.textAnswer}>
                   <StyledTableCell
                     component="th"
                     scope="row"
@@ -195,12 +205,12 @@ export default function RapidFormFragment({ answerMap = {}, onChange }) {
                     )}
                   </StyledTableCell>
                   <TableCell align="right" className={classes.relative}>
-                    <textarea
+                    <input
+                      type="text"
                       required={required}
                       className="radid-form-fragment__text-answer"
                       id={`question-${identifier}`}
                       name={identifier}
-                      rows="2"
                       value={answer || ''}
                       onChange={e => {
                         handleChange(identifier, e.target.value);
@@ -212,12 +222,7 @@ export default function RapidFormFragment({ answerMap = {}, onChange }) {
             })}
           </TableBody>
         </Table>
-    </TableContainer>
-      <NoticeBox type="warning">
-        Beta Notice: Please note that any reviews submitted during the beta
-        stage of Outbreak Science Rapid PREreview will be migrated over into
-        future updates.
-      </NoticeBox>
+      </TableContainer>
     </div>
   );
 }

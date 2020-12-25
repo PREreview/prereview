@@ -81,6 +81,11 @@
   margin-bottom: var(--mgrd);
 }
 
+.shell-content-reviews__title {
+  font: var(--ui-header-1-font);
+  margin-bottom: 0;
+}
+
 .shell-content-read {
   & .review-reader {
     margin-top: var(--mgrd);
@@ -94,6 +99,10 @@
   animation-duration: 0.5s;
   animation-iteration-count: 1;
   animation-timing-function: ease-out;
+}
+
+.shell-content-review {
+  margin-top: 2em;
 }
 
 @keyframes open-tab {

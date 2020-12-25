@@ -72,19 +72,11 @@ export const QUESTIONS = [
   {
     identifier: 'ynAvailableData', // DO NOT CHANGE THIS IS USED IN THE INDEX (or update everywhere)
     indexed: true,
-    question:
-      'Are the data used in the manuscript available? If yes, please paste the link to the data in the box below.',
+    question: 'Are the data used in the manuscript available?',
     help:
       'The data are available for anyone to download (e.g. from a public repository) and are linked in the manuscript or supplementary information.',
     type: 'YesNoQuestion',
     required: true,
-  },
-
-  {
-    identifier: 'linkToData',
-    question: 'Links to the data used in the manuscript',
-    type: 'Question',
-    required: false,
   },
 
   {
@@ -113,6 +105,13 @@ export const QUESTIONS = [
       'Would you recommend this manuscript to a journal editor for formal peer review?',
     type: 'YesNoQuestion',
     required: true,
+  },
+
+  {
+    identifier: 'linkToData',
+    question: 'Links to the data used in the manuscript (if applicable)',
+    type: 'Question',
+    required: false,
   },
 ];
 

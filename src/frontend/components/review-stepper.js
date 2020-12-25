@@ -1,5 +1,5 @@
 // base imports
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import clsx from 'clsx';
 
@@ -94,6 +94,18 @@ const useQontoStepIconStyles = makeStyles({
     '&:before': {
       borderColor: '#F77463',
     },
+    '&:after': {
+      borderLeft: '13px solid transparent',
+      borderRight: '13px solid transparent',
+      borderTop: '20px solid #eaeaf0',
+      content: "''",
+      height: 0,
+      left: '50%',
+      position: 'absolute',
+      top: '-36px',
+      transform: 'translateX(-50%)',
+      width: 0,
+    }
   },
   circle: {
     borderRadius: '50%',
@@ -139,7 +151,7 @@ QontoStepIcon.propTypes = {
   completed: PropTypes.bool,
 };
 
-export default function ReviewStepper({ preprint, disabled, onClose }) {
+export default function ReviewStepper({ user, preprint, disabled, onClose }) {
   const classes = useStyles();
   const [activeStep, setActiveStep] = React.useState(0);
   const [completed, setCompleted] = React.useState(new Set());
@@ -255,50 +267,89 @@ export default function ReviewStepper({ preprint, disabled, onClose }) {
       loadingPostLongReview,
     } = usePostFullReviews();
 
+    const [hasRapidReviewed, setHasRapidReviewed] = useState(false);
+    const [hasLongReviewed, setHasLongReviewed] = useState(false);
+
     const [answerMap, setAnswerMap] = useState({});
 
+    const [initialContent, setInitialContent] = useState('');
     const [content, setContent] = useState('');
 
     const onContentChange = value => {
       setContent(value);
     };
 
+    useEffect(() => {
+      if (user) {
+        preprint.fullReviews.map(review => {
+          review.authors.map(author => {
+            user.personas.some(persona => {
+              if (persona.identity === author.identity) {
+                if (review.published === true) {
+                  setHasLongReviewed(true);
+                } else {
+                  setInitialContent(
+                    review.drafts[review.drafts.length - 1].contents,
+                  );
+                }
+              }
+            });
+          });
+        });
+
+        preprint.rapidReviews.map(review => {
+          user.personas.some(persona => {
+            if (persona.identity === review.author.identity) {
+              setHasRapidReviewed(true);
+            }
+          });
+        });
+      }
+    }, [preprint, user]);
+
     switch (step) {
       case 0:
         return (
-          <form>
-            <RapidFormFragment
-              answerMap={answerMap}
-              onChange={(key, value) => {
-                setAnswerMap(answerMap => ({ ...answerMap, [key]: value }));
-              }}
-            />
-            <Controls error={error}>
-              <Button
-                type="submit"
-                primary={true}
-                isWaiting={loading}
-                disabled={disabled || !canSubmitRapid}
-                onClick={event => {
-                  event.preventDefault();
-                  if (canSubmitRapid(answerMap)) {
-                    postRapidReview({ ...answerMap, preprint: preprint.id })
-                      .then(() => {
-                        alert('Rapid review submitted successfully.');
-                        return onClose(answerMap);
-                      })
-                      .catch(err => alert(`An error occurred: ${err.message}`));
-                  } else {
-                    alert(
-                      'Please complete the required fields. All multiple choice questions are required.',
-                    );
-                  }
+          <div>
+            <header className="shell-content-reviews__title">
+              Rapid Review
+            </header>
+            <form>
+              <RapidFormFragment
+                answerMap={answerMap}
+                onChange={(key, value) => {
+                  setAnswerMap(answerMap => ({ ...answerMap, [key]: value }));
                 }}
-              >
-                Submit
-              </Button>
-            </Controls>
-          </form>
+              />
+              <Controls error={error}>
+                <Button
+                  type="submit"
+                  primary={true}
+                  isWaiting={loading}
+                  disabled={disabled || !canSubmitRapid}
+                  onClick={event => {
+                    event.preventDefault();
+                    if (canSubmitRapid(answerMap)) {
+                      postRapidReview({ ...answerMap, preprint: preprint.id })
+                        .then(() => {
+                          alert('Rapid review submitted successfully.');
+                          return onClose(answerMap);
+                        })
+                        .catch(err =>
+                          alert(`An error occurred: ${err.message}`),
+                        );
+                    } else {
+                      alert(
+                        'Please complete the required fields. All multiple choice questions are required.',
+                      );
+                    }
+                  }}
+                >
+                  Submit
+                </Button>
+              </Controls>
+            </form>
+          </div>
         );
       case 1:
         return (
@@ -312,7 +363,7 @@ export default function ReviewStepper({ preprint, disabled, onClose }) {
               <Button
                 type="submit"
                 primary={true}
-                isWaiting={isPosting}
+                isWaiting={loadingPostLongReview}
                 disabled={disabled || !canSubmitFull(content)}
                 onClick={event => {
                   event.preventDefault();
@@ -333,11 +384,11 @@ export default function ReviewStepper({ preprint, disabled, onClose }) {
               <Button
                 type="submit"
                 primary={true}
-                isWaiting={isPosting}
-                disabled={disabled || !canSubmit(content)}
+                isWaiting={loadingPostLongReview}
+                disabled={disabled || !canSubmitFull(content)}
                 onClick={event => {
                   event.preventDefault();
-                  if (canSubmit(content)) {
+                  if (canSubmitFull(content)) {
                     if (
                       confirm(
                         'Are you sure you want to publish this review? This action cannot be undone.',
@@ -352,7 +403,9 @@ export default function ReviewStepper({ preprint, disabled, onClose }) {
                           alert('Full review submitted successfully.');
                           return onClose(content);
                         })
-                        .catch(err => alert(`An error occurred: ${err.message}`));
+                        .catch(err =>
+                          alert(`An error occurred: ${err.message}`),
+                        );
                     }
                   } else {
                     alert('Review cannot be blank.');
@@ -398,7 +451,6 @@ export default function ReviewStepper({ preprint, disabled, onClose }) {
             <Step key={label} {...stepProps}>
               <StepLabel
                 StepIconComponent={QontoStepIcon}
-                onClick={handleStep(index)}
                 completed={isStepComplete(index)}
                 {...buttonProps}
               >
@@ -471,6 +523,7 @@ export default function ReviewStepper({ preprint, disabled, onClose }) {
 }
 
 ReviewStepper.propTypes = {
+  user: PropTypes.object,
   preprint: PropTypes.object.isRequired,
   disabled: PropTypes.bool,
   onClose: PropTypes.func.isRequired,

@@ -287,14 +287,11 @@ ShellContentRead.propTypes = {
   longContent: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]),
 };
 
-function ShellContentReviews({ preprint, disabled, onClose }) {
-
-
-
-
+function ShellContentReviews({ user, preprint, disabled, onClose }) {
   return (
     <div className="shell-content-review">
       <ReviewStepper
+        user={user}
         preprint={preprint}
         disabled={disabled}
         onClose={onClose}

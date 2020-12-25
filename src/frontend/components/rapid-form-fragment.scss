@@ -27,15 +27,16 @@
   }
 
   & .radid-form-fragment__question {
+    align-items: center;
+    border-bottom: none;
+    box-sizing: border-box;
     font: var(--ui-basic-font);
-    width: 50%;
+    hyphens: auto;
     margin: 0;
     padding-right: var(--sgrd);
-    box-sizing: border-box;
     position: relative;
+    width: 50%;
 
-    align-items: center;
-    hyphens: auto;
     & p {
       display: inline-block;
       hyphens: auto;
@@ -88,14 +89,14 @@
   }
   & .radid-form-fragment__text-question {
     font: var(--ui-basic-font);
+    border-bottom: none;
     display: block;
     margin-bottom: var(--xsgrd);
   }
 
   & .radid-form-fragment__text-answer {
-    left: 0;
-    min-height: 6em;
-    min-width: 250px;
+    left: 20px;
+    min-width: 180px;
     position: absolute;
     resize: vertical;
     top: 50%;
