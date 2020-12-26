@@ -8,7 +8,7 @@ import XLink from './xlink';
 import ShellIcon from '../svgs/shell_icon.svg';
 
 export default function PreprintPreview({ preprint }) {
-  
+
   const preprintId = createPreprintId(preprint.handle);
   const { id, scheme } = decodePreprintId(preprintId);
 

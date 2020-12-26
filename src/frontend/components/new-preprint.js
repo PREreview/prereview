@@ -10,10 +10,14 @@ import {
 } from '../utils/ids';
 import { unprefix, cleanup, getId, nodeify } from '../utils/jsonld';
 import {
-  usePostAction,
   usePreprint,
   usePreprintActions
 } from '../hooks/old-hooks';
+import {
+  usePostFullReviews,
+  usePostRapidReviews,
+  usePostRequests,
+} from '../hooks/api-hooks.tsx';
 import { useLocalState } from '../hooks/ui-hooks';
 import SubjectEditor from './subject-editor';
 import RapidFormFragment from './rapid-form-fragment';
@@ -151,7 +155,7 @@ export default function NewPreprint({
         <StepReviewSuccess
           preprint={preprint}
           onClose={() => {
-            onSuccess(preprintify(preprint, action), isNew);
+            onSuccess(preprint);
           }}
           onViewInContext={handleViewInContext}
         />
@@ -159,7 +163,7 @@ export default function NewPreprint({
         <StepRequestSuccess
           preprint={preprint}
           onClose={() => {
-            onSuccess(preprintify(preprint, action), isNew);
+            onSuccess(preprint);
           }}
           onViewInContext={handleViewInContext}
         />
@@ -349,7 +353,6 @@ function StepReview({
   isSingleStep
 }) {
   const [user] = useUser();
-  const [post, postData] = usePostAction();
   const [subjects, setSubjects] = useLocalState(
     'subjects',
     user.defaultRole,
@@ -473,7 +476,12 @@ function StepRequest({
   onSuccess
 }) {
   const [user] = useUser();
-  const [post, postData] = usePostAction();
+
+  const {
+    mutate: postReviewRequest,
+    loadingPostReviewRequest,
+    errorPostReviewRequest,
+  } = usePostRequests();
 
   return (
     <div className="new-preprint__step-request">
@@ -481,33 +489,28 @@ function StepRequest({
 
       <PreprintPreview preprint={preprint} />
 
-      <Controls error={postData.error} className="new-preprint__button-bar">
+      <Controls error={errorPostReviewRequest} className="new-preprint__button-bar">
         <Button
           onClick={e => {
             onCancel();
           }}
-          disabled={postData.isActive}
+          disabled={loadingPostReviewRequest}
         >
           {isSingleStep ? 'Cancel' : 'Go Back'}
         </Button>
 
         <Button
           primary={true}
-          isWaiting={postData.isActive}
+          isWaiting={loadingPostReviewRequest}
           onClick={e => {
-            post(
-              {
-                '@type': 'RequestForRapidPREreviewAction',
-                actionStatus: 'CompletedActionStatus',
-                agent: user.defaultRole,
-                object: Object.assign({}, nodeify(preprint), {
-                  '@id': createPreprintIdentifierCurie(preprint)
-                })
-              },
-              onSuccess
-            );
-          }}
-          disabled={postData.isActive}
+            postReviewRequest({preprint: preprint})
+              .then(() => {
+                alert('Request for reviews submitted succesfully.')
+                return onSuccess()
+              })
+              .catch(err => alert(`An error occured: ${err.message}`))
+            }}
+          disabled={loadingPostReviewRequest}
         >
           Submit
         </Button>

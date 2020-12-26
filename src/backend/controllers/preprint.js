@@ -58,15 +58,7 @@ export default function controller(preprints, thisUser) {
       }
       if (!data) ctx.throw(404, 'No preprint found.');
       log.debug('preprint********', preprint);
-      ctx.body = {
-        title: preprint.title,
-        handle: preprint.handle,
-        preprintServer: preprint.preprintServer,
-        contentUrl: preprint.contentUrl,
-        url: preprint.url,
-        datePosted: preprint.datePosted,
-        contentEncoding: preprint.contentEncoding,
-      };
+      ctx.body = preprint;
     },
   });
 
