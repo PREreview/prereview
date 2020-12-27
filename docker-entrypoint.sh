@@ -34,9 +34,9 @@ if [ $result -ne 0 ]; then
   echo "Initializing database schema"
   npm run db:migrations
   npm run db:init
-  if [ $NODE_ENV -eq "staging" ]; then
+  if [ $NODE_ENV = "staging" ]; then
     echo "Import legacy data"
-    npm run db:import
+    npm run db:import &
   fi
 else
   echo "Updating database schema"

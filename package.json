@@ -42,7 +42,7 @@
     "build:scripts:migrations": "npm run scan:migrations && parcel build --target=migrations-script --no-scope-hoist --no-minify --no-cache src/backend/scripts/dbMigrations.ts",
     "build:scripts:seeds": "parcel build --target=seeds-script --no-scope-hoist --no-minify --no-cache src/backend/scripts/dbSeeds.ts",
     "build:scripts:init": "parcel build --target=init-script --no-scope-hoist --no-minify --no-cache src/backend/scripts/dbInit.ts",
-    "build:scripts": "rimraf dist/scripts && npm run build:scripts:migrations && npm run build:scripts:init",
+    "build:scripts": "rimraf dist/scripts && npm run build:scripts:migrations && npm run build:scripts:init && npm run build:scripts:import",
     "db": "mikro-orm",
     "db:migrations": "node dist/scripts/dbMigrations.js",
     "db:migrations:test": "ts-node src/backend/scripts/dbMigrations.ts",
