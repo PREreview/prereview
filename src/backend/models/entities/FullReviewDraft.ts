@@ -16,17 +16,13 @@ export class FullReviewDraft extends BaseEntity {
   @ManyToOne({ entity: () => FullReview })
   parent!: FullReview;
 
-  @Fixture(faker => `${faker.commerce.color()} ${faker.random.word()}`)
-  @Property({ nullable: true })
-  title?: string;
-
   @Fixture(faker => faker.lorem.paragraph())
   @Property({ columnType: 'text' })
   contents!: string;
 
-  constructor(title: string, contents: string) {
+  constructor(parent: FullReview, contents: string) {
     super();
-    this.title = title;
+    this.parent = parent;
     this.contents = contents;
   }
 }

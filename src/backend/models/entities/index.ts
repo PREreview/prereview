@@ -1,6 +1,7 @@
 export * from './BaseEntity';
 export * from './Comment';
 export * from './Community';
+export * from './Contact';
 export * from './FullReview';
 export * from './FullReviewDraft';
 export * from './Group';
@@ -10,3 +11,4 @@ export * from './RapidReview';
 export * from './Request';
 export * from './Tag';
 export * from './User';
+export * from './Work';

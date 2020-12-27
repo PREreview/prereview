@@ -3,6 +3,7 @@ import {
   BaseEntity,
   Comment,
   Community,
+  Contact,
   FullReview,
   FullReviewDraft,
   Group,
@@ -12,6 +13,7 @@ import {
   Request,
   Tag,
   User,
+  Work,
 } from './models/entities';
 import config from './config';
 
@@ -28,6 +30,7 @@ const options: Options = {
     BaseEntity,
     Comment,
     Community,
+    Contact,
     FullReview,
     FullReviewDraft,
     Group,
@@ -37,6 +40,7 @@ const options: Options = {
     Request,
     Tag,
     User,
+    Work,
   ],
   type: dbType,
   clientUrl: `${dbType}://${authString}${config.dbHost}${portString}/${

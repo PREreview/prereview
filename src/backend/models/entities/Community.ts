@@ -32,13 +32,13 @@ export class Community extends BaseEntity {
   @Property({ nullable: true })
   logo?: Buffer;
 
-  @ManyToMany({ entity: () => User, mappedBy: 'communities', owner: true })
+  @ManyToMany({ entity: () => User, inversedBy: 'communities' })
   members: Collection<User> = new Collection<User>(this);
 
-  @ManyToMany({ entity: () => Preprint, mappedBy: 'communities', owner: true })
+  @ManyToMany({ entity: () => Preprint, inversedBy: 'communities' })
   preprints: Collection<Preprint> = new Collection<Preprint>(this);
 
-  constructor(name: string, description: string, logo: Buffer) {
+  constructor(name: string, description?: string, logo?: Buffer) {
     super();
     this.name = name;
     this.description = description;

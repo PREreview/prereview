@@ -21,7 +21,7 @@ export class Group extends BaseEntity {
   @Unique()
   name!: string;
 
-  @ManyToMany({ entity: () => User, mappedBy: 'groups', owner: true })
+  @ManyToMany({ entity: () => User, inversedBy: 'groups' })
   members: Collection<User> = new Collection<User>(this);
 
   constructor(name: string) {

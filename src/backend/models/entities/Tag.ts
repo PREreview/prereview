@@ -26,7 +26,7 @@ export class Tag extends BaseEntity {
   @Property()
   color?: string;
 
-  @ManyToMany({ entity: () => Preprint, mappedBy: 'tags', owner: true })
+  @ManyToMany({ entity: () => Preprint, inversedBy: 'tags' })
   preprints: Collection<Preprint> = new Collection<Preprint>(this);
 
   constructor(name: string, color = '#FF0000') {
