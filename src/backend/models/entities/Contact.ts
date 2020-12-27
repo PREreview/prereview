@@ -25,6 +25,7 @@ export class Contact extends BaseEntity {
   @ManyToOne({ entity: () => User })
   identity!: User;
 
+  @Fixture(() => false)
   @Property()
   isVerified = false;
 

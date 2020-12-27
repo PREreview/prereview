@@ -30,9 +30,10 @@ export class User extends BaseEntity {
   @Property({ nullable: true })
   name?: string;
 
-  @OneToOne({ entity: () => Persona })
+  @OneToOne(() => Persona)
   defaultPersona?: Persona;
 
+  @Fixture(() => false)
   @Property()
   isPrivate = false;
 

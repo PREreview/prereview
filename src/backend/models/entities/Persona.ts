@@ -29,13 +29,15 @@ export class Persona extends BaseEntity {
   @ManyToOne({ entity: () => User })
   identity!: User;
 
+  @Fixture(() => true)
   @Property()
-  isActive = true;
+  isActive!: boolean;
 
+  @Fixture(() => false)
   @Property()
-  isAnonymous = false;
+  isAnonymous!: boolean;
 
-  @Fixture({ get: faker => faker.lorem.paragraph(), optional: true })
+  @Fixture(faker => faker.lorem.paragraph())
   @Property({ columnType: 'text', nullable: true })
   bio?: string;
 

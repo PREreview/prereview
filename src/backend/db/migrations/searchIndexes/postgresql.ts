@@ -20,7 +20,7 @@ export class SearchPostgresql extends Migration {
     this.addSql('ALTER TABLE "full_review_draft" ADD COLUMN "fts" TSVECTOR;');
     this.addSql(
       "CREATE FUNCTION full_review_draft_fts_trigger() RETURNS trigger AS \
-                $$ BEGIN new.fts := setweight(to_tsvector('english', new.title), 'A') || setweight(to_tsvector('english', new.contents), 'B'); return new; END; $$ LANGUAGE plpgsql;",
+                $$ BEGIN new.fts := to_tsvector('english', new.contents); return new; END; $$ LANGUAGE plpgsql;",
     );
     this.addSql(
       'CREATE TRIGGER full_review_draft_fts_trigger_update \

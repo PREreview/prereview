@@ -24,7 +24,7 @@ export class Community extends BaseEntity {
 
   //@Fixture({ get: faker => faker.lorem.paragraph(), optional: true })
   @Fixture(faker => faker.lorem.sentences())
-  @Property({ nullable: true })
+  @Property({ columnType: 'text', nullable: true })
   description?: string;
 
   //@Fixture({ get: faker => faker.image.abstract(), optional: true })
