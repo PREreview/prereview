@@ -53,7 +53,7 @@ const useStyles = makeStyles({
     maxHeight: 650,
   },
   textAnswer: {
-    display: 'inline-block',
+    // display: 'inline-block',
   },
 });
 
@@ -204,7 +204,7 @@ export default function RapidFormFragment({ answerMap = {}, onChange }) {
                       </IconButton>
                     )}
                   </StyledTableCell>
-                  <TableCell align="right" className={classes.relative}>
+                  <StyledTableCell align="right" className={classes.relative}>
                     <input
                       type="text"
                       required={required}
@@ -216,7 +216,7 @@ export default function RapidFormFragment({ answerMap = {}, onChange }) {
                         handleChange(identifier, e.target.value);
                       }}
                     />
-                  </TableCell>
+                  </StyledTableCell>
                 </StyledTableRow>
               );
             })}

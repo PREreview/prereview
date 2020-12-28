@@ -4,12 +4,16 @@ import PropTypes from 'prop-types';
 import clsx from 'clsx';
 
 // material ui
-import { makeStyles, withStyles } from '@material-ui/core/styles';
+import {
+  ThemeProvider,
+  createMuiTheme,
+  makeStyles,
+  withStyles,
+} from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import Check from '@material-ui/icons/Check';
 import Stepper from '@material-ui/core/Stepper';
 import Step from '@material-ui/core/Step';
-import StepButton from '@material-ui/core/StepButton';
 import StepConnector from '@material-ui/core/StepConnector';
 import StepLabel from '@material-ui/core/StepLabel';
 import Typography from '@material-ui/core/Typography';
@@ -28,6 +32,18 @@ import LongFormFragment from './long-form-fragment';
 // constants
 import { QUESTIONS } from '../constants';
 
+const prereviewTheme = createMuiTheme({
+  palette: {
+    primary: {
+      main: '#F77463',
+      contrastText: '#fff',
+    },
+    secondary: {
+      main: '#eaeaf0',
+    },
+  },
+});
+
 const useStyles = makeStyles(theme => ({
   root: {
     width: '100%',
@@ -44,6 +60,9 @@ const useStyles = makeStyles(theme => ({
   instructions: {
     marginTop: theme.spacing(1),
     marginBottom: theme.spacing(1),
+  },
+  label: {
+    textAlign: 'center',
   },
 }));
 
@@ -105,7 +124,7 @@ const useQontoStepIconStyles = makeStyles({
       top: '-36px',
       transform: 'translateX(-50%)',
       width: 0,
-    }
+    },
   },
   circle: {
     borderRadius: '50%',
@@ -216,6 +235,10 @@ export default function ReviewStepper({ user, preprint, disabled, onClose }) {
         : activeStep + 1;
 
     setActiveStep(newActiveStep);
+
+    if (activeStep === 0) {
+      console.log(activeStep);
+    }
   };
 
   const handleBack = () => {
@@ -323,8 +346,11 @@ export default function ReviewStepper({ user, preprint, disabled, onClose }) {
               />
               <Controls error={error}>
                 <Button
+                  className={classes.button}
+                  variant="contained"
+                  color="primary"
                   type="submit"
-                  primary={true}
+                  primary={'true'}
                   isWaiting={loading}
                   disabled={disabled || !canSubmitRapid}
                   onClick={event => {
@@ -345,7 +371,7 @@ export default function ReviewStepper({ user, preprint, disabled, onClose }) {
                     }
                   }}
                 >
-                  Submit
+                  Next
                 </Button>
               </Controls>
             </form>
@@ -353,69 +379,114 @@ export default function ReviewStepper({ user, preprint, disabled, onClose }) {
         );
       case 1:
         return (
-          <form>
-            <LongFormFragment
-              onContentChange={onContentChange}
-              content={initialContent}
-            />
+          <div>
+            <div>
+              <header className="shell-content-reviews__title">
+                Rapid Review
+              </header>
+              <form>
+                <RapidFormFragment
+                  answerMap={answerMap}
+                  onChange={(key, value) => {
+                    setAnswerMap(answerMap => ({ ...answerMap, [key]: value }));
+                  }}
+                />
+                <Controls error={error}>
+                  <Button
+                    className={classes.button}
+                    variant="contained"
+                    color="primary"
+                    type="submit"
+                    primary={'true'}
+                    isWaiting={loading}
+                    disabled={disabled || !canSubmitRapid}
+                    onClick={event => {
+                      event.preventDefault();
+                      if (canSubmitRapid(answerMap)) {
+                        postRapidReview({ ...answerMap, preprint: preprint.id })
+                          .then(() => {
+                            alert('Rapid review submitted successfully.');
+                            return onClose(answerMap);
+                          })
+                          .catch(err =>
+                            alert(`An error occurred: ${err.message}`),
+                          );
+                      } else {
+                        alert(
+                          'Please complete the required fields. All multiple choice questions are required.',
+                        );
+                      }
+                    }}
+                  >
+                    Next
+                  </Button>
+                </Controls>
+              </form>
+            </div>
+            <form>
+              <LongFormFragment
+                onContentChange={onContentChange}
+                content={initialContent}
+              />
 
-            <Controls error={error}>
-              <Button
-                type="submit"
-                primary={true}
-                isWaiting={loadingPostLongReview}
-                disabled={disabled || !canSubmitFull(content)}
-                onClick={event => {
-                  event.preventDefault();
-                  if (canSubmitFull(content)) {
-                    postLongReview({
-                      preprint: preprint.id,
-                      contents: content,
-                    })
-                      .then(() => alert('Draft updated successfully.'))
-                      .catch(err => alert(`An error occurred: ${err.message}`));
-                  } else {
-                    alert('Review cannot be blank.');
-                  }
-                }}
-              >
-                Save
-              </Button>
-              <Button
-                type="submit"
-                primary={true}
-                isWaiting={loadingPostLongReview}
-                disabled={disabled || !canSubmitFull(content)}
-                onClick={event => {
-                  event.preventDefault();
-                  if (canSubmitFull(content)) {
-                    if (
-                      confirm(
-                        'Are you sure you want to publish this review? This action cannot be undone.',
-                      )
-                    ) {
+              <Controls error={error}>
+                <Button
+                  type="submit"
+                  primary={'true'}
+                  isWaiting={loadingPostLongReview}
+                  disabled={disabled || !canSubmitFull(content)}
+                  onClick={event => {
+                    event.preventDefault();
+                    if (canSubmitFull(content)) {
                       postLongReview({
                         preprint: preprint.id,
                         contents: content,
-                        published: true,
                       })
-                        .then(() => {
-                          alert('Full review submitted successfully.');
-                          return onClose(content);
-                        })
-                        .catch(err =>
-                          alert(`An error occurred: ${err.message}`),
-                        );
+                        .then(() => alert('Draft updated successfully.'))
+                        .catch(err => alert(`An error occurred: ${err.message}`));
+                    } else {
+                      alert('Review cannot be blank.');
                     }
-                  } else {
-                    alert('Review cannot be blank.');
-                  }
-                }}
-              >
-                Submit
-              </Button>
-            </Controls>
-          </form>
+                  }}
+                >
+                  Save
+                </Button>
+                <Button
+                  type="submit"
+                  primary={'true'}
+                  isWaiting={loadingPostLongReview}
+                  disabled={disabled || !canSubmitFull(content)}
+                  onClick={event => {
+                    event.preventDefault();
+                    if (canSubmitFull(content)) {
+                      if (
+                        confirm(
+                          'Are you sure you want to publish this review? This action cannot be undone.',
+                        )
+                      ) {
+                        postLongReview({
+                          preprint: preprint.id,
+                          contents: content,
+                          published: true,
+                        })
+                          .then(() => {
+                            alert('Full review submitted successfully.');
+                            return onClose(content);
+                          })
+                          .catch(err =>
+                            alert(`An error occurred: ${err.message}`),
+                          );
+                      }
+                    } else {
+                      alert('Review cannot be blank.');
+                    }
+                  }}
+                >
+                  Submit
+                </Button>
+              </Controls>
+            </form>
+          </div>
         );
       case 2:
         return (
@@ -429,96 +500,100 @@ export default function ReviewStepper({ user, preprint, disabled, onClose }) {
   }
 
   return (
-    <div className={classes.root}>
-      <Stepper
-        alternativeLabel
-        nonLinear
-        activeStep={activeStep}
-        connector={<QontoConnector />}
-      >
-        {steps.map((label, index) => {
-          const stepProps = {};
-          const buttonProps = {};
-          if (isStepOptional(index)) {
-            buttonProps.optional = (
-              <Typography variant="caption">Optional</Typography>
+    <ThemeProvider theme={prereviewTheme}>
+      <div className={classes.root}>
+        <Stepper
+          alternativeLabel
+          nonLinear
+          activeStep={activeStep}
+          connector={<QontoConnector />}
+        >
+          {steps.map((label, index) => {
+            const stepProps = {};
+            const buttonProps = {};
+            if (isStepOptional(index)) {
+              buttonProps.optional = (
+                <Typography variant="caption">Optional</Typography>
+              );
+            }
+            if (isStepSkipped(index)) {
+              stepProps.completed = false;
+            }
+            return (
+              <Step key={label} {...stepProps}>
+                <StepLabel
+                  className={classes.label}
+                  StepIconComponent={QontoStepIcon}
+                  completed={isStepComplete(index)}
+                  {...buttonProps}
+                >
+                  {label}
+                </StepLabel>
+              </Step>
             );
-          }
-          if (isStepSkipped(index)) {
-            stepProps.completed = false;
-          }
-          return (
-            <Step key={label} {...stepProps}>
-              <StepLabel
-                StepIconComponent={QontoStepIcon}
-                completed={isStepComplete(index)}
-                {...buttonProps}
-              >
-                {label}
-              </StepLabel>
-            </Step>
-          );
-        })}
-      </Stepper>
-      <div>
-        {allStepsCompleted() ? (
-          <div>
-            <Typography className={classes.instructions}>
-              All steps completed - you&apos;re finished
-            </Typography>
-            <Button onClick={handleReset}>Reset</Button>
-          </div>
-        ) : (
-          <div>
-            {getStepContent(activeStep)}
+          })}
+        </Stepper>
+        <div>
+          {allStepsCompleted() ? (
             <div>
-              <Button
-                disabled={activeStep === 0}
-                onClick={handleBack}
-                className={classes.button}
-              >
-                Back
-              </Button>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={handleNext}
-                className={classes.button}
-              >
-                Next
-              </Button>
-              {isStepOptional(activeStep) && !completed.has(activeStep) && (
+              <Typography className={classes.instructions}>
+                All steps completed - you&apos;re finished
+              </Typography>
+              <Button onClick={handleReset}>Reset</Button>
+            </div>
+          ) : (
+            <div>
+              {getStepContent(activeStep)}
+              <div>
+                {//<Button
+                  // disabled={activeStep === 0}
+                  // onClick={handleBack}
+                  // className={classes.button}
+                // >
+                //   Back
+                // </Button>
+              }
                 <Button
                   variant="contained"
                   color="primary"
-                  onClick={handleSkip}
+                  onClick={handleNext}
                   className={classes.button}
                 >
-                  Skip
+                  Next
                 </Button>
-              )}
-
-              {activeStep !== steps.length &&
-                (completed.has(activeStep) ? (
-                  <Typography variant="caption" className={classes.completed}>
-                    Step {activeStep + 1} already completed
-                  </Typography>
-                ) : (
+                {isStepOptional(activeStep) && !completed.has(activeStep) && (
                   <Button
                     variant="contained"
                     color="primary"
-                    onClick={handleComplete}
+                    onClick={handleSkip}
+                    className={classes.button}
                   >
-                    {completedSteps() === totalSteps() - 1
-                      ? 'Finish'
-                      : 'Complete Step'}
+                    Skip
                   </Button>
-                ))}
+                )}
+
+                {activeStep !== steps.length &&
+                  (completed.has(activeStep) ? (
+                    <Typography variant="caption" className={classes.completed}>
+                      Step {activeStep + 1} already completed
+                    </Typography>
+                  ) : (
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      onClick={handleComplete}
+                    >
+                      {completedSteps() === totalSteps() - 1
+                        ? 'Finish'
+                        : 'Complete Step'}
+                    </Button>
+                  ))}
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
-    </div>
+    </ThemeProvider>
   );
 }
 
