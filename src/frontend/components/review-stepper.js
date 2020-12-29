@@ -20,6 +20,7 @@ import Stepper from '@material-ui/core/Stepper';
 import Step from '@material-ui/core/Step';
 import StepConnector from '@material-ui/core/StepConnector';
 import StepLabel from '@material-ui/core/StepLabel';
+import TextareaAutosize from '@material-ui/core/TextareaAutosize';
 import Typography from '@material-ui/core/Typography';
 
 // utils
@@ -29,7 +30,6 @@ import {
 } from '../hooks/api-hooks.tsx';
 
 // components
-import Controls from './controls';
 import RapidFormFragment from './rapid-form-fragment';
 import LongFormFragment from './long-form-fragment';
 
@@ -69,12 +69,20 @@ const useStyles = makeStyles(theme => ({
       fontSize: '0.8rem',
     },
   },
+  fullWidth: {
+    padding: 5,
+    width: '100%',
+  },
   instructions: {
     marginTop: theme.spacing(1),
     marginBottom: theme.spacing(1),
   },
   label: {
     textAlign: 'center',
+  },
+  red: {
+    backgroundColor: '#FAB7B7',
+    padding: 10,
   },
   yellow: {
     backgroundColor: '#FFFAEE',
@@ -199,17 +207,15 @@ export default function ReviewStepper({ user, preprint, disabled, onClose }) {
   const [disabledRapid, setDisabledRapid] = React.useState(false);
   const [disabledSkip, setDisabledSkip] = React.useState(false);
   const [disabledSubmit, setDisabledSubmit] = React.useState(false);
+  const [hasLongReviewed, setHasLongReviewed] = React.useState(false);
   const [hasRapidReviewed, setHasRapidReviewed] = React.useState(false);
   const [initialContent, setInitialContent] = useState('');
   const [skipped, setSkipped] = React.useState(new Set());
-  const [submitted, setSubmitted] = React.useState(false);
   const steps = getSteps();
 
-  const {
-    mutate: postRapidReview,
-    loadingPostRapid,
-    errorPostRapid,
-  } = usePostRapidReviews();
+  const { mutate: postRapidReview } = usePostRapidReviews();
+
+  const { mutate: postLongReview } = usePostFullReviews();
 
   const onContentChange = value => {
     setContent(value);
@@ -225,7 +231,7 @@ export default function ReviewStepper({ user, preprint, disabled, onClose }) {
     );
   };
 
-  const canSubmitFull = content => {
+  const canSubmitLong = content => {
     return content && content !== '<p></p>';
   };
 
@@ -253,21 +259,59 @@ export default function ReviewStepper({ user, preprint, disabled, onClose }) {
         });
         setHasRapidReviewed(true);
         setDisabledSubmit(true);
-        setSubmitted(true);
         return handleComplete();
       })
       .catch(err => alert(`An error occurred: ${err.message}`));
   };
 
-  const handleSaveLong = () => {
-    console.log('saved!');
+  const handleSaveLong = event => {
+    event.preventDefault();
+    if (canSubmitLong(content)) {
+      postLongReview({
+        preprint: preprint.id,
+        contents: content,
+      })
+        .then(() => alert('Draft updated successfully.'))
+        .catch(err => alert(`An error occurred: ${err.message}`));
+    } else {
+      alert('Review cannot be blank.');
+    }
   };
 
   const handleSubmitBoth = () => {
-    console.log('submitted!');
-    setDisabledSubmit(true);
-    setSubmitted(true);
-    handleComplete(activeStep + 1);
+    if (canSubmitLong(content)) {
+      if (
+        confirm(
+          'Are you sure you want to publish this review? This action cannot be undone.',
+        )
+      ) {
+        postRapidReview({ ...answerMap, preprint: preprint.id })
+          .then(() => {
+            return;
+          })
+          .catch(err => alert(`An error occurred: ${err.message}`));
+
+        postLongReview({
+          preprint: preprint.id,
+          contents: content,
+          published: true,
+        })
+          .then(() => {
+            setActiveStep(prevActiveStep => prevActiveStep + 2);
+
+            setSkipped(prevSkipped => {
+              const newSkipped = new Set(prevSkipped.values());
+              newSkipped.add(activeStep);
+              return newSkipped;
+            });
+            setHasRapidReviewed(true);
+            setHasLongReviewed(true);
+            setDisabledSubmit(true);
+            return handleComplete(activeStep + 1);
+          })
+          .catch(err => alert(`An error occurred: ${err.message}`));
+      }
+    }
   };
 
   const handleSkip = () => {
@@ -319,6 +363,9 @@ export default function ReviewStepper({ user, preprint, disabled, onClose }) {
       newCompleted.add(activeStep + 2);
     } else if (step === 2) {
       newCompleted.add(activeStep + 1);
+    } else if (step === 4) {
+      newCompleted.add(activeStep + 1);
+      newCompleted.add(activeStep + 2);
     }
 
     setCompleted(newCompleted);
@@ -345,7 +392,6 @@ export default function ReviewStepper({ user, preprint, disabled, onClose }) {
     return ['Rapid Review', 'Longform Review', 'Submitted'];
   }
 
-
   useEffect(() => {
     if (user) {
       preprint.fullReviews.map(review => {
@@ -354,8 +400,12 @@ export default function ReviewStepper({ user, preprint, disabled, onClose }) {
             if (persona.identity === author.identity) {
               if (review.published === true) {
                 setHasLongReviewed(true);
+                setActiveStep(2);
+                handleComplete(4);
               } else {
-                setLongContent(review.drafts[review.drafts.length - 1].contents);
+                setInitialContent(
+                  review.drafts[review.drafts.length - 1].contents,
+                );
               }
             }
           });
@@ -407,7 +457,7 @@ export default function ReviewStepper({ user, preprint, disabled, onClose }) {
           })}
         </Stepper>
         <div>
-          {submitted ? (
+          {hasLongReviewed ? (
             <Box mt={2} mb={2} className={classes.yellow}>
               Congratulations! You have successfully submitted your PREreview.
             </Box>
@@ -509,16 +559,38 @@ export default function ReviewStepper({ user, preprint, disabled, onClose }) {
                 </Box>
               ) : null}
               {expandLong ? (
-                <Box>
+                <Box mt={2}>
+                  <Box className={classes.red}>
+                    <Typography variant="button" display="block" gutterBottom>
+                      Instructions
+                    </Typography>
+                    <Typography variant="body2" gutterBottom>
+                      Use the space below to compose your longform review.
+                    </Typography>
+                    <Typography variant="body2" gutterBottom>
+                      Please remember to be constructive and to abide by the{' '}
+                      <Link href="#">PREreview Code of Conduct</Link>.
+                    </Typography>
+                  </Box>
                   <Box mt={2} mb={2}>
                     <form>
-                    <LongFormFragment
-                      onContentChange={onContentChange}
-                      content={initialContent}
-                    />
+                      <LongFormFragment
+                        onContentChange={onContentChange}
+                        content={initialContent}
+                      />
+                      <Box mt={2}>
+                        <Typography variant="body2" gutterBottom>
+                          Please use the space below to declare any existing{' '}
+                          <Link href="#">competing interest</Link>.
+                        </Typography>
+                        <TextareaAutosize
+                          aria-label="coi"
+                          className={classes.fullWidth}
+                        />
+                      </Box>
                     </form>
                   </Box>
-                  <Box>
+                  <Box textAlign="right">
                     <Button
                       disabled={disabledSubmit}
                       variant="outlined"
