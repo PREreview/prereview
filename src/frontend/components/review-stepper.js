@@ -194,7 +194,7 @@ QontoStepIcon.propTypes = {
   completed: PropTypes.bool,
 };
 
-export default function ReviewStepper({ user, preprint, disabled, onClose }) {
+export default function ReviewStepper({ user, preprint }) {
   const classes = useStyles();
   const [activeStep, setActiveStep] = React.useState(0);
   const [answerMap, setAnswerMap] = useState({});
@@ -285,11 +285,16 @@ export default function ReviewStepper({ user, preprint, disabled, onClose }) {
           'Are you sure you want to publish this review? This action cannot be undone.',
         )
       ) {
-        postRapidReview({ ...answerMap, preprint: preprint.id })
-          .then(() => {
-            return;
-          })
-          .catch(err => alert(`An error occurred: ${err.message}`));
+        if (
+          Object.keys(answerMap).length === 0 &&
+          answerMap.constructor === Object
+        ) {
+          postRapidReview({ ...answerMap, preprint: preprint.id })
+            .then(() => {
+              return;
+            })
+            .catch(err => alert(`An error occurred: ${err.message}`));
+        }
 
         postLongReview({
           preprint: preprint.id,
@@ -304,6 +309,7 @@ export default function ReviewStepper({ user, preprint, disabled, onClose }) {
               newSkipped.add(activeStep);
               return newSkipped;
             });
+
             setHasRapidReviewed(true);
             setHasLongReviewed(true);
             setDisabledSubmit(true);
@@ -346,6 +352,7 @@ export default function ReviewStepper({ user, preprint, disabled, onClose }) {
     } else {
       setExpandLong(true);
       setDisabledRapid(true);
+      handleComplete(activeStep + 1);
     }
   };
 
@@ -420,7 +427,7 @@ export default function ReviewStepper({ user, preprint, disabled, onClose }) {
         });
       });
     }
-  }, [preprint, user]);
+  }, [preprint, user, hasRapidReviewed, hasLongReviewed]);
 
   return (
     <ThemeProvider theme={prereviewTheme}>
@@ -623,6 +630,4 @@ export default function ReviewStepper({ user, preprint, disabled, onClose }) {
 ReviewStepper.propTypes = {
   user: PropTypes.object,
   preprint: PropTypes.object.isRequired,
-  disabled: PropTypes.bool,
-  onClose: PropTypes.func.isRequired,
-}
+};
