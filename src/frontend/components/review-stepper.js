@@ -194,7 +194,7 @@ QontoStepIcon.propTypes = {
   completed: PropTypes.bool,
 };
 
-export default function ReviewStepper({ user, preprint }) {
+export default function ReviewStepper({ user, preprint, onClose }) {
   const classes = useStyles();
   const [activeStep, setActiveStep] = React.useState(0);
   const [answerMap, setAnswerMap] = useState({});
@@ -257,6 +257,7 @@ export default function ReviewStepper({ user, preprint }) {
           newSkipped.add(activeStep);
           return newSkipped;
         });
+        setExpandFeedback(false);
         setHasRapidReviewed(true);
         setDisabledSubmit(true);
         return handleComplete();
@@ -313,7 +314,8 @@ export default function ReviewStepper({ user, preprint }) {
             setHasRapidReviewed(true);
             setHasLongReviewed(true);
             setDisabledSubmit(true);
-            return handleComplete(activeStep + 1);
+            handleComplete(activeStep + 1);
+            return onClose();
           })
           .catch(err => alert(`An error occurred: ${err.message}`));
       }
@@ -400,6 +402,8 @@ export default function ReviewStepper({ user, preprint }) {
   }
 
   useEffect(() => {
+    console.log('rapid: ', hasRapidReviewed);
+    console.log('long: ', hasLongReviewed);
     if (user) {
       preprint.fullReviews.map(review => {
         review.authors.map(author => {
@@ -464,7 +468,11 @@ export default function ReviewStepper({ user, preprint }) {
           })}
         </Stepper>
         <div>
-          {hasLongReviewed ? (
+          {disabledSubmit ? (
+            <Box mt={2} mb={2} className={classes.yellow}>
+              Congratulations! You have successfully submitted your PREreview.
+            </Box>
+          ) : hasLongReviewed ? (
             <Box mt={2} mb={2} className={classes.yellow}>
               Congratulations! You have successfully submitted your PREreview.
             </Box>
@@ -535,10 +543,9 @@ export default function ReviewStepper({ user, preprint }) {
                   <Box mt={2} mb={2} className={classes.yellow}>
                     Thank you for your contribution!
                     <br />
-                    Please review <Link href="#">
-                      PREreview Code of Conduct
-                    </Link>{' '}
-                     before submitting your review.
+                    Please review{' '}
+                    <Link href="#">PREreview Code of Conduct</Link> before
+                    submitting your review.
                   </Box>
                   <FormControlLabel
                     className={classes.formLabel}
@@ -630,4 +637,5 @@ export default function ReviewStepper({ user, preprint }) {
 ReviewStepper.propTypes = {
   user: PropTypes.object,
   preprint: PropTypes.object.isRequired,
+  onClose: PropTypes.func.isRequired,
 };

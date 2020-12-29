@@ -56,19 +56,21 @@ export default function ShellContent({
 
   const [rapidContent, setRapidContent] = useState(null);
 
-  const onCloseRapid = review => {
-    setRapidContent(review);
-    setHasRapidReviewed(true);
-    setTab('read');
+  const onCloseReviews = (rapidReview, longReview) => {
+    if (rapidReview) {
+      console.log('rapid found');
+      setRapidContent(rapidReview);
+      setHasRapidReviewed(true);
+    }
+
+    if (longReview) {
+      console.log('long found');
+      setLongContent(longReview);
+      setHasLongReviewed(true);
+    }
   };
 
   const [longContent, setLongContent] = useState('');
-
-  const onCloseLong = review => {
-    setLongContent(review);
-    setHasLongReviewed(true);
-    setTab('read');
-  };
 
   return (
     <div className="shell-content">
@@ -184,7 +186,7 @@ export default function ShellContent({
             user={user}
             preprint={preprint}
             disabled={hasRapidReviewed}
-            onClose={onCloseRapid}
+            onClose={onCloseReviews}
           />
         ) : tab === 'rapidReview#success' ? (
           <ShellContentReviewSuccess
