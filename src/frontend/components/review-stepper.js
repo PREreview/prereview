@@ -199,10 +199,17 @@ export default function ReviewStepper({ user, preprint, disabled, onClose }) {
   const [disabledRapid, setDisabledRapid] = React.useState(false);
   const [disabledSkip, setDisabledSkip] = React.useState(false);
   const [disabledSubmit, setDisabledSubmit] = React.useState(false);
+  const [hasRapidReviewed, setHasRapidReviewed] = React.useState(false);
   const [initialContent, setInitialContent] = useState('');
   const [skipped, setSkipped] = React.useState(new Set());
   const [submitted, setSubmitted] = React.useState(false);
   const steps = getSteps();
+
+  const {
+    mutate: postRapidReview,
+    loadingPostRapid,
+    errorPostRapid,
+  } = usePostRapidReviews();
 
   const onContentChange = value => {
     setContent(value);
@@ -234,17 +241,22 @@ export default function ReviewStepper({ user, preprint, disabled, onClose }) {
     if (!checkedCOI) {
       window.prompt('Please tell us about your conflict of interest');
     }
-    setActiveStep(prevActiveStep => prevActiveStep + 2);
 
-    setSkipped(prevSkipped => {
-      const newSkipped = new Set(prevSkipped.values());
-      newSkipped.add(activeStep);
-      return newSkipped;
-    });
+    postRapidReview({ ...answerMap, preprint: preprint.id })
+      .then(() => {
+        setActiveStep(prevActiveStep => prevActiveStep + 2);
 
-    setDisabledSubmit(true);
-    setSubmitted(true);
-    handleComplete();
+        setSkipped(prevSkipped => {
+          const newSkipped = new Set(prevSkipped.values());
+          newSkipped.add(activeStep);
+          return newSkipped;
+        });
+        setHasRapidReviewed(true);
+        setDisabledSubmit(true);
+        setSubmitted(true);
+        return handleComplete();
+      })
+      .catch(err => alert(`An error occurred: ${err.message}`));
   };
 
   const handleSaveLong = () => {
@@ -278,8 +290,19 @@ export default function ReviewStepper({ user, preprint, disabled, onClose }) {
   };
 
   const handleNextRapid = () => {
-    setExpandFeedback(true);
-    setDisabledRapid(true);
+    if (!hasRapidReviewed) {
+      if (canSubmitRapid(answerMap)) {
+        setExpandFeedback(true);
+        setDisabledRapid(true);
+      } else {
+        alert(
+          'Please complete the required fields. All multiple choice questions are required.',
+        );
+      }
+    } else {
+      setExpandLong(true);
+      setDisabledRapid(true);
+    }
   };
 
   const handleNextLong = () => {
@@ -322,6 +345,33 @@ export default function ReviewStepper({ user, preprint, disabled, onClose }) {
     return ['Rapid Review', 'Longform Review', 'Submitted'];
   }
 
+
+  useEffect(() => {
+    if (user) {
+      preprint.fullReviews.map(review => {
+        review.authors.map(author => {
+          user.personas.some(persona => {
+            if (persona.identity === author.identity) {
+              if (review.published === true) {
+                setHasLongReviewed(true);
+              } else {
+                setLongContent(review.drafts[review.drafts.length - 1].contents);
+              }
+            }
+          });
+        });
+      });
+
+      preprint.rapidReviews.map(review => {
+        user.personas.some(persona => {
+          if (persona.identity === review.author.identity) {
+            setHasRapidReviewed(true);
+          }
+        });
+      });
+    }
+  }, [preprint, user]);
+
   return (
     <ThemeProvider theme={prereviewTheme}>
       <div className={classes.root}>
@@ -363,17 +413,28 @@ export default function ReviewStepper({ user, preprint, disabled, onClose }) {
             </Box>
           ) : (
             <Box>
-              <header className="shell-content-reviews__title">
-                Rapid Review
-              </header>
-              <form>
-                <RapidFormFragment
-                  answerMap={answerMap}
-                  onChange={(key, value) => {
-                    setAnswerMap(answerMap => ({ ...answerMap, [key]: value }));
-                  }}
-                />
-              </form>
+              {hasRapidReviewed ? (
+                <Box mt={2} mb={2} className={classes.yellow}>
+                  You have already submitted a rapid review. Would you like to submit a longform review?
+                </Box>
+              ) : (
+                <Box>
+                  <header className="shell-content-reviews__title">
+                    Rapid Review
+                  </header>
+                  <form>
+                    <RapidFormFragment
+                      answerMap={answerMap}
+                      onChange={(key, value) => {
+                        setAnswerMap(answerMap => ({
+                          ...answerMap,
+                          [key]: value,
+                        }));
+                      }}
+                    />
+                  </form>
+                </Box>
+              )}
               <Box textAlign="right">
                 <Button
                   disabled={disabledRapid}
@@ -382,7 +443,7 @@ export default function ReviewStepper({ user, preprint, disabled, onClose }) {
                   onClick={handleNextRapid}
                   className={classes.button}
                 >
-                  Next
+                  {hasRapidReviewed ? 'Yes' : 'Next'}
                 </Button>
               </Box>
               {expandFeedback ? (

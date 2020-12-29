@@ -70,32 +70,6 @@ export default function ShellContent({
     setTab('read');
   };
 
-  useEffect(() => {
-    if (user) {
-      preprint.fullReviews.map(review => {
-        review.authors.map(author => {
-          user.personas.some(persona => {
-            if (persona.identity === author.identity) {
-              if (review.published === true) {
-                setHasLongReviewed(true);
-              } else {
-                setLongContent(review.drafts[review.drafts.length - 1].contents);
-              }
-            }
-          });
-        });
-      });
-
-      preprint.rapidReviews.map(review => {
-        user.personas.some(persona => {
-          if (persona.identity === review.author.identity) {
-            setHasRapidReviewed(true);
-          }
-        });
-      });
-    }
-  }, [preprint, user]);
-
   return (
     <div className="shell-content">
       {!process.env.IS_EXTENSION && (
