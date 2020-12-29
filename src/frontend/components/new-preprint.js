@@ -64,17 +64,11 @@ export default function NewPreprint({
 
   const [actions, fetchActionsProgress] = usePreprintActions(identifier);
 
-  console.log(".. location.state && location.state.preprint??", `${location.state && location.state.preprint}`)
-
-
   const [preprint, resolvePreprintStatus] = usePreprint(
     identifier,
     location.state && location.state.preprint,
     url
   );
-
-  !preprint ? console.log("NO PREPRINT YET", preprint, typeof preprint) : console.log("PREPRINT: ", preprint)
-
 
   const [action, setAction] = useState(null);
 
@@ -109,7 +103,6 @@ export default function NewPreprint({
           onCancel={onCancel}
           onStep={setStep}
           onIdentifier={(identifier, url = null) => {
-            console.log({ identifier, url });
             setIdentifierAndUrl({ identifier, url });
           }}
           identifier={identifier}
@@ -128,16 +121,15 @@ export default function NewPreprint({
             }
           }}
           preprint={preprint}
-          onSuccess={action => {
+          onSuccess={()=> {
             setStep('REVIEW_SUCCESS');
-            setAction(action);
           }}
           onViewInContext={handleViewInContext}
         />
       ) : preprint && step === 'NEW_REQUEST' ? (
         <StepRequest
           isSingleStep={isSingleStep}
-          onCancel={e => {
+          onCancel={() => {
             if (isSingleStep) {
               onCancel();
             } else {
@@ -145,9 +137,8 @@ export default function NewPreprint({
             }
           }}
           preprint={preprint}
-          onSuccess={action => {
+          onSuccess={() => {
             setStep('REQUEST_SUCCESS');
-            setAction(action);
           }}
           onViewInContext={handleViewInContext}
         />
@@ -194,8 +185,6 @@ function StepPreprint({
   const location = useLocation();
 
   const [value, setValue] = useState(unprefix(identifier));
-
-  console.log("value!!!!", value, typeof value)
 
   const hasReviewed = checkIfHasReviewed(user, actions);
   const hasRequested = checkIfHasRequested(user, actions);
@@ -316,7 +305,7 @@ function StepPreprint({
           onClick={e => {
             onViewInContext({
               preprint,
-              tab: 'review'
+              tab: 'rapidReview'
             });
           }}
           disabled={
@@ -326,7 +315,24 @@ function StepPreprint({
             !preprint
           }
         >
-          Add review
+          Add rapid review
+        </Button>
+
+          <Button
+          onClick={e => {
+            onViewInContext({
+              preprint,
+              tab: 'longReview'
+            });
+          }}
+          disabled={
+            fetchActionsProgress.isActive ||
+            hasReviewed ||
+            !identifier ||
+            !preprint
+          }
+        >
+          Add long-form review
         </Button>
       </Controls>
     </div>
@@ -353,16 +359,19 @@ function StepReview({
   isSingleStep
 }) {
   const [user] = useUser();
+
+  const { mutate: postRapidReview, loading, error } = usePostRapidReviews();
+
   const [subjects, setSubjects] = useLocalState(
     'subjects',
     user.defaultRole,
-    createPreprintId(preprint),
+    createPreprintId(preprint.handle),
     []
   );
   const [answerMap, setAnswerMap] = useLocalState(
     'answerMap',
     user.defaultRole,
-    createPreprintId(preprint),
+    createPreprintId(preprint.handle),
     {}
   );
 
