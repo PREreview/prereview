@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Helmet } from 'react-helmet-async';
 import socketIoClient from 'socket.io-client';
-import { useUser } from '../contexts/user-context';
+import { UserProvider } from '../contexts/user-context';
 import { getId } from '../utils/jsonld';
 import HeaderBar from './header-bar';
 import { ORG } from '../constants';
@@ -15,7 +15,7 @@ const socket = socketIoClient(window.location.origin, {
 });
 
 export default function Moderate() {
-  const [user] = useUser();
+  const [user] = UserProvider();
   const [bookmark, setBookmark] = useState(null);
   const [excluded, setExcluded] = useState(new Set());
   const [lockersByReviewActionId, setLockersByReviewActionId] = useState({});

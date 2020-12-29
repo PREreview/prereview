@@ -4,8 +4,7 @@ import { createError } from '../utils/errors';
 import { unprefix, getId, arrayify } from '../utils/jsonld';
 import { createPreprintId } from '../utils/ids';
 import { useStores } from '../contexts/store-context';
-import { useUser } from '../contexts/user-context';
-import { useGetResolvePreprints } from '../hooks/api-hooks.tsx'
+import { UserProvider } from '../contexts/user-context';
 
 const DEFAULT_SEARCH_RESULTS = {
   bookmark: null,
@@ -19,7 +18,7 @@ const DEFAULT_SEARCH_RESULTS = {
  * error
  */
 export function usePostAction() {
-  const [, setUser] = useUser();
+  const [, setUser] = UserProvider();
 
   const isMounted = useRef(false);
   useEffect(() => {

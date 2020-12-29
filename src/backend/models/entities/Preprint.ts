@@ -22,18 +22,22 @@ export class Preprint extends BaseEntity {
   //eslint-disable-next-line
   [EntityRepositoryType]?: PreprintModel;
 
-  @Fixture(faker => `${faker.commerce.color()} ${faker.random.word()}`)
-  @Property()
-  title!: string;
-
   @Fixture({ get: () => `doi:${createRandomDoi()}` })
   @Property()
   @Unique()
   handle!: string;
 
+  @Fixture(faker => `${faker.commerce.color()} ${faker.random.word()}`)
+  @Property()
+  title!: string;
+
   @Fixture(() => true)
   @Property()
   published!: boolean;
+
+  @Fixture(faker => faker.lorem.paragraph())
+  @Property({ columnType: 'text', nullable: true })
+  abstractText?: string;
 
   @Fixture(faker => faker.random.arrayElement(['arxiv', 'biorxiv', 'medrxiv']))
   @Property({ nullable: true })
@@ -41,6 +45,14 @@ export class Preprint extends BaseEntity {
 
   @Property({ nullable: true })
   datePosted?: Date;
+
+  @Fixture(faker => faker.random.word())
+  @Property({ nullable: true })
+  license?: string;
+
+  @Fixture(faker => faker.random.word())
+  @Property({ nullable: true })
+  publication?: string;
 
   @Fixture(faker => faker.internet.url())
   @Property({ nullable: true })
@@ -54,8 +66,8 @@ export class Preprint extends BaseEntity {
     () =>
       'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf',
   )
-  @Property()
-  contentUrl!: string;
+  @Property({ nullable: true })
+  contentUrl?: string;
 
   //@Fixture({ ignore: true })
   //@Property({ persist: false })
@@ -90,11 +102,30 @@ export class Preprint extends BaseEntity {
   @ManyToMany({ entity: () => Tag, mappedBy: 'preprints' })
   tags: Collection<Tag> = new Collection<Tag>(this);
 
-  constructor(title: string, handle: string, url: string, published = false) {
+  constructor(
+    handle: string,
+    title: string,
+    published = false,
+    abstractText?: string,
+    preprintServer?: string,
+    datePosted?: Date,
+    license?: string,
+    publication?: string,
+    url?: string,
+    contentEncoding?: string,
+    contentUrl?: string,
+  ) {
     super();
-    this.title = title;
     this.handle = handle;
-    this.url = url;
+    this.title = title;
     this.published = published;
+    this.abstractText = abstractText;
+    this.preprintServer = preprintServer;
+    this.datePosted = datePosted;
+    this.license = license;
+    this.publication = publication;
+    this.url = url;
+    this.contentEncoding = contentEncoding;
+    this.contentUrl = contentUrl;
   }
 }

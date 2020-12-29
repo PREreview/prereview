@@ -1,28 +1,41 @@
-import React, { useContext, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
+import Cookies from 'js-cookie';
 
-const UserContext = React.createContext();
+export const UserContext = React.createContext();
 
 export function UserProvider({ user = null, children }) {
-  const [state, setState] = useState({
-    user,
-    setUser(user) {
-      setState(prevUser => Object.assign({}, prevUser, { user }));
-    },
-  });
+  const [thisUser, setThisUser] = useState(null);
 
-  return <UserContext.Provider value={state}>{children}</UserContext.Provider>;
+  useEffect(() => {
+    // if (!thisUser) return;
+    const username = Cookies.get('PRE_user');
+    if (username) {
+      fetch(`api/v2/users/${username}`)
+        .then(response => {
+          if (response.status === 200) {
+            return response.json();
+          }
+          throw new Error(response.message);
+        })
+        .then(result => {
+          setThisUser(result.data);
+          return result;
+        })
+        .catch(err => {
+          console.log('Error: ', err.message);
+        });
+    }
+  }, []);
+
+  return (
+    <UserContext.Provider value={[thisUser, setThisUser]}>
+      {children}
+    </UserContext.Provider>
+  );
 }
 
 UserProvider.propTypes = {
-  user: PropTypes.shape({
-    '@id': PropTypes.string,
-    hasRole: PropTypes.array,
-  }),
+  user: PropTypes.object,
   children: PropTypes.any,
 };
-
-export function useUser() {
-  const value = useContext(UserContext);
-  return [value.user, value.setUser];
-}

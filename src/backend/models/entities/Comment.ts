@@ -25,8 +25,10 @@ export class Comment extends BaseEntity {
   @ManyToOne({ entity: () => FullReview })
   parent!: FullReview;
 
-  constructor(contents: string) {
+  constructor(contents: string, author: Persona, parent: FullReview) {
     super();
     this.contents = contents;
+    this.author = author;
+    this.parent = parent;
   }
 }

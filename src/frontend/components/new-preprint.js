@@ -21,13 +21,13 @@ import {
 import { useLocalState } from '../hooks/ui-hooks';
 import SubjectEditor from './subject-editor';
 import RapidFormFragment from './rapid-form-fragment';
-import { useUser } from '../contexts/user-context';
 import {
   getReviewAnswers,
   checkIfAllAnswered,
   checkIfHasReviewed,
   checkIfHasRequested
 } from '../utils/actions';
+import { UserProvider } from '../contexts/user-context';
 import Controls from './controls';
 import Button from './button';
 import TextInput from './text-input';

@@ -1,4 +1,4 @@
-import React, { Suspense, lazy } from 'react';
+import React, { Suspense, lazy, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import mobile from 'is-mobile';
 import { HTML5Backend } from 'react-dnd-html5-backend';
@@ -33,6 +33,7 @@ const Moderate = React.lazy(() => import('./moderate'));
 //smoothscroll.polyfill();
 
 export default function App({ user }) {
+
   return (
     <HelmetProvider>
       <DndProvider
@@ -67,7 +68,7 @@ export default function App({ user }) {
                 </ToCPage>
               </Route>
 
-              <Route exact={true} path="/about/:roleId">
+              <Route exact={true} path="/about/:id">
                 <Profile />
               </Route>
               <Route exact={true} path="/extension">

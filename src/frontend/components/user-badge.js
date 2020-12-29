@@ -4,11 +4,7 @@ import RoleBadge from './role-badge';
 
 export default function UserBadge({ user, children, ...others }) {
   return (
-    <RoleBadge
-      {...others}
-      roleId={user.defaultRole ? user.defaultRole : 'contributor'}
-      user={user}
-    >
+    <RoleBadge {...others} user={user}>
       {children}
     </RoleBadge>
   );

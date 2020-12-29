@@ -24,7 +24,7 @@ export class Community extends BaseEntity {
 
   //@Fixture({ get: faker => faker.lorem.paragraph(), optional: true })
   @Fixture(faker => faker.lorem.sentences())
-  @Property({ nullable: true })
+  @Property({ columnType: 'text', nullable: true })
   description?: string;
 
   //@Fixture({ get: faker => faker.image.abstract(), optional: true })
@@ -32,13 +32,13 @@ export class Community extends BaseEntity {
   @Property({ nullable: true })
   logo?: Buffer;
 
-  @ManyToMany({ entity: () => User, mappedBy: 'communities', owner: true })
+  @ManyToMany({ entity: () => User, inversedBy: 'communities' })
   members: Collection<User> = new Collection<User>(this);
 
-  @ManyToMany({ entity: () => Preprint, mappedBy: 'communities', owner: true })
+  @ManyToMany({ entity: () => Preprint, inversedBy: 'communities' })
   preprints: Collection<Preprint> = new Collection<Preprint>(this);
 
-  constructor(name: string, description: string, logo: Buffer) {
+  constructor(name: string, description?: string, logo?: Buffer) {
     super();
     this.name = name;
     this.description = description;
