@@ -10,8 +10,12 @@ import {
   makeStyles,
   withStyles,
 } from '@material-ui/core/styles';
+import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
 import Check from '@material-ui/icons/Check';
+import Checkbox from '@material-ui/core/Checkbox';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Link from '@material-ui/core/Link';
 import Stepper from '@material-ui/core/Stepper';
 import Step from '@material-ui/core/Step';
 import StepConnector from '@material-ui/core/StepConnector';
@@ -42,6 +46,9 @@ const prereviewTheme = createMuiTheme({
       main: '#eaeaf0',
     },
   },
+  typography: {
+    fontFamily: ['Open Sans', 'sans-serif'].join(','),
+  },
 });
 
 const useStyles = makeStyles(theme => ({
@@ -57,6 +64,11 @@ const useStyles = makeStyles(theme => ({
   completed: {
     display: 'inline-block',
   },
+  formLabel: {
+    '& span:last-child': {
+      fontSize: '0.8rem',
+    },
+  },
   instructions: {
     marginTop: theme.spacing(1),
     marginBottom: theme.spacing(1),
@@ -64,6 +76,10 @@ const useStyles = makeStyles(theme => ({
   label: {
     textAlign: 'center',
   },
+  yellow: {
+    backgroundColor: '#FFFAEE',
+    padding: 10,
+  }
 }));
 
 const QontoConnector = withStyles({
@@ -173,9 +189,28 @@ QontoStepIcon.propTypes = {
 export default function ReviewStepper({ user, preprint, disabled, onClose }) {
   const classes = useStyles();
   const [activeStep, setActiveStep] = React.useState(0);
+  const [answerMap, setAnswerMap] = useState({});
   const [completed, setCompleted] = React.useState(new Set());
+  const [checkedCOI, setCheckedCOI] = React.useState(false);
+  const [content, setContent] = useState('');
+  const [expandConsent, setExpandConsent] = React.useState(false);
+  const [expandFeedback, setExpandFeedback] = React.useState(false);
+  const [expandLong, setExpandLong] = React.useState(false);
+  const [disabledRapid, setDisabledRapid] = React.useState(false);
+  const [disabledSkip, setDisabledSkip] = React.useState(false);
+  const [disabledSubmit, setDisabledSubmit] = React.useState(false);
+  const [initialContent, setInitialContent] = useState('');
   const [skipped, setSkipped] = React.useState(new Set());
+  const [submitted, setSubmitted] = React.useState(false);
   const steps = getSteps();
+
+  const onContentChange = value => {
+    setContent(value);
+  };
+
+  const handleCOIChange = event => {
+    setCheckedCOI(event.target.checked);
+  };
 
   const canSubmitRapid = answerMap => {
     return QUESTIONS.filter(q => q.type == 'YesNoQuestion').every(
@@ -195,63 +230,74 @@ export default function ReviewStepper({ user, preprint, disabled, onClose }) {
     return step === 1;
   };
 
-  const handleSkip = () => {
-    if (!isStepOptional(activeStep)) {
-      // You probably want to guard against something like this
-      // it should never occur unless someone's actively trying to break something.
-      throw new Error("You can't skip a step that isn't optional.");
+  const handleSubmitRapid = () => {
+    if (!checkedCOI) {
+      window.prompt('Please tell us about your conflict of interest');
     }
+    setActiveStep(prevActiveStep => prevActiveStep + 2);
 
-    setActiveStep(prevActiveStep => prevActiveStep + 1);
     setSkipped(prevSkipped => {
       const newSkipped = new Set(prevSkipped.values());
       newSkipped.add(activeStep);
       return newSkipped;
     });
+
+    setDisabledSubmit(true);
+    setSubmitted(true);
+    handleComplete();
+  };
+
+  const handleSaveLong = () => {
+    console.log('saved!');
+  };
+
+  const handleSubmitBoth = () => {
+    console.log('submitted!');
+    setDisabledSubmit(true);
+    setSubmitted(true);
+    handleComplete(activeStep + 1);
+  };
+
+  const handleSkip = () => {
+    if (!isStepOptional(activeStep + 1)) {
+      // You probably want to guard against something like this
+      // it should never occur unless someone's actively trying to break something.
+      throw new Error("You can't skip a step that isn't optional.");
+    }
+    setDisabledSkip(true);
+    setExpandConsent(true);
   };
 
   const skippedSteps = () => {
     return skipped.size;
   };
 
-  const completedSteps = () => {
-    return completed.size;
-  };
-
-  const allStepsCompleted = () => {
-    return completedSteps() === totalSteps() - skippedSteps();
-  };
-
-  const isLastStep = () => {
-    return activeStep === totalSteps() - 1;
-  };
-
-  const handleNext = () => {
-    const newActiveStep =
-      isLastStep() && !allStepsCompleted()
-        ? // It's the last step, but not all steps have been completed
-          // find the first step that has been completed
-          steps.findIndex((step, i) => !completed.has(i))
-        : activeStep + 1;
-
+  const handleNext = step => {
+    const newActiveStep = step ? activeStep + 1 : activeStep + 2;
     setActiveStep(newActiveStep);
-
-    if (activeStep === 0) {
-      console.log(activeStep);
-    }
   };
 
-  const handleBack = () => {
-    setActiveStep(prevActiveStep => prevActiveStep - 1);
+  const handleNextRapid = () => {
+    setExpandFeedback(true);
+    setDisabledRapid(true);
   };
 
-  const handleStep = step => () => {
-    setActiveStep(step);
+  const handleNextLong = () => {
+    setDisabledSkip(true);
+    setExpandLong(true);
+    handleComplete(activeStep + 1);
   };
 
-  const handleComplete = () => {
+  const handleComplete = step => {
     const newCompleted = new Set(completed);
     newCompleted.add(activeStep);
+
+    if (!step) {
+      newCompleted.add(activeStep + 2);
+    } else if (step === 2) {
+      newCompleted.add(activeStep + 1);
+    }
+
     setCompleted(newCompleted);
 
     /**
@@ -260,14 +306,8 @@ export default function ReviewStepper({ user, preprint, disabled, onClose }) {
      * thus we have to resort to not being very DRY.
      */
     if (completed.size !== totalSteps() - skippedSteps()) {
-      handleNext();
+      handleNext(step);
     }
-  };
-
-  const handleReset = () => {
-    setActiveStep(0);
-    setCompleted(new Set());
-    setSkipped(new Set());
   };
 
   const isStepSkipped = step => {
@@ -280,223 +320,6 @@ export default function ReviewStepper({ user, preprint, disabled, onClose }) {
 
   function getSteps() {
     return ['Rapid Review', 'Longform Review', 'Submitted'];
-  }
-
-  function getStepContent(step) {
-    const { mutate: postRapidReview, loading, error } = usePostRapidReviews();
-
-    const {
-      mutate: postLongReview,
-      loadingPostLongReview,
-    } = usePostFullReviews();
-
-    const [hasRapidReviewed, setHasRapidReviewed] = useState(false);
-    const [hasLongReviewed, setHasLongReviewed] = useState(false);
-
-    const [answerMap, setAnswerMap] = useState({});
-
-    const [initialContent, setInitialContent] = useState('');
-    const [content, setContent] = useState('');
-
-    const onContentChange = value => {
-      setContent(value);
-    };
-
-    useEffect(() => {
-      if (user) {
-        preprint.fullReviews.map(review => {
-          review.authors.map(author => {
-            user.personas.some(persona => {
-              if (persona.identity === author.identity) {
-                if (review.published === true) {
-                  setHasLongReviewed(true);
-                } else {
-                  setInitialContent(
-                    review.drafts[review.drafts.length - 1].contents,
-                  );
-                }
-              }
-            });
-          });
-        });
-
-        preprint.rapidReviews.map(review => {
-          user.personas.some(persona => {
-            if (persona.identity === review.author.identity) {
-              setHasRapidReviewed(true);
-            }
-          });
-        });
-      }
-    }, [preprint, user]);
-
-    switch (step) {
-      case 0:
-        return (
-          <div>
-            <header className="shell-content-reviews__title">
-              Rapid Review
-            </header>
-            <form>
-              <RapidFormFragment
-                answerMap={answerMap}
-                onChange={(key, value) => {
-                  setAnswerMap(answerMap => ({ ...answerMap, [key]: value }));
-                }}
-              />
-              <Controls error={error}>
-                <Button
-                  className={classes.button}
-                  variant="contained"
-                  color="primary"
-                  type="submit"
-                  primary={'true'}
-                  isWaiting={loading}
-                  disabled={disabled || !canSubmitRapid}
-                  onClick={event => {
-                    event.preventDefault();
-                    if (canSubmitRapid(answerMap)) {
-                      postRapidReview({ ...answerMap, preprint: preprint.id })
-                        .then(() => {
-                          alert('Rapid review submitted successfully.');
-                          return onClose(answerMap);
-                        })
-                        .catch(err =>
-                          alert(`An error occurred: ${err.message}`),
-                        );
-                    } else {
-                      alert(
-                        'Please complete the required fields. All multiple choice questions are required.',
-                      );
-                    }
-                  }}
-                >
-                  Next
-                </Button>
-              </Controls>
-            </form>
-          </div>
-        );
-      case 1:
-        return (
-          <div>
-            <div>
-              <header className="shell-content-reviews__title">
-                Rapid Review
-              </header>
-              <form>
-                <RapidFormFragment
-                  answerMap={answerMap}
-                  onChange={(key, value) => {
-                    setAnswerMap(answerMap => ({ ...answerMap, [key]: value }));
-                  }}
-                />
-                <Controls error={error}>
-                  <Button
-                    className={classes.button}
-                    variant="contained"
-                    color="primary"
-                    type="submit"
-                    primary={'true'}
-                    isWaiting={loading}
-                    disabled={disabled || !canSubmitRapid}
-                    onClick={event => {
-                      event.preventDefault();
-                      if (canSubmitRapid(answerMap)) {
-                        postRapidReview({ ...answerMap, preprint: preprint.id })
-                          .then(() => {
-                            alert('Rapid review submitted successfully.');
-                            return onClose(answerMap);
-                          })
-                          .catch(err =>
-                            alert(`An error occurred: ${err.message}`),
-                          );
-                      } else {
-                        alert(
-                          'Please complete the required fields. All multiple choice questions are required.',
-                        );
-                      }
-                    }}
-                  >
-                    Next
-                  </Button>
-                </Controls>
-              </form>
-            </div>
-            <form>
-              <LongFormFragment
-                onContentChange={onContentChange}
-                content={initialContent}
-              />
-
-              <Controls error={error}>
-                <Button
-                  type="submit"
-                  primary={'true'}
-                  isWaiting={loadingPostLongReview}
-                  disabled={disabled || !canSubmitFull(content)}
-                  onClick={event => {
-                    event.preventDefault();
-                    if (canSubmitFull(content)) {
-                      postLongReview({
-                        preprint: preprint.id,
-                        contents: content,
-                      })
-                        .then(() => alert('Draft updated successfully.'))
-                        .catch(err => alert(`An error occurred: ${err.message}`));
-                    } else {
-                      alert('Review cannot be blank.');
-                    }
-                  }}
-                >
-                  Save
-                </Button>
-                <Button
-                  type="submit"
-                  primary={'true'}
-                  isWaiting={loadingPostLongReview}
-                  disabled={disabled || !canSubmitFull(content)}
-                  onClick={event => {
-                    event.preventDefault();
-                    if (canSubmitFull(content)) {
-                      if (
-                        confirm(
-                          'Are you sure you want to publish this review? This action cannot be undone.',
-                        )
-                      ) {
-                        postLongReview({
-                          preprint: preprint.id,
-                          contents: content,
-                          published: true,
-                        })
-                          .then(() => {
-                            alert('Full review submitted successfully.');
-                            return onClose(content);
-                          })
-                          .catch(err =>
-                            alert(`An error occurred: ${err.message}`),
-                          );
-                      }
-                    } else {
-                      alert('Review cannot be blank.');
-                    }
-                  }}
-                >
-                  Submit
-                </Button>
-              </Controls>
-            </form>
-          </div>
-        );
-      case 2:
-        return (
-          <div>
-            Congratulations! You have successfully submitted your PREreview.
-          </div>
-        );
-      default:
-        return 'Unknown step';
-    }
   }
 
   return (
@@ -534,62 +357,129 @@ export default function ReviewStepper({ user, preprint, disabled, onClose }) {
           })}
         </Stepper>
         <div>
-          {allStepsCompleted() ? (
-            <div>
-              <Typography className={classes.instructions}>
-                All steps completed - you&apos;re finished
-              </Typography>
-              <Button onClick={handleReset}>Reset</Button>
-            </div>
+          {submitted ? (
+            <Box mt={2} mb={2} className={classes.yellow}>
+              Congratulations! You have successfully submitted your PREreview.
+            </Box>
           ) : (
-            <div>
-              {getStepContent(activeStep)}
-              <div>
-                {//<Button
-                  // disabled={activeStep === 0}
-                  // onClick={handleBack}
-                  // className={classes.button}
-                // >
-                //   Back
-                // </Button>
-              }
+            <Box>
+              <header className="shell-content-reviews__title">
+                Rapid Review
+              </header>
+              <form>
+                <RapidFormFragment
+                  answerMap={answerMap}
+                  onChange={(key, value) => {
+                    setAnswerMap(answerMap => ({ ...answerMap, [key]: value }));
+                  }}
+                />
+              </form>
+              <Box textAlign="right">
                 <Button
+                  disabled={disabledRapid}
                   variant="contained"
                   color="primary"
-                  onClick={handleNext}
+                  onClick={handleNextRapid}
                   className={classes.button}
                 >
                   Next
                 </Button>
-                {isStepOptional(activeStep) && !completed.has(activeStep) && (
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={handleSkip}
-                    className={classes.button}
-                  >
-                    Skip
-                  </Button>
-                )}
-
-                {activeStep !== steps.length &&
-                  (completed.has(activeStep) ? (
-                    <Typography variant="caption" className={classes.completed}>
-                      Step {activeStep + 1} already completed
-                    </Typography>
-                  ) : (
+              </Box>
+              {expandFeedback ? (
+                <Box>
+                  <Box mt={2} mb={2}>
+                    Would you like to expand on your feedback with a longform review?
+                  </Box>
+                  <Box textAlign="right">
                     <Button
+                      disabled={disabledSkip}
+                      variant="outlined"
+                      color="primary"
+                      onClick={handleSkip}
+                      className={classes.button}
+                    >
+                      Skip
+                    </Button>
+                    <Button
+                      disabled={disabledSkip}
                       variant="contained"
                       color="primary"
-                      onClick={handleComplete}
+                      onClick={handleNextLong}
+                      className={classes.button}
                     >
-                      {completedSteps() === totalSteps() - 1
-                        ? 'Finish'
-                        : 'Complete Step'}
+                      Yes
                     </Button>
-                  ))}
-              </div>
-            </div>
+                  </Box>
+                </Box>
+              ) : null}
+              {expandConsent ? (
+                <Box>
+                  <Box mt={2} mb={2} className={classes.yellow}>
+                    Thank you for your contribution!
+                    <br />
+                    Please review <Link href="#">
+                      PREreview Code of Conduct
+                    </Link>{' '}
+                     before submitting your review.
+                  </Box>
+                  <FormControlLabel
+                    className={classes.formLabel}
+                    control={
+                      <Checkbox
+                        checked={checkedCOI}
+                        onChange={handleCOIChange}
+                        name="checkedCOI"
+                        color="primary"
+                      />
+                    }
+                    label="I have no conflict of interest in reviewing this preprint."
+                  />
+                  <Box textAlign="right">
+                    <Button
+                      disabled={disabledSubmit}
+                      variant="contained"
+                      color="primary"
+                      onClick={handleSubmitRapid}
+                      className={classes.button}
+                    >
+                      Submit
+                    </Button>
+                  </Box>
+                </Box>
+              ) : null}
+              {expandLong ? (
+                <Box>
+                  <Box mt={2} mb={2}>
+                    <form>
+                    <LongFormFragment
+                      onContentChange={onContentChange}
+                      content={initialContent}
+                    />
+                    </form>
+                  </Box>
+                  <Box>
+                    <Button
+                      disabled={disabledSubmit}
+                      variant="outlined"
+                      color="primary"
+                      onClick={handleSaveLong}
+                      className={classes.button}
+                    >
+                      Save
+                    </Button>
+                    <Button
+                      disabled={disabledSubmit}
+                      variant="contained"
+                      color="primary"
+                      onClick={handleSubmitBoth}
+                      className={classes.button}
+                    >
+                      Submit
+                    </Button>
+                  </Box>
+                </Box>
+              ) : null}
+            </Box>
           )}
         </div>
       </div>
