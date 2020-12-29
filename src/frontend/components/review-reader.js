@@ -43,7 +43,11 @@ const ReviewReader = React.memo(function ReviewReader({
     defaultHighlightedRoleIds || [],
   );
 
-  let allReviews = preprint.fullReviews.concat(preprint.rapidReviews);
+  const publishedReviews = preprint.fullReviews.filter(
+    review => review.published,
+  );
+
+  let allReviews = publishedReviews.concat(preprint.rapidReviews);
 
   useEffect(() => {
     if (
@@ -70,9 +74,9 @@ const ReviewReader = React.memo(function ReviewReader({
       {!preview && (
         <h3 className="review-reader__title">
           {preprint.rapidReviews.length > 0 ? preprint.rapidReviews.length : 0} rapid review{preprint.rapidReviews.length > 1 ? 's' : ''}
-          {preprint.fullReviews.length > 0
-            ? ` | ${preprint.fullReviews.length} full review${
-                preprint.fullReviews.length > 1 ? 's' : ''
+          {publishedReviews.length > 0
+            ? ` | ${publishedReviews.length} full review${
+                publishedReviews.length > 1 ? 's' : ''
               }`
             : ''}
           {preprint.requests.length > 0
@@ -83,7 +87,7 @@ const ReviewReader = React.memo(function ReviewReader({
         </h3>
       )}
 
-      {(preprint.rapidReviews.length || preprint.fullReviews.length) && (
+      {(preprint.rapidReviews.length || publishedReviews.length) && (
         <Fragment>
           {!preview && (
             <Fragment>
@@ -130,12 +134,12 @@ const ReviewReader = React.memo(function ReviewReader({
             />
           )}
 
-          {preprint.fullReviews.length && (
+          {publishedReviews.length && (
             <div className="text-answers">
-              {preprint.fullReviews.map(review => {
+              {publishedReviews.map(review => {
                 if (review.published) {
                   return (
-                    <div>
+                    <div key={review.id}>
                       <div className="text-answers__question">
                         {review.drafts[review.drafts.length - 1].title}
                       </div>
