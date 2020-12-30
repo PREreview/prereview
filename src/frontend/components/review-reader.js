@@ -119,8 +119,8 @@ const ReviewReader = React.memo(function ReviewReader({
           )}
 
           <Barplot
-            stats={getYesNoStats(highlightedActions)}
-            nTotalReviews={preprint.rapidReviews.length}
+            stats={getYesNoStats(preprint.rapidReviews)}
+            nReviews={preprint.rapidReviews.length}
           >
             <ShareMenu
               identifier={preprint.handle}

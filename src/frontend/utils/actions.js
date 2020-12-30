@@ -3,12 +3,10 @@ import uniqWith from 'lodash/uniqWith';
 import { QUESTIONS } from '../constants';
 import { getId, unprefix, arrayify } from '../utils/jsonld';
 
-export function getAnswerMap(action = {}) {
-  const answers = arrayify(
-    action.resultReview && action.resultReview.reviewAnswer,
-  );
+export function getAnswerMap(review = {}) {
+  console.log(review);
 
-  return answers.reduce((map, answer) => {
+  return review.reduce((map, answer) => {
     const questionId = unprefix(getId(answer.parentItem));
     if (answer['@type'] === 'YesNoAnswer') {
       map[questionId] = answer.text.toLowerCase().trim();

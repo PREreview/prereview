@@ -136,23 +136,27 @@ export function getTags(preprint) {
 }
 
 export function getYesNoStats(reviews = []) {
-  return reviews
-    .filter(review => review.author)
-    .map(review => {
-      return QUESTIONS.filter(({ type }) => type === 'YesNoQuestion').map(
-        ({ identifier, question }) => {
-          return {
-            questionId: `${identifier}`,
-            nReviews: reviews.length,
-            question,
-            yes: isYes(review[identifier]),
-            no: isNo(review[identifier]),
-            na: isNa(review[identifier]),
-            unsure: isUnsure(review[identifier]),
-          };
-        },
-      );
-    });
+  return QUESTIONS.filter(({ type }) => type === 'YesNoQuestion').map(
+    ({ identifier, question }) => {
+      return {
+        questionId: `question:${identifier}`,
+        nReviews: reviews.length,
+        question,
+        yes: reviews.filter(review => {
+          return isYes(review[identifier]);
+        }),
+        no: reviews.filter(review => {
+          return isNo(review[identifier]);
+        }),
+        na: reviews.filter(review => {
+          return isNa(review[identifier]);
+        }),
+        unsure: reviews.filter(review => {
+          return isUnsure(review[identifier]);
+        }),
+      };
+    },
+  );
 }
 
 export function getTextAnswers(actions = []) {
