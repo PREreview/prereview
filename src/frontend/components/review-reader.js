@@ -141,7 +141,7 @@ const ReviewReader = React.memo(function ReviewReader({
           {publishedReviews.length && (
             <div className="text-answers">
               {publishedReviews.map(review => {
-                if (review.published) {
+                if (review.published && review.drafts) {
                   return (
                     <div key={review.id}>
                       <div className="text-answers__question">

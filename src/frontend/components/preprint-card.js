@@ -358,7 +358,7 @@ export default function PreprintCard({
           <ReviewReader
             user={user}
             identifier={id}
-            actions={preprint.fullReviews}
+            preprint={preprint}
             preview={true}
           />
 

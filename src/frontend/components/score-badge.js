@@ -93,11 +93,11 @@ const ScoreBadge = React.forwardRef(function ScoreBadge(
 ScoreBadge.propTypes = {
   isHighlighted: PropTypes.bool,
   isAnimating: PropTypes.bool,
-  now: PropTypes.string,
+  now: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date)]),
   nRequests: PropTypes.number.isRequired,
   nRapidReviews: PropTypes.number.isRequired,
   nLongReviews: PropTypes.number.isRequired,
-  dateFirstActivity: PropTypes.string.isRequired,
+  dateFirstActivity: PropTypes.string,
 };
 
 export default ScoreBadge;
