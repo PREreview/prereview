@@ -44,7 +44,7 @@ export default function controller(
 
     try {
       if (pid) {
-        allReviews = await reviewModel.find({ preprint: pid }, [
+        allReviews = await reviewModel.findAll({ preprint: pid }, [
           'authors',
           'comments',
         ]);

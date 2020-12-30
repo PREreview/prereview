@@ -29,7 +29,11 @@ const ReviewReader = React.memo(function ReviewReader({
   const [content, setContent] = useState('');
   const [commentTitle, setCommentTitle] = useState('');
 
-  const { mutate: postComment, loadingPostComment, errorPostComment } = usePostComments();
+  const {
+    mutate: postComment,
+    loadingPostComment,
+    errorPostComment,
+  } = usePostComments();
 
   const handleCommentChange = value => {
     setContent(value);
@@ -87,7 +91,7 @@ const ReviewReader = React.memo(function ReviewReader({
         </h3>
       )}
 
-      {(preprint.rapidReviews.length || publishedReviews.length) && (
+      {allReviews.length && (
         <Fragment>
           {!preview && (
             <Fragment>
@@ -95,7 +99,7 @@ const ReviewReader = React.memo(function ReviewReader({
               <div className="review-reader__persona-selector">
                 <PotentialRoles
                   role={role}
-                  reviews={allReviews}
+                  allReviews={allReviews}
                   hasReviewed={
                     rapidContent || (longContent && longContent.length)
                   }

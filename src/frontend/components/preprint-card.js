@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from 'react';
+import React, { Fragment, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import omit from 'lodash/omit';
 import classNames from 'classnames';
@@ -13,7 +13,6 @@ import {
 import Tooltip from '@reach/tooltip';
 import Value from './value';
 import { getTags } from '../utils/stats';
-import { checkIfHasReviewed, checkIfHasRequested } from '../utils/actions';
 import ScoreBadge from './score-badge';
 import IconButton from './icon-button';
 import TagPill from './tag-pill';
@@ -49,21 +48,23 @@ export default function PreprintCard({
   const preprintId = createPreprintId(handle);
   const { id, scheme } = decodePreprintId(preprintId);
 
-  const hasReviewed = checkIfHasReviewed(user, preprint.reviews); // `actions` (_all_ of them including moderated ones) not `safeActions`
-  const hasRequested = checkIfHasRequested(user, preprint.requests); // `actions` (_all_ of them including moderated ones) not `safeActions`
+  const [hasReviewed, setHasReviewed] = useState(false);
+  const [hasRequested, setHasRequested] = useState(false);
 
   const { hasData, hasCode, subjects } = getTags(preprint);
 
   const {
     nRequests,
-    nReviews,
+    nRapidReviews,
+    nLongReviews,
     now,
     onStartAnim,
     onStopAnim,
     dateFirstActivity,
     dateLastActivity,
     lastActionType,
-    dateLastReview,
+    dateLastRapidReview,
+    dateLastLongReview,
     dateLastRequest,
     isAnimating,
   } = useAnimatedScore(preprint);
@@ -72,10 +73,42 @@ export default function PreprintCard({
     sortOption,
     hoveredSortOption,
     lastActionType,
-    dateLastReview,
+    dateLastRapidReview,
+    dateLastLongReview,
     dateLastRequest,
     dateLastActivity,
   );
+
+  const publishedReviews = preprint.fullReviews.filter(
+    review => review.published,
+  );
+
+  useEffect(() => {
+    if (user) {
+      if (preprint.requests.length) {
+        preprint.requests.map(request => {
+          if (request.author === user.id) {
+            setHasRequested(true);
+          }
+        });
+      }
+      if (preprint.fullReviews.length) {
+        preprint.fullReviews.map(review => {
+          review.authors.map(author => {
+            if (author.identity === user.id) {
+              setHasReviewed(true);
+            }
+          });
+        });
+      } else if (preprint.rapidReviews.length) {
+        preprint.rapidReviews.map(review => {
+          if (review.author.identity === user.id) {
+            setHasReviewed(true);
+          }
+        });
+      }
+    }
+  }, []);
 
   return (
     <Fragment>
@@ -211,7 +244,8 @@ export default function PreprintCard({
                     isHighlighted={hoveredSortOption === 'score'}
                     now={now}
                     nRequests={nRequests}
-                    nReviews={nReviews}
+                    nRapidReviews={nRapidReviews}
+                    nLongReviews={nLongReviews}
                     dateFirstActivity={dateFirstActivity}
                     onMouseEnter={onStartAnim}
                     onMouseLeave={onStopAnim}
@@ -244,13 +278,24 @@ export default function PreprintCard({
                   </div>
                   <div className="preprint-card__count-badge">
                     <AnimatedNumber
-                      value={nReviews}
+                      value={preprint.rapidReviews.length}
                       isAnimating={isAnimating}
                     />
                   </div>
 
                   <div className="preprint-card__count-label">
-                    Review{nReviews > 1 ? 's' : ''}
+                    Rapid Review{preprint.rapidReviews.length > 1 ? 's' : ''}
+                  </div>
+                  <div className="preprint-card__count-divider" />
+
+                  <div className="preprint-card__count-badge">
+                    <AnimatedNumber
+                      value={publishedReviews.length}
+                      isAnimating={isAnimating}
+                    />
+                  </div>
+                  <div className="preprint-card__count-label">
+                    Longform Review{publishedReviews.length > 1 ? 's' : ''}
                   </div>
                   <div className="preprint-card__count-divider" />
                   <div className="preprint-card__count-badge">
@@ -284,11 +329,14 @@ export default function PreprintCard({
                 })}
               >
                 <span className="preprint-card__days-ago__prefix">
-                  Last {agoData.verb}{' '}
+                  {dateLastActivity
+                    ? `Last activity ${formatDistanceStrict(
+                        new Date(dateLastActivity),
+                        new Date(),
+                      )} ago`
+                    : `No activity yet`}
                 </span>
-                {formatDistanceStrict(new Date(agoData.date), new Date())} ago
               </span>
-
               <IconButton
                 className="preprint-card__expansion-toggle"
                 onClick={e => {
@@ -358,7 +406,8 @@ PreprintCard.propTypes = {
     createdAt: PropTypes.string,
     title: PropTypes.string.isRequired,
     preprintServer: PropTypes.string.isRequired,
-    reviews: PropTypes.array,
+    fullReviews: PropTypes.array,
+    rapidReviews: PropTypes.array,
     requests: PropTypes.array,
   }).isRequired,
   onNewRequest: PropTypes.func.isRequired,
@@ -385,7 +434,8 @@ function getAgoData(
   sortOption,
   hoveredSortOption,
   lastActionType,
-  dateLastReview,
+  dateLastRapidReview,
+  dateLastLongReview,
   dateLastRequest,
   dateLastActivity,
 ) {

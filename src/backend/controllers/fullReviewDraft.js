@@ -98,7 +98,7 @@ export default function controller(draftModel, thisUser) {
       let draft;
 
       try {
-        draft = await draftModel.fidnOne(ctx.params.id);
+        draft = await draftModel.findOne(ctx.params.id);
         if (!draft) {
           ctx.throw(404, `Draft with ID ${ctx.params.id} doesn't exist`);
         }

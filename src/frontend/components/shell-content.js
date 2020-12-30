@@ -6,10 +6,7 @@ import classNames from 'classnames';
 import { Helmet } from 'react-helmet-async';
 
 // utils
-import {
-  usePostFullReviews,
-  usePostRequests,
-} from '../hooks/api-hooks.tsx';
+import { usePostRequests } from '../hooks/api-hooks.tsx';
 
 // components
 import Button from './button';
@@ -52,7 +49,6 @@ export default function ShellContent({
 
   const extensionNextURL = new URL(window.location.href);
   extensionNextURL.hash = '#osrpre-shell';
-
 
   const [rapidContent, setRapidContent] = useState(null);
 
@@ -197,7 +193,7 @@ export default function ShellContent({
             user={user}
             preprint={preprint}
             onSubmit={preprint => {
-              postReviewRequest({ preprint: preprint})
+              postReviewRequest({ preprint: preprint })
                 .then(() => {
                   alert('PREreview request submitted successfully.');
                   return setTab('read');
@@ -311,7 +307,7 @@ function ShellContentReviews({
         hasRapidReviewed={hasRapidReviewed}
         hasLongReviewed={hasLongReviewed}
         initialContent={initialContent}
-       />
+      />
     </div>
   );
 }
