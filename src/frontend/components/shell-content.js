@@ -58,19 +58,46 @@ export default function ShellContent({
 
   const onCloseReviews = (rapidReview, longReview) => {
     if (rapidReview) {
-      console.log('rapid found');
       setRapidContent(rapidReview);
       setHasRapidReviewed(true);
     }
 
     if (longReview) {
-      console.log('long found');
       setLongContent(longReview);
       setHasLongReviewed(true);
     }
   };
 
   const [longContent, setLongContent] = useState('');
+  const [initialContent, setInitialContent] = useState('');
+
+  useEffect(() => {
+    if (user) {
+      preprint.fullReviews.map(review => {
+        review.authors.map(author => {
+          user.personas.some(persona => {
+            if (persona.identity === author.identity) {
+              if (review.published === true) {
+                setHasLongReviewed(true);
+              } else {
+                setInitialContent(
+                  review.drafts[review.drafts.length - 1].contents,
+                );
+              }
+            }
+          });
+        });
+      });
+
+      preprint.rapidReviews.map(review => {
+        user.personas.some(persona => {
+          if (persona.identity === review.author.identity) {
+            setHasRapidReviewed(true);
+          }
+        });
+      });
+    }
+  }, [preprint, user, hasRapidReviewed, hasLongReviewed]);
 
   return (
     <div className="shell-content">
@@ -114,7 +141,7 @@ export default function ShellContent({
                 className={classNames('shell-content__tab-button', {
                   'shell-content__tab-button--active': tab === 'reviews',
                 })}
-                disabled={!preprint || hasRapidReviewed}
+                disabled={!preprint}
                 onClick={() => {
                   if (user) {
                     onRequireScreen();
@@ -185,8 +212,10 @@ export default function ShellContent({
           <ShellContentReviews
             user={user}
             preprint={preprint}
-            disabled={hasRapidReviewed}
             onClose={onCloseReviews}
+            hasRapidReviewed={hasRapidReviewed}
+            hasLongReviewed={hasLongReviewed}
+            initialContent={initialContent}
           />
         ) : tab === 'rapidReview#success' ? (
           <ShellContentReviewSuccess
@@ -263,7 +292,15 @@ ShellContentRead.propTypes = {
   longContent: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]),
 };
 
-function ShellContentReviews({ user, preprint, disabled, onClose }) {
+function ShellContentReviews({
+  user,
+  preprint,
+  disabled,
+  onClose,
+  hasRapidReviewed,
+  hasLongReviewed,
+  initialContent,
+}) {
   return (
     <div className="shell-content-review">
       <ReviewStepper
@@ -271,6 +308,9 @@ function ShellContentReviews({ user, preprint, disabled, onClose }) {
         preprint={preprint}
         disabled={disabled}
         onClose={onClose}
+        hasRapidReviewed={hasRapidReviewed}
+        hasLongReviewed={hasLongReviewed}
+        initialContent={initialContent}
        />
     </div>
   );
@@ -280,6 +320,9 @@ ShellContentReviews.propTypes = {
   preprint: PropTypes.object.isRequired,
   onClose: PropTypes.func.isRequired,
   disabled: PropTypes.bool,
+  hasLongReviewed: PropTypes.bool.isRequired,
+  hasRapidReviewed: PropTypes.bool.isRequired,
+  initialContent: PropTypes.string,
 };
 
 function ShellContentRequest({

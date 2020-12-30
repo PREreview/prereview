@@ -194,7 +194,14 @@ QontoStepIcon.propTypes = {
   completed: PropTypes.bool,
 };
 
-export default function ReviewStepper({ user, preprint, onClose }) {
+export default function ReviewStepper({
+  user,
+  preprint,
+  onClose,
+  hasRapidReviewed,
+  hasLongReviewed,
+  initialContent,
+}) {
   const classes = useStyles();
   const [activeStep, setActiveStep] = React.useState(0);
   const [answerMap, setAnswerMap] = useState({});
@@ -207,9 +214,6 @@ export default function ReviewStepper({ user, preprint, onClose }) {
   const [disabledRapid, setDisabledRapid] = React.useState(false);
   const [disabledSkip, setDisabledSkip] = React.useState(false);
   const [disabledSubmit, setDisabledSubmit] = React.useState(false);
-  const [hasLongReviewed, setHasLongReviewed] = React.useState(false);
-  const [hasRapidReviewed, setHasRapidReviewed] = React.useState(false);
-  const [initialContent, setInitialContent] = useState('');
   const [skipped, setSkipped] = React.useState(new Set());
   const steps = getSteps();
 
@@ -258,9 +262,9 @@ export default function ReviewStepper({ user, preprint, onClose }) {
           return newSkipped;
         });
         setExpandFeedback(false);
-        setHasRapidReviewed(true);
         setDisabledSubmit(true);
-        return handleComplete();
+        handleComplete();
+        return onClose(true, false);
       })
       .catch(err => alert(`An error occurred: ${err.message}`));
   };
@@ -311,11 +315,9 @@ export default function ReviewStepper({ user, preprint, onClose }) {
               return newSkipped;
             });
 
-            setHasRapidReviewed(true);
-            setHasLongReviewed(true);
             setDisabledSubmit(true);
             handleComplete(activeStep + 1);
-            return onClose();
+            return onClose(true, true);
           })
           .catch(err => alert(`An error occurred: ${err.message}`));
       }
@@ -402,36 +404,11 @@ export default function ReviewStepper({ user, preprint, onClose }) {
   }
 
   useEffect(() => {
-    console.log('rapid: ', hasRapidReviewed);
-    console.log('long: ', hasLongReviewed);
-    if (user) {
-      preprint.fullReviews.map(review => {
-        review.authors.map(author => {
-          user.personas.some(persona => {
-            if (persona.identity === author.identity) {
-              if (review.published === true) {
-                setHasLongReviewed(true);
-                setActiveStep(2);
-                handleComplete(4);
-              } else {
-                setInitialContent(
-                  review.drafts[review.drafts.length - 1].contents,
-                );
-              }
-            }
-          });
-        });
-      });
-
-      preprint.rapidReviews.map(review => {
-        user.personas.some(persona => {
-          if (persona.identity === review.author.identity) {
-            setHasRapidReviewed(true);
-          }
-        });
-      });
+    if (hasLongReviewed) {
+      setActiveStep(2);
+      handleComplete(4);
     }
-  }, [preprint, user, hasRapidReviewed, hasLongReviewed]);
+  }, []);
 
   return (
     <ThemeProvider theme={prereviewTheme}>
@@ -638,4 +615,7 @@ ReviewStepper.propTypes = {
   user: PropTypes.object,
   preprint: PropTypes.object.isRequired,
   onClose: PropTypes.func.isRequired,
+  hasLongReviewed: PropTypes.bool.isRequired,
+  hasRapidReviewed: PropTypes.bool.isRequired,
+  initialContent: PropTypes.string,
 };
