@@ -1,14 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { MenuItem } from '@reach/menu-button';
 import Value from './value';
 import RoleBadge from './role-badge';
-import { getId, arrayify } from '../utils/jsonld';
 import { getTextAnswers } from '../utils/stats';
 
 export default function TextAnswers({
   user,
-  role,
   reviews,
   isModerationInProgress,
   onModerate,
@@ -68,7 +66,6 @@ export default function TextAnswers({
 
 TextAnswers.propTypes = {
   user: PropTypes.object,
-  role: PropTypes.object,
   reviews: PropTypes.array.isRequired,
   isModerationInProgress: PropTypes.bool,
   onModerate: PropTypes.func,

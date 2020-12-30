@@ -37,7 +37,7 @@ const ReviewReader = React.memo(function ReviewReader({
 
   const handleCommentChange = value => {
     setContent(value);
-  }
+  };
 
   const canSubmit = content => {
     return content && content !== '<p></p>';

@@ -1,6 +1,6 @@
 import { QUESTIONS } from '../constants';
-import { getId, arrayify } from './jsonld';
-import { getAnswerMap, checkIfIsModerated } from './actions';
+import { arrayify } from './jsonld';
+import { checkIfIsModerated } from './actions';
 
 function isYes(textOrAnswer) {
   const text =
