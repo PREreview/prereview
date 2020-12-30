@@ -6,12 +6,24 @@
     padding-bottom: var(--xsgrd);
     display: block;
     border-bottom: 2px solid var(--ruling-color);
+
+    &.long {
+      border-bottom: none;
+      font-weight: normal;
+    }
   }
 
   & .text-answers__response-row {
     margin: 0;
     display: flex;
     background-color: var(--xxlight-grey);
+    padding: var(--sgrd);
+    &:nth-child(even) {
+      background-color: var(--xlight-grey);
+    }
+  }
+
+  & .text-answers__long-response-row {
     padding: var(--sgrd);
     &:nth-child(even) {
       background-color: var(--xlight-grey);

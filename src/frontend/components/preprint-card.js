@@ -37,7 +37,6 @@ export default function PreprintCard({
   onNewRequest,
   onNewReview,
   onNew,
-  sortOption,
   hoveredSortOption,
   isNew = false,
 }) {
@@ -68,16 +67,6 @@ export default function PreprintCard({
     dateLastRequest,
     isAnimating,
   } = useAnimatedScore(preprint);
-
-  const agoData = getAgoData(
-    sortOption,
-    hoveredSortOption,
-    lastActionType,
-    dateLastRapidReview,
-    dateLastLongReview,
-    dateLastRequest,
-    dateLastActivity,
-  );
 
   const publishedReviews = preprint.fullReviews.filter(
     review => review.published,
@@ -414,13 +403,6 @@ PreprintCard.propTypes = {
   onNewReview: PropTypes.func.isRequired,
   onNew: PropTypes.func.isRequired,
   isNew: PropTypes.bool,
-  sortOption: PropTypes.oneOf([
-    'score',
-    'new',
-    'reviewed',
-    'requested',
-    'date',
-  ]),
   hoveredSortOption: PropTypes.oneOf([
     'score',
     'new',
@@ -429,48 +411,3 @@ PreprintCard.propTypes = {
     'date',
   ]),
 };
-
-function getAgoData(
-  sortOption,
-  hoveredSortOption,
-  lastActionType,
-  dateLastRapidReview,
-  dateLastLongReview,
-  dateLastRequest,
-  dateLastActivity,
-) {
-  const option = hoveredSortOption || sortOption;
-
-  switch (option) {
-    case 'new':
-    case 'score':
-    case 'date':
-      return {
-        verb:
-          lastActionType === 'RapidPREreviewAction' ? 'reviewed' : 'requested',
-        date: dateLastActivity,
-      };
-
-    case 'reviewed':
-      return dateLastReview
-        ? {
-            verb: 'reviewed',
-            date: dateLastReview,
-          }
-        : {
-            verb: 'requested',
-            date: dateLastRequest,
-          };
-
-    case 'requested':
-      return dateLastRequest
-        ? {
-            verb: 'requested',
-            date: dateLastRequest,
-          }
-        : {
-            verb: 'reviewed',
-            date: dateLastReview,
-          };
-  }
-}

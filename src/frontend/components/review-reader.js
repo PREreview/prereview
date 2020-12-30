@@ -77,13 +77,13 @@ const ReviewReader = React.memo(function ReviewReader({
     >
       {!preview && (
         <h3 className="review-reader__title">
-          {preprint.rapidReviews.length > 0 ? preprint.rapidReviews.length : 0} rapid review{preprint.rapidReviews.length > 1 ? 's' : ''}
-          {publishedReviews.length > 0
+          {preprint.rapidReviews.length ? preprint.rapidReviews.length : 0} rapid review{preprint.rapidReviews.length > 1 ? 's' : ''}
+          {publishedReviews.length
             ? ` | ${publishedReviews.length} full review${
                 publishedReviews.length > 1 ? 's' : ''
               }`
             : ''}
-          {preprint.requests.length > 0
+          {preprint.requests.length
             ? ` | ${preprint.requests.length} request${
                 preprint.requests.length > 1 ? 's' : ''
               }`
@@ -132,29 +132,38 @@ const ReviewReader = React.memo(function ReviewReader({
             <TextAnswers
               user={user}
               role={role}
-              actions={highlightedActions}
+              reviews={preprint.rapidReviews}
               isModerationInProgress={isModerationInProgress}
               onModerate={onModerate}
             />
           )}
 
-          {publishedReviews.length && (
+          {publishedReviews && publishedReviews.length && (
             <div className="text-answers">
+              <div className="text-answers__question">Longform Reviews</div>
               {publishedReviews.map(review => {
                 if (review.published && review.drafts) {
                   return (
-                    <div key={review.id}>
-                      <div className="text-answers__question">
+                    <div
+                      key={review.id}
+                      className="text-answers__long-response-row"
+                    >
+                      <div className="text-answers__question long">
                         {review.drafts[review.drafts.length - 1].title}
                       </div>
-                      <div className="text-answers__response-row">
+                      <div className="">
                         {review.authors.map(author => (
                           <span key={author.id}>by {author.name}</span>
                         ))}
                       </div>
-                      <div className="text-answers__response-row">
-                        {review.drafts[review.drafts.length - 1].contents}
-                      </div>
+                      <div
+                        className=""
+                        dangerouslySetInnerHTML={{
+                          __html: `${
+                            review.drafts[review.drafts.length - 1].contents
+                          }`,
+                        }}
+                      />
                       {review.comments && (
                         <div>
                           <div>Comments</div>
@@ -176,7 +185,8 @@ const ReviewReader = React.memo(function ReviewReader({
                           required
                         />
                         <div className="remirror-container">
-                          <CollabEditor initialContent={''}
+                          <CollabEditor
+                            initialContent={''}
                             handleContentChange={handleCommentChange}
                           />
                         </div>
@@ -215,17 +225,17 @@ const ReviewReader = React.memo(function ReviewReader({
             </div>
           )}
 
-          {preprint.tags && (
+          {preprint.tags && preprint.tags.length && (
             <div>
               <div className="tags__title">Subject Tags</div>
               <div className="tags">
-              {preprint.tags.map(tag => {
+                {preprint.tags.map(tag => {
                   return (
                     <div key={tag.name} className="tags__tag">
                       {tag.name}
                     </div>
                   );
-              })}
+                })}
               </div>
             </div>
           )}
