@@ -61,7 +61,7 @@ export function usePostAction() {
       }
       controllerRef.current = controller;
 
-      fetch(`api/v2/v2/action`, {
+      fetch(`api/v2/action`, {
         signal: controller.signal,
         method: 'POST',
         body: JSON.stringify(action),
