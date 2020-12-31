@@ -27,7 +27,6 @@ import {
   checkIfHasReviewed,
   checkIfHasRequested
 } from '../utils/actions';
-import { UserProvider } from '../contexts/user-context';
 import Controls from './controls';
 import Button from './button';
 import TextInput from './text-input';
@@ -356,8 +355,6 @@ function StepRequest({
   onCancel,
   onSuccess
 }) {
-  const [user] = useUser();
-
   const {
     mutate: postReviewRequest,
     loadingPostReviewRequest,
