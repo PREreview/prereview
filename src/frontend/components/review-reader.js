@@ -52,13 +52,12 @@ const ReviewReader = React.memo(function ReviewReader({
   );
 
   useEffect(() => {
-    console.log('rapid: ', allRapidReviews);
-    console.log('long: ', publishedReviews);
     const allPublished = preprint.fullReviews.filter(
       review => review.published,
     );
     setPublishedReviews(allPublished);
-    if (rapidContent &&
+    if (
+      rapidContent &&
       Object.keys(rapidContent).length !== 0 &&
       rapidContent.constructor === Object
     ) {

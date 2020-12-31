@@ -570,7 +570,7 @@ export default function ReviewStepper({
                     <form>
                       <LongFormFragment
                         onContentChange={onContentChange}
-                        content={content ? content : initialContent}
+                        content={content}
                       />
                       <Box mt={2}>
                         <Typography variant="body2" gutterBottom>
