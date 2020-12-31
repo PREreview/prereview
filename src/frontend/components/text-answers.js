@@ -35,15 +35,17 @@ export default function TextAnswers({
                   return (
                     <dd
                       className="text-answers__response-row"
-                      key={author.identity}
+                      key={author ? author.identity : user.identity}
                     >
                       <div className="text-answers__user-badge-container">
-                        <RoleBadge user={author}>
+                        <RoleBadge user={author ? author : user}>
                           {isLoggedIn && (
                             <MenuItem
                               disabled={isModerationInProgress}
                               onSelect={() => {
-                                onModerate(author.identity);
+                                onModerate(
+                                  author ? author.identity : user.identity,
+                                );
                               }}
                             >
                               Report Review

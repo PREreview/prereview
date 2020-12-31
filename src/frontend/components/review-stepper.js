@@ -87,7 +87,7 @@ const useStyles = makeStyles(theme => ({
   yellow: {
     backgroundColor: '#FFFAEE',
     padding: 10,
-  }
+  },
 }));
 
 const QontoConnector = withStyles({
@@ -195,19 +195,18 @@ QontoStepIcon.propTypes = {
 };
 
 export default function ReviewStepper({
-  user,
   preprint,
   onClose,
   hasRapidReviewed,
   hasLongReviewed,
-  initialContent,
+  content,
+  onContentChange
 }) {
   const classes = useStyles();
   const [activeStep, setActiveStep] = React.useState(0);
   const [answerMap, setAnswerMap] = useState({});
   const [completed, setCompleted] = React.useState(new Set());
   const [checkedCOI, setCheckedCOI] = React.useState(false);
-  const [content, setContent] = useState('');
   const [expandConsent, setExpandConsent] = React.useState(false);
   const [expandFeedback, setExpandFeedback] = React.useState(false);
   const [expandLong, setExpandLong] = React.useState(false);
@@ -220,10 +219,6 @@ export default function ReviewStepper({
   const { mutate: postRapidReview } = usePostRapidReviews();
 
   const { mutate: postLongReview } = usePostFullReviews();
-
-  const onContentChange = value => {
-    setContent(value);
-  };
 
   const handleCOIChange = event => {
     setCheckedCOI(event.target.checked);
@@ -264,7 +259,7 @@ export default function ReviewStepper({
         setExpandFeedback(false);
         setDisabledSubmit(true);
         handleComplete();
-        return onClose(true, false);
+        return onClose(answerMap);
       })
       .catch(err => alert(`An error occurred: ${err.message}`));
   };
@@ -291,9 +286,10 @@ export default function ReviewStepper({
         )
       ) {
         if (
-          Object.keys(answerMap).length === 0 &&
+          !Object.keys(answerMap).length === 0 &&
           answerMap.constructor === Object
         ) {
+          console.log('posting rapid...', answerMap);
           postRapidReview({ ...answerMap, preprint: preprint.id })
             .then(() => {
               return;
@@ -317,7 +313,14 @@ export default function ReviewStepper({
 
             setDisabledSubmit(true);
             handleComplete(activeStep + 1);
-            return onClose(true, true);
+            if (
+              Object.keys(answerMap).length === 0 &&
+              answerMap.constructor === Object
+            ) {
+              return onClose(answerMap, content);
+            } else {
+              return onClose(false, content);
+            }
           })
           .catch(err => alert(`An error occurred: ${err.message}`));
       }
@@ -567,7 +570,7 @@ export default function ReviewStepper({
                     <form>
                       <LongFormFragment
                         onContentChange={onContentChange}
-                        content={initialContent}
+                        content={content ? content : initialContent}
                       />
                       <Box mt={2}>
                         <Typography variant="body2" gutterBottom>
@@ -612,10 +615,10 @@ export default function ReviewStepper({
 }
 
 ReviewStepper.propTypes = {
-  user: PropTypes.object,
   preprint: PropTypes.object.isRequired,
   onClose: PropTypes.func.isRequired,
+  onContentChange: PropTypes.func.isRequired,
   hasLongReviewed: PropTypes.bool.isRequired,
   hasRapidReviewed: PropTypes.bool.isRequired,
-  initialContent: PropTypes.string,
+  content: PropTypes.string,
 };

@@ -67,6 +67,10 @@ export default function ShellContent({
   const [longContent, setLongContent] = useState('');
   const [initialContent, setInitialContent] = useState('');
 
+  const onContentChange = value => {
+    setInitialContent(value);
+  };
+
   useEffect(() => {
     if (user) {
       preprint.fullReviews.map(review => {
@@ -93,7 +97,14 @@ export default function ShellContent({
         });
       });
     }
-  }, [preprint, user, hasRapidReviewed, hasLongReviewed]);
+  }, [
+    preprint,
+    user,
+    hasRapidReviewed,
+    hasLongReviewed,
+    rapidContent,
+    longContent,
+  ]);
 
   return (
     <div className="shell-content">
@@ -185,8 +196,8 @@ export default function ShellContent({
             user={user}
             preprint={preprint}
             counts={counts}
-            rapidContent={rapidContent || hasRapidReviewed}
-            longContent={longContent || hasLongReviewed}
+            rapidContent={rapidContent}
+            longContent={longContent}
           />
         ) : tab === 'request' ? (
           <ShellContentRequest
@@ -209,6 +220,7 @@ export default function ShellContent({
             user={user}
             preprint={preprint}
             onClose={onCloseReviews}
+            onContentChange={onContentChange}
             hasRapidReviewed={hasRapidReviewed}
             hasLongReviewed={hasLongReviewed}
             initialContent={initialContent}
@@ -289,10 +301,10 @@ ShellContentRead.propTypes = {
 };
 
 function ShellContentReviews({
-  user,
   preprint,
   disabled,
   onClose,
+  onContentChange,
   hasRapidReviewed,
   hasLongReviewed,
   initialContent,
@@ -300,21 +312,21 @@ function ShellContentReviews({
   return (
     <div className="shell-content-review">
       <ReviewStepper
-        user={user}
         preprint={preprint}
         disabled={disabled}
         onClose={onClose}
+        onContentChange={onContentChange}
         hasRapidReviewed={hasRapidReviewed}
         hasLongReviewed={hasLongReviewed}
-        initialContent={initialContent}
+        content={initialContent}
       />
     </div>
   );
 }
 ShellContentReviews.propTypes = {
-  user: PropTypes.object,
   preprint: PropTypes.object.isRequired,
   onClose: PropTypes.func.isRequired,
+  onContentChange: PropTypes.func.isRequired,
   disabled: PropTypes.bool,
   hasLongReviewed: PropTypes.bool.isRequired,
   hasRapidReviewed: PropTypes.bool.isRequired,

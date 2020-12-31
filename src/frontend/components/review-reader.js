@@ -6,7 +6,6 @@ import classNames from 'classnames';
 import Barplot from './barplot';
 import Controls from './controls';
 import Button from './button';
-import { getId } from '../utils/jsonld';
 import { getYesNoStats } from '../utils/stats';
 import TextAnswers from './text-answers';
 import { PotentialRoles } from './role-list';
@@ -28,6 +27,11 @@ const ReviewReader = React.memo(function ReviewReader({
 }) {
   const [content, setContent] = useState('');
   const [commentTitle, setCommentTitle] = useState('');
+  const [allRapidReviews, setAllRapidReviews] = useState(preprint.rapidReviews);
+  const [publishedReviews, setPublishedReviews] = useState(
+    preprint.fullReviews,
+  );
+  const [allReviews] = useState(publishedReviews.concat(allRapidReviews));
 
   const {
     mutate: postComment,
@@ -47,11 +51,30 @@ const ReviewReader = React.memo(function ReviewReader({
     defaultHighlightedRoleIds || [],
   );
 
-  const publishedReviews = preprint.fullReviews.filter(
-    review => review.published,
-  );
+  useEffect(() => {
+    console.log('rapid: ', allRapidReviews);
+    console.log('long: ', publishedReviews);
+    const allPublished = preprint.fullReviews.filter(
+      review => review.published,
+    );
+    setPublishedReviews(allPublished);
+    if (rapidContent &&
+      Object.keys(rapidContent).length !== 0 &&
+      rapidContent.constructor === Object
+    ) {
+      console.log('rapid content found: ', rapidContent);
+      setAllRapidReviews(allRapidReviews =>
+        allRapidReviews.concat(rapidContent),
+      );
+    }
 
-  let allReviews = publishedReviews.concat(preprint.rapidReviews);
+    if (longContent) {
+      console.log('long content found: ', longContent);
+      setPublishedReviews(allPublishedReviews =>
+        allPublishedReviews.concat(longContent),
+      );
+    }
+  }, [rapidContent, longContent]);
 
   useEffect(() => {
     if (
@@ -62,12 +85,6 @@ const ReviewReader = React.memo(function ReviewReader({
     }
   }, [defaultHighlightedRoleIds, highlightedRoleIds]);
 
-  const highlightedActions = highlightedRoleIds.length
-    ? allReviews.filter(action =>
-        highlightedRoleIds.some(roleId => getId(action.agent) === roleId),
-      )
-    : allReviews;
-
   return (
     <div
       className={classNames('review-reader', {
@@ -77,17 +94,33 @@ const ReviewReader = React.memo(function ReviewReader({
     >
       {!preview && (
         <h3 className="review-reader__title">
-          {preprint.rapidReviews.length ? preprint.rapidReviews.length : 0} rapid review{preprint.rapidReviews.length > 1 ? 's' : ''}
-          {publishedReviews.length
-            ? ` | ${publishedReviews.length} full review${
-                publishedReviews.length > 1 ? 's' : ''
-              }`
-            : ''}
-          {preprint.requests.length
-            ? ` | ${preprint.requests.length} request${
-                preprint.requests.length > 1 ? 's' : ''
-              }`
-            : ''}
+          {!allRapidReviews.length &&
+          !publishedReviews.length &&
+          !preprint.requests.length ? (
+            <div>
+              No reviews or requests for review. Would you like to add one?
+            </div>
+          ) : allRapidReviews.length ? (
+            <span>{` ${allRapidReviews.length} rapid review${
+              allRapidReviews.length > 1 ? 's' : ''
+            }`}</span>
+          ) : (
+            ''
+          )}
+          {publishedReviews.length ? (
+            <span>{`${publishedReviews.length} full review${
+              publishedReviews.length > 1 ? 's' : ''
+            }`}</span>
+          ) : (
+            ''
+          )}
+          {preprint.requests.length ? (
+            <span>{`${preprint.requests.length} request${
+              preprint.requests.length > 1 ? 's' : ''
+            }`}</span>
+          ) : (
+            ''
+          )}
         </h3>
       )}
 
@@ -119,8 +152,8 @@ const ReviewReader = React.memo(function ReviewReader({
           )}
 
           <Barplot
-            stats={getYesNoStats(preprint.rapidReviews)}
-            nReviews={preprint.rapidReviews.length}
+            stats={getYesNoStats(allRapidReviews)}
+            nReviews={allRapidReviews.length}
           >
             <ShareMenu
               identifier={preprint.handle}
@@ -132,7 +165,7 @@ const ReviewReader = React.memo(function ReviewReader({
             <TextAnswers
               user={user}
               role={role}
-              reviews={preprint.rapidReviews}
+              reviews={allRapidReviews}
               isModerationInProgress={isModerationInProgress}
               onModerate={onModerate}
             />
@@ -219,7 +252,28 @@ const ReviewReader = React.memo(function ReviewReader({
                         </Controls>
                       </form>
                     </div>
-                  )
+                  );
+                }
+                if (typeof review === 'string') {
+                  return (
+                    <div
+                      key={'new-review'}
+                      className="text-answers__long-response-row"
+                    >
+                      <div className="text-answers__question long">
+                        {'New user review'}
+                      </div>
+                      <div className="">
+                        <span key={user.id}>by {user.name}</span>
+                      </div>
+                      <div
+                        className=""
+                        dangerouslySetInnerHTML={{
+                          __html: `${review}`,
+                        }}
+                      />
+                    </div>
+                  );
                 }
               })}
             </div>
@@ -254,8 +308,8 @@ ReviewReader.propTypes = {
   defaultHighlightedRoleIds: PropTypes.arrayOf(PropTypes.string),
   isModerationInProgress: PropTypes.bool,
   onModerate: PropTypes.func,
-  rapidContent: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]),
-  longContent: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]),
+  rapidContent: PropTypes.object,
+  longContent: PropTypes.oneOfType([PropTypes.object, PropTypes.string]),
 };
 
 export default ReviewReader;
