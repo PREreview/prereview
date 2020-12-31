@@ -174,16 +174,14 @@ const ReviewReader = React.memo(function ReviewReader({
             <div className="text-answers">
               <div className="text-answers__question">Longform Reviews</div>
               {publishedReviews.map(review => {
-                if (review.published && review.drafts) {
+                if (review.published && review.drafts && review.drafts.length) {
                   return (
                     <div
                       key={review.id}
                       className="text-answers__long-response-row"
                     >
                       <div className="text-answers__question long">
-                        {review.drafts.length > 1
-                          ? review.drafts[review.drafts.length - 1].title
-                          : review.drafts[0].title}
+                        {review.drafts[review.drafts.length - 1].title}
                       </div>
                       <div className="">
                         {review.authors.map(author => (
@@ -194,9 +192,7 @@ const ReviewReader = React.memo(function ReviewReader({
                         className=""
                         dangerouslySetInnerHTML={{
                           __html: `${
-                            review.drafts.length > 1
-                              ? review.drafts[review.drafts.length - 1].contents
-                              : review.drafts[0].contents
+                            review.drafts[review.drafts.length - 1].contents
                           }`,
                         }}
                       />
