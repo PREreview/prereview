@@ -29,10 +29,18 @@ export class Persona extends BaseEntity {
   @ManyToOne({ entity: () => User })
   identity!: User;
 
+  @Fixture(() => true)
   @Property()
   isActive!: boolean;
 
-  //@Fixture({ get: faker => faker.image.avatar(), optional: true })
+  @Fixture(() => false)
+  @Property()
+  isAnonymous!: boolean;
+
+  @Fixture(faker => faker.lorem.paragraph())
+  @Property({ columnType: 'text', nullable: true })
+  bio?: string;
+
   @Fixture(faker => faker.image.avatar())
   @Property({ nullable: true })
   avatar?: Buffer;
@@ -46,9 +54,19 @@ export class Persona extends BaseEntity {
   @OneToMany({ entity: () => Request, mappedBy: 'author' })
   requests: Collection<Request> = new Collection<Request>(this);
 
-  constructor(name: string, avatar: Buffer) {
+  constructor(
+    name: string,
+    identity: User,
+    isAnonymous = false,
+    bio: string,
+    avatar?: Buffer,
+  ) {
     super();
     this.name = name;
+    this.identity = identity;
+    this.isAnonymous = isAnonymous;
+    this.bio = bio;
     this.avatar = avatar;
+    this.isActive = true;
   }
 }

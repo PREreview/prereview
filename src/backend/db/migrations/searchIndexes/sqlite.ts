@@ -41,7 +41,6 @@ export class SearchSqlite extends Migration {
     );
     this.addSql(
       'CREATE VIRTUAL TABLE "full_review_draft_fts" USING fts5( \
-                title, \
                 contents, \
                 content="full_review_draft", \
                 content_rowid="id" \
@@ -50,24 +49,24 @@ export class SearchSqlite extends Migration {
     this.addSql(
       'CREATE TRIGGER full_review_draft_after_insert AFTER INSERT ON "full_review_draft" \
         BEGIN \
-          INSERT INTO "full_review_draft_fts" (rowid, title, contents) \
-          VALUES (new.id, new.title, new.contents); \
+          INSERT INTO "full_review_draft_fts" (rowid, contents) \
+          VALUES (new.id, new.contents); \
         END;',
     );
     this.addSql(
       'CREATE TRIGGER full_review_draft_after_delete AFTER DELETE ON "full_review_draft" \
         BEGIN \
-          INSERT INTO "full_review_draft_fts" (full_review_draft_fts, rowid, title, contents) \
-          VALUES ("delete", old.id, old.title, old.contents); \
+          INSERT INTO "full_review_draft_fts" (full_review_draft_fts, rowid, contents) \
+          VALUES ("delete", old.id, old.contents); \
         END;',
     );
     this.addSql(
       'CREATE TRIGGER full_review_draft_after_update AFTER UPDATE ON "full_review_draft" \
         BEGIN \
-          INSERT INTO "full_review_draft_fts" (full_review_draft_fts, rowid, title, contents) \
-          VALUES ("delete", old.id, old.title, old.contents); \
-          INSERT INTO "full_review_draft_fts" (rowid, title, contents) \
-          VALUES (new.id, new.title, new.contents); \
+          INSERT INTO "full_review_draft_fts" (full_review_draft_fts, rowid, contents) \
+          VALUES ("delete", old.id, old.contents); \
+          INSERT INTO "full_review_draft_fts" (rowid, contents) \
+          VALUES (new.id, new.contents); \
         END;',
     );
   }

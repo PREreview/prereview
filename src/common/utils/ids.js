@@ -24,9 +24,9 @@ export function createPreprintId(
   }
 
   let vendor;
-  if (id.startsWith('doi:')) {
+  if (id.toLowerCase().startsWith('doi:')) {
     vendor = 'doi';
-  } else if (id.startsWith('arXiv:')) {
+  } else if (id.toLowerCase().startsWith('arxiv:')) {
     vendor = 'arxiv';
   } else if (doiRegex().test(id)) {
     vendor = 'doi';

@@ -25,6 +25,8 @@ import WelcomeModal from './welcome-modal';
 import XLink from './xlink';
 import AddButton from './add-button';
 import { ORG } from '../constants';
+import Banner from './banner';
+import { createPreprintId } from '../../common/utils/ids.js'
 
 const searchParamsToObject = params => {
   const obj = {};
@@ -182,11 +184,11 @@ export default function Home() {
                   }}
                   onViewInContext={({ preprint, tab }) => {
                     history.push(
-                      `/${unprefix(preprint.doi || preprint.arXivId)}`,
+                      `/preprints/${createPreprintId(preprint.handle)}`,
                       {
-                        preprint: omit(preprint, ['potentialAction']),
+                        preprint: preprint,
                         tab,
-                      }, // #FIXME, do we need omit?
+                      }, 
                     );
                   }}
                 />

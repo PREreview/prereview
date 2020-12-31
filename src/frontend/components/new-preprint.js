@@ -1,33 +1,45 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { useLocation, useHistory } from 'react-router-dom';
 import identifiersArxiv from 'identifiers-arxiv';
 import doiRegex from 'doi-regex';
-import { unversionDoi } from '../utils/ids';
-import { unprefix } from '../utils/jsonld';
 import {
-  useGetPreprint,
-  useGetUser,
-  usePostPreprints,
-  // usePostRapidReview,
-  // usePostFullReview
+  createPreprintIdentifierCurie,
+  createPreprintId,
+  unversionDoi
+} from '../utils/ids';
+import { unprefix, cleanup, getId, nodeify } from '../utils/jsonld';
+import {
+  usePreprint,
+  usePreprintActions
+} from '../hooks/old-hooks';
+import {
+  usePostFullReviews,
+  usePostRapidReviews,
+  usePostRequests,
 } from '../hooks/api-hooks.tsx';
 import { useLocalState } from '../hooks/ui-hooks';
 import SubjectEditor from './subject-editor';
 import RapidFormFragment from './rapid-form-fragment';
-import { UserProvider } from '../contexts/user-context';
+import {
+  getReviewAnswers,
+  checkIfAllAnswered,
+  checkIfHasReviewed,
+  checkIfHasRequested
+} from '../utils/actions';
 import Controls from './controls';
 import Button from './button';
 import TextInput from './text-input';
 import PreprintPreview from './preprint-preview';
+import { preprintify } from '../utils/preprints';
 
 export default function NewPreprint({
   user,
   onCancel,
   onSuccess,
-  onViewInContext,
+  onViewInContext
 }) {
-  const location = useLocation(); // location.state can be {preprint, tab, isSingleStep} with tab being `request` or `review` (so that we know on which tab the shell should be activated with)
+  const location = useLocation(); // location.state can be {preprint, tab, isSingleStep} with tab being `request` or `review` (so that we know on which tab the shell should be activated with
   const qs = new URLSearchParams(location.search);
 
   const isSingleStep = location.state && location.state.isSingleStep;
@@ -46,42 +58,59 @@ export default function NewPreprint({
       (location.state &&
         location.state.preprint &&
         location.state.preprint.url) ||
-      null,
+      null
   });
 
-  const preprint = useGetPreprint(
+  const [actions, fetchActionsProgress] = usePreprintActions(identifier);
+
+  const [preprint, resolvePreprintStatus] = usePreprint(
     identifier,
     location.state && location.state.preprint,
-    url,
+    url
   );
+
+  const [action, setAction] = useState(null);
 
   const [step, setStep] = useState(
     location.state && location.state.tab === 'review'
       ? 'NEW_REVIEW'
       : location.state && location.state.tab === 'request'
       ? 'NEW_REQUEST'
-      : 'NEW_PREPRINT',
+      : 'NEW_PREPRINT'
+  );
+
+  const isNew =
+    !fetchActionsProgress.isActive &&
+    actions.filter(_action => getId(_action) !== getId(action)).length === 0;
+
+  const handleViewInContext = useCallback(
+    data => {
+      onViewInContext(data, isNew);
+    },
+    [isNew, onViewInContext]
   );
 
   return (
     <div className="new-preprint">
       {step === 'NEW_PREPRINT' ? (
         <StepPreprint
+          actions={actions}
+          fetchActionsProgress={fetchActionsProgress}
           user={user}
           onCancel={onCancel}
           onStep={setStep}
           onIdentifier={(identifier, url = null) => {
-            console.log({ identifier, url });
             setIdentifierAndUrl({ identifier, url });
           }}
           identifier={identifier}
           preprint={preprint}
+          resolvePreprintStatus={resolvePreprintStatus}
           onViewInContext={onViewInContext}
         />
       ) : preprint && step === 'NEW_REVIEW' ? (
         <StepReview
           isSingleStep={isSingleStep}
-          onCancel={() => {
+          onCancel={e => {
             if (isSingleStep) {
               onCancel();
             } else {
@@ -89,10 +118,10 @@ export default function NewPreprint({
             }
           }}
           preprint={preprint}
-          onSuccess={() => {
+          onSuccess={()=> {
             setStep('REVIEW_SUCCESS');
           }}
-          onViewInContext={onViewInContext}
+          onViewInContext={handleViewInContext}
         />
       ) : preprint && step === 'NEW_REQUEST' ? (
         <StepRequest
@@ -108,7 +137,7 @@ export default function NewPreprint({
           onSuccess={() => {
             setStep('REQUEST_SUCCESS');
           }}
-          onViewInContext={onViewInContext}
+          onViewInContext={handleViewInContext}
         />
       ) : preprint && step === 'REVIEW_SUCCESS' ? (
         <StepReviewSuccess
@@ -116,7 +145,7 @@ export default function NewPreprint({
           onClose={() => {
             onSuccess(preprint);
           }}
-          onViewInContext={onViewInContext}
+          onViewInContext={handleViewInContext}
         />
       ) : preprint && step === 'REQUEST_SUCCESS' ? (
         <StepRequestSuccess
@@ -124,7 +153,7 @@ export default function NewPreprint({
           onClose={() => {
             onSuccess(preprint);
           }}
-          onViewInContext={onViewInContext}
+          onViewInContext={handleViewInContext}
         />
       ) : null}
     </div>
@@ -134,7 +163,7 @@ NewPreprint.propTypes = {
   user: PropTypes.object,
   onCancel: PropTypes.func.isRequired,
   onSuccess: PropTypes.func.isRequired,
-  onViewInContext: PropTypes.func.isRequired,
+  onViewInContext: PropTypes.func.isRequired
 };
 
 function StepPreprint({
@@ -144,15 +173,18 @@ function StepPreprint({
   onIdentifier,
   identifier,
   preprint,
-  onViewInContext,
+  actions,
+  fetchActionsProgress,
+  resolvePreprintStatus,
+  onViewInContext
 }) {
   const history = useHistory();
   const location = useLocation();
 
   const [value, setValue] = useState(unprefix(identifier));
 
-  const hasReviewed = useGetUser(user, preprint); // #FIXME
-  const hasRequested = useGetUser(user, preprint); // #FIXME
+  const hasReviewed = checkIfHasReviewed(user, actions);
+  const hasRequested = checkIfHasRequested(user, actions);
 
   // Note: biorXiv use versioned DOI in URL but do not register those DOIs with
   // doi.org => they 404 when we dereference them
@@ -182,7 +214,8 @@ function StepPreprint({
             if (location.search) {
               const qs = new URLSearchParams(location.search);
               if (qs.get('identifier')) {
-                history.replace('/new');
+                qs.delete('identifier');
+                history.replace({ pathname: location.pathname, search: qs.toString() });
               }
             }
 
@@ -213,9 +246,12 @@ function StepPreprint({
 
       {preprint ? (
         <PreprintPreview preprint={preprint} />
-      ) : preprint.loading ? (
+      ) : resolvePreprintStatus.isActive ? (
         <p>{`resolving ${identifier}`}</p>
-      ) : preprint.error && unversionedDoi && unversionedDoi !== doi ? (
+      ) : resolvePreprintStatus.error &&
+        resolvePreprintStatus.error.statusCode === 404 &&
+        unversionedDoi &&
+        unversionedDoi !== doi ? (
         <p>
           Could not find an entry corresponding to <code>{doi}</code>. Try with{' '}
           <a
@@ -232,16 +268,16 @@ function StepPreprint({
         </p>
       ) : null}
 
-      {preprint.loading && (
+      {fetchActionsProgress.isActive && (
         <p>Checking for existing reviews or requests for reviews…</p>
       )}
 
       <Controls
         className="new-preprint__button-bar"
-        error={preprint.error} // #FIXME
+        error={resolvePreprintStatus.error}
       >
         <Button
-          onClick={() => {
+          onClick={e => {
             setValue('');
             onIdentifier('');
             onCancel();
@@ -250,25 +286,50 @@ function StepPreprint({
           Cancel
         </Button>
         <Button
-          onClick={() => {
+          onClick={e => {
             onStep('NEW_REQUEST');
           }}
           disabled={
-            preprint.loading || hasRequested || !identifier || !preprint
+            fetchActionsProgress.isActive ||
+            hasRequested ||
+            !identifier ||
+            !preprint
           }
         >
           Request reviews
         </Button>
         <Button
-          onClick={() => {
+          onClick={e => {
             onViewInContext({
               preprint,
-              tab: 'review',
+              tab: 'rapidReview'
             });
           }}
-          disabled={preprint.loading || hasReviewed || !identifier || !preprint}
+          disabled={
+            fetchActionsProgress.isActive ||
+            hasReviewed ||
+            !identifier ||
+            !preprint
+          }
         >
-          Add review
+          Add rapid review
+        </Button>
+
+          <Button
+          onClick={e => {
+            onViewInContext({
+              preprint,
+              tab: 'longReview'
+            });
+          }}
+          disabled={
+            fetchActionsProgress.isActive ||
+            hasReviewed ||
+            !identifier ||
+            !preprint
+          }
+        >
+          Add long-form review
         </Button>
       </Controls>
     </div>
@@ -283,116 +344,22 @@ StepPreprint.propTypes = {
   preprint: PropTypes.object,
   resolvePreprintStatus: PropTypes.object,
   onViewInContext: PropTypes.func.isRequired,
+  actions: PropTypes.array.isRequired,
+  fetchActionsProgress: PropTypes.object.isRequired,
 };
 
-function StepReview({ preprint, onViewInContext, onCancel, isSingleStep }) {
-  const [user] = UserProvider();
-  const postRapidReview = usePostRapidReview();
-  const postFullReview = usePostFullReview();
-  const [subjects, setSubjects] = useLocalState(
-    'subjects',
-    user.defaultRole,
-    preprint,
-    [],
-  );
-  const [answerMap, setAnswerMap] = useLocalState(
-    'answerMap',
-    user.defaultRole,
-    preprint,
-    {},
-  );
-
-  const canSubmit = GetUserReview(answerMap);
-
-  return (
-    <div className="new-preprint__step-review">
-      <header className="new-preprint__title">Add a review</header>
-
-      <PreprintPreview preprint={preprint} />
-
-      <form
-        onSubmit={e => {
-          e.preventDefault();
-        }}
-      >
-        <SubjectEditor
-          subjects={subjects}
-          onAdd={subject => {
-            setSubjects(
-              subjects.concat(subject).sort((a, b) => {
-                return (a.alternateName || a.name).localeCompare(
-                  b.alternateName || b.name,
-                );
-              }),
-            );
-          }}
-          onDelete={subject => {
-            setSubjects(
-              subjects.filter(_subject => _subject.name !== subject.name),
-            );
-          }}
-        />
-
-        <RapidFormFragment
-          answerMap={answerMap}
-          onChange={(key, value) => {
-            setAnswerMap(prev => {
-              return Object.assign({}, prev, { [key]: value });
-            });
-          }}
-        />
-
-        <Controls
-          error={postPrereview.FIXME}
-          className="new-preprint__button-bar"
-        >
-          <Button
-            onClick={() => {
-              onCancel();
-            }}
-            disabled={postPrereview.loading}
-          >
-            {isSingleStep ? 'Cancel' : 'Go Back'}
-          </Button>
-
-          <Button
-            onClick={() => {
-              onViewInContext({
-                preprint,
-                tab: 'review',
-              });
-            }}
-            disabled={postPrereview.loading}
-          >
-            View In Context
-          </Button>
-          <Button
-            primary={true}
-            onClick={() => {
-              postPrereview(preprint)
-                .then(() => alert('PREreview posted successfully.'))
-                .catch(err => `An error occurred: ${err}`);
-            }}
-            isWaiting={postPrereview.loading}
-            disabled={postPrereview.loading || !canSubmit}
-          >
-            Submit
-          </Button>
-        </Controls>
-      </form>
-    </div>
-  );
-}
-StepReview.propTypes = {
-  isSingleStep: PropTypes.bool,
-  preprint: PropTypes.object.isRequired,
-  onCancel: PropTypes.func.isRequired,
-  onSuccess: PropTypes.func.isRequired,
-  onViewInContext: PropTypes.func.isRequired,
-};
-
-function StepRequest({ isSingleStep, preprint, onCancel }) {
-  const postPreprint = PostPreprint();
+function StepRequest({
+  isSingleStep,
+  preprint,
+  onViewInContext,
+  onCancel,
+  onSuccess
+}) {
+  const {
+    mutate: postReviewRequest,
+    loadingPostReviewRequest,
+    errorPostReviewRequest,
+  } = usePostRequests();
 
   return (
     <div className="new-preprint__step-request">
@@ -400,25 +367,28 @@ function StepRequest({ isSingleStep, preprint, onCancel }) {
 
       <PreprintPreview preprint={preprint} />
 
-      <Controls error={postPreprint.FIXME} className="new-preprint__button-bar">
+      <Controls error={errorPostReviewRequest} className="new-preprint__button-bar">
         <Button
-          onClick={() => {
+          onClick={e => {
             onCancel();
           }}
-          disabled={postPreprint.loading}
+          disabled={loadingPostReviewRequest}
         >
           {isSingleStep ? 'Cancel' : 'Go Back'}
         </Button>
 
         <Button
           primary={true}
-          isWaiting={postPreprint.loading}
-          onClick={() => {
-            postPreprint(preprint)
-              .then(() => alert('Preprint added successfully.'))
-              .catch(err => alert(`An error occurred: ${err}`));
-          }}
-          disabled={postPreprint.loading}
+          isWaiting={loadingPostReviewRequest}
+          onClick={e => {
+            postReviewRequest({preprint: preprint})
+              .then(() => {
+                alert('Request for reviews submitted succesfully.')
+                return onSuccess()
+              })
+              .catch(err => alert(`An error occured: ${err.message}`))
+            }}
+          disabled={loadingPostReviewRequest}
         >
           Submit
         </Button>
@@ -431,7 +401,7 @@ StepRequest.propTypes = {
   preprint: PropTypes.object.isRequired,
   onCancel: PropTypes.func.isRequired,
   onSuccess: PropTypes.func.isRequired,
-  onViewInContext: PropTypes.func.isRequired,
+  onViewInContext: PropTypes.func.isRequired
 };
 
 function StepReviewSuccess({ preprint, onClose, onViewInContext }) {
@@ -459,7 +429,7 @@ function StepReviewSuccess({ preprint, onClose, onViewInContext }) {
 StepReviewSuccess.propTypes = {
   preprint: PropTypes.object.isRequired,
   onClose: PropTypes.func.isRequired,
-  onViewInContext: PropTypes.func.isRequired,
+  onViewInContext: PropTypes.func.isRequired
 };
 
 function StepRequestSuccess({ preprint, onClose, onViewInContext }) {
@@ -487,5 +457,5 @@ function StepRequestSuccess({ preprint, onClose, onViewInContext }) {
 StepRequestSuccess.propTypes = {
   preprint: PropTypes.object.isRequired,
   onClose: PropTypes.func.isRequired,
-  onViewInContext: PropTypes.func.isRequired,
+  onViewInContext: PropTypes.func.isRequired
 };

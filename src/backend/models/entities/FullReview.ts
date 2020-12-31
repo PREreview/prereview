@@ -35,7 +35,7 @@ export class FullReview extends BaseEntity {
   @OneToMany({ entity: () => FullReviewDraft, mappedBy: 'parent' })
   drafts: Collection<FullReviewDraft> = new Collection<FullReviewDraft>(this);
 
-  @ManyToMany({ entity: () => Persona, mappedBy: 'fullReviews', owner: true })
+  @ManyToMany({ entity: () => Persona, inversedBy: 'fullReviews' })
   authors: Collection<Persona> = new Collection<Persona>(this);
 
   @ManyToOne({ entity: () => Preprint })
@@ -44,9 +44,10 @@ export class FullReview extends BaseEntity {
   @OneToMany({ entity: () => Comment, mappedBy: 'parent' })
   comments: Collection<Comment> = new Collection<Comment>(this);
 
-  constructor(doi: string, published = false) {
+  constructor(preprint: Preprint, published = false, doi?: string) {
     super();
-    this.doi = doi;
+    this.preprint = preprint;
     this.published = published;
+    this.doi = doi;
   }
 }

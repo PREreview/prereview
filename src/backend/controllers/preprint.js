@@ -1,7 +1,8 @@
 import router from 'koa-joi-router';
 import { QueryOrder } from '@mikro-orm/core';
 import { getLogger } from '../log.js';
-import resolve from '../utils/resolve.js';
+import { resolvePreprint } from '../utils/resolve.ts';
+import { createPreprintId } from '../../common/utils/ids';
 import { getErrorMessages } from '../utils/errors';
 
 const log = getLogger('backend:controllers:preprint');
@@ -44,21 +45,35 @@ export default function controller(preprints, thisUser) {
     handler: async ctx => {
       const { identifier } = ctx.query;
       log.debug(`Resolving preprint with ID: ${identifier}`);
-      let data;
+      let preprint, data;
       try {
-        data = await resolve(identifier);
+        preprint = await preprints.findOneByIdOrHandle(
+          createPreprintId(identifier),
+          [
+            'fullReviews.authors',
+            'fullReviews.drafts',
+            'rapidReviews.author',
+            'requests',
+            'tags',
+          ],
+        );
+        if (preprint) {
+          log.debug(`Found cached preprint ${identifier}`);
+          ctx.body = preprint;
+          return;
+        }
+        data = await resolvePreprint(identifier);
         if (data) {
-          log.debug(`Adding a preprint & its resolved metadata to database.`);
-          const preprint = preprints.create(data);
+          log.debug('Adding a preprint & its resolved metadata to database.');
+          preprint = preprints.create(data);
           await preprints.persistAndFlush(preprint);
         }
       } catch (err) {
         log.error(`Preprint resolution failed: ${err}`);
         ctx.throw(400, `Preprint resolution failed: ${err}`);
       }
-
       if (!data) ctx.throw(404, 'No preprint found.');
-      ctx.body = data;
+      ctx.body = preprint;
     },
   });
 
