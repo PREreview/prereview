@@ -2,6 +2,7 @@ import router from 'koa-joi-router';
 import { QueryOrder } from '@mikro-orm/core';
 import { getLogger } from '../log.js';
 import { resolvePreprint } from '../utils/resolve.ts';
+import { createPreprintId } from '../../common/utils/ids';
 import { getErrorMessages } from '../utils/errors';
 
 const log = getLogger('backend:controllers:preprint');
@@ -46,9 +47,24 @@ export default function controller(preprints, thisUser) {
       log.debug(`Resolving preprint with ID: ${identifier}`);
       let preprint, data;
       try {
+        preprint = await preprints.findOneByIdOrHandle(
+          createPreprintId(identifier),
+          [
+            'fullReviews.authors',
+            'fullReviews.drafts',
+            'rapidReviews.author',
+            'requests',
+            'tags',
+          ],
+        );
+        if (preprint) {
+          log.debug(`Found cached preprint ${identifier}`);
+          ctx.body = preprint;
+          return;
+        }
         data = await resolvePreprint(identifier);
         if (data) {
-          log.debug(`Adding a preprint & its resolved metadata to database.`);
+          log.debug('Adding a preprint & its resolved metadata to database.');
           preprint = preprints.create(data);
           await preprints.persistAndFlush(preprint);
         }
@@ -57,7 +73,6 @@ export default function controller(preprints, thisUser) {
         ctx.throw(400, `Preprint resolution failed: ${err}`);
       }
       if (!data) ctx.throw(404, 'No preprint found.');
-      log.debug('preprint********', preprint);
       ctx.body = preprint;
     },
   });
