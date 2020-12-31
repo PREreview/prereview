@@ -302,7 +302,7 @@ function StepPreprint({
           onClick={e => {
             onViewInContext({
               preprint,
-              tab: 'rapidReview'
+              tab: 'reviews'
             });
           }}
           disabled={
@@ -312,24 +312,7 @@ function StepPreprint({
             !preprint
           }
         >
-          Add rapid review
-        </Button>
-
-          <Button
-          onClick={e => {
-            onViewInContext({
-              preprint,
-              tab: 'longReview'
-            });
-          }}
-          disabled={
-            fetchActionsProgress.isActive ||
-            hasReviewed ||
-            !identifier ||
-            !preprint
-          }
-        >
-          Add long-form review
+          Add reviews
         </Button>
       </Controls>
     </div>
