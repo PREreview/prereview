@@ -96,7 +96,7 @@ export default function controller(groupModel, thisUser) {
       let res;
 
       try {
-        res = await groupModel.findAll(['members']);
+        res = await groupModel.findAll(['members', 'members.personas']);
 
         ctx.body = {
           status: 200,

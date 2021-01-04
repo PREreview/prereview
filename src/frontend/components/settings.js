@@ -34,7 +34,7 @@ export default function Settings() {
 
         <SettingsRoles user={user} />
         <SettingsNotifications user={user} />
-        <SettingsApi user={user} />
+        {/*<SettingsApi user={user} />*/}
       </div>
     </div>
   );

@@ -54,6 +54,8 @@ export default function AdminPanel() {
     queryParams: searchParamsToObject(search),
   });
 
+  const [moderators, setModerators] = useState([]);
+
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [revokeRole, setRevokeRole] = useState(null);
 
@@ -67,11 +69,22 @@ export default function AdminPanel() {
   useEffect(() => {
     if (!loadingGroups) {
       if (groupsData) {
-        setGroups(groupsData[0].data);
+        let filteredModerators = [];
+        groupsData.data.map(group => {
+          group.members.map(member => {
+            filteredModerators = [...filteredModerators, member];
+          });
+        });
+        filteredModerators = filteredModerators.filter(
+          (moderator, index, self) =>
+            self.findIndex(m => m.id === moderator.id) === index,
+        );
+        setModerators(filteredModerators);
+        setGroups(groupsData.data);
         setLoading(false);
       }
     }
-  }, [groupsData, loadingGroups]);
+  }, [loadingGroups, groupsData, user]);
 
   if (loading) {
     return <Loading />;
@@ -96,66 +109,45 @@ export default function AdminPanel() {
             </Button>
           </header>
 
-          {groups.total_rows === 0 &&
-          !groups.loading &&
-          !added.length ? (
+          {!moderators.length ? (
             <div>No moderators.</div>
           ) : (
             <div>
               <ul className="admin-panel__card-list">
-                {added
-                  .concat(
-                    groups.rows
-                      .map(row => row.doc)
-                      .filter(
-                        role =>
-                          !excluded.has(getId(role)) &&
-                          !added.some(_role => getId(_role) === getId(role)),
-                      ),
-                  )
-                  .map(role => (
-                    <li key={getId(role)} className="admin-panel__card-list-item">
-                      <div className="admin-panel__card-list-item__left">
-                        <RoleBadgeUI role={role} />
-                        <span>{role.name || unprefix(getId(role))}</span>
-                      </div>
-                      <div className="admin-panel__card-list-item__right">
-                        <LabelStyle>
-                          {role['@type'] === 'AnonymousReviewerRole'
-                            ? 'Anonymous'
-                            : 'Public'}
-                        </LabelStyle>
-                        <IconButton
-                          className="admin-panel__remove-button"
-                          onClick={() => {
-                            setRevokeRole(role);
-                          }}
+                {moderators.map(moderator => {
+                  moderator.personas.map(persona => {
+                    console.log('person: ', persona);
+                    if (moderator.defaultPersona === persona.id) {
+                      return (
+                        <li
+                          key={persona.id}
+                          className="admin-panel__card-list-item"
                         >
-                          <MdClose className="admin-panel__remove-button-icon" />
-                        </IconButton>
-                      </div>
-                    </li>
-                  ))}
+                          <div className="admin-panel__card-list-item__left">
+                            <RoleBadgeUI user={persona} />
+                            <span>{persona.name}</span>
+                          </div>
+                          <div className="admin-panel__card-list-item__right">
+                            <LabelStyle>
+                              {persona.isActive ? 'Public' : 'Anonymous'}
+                            </LabelStyle>
+                            <IconButton
+                              className="admin-panel__remove-button"
+                              onClick={() => {
+                                setRevokeRole(moderator);
+                              }}
+                            >
+                              <MdClose className="admin-panel__remove-button-icon" />
+                            </IconButton>
+                          </div>
+                        </li>
+                      );
+                    }
+                  });
+                })}
               </ul>
             </div>
           )}
-
-          <div className="admin-panel__page-nav">
-            {/* Cloudant returns the same bookmark when it hits the end of the list */}
-            {!!(
-              groups.rows.length < groups.total_rows &&
-              groups.bookmark !== bookmark
-            ) && (
-              <Button
-                onClick={e => {
-                  e.preventDefault();
-                  setBookmark(groups.bookmark);
-                }}
-              >
-                More
-              </Button>
-            )}
-          </div>
         </section>
 
         {isAddModalOpen && (
