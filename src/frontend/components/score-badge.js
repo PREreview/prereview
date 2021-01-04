@@ -7,7 +7,8 @@ const ScoreBadge = React.forwardRef(function ScoreBadge(
   {
     isHighlighted,
     nRequests,
-    nReviews,
+    nRapidReviews,
+    nLongReviews,
     dateFirstActivity,
     now,
     isAnimating,
@@ -18,7 +19,9 @@ const ScoreBadge = React.forwardRef(function ScoreBadge(
   const timeScore = getTimeScore(dateFirstActivity, now);
 
   const statusClass =
-    nRequests > 0 && nReviews === 0 ? 'needs-attention' : 'normal';
+    nRequests > 0 && nRapidReviews === 0 && nLongReviews === 0
+      ? 'needs-attention'
+      : 'normal';
 
   /*
      the arc polar cordinates need to be converted to x,y for svg see:
@@ -80,7 +83,9 @@ const ScoreBadge = React.forwardRef(function ScoreBadge(
           className="score-badge__clock-svg__active-path"
         />
       </svg>
-      <div className="score-badge__score">{nRequests + nReviews}</div>
+      <div className="score-badge__score">
+        {nRequests + nRapidReviews + nLongReviews}
+      </div>
     </div>
   );
 });
@@ -88,10 +93,11 @@ const ScoreBadge = React.forwardRef(function ScoreBadge(
 ScoreBadge.propTypes = {
   isHighlighted: PropTypes.bool,
   isAnimating: PropTypes.bool,
-  now: PropTypes.string,
+  now: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date)]),
   nRequests: PropTypes.number.isRequired,
-  nReviews: PropTypes.number.isRequired,
-  dateFirstActivity: PropTypes.string.isRequired,
+  nRapidReviews: PropTypes.number.isRequired,
+  nLongReviews: PropTypes.number.isRequired,
+  dateFirstActivity: PropTypes.string,
 };
 
 export default ScoreBadge;

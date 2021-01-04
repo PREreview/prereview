@@ -6,7 +6,6 @@ import classNames from 'classnames';
 import Barplot from './barplot';
 import Controls from './controls';
 import Button from './button';
-import { getId } from '../utils/jsonld';
 import { getYesNoStats } from '../utils/stats';
 import TextAnswers from './text-answers';
 import { PotentialRoles } from './role-list';
@@ -28,12 +27,21 @@ const ReviewReader = React.memo(function ReviewReader({
 }) {
   const [content, setContent] = useState('');
   const [commentTitle, setCommentTitle] = useState('');
+  const [allRapidReviews, setAllRapidReviews] = useState(preprint.rapidReviews);
+  const [publishedReviews, setPublishedReviews] = useState(
+    preprint.fullReviews,
+  );
+  const [allReviews] = useState(publishedReviews.concat(allRapidReviews));
 
-  const { mutate: postComment, loadingPostComment, errorPostComment } = usePostComments();
+  const {
+    mutate: postComment,
+    loadingPostComment,
+    errorPostComment,
+  } = usePostComments();
 
   const handleCommentChange = value => {
     setContent(value);
-  }
+  };
 
   const canSubmit = content => {
     return content && content !== '<p></p>';
@@ -43,7 +51,29 @@ const ReviewReader = React.memo(function ReviewReader({
     defaultHighlightedRoleIds || [],
   );
 
-  let allReviews = preprint.fullReviews.concat(preprint.rapidReviews);
+  useEffect(() => {
+    const allPublished = preprint.fullReviews.filter(
+      review => review.published,
+    );
+    setPublishedReviews(allPublished);
+    if (
+      rapidContent &&
+      Object.keys(rapidContent).length !== 0 &&
+      rapidContent.constructor === Object
+    ) {
+      console.log('rapid content found: ', rapidContent);
+      setAllRapidReviews(allRapidReviews =>
+        allRapidReviews.concat(rapidContent),
+      );
+    }
+
+    if (longContent) {
+      console.log('long content found: ', longContent);
+      setPublishedReviews(allPublishedReviews =>
+        allPublishedReviews.concat(longContent),
+      );
+    }
+  }, [rapidContent, longContent]);
 
   useEffect(() => {
     if (
@@ -54,12 +84,6 @@ const ReviewReader = React.memo(function ReviewReader({
     }
   }, [defaultHighlightedRoleIds, highlightedRoleIds]);
 
-  const highlightedActions = highlightedRoleIds.length
-    ? allReviews.filter(action =>
-        highlightedRoleIds.some(roleId => getId(action.agent) === roleId),
-      )
-    : allReviews;
-
   return (
     <div
       className={classNames('review-reader', {
@@ -69,21 +93,37 @@ const ReviewReader = React.memo(function ReviewReader({
     >
       {!preview && (
         <h3 className="review-reader__title">
-          {preprint.rapidReviews.length > 0 ? preprint.rapidReviews.length : 0} rapid review{preprint.rapidReviews.length > 1 ? 's' : ''}
-          {preprint.fullReviews.length > 0
-            ? ` | ${preprint.fullReviews.length} full review${
-                preprint.fullReviews.length > 1 ? 's' : ''
-              }`
-            : ''}
-          {preprint.requests.length > 0
-            ? ` | ${preprint.requests.length} request${
-                preprint.requests.length > 1 ? 's' : ''
-              }`
-            : ''}
+          {!allRapidReviews.length &&
+          !publishedReviews.length &&
+          !preprint.requests.length ? (
+            <div>
+              No reviews or requests for review. Would you like to add one?
+            </div>
+          ) : allRapidReviews.length ? (
+            <span>{` ${allRapidReviews.length} rapid review${
+              allRapidReviews.length > 1 ? 's' : ''
+            }`}</span>
+          ) : (
+            ''
+          )}
+          {publishedReviews.length ? (
+            <span>{`${publishedReviews.length} full review${
+              publishedReviews.length > 1 ? 's' : ''
+            }`}</span>
+          ) : (
+            ''
+          )}
+          {preprint.requests.length ? (
+            <span>{`${preprint.requests.length} request${
+              preprint.requests.length > 1 ? 's' : ''
+            }`}</span>
+          ) : (
+            ''
+          )}
         </h3>
       )}
 
-      {(preprint.rapidReviews.length || preprint.fullReviews.length) && (
+      {allReviews.length ? (
         <Fragment>
           {!preview && (
             <Fragment>
@@ -91,7 +131,7 @@ const ReviewReader = React.memo(function ReviewReader({
               <div className="review-reader__persona-selector">
                 <PotentialRoles
                   role={role}
-                  reviews={allReviews}
+                  allReviews={allReviews}
                   hasReviewed={
                     rapidContent || (longContent && longContent.length)
                   }
@@ -110,43 +150,55 @@ const ReviewReader = React.memo(function ReviewReader({
             </Fragment>
           )}
 
-          <Barplot
-            stats={getYesNoStats(highlightedActions)}
-            nTotalReviews={preprint.rapidReviews.length}
-          >
-            <ShareMenu
-              identifier={preprint.handle}
-              roleIds={highlightedRoleIds}
-            />
-          </Barplot>
+          {allRapidReviews && allRapidReviews.length ? (
+            <>
+              <Barplot
+                stats={getYesNoStats(allRapidReviews)}
+                nReviews={allRapidReviews.length}
+              >
+                <ShareMenu
+                  identifier={preprint.handle}
+                  roleIds={highlightedRoleIds}
+                />
+              </Barplot>
 
-          {!preview && (
-            <TextAnswers
-              user={user}
-              role={role}
-              actions={highlightedActions}
-              isModerationInProgress={isModerationInProgress}
-              onModerate={onModerate}
-            />
-          )}
+              <TextAnswers
+                user={user}
+                role={role}
+                reviews={allRapidReviews}
+                isModerationInProgress={isModerationInProgress}
+                onModerate={onModerate}
+              />
+            </>
+          ) : null}
 
-          {preprint.fullReviews.length && (
+          {publishedReviews && publishedReviews.length ? (
             <div className="text-answers">
-              {preprint.fullReviews.map(review => {
-                if (review.published) {
+              <div className="text-answers__question">Longform Reviews</div>
+              {publishedReviews.map(review => {
+                console.log(review);
+                if (review.published && review.drafts && review.drafts.length) {
                   return (
-                    <div>
-                      <div className="text-answers__question">
+                    <div
+                      key={review.id}
+                      className="text-answers__long-response-row"
+                    >
+                      <div className="text-answers__question long">
                         {review.drafts[review.drafts.length - 1].title}
                       </div>
-                      <div className="text-answers__response-row">
+                      <div className="">
                         {review.authors.map(author => (
                           <span key={author.id}>by {author.name}</span>
                         ))}
                       </div>
-                      <div className="text-answers__response-row">
-                        {review.drafts[review.drafts.length - 1].contents}
-                      </div>
+                      <div
+                        className=""
+                        dangerouslySetInnerHTML={{
+                          __html: `${
+                            review.drafts[review.drafts.length - 1].contents
+                          }`,
+                        }}
+                      />
                       {review.comments && (
                         <div>
                           <div>Comments</div>
@@ -168,7 +220,8 @@ const ReviewReader = React.memo(function ReviewReader({
                           required
                         />
                         <div className="remirror-container">
-                          <CollabEditor initialContent={''}
+                          <CollabEditor
+                            initialContent={''}
                             handleContentChange={handleCommentChange}
                           />
                         </div>
@@ -201,27 +254,54 @@ const ReviewReader = React.memo(function ReviewReader({
                         </Controls>
                       </form>
                     </div>
-                  )
+                  );
+                }
+                if (typeof review === 'string') {
+                  return (
+                    <div
+                      key={'new-review'}
+                      className="text-answers__long-response-row"
+                    >
+                      <div className="text-answers__question long">
+                        {'New user review'}
+                      </div>
+                      <div className="">
+                        <span key={user.id}>by {user.name}</span>
+                      </div>
+                      <div
+                        className=""
+                        dangerouslySetInnerHTML={{
+                          __html: `${review}`,
+                        }}
+                      />
+                    </div>
+                  );
                 }
               })}
             </div>
-          )}
+          ) : null}
 
-          {preprint.tags && (
+          {preprint.tags && preprint.tags.length ? (
             <div>
               <div className="tags__title">Subject Tags</div>
               <div className="tags">
-              {preprint.tags.map(tag => {
+                {preprint.tags.map(tag => {
                   return (
                     <div key={tag.name} className="tags__tag">
                       {tag.name}
                     </div>
                   );
-              })}
+                })}
               </div>
             </div>
-          )}
+          ) : null}
         </Fragment>
+      ) : (
+        <div className="text-answers">
+          <div className="text-answers__question long">
+            No reviews yet. Would you like to leave one?
+          </div>
+        </div>
       )}
     </div>
   );
@@ -236,8 +316,8 @@ ReviewReader.propTypes = {
   defaultHighlightedRoleIds: PropTypes.arrayOf(PropTypes.string),
   isModerationInProgress: PropTypes.bool,
   onModerate: PropTypes.func,
-  rapidContent: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]),
-  longContent: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]),
+  rapidContent: PropTypes.object,
+  longContent: PropTypes.oneOfType([PropTypes.object, PropTypes.string]),
 };
 
 export default ReviewReader;

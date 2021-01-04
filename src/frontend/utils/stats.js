@@ -1,6 +1,6 @@
 import { QUESTIONS } from '../constants';
-import { getId, arrayify } from './jsonld';
-import { getAnswerMap, checkIfIsModerated } from './actions';
+import { arrayify } from './jsonld';
+import { checkIfIsModerated } from './actions';
 
 function isYes(textOrAnswer) {
   const text =
@@ -50,33 +50,21 @@ function isUnsure(textOrAnswer) {
  * Tags are computed following a majority rule
  */
 export function getTags(preprint) {
-  const hasReviews = preprint.reviews && preprint.reviews.length > 0;
+  const hasReviews = preprint.rapidReviews.length || preprint.fullReviews.length;
 
-  const hasRequests = preprint.requests && preprint.requests.length > 0;
+  const hasRequests = preprint.requests.length;
 
-  const reviewActions = preprint.reviews && preprint.reviews.length;
-
-  const threshold = reviewActions ? Math.ceil(reviewActions.length / 2) : 0;
+  const threshold = preprint.rapidReviews.length
+    ? Math.ceil(preprint.rapidReviews.length / 2)
+    : 0;
 
   // hasData
-  const reviewsWithData =
-    reviewActions &&
-    reviewActions.filter(preprint => {
-      if (preprint.reviews && preprint.reviews.reviewAnswer) {
-        const answers = preprint.reviews.reviewAnswer;
-
-        for (let i = 0; i < answers.length; i++) {
-          const answer = answers[i];
-          if (answer.parentItem) {
-            const questionId = getId(answer.parentItem);
-            if (questionId === 'question:ynAvailableData') {
-              return isYes(answer);
-            }
-          }
-        }
-      }
-      return false;
-    });
+  const reviewsWithData = preprint.rapidReviews.filter(review => {
+    if (review.ynAvailableData) {
+      return isYes(review.ynAvailableData);
+    }
+    return false;
+  });
 
   const hasData =
     reviewsWithData &&
@@ -84,24 +72,12 @@ export function getTags(preprint) {
     reviewsWithData.length >= threshold;
 
   // hasCode
-  const reviewsWithCode =
-    reviewActions &&
-    reviewActions.filter(preprint => {
-      if (preprint.reviews && preprint.reviews.reviewAnswer) {
-        const answers = preprint.reviews.reviewAnswer;
-
-        for (let i = 0; i < answers.length; i++) {
-          const answer = answers[i];
-          if (answer.parentItem) {
-            const questionId = getId(answer.parentItem);
-            if (questionId === 'question:ynAvailableCode') {
-              return isYes(answer);
-            }
-          }
-        }
-      }
-      return false;
-    });
+  const reviewsWithCode = preprint.rapidReviews.filter(review => {
+    if (review.ynAvailableCode) {
+      return isYes(review.ynAvailableCode);
+    }
+    return false;
+  });
 
   const hasCode =
     reviewsWithCode &&
@@ -111,21 +87,19 @@ export function getTags(preprint) {
   // subjects
   const subjectCountMap = {};
 
-  if (reviewActions) {
-    reviewActions.forEach(action => {
-      if (action.reviews && action.reviews.about) {
-        action.reviews.about.forEach(subject => {
-          if (typeof subject.name === 'string') {
-            if (subject.name in subjectCountMap) {
-              subjectCountMap[subject.name] += 1;
-            } else {
-              subjectCountMap[subject.name] = 1;
-            }
+  preprint.rapidReviews.forEach(action => {
+    if (action.reviews && action.reviews.about) {
+      action.reviews.about.forEach(subject => {
+        if (typeof subject.name === 'string') {
+          if (subject.name in subjectCountMap) {
+            subjectCountMap[subject.name] += 1;
+          } else {
+            subjectCountMap[subject.name] = 1;
           }
-        });
-      }
-    });
-  }
+        }
+      });
+    }
+  });
 
   const subjects = Object.keys(subjectCountMap).filter(subjectName => {
     const count = subjectCountMap[subjectName];
@@ -136,53 +110,42 @@ export function getTags(preprint) {
 }
 
 export function getYesNoStats(reviews = []) {
-  return reviews
-    .filter(review => review.author)
-    .map(review => {
-      return QUESTIONS.filter(({ type }) => type === 'YesNoQuestion').map(
-        ({ identifier, question }) => {
-          return {
-            questionId: `${identifier}`,
-            nReviews: reviews.length,
-            question,
-            yes: isYes(review[identifier]),
-            no: isNo(review[identifier]),
-            na: isNa(review[identifier]),
-            unsure: isUnsure(review[identifier]),
-          };
-        },
-      );
-    });
+  return QUESTIONS.filter(({ type }) => type === 'YesNoQuestion').map(
+    ({ identifier, question }) => {
+      return {
+        questionId: `question:${identifier}`,
+        nReviews: reviews.length,
+        question,
+        yes: reviews.filter(review => {
+          return isYes(review[identifier]);
+        }),
+        no: reviews.filter(review => {
+          return isNo(review[identifier]);
+        }),
+        na: reviews.filter(review => {
+          return isNa(review[identifier]);
+        }),
+        unsure: reviews.filter(review => {
+          return isUnsure(review[identifier]);
+        }),
+      };
+    },
+  );
 }
 
-export function getTextAnswers(actions = []) {
-  const answersData = arrayify(actions)
-    .filter(action => action['@type'] === 'RapidPREreviewAction')
-    .map(action => {
-      return {
-        actionId: getId(action),
-        roleId: getId(action.agent),
-        answerMap: getAnswerMap(action),
-      };
-    });
-
+export function getTextAnswers(reviews = []) {
   return QUESTIONS.filter(({ type }) => {
     return type === 'Question';
-  }).map(({ question, identifier, required }) => {
+  }).map(({ question, identifier }) => {
     return {
       questionId: `question:${identifier}`,
       question,
-      answers: answersData
-        .map(({ actionId, roleId, answerMap }) => {
-          return {
-            actionId,
-            roleId,
-            text: answerMap[identifier],
-          };
-        })
-        .filter(({ text }) => {
-          return required || text !== undefined;
-        }),
+      answers: reviews.map(review => {
+        return {
+          author: review.author,
+          text: review[identifier],
+        };
+      })
     };
   });
 }

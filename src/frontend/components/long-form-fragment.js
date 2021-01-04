@@ -7,7 +7,7 @@ import CollabEditor from './collab-editor';
 export default function LongFormFragment({ content, onContentChange }) {
   const handleContentChange = value => {
     onContentChange(value);
-  }
+  };
 
   return (
     <div className="rapid-form-fragment">

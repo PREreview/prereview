@@ -1,15 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-export default function Barplot({ nTotalReviews, stats, children }) {
+export default function Barplot({ stats, nReviews, children }) {
   return (
     <div className="barplot">
-      {stats[0] ? (
+      {stats ? (
         <div>
           <div className="barplot__question-list-header">
             {}
             <div className="barplot__question-list-header__left">
-              <span>Showing {nTotalReviews} Reviews</span>
+              <span>Showing {nReviews} Reviews</span>
             </div>
 
             <div className="barplot__question-list-header__right">
@@ -41,100 +41,104 @@ export default function Barplot({ nTotalReviews, stats, children }) {
       ) : null}
 
       <ul className="barplot__question-list">
-        {stats[0] ? stats[0].map(
-          ({ questionId, nReviews, question, yes, no, na, unsure }) => (
-            <li
-              className="barplot__question-list__item"
-              key={questionId}
-              tabIndex={0}
-            >
-              <table className="barplot__question-table">
-                <caption className="barplot__question">{question}</caption>
-                <thead className="barplot__table-header">
-                  <tr className="barplot__segment-titles">
-                    <th
-                      className="barplot__segment-title"
-                      style={{ width: `${(stats.length / nReviews) * 100}%` }}
-                    >
-                      {yes ? 'yes' : ''}
-                    </th>
+        {stats ? (
+          stats.map(
+            ({ questionId, nReviews, question, yes, no, na, unsure }) => (
+              <li
+                className="barplot__question-list__item"
+                key={questionId}
+                tabIndex={0}
+              >
+                <table className="barplot__question-table">
+                  <caption className="barplot__question">{question}</caption>
+                  <thead className="barplot__table-header">
+                    <tr className="barplot__segment-titles">
+                      <th
+                        className="barplot__segment-title"
+                        style={{ width: `${(yes.length / nReviews) * 100}%` }}
+                      >
+                        {yes.length ? 'yes' : ''}
+                      </th>
 
-                    <th
-                      className="barplot__segment-title"
-                      style={{
-                        width: `${(stats.length / nReviews) * 100}%`,
-                      }}
-                    >
-                      {unsure ? 'unsure' : ''}
-                    </th>
+                      <th
+                        className="barplot__segment-title"
+                        style={{
+                          width: `${(unsure.length / nReviews) * 100}%`,
+                        }}
+                      >
+                        {unsure.length ? 'unsure' : ''}
+                      </th>
 
-                    <th
-                      className="barplot__segment-title"
-                      style={{ width: `${(stats.length / nReviews) * 100}%` }}
-                    >
-                      {na ? 'N/A' : ''}
-                    </th>
+                      <th
+                        className="barplot__segment-title"
+                        style={{ width: `${(na.length / nReviews) * 100}%` }}
+                      >
+                        {na.length ? 'N/A' : ''}
+                      </th>
 
-                    <th
-                      className="barplot__segment-title"
-                      style={{ width: `${(stats.length / nReviews) * 100}%` }}
-                    >
-                      {no ? 'no' : ''}
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="barplot__responses">
-                  <tr className="barplot__bar-segments">
-                    <td
-                      className="barplot__bar-segment barplot__bar-segment--yes"
-                      style={{ width: `${(stats.length / nReviews) * 100}%` }}
-                    >
-                      <span className="barplot__bar-segment__number">
-                        {yes ? 1 : 0}
-                      </span>
-                    </td>
+                      <th
+                        className="barplot__segment-title"
+                        style={{ width: `${(no.length / nReviews) * 100}%` }}
+                      >
+                        {no.length ? 'no' : ''}
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="barplot__responses">
+                    <tr className="barplot__bar-segments">
+                      <td
+                        className="barplot__bar-segment barplot__bar-segment--yes"
+                        style={{ width: `${(yes.length / nReviews) * 100}%` }}
+                      >
+                        <span className="barplot__bar-segment__number">
+                          {yes.length}
+                        </span>
+                      </td>
 
-                    <td
-                      className="barplot__bar-segment barplot__bar-segment--unsure"
-                      style={{
-                        width: `${(stats.length / nReviews) * 100}%`,
-                      }}
-                    >
-                      <span className="barplot__bar-segment__number">
-                        {unsure ? 1 : 0}
-                      </span>
-                    </td>
+                      <td
+                        className="barplot__bar-segment barplot__bar-segment--unsure"
+                        style={{
+                          width: `${(unsure.length / nReviews) * 100}%`,
+                        }}
+                      >
+                        <span className="barplot__bar-segment__number">
+                          {unsure.length}
+                        </span>
+                      </td>
 
-                    <td
-                      className="barplot__bar-segment barplot__bar-segment--na"
-                      style={{ width: `${(stats.length / nReviews) * 100}%` }}
-                    >
-                      <span className="barplot__bar-segment__number">
-                        {na ? 1 : 0}
-                      </span>
-                    </td>
+                      <td
+                        className="barplot__bar-segment barplot__bar-segment--na"
+                        style={{ width: `${(na.length / nReviews) * 100}%` }}
+                      >
+                        <span className="barplot__bar-segment__number">
+                          {na.length}
+                        </span>
+                      </td>
 
-                    <td
-                      className="barplot__bar-segment barplot__bar-segment--no"
-                      style={{ width: `${(stats.length / nReviews) * 100}%` }}
-                    >
-                      <span className="barplot__bar-segment__number">
-                        {no ? 1 : 0}
-                      </span>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </li>
-          ),
-        ) : (<div>No rapid reviews. Would you like to leave one?</div>)}
+                      <td
+                        className="barplot__bar-segment barplot__bar-segment--no"
+                        style={{ width: `${(no.length / nReviews) * 100}%` }}
+                      >
+                        <span className="barplot__bar-segment__number">
+                          {no.length}
+                        </span>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </li>
+            ),
+          )
+        ) : (
+          <div>No rapid reviews. Would you like to leave one?</div>
+        )}
       </ul>
     </div>
   );
 }
 
 Barplot.propTypes = {
-  nTotalReviews: PropTypes.number.isRequired,
   stats: PropTypes.array.isRequired,
+  nReviews: PropTypes.number.isRequired,
   children: PropTypes.element, // share menu
 };

@@ -1,47 +1,25 @@
-// base imports
 import React, {
   Fragment,
-  useContext,
   useEffect,
   useRef,
   useState,
   useCallback,
 } from 'react';
-import { Link } from 'react-router-dom';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
-import debounce from 'lodash/debounce';
-import { MenuLink } from '@reach/menu-button';
-
-// utils
-import { UserContext } from '../contexts/user-context';
-import { checkIfRoleLacksMininmalData } from '../utils/roles';
-
-// components
-import NoticeBadge from './notice-badge';
-import UserBadge from './user-badge';
-import XLink from './xlink';
-
-// icons
 import { MdDragHandle, MdUnfoldMore, MdUnfoldLess } from 'react-icons/md';
 import IconButton from './icon-button';
 import PreReviewLogo from './pre-review-logo';
+import debounce from 'lodash/debounce';
 
 const SHELL_HEADER_HEIGHT = 40; // !! keep in sync with CSS
 
 export default function Shell({ children, defaultStatus = 'default' }) {
-  const [user] = useContext(UserContext);
   const [isDown, setIsDown] = useState(false);
   const ref = useRef();
   const nextHeightRef = useRef(null);
   const needForRafRef = useRef(true);
   const rafIdRef = useRef(null);
-
-  const loginUrl = process.env.IS_EXTENSION
-    ? `/login?next=${encodeURIComponent(extensionNextURL)}`
-    : `/login?next=${location.pathname}`;
-
-  const showProfileNotice = checkIfRoleLacksMininmalData(user);
 
   // shell height is set in `%` units through the `max-height` CSS property
   const [height, setHeight] = useState(50);
@@ -288,76 +266,6 @@ export default function Shell({ children, defaultStatus = 'default' }) {
                 </div>
               </IconButton>
             </div>
-
-            {user ? (
-              <UserBadge
-                className="shell-content__user"
-                user={user}
-                showNotice={showProfileNotice}
-              >
-                {showProfileNotice && (
-                  <MenuLink
-                    as={process.env.IS_EXTENSION ? undefined : Link}
-                    to={process.env.IS_EXTENSION ? undefined : '/settings'}
-                    href={process.env.IS_EXTENSION ? `settings` : undefined}
-                    target={process.env.IS_EXTENSION ? '_blank' : undefined}
-                  >
-                    Complete Profile
-                    <div className="menu__link-item__icon">
-                      <NoticeBadge />
-                    </div>
-                  </MenuLink>
-                )}
-
-                <MenuLink
-                  as={process.env.IS_EXTENSION ? undefined : Link}
-                  to={process.env.IS_EXTENSION ? undefined : '/settings'}
-                  href={process.env.IS_EXTENSION ? `settings` : undefined}
-                  target={process.env.IS_EXTENSION ? '_blank' : undefined}
-                >
-                  User Settings
-                </MenuLink>
-
-                {user.isAdmin && (
-                  <MenuLink
-                    as={process.env.IS_EXTENSION ? undefined : Link}
-                    to={process.env.IS_EXTENSION ? undefined : '/admin'}
-                    href={process.env.IS_EXTENSION ? `admin` : undefined}
-                    target={process.env.IS_EXTENSION ? '_blank' : undefined}
-                  >
-                    Admin Settings
-                  </MenuLink>
-                )}
-
-                {user.isAdmin && (
-                  <MenuLink
-                    as={process.env.IS_EXTENSION ? undefined : Link}
-                    to={process.env.IS_EXTENSION ? undefined : '/block'}
-                    href={process.env.IS_EXTENSION ? `block` : undefined}
-                    target={process.env.IS_EXTENSION ? '_blank' : undefined}
-                  >
-                    Moderate Users
-                  </MenuLink>
-                )}
-
-                {!!(user && user.isModerator && !user.isModerated) && (
-                  <MenuLink
-                    as={process.env.IS_EXTENSION ? undefined : Link}
-                    to={process.env.IS_EXTENSION ? undefined : '/moderate'}
-                    href={process.env.IS_EXTENSION ? `moderate` : undefined}
-                    target={process.env.IS_EXTENSION ? '_blank' : undefined}
-                  >
-                    Moderate Reviews
-                  </MenuLink>
-                )}
-
-                <MenuLink href={`/logout`}>Logout</MenuLink>
-              </UserBadge>
-            ) : (
-              <XLink href={loginUrl} to={loginUrl}>
-                Login
-              </XLink>
-            )}
           </div>
         </div>
 
