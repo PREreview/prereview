@@ -1,11 +1,3 @@
-//const fetch = require('node-fetch');
-//const fs = require('fs');
-//const { create } = require('xmlbuilder2');
-//const Feed = require('feed').Feed;
-import fs from 'fs';
-//import path from 'path';
-import fetch from 'node-fetch';
-import ndjson from 'ndjson';
 import _ from 'lodash';
 import { dbWrapper } from '../db.ts';
 import {
@@ -28,279 +20,9 @@ import {
   Work,
 } from '../models/entities/index.ts';
 
-//import fs from 'fs';
-
-//const REVIEWS_API_URL =
-//  'https://outbreaksci.prereview.org/api/action?q=@type:RapidPREreviewAction&include_docs=true';
-
-const USERS_API_URL =
-  'https://outbreaksci.prereview.org/api/role?q=*:*&include_docs=true';
-
-// only fetches preprints with reviews
-const PREPRINTS_API_URL = 'https://outbreaksci.prereview.org/api/preprint?';
-const REVIEWED_PREPRINTS_QUERY =
-  'q=nReviews:[1+TO+Infinity]&sort=["-score<number>","-datePosted<number>","-dateLastActivity<number>"]&include_docs=true&counts=["hasPeerRec","hasOthersRec","hasData","hasCode","hasReviews","hasRequests","subjectName"]&ranges={"nReviews":{"0":"[0+TO+1}","1+":"[1+TO+Infinity]","2+":"[2+TO+Infinity]","3+":"[3+TO+Infinity]","4+":"[4+TO+Infinity]","5+":"[5+TO+Infinity]"},"nRequests":{"0":"[0+TO+1}","1+":"[1+TO+Infinity]","2+":"[2+TO+Infinity]","3+":"[3+TO+Infinity]","4+":"[4+TO+Infinity]","5+":"[5+TO+Infinity]"}}';
-
-//const getReviews = async bookmark => {
-//  let url = REVIEWS_API_URL;
-//
-//  if (bookmark) {
-//    url = url + `&bookmark=${bookmark}`;
-//  }
-//
-//  try {
-//    const response = await fetch(url);
-//    const data = await response.json();
-//    return data;
-//  } catch (error) {
-//    console.log('oh dear, looks like we broke the reviews fetch: ', error);
-//  }
-//};
-
-const processJsonDump = (path, cb) => {
-  fs.createReadStream(path)
-    .pipe(ndjson.parse())
-    .on('data', obj => cb(obj));
-};
-
-// eslint-disable-next-line no-unused-vars
-const processJson = path => {
-  const users = new Map();
-  const roles = new Map();
-  const contacts = new Map();
-  const processJsonArray = obj => {
-    obj.map(item => {
-      if (item['@type'] === 'Person') {
-        console.log('inserting person');
-        users.set(item['@id'], item);
-      } else if (item['@type'] === 'PublicReviewerRole') {
-        console.log('inserting role');
-        roles.set(item['@id'], item);
-      } else if (item['@type'] === 'ContactPoint') {
-        console.log('inserting contact');
-        contacts.set(item['@id'], item);
-      }
-    });
-  };
-  processJsonDump(path, processJsonArray);
-};
-
-const getUsers = async bookmark => {
-  let url = USERS_API_URL;
-
-  if (bookmark) {
-    url = url + `&bookmark=${bookmark}`;
-  }
-
+async function importPreprints(site, preprints, preprintModel, preprintsMap) {
   try {
-    const response = await fetch(url);
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.log('oh dear, looks like we broke the users fetch: ', error);
-  }
-};
-
-const getPreprints = async bookmark => {
-  let url = PREPRINTS_API_URL + REVIEWED_PREPRINTS_QUERY;
-
-  if (bookmark) {
-    url =
-      PREPRINTS_API_URL +
-      `bookmark=${bookmark}` +
-      `&${REVIEWED_PREPRINTS_QUERY}`;
-  }
-
-  try {
-    const response = await fetch(url);
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.log('oh dear, looks like we broke the users fetch: ', error);
-  }
-};
-
-//const getAllReviews = async () => {
-//  let prevBookmark = null;
-//  let results = [];
-//  let prevRows = [];
-//
-//  do {
-//    let { rows, bookmark } = await getReviews(prevBookmark);
-//    prevBookmark = bookmark;
-//    prevRows = rows;
-//    results = results.concat(rows);
-//  } while (prevRows.length > 0);
-//
-//  return results;
-//};
-
-const getAllRoles = async () => {
-  let prevBookmark = null;
-  let results = [];
-  let prevRows = [];
-
-  do {
-    let { rows, bookmark } = await getUsers(prevBookmark);
-    prevBookmark = bookmark;
-    prevRows = rows;
-    results = results.concat(rows);
-  } while (prevRows.length > 0);
-
-  return results;
-};
-
-const getAllPreprints = async () => {
-  let prevBookmark = null;
-  let results = [];
-  let prevRows = [];
-
-  do {
-    let { rows, bookmark } = await getPreprints(prevBookmark);
-    prevBookmark = bookmark;
-    prevRows = rows;
-    results = results.concat(rows);
-  } while (prevRows.length > 0);
-
-  return results;
-};
-
-// eslint-disable-next-line no-unused-vars
-const OSrPREImportAll = async () => {
-  const roles = await getAllRoles();
-  const rolesMap = roles.reduce((rolesMap, role) => {
-    rolesMap.set(role.id, {
-      isAnonymous: role.doc['@type'] === 'AnonymousReviewerRole',
-      name:
-        role.doc['@type'] === 'AnonymousReviewerRole'
-          ? 'Anonymous'
-          : role.doc.name,
-    });
-    return rolesMap;
-  }, new Map());
-
-  //const allReviews = await getAllReviews();
-
-  //const sorted = cleaned.sort((a, b) => b.dateReviewed - a.dateReviewed);
-
-  //const reviews = JSON.stringify(sorted, null, 2);
-
-  const preprints = await getAllPreprints();
-
-  const processAnswers = answers => {
-    const rapid = {};
-    let full;
-    answers.map(answer => {
-      const key = answer.parentItem.split(':')[1];
-      if (key.startsWith('yn')) {
-        if (answer.text === 'n.a.') {
-          answer.text = 'N/A';
-        }
-        rapid[`${key}`] = answer.text;
-      } else if (key.startsWith('c') && answer.text) {
-        if (!full) {
-          full = 'Imported from Outbreak Science:\n';
-        }
-        full.concat(`${key}:\n ${answer.text}`);
-      }
-    });
-    return { rapid, full };
-  };
-
-  const processActions = actions => {
-    let rapid = [],
-      full = [],
-      requests = [];
-
-    actions.map(action => {
-      if (action['@type'] === 'RequestForRapidPREreviewAction') {
-        requests.push({
-          author: rolesMap.get(action.agent),
-          createdAt: action.startTime,
-          updatedAt: new Date(),
-        });
-      } else if (action['@type'] === 'RapidPREreviewAction') {
-        const reviewHeader = {
-          author: rolesMap.get(action.agent),
-          createdAt: action.startTime,
-          updatedAt: new Date(),
-        };
-        const { rapid: rapidAnswers, full: fullAnswers } = processAnswers(
-          action.resultReview.reviewAnswer,
-        );
-        if (rapidAnswers) {
-          rapid.push({ ...reviewHeader, ...rapidAnswers });
-        }
-
-        if (fullAnswers) {
-          full.push({ ...reviewHeader, content: fullAnswers });
-        }
-      }
-    });
-    return { rapid, full, requests };
-  };
-
-  const cleaned = preprints.map(preprint => {
-    const { rapid, full, requests } = processActions(
-      preprint.doc.potentialAction,
-    );
-
-    return {
-      handle: preprint.doc.doi
-        ? `doi:${preprint.doc.doi}`
-        : `arXivId:${preprint.doc.arXivId}`,
-      title: preprint.doc.name,
-      preprintServer: preprint.doc.preprintServer
-        ? preprint.doc.preprintServer.name.toLowerCase()
-        : undefined,
-      datePosted: new Date(preprint.doc.datePosted),
-      contentUrl: preprint.doc.encoding
-        ? preprint.doc.encoding.contentUrl
-        : undefined,
-      contentEncoding: preprint.doc.encoding
-        ? preprint.doc.encoding.encodingFormat
-        : undefined,
-      createdAt: preprint.doc.sdDateRetrieved,
-      updatedAt: new Date(),
-      rapidReviews: rapid,
-      fullReviews: full,
-      requests: requests,
-    };
-  });
-
-  console.log('cleaned:', JSON.stringify(cleaned, null, 2));
-
-  //fs.writeFile('reviews.json', reviews, (error) => {
-  //  if (error) throw error;
-  //  console.log('A JSON file of all reviews has been saved to reviews.json!');
-  //});
-
-  //return sorted;
-};
-
-//const processPreprints = async () => {
-//  const hasReviews = await getAllPreprints();
-//  const withDOI = hasReviews.filter(preprint => !!preprint.doc.doi);
-//
-//  const processed = withDOI.map(preprint => {
-//    return {
-//      title: preprint.doc.name,
-//      doi: preprint.doc.doi,
-//      link: `https://outbreaksci.prereview.org/${preprint.doc.doi}`,
-//    };
-//  });
-//
-//  return processed;
-//}
-
-async function prereviewOrgImportPreprints(db, client, preprintsMap) {
-  const preprintModel = preprintModelWrapper(db);
-  try {
-    const oldPreprints = await client.query(
-      'SELECT id AS handle,title,date_created AS "createdAt",source AS url,publisher AS "preprintServer",date_published AS "datePosted" FROM preprints',
-    );
-
-    for (let r of oldPreprints.rows) {
+    for (let r of preprints.rows) {
       r.createdAt = new Date(r.createdAt);
       r.datePosted = new Date(r.datePosted);
       let handle, lookup;
@@ -313,40 +35,77 @@ async function prereviewOrgImportPreprints(db, client, preprintsMap) {
         handle = r.handle.replace(/^arxiv\//, '');
         lookup = await resolvePreprint(handle);
         handle = `arxiv:${handle}`;
+      } else if (r.handle.startsWith('arXivId:')) {
+        handle = r.handle.replace(/^arXivId:/, '');
+        lookup = await resolvePreprint(handle);
+        handle = `arxiv:${handle}`;
+      } else if (r.handle.startsWith('doi:') || r.handle.startsWith('arxiv:')) {
+        handle = r.handle.replace(/^.*:/, '');
+        lookup = await resolvePreprint(handle);
+        handle = r.handle;
       } else {
         console.log('ERROR');
       }
       let preprint = await preprintModel.findOne({ handle: handle });
-      if (
-        !preprint &&
-        handle !== 'doi:10.1101/2020.06.07.138883' &&
-        handle !== 'arxiv:2001.00010'
-      ) {
+      if (!preprint) {
+        let source;
+        if (lookup) {
+          source = lookup;
+        } else {
+          console.warn(`${site}: Failed to lookup preprint, using data as-is`);
+          source = r;
+        }
         preprint = new Preprint(
           handle,
-          lookup.title,
+          source.title,
           true,
-          lookup.abstractText,
-          lookup.preprintServer,
-          lookup.datePosted,
-          lookup.license,
-          lookup.publication,
-          lookup.url,
-          lookup.contentEncoding,
-          lookup.contentUrl,
+          source.abstractText,
+          source.preprintServer,
+          source.datePosted,
+          source.license,
+          source.publication,
+          source.url,
+          source.contentEncoding,
+          source.contentUrl,
         );
         await preprintModel.persistAndFlush(preprint);
-        console.log(`PREreview.org: Inserted Preprint ${preprint.handle}`);
+        console.log(`${site}: Inserted Preprint ${preprint.handle}`);
       } else {
-        console.log(`PREreview.org: Duplicate preprint ${handle}, skipping`);
+        console.log(`${site}: Duplicate preprint ${handle}, skipping`);
       }
       preprintsMap.set(r.handle, preprint);
     }
-    console.log('PREreview.org: Flushing preprints to disk.');
+    console.log(`${site}: Flushing preprints to disk.`);
     //await preprintModel.flush();
-    console.log('PREreview.org: Done flushing preprints to disk.');
+    console.log(`${site}: Done flushing preprints to disk.`);
   } catch (err) {
     console.error('Failed to import:', err);
+  }
+}
+
+async function prereviewOrgImportPreprints(db, client, preprintsMap) {
+  const preprintModel = preprintModelWrapper(db);
+  let oldPreprints;
+  try {
+    oldPreprints = await client.query(
+      'SELECT id AS handle,title,date_created AS "createdAt",source AS url,publisher AS "preprintServer",date_published AS "datePosted" FROM preprints',
+    );
+  } catch (err) {
+    console.error('PREreview.org: Failed to query legacy database:', err);
+  }
+  if (oldPreprints) {
+    try {
+      await importPreprints(
+        'prereviewOrg',
+        oldPreprints,
+        preprintModel,
+        preprintsMap,
+      );
+    } catch (err) {
+      console.error('PREreview.org: Failed to import preprints:', err);
+    }
+  } else {
+    console.error('PREreview.org: Failed to query legacy database');
   }
 }
 
@@ -578,7 +337,6 @@ async function prereviewOrgImportReviews(db, client, usersMap, preprintsMap) {
           author,
         );
       }
-      console.log('***REVIEW***:', review);
       await fullReviewModel.persistAndFlush(review);
       //fullReviewDraftModel.persist(draft);
     }
@@ -589,7 +347,6 @@ async function prereviewOrgImportReviews(db, client, usersMap, preprintsMap) {
 }
 
 async function main() {
-  //process('/home/n0n/net/rapid-prereview-docs.txt');
   const usersMap = new Map();
   const preprintsMap = new Map();
   const [db] = await dbWrapper();
@@ -606,7 +363,6 @@ async function main() {
   await prereviewOrgImportPreprints(db, client, preprintsMap);
   await prereviewOrgImportUsers(db, client, usersMap);
   await prereviewOrgImportReviews(db, client, usersMap, preprintsMap);
-  //savePreprints();
   await client.end();
 }
 
