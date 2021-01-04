@@ -24,9 +24,9 @@ export function AdminRoute({ children, ...rest }) {
   } else {
     return (
       <Route {...rest}>
-        {user && user.isAdmin ? (
+        {user  ? (
           children
-        ) : user && !user.isAdmin ? (
+        ) : user  ? (
           <NotFound />
         ) : (
           <Redirect to="/login" />

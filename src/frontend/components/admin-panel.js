@@ -1,32 +1,82 @@
+// base imports
 import React, { Fragment, useContext, useEffect, useState} from 'react';
 import PropTypes from 'prop-types';
 import { Helmet } from 'react-helmet-async';
-import { MdClose } from 'react-icons/md';
+
+// contexts
 import { UserContext } from '../contexts/user-context';
+
+// utils
 import { getId, unprefix } from '../utils/jsonld';
-import HeaderBar from './header-bar';
-import { ORG } from '../constants';
 import { createModeratorQs } from '../utils/search';
+
+// hooks
 import {
   useGetGroups,
   usePostGroups,
   usePutUser,
 } from '../hooks/api-hooks.tsx';
+
+// Material UI
+import { makeStyles } from '@material-ui/core/styles';
+import CircularProgress from '@material-ui/core/CircularProgress';
+
+// components
 import Button from './button';
+import Controls from './controls';
+import HeaderBar from './header-bar';
 import IconButton from './icon-button';
-import { RoleBadgeUI } from './role-badge';
 import LabelStyle from './label-style';
 import Modal from './modal';
+import { RoleBadgeUI } from './role-badge';
 import TextInput from './text-input';
-import Controls from './controls';
+
+// constants
+import { ORG } from '../constants';
+
+// icons
+import { MdClose } from 'react-icons/md';
+import PreReviewLogo from './pre-review-logo';
+
+const searchParamsToObject = params => {
+  const obj = {};
+  for (const [key, value] of params) {
+    obj[key] = value;
+  }
+  return obj;
+};
+
+const useStyles = makeStyles(theme => ({
+  root: {
+    left: '50%',
+    position: 'absolute',
+    top: '50%',
+    transform: 'translate(-50%, -50%)',
+    '& > * + *': {
+      marginLeft: theme.spacing(2),
+    },
+  },
+  spinning: {
+    color: '#ff3333',
+    display: 'block',
+    marginLeft: 'auto',
+    marginRight: 'auto',
+    marginTop: 30,
+  },
+}));
 
 export default function AdminPanel() {
+  const classes = useStyles();
   const user = useContext(UserContext);
   const [bookmark, setBookmark] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [groups, setGroups] = useStyles(null);
 
   const search = createModeratorQs({ bookmark });
 
-  const groups = useGetGroups(search, !!bookmark);
+  const { data: groupsData, loadingGroups, error } = useGetGroups({
+    queryParams: searchParamsToObject(search),
+  });
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [revokeRole, setRevokeRole] = useState(null);
@@ -38,116 +88,134 @@ export default function AdminPanel() {
     window.scrollTo(0, 0);
   }, []);
 
-  return (
-    <div className="admin-panel">
-      <Helmet>
-        <title>{ORG} • Admin panel</title>
-      </Helmet>
-      <HeaderBar />
+  useEffect(() => {
+    if (!loadingGroups) {
+      if (groupsData) {
+        setGroups(groupsData[0].data);
+        setLoading(false);
+      }
+    }
+  }, [groupsData, loadingGroups]);
 
-      <section>
-        <header className="admin-panel__header">
-          <span>Manage moderators</span>
-          <Button
-            primary={true}
-            onClick={() => {
-              setIsAddModalOpen(true);
-            }}
-          >
-            Add moderator
-          </Button>
-        </header>
+  if (loading) {
+    return (
+      <div className={classes.root}>
+        <PreReviewLogo />
+        <CircularProgress className={classes.spinning} size={60} />
+      </div>
+    );
+  } else {
+    return (
+      <div className="admin-panel">
+        <Helmet>
+          <title>{ORG} • Admin panel</title>
+        </Helmet>
+        <HeaderBar />
 
-        {user.groups.total_rows === 0 &&
-        !user.groups.loading &&
-        !added.length ? (
-          <div>No moderators.</div>
-        ) : (
-          <div>
-            <ul className="admin-panel__card-list">
-              {added
-                .concat(
-                  user.groups.rows
-                    .map(row => row.doc)
-                    .filter(
-                      role =>
-                        !excluded.has(getId(role)) &&
-                        !added.some(_role => getId(_role) === getId(role)),
-                    ),
-                )
-                .map(role => (
-                  <li key={getId(role)} className="admin-panel__card-list-item">
-                    <div className="admin-panel__card-list-item__left">
-                      <RoleBadgeUI role={role} />
-                      <span>{role.name || unprefix(getId(role))}</span>
-                    </div>
-                    <div className="admin-panel__card-list-item__right">
-                      <LabelStyle>
-                        {role['@type'] === 'AnonymousReviewerRole'
-                          ? 'Anonymous'
-                          : 'Public'}
-                      </LabelStyle>
-                      <IconButton
-                        className="admin-panel__remove-button"
-                        onClick={() => {
-                          setRevokeRole(role);
-                        }}
-                      >
-                        <MdClose className="admin-panel__remove-button-icon" />
-                      </IconButton>
-                    </div>
-                  </li>
-                ))}
-            </ul>
-          </div>
-        )}
-
-        <div className="admin-panel__page-nav">
-          {/* Cloudant returns the same bookmark when it hits the end of the list */}
-          {!!(
-            user.groups.rows.length < user.groups.total_rows &&
-            user.groups.bookmark !== bookmark
-          ) && (
+        <section>
+          <header className="admin-panel__header">
+            <span>Manage moderators</span>
             <Button
-              onClick={e => {
-                e.preventDefault();
-                setBookmark(user.groups.bookmark);
+              primary={true}
+              onClick={() => {
+                setIsAddModalOpen(true);
               }}
             >
-              More
+              Add moderator
             </Button>
+          </header>
+
+          {groups.total_rows === 0 &&
+          !groups.loading &&
+          !added.length ? (
+            <div>No moderators.</div>
+          ) : (
+            <div>
+              <ul className="admin-panel__card-list">
+                {added
+                  .concat(
+                    groups.rows
+                      .map(row => row.doc)
+                      .filter(
+                        role =>
+                          !excluded.has(getId(role)) &&
+                          !added.some(_role => getId(_role) === getId(role)),
+                      ),
+                  )
+                  .map(role => (
+                    <li key={getId(role)} className="admin-panel__card-list-item">
+                      <div className="admin-panel__card-list-item__left">
+                        <RoleBadgeUI role={role} />
+                        <span>{role.name || unprefix(getId(role))}</span>
+                      </div>
+                      <div className="admin-panel__card-list-item__right">
+                        <LabelStyle>
+                          {role['@type'] === 'AnonymousReviewerRole'
+                            ? 'Anonymous'
+                            : 'Public'}
+                        </LabelStyle>
+                        <IconButton
+                          className="admin-panel__remove-button"
+                          onClick={() => {
+                            setRevokeRole(role);
+                          }}
+                        >
+                          <MdClose className="admin-panel__remove-button-icon" />
+                        </IconButton>
+                      </div>
+                    </li>
+                  ))}
+              </ul>
+            </div>
           )}
-        </div>
-      </section>
 
-      {isAddModalOpen && (
-        <AdminPanelAddModal
-          user={user}
-          onClose={() => {
-            setIsAddModalOpen(false);
-          }}
-          onSuccess={action => {
-            setAdded(added.concat(action.result));
-          }}
-        />
-      )}
+          <div className="admin-panel__page-nav">
+            {/* Cloudant returns the same bookmark when it hits the end of the list */}
+            {!!(
+              groups.rows.length < groups.total_rows &&
+              groups.bookmark !== bookmark
+            ) && (
+              <Button
+                onClick={e => {
+                  e.preventDefault();
+                  setBookmark(groups.bookmark);
+                }}
+              >
+                More
+              </Button>
+            )}
+          </div>
+        </section>
 
-      {!!revokeRole && (
-        <AdminPanelRemoveModal
-          user={user}
-          role={revokeRole}
-          onClose={() => {
-            setRevokeRole(null);
-          }}
-          onSuccess={action => {
-            setExcluded(
-              new Set(Array.from(excluded).concat(getId(action.result))),
-            );
-          }}
-        />
-      )}
-    </div>
-  );
+        {isAddModalOpen && (
+          <AdminPanelAddModal
+            user={user}
+            onClose={() => {
+              setIsAddModalOpen(false);
+            }}
+            onSuccess={action => {
+              setAdded(added.concat(action.result));
+            }}
+          />
+        )}
+
+        {!!revokeRole && (
+          <AdminPanelRemoveModal
+            user={user}
+            role={revokeRole}
+            onClose={() => {
+              setRevokeRole(null);
+            }}
+            onSuccess={action => {
+              setExcluded(
+                new Set(Array.from(excluded).concat(getId(action.result))),
+              );
+            }}
+          />
+        )}
+      </div>
+    );
+  }
 }
 
 function AdminPanelAddModal({ user, onClose, onSuccess }) {

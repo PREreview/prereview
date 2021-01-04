@@ -47,7 +47,7 @@ const Moderate = React.lazy(() => import('./moderate'));
 // kick off the polyfill!
 //smoothscroll.polyfill();
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(theme => ({
   root: {
     left: '50%',
     position: 'absolute',
@@ -87,8 +87,6 @@ export default function App({ user }) {
         .catch(err => {
           console.log('An error occurred: ', err.message);
         });
-    } else {
-      setLoading(false);
     }
   }, [loading]);
 

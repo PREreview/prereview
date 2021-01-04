@@ -1,38 +1,48 @@
+// base imports
 import React, { useContext, useCallback, useEffect, useState } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import omit from 'lodash/omit';
-import { MdChevronRight, MdFirstPage } from 'react-icons/md';
-import PrivateRoute from './private-route';
+
+// Material UI
+import { makeStyles } from '@material-ui/core/styles';
+import CircularProgress from '@material-ui/core/CircularProgress';
+
+// contexts
 import { UserContext } from '../contexts/user-context';
+
+// hooks
 import { useGetPreprints } from '../hooks/api-hooks.tsx';
 import {
   useIsNewVisitor,
   useIsMobile,
   useNewPreprints,
 } from '../hooks/ui-hooks';
-import { getId } from '../utils/jsonld';
-import HeaderBar from './header-bar';
-import SearchBar from './search-bar';
-import PreprintCard from './preprint-card';
-import SortOptions from './sort-options';
-import NewPreprint from './new-preprint';
-import Modal from './modal';
-import Button from './button';
-import LoginRequiredModal from './login-required-modal';
+
+// utils
 import { createPreprintQs } from '../utils/search';
+import { createPreprintId } from '../../common/utils/ids.js';
+import { getId } from '../utils/jsonld';
+
+// components
+import AddButton from './add-button';
+import Button from './button';
+import HeaderBar from './header-bar';
+import LoginRequiredModal from './login-required-modal';
+import Modal from './modal';
+import NewPreprint from './new-preprint';
+import PreprintCard from './preprint-card';
+import PrivateRoute from './private-route';
+import SearchBar from './search-bar';
+import SortOptions from './sort-options';
 import WelcomeModal from './welcome-modal';
 import XLink from './xlink';
-import AddButton from './add-button';
-import { ORG } from '../constants';
-import Banner from './banner';
-import { createPreprintId } from '../../common/utils/ids.js'
 
-// Material UI
-import { makeStyles } from '@material-ui/core/styles';
-import CircularProgress from '@material-ui/core/CircularProgress';
+// constants
+import { ORG } from '../constants';
 
 // icons
+import { MdChevronRight, MdFirstPage } from 'react-icons/md';
 import PreReviewLogo from './pre-review-logo';
 
 const searchParamsToObject = params => {
@@ -43,7 +53,7 @@ const searchParamsToObject = params => {
   return obj;
 };
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(theme => ({
   root: {
     left: '50%',
     position: 'absolute',
