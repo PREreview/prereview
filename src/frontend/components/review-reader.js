@@ -123,7 +123,7 @@ const ReviewReader = React.memo(function ReviewReader({
         </h3>
       )}
 
-      {allReviews.length && (
+      {allReviews.length ? (
         <Fragment>
           {!preview && (
             <Fragment>
@@ -176,6 +176,7 @@ const ReviewReader = React.memo(function ReviewReader({
             <div className="text-answers">
               <div className="text-answers__question">Longform Reviews</div>
               {publishedReviews.map(review => {
+                console.log(review);
                 if (review.published && review.drafts && review.drafts.length) {
                   return (
                     <div
@@ -295,6 +296,12 @@ const ReviewReader = React.memo(function ReviewReader({
             </div>
           ) : null}
         </Fragment>
+      ) : (
+        <div className="text-answers">
+          <div className="text-answers__question long">
+            No reviews yet. Would you like to leave one?
+          </div>
+        </div>
       )}
     </div>
   );
