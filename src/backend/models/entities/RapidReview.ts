@@ -81,9 +81,13 @@ export class RapidReview extends BaseEntity {
   @Property({ columnType: 'text', nullable: true })
   linkToData?: string;
 
-  constructor(author: Persona, preprint: Preprint) {
+  @Property()
+  isFlagged: boolean = false;
+
+  constructor(author: Persona, preprint: Preprint, isFlagged: false) {
     super();
     this.author = author;
     this.preprint = preprint;
+    this.isFlagged = isFlagged;
   }
 }

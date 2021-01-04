@@ -26,6 +26,9 @@ export class FullReview extends BaseEntity {
   @Property()
   published: boolean = false;
 
+  @Property()
+  isFlagged: boolean = false;
+
   //eslint-disable-next-line
   @Fixture({ get: () => createRandomDoi(), optional: true })
   @Property({ nullable: true })
@@ -44,10 +47,11 @@ export class FullReview extends BaseEntity {
   @OneToMany({ entity: () => Comment, mappedBy: 'parent' })
   comments: Collection<Comment> = new Collection<Comment>(this);
 
-  constructor(preprint: Preprint, published = false, doi?: string) {
+  constructor(preprint: Preprint, published = false, isFlagged = false, doi?: string) {
     super();
     this.preprint = preprint;
     this.published = published;
+    this.isFlagged = isFlagged;
     this.doi = doi;
   }
 }
