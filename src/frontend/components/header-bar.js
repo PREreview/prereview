@@ -3,13 +3,11 @@ import PropTypes from 'prop-types';
 import { MdMenu } from 'react-icons/md';
 import { Link } from 'react-router-dom';
 import { MenuLink } from '@reach/menu-button';
-import { GetUser } from '../hooks/api-hooks.tsx';
 import PreReviewLogo from './pre-review-logo';
 import IconButton from './icon-button';
 import UserBadge from './user-badge';
 import XLink from './xlink';
 import NoticeBadge from './notice-badge';
-import { checkIfRoleLacksMininmalData } from '../utils/roles';
 import { useIsMobile } from '../hooks/ui-hooks';
 
 export default function HeaderBar({ onClickMenuButton, closeGap, thisUser }) {
@@ -169,7 +167,7 @@ export default function HeaderBar({ onClickMenuButton, closeGap, thisUser }) {
                   Moderate Reviews
                 </MenuLink>
               )}
-              <MenuLink href={`/logout`}>Logout</MenuLink>
+              <MenuLink href={`/api/v2/logout`}>Logout</MenuLink>
             </UserBadge>
           ) : (
             <XLink to="/login" href="/login">

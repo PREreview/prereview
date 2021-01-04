@@ -270,7 +270,7 @@ export default function ShellContent({
               </MenuLink>
             )}
 
-            <MenuLink href={`/logout`}>Logout</MenuLink>
+            <MenuLink href={`/api/v2/logout`}>Logout</MenuLink>
           </UserBadge>
         ) : (
           <XLink href={loginUrl} to={loginUrl}>

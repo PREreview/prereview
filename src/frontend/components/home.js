@@ -11,7 +11,7 @@ import {
   useIsMobile,
   useNewPreprints,
 } from '../hooks/ui-hooks';
-import { unprefix, getId } from '../utils/jsonld';
+import { getId } from '../utils/jsonld';
 import HeaderBar from './header-bar';
 import SearchBar from './search-bar';
 import PreprintCard from './preprint-card';
@@ -28,6 +28,13 @@ import { ORG } from '../constants';
 import Banner from './banner';
 import { createPreprintId } from '../../common/utils/ids.js'
 
+// Material UI
+import { makeStyles } from '@material-ui/core/styles';
+import CircularProgress from '@material-ui/core/CircularProgress';
+
+// icons
+import PreReviewLogo from './pre-review-logo';
+
 const searchParamsToObject = params => {
   const obj = {};
   for (const [key, value] of params) {
@@ -36,12 +43,32 @@ const searchParamsToObject = params => {
   return obj;
 };
 
+const useStyles = makeStyles((theme) => ({
+  root: {
+    left: '50%',
+    position: 'absolute',
+    top: '50%',
+    transform: 'translate(-50%, -50%)',
+    '& > * + *': {
+      marginLeft: theme.spacing(2),
+    },
+  },
+  spinning: {
+    color: '#ff3333',
+    display: 'block',
+    marginLeft: 'auto',
+    marginRight: 'auto',
+    marginTop: 30,
+  },
+}));
+
 export default function Home() {
+  const classes = useStyles();
   const history = useHistory();
   const location = useLocation();
   const params = new URLSearchParams(location.search);
 
-  const [thisUser] = useContext(UserContext);
+  const thisUser = useContext(UserContext);
   const isMobile = useIsMobile();
   const [showLeftPanel, setShowLeftPanel] = useState(!isMobile);
   const [loginModalOpenNext, setLoginModalOpenNext] = useState(null);
@@ -65,8 +92,6 @@ export default function Home() {
       }
     }
   }, []);
-
-  useEffect(() => {}, [thisUser])
 
   const handleNewReview = useCallback(
     preprint => {
@@ -118,7 +143,12 @@ export default function Home() {
   );
 
   if (loadingPreprints) {
-    return <div>Loading...</div>;
+    return (
+      <div className={classes.root}>
+        <PreReviewLogo />
+        <CircularProgress className={classes.spinning} size={60} />
+      </div>
+    );
   } else if (error) {
     return <div>An error occurred: {error}</div>;
   } else {
@@ -188,7 +218,7 @@ export default function Home() {
                       {
                         preprint: preprint,
                         tab,
-                      }, 
+                      },
                     );
                   }}
                 />
@@ -259,24 +289,24 @@ export default function Home() {
             ) : preprints.length <= 0 ? (
               <div>No more results.</div>
             ) : (
-                  <ul className="home__preprint-list">
-                    {preprints &&
-                      preprints.data.map(row => (
-                        <li key={row.id} className="home__preprint-list__item">
-                          <PreprintCard
-                            isNew={false}
-                            user={thisUser}
-                            preprint={row}
-                            onNewRequest={handleNewRequest}
-                            onNew={handleNew}
-                            onNewReview={handleNewReview}
-                            hoveredSortOption={hoveredSortOption}
-                            sortOption={params.get('sort') || 'score'}
-                          />
-                        </li>
-                      ))}
-                  </ul>
-                )}
+              <ul className="home__preprint-list">
+                {preprints &&
+                  preprints.data.map(row => (
+                    <li key={row.id} className="home__preprint-list__item">
+                      <PreprintCard
+                        isNew={false}
+                        user={thisUser}
+                        preprint={row}
+                        onNewRequest={handleNewRequest}
+                        onNew={handleNew}
+                        onNewReview={handleNewReview}
+                        hoveredSortOption={hoveredSortOption}
+                        sortOption={params.get('sort') || 'score'}
+                      />
+                    </li>
+                  ))}
+              </ul>
+            )}
 
             <div className="home__pagination">
               {!!(location.state && location.state.bookmark) && (

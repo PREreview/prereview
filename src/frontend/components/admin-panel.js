@@ -1,8 +1,8 @@
-import React, { Fragment, useState, useEffect } from 'react';
+import React, { Fragment, useContext, useEffect, useState} from 'react';
 import PropTypes from 'prop-types';
 import { Helmet } from 'react-helmet-async';
 import { MdClose } from 'react-icons/md';
-import { UserProvider } from '../contexts/user-context';
+import { UserContext } from '../contexts/user-context';
 import { getId, unprefix } from '../utils/jsonld';
 import HeaderBar from './header-bar';
 import { ORG } from '../constants';
@@ -21,7 +21,7 @@ import TextInput from './text-input';
 import Controls from './controls';
 
 export default function AdminPanel() {
-  const [user] = UserProvider();
+  const user = useContext(UserContext);
   const [bookmark, setBookmark] = useState(null);
 
   const search = createModeratorQs({ bookmark });
@@ -58,14 +58,16 @@ export default function AdminPanel() {
           </Button>
         </header>
 
-        {groups.total_rows === 0 && !groups.loading && !added.length ? (
+        {user.groups.total_rows === 0 &&
+        !user.groups.loading &&
+        !added.length ? (
           <div>No moderators.</div>
         ) : (
           <div>
             <ul className="admin-panel__card-list">
               {added
                 .concat(
-                  groups.rows
+                  user.groups.rows
                     .map(row => row.doc)
                     .filter(
                       role =>
@@ -103,13 +105,13 @@ export default function AdminPanel() {
         <div className="admin-panel__page-nav">
           {/* Cloudant returns the same bookmark when it hits the end of the list */}
           {!!(
-            groups.rows.length < groups.total_rows &&
-            groups.bookmark !== bookmark
+            user.groups.rows.length < user.groups.total_rows &&
+            user.groups.bookmark !== bookmark
           ) && (
             <Button
               onClick={e => {
                 e.preventDefault();
-                setBookmark(groups.bookmark);
+                setBookmark(user.groups.bookmark);
               }}
             >
               More
