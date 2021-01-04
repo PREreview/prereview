@@ -11,10 +11,6 @@ import { HelmetProvider } from 'react-helmet-async';
 //import smoothscroll from 'smoothscroll-polyfill';
 import 'url-search-params-polyfill'; /* pollyfill for IE / Edge */
 
-// Material UI
-import { makeStyles } from '@material-ui/core/styles';
-import CircularProgress from '@material-ui/core/CircularProgress';
-
 // contexts
 import { UserProvider } from '../contexts/user-context';
 import { StoresProvider } from '../contexts/store-context';
@@ -27,6 +23,7 @@ import CodeOfConduct from './code-of-conduct';
 import ExtensionFallback from './extension-fallback';
 import ExtensionSplash from './extension-splash';
 import Home from './home';
+import Loading from './loading';
 import Login from './login';
 import ModeratorRoute from './moderator-route';
 import NotFound from './not-found';
@@ -47,27 +44,7 @@ const Moderate = React.lazy(() => import('./moderate'));
 // kick off the polyfill!
 //smoothscroll.polyfill();
 
-const useStyles = makeStyles(theme => ({
-  root: {
-    left: '50%',
-    position: 'absolute',
-    top: '50%',
-    transform: 'translate(-50%, -50%)',
-    '& > * + *': {
-      marginLeft: theme.spacing(2),
-    },
-  },
-  spinning: {
-    color: '#ff3333',
-    display: 'block',
-    marginLeft: 'auto',
-    marginRight: 'auto',
-    marginTop: 30,
-  },
-}));
-
 export default function App({ user }) {
-  const classes = useStyles();
   const [loading, setLoading] = useState(true);
   const [thisUser, setThisUser] = useState(null);
   useEffect(() => {
@@ -91,12 +68,7 @@ export default function App({ user }) {
   }, [loading]);
 
   if (loading) {
-    return (
-      <div className={classes.root}>
-        <PreReviewLogo />
-        <CircularProgress className={classes.spinning} size={60} />
-      </div>
-    );
+    return <Loading />;
   } else {
     return (
       <HelmetProvider>

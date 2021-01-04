@@ -4,10 +4,6 @@ import { useHistory, useLocation } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import omit from 'lodash/omit';
 
-// Material UI
-import { makeStyles } from '@material-ui/core/styles';
-import CircularProgress from '@material-ui/core/CircularProgress';
-
 // contexts
 import { UserContext } from '../contexts/user-context';
 
@@ -28,6 +24,7 @@ import { getId } from '../utils/jsonld';
 import AddButton from './add-button';
 import Button from './button';
 import HeaderBar from './header-bar';
+import Loading from './loading';
 import LoginRequiredModal from './login-required-modal';
 import Modal from './modal';
 import NewPreprint from './new-preprint';
@@ -43,7 +40,6 @@ import { ORG } from '../constants';
 
 // icons
 import { MdChevronRight, MdFirstPage } from 'react-icons/md';
-import PreReviewLogo from './pre-review-logo';
 
 const searchParamsToObject = params => {
   const obj = {};
@@ -53,27 +49,7 @@ const searchParamsToObject = params => {
   return obj;
 };
 
-const useStyles = makeStyles(theme => ({
-  root: {
-    left: '50%',
-    position: 'absolute',
-    top: '50%',
-    transform: 'translate(-50%, -50%)',
-    '& > * + *': {
-      marginLeft: theme.spacing(2),
-    },
-  },
-  spinning: {
-    color: '#ff3333',
-    display: 'block',
-    marginLeft: 'auto',
-    marginRight: 'auto',
-    marginTop: 30,
-  },
-}));
-
 export default function Home() {
-  const classes = useStyles();
   const history = useHistory();
   const location = useLocation();
   const params = new URLSearchParams(location.search);
@@ -153,12 +129,7 @@ export default function Home() {
   );
 
   if (loadingPreprints) {
-    return (
-      <div className={classes.root}>
-        <PreReviewLogo />
-        <CircularProgress className={classes.spinning} size={60} />
-      </div>
-    );
+    return <Loading />;
   } else if (error) {
     return <div>An error occurred: {error}</div>;
   } else {

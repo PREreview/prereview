@@ -17,16 +17,13 @@ import {
   usePutUser,
 } from '../hooks/api-hooks.tsx';
 
-// Material UI
-import { makeStyles } from '@material-ui/core/styles';
-import CircularProgress from '@material-ui/core/CircularProgress';
-
 // components
 import Button from './button';
 import Controls from './controls';
 import HeaderBar from './header-bar';
 import IconButton from './icon-button';
 import LabelStyle from './label-style';
+import Loading from './loading';
 import Modal from './modal';
 import { RoleBadgeUI } from './role-badge';
 import TextInput from './text-input';
@@ -36,7 +33,6 @@ import { ORG } from '../constants';
 
 // icons
 import { MdClose } from 'react-icons/md';
-import PreReviewLogo from './pre-review-logo';
 
 const searchParamsToObject = params => {
   const obj = {};
@@ -46,31 +42,11 @@ const searchParamsToObject = params => {
   return obj;
 };
 
-const useStyles = makeStyles(theme => ({
-  root: {
-    left: '50%',
-    position: 'absolute',
-    top: '50%',
-    transform: 'translate(-50%, -50%)',
-    '& > * + *': {
-      marginLeft: theme.spacing(2),
-    },
-  },
-  spinning: {
-    color: '#ff3333',
-    display: 'block',
-    marginLeft: 'auto',
-    marginRight: 'auto',
-    marginTop: 30,
-  },
-}));
-
 export default function AdminPanel() {
-  const classes = useStyles();
   const user = useContext(UserContext);
   const [bookmark, setBookmark] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [groups, setGroups] = useStyles(null);
+  const [groups, setGroups] = useState(null);
 
   const search = createModeratorQs({ bookmark });
 
@@ -98,12 +74,7 @@ export default function AdminPanel() {
   }, [groupsData, loadingGroups]);
 
   if (loading) {
-    return (
-      <div className={classes.root}>
-        <PreReviewLogo />
-        <CircularProgress className={classes.spinning} size={60} />
-      </div>
-    );
+    return <Loading />;
   } else {
     return (
       <div className="admin-panel">
