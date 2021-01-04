@@ -150,27 +150,29 @@ const ReviewReader = React.memo(function ReviewReader({
             </Fragment>
           )}
 
-          <Barplot
-            stats={getYesNoStats(allRapidReviews)}
-            nReviews={allRapidReviews.length}
-          >
-            <ShareMenu
-              identifier={preprint.handle}
-              roleIds={highlightedRoleIds}
-            />
-          </Barplot>
+          {allRapidReviews && allRapidReviews.length ? (
+            <>
+              <Barplot
+                stats={getYesNoStats(allRapidReviews)}
+                nReviews={allRapidReviews.length}
+              >
+                <ShareMenu
+                  identifier={preprint.handle}
+                  roleIds={highlightedRoleIds}
+                />
+              </Barplot>
 
-          {!preview && (
-            <TextAnswers
-              user={user}
-              role={role}
-              reviews={allRapidReviews}
-              isModerationInProgress={isModerationInProgress}
-              onModerate={onModerate}
-            />
-          )}
+              <TextAnswers
+                user={user}
+                role={role}
+                reviews={allRapidReviews}
+                isModerationInProgress={isModerationInProgress}
+                onModerate={onModerate}
+              />
+            </>
+          ) : null}
 
-          {publishedReviews && publishedReviews.length && (
+          {publishedReviews && publishedReviews.length ? (
             <div className="text-answers">
               <div className="text-answers__question">Longform Reviews</div>
               {publishedReviews.map(review => {
@@ -276,9 +278,9 @@ const ReviewReader = React.memo(function ReviewReader({
                 }
               })}
             </div>
-          )}
+          ) : null}
 
-          {preprint.tags && preprint.tags.length && (
+          {preprint.tags && preprint.tags.length ? (
             <div>
               <div className="tags__title">Subject Tags</div>
               <div className="tags">
@@ -291,7 +293,7 @@ const ReviewReader = React.memo(function ReviewReader({
                 })}
               </div>
             </div>
-          )}
+          ) : null}
         </Fragment>
       )}
     </div>

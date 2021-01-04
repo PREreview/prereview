@@ -57,6 +57,7 @@ export function PotentialRoles({
         i === authors.findIndex(a => a.id === author.id);
       });
     }
+    return review;
   });
 
   // const [reviewsList, setReviewsList] = useState(reviews);
@@ -139,7 +140,11 @@ PotentialRoles.propTypes = {
   isModerationInProgress: PropTypes.bool,
   onRemoved: PropTypes.func.isRequired,
   roleIds: PropTypes.arrayOf(PropTypes.object),
-  hasReviewed: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]),
+  hasReviewed: PropTypes.oneOfType([
+    PropTypes.object,
+    PropTypes.bool,
+    PropTypes.string,
+  ]),
 };
 
 function DraggableRoleBadge({ author, onDropped, children, type }) {
