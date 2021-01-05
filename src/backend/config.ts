@@ -136,6 +136,12 @@ function validateUrl(value: string, previous: string): string {
   return url;
 }
 
+function validateEmail(value: string, previous: string): string {
+  const email = value ? value : previous;
+  Joi.assert(email, Joi.string().email());
+  return email;
+}
+
 function validateToken(value: string, previous: string): string {
   const token = value ? value : previous;
   Joi.assert(token, Joi.string());
@@ -375,6 +381,24 @@ export default program
     'Cloudflare Access Audience',
     validateToken,
     getEnvOrDefault('cfaccess_audience').asString(),
+  )
+  .option(
+    '--email-address <email>',
+    'From address for email notifications',
+    validateEmail,
+    getEnvOrDefault('email_address').asString(),
+  )
+  .option(
+    '--email-sendgrid-user <username>',
+    'Sendgrid user for sending emails',
+    validateToken,
+    getEnvOrDefault('email_sendgrid_user').asString(),
+  )
+  .option(
+    '--email-sendgrid-key <key>',
+    'Sendgrid token for sending emails',
+    validateToken,
+    getEnvOrDefault('email_sendgrid_key').asString(),
   )
   .option(
     '--orcid-client-id <id>',
