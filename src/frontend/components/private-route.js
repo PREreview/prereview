@@ -35,7 +35,7 @@ export function AdminRoute({ children, ...rest }) {
   } else {
     return (
       <Route {...rest}>
-        {user && !isAdmin ? (
+        {user && isAdmin ? (
           children
         ) : user && !isAdmin ? (
           <NotFound />

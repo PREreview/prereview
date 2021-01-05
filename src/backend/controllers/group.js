@@ -249,7 +249,7 @@ export default function controller(groupModel, userModel, thisUser) {
           .required(),
       },
     },
-    // pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next), #FIXME
+    pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next),
     handler: async ctx => {
       log.debug(`Adding user ${ctx.params.uid} to group ${ctx.params.id}.`);
       let group, user;
@@ -290,7 +290,7 @@ export default function controller(groupModel, userModel, thisUser) {
   groupsRouter.route({
     method: 'DELETE',
     path: '/groups/:id/members/:uid',
-    // pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next), #FIXME
+    pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next),
     handler: async ctx => {
       log.debug(`Removing user ${ctx.params.uid} from group ${ctx.params.id}.`);
       let group, user;
