@@ -38,6 +38,7 @@ export default function AdminPanel() {
   const user = useContext(UserContext);
   const [loading, setLoading] = useState(true);
   const [group, setGroup] = useState(null);
+  const [moderators, setModerators] = useState(null);
 
   const { data: groupData, loadingGroup, error } = useGetGroup({
     id: 10,
@@ -47,7 +48,6 @@ export default function AdminPanel() {
   const [revokeRole, setRevokeRole] = useState(null);
 
   const [excluded, setExcluded] = useState(new Set());
-  const [added, setAdded] = useState([]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -56,7 +56,9 @@ export default function AdminPanel() {
   useEffect(() => {
     if (!loadingGroup) {
       if (groupData) {
+        console.log(groupData.data[0]);
         setGroup(groupData.data[0]);
+        setModerators(groupData.data[0].members);
         setLoading(false);
       }
     }
@@ -133,7 +135,7 @@ export default function AdminPanel() {
               setIsAddModalOpen(false);
             }}
             onSuccess={action => {
-              setAdded(added.concat(action.result));
+              setModerators(moderators => moderators.concat(action.result));
             }}
           />
         )}
@@ -199,9 +201,8 @@ function AdminPanelAddModal({ group, onClose, onSuccess }) {
                 disabled={loading}
                 onClick={() => {
                   updateGroupMember({ id: group, uid: value })
-                    .then(() => alert('Moderator added successfully.'))
+                    .then(() => onSuccess(value))
                     .catch(err => alert(`An error occurred: ${err.message}`));
-                  onSuccess(value);
                 }}
               >
                 Add

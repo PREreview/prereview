@@ -45,7 +45,7 @@ const handleInvalid = ctx => {
  */
 
 // eslint-disable-next-line no-unused-vars
-export default function controller(groupModel, thisUser) {
+export default function controller(groupModel, userModel, thisUser) {
   const groupsRouter = router();
 
   groupsRouter.route({
@@ -232,45 +232,56 @@ export default function controller(groupModel, thisUser) {
     method: 'put',
     path: '/groups/:id/members/:uid',
     validate: {
-      // body: {
-      //   username: Joi.string(),
-      //   password: Joi.string(),
-      //   id: Joi.number(),
-      //   firstName: Joi.string(),
-      //   lastName: Joi.string(),
-      //   email: Joi.string(),
-      //   role: Joi.number(),
-      // },
       type: 'json',
+      params: {
+        id: Joi.number().integer()
+          .description('Group id')
+          .required(),
+        uid: Joi.alternatives()
+          .try(Joi.number().integer(), Joi.string())
+          .description('User id')
+          .required(),
+      },
     },
     // pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next),
     handler: async ctx => {
       log.debug(`Adding user ${ctx.params.uid} to group ${ctx.params.id}.`);
-      let res;
+      let group, user;
 
       try {
-        res = await groupModel.memberAdd(ctx.params.id, ctx.params.uid);
+        group = await groupModel.findOne(ctx.params.id);
+        user = await userModel.findOneByIdOrOrcid(ctx.params.uid, ['personas']);
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse query: ${err}`);
       }
 
-      if (res) {
-        ctx.response.body = { statusCode: 201, status: 'created', data: res };
-        ctx.response.status = 201;
-      } else {
-        log.error(
-          `HTTP 404 Error: That mapping with gid ${ctx.params.id} and uid ${
-            ctx.params.uid
-          } does not exist.`,
-        );
-        ctx.throw(
-          404,
-          `That mapping with gid ${ctx.params.id} and uid ${
-            ctx.params.uid
-          } does not exist.`,
-        );
+      try {
+        log.debug(`Group ${group.id} found. Adding user ${user.id} to group.`);
+        group.members.add(user);
+      } catch (err) {
+        log.error('HTTP 400 Error: ', err);
+        ctx.throw(400, `Failed to add user to group: ${err}`);
       }
+
+      ctx.body = { status: 201, message: 'created', data: group };
+      ctx.status = 201;
+
+      // if (res) {
+      //
+      // } else {
+      //   log.error(
+      //     `HTTP 404 Error: That mapping with gid ${ctx.params.id} and uid ${
+      //       ctx.params.uid
+      //     } does not exist.`,
+      //   );
+      //   ctx.throw(
+      //     404,
+      //     `That mapping with gid ${ctx.params.id} and uid ${
+      //       ctx.params.uid
+      //     } does not exist.`,
+      //   );
+      // }
     },
     meta: {
       swagger: {

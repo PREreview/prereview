@@ -109,7 +109,7 @@ export default async function configServer(config) {
   const fullReviewModel = fullReviewModelWrapper(db);
   const draftModel = fullReviewDraftModelWrapper(db);
   const fullReviewDrafts = DraftController(draftModel, authz);
-  const groups = GroupController(groupModel, authz);
+  const groups = GroupController(groupModel, userModel, authz);
   const personas = PersonaController(personaModel, authz);
   const preprintModel = preprintModelWrapper(db);
   const preprints = PreprintController(preprintModel, authz);
