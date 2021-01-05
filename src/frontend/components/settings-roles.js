@@ -126,7 +126,10 @@ export default function SettingsRoles({ user }) {
                           </span>
                         </span>
                       ) : (
-                        <MakeActivePersonaModalButton user={persona} />
+                        <MakeActivePersonaModalButton
+                          user={user}
+                          persona={persona}
+                        />
                       )}
                     </div>
                   </TableCell>
@@ -219,7 +222,7 @@ SettingsRoles.propTypes = {
   user: PropTypes.object.isRequired,
 };
 
-function MakeActivePersonaModalButton({ user }) {
+function MakeActivePersonaModalButton({ user, persona }) {
   const [isOpen, setIsOpen] = useState(false);
   const { mutate: updateUser, loading, error } = usePutUser({
     id: user.id});
@@ -236,9 +239,7 @@ function MakeActivePersonaModalButton({ user }) {
       </Button>
 
       {isOpen && (
-        <Modal
-          title={`Set active persona to ${user.name || unprefix(user.id)}`}
-        >
+        <Modal title={`Set active persona to ${user.name || user.id}`}>
           <p>
             The <strong>public</strong> persona makes your information viewable
             by other users when you write <em>new</em> reviews or <em>new</em>{' '}
@@ -246,9 +247,7 @@ function MakeActivePersonaModalButton({ user }) {
             cannot be changed.
           </p>
 
-          <Controls
-            error={error} // #FIXME
-          >
+          <Controls error={error}>
             <Button
               disabled={loading}
               onClick={() => {
@@ -277,4 +276,5 @@ function MakeActivePersonaModalButton({ user }) {
 }
 MakeActivePersonaModalButton.propTypes = {
   user: PropTypes.object.isRequired,
+  persona: PropTypes.object.isRequired,
 };
