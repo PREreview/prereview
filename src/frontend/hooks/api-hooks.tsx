@@ -26,7 +26,7 @@ export type GetResolvePreprintsProps = Omit<GetProps<void, unknown, void, void>,
 export const GetResolvePreprints = (props: GetResolvePreprintsProps) => (
   <Get<void, unknown, void, void>
     path={`/resolve`}
-    
+
     {...props}
   />
 );
@@ -48,7 +48,7 @@ export const PostPreprints = (props: PostPreprintsProps) => (
   <Mutate<void, unknown, void, void, void>
     verb="POST"
     path={`/preprints`}
-    
+
     {...props}
   />
 );
@@ -76,7 +76,7 @@ export type GetPreprintsProps = Omit<GetProps<void, unknown, GetPreprintsQueryPa
 export const GetPreprints = (props: GetPreprintsProps) => (
   <Get<void, unknown, GetPreprintsQueryParams, void>
     path={`/preprints`}
-    
+
     {...props}
   />
 );
@@ -104,7 +104,7 @@ export type GetPreprintProps = Omit<GetProps<void, unknown, void, GetPreprintPat
 export const GetPreprint = ({id, ...props}: GetPreprintProps) => (
   <Get<void, unknown, void, GetPreprintPathParams>
     path={`/preprints/${id}`}
-    
+
     {...props}
   />
 );
@@ -137,7 +137,7 @@ export const PutPreprint = ({id, ...props}: PutPreprintProps) => (
   <Mutate<void, unknown, void, PutPreprintRequestBody, PutPreprintPathParams>
     verb="PUT"
     path={`/preprints/${id}`}
-    
+
     {...props}
   />
 );
@@ -159,7 +159,7 @@ export const DeletePreprint = (props: DeletePreprintProps) => (
   <Mutate<void, unknown, void, number, void>
     verb="DELETE"
     path={`/preprints`}
-    
+
     {...props}
   />
 );
@@ -180,7 +180,7 @@ export type GetUsersProps = Omit<GetProps<void, unknown, void, void>, "path">;
 export const GetUsers = (props: GetUsersProps) => (
   <Get<void, unknown, void, void>
     path={`/users`}
-    
+
     {...props}
   />
 );
@@ -208,7 +208,7 @@ export type GetUserProps = Omit<GetProps<void, unknown, void, GetUserPathParams>
 export const GetUser = ({id, ...props}: GetUserProps) => (
   <Get<void, unknown, void, GetUserPathParams>
     path={`/users/${id}`}
-    
+
     {...props}
   />
 );
@@ -242,7 +242,7 @@ export const PutUser = ({id, ...props}: PutUserProps) => (
   <Mutate<void, unknown, void, PutUserRequestBody, PutUserPathParams>
     verb="PUT"
     path={`/users/${id}`}
-    
+
     {...props}
   />
 );
@@ -264,7 +264,7 @@ export const DeleteUser = (props: DeleteUserProps) => (
   <Mutate<void, unknown, void, number, void>
     verb="DELETE"
     path={`/users`}
-    
+
     {...props}
   />
 );
@@ -286,7 +286,7 @@ export const PostFullReviews = (props: PostFullReviewsProps) => (
   <Mutate<void, unknown, void, void, void>
     verb="POST"
     path={`/fullReviews`}
-    
+
     {...props}
   />
 );
@@ -307,7 +307,7 @@ export type GetFullReviewsProps = Omit<GetProps<void, unknown, void, void>, "pat
 export const GetFullReviews = (props: GetFullReviewsProps) => (
   <Get<void, unknown, void, void>
     path={`/fullReviews`}
-    
+
     {...props}
   />
 );
@@ -332,7 +332,7 @@ export type GetPreprintFullReviewsProps = Omit<GetProps<void, unknown, void, Get
 export const GetPreprintFullReviews = ({pid, ...props}: GetPreprintFullReviewsProps) => (
   <Get<void, unknown, void, GetPreprintFullReviewsPathParams>
     path={`/preprints/${pid}/fullReviews`}
-    
+
     {...props}
   />
 );
@@ -358,7 +358,7 @@ export const PutFullReview = ({id, ...props}: PutFullReviewProps) => (
   <Mutate<void, unknown, void, void, PutFullReviewPathParams>
     verb="PUT"
     path={`/fullReviews/${id}`}
-    
+
     {...props}
   />
 );
@@ -383,7 +383,7 @@ export type GetFullReviewProps = Omit<GetProps<void, unknown, void, GetFullRevie
 export const GetFullReview = ({id, ...props}: GetFullReviewProps) => (
   <Get<void, unknown, void, GetFullReviewPathParams>
     path={`/fullReviews/${id}`}
-    
+
     {...props}
   />
 );
@@ -405,7 +405,7 @@ export const DeleteFullReview = (props: DeleteFullReviewProps) => (
   <Mutate<void, unknown, void, string, void>
     verb="DELETE"
     path={`/fullReviews`}
-    
+
     {...props}
   />
 );
@@ -436,7 +436,7 @@ export const PostGroups = (props: PostGroupsProps) => (
   <Mutate<void, unknown, PostGroupsQueryParams, PostGroupsBodyRequestBody, void>
     verb="POST"
     path={`/groups`}
-    
+
     {...props}
   />
 );
@@ -466,7 +466,7 @@ export type GetGroupsProps = Omit<GetProps<void, unknown, GetGroupsQueryParams, 
 export const GetGroups = (props: GetGroupsProps) => (
   <Get<void, unknown, GetGroupsQueryParams, void>
     path={`/groups`}
-    
+
     {...props}
   />
 );
@@ -491,7 +491,7 @@ export type GetGroupProps = Omit<GetProps<void, unknown, void, GetGroupPathParam
 export const GetGroup = ({id, ...props}: GetGroupProps) => (
   <Get<void, unknown, void, GetGroupPathParams>
     path={`/groups/${id}`}
-    
+
     {...props}
   />
 );
@@ -526,7 +526,7 @@ export const PutGroup = ({id, ...props}: PutGroupProps) => (
   <Mutate<void, unknown, PutGroupQueryParams, PostGroupsBodyRequestBody, PutGroupPathParams>
     verb="PUT"
     path={`/groups/${id}`}
-    
+
     {...props}
   />
 );
@@ -548,7 +548,7 @@ export const DeleteGroup = (props: DeleteGroupProps) => (
   <Mutate<void, unknown, void, string, void>
     verb="DELETE"
     path={`/groups`}
-    
+
     {...props}
   />
 );
@@ -562,8 +562,14 @@ export const useDeleteGroup = (props: UseDeleteGroupProps) => useMutate<void, un
 
 
 export interface PutGroupMemberPathParams {
-  id: string;
-  uid: string
+  /**
+   * Group id
+   */
+  id: number;
+  /**
+   * User id
+   */
+  uid: number
 }
 
 export type PutGroupMemberProps = Omit<MutateProps<void, unknown, void, void, PutGroupMemberPathParams>, "path" | "verb"> & PutGroupMemberPathParams;
@@ -575,7 +581,7 @@ export const PutGroupMember = ({id, uid, ...props}: PutGroupMemberProps) => (
   <Mutate<void, unknown, void, void, PutGroupMemberPathParams>
     verb="PUT"
     path={`/groups/${id}/members/${uid}`}
-    
+
     {...props}
   />
 );
@@ -597,11 +603,11 @@ export type DeleteGroupMemberProps = Omit<MutateProps<void, unknown, void, strin
 /**
  * Endpoint to DELETE one user from a group by ID from PREreview. Admin users only.
  */
-export const DeleteGroupMember = ({id, ...props}: DeleteGroupMemberProps) => (
+export const DeleteGroupMember = ({id, uid, ...props}: DeleteGroupMemberProps) => (
   <Mutate<void, unknown, void, string, DeleteGroupMemberPathParams>
     verb="DELETE"
-    path={`/groups/${id}/members`}
-    
+    path={`/groups/${id}/members/${uid}`}
+
     {...props}
   />
 );
@@ -611,7 +617,7 @@ export type UseDeleteGroupMemberProps = Omit<UseMutateProps<void, unknown, void,
 /**
  * Endpoint to DELETE one user from a group by ID from PREreview. Admin users only.
  */
-export const useDeleteGroupMember = ({id, ...props}: UseDeleteGroupMemberProps) => useMutate<void, unknown, void, string, DeleteGroupMemberPathParams>("DELETE", (paramsInPath: DeleteGroupMemberPathParams) => `/groups/${paramsInPath.id}/members`, {  pathParams: { id }, ...props });
+export const useDeleteGroupMember = ({id, uid, ...props}: UseDeleteGroupMemberProps) => useMutate<void, unknown, void, string, DeleteGroupMemberPathParams>("DELETE", (paramsInPath: DeleteGroupMemberPathParams) => `/groups/${paramsInPath.id}/members/${paramsInPath.uid}`, {  pathParams: { id, uid }, ...props });
 
 
 export type PostCommentsProps = Omit<MutateProps<void, unknown, void, PostCommentsBodyRequestBody, void>, "path" | "verb">;
@@ -623,7 +629,7 @@ export const PostComments = (props: PostCommentsProps) => (
   <Mutate<void, unknown, void, PostCommentsBodyRequestBody, void>
     verb="POST"
     path={`/comments`}
-    
+
     {...props}
   />
 );
@@ -653,7 +659,7 @@ export type GetCommentsProps = Omit<GetProps<void, unknown, GetCommentsQueryPara
 export const GetComments = (props: GetCommentsProps) => (
   <Get<void, unknown, GetCommentsQueryParams, void>
     path={`/comments`}
-    
+
     {...props}
   />
 );
@@ -687,7 +693,7 @@ export type GetFullReviewCommentsProps = Omit<GetProps<void, unknown, GetFullRev
 export const GetFullReviewComments = ({fid, ...props}: GetFullReviewCommentsProps) => (
   <Get<void, unknown, GetFullReviewCommentsQueryParams, GetFullReviewCommentsPathParams>
     path={`/fullReviews/${fid}/comments`}
-    
+
     {...props}
   />
 );
@@ -712,7 +718,7 @@ export type GetCommentProps = Omit<GetProps<void, unknown, void, GetCommentPathP
 export const GetComment = ({id, ...props}: GetCommentProps) => (
   <Get<void, unknown, void, GetCommentPathParams>
     path={`/comments/${id}`}
-    
+
     {...props}
   />
 );
@@ -738,7 +744,7 @@ export const PutComment = ({id, ...props}: PutCommentProps) => (
   <Mutate<void, unknown, void, PostCommentsBodyRequestBody, PutCommentPathParams>
     verb="PUT"
     path={`/comments/${id}`}
-    
+
     {...props}
   />
 );
@@ -760,7 +766,7 @@ export const DeleteComment = (props: DeleteCommentProps) => (
   <Mutate<void, unknown, void, string, void>
     verb="DELETE"
     path={`/comments`}
-    
+
     {...props}
   />
 );
@@ -782,7 +788,7 @@ export const PostCommunities = (props: PostCommunitiesProps) => (
   <Mutate<void, unknown, void, PostCommunitiesBodyRequestBody, void>
     verb="POST"
     path={`/communities`}
-    
+
     {...props}
   />
 );
@@ -812,7 +818,7 @@ export type GetCommunitiesProps = Omit<GetProps<void, unknown, GetCommunitiesQue
 export const GetCommunities = (props: GetCommunitiesProps) => (
   <Get<void, unknown, GetCommunitiesQueryParams, void>
     path={`/communities`}
-    
+
     {...props}
   />
 );
@@ -846,7 +852,7 @@ export type GetCommunityProps = Omit<GetProps<void, unknown, GetCommunityQueryPa
 export const GetCommunity = ({id, ...props}: GetCommunityProps) => (
   <Get<void, unknown, GetCommunityQueryParams, GetCommunityPathParams>
     path={`/communities/${id}`}
-    
+
     {...props}
   />
 );
@@ -872,7 +878,7 @@ export const PutCommunity = ({id, ...props}: PutCommunityProps) => (
   <Mutate<void, unknown, void, PostCommunitiesBodyRequestBody, PutCommunityPathParams>
     verb="PUT"
     path={`/communities/${id}`}
-    
+
     {...props}
   />
 );
@@ -894,7 +900,7 @@ export const DeleteCommunity = (props: DeleteCommunityProps) => (
   <Mutate<void, unknown, void, string, void>
     verb="DELETE"
     path={`/communities`}
-    
+
     {...props}
   />
 );
@@ -916,7 +922,7 @@ export const PostRapidReviews = (props: PostRapidReviewsProps) => (
   <Mutate<void, unknown, void, void, void>
     verb="POST"
     path={`/rapidReviews`}
-    
+
     {...props}
   />
 );
@@ -937,7 +943,7 @@ export type GetRapidReviewsProps = Omit<GetProps<void, unknown, void, void>, "pa
 export const GetRapidReviews = (props: GetRapidReviewsProps) => (
   <Get<void, unknown, void, void>
     path={`/rapidReviews`}
-    
+
     {...props}
   />
 );
@@ -962,7 +968,7 @@ export type GetPreprintRapidReviewsProps = Omit<GetProps<void, unknown, void, Ge
 export const GetPreprintRapidReviews = ({pid, ...props}: GetPreprintRapidReviewsProps) => (
   <Get<void, unknown, void, GetPreprintRapidReviewsPathParams>
     path={`/preprints/${pid}/rapidReviews`}
-    
+
     {...props}
   />
 );
@@ -987,7 +993,7 @@ export type GetRapidReviewProps = Omit<GetProps<void, unknown, void, GetRapidRev
 export const GetRapidReview = ({id, ...props}: GetRapidReviewProps) => (
   <Get<void, unknown, void, GetRapidReviewPathParams>
     path={`/rapidReviews/${id}`}
-    
+
     {...props}
   />
 );
@@ -1013,7 +1019,7 @@ export const PutRapidReview = ({id, ...props}: PutRapidReviewProps) => (
   <Mutate<void, unknown, void, void, PutRapidReviewPathParams>
     verb="PUT"
     path={`/rapidReviews/${id}`}
-    
+
     {...props}
   />
 );
@@ -1035,7 +1041,7 @@ export const DeleteRapidReview = (props: DeleteRapidReviewProps) => (
   <Mutate<void, unknown, void, string, void>
     verb="DELETE"
     path={`/rapidReviews`}
-    
+
     {...props}
   />
 );
@@ -1061,7 +1067,7 @@ export const PostRequests = ({pid, ...props}: PostRequestsProps) => (
   <Mutate<void, unknown, void, void, PostRequestsPathParams>
     verb="POST"
     path={`/preprints/${pid}/requests`}
-    
+
     {...props}
   />
 );
@@ -1086,7 +1092,7 @@ export type GetPreprintRequestsProps = Omit<GetProps<void, unknown, void, GetPre
 export const GetPreprintRequests = ({pid, ...props}: GetPreprintRequestsProps) => (
   <Get<void, unknown, void, GetPreprintRequestsPathParams>
     path={`/preprints/${pid}/requests`}
-    
+
     {...props}
   />
 );
@@ -1107,7 +1113,7 @@ export type GetRequestsProps = Omit<GetProps<void, unknown, void, void>, "path">
 export const GetRequests = (props: GetRequestsProps) => (
   <Get<void, unknown, void, void>
     path={`/requests`}
-    
+
     {...props}
   />
 );
@@ -1132,7 +1138,7 @@ export type GetRequestProps = Omit<GetProps<void, unknown, void, GetRequestPathP
 export const GetRequest = ({id, ...props}: GetRequestProps) => (
   <Get<void, unknown, void, GetRequestPathParams>
     path={`/requests/${id}`}
-    
+
     {...props}
   />
 );
@@ -1154,7 +1160,7 @@ export const DeleteRequest = (props: DeleteRequestProps) => (
   <Mutate<void, unknown, void, string, void>
     verb="DELETE"
     path={`/requests`}
-    
+
     {...props}
   />
 );
@@ -1185,7 +1191,7 @@ export type SearchProps = Omit<GetProps<void, unknown, SearchQueryParams, void>,
 export const Search = (props: SearchProps) => (
   <Get<void, unknown, SearchQueryParams, void>
     path={`/searches`}
-    
+
     {...props}
   />
 );
@@ -1207,7 +1213,7 @@ export const PostTags = (props: PostTagsProps) => (
   <Mutate<void, unknown, void, void, void>
     verb="POST"
     path={`/tags`}
-    
+
     {...props}
   />
 );
@@ -1228,7 +1234,7 @@ export type GetTagsProps = Omit<GetProps<void, unknown, void, void>, "path">;
 export const GetTags = (props: GetTagsProps) => (
   <Get<void, unknown, void, void>
     path={`/tags`}
-    
+
     {...props}
   />
 );
@@ -1253,7 +1259,7 @@ export type GetTagProps = Omit<GetProps<void, unknown, void, GetTagPathParams>, 
 export const GetTag = ({id, ...props}: GetTagProps) => (
   <Get<void, unknown, void, GetTagPathParams>
     path={`/tags/${id}`}
-    
+
     {...props}
   />
 );
@@ -1279,7 +1285,7 @@ export const PutTag = ({id, ...props}: PutTagProps) => (
   <Mutate<void, unknown, void, void, PutTagPathParams>
     verb="PUT"
     path={`/tags/${id}`}
-    
+
     {...props}
   />
 );
@@ -1301,7 +1307,7 @@ export const DeleteTag = (props: DeleteTagProps) => (
   <Mutate<void, unknown, void, string, void>
     verb="DELETE"
     path={`/tags`}
-    
+
     {...props}
   />
 );
@@ -1312,4 +1318,3 @@ export type UseDeleteTagProps = Omit<UseMutateProps<void, unknown, void, string,
  * Endpoint to DELETE a single tag by ID.
  */
 export const useDeleteTag = (props: UseDeleteTagProps) => useMutate<void, unknown, void, string, void>("DELETE", `/tags`, {   ...props });
-

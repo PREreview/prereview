@@ -246,14 +246,14 @@ export default function controller(groupModel, userModel, thisUser) {
           .required(),
       },
     },
-    // pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next),
+    // pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next), #FIXME
     handler: async ctx => {
       log.debug(`Adding user ${ctx.params.uid} to group ${ctx.params.id}.`);
       let group, user;
 
       try {
         group = await groupModel.findOne(ctx.params.id, ['members']);
-        user = await userModel.findOneByIdOrOrcid(ctx.params.uid, ['personas']);
+        user = await userModel.findOne({ id: ctx.params.uid });
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse query: ${err}`);
@@ -270,22 +270,6 @@ export default function controller(groupModel, userModel, thisUser) {
 
       ctx.body = { status: 201, message: 'created', data: group };
       ctx.status = 201;
-
-      // if (res) {
-      //
-      // } else {
-      //   log.error(
-      //     `HTTP 404 Error: That mapping with gid ${ctx.params.id} and uid ${
-      //       ctx.params.uid
-      //     } does not exist.`,
-      //   );
-      //   ctx.throw(
-      //     404,
-      //     `That mapping with gid ${ctx.params.id} and uid ${
-      //       ctx.params.uid
-      //     } does not exist.`,
-      //   );
-      // }
     },
     meta: {
       swagger: {
@@ -298,36 +282,34 @@ export default function controller(groupModel, userModel, thisUser) {
   });
 
   groupsRouter.route({
-    method: 'delete',
+    method: 'DELETE',
     path: '/groups/:id/members/:uid',
-    pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next),
+    // pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next), #FIXME
     handler: async ctx => {
       log.debug(`Removing user ${ctx.params.uid} from group ${ctx.params.id}.`);
-      let res;
+      let group, user;
 
       try {
-        res = await groupModel.memberRemove(ctx.params.id, ctx.params.uid);
+        group = await groupModel.findOne(ctx.params.id, ['members']);
+        user = await userModel.findOneByIdOrOrcid(ctx.params.uid, ['personas']);
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse query: ${err}`);
       }
 
-      if (res) {
-        ctx.response.body = { statusCode: 200, status: 'ok', data: res };
-        ctx.response.status = 200;
-      } else {
-        log.error(
-          `HTTP 404 Error: That mapping with gid ${ctx.params.id} and uid ${
-            ctx.params.uid
-          } does not exist.`,
+      try {
+        log.debug(
+          `Group ${group.id} found. Removing user ${user.id} from group.`,
         );
-        ctx.throw(
-          404,
-          `That mapping with gid ${ctx.params.id} and uid ${
-            ctx.params.uid
-          } does not exist.`,
-        );
+        group.members.remove(user);
+        await groupModel.removeAndFlush(group);
+      } catch (err) {
+        log.error('HTTP 400 Error: ', err);
+        ctx.throw(400, `Failed to remove user from group: ${err}`);
       }
+
+      // if deleted
+      ctx.status = 204;
     },
     meta: {
       swagger: {

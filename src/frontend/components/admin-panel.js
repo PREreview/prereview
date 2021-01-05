@@ -7,14 +7,13 @@ import { Helmet } from 'react-helmet-async';
 import { UserContext } from '../contexts/user-context';
 
 // utils
-import { getId, unprefix } from '../utils/jsonld';
-import { createModeratorQs } from '../utils/search';
+import { getId } from '../utils/jsonld';
 
 // hooks
 import {
+  useDeleteGroupMember,
   useGetGroup,
   usePutGroupMember,
-  usePutUser,
 } from '../hooks/api-hooks.tsx';
 
 // components
@@ -40,12 +39,13 @@ export default function AdminPanel() {
   const [group, setGroup] = useState(null);
   const [moderators, setModerators] = useState(null);
 
-  const { data: groupData, loadingGroup, error } = useGetGroup({
+  const { data: groupData, loadingGroup } = useGetGroup({
     id: 10,
   });
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [revokeRole, setRevokeRole] = useState(null);
+  const [revokeRolePersona, setRevokeRolePersona] = useState(null);
 
   const [excluded, setExcluded] = useState(new Set());
 
@@ -72,7 +72,7 @@ export default function AdminPanel() {
         <Helmet>
           <title>{ORG} • Admin panel</title>
         </Helmet>
-        <HeaderBar />
+        <HeaderBar thisUser={user} />
 
         <section>
           <header className="admin-panel__header">
@@ -93,9 +93,8 @@ export default function AdminPanel() {
             <div>
               <ul className="admin-panel__card-list">
                 {moderators.map(moderator => {
-                  moderator.personas.map(persona => {
-                    console.log('person: ', persona);
-                    if (moderator.defaultPersona === persona.id) {
+                  return moderator.personas.map(persona => {
+                    if (moderator.defaultPersona === persona.identity) {
                       return (
                         <li
                           key={persona.id}
@@ -113,6 +112,7 @@ export default function AdminPanel() {
                               className="admin-panel__remove-button"
                               onClick={() => {
                                 setRevokeRole(moderator);
+                                setRevokeRolePersona(persona);
                               }}
                             >
                               <MdClose className="admin-panel__remove-button-icon" />
@@ -142,10 +142,12 @@ export default function AdminPanel() {
 
         {!!revokeRole && (
           <AdminPanelRemoveModal
-            user={user}
-            role={revokeRole}
+            group={group}
+            userToDelete={revokeRole}
+            personaToDelete={revokeRolePersona}
             onClose={() => {
               setRevokeRole(null);
+              setRevokeRolePersona(null);
             }}
             onSuccess={action => {
               setExcluded(
@@ -211,9 +213,7 @@ function AdminPanelAddModal({ group, onClose, onSuccess }) {
           </Fragment>
         ) : (
           <Fragment>
-            <p>
-              The role (persona) was successfully granted moderator permission.
-            </p>
+            <p>The user was successfully granted moderator permission.</p>
 
             <Controls
               error={error} // #FIXME
@@ -240,8 +240,17 @@ AdminPanelAddModal.propTypes = {
   onSuccess: PropTypes.func.isRequired,
 };
 
-function AdminPanelRemoveModal({ user, role, onClose, onSuccess }) {
-  const updateUserRole = usePutUser();
+function AdminPanelRemoveModal({
+  userToDelete,
+  personaToDelete,
+  group,
+  onClose,
+  onSuccess,
+}) {
+  const { mutate: deleteGroupMember, loading, error } = useDeleteGroupMember({
+    id: group.id,
+    uid: userToDelete.id,
+  });
   const [frame, setFrame] = useState('submit');
 
   return (
@@ -250,15 +259,20 @@ function AdminPanelRemoveModal({ user, role, onClose, onSuccess }) {
         {frame === 'submit' ? (
           <Fragment>
             <p>
-              Are you sure to want to revoke moderator permission for role
-              (persona) <em>{role.name || unprefix(getId(role))}</em>?
+              Are you sure to want to revoke moderator permission for{' '}
+              <em>
+                {personaToDelete.name ||
+                  personaToDelete.orcid ||
+                  personaToDelete.id}
+              </em>
+              ?
             </p>
 
             <Controls
-              error={updateUserRole.error} // #FIXME
+              error={error} // #FIXME
             >
               <Button
-                disabled={updateUserRole.loading}
+                disabled={loading}
                 onClick={() => {
                   onClose();
                 }}
@@ -266,13 +280,12 @@ function AdminPanelRemoveModal({ user, role, onClose, onSuccess }) {
                 Cancel
               </Button>
               <Button
-                disabled={updateUserRole.loading}
-                isWaiting={updateUserRole.loading}
+                disabled={loading}
+                isWaiting={loading}
                 onClick={() => {
-                  updateUserRole(user, role)
-                    .then(() => alert('User role updated successfully.'))
-                    .catch(err => alert(`An error occurred: ${err}`));
-                  onSuccess(role);
+                  deleteGroupMember({ id: group.id, uid: userToDelete.id })
+                    .then(() => onSuccess(userToDelete))
+                    .catch(err => alert(`An error occurred: ${err.message}`));
                 }}
               >
                 Revoke
@@ -283,11 +296,17 @@ function AdminPanelRemoveModal({ user, role, onClose, onSuccess }) {
           <Fragment>
             <p>
               The moderator permission was successfuly revoked for role
-              (persona) <em>{role.name || unprefix(getId(role))}</em>.
+              (persona)
+              <em>
+                {personaToDelete.name ||
+                  personaToDelete.orcid ||
+                  personaToDelete.id}
+              </em>
+              .
             </p>
 
             <Controls
-              error={updateUserRole.error} // #FIXME
+              error={error} // #FIXME
             >
               <Button
                 disabled={updateUserRole.loading}
@@ -306,8 +325,9 @@ function AdminPanelRemoveModal({ user, role, onClose, onSuccess }) {
 }
 
 AdminPanelRemoveModal.propTypes = {
-  user: PropTypes.object.isRequired,
-  role: PropTypes.object.isRequired,
+  userToDelete: PropTypes.object.isRequired,
+  personaToDelete: PropTypes.object.isRequired,
+  group: PropTypes.object.isRequired,
   onClose: PropTypes.func.isRequired,
   onSuccess: PropTypes.func.isRequired,
 };
