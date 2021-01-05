@@ -221,7 +221,8 @@ SettingsRoles.propTypes = {
 
 function MakeActivePersonaModalButton({ user }) {
   const [isOpen, setIsOpen] = useState(false);
-  const { mutate: updateUser, loading, error } = usePutUser(user.id);
+  const { mutate: updateUser, loading, error } = usePutUser({
+    id: user.id});
 
   return (
     <Fragment>
@@ -260,7 +261,7 @@ function MakeActivePersonaModalButton({ user }) {
               isWaiting={loading}
               disabled={loading}
               onClick={() => {
-                updateUser({ defaultPersona: user.id, isActive: true })
+                updateUser({ defaultPersona: persona.id })
                   .then(() => alert('User updated successfully.'))
                   .catch(err => alert(`An error occurred: ${err.message}`));
                 setIsOpen(false);
