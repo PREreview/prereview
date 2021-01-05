@@ -234,7 +234,8 @@ export default function controller(groupModel, userModel, thisUser) {
     validate: {
       type: 'json',
       params: {
-        id: Joi.number().integer()
+        id: Joi.number()
+          .integer()
           .description('Group id')
           .required(),
         uid: Joi.alternatives()
