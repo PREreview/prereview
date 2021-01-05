@@ -250,7 +250,7 @@ export default function controller(groupModel, userModel, thisUser) {
       let group, user;
 
       try {
-        group = await groupModel.findOne(ctx.params.id);
+        group = await groupModel.findOne(ctx.params.id, ['members']);
         user = await userModel.findOneByIdOrOrcid(ctx.params.uid, ['personas']);
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
