@@ -40,23 +40,20 @@ export default function AdminPanel() {
   const [moderators, setModerators] = useState(null);
 
   const { data: groupData, loadingGroup } = useGetGroup({
-    id: 10,
+    id: 'moderators',
   });
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [revokeRole, setRevokeRole] = useState(null);
   const [revokeRolePersona, setRevokeRolePersona] = useState(null);
 
-  const [excluded, setExcluded] = useState(new Set());
-
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, []);
+  }, [moderators]);
 
   useEffect(() => {
     if (!loadingGroup) {
-      if (groupData) {
-        console.log(groupData.data[0]);
+      if (groupData && groupData.data[0]) {
         setGroup(groupData.data[0]);
         setModerators(groupData.data[0].members);
         setLoading(false);
@@ -134,8 +131,8 @@ export default function AdminPanel() {
             onClose={() => {
               setIsAddModalOpen(false);
             }}
-            onSuccess={action => {
-              setModerators(moderators => moderators.concat(action.result));
+            onSuccess={mods => {
+              setModerators(mods);
             }}
           />
         )}
@@ -149,10 +146,11 @@ export default function AdminPanel() {
               setRevokeRole(null);
               setRevokeRolePersona(null);
             }}
-            onSuccess={action => {
-              setExcluded(
-                new Set(Array.from(excluded).concat(getId(action.result))),
+            onSuccess={user => {
+              const filteredMods = moderators.filter(
+                moderator => moderator.id !== user.id,
               );
+              setModerators(filteredMods);
             }}
           />
         )}
@@ -203,7 +201,11 @@ function AdminPanelAddModal({ group, onClose, onSuccess }) {
                 disabled={loading}
                 onClick={() => {
                   updateGroupMember({ id: group, uid: value })
-                    .then(() => onSuccess(value))
+                    .then(response => {
+                      console.log(response.data.members);
+                      onSuccess(response.data.members);
+                      return onClose();
+                    })
                     .catch(err => alert(`An error occurred: ${err.message}`));
                 }}
               >
@@ -284,7 +286,10 @@ function AdminPanelRemoveModal({
                 isWaiting={loading}
                 onClick={() => {
                   deleteGroupMember({ id: group.id, uid: userToDelete.id })
-                    .then(() => onSuccess(userToDelete))
+                    .then(() => {
+                      onSuccess(userToDelete);
+                      return onClose();
+                    })
                     .catch(err => alert(`An error occurred: ${err.message}`));
                 }}
               >

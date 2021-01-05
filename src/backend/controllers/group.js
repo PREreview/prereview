@@ -58,7 +58,7 @@ export default function controller(groupModel, userModel, thisUser) {
     },
     method: 'POST',
     path: '/groups',
-    pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next),
+    // pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next),
     validate: validationSchema,
     handler: async ctx => {
       if (ctx.invalid) {
@@ -119,7 +119,7 @@ export default function controller(groupModel, userModel, thisUser) {
 
   groupsRouter.route({
     method: 'GET',
-    path: '/groups/:name',
+    path: '/groups/:id',
     // validate: validationSchema,
     pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
     handler: async ctx => {
@@ -128,13 +128,16 @@ export default function controller(groupModel, userModel, thisUser) {
         return;
       }
 
-      const groupName = ctx.params.name;
+      const groupName = ctx.params.id;
 
       log.debug(`Retrieving group ${groupName}.`);
       let group;
 
       try {
-        group = await groupModel.find({ name: groupName }, ['members']);
+        group = await groupModel.find({ name: groupName }, [
+          'members',
+          'members.personas',
+        ]);
         if (!group) {
           ctx.throw(404, `Group with ID ${ctx.params.id} doesn't exist`);
         }
@@ -252,8 +255,11 @@ export default function controller(groupModel, userModel, thisUser) {
       let group, user;
 
       try {
-        group = await groupModel.findOne(ctx.params.id, ['members']);
-        user = await userModel.findOne({ id: ctx.params.uid });
+        group = await groupModel.findOne(ctx.params.id, [
+          'members',
+          'members.personas',
+        ]);
+        user = await userModel.findOneByIdOrOrcid(ctx.params.uid, ['personas']);
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse query: ${err}`);
@@ -291,7 +297,7 @@ export default function controller(groupModel, userModel, thisUser) {
 
       try {
         group = await groupModel.findOne(ctx.params.id, ['members']);
-        user = await userModel.findOneByIdOrOrcid(ctx.params.uid, ['personas']);
+        user = await userModel.findOne({ id: ctx.params.uid });
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse query: ${err}`);
@@ -302,7 +308,7 @@ export default function controller(groupModel, userModel, thisUser) {
           `Group ${group.id} found. Removing user ${user.id} from group.`,
         );
         group.members.remove(user);
-        await groupModel.removeAndFlush(group);
+        await groupModel.persistAndFlush(group);
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to remove user from group: ${err}`);

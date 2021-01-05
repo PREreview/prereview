@@ -1,12 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import { MdPerson } from 'react-icons/md';
 import { Menu, MenuList, MenuButton, MenuLink } from '@reach/menu-button';
 import classNames from 'classnames';
 import Tooltip from '@reach/tooltip';
-import { unprefix, getId } from '../utils/jsonld';
-import { useGetUser } from '../hooks/api-hooks.tsx';
 import NoticeBadge from './notice-badge';
 
 const RoleBadge = React.forwardRef(function RoleBadge(
@@ -93,14 +91,26 @@ const RoleBadgeUI = React.forwardRef(function RoleBadgeUI(
               className="menu__list__link-item"
               href={
                 process.env.IS_EXTENSION
-                  ? `about/${user.orcid ? user.orcid : user.id}`
+                  ? `about/${
+                      user.orcid
+                        ? user.orcid
+                        : user.identity
+                        ? user.identity
+                        : user.id
+                    }`
                   : undefined
               }
               target={process.env.IS_EXTENSION ? '_blank' : undefined}
               to={
                 process.env.IS_EXTENSION
                   ? undefined
-                  : `/about/${user.orcid ? user.orcid : user.id}`
+                  : `/about/${
+                      user.orcid
+                        ? user.orcid
+                        : user.identity
+                        ? user.identity
+                        : user.id
+                    }`
               }
             >
               {user && user.orcid
@@ -116,14 +126,26 @@ const RoleBadgeUI = React.forwardRef(function RoleBadgeUI(
               className="menu__list__link-item"
               href={
                 process.env.IS_EXTENSION
-                  ? `about/${user.orcid ? user.orcid : user.id}`
+                  ? `about/${
+                      user.orcid
+                        ? user.orcid
+                        : user.identity
+                        ? user.identity
+                        : user.id
+                    }`
                   : undefined
               }
               target={process.env.IS_EXTENSION ? '_blank' : undefined}
               to={
                 process.env.IS_EXTENSION
                   ? undefined
-                  : `/about/${user.orcid ? user.orid : user.id}`
+                  : `/about/${
+                      user.orcid
+                        ? user.orcid
+                        : user.identity
+                        ? user.identity
+                        : user.id
+                    }`
               }
             >
               {user && user.orcid
@@ -142,6 +164,7 @@ RoleBadgeUI.propTypes = {
   tooltip: PropTypes.bool,
   user: PropTypes.shape({
     id: PropTypes.number,
+    identity: PropTypes.number,
     orcid: PropTypes.string,
     name: PropTypes.string,
     avatar: PropTypes.object,
