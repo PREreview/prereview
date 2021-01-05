@@ -189,7 +189,7 @@ export default function RoleEditor({ user, onCancel, onSaved }) {
               };
             }
 
-            updateUser({ avatar: payload.avatar })
+            updateUser({ payload })
               .then(() => alert('User updated successfully.'))
               .catch(err => alert(`An error occurred: ${err.message}`));
             onSaved(user);

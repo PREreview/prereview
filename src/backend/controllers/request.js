@@ -86,17 +86,17 @@ export default function controller(reqModel, thisUser) {
     handler: postHandler,
   });
 
-  requestRouter.route({
-    meta: {
-      swagger: {
-        operationId: 'PostRequests',
-      },
-    },
-    method: 'POST',
-    path: '/requests',
-    // pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
-    handler: postHandler,
-  });
+  // requestRouter.route({
+  //   meta: {
+  //     swagger: {
+  //       operationId: 'PostRequests',
+  //     },
+  //   },
+  //   method: 'POST',
+  //   path: '/requests',
+  //   // pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
+  //   handler: postHandler,
+  // });
 
   requestRouter.route({
     meta: {

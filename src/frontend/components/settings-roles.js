@@ -113,6 +113,7 @@ export default function SettingsRoles({ user }) {
           </TableHead>
           <TableBody>
             {user.personas.map(persona => {
+              console.log(persona);
               return (
                 <TableRow key={persona.id}>
                   <TableCell>
@@ -168,13 +169,15 @@ export default function SettingsRoles({ user }) {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <Button
-                      onClick={() => {
-                        setUserToEdit(persona);
-                      }}
-                    >
-                      Edit
-                    </Button>
+                    {!persona.isAnonymous ? (
+                      <Button
+                        onClick={() => {
+                          setUserToEdit(persona);
+                        }}
+                      >
+                        Edit
+                      </Button>
+                    ) : null}
                   </TableCell>
                 </TableRow>
               );
@@ -257,7 +260,7 @@ function MakeActivePersonaModalButton({ user }) {
               isWaiting={loading}
               disabled={loading}
               onClick={() => {
-                updateUser({ isActive: true })
+                updateUser({ defaultPersona: user.id, isActive: true })
                   .then(() => alert('User updated successfully.'))
                   .catch(err => alert(`An error occurred: ${err.message}`));
                 setIsOpen(false);

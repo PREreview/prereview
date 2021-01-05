@@ -120,7 +120,7 @@ export default function controller(groupModel, thisUser) {
   groupsRouter.route({
     method: 'GET',
     path: '/groups/:id',
-    validate: validationSchema,
+    // validate: validationSchema,
     pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
     handler: async ctx => {
       if (ctx.invalid) {
@@ -228,107 +228,101 @@ export default function controller(groupModel, thisUser) {
     },
   });
 
-  // groupsRouter.route({
-  //   method: 'put',
-  //   path: '/groups/:id/members/:uid',
-  //   validate: {
-  //     body: {
-  //       username: Joi.string(),
-  //       password: Joi.string(),
-  //       id: Joi.number(),
-  //       firstName: Joi.string(),
-  //       lastName: Joi.string(),
-  //       email: Joi.string(),
-  //       role: Joi.number(),
-  //     },
-  //     type: 'json',
-  //   },
-  //   pre: async (ctx, next) => {
-  //     await thisUser.can('access admin pages');
-  //     return next();
-  //   },
-  //   handler: async ctx => {
-  //     log.debug(`Adding user ${ctx.params.uid} to group ${ctx.params.id}.`);
-  //     let res;
+  groupsRouter.route({
+    method: 'put',
+    path: '/groups/:id/members/:uid',
+    validate: {
+      // body: {
+      //   username: Joi.string(),
+      //   password: Joi.string(),
+      //   id: Joi.number(),
+      //   firstName: Joi.string(),
+      //   lastName: Joi.string(),
+      //   email: Joi.string(),
+      //   role: Joi.number(),
+      // },
+      type: 'json',
+    },
+    // pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next),
+    handler: async ctx => {
+      log.debug(`Adding user ${ctx.params.uid} to group ${ctx.params.id}.`);
+      let res;
 
-  //     try {
-  //       res = await groupModel.memberAdd(ctx.params.id, ctx.params.uid);
-  //     } catch (err) {
-  //       log.error('HTTP 400 Error: ', err);
-  //       ctx.throw(400, `Failed to parse query: ${err}`);
-  //     }
+      try {
+        res = await groupModel.memberAdd(ctx.params.id, ctx.params.uid);
+      } catch (err) {
+        log.error('HTTP 400 Error: ', err);
+        ctx.throw(400, `Failed to parse query: ${err}`);
+      }
 
-  //     if (res) {
-  //       ctx.response.body = { statusCode: 201, status: 'created', data: res };
-  //       ctx.response.status = 201;
-  //     } else {
-  //       log.error(
-  //         `HTTP 404 Error: That mapping with gid ${ctx.params.id} and uid ${
-  //           ctx.params.uid
-  //         } does not exist.`,
-  //       );
-  //       ctx.throw(
-  //         404,
-  //         `That mapping with gid ${ctx.params.id} and uid ${
-  //           ctx.params.uid
-  //         } does not exist.`,
-  //       );
-  //     }
-  //   },
-  //  meta: {
-  //    swagger: {
-  //      operationId: 'GetGroupMember',
-  //      summary:
-  //        'Endpoint to GET one user from a group by ID from PREreview. Admin users only.',
-  //      required: true,
-  //    },
-  //  },
-  // });
+      if (res) {
+        ctx.response.body = { statusCode: 201, status: 'created', data: res };
+        ctx.response.status = 201;
+      } else {
+        log.error(
+          `HTTP 404 Error: That mapping with gid ${ctx.params.id} and uid ${
+            ctx.params.uid
+          } does not exist.`,
+        );
+        ctx.throw(
+          404,
+          `That mapping with gid ${ctx.params.id} and uid ${
+            ctx.params.uid
+          } does not exist.`,
+        );
+      }
+    },
+    meta: {
+      swagger: {
+        operationId: 'PutGroupMember',
+        summary:
+          'Endpoint to PUT one user to a group by ID from PREreview. Admin users only.',
+        required: true,
+      },
+    },
+  });
 
-  // groupsRouter.route({
-  //   method: 'delete',
-  //   path: '/groups/:id/members/:uid',
-  //   pre: async (ctx, next) => {
-  //     await thisUser.can('access admin pages');
-  //     return next();
-  //   },
-  //   handler: async ctx => {
-  //     log.debug(`Removing user ${ctx.params.uid} from group ${ctx.params.id}.`);
-  //     let res;
+  groupsRouter.route({
+    method: 'delete',
+    path: '/groups/:id/members/:uid',
+    pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next),
+    handler: async ctx => {
+      log.debug(`Removing user ${ctx.params.uid} from group ${ctx.params.id}.`);
+      let res;
 
-  //     try {
-  //       res = await groupModel.memberRemove(ctx.params.id, ctx.params.uid);
-  //     } catch (err) {
-  //       log.error('HTTP 400 Error: ', err);
-  //       ctx.throw(400, `Failed to parse query: ${err}`);
-  //     }
+      try {
+        res = await groupModel.memberRemove(ctx.params.id, ctx.params.uid);
+      } catch (err) {
+        log.error('HTTP 400 Error: ', err);
+        ctx.throw(400, `Failed to parse query: ${err}`);
+      }
 
-  //     if (res) {
-  //       ctx.response.body = { statusCode: 200, status: 'ok', data: res };
-  //       ctx.response.status = 200;
-  //     } else {
-  //       log.error(
-  //         `HTTP 404 Error: That mapping with gid ${ctx.params.id} and uid ${
-  //           ctx.params.uid
-  //         } does not exist.`,
-  //       );
-  //       ctx.throw(
-  //         404,
-  //         `That mapping with gid ${ctx.params.id} and uid ${
-  //           ctx.params.uid
-  //         } does not exist.`,
-  //       );
-  //     }
-  //   },
-  //  meta: {
-  //    swagger: {
-  //      operationId: 'DeleteGroupMember',
-  //      summary:
-  //        'Endpoint to DELETE one user from a group by ID from PREreview. Admin users only.',
-  //      required: true,
-  //    },
-  //  },
-  // });
+      if (res) {
+        ctx.response.body = { statusCode: 200, status: 'ok', data: res };
+        ctx.response.status = 200;
+      } else {
+        log.error(
+          `HTTP 404 Error: That mapping with gid ${ctx.params.id} and uid ${
+            ctx.params.uid
+          } does not exist.`,
+        );
+        ctx.throw(
+          404,
+          `That mapping with gid ${ctx.params.id} and uid ${
+            ctx.params.uid
+          } does not exist.`,
+        );
+      }
+    },
+    meta: {
+      swagger: {
+        operationId: 'DeleteGroupMember',
+        summary:
+          'Endpoint to DELETE one user from a group by ID from PREreview. Admin users only.',
+        required: true,
+      },
+    },
+  });
 
   return groupsRouter;
 }

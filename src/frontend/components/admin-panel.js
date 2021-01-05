@@ -12,8 +12,8 @@ import { createModeratorQs } from '../utils/search';
 
 // hooks
 import {
-  useGetGroups,
-  usePostGroups,
+  useGetGroup,
+  usePutGroupMember,
   usePutUser,
 } from '../hooks/api-hooks.tsx';
 
@@ -34,27 +34,14 @@ import { ORG } from '../constants';
 // icons
 import { MdClose } from 'react-icons/md';
 
-const searchParamsToObject = params => {
-  const obj = {};
-  for (const [key, value] of params) {
-    obj[key] = value;
-  }
-  return obj;
-};
-
 export default function AdminPanel() {
   const user = useContext(UserContext);
-  const [bookmark, setBookmark] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [groups, setGroups] = useState(null);
+  const [group, setGroup] = useState(null);
 
-  const search = createModeratorQs({ bookmark });
-
-  const { data: groupsData, loadingGroups, error } = useGetGroups({
-    queryParams: searchParamsToObject(search),
+  const { data: groupData, loadingGroup, error } = useGetGroup({
+    id: 10,
   });
-
-  const [moderators, setModerators] = useState([]);
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [revokeRole, setRevokeRole] = useState(null);
@@ -67,24 +54,13 @@ export default function AdminPanel() {
   }, []);
 
   useEffect(() => {
-    if (!loadingGroups) {
-      if (groupsData) {
-        let filteredModerators = [];
-        groupsData.data.map(group => {
-          group.members.map(member => {
-            filteredModerators = [...filteredModerators, member];
-          });
-        });
-        filteredModerators = filteredModerators.filter(
-          (moderator, index, self) =>
-            self.findIndex(m => m.id === moderator.id) === index,
-        );
-        setModerators(filteredModerators);
-        setGroups(groupsData.data);
+    if (!loadingGroup) {
+      if (groupData) {
+        setGroup(groupData.data[0]);
         setLoading(false);
       }
     }
-  }, [loadingGroups, groupsData, user]);
+  }, [loadingGroup, groupData, user]);
 
   if (loading) {
     return <Loading />;
@@ -109,7 +85,7 @@ export default function AdminPanel() {
             </Button>
           </header>
 
-          {!moderators.length ? (
+          {!group.members.length ? (
             <div>No moderators.</div>
           ) : (
             <div>
@@ -152,7 +128,7 @@ export default function AdminPanel() {
 
         {isAddModalOpen && (
           <AdminPanelAddModal
-            user={user}
+            group={group.id}
             onClose={() => {
               setIsAddModalOpen(false);
             }}
@@ -181,14 +157,13 @@ export default function AdminPanel() {
   }
 }
 
-function AdminPanelAddModal({ user, onClose, onSuccess }) {
+function AdminPanelAddModal({ group, onClose, onSuccess }) {
   const [value, setValue] = useState('');
-  const postGroup = usePostGroups();
+  const { mutate: updateGroupMember, loading, error } = usePutGroupMember({
+    id: group,
+    uid: value,
+  });
   const [frame, setFrame] = useState('input');
-
-  const pattern =
-    '^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$'; // uuid v4
-  const re = new RegExp(pattern, 'i');
 
   return (
     <Modal title="Add Moderator">
@@ -197,12 +172,11 @@ function AdminPanelAddModal({ user, onClose, onSuccess }) {
           <Fragment>
             <TextInput
               inputId="step-preprint-input-new"
-              label={<span>Enter a role (persona) ID</span>}
+              label={<span>Enter a user ID or ORCID</span>}
               minimal={true}
               autoComplete="off"
-              disabled={postGroup.loading}
+              disabled={loading}
               placeholder=""
-              pattern={pattern}
               onChange={e => {
                 const value = e.target.value;
                 setValue(value);
@@ -211,10 +185,10 @@ function AdminPanelAddModal({ user, onClose, onSuccess }) {
             />
 
             <Controls
-              error={postGroup.error} // #FIXME
+              error={error} // #FIXME
             >
               <Button
-                disabled={postGroup.loading}
+                disabled={loading}
                 onClick={() => {
                   onClose();
                 }}
@@ -222,12 +196,11 @@ function AdminPanelAddModal({ user, onClose, onSuccess }) {
                 Cancel
               </Button>
               <Button
-                disabled={postGroup.loading || !re.test(value)}
-                isWaiting={postGroup.loading}
+                disabled={loading}
                 onClick={() => {
-                  postGroup(user, value)
-                    .then(() => alert('Role posted successfully.'))
-                    .catch(err => alert(`An error occurred: ${err}`));
+                  updateGroupMember({ id: group, uid: value })
+                    .then(() => alert('Moderator added successfully.'))
+                    .catch(err => alert(`An error occurred: ${err.message}`));
                   onSuccess(value);
                 }}
               >
@@ -242,10 +215,10 @@ function AdminPanelAddModal({ user, onClose, onSuccess }) {
             </p>
 
             <Controls
-              error={postGroup.error} // #FIXME
+              error={error} // #FIXME
             >
               <Button
-                disabled={postGroup.loading}
+                disabled={loading}
                 onClick={() => {
                   onClose();
                 }}
@@ -261,7 +234,7 @@ function AdminPanelAddModal({ user, onClose, onSuccess }) {
 }
 
 AdminPanelAddModal.propTypes = {
-  user: PropTypes.object.isRequired,
+  group: PropTypes.number.isRequired,
   onClose: PropTypes.func.isRequired,
   onSuccess: PropTypes.func.isRequired,
 };
