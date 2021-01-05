@@ -260,6 +260,7 @@ export default function controller(groupModel, userModel, thisUser) {
       try {
         log.debug(`Group ${group.id} found. Adding user ${user.id} to group.`);
         group.members.add(user);
+        await groupModel.persistAndFlush(group)
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to add user to group: ${err}`);
