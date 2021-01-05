@@ -25,7 +25,7 @@ const groupSchema = Joi.object({
 
 const validationSchema = {
   body: groupSchema,
-  query: querySchema,
+  // query: querySchema,
   type: 'json',
   continueOnError: true,
 };
@@ -119,8 +119,8 @@ export default function controller(groupModel, thisUser) {
 
   groupsRouter.route({
     method: 'GET',
-    path: '/groups/:id',
-    validate: validationSchema,
+    path: '/groups/:name',
+    // validate: validationSchema,
     pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
     handler: async ctx => {
       if (ctx.invalid) {
@@ -128,11 +128,13 @@ export default function controller(groupModel, thisUser) {
         return;
       }
 
-      log.debug(`Retrieving group ${ctx.params.id}.`);
+      const groupName = ctx.params.name;
+
+      log.debug(`Retrieving group ${groupName}.`);
       let group;
 
       try {
-        group = await groupModel.findOne(ctx.params.id, ['members']);
+        group = await groupModel.find({ name: groupName }, ['members']);
         if (!group) {
           ctx.throw(404, `Group with ID ${ctx.params.id} doesn't exist`);
         }
@@ -144,7 +146,7 @@ export default function controller(groupModel, thisUser) {
       ctx.body = {
         status: 200,
         message: 'ok',
-        data: [group],
+        data: group,
       };
       ctx.status = 200;
     },
@@ -160,7 +162,7 @@ export default function controller(groupModel, thisUser) {
 
   groupsRouter.route({
     method: 'PUT',
-    path: '/groups/:id',
+    path: '/groups/:name',
     validate: validationSchema,
     pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next),
     handler: async ctx => {
@@ -169,7 +171,7 @@ export default function controller(groupModel, thisUser) {
         return;
       }
 
-      log.debug(`Updating group ${ctx.params.id}.`);
+      log.debug(`Updating group ${ctx.params.name}.`);
       let group;
 
       try {
