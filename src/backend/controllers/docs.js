@@ -8,6 +8,7 @@ import fullReviewRoutes from './fullReview.js';
 import commentRoutes from './comment.js';
 import communityRoutes from './community.js';
 import groupRoutes from './group.js';
+import personaRoutes from './persona.js';
 import rapidReviewRoutes from './rapidReview.js';
 import requestRoutes from './request.js';
 import searchesRoutes from './searches.js';
@@ -25,6 +26,7 @@ export default function docs(authz) {
   generator.addJoiRouter(groupRoutes({}, authz));
   generator.addJoiRouter(commentRoutes({}, authz));
   generator.addJoiRouter(communityRoutes({}, authz));
+  generator.addJoiRouter(personaRoutes({}, authz));
   generator.addJoiRouter(rapidReviewRoutes({}, authz));
   generator.addJoiRouter(requestRoutes({}, authz));
   generator.addJoiRouter(searchesRoutes({}, authz));

@@ -80,4 +80,10 @@ export class RapidReview extends BaseEntity {
   @Fixture(faker => faker.lorem.sentence())
   @Property({ columnType: 'text', nullable: true })
   linkToData?: string;
+
+  constructor(author: Persona, preprint: Preprint) {
+    super();
+    this.author = author;
+    this.preprint = preprint;
+  }
 }

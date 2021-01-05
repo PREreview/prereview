@@ -2,6 +2,17 @@
   & .review-reader__title {
     font: var(--ui-header-1-font);
     margin: 0 var(--xsgrd) var(--xsgrd);
+
+    & span {
+      &:not(:first-child) {
+        padding-left: 10px;
+      }
+
+      &:not(:last-child) {
+        border-right: 1px solid #000;
+        padding-right: 10px;
+      }
+    }
   }
   & .review-reader__sub-header {
     font: var(--ui-header-2-font);

@@ -84,7 +84,6 @@ export default function controller(users, personas, config, thisUser) {
         log.debug('Creating new user.');
         newUser = users.create({ orcid: params.orcid, name: usersName });
         log.trace('verifyCallback() newUser:', newUser);
-        await users.persistAndFlush(newUser);
       } catch (err) {
         log.error('Error creating user:', err);
       }
@@ -99,19 +98,25 @@ export default function controller(users, personas, config, thisUser) {
           anonPersona = personas.create({
             name: 'Anonymous',
             identity: newUser,
-            isActive: false,
             isAnonymous: true,
           });
           defaultPersona = personas.create({
             name: usersName,
             identity: newUser,
-            isActive: true,
             isAnonymous: false,
           });
 
-          await personas.persistAndFlush([anonPersona, defaultPersona]);
+          newUser.defaultPersona = defaultPersona;
+          personas.persist([anonPersona, defaultPersona]);
+          users.persist(newUser);
         } catch (err) {
           log.debug('Error creating personas.', err);
+        }
+
+        try {
+          await users.em.flush();
+        } catch (err) {
+          log.debug('Error saving user and personas to database.', err);
         }
       }
 

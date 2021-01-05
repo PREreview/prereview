@@ -138,7 +138,13 @@ export default function controller(preprints, thisUser) {
       log.debug(`Retrieving preprints.`);
 
       try {
-        const populate = ['fullReviews', 'rapidReviews', 'requests', 'tags'];
+        const populate = [
+          'fullReviews',
+          'fullReviews.authors',
+          'rapidReviews',
+          'requests',
+          'tags',
+        ];
         let foundPreprints, count;
         if (ctx.query.search && ctx.query.search !== '') {
           [foundPreprints, count] = await preprints.search(ctx.query, populate);

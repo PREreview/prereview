@@ -4,6 +4,13 @@
   overflow-x: hidden;
   position: relative;
 
+  & .shell-content__preview {
+    height: var(--xlgrd);
+    position: fixed;
+    width: inherit;
+    z-index: 1000000;
+  }
+
   & .shell-content__header {
     width: inherit;
     height: var(--xlgrd);
@@ -13,10 +20,10 @@
     z-index: 1000000;
     background-color: white;
     position: fixed;
+    top: 126px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    border-top: 1px solid var(--ruling-color);
     box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.4);
     overflow: hidden;
     & nav {
@@ -62,7 +69,7 @@
 }
 
 .shell-content__body {
-  padding: 64px var(--sgrd) var(--lgrd) var(--sgrd);
+  padding: 140px var(--sgrd) var(--lgrd) var(--sgrd);
 }
 
 .shell-content-read__title,
@@ -72,6 +79,11 @@
 .shell-content-request-success__title {
   font: var(--ui-header-1-font);
   margin-bottom: var(--mgrd);
+}
+
+.shell-content-reviews__title {
+  font: var(--ui-header-1-font);
+  margin-bottom: 0;
 }
 
 .shell-content-read {
@@ -87,6 +99,10 @@
   animation-duration: 0.5s;
   animation-iteration-count: 1;
   animation-timing-function: ease-out;
+}
+
+.shell-content-review {
+  margin-top: 2em;
 }
 
 @keyframes open-tab {

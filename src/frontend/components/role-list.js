@@ -20,7 +20,7 @@ const HIGHLIGHTED_ROLE_TYPE = Symbol('dnd:highlighted-role-type');
  */
 export function PotentialRoles({
   user,
-  reviews,
+  allReviews,
   onRemoved,
   onModerate,
   isModerationInProgress,
@@ -32,6 +32,32 @@ export function PotentialRoles({
       isOver: monitor.isOver(),
       canDrop: monitor.canDrop(),
     }),
+  });
+
+  const [reviews, setReviews] = useState(allReviews);
+
+  useEffect(() => {
+    if (hasReviewed) {
+      setReviews(reviews => reviews.concat(user));
+    }
+  }, []);
+
+  const filteredReviews = reviews.filter((review, index, reviews) => {
+    if (review.author) {
+      return (
+        index ===
+        reviews.findIndex(r => {
+          if (r.author) {
+            return r.author.id === review.author.id;
+          }
+        })
+      );
+    } else if (review.authors) {
+      review.authors.filter((author, i, authors) => {
+        i === authors.findIndex(a => a.id === author.id);
+      });
+    }
+    return review;
   });
 
   // const [reviewsList, setReviewsList] = useState(reviews);
@@ -47,8 +73,8 @@ export function PotentialRoles({
       {!reviews.length && <p className="role-list__tip-text">No Reviewers</p>}
 
       <ul className="role-list__list">
-        {reviews.length
-          ? reviews.map(review => {
+        {filteredReviews.length
+          ? filteredReviews.map(review => {
               if (review.authors) {
                 return review.authors.map(author => {
                   return (
@@ -102,28 +128,6 @@ export function PotentialRoles({
               }
             })
           : null}
-        {user && hasReviewed ? (
-          <li key={user.identity}>
-            <DraggableRoleBadge
-              type={POTENTIAL_ROLE_TYPE}
-              author={user}
-              onDropped={() => {
-                onRemoved(user.identity);
-              }}
-            >
-              {user.isAdmin && (
-                <MenuItem
-                  disabled={isModerationInProgress || user.identity}
-                  onSelect={() => {
-                    onModerate(user.identity);
-                  }}
-                >
-                  Report Review
-                </MenuItem>
-              )}
-            </DraggableRoleBadge>
-          </li>
-        ) : null}
       </ul>
     </div>
   );
@@ -131,12 +135,16 @@ export function PotentialRoles({
 
 PotentialRoles.propTypes = {
   user: PropTypes.object,
-  reviews: PropTypes.array.isRequired,
+  allReviews: PropTypes.array.isRequired,
   onModerate: PropTypes.func,
   isModerationInProgress: PropTypes.bool,
   onRemoved: PropTypes.func.isRequired,
   roleIds: PropTypes.arrayOf(PropTypes.object),
-  hasReviewed: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]),
+  hasReviewed: PropTypes.oneOfType([
+    PropTypes.object,
+    PropTypes.bool,
+    PropTypes.string,
+  ]),
 };
 
 function DraggableRoleBadge({ author, onDropped, children, type }) {

@@ -125,11 +125,11 @@ export default function controller(users, thisUser) {
     method: 'put',
     path: '/users/:id',
     validate: {
-      body: Joi.object({
-        name: Joi.string(),
-        email: Joi.string(),
-      }),
-      type: 'json',
+      // body: Joi.object({
+      //   name: Joi.string(),
+      //   email: Joi.string(),
+      // }),
+      // type: 'json',
       params: {
         id: Joi.alternatives()
           .try(Joi.number().integer(), Joi.string())
