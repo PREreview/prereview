@@ -64,6 +64,8 @@ export default function App({ user }) {
         .catch(err => {
           console.log('An error occurred: ', err.message);
         });
+    } else {
+      setLoading(false);
     }
   }, [loading]);
 
