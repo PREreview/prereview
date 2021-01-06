@@ -229,6 +229,9 @@ const ReviewReader = React.memo(function ReviewReader({
                                         {comment.title}
                                       </div>
                                     ) : null}
+                                    <div>
+                                      <em>{comment.author.name}</em>
+                                    </div>
                                     <div
                                       dangerouslySetInnerHTML={{
                                         __html: `${comment.contents}`,
@@ -245,7 +248,14 @@ const ReviewReader = React.memo(function ReviewReader({
                                   {publishedTitle}
                                 </div>
                               ) : null}
-                              <div>{publishedComment}</div>
+                              <div>
+                                <em>{user.name}</em>
+                              </div>
+                              <div
+                                dangerouslySetInnerHTML={{
+                                  __html: `${publishedComment}`,
+                                }}
+                              />
                             </div>
                           ) : null}
                         </div>
