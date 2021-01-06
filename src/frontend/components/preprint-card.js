@@ -169,12 +169,15 @@ export default function PreprintCard({
             <div className="preprint-card__info-row__right">
               <ul className="preprint-card__tag-list">
                 {subjects.map(subject => (
-                  <li key={subject} className="preprint-card__tag-list__item">
+                  <li
+                    key={subject.id}
+                    className="preprint-card__tag-list__item"
+                  >
                     <Tooltip
-                      label={`Majority of reviewers tagged with ${subject}`}
+                      label={`Reviewers tagged this preprint as ${subject.name}`}
                     >
                       <div>
-                        <TagPill>{subject}</TagPill>
+                        <TagPill>{subject.name}</TagPill>
                       </div>
                     </Tooltip>
                   </li>

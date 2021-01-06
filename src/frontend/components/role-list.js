@@ -101,6 +101,8 @@ export function PotentialRoles({
                   );
                 });
               } else if (review.author) {
+                console.log('author: ', review.author);
+
                 return (
                   <li key={review.author.identity}>
                     <DraggableRoleBadge
