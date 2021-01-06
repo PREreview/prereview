@@ -52,6 +52,8 @@ export default function ShellContent({
   const [rapidContent, setRapidContent] = useState(null);
 
   const onCloseReviews = (rapidReview, longReview) => {
+    console.log(rapidReview);
+    console.log(longReview);
     if (rapidReview) {
       setRapidContent(rapidReview);
       setHasRapidReviewed(true);

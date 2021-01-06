@@ -81,6 +81,8 @@ const ReviewReader = React.memo(function ReviewReader({
     }
   }, [defaultHighlightedRoleIds, highlightedRoleIds]);
 
+  useEffect(() => {}, [allRapidReviews, publishedReviews]);
+
   return (
     <div
       className={classNames('review-reader', {
