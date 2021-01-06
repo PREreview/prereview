@@ -50,7 +50,11 @@ export default function controller(
           'drafts',
         ]);
       } else {
-        allReviews = await reviewModel.findAll(['authors', 'comments', 'drafts']);
+        allReviews = await reviewModel.findAll([
+          'authors',
+          'comments',
+          'drafts',
+        ]);
       }
     } catch (err) {
       log.error('HTTP 400 Error: ', err);
@@ -83,7 +87,10 @@ export default function controller(
 
       try {
         preprint = await preprintModel.findOne(ctx.request.body.preprint);
-        review = reviewModel.create({ ...ctx.request.body, preprint: preprint });
+        review = reviewModel.create({
+          ...ctx.request.body,
+          preprint: preprint,
+        });
 
         review.authors.add(authorPersona);
 

@@ -99,15 +99,14 @@ export default function controller(users, thisUser) {
       }
 
       if (user) {
-        if (
-          thisUser.isMemberOf('admins', user.orcid) ||
-          user.groups.contains('admins')
-        ) {
-          user.isAdmin = true;
+        let isAdmin = false;
+        if (await thisUser.isMemberOf('admins', user.orcid)) {
+          log.debug(`User ${user.orcid} is an administrator!`);
+          isAdmin = true;
         }
         ctx.status = 200;
         ctx.body = {
-          data: user,
+          data: { ...user, isAdmin: isAdmin },
         };
       } else {
         ctx.throw(404, `That user with ID ${ctx.params.id} does not exist.`);
