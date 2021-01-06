@@ -24,7 +24,10 @@ const authWrapper = groups => {
       isString(id) &&
       orcidUtils.isValid(id)
     ) {
-      return config.adminUsers.includes(id) || await groups.isMemberOf('admins', id);
+      return (
+        config.adminUsers.includes(id) ||
+        (await groups.isMemberOf('admins', id))
+      );
     } else {
       return groups.isMemberOf(group, id);
     }

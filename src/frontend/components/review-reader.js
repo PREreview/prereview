@@ -28,6 +28,8 @@ const ReviewReader = React.memo(function ReviewReader({
 }) {
   const [content, setContent] = useState('');
   const [commentTitle, setCommentTitle] = useState('');
+  const [publishedTitle, setPublishedTitle] = useState('');
+  const [publishedComment, setPublishedComment] = useState('');
   const [allRapidReviews, setAllRapidReviews] = useState(preprint.rapidReviews);
   const [publishedReviews, setPublishedReviews] = useState(
     preprint.fullReviews.filter(review => review.published),
@@ -42,6 +44,13 @@ const ReviewReader = React.memo(function ReviewReader({
 
   const handleCommentChange = value => {
     setContent(value);
+  };
+
+  const handleSubmitComment = (title, content) => {
+    setPublishedTitle(title);
+    setPublishedComment(content);
+    setCommentTitle('');
+    setContent('');
   };
 
   const canSubmit = content => {
@@ -67,7 +76,14 @@ const ReviewReader = React.memo(function ReviewReader({
         allPublishedReviews.concat(longContent),
       );
     }
-  }, [rapidContent, longContent]);
+  }, [
+    rapidContent,
+    longContent,
+    publishedTitle,
+    publishedComment,
+    content,
+    commentTitle,
+  ]);
 
   useEffect(() => {
     if (
@@ -180,36 +196,68 @@ const ReviewReader = React.memo(function ReviewReader({
                       key={review.id}
                       className="text-answers__long-response-row"
                     >
-                      <div className="text-answers__question long">
-                        {review.drafts[review.drafts.length - 1].title}
-                      </div>
-                      <div className="">
+                      {review.drafts[review.drafts.length - 1].title ? (
+                        <div className="text-answers__question long">
+                          {review.drafts[review.drafts.length - 1].title}
+                        </div>
+                      ) : null}
+                      <div>
                         {review.authors.map(author => (
-                          <span key={author.id}>by {author.name}</span>
+                          <span key={author.id}>
+                            <em>by {author.name}</em>
+                          </span>
                         ))}
                       </div>
                       <div
-                        className=""
                         dangerouslySetInnerHTML={{
                           __html: `${
                             review.drafts[review.drafts.length - 1].contents
                           }`,
                         }}
                       />
-                      {review.comments && (
-                        <div>
-                          <div>Comments</div>
-                          {review.comments.map(comment => {
-                            return (
-                              <div key={comment.id}>{comment.contents}</div>
-                            );
-                          })}
+                      {(review.comments || publishedComment) && (
+                        <div className="comments">
+                          <div>
+                            <b>Comments</b>
+                          </div>
+                          {review.comments
+                            ? review.comments.map(comment => {
+                                return (
+                                  <div key={comment.id}>
+                                    {comment.title ? (
+                                      <div className="comments-title">
+                                        {comment.title}
+                                      </div>
+                                    ) : null}
+                                    <div
+                                      dangerouslySetInnerHTML={{
+                                        __html: `${comment.contents}`,
+                                      }}
+                                    />
+                                  </div>
+                                );
+                              })
+                            : null}
+                          {publishedComment ? (
+                            <div>
+                              {commentTitle ? (
+                                <div className="comments-title">
+                                  {publishedTitle}
+                                </div>
+                              ) : null}
+                              <div>{publishedComment}</div>
+                            </div>
+                          ) : null}
                         </div>
                       )}
-                      <form>
-                        <div>Add a comment</div>
+                      <form className="comments__add">
+                        <div>
+                          <b>Add a comment</b>
+                        </div>
                         <input
+                          className="comments-title-input"
                           type="text"
+                          placeholder={'Title'}
                           value={commentTitle}
                           onChange={event =>
                             setCommentTitle(event.target.value)
@@ -235,14 +283,18 @@ const ReviewReader = React.memo(function ReviewReader({
                                   title: commentTitle,
                                   contents: content,
                                 })
-                                  .then(() =>
-                                    alert('Comment submitted successfully.'),
-                                  )
+                                  .then(() => {
+                                    alert('Comment submitted successfully.');
+                                    return handleSubmitComment(
+                                      commentTitle,
+                                      content,
+                                    );
+                                  })
                                   .catch(err =>
                                     alert(`An error occurred: ${err.message}`),
                                   );
                               } else {
-                                alert('Review cannot be blank.');
+                                alert('Comment cannot be blank.');
                               }
                             }}
                           >

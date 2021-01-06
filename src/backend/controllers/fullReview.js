@@ -202,6 +202,7 @@ export default function controller(
         fullReview = await reviewModel.findOne(ctx.params.id, [
           'drafts',
           'authors',
+          'comments',
         ]);
 
         if (!fullReview) {
