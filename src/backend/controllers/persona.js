@@ -106,7 +106,7 @@ export default function controller(personasModel, thisUser) {
       continueOnError: true,
       false: 400,
     },
-    pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next), // TODO: can edit self only no?
+    // pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next), // TODO: can edit self only no?
     handler: async ctx => {
       if (ctx.invalid) {
         handleInvalid(ctx);
