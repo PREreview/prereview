@@ -7,6 +7,7 @@ import { Helmet } from 'react-helmet-async';
 
 // utils
 import { usePostRequests } from '../hooks/api-hooks.tsx';
+import { checkIfRoleLacksMininmalData } from '../utils/roles';
 
 // components
 import Button from './button';
@@ -32,11 +33,12 @@ export default function ShellContent({
     mutate: postReviewRequest,
     loadingPostReviewRequest,
     errorPostReviewRequest,
-  } = usePostRequests();
+  } = usePostRequests({ pid: preprint.id });
 
   const [hasRapidReviewed, setHasRapidReviewed] = useState(false);
   const [hasLongReviewed, setHasLongReviewed] = useState(false);
   const [hasRequested, setHasRequested] = useState(false);
+  const [newRequest, setNewRequest] = useState(false);
 
   const [tab, setTab] = useState(defaultTab);
 
@@ -47,12 +49,11 @@ export default function ShellContent({
     preprint.rapidReviews.length +
     preprint.fullReviews.length;
 
-  const extensionNextURL = new URL(window.location.href);
-  extensionNextURL.hash = '#osrpre-shell';
-
   const [rapidContent, setRapidContent] = useState(null);
 
   const onCloseReviews = (rapidReview, longReview) => {
+    console.log(rapidReview);
+    console.log(longReview);
     if (rapidReview) {
       setRapidContent(rapidReview);
       setHasRapidReviewed(true);
@@ -72,9 +73,9 @@ export default function ShellContent({
   };
 
   const onCloseRequest = () => {
-    setHasRequested(true)
-    setTab('read')
-  }
+    setNewRequest(true);
+    setTab('read');
+  };
 
   useEffect(() => {
     if (user) {
@@ -105,9 +106,11 @@ export default function ShellContent({
       let author;
 
       preprint.requests.map(request => {
-        request.author.id ? author = request.author.id : author = request.author
-        setHasRequested((user.personas.some(persona => persona.id === author)))
-      })
+        request.author.id
+          ? (author = request.author.id)
+          : (author = request.author);
+        setHasRequested(user.personas.some(persona => persona.id === author));
+      });
     }
   }, [
     preprint,
@@ -116,6 +119,7 @@ export default function ShellContent({
     hasLongReviewed,
     rapidContent,
     longContent,
+    hasRequested,
   ]);
 
   return (
@@ -193,76 +197,6 @@ export default function ShellContent({
             </li>
           </ul>
         </nav>
-
-        {user ? (
-          <UserBadge
-            className="shell-content__user"
-            user={user}
-            showNotice={showProfileNotice}
-          >
-            {showProfileNotice && (
-              <MenuLink
-                as={process.env.IS_EXTENSION ? undefined : Link}
-                to={process.env.IS_EXTENSION ? undefined : '/settings'}
-                href={process.env.IS_EXTENSION ? `settings` : undefined}
-                target={process.env.IS_EXTENSION ? '_blank' : undefined}
-              >
-                Complete Profile
-                <div className="menu__link-item__icon">
-                  <NoticeBadge />
-                </div>
-              </MenuLink>
-            )}
-
-            <MenuLink
-              as={process.env.IS_EXTENSION ? undefined : Link}
-              to={process.env.IS_EXTENSION ? undefined : '/settings'}
-              href={process.env.IS_EXTENSION ? `settings` : undefined}
-              target={process.env.IS_EXTENSION ? '_blank' : undefined}
-            >
-              User Settings
-            </MenuLink>
-
-            {user.isAdmin && (
-              <MenuLink
-                as={process.env.IS_EXTENSION ? undefined : Link}
-                to={process.env.IS_EXTENSION ? undefined : '/admin'}
-                href={process.env.IS_EXTENSION ? `admin` : undefined}
-                target={process.env.IS_EXTENSION ? '_blank' : undefined}
-              >
-                Admin Settings
-              </MenuLink>
-            )}
-
-            {user.isAdmin && (
-              <MenuLink
-                as={process.env.IS_EXTENSION ? undefined : Link}
-                to={process.env.IS_EXTENSION ? undefined : '/block'}
-                href={process.env.IS_EXTENSION ? `block` : undefined}
-                target={process.env.IS_EXTENSION ? '_blank' : undefined}
-              >
-                Moderate Users
-              </MenuLink>
-            )}
-
-            {!!(user && user.isModerator && !user.isModerated) && (
-              <MenuLink
-                as={process.env.IS_EXTENSION ? undefined : Link}
-                to={process.env.IS_EXTENSION ? undefined : '/moderate'}
-                href={process.env.IS_EXTENSION ? `moderate` : undefined}
-                target={process.env.IS_EXTENSION ? '_blank' : undefined}
-              >
-                Moderate Reviews
-              </MenuLink>
-            )}
-
-            <MenuLink href={`/api/v2/logout`}>Logout</MenuLink>
-          </UserBadge>
-        ) : (
-          <XLink href={loginUrl} to={loginUrl}>
-            Login
-          </XLink>
-        )}
       </header>
       {isLoginModalOpen && (
         <LoginRequiredModal
@@ -280,6 +214,7 @@ export default function ShellContent({
             counts={counts}
             rapidContent={rapidContent}
             longContent={longContent}
+            newRequest={newRequest}
           />
         ) : tab === 'request' ? (
           <ShellContentRequest
@@ -340,12 +275,13 @@ function ShellContentRead({
   counts,
   rapidContent,
   longContent,
+  newRequest,
 }) {
   // Note: !! this needs to work both in the webApp where it is URL driven and in
   // the extension where it is shell driven
 
   const [moderatedReviewId, setModeratedReviewId] = useState(null);
-  const postReport = usePostRequests(); // #FIXME should be PostReport() when built
+  const postReport = usePostRequests(preprint); // #FIXME should be PostReport() when built
 
   return (
     <div className="shell-content-read">
@@ -355,6 +291,7 @@ function ShellContentRead({
         nRequests={counts}
         rapidContent={rapidContent}
         longContent={longContent}
+        newRequest={newRequest}
       />
       {!!moderatedReviewId && (
         <ModerationModal
@@ -380,6 +317,7 @@ ShellContentRead.propTypes = {
   preprint: PropTypes.object.isRequired,
   rapidContent: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]),
   longContent: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]),
+  newRequest: PropTypes.bool,
 };
 
 function ShellContentReviews({

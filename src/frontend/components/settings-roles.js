@@ -26,7 +26,7 @@ import XLink from './xlink';
 
 // icons
 import { MdInfoOutline, MdPublic, MdStar, MdStarBorder } from 'react-icons/md';
-import IncognitoIcon from '../svgs/incognito_icon.svg';
+import incognitoIcon from '../svgs/incognito_icon.svg';
 
 const useStyles = makeStyles({
   relative: {
@@ -161,7 +161,7 @@ export default function SettingsRoles({ user }) {
                       ) : (
                         <div className="settings__persona-status__icon-container">
                           <img
-                            src={IncognitoIcon}
+                            src={incognitoIcon}
                             className="settings__persona-status__icon"
                           />{' '}
                           <span className="settings__persona-status__label">

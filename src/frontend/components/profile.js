@@ -77,7 +77,10 @@ export default function Profile() {
                       </div>
                     ) : (
                       <div className="profile__persona-status__icon-container">
-                        <IncognitoIcon className="profile__persona-status__icon" />{' '}
+                        <img
+                          src={IncognitoIcon}
+                          className="profile__persona-status__icon"
+                        />{' '}
                         Anonymous
                       </div>
                     )}
@@ -94,7 +97,7 @@ export default function Profile() {
                     to={`/about/${user.orcid ? user.orcid : user.id}`}
                     href={`/about/${user.orcid ? user.orcid : user.id}`}
                   >
-                    {user.name}
+                    {persona.name}
                   </XLink>
                 </dd>
                 {user && (

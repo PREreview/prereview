@@ -1,18 +1,30 @@
-import React, { Suspense, useEffect, useMemo, useState } from 'react';
+// base imports
+import React, { Suspense, useContext, useEffect, useMemo, useState } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import Cookies from 'js-cookie';
 import mobile from 'is-mobile';
-import { useGetPreprint, useGetUser } from '../hooks/api-hooks.tsx';
+
+// contexts
+import { UserContext } from '../contexts/user-context';
+
+// hooks
+import { useGetPreprint } from '../hooks/api-hooks.tsx';
 import { useExtension } from '../hooks/extension-hooks';
+
+// utils
+import { createPreprintId } from '../utils/ids';
 import { getCanonicalUrl } from '../utils/preprints';
+import { unprefix } from '../utils/jsonld';
+
+// components
+import NotFound from './not-found';
 import Shell from './shell';
 import ShellContent from './shell-content';
-import NotFound from './not-found';
 import SuspenseLoading from './suspense-loading';
+
+// constants
 import { ORG } from '../constants';
-import { createPreprintId } from '../utils/ids';
-import { unprefix } from '../utils/jsonld';
 
 const PdfViewer = React.lazy(() =>
   import(/* webpackChunkName: "pdf-viewer" */ './pdf-viewer'),
@@ -22,16 +34,14 @@ const PdfViewer = React.lazy(() =>
 
 export default function ExtensionFallback() {
   const location = useLocation(); // location.state can be {preprint, tab} with tab being `request` or `review` (so that we know on which tab the shell should be activated with
+  const user = useContext(UserContext);
+
   const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState(null);
   const [preprint, setPreprint] = useState(null);
+
   const { id } = useParams();
 
   const { data: preprintData, loadingPreprint, errorPreprint } = useGetPreprint({id: id});
-
-  const { data: userData, loadingUser, errorUser } = useGetUser({
-    id: Cookies.get('PRE_user'),
-  });
 
   useEffect(() => {
     if (!loadingPreprint) {
@@ -41,14 +51,6 @@ export default function ExtensionFallback() {
       }
     }
   }, [loadingPreprint, preprintData]);
-
-  useEffect(() => {
-    if (!loadingUser) {
-      if (userData) {
-        setUser(userData.data);
-      }
-    }
-  }, [loadingUser, userData]);
 
   const isMobile = useMemo(() => mobile({ tablet: true }), []);
 
