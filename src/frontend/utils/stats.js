@@ -85,26 +85,11 @@ export function getTags(preprint) {
     reviewsWithCode.length >= threshold;
 
   // subjects
-  const subjectCountMap = {};
+  let subjects = [];
 
-  preprint.rapidReviews.forEach(action => {
-    if (action.reviews && action.reviews.about) {
-      action.reviews.about.forEach(subject => {
-        if (typeof subject.name === 'string') {
-          if (subject.name in subjectCountMap) {
-            subjectCountMap[subject.name] += 1;
-          } else {
-            subjectCountMap[subject.name] = 1;
-          }
-        }
-      });
-    }
-  });
-
-  const subjects = Object.keys(subjectCountMap).filter(subjectName => {
-    const count = subjectCountMap[subjectName];
-    return count >= threshold;
-  });
+  if (preprint.tags.length) {
+    subjects = preprint.tags;
+  }
 
   return { hasReviews, hasRequests, hasData, hasCode, subjects };
 }

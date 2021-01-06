@@ -279,9 +279,9 @@ const ReviewReader = React.memo(function ReviewReader({
           ) : null}
 
           {preprint.tags && preprint.tags.length ? (
-            <div>
+            <div className="tags">
               <div className="tags__title">Subject Tags</div>
-              <div className="tags">
+              <div className="tags__content">
                 {preprint.tags.map(tag => {
                   return (
                     <div key={tag.name} className="tags__tag">
