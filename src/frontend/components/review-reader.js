@@ -58,14 +58,11 @@ const ReviewReader = React.memo(function ReviewReader({
       Object.keys(rapidContent).length !== 0 &&
       rapidContent.constructor === Object
     ) {
-      console.log('rapid content found: ', rapidContent);
-      setAllRapidReviews(allRapidReviews =>
-        allRapidReviews.concat(rapidContent),
-      );
+      const all = allRapidReviews.concat(rapidContent);
+      setAllRapidReviews(all);
     }
 
     if (longContent) {
-      console.log('long content found: ', longContent);
       setPublishedReviews(allPublishedReviews =>
         allPublishedReviews.concat(longContent),
       );
