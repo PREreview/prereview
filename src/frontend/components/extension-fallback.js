@@ -29,6 +29,8 @@ export default function ExtensionFallback() {
 
   const { data: preprintData, loadingPreprint, errorPreprint } = useGetPreprint({id: id});
 
+  const username = Cookies.get('PRE_user');
+
   const { data: userData, loadingUser, errorUser } = useGetUser({
     id: Cookies.get('PRE_user'),
   });

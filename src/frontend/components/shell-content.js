@@ -4,9 +4,11 @@ import PropTypes from 'prop-types';
 import { useLocation } from 'react-router-dom';
 import classNames from 'classnames';
 import { Helmet } from 'react-helmet-async';
+import { MenuLink } from '@reach/menu-button';
 
 // utils
 import { usePostRequests } from '../hooks/api-hooks.tsx';
+import { checkIfRoleLacksMininmalData } from '../utils/roles';
 
 // components
 import Button from './button';
@@ -16,6 +18,8 @@ import ModerationModal from './moderation-modal';
 import PreprintPreview from './preprint-preview';
 import ReviewReader from './review-reader';
 import ReviewStepper from './review-stepper';
+import UserBadge from './user-badge';
+import XLink from './xlink';
 
 // !! this needs to work both in web and extension use
 // `process.env.IS_EXTENSION` to assess the environment we are in.
@@ -28,11 +32,20 @@ export default function ShellContent({
 }) {
   const location = useLocation();
 
+  const extensionNextURL = new URL(window.location.href);
+  extensionNextURL.hash = '#osrpre-shell';
+
+  const loginUrl = process.env.IS_EXTENSION
+    ? `/login?next=${encodeURIComponent(extensionNextURL)}`
+    : `/login?next=${location.pathname}`;
+
+  const showProfileNotice = checkIfRoleLacksMininmalData(user);
+
   const {
     mutate: postReviewRequest,
     loadingPostReviewRequest,
     errorPostReviewRequest,
-  } = usePostRequests();
+  } = usePostRequests(preprint);
 
   const [hasRapidReviewed, setHasRapidReviewed] = useState(false);
   const [hasLongReviewed, setHasLongReviewed] = useState(false);
@@ -46,9 +59,6 @@ export default function ShellContent({
     preprint.requests.length +
     preprint.rapidReviews.length +
     preprint.fullReviews.length;
-
-  const extensionNextURL = new URL(window.location.href);
-  extensionNextURL.hash = '#osrpre-shell';
 
   const [rapidContent, setRapidContent] = useState(null);
 
@@ -72,9 +82,9 @@ export default function ShellContent({
   };
 
   const onCloseRequest = () => {
-    setHasRequested(true)
-    setTab('read')
-  }
+    setHasRequested(true);
+    setTab('read');
+  };
 
   useEffect(() => {
     if (user) {
@@ -105,9 +115,11 @@ export default function ShellContent({
       let author;
 
       preprint.requests.map(request => {
-        request.author.id ? author = request.author.id : author = request.author
-        setHasRequested((user.personas.some(persona => persona.id === author)))
-      })
+        request.author.id
+          ? (author = request.author.id)
+          : (author = request.author);
+        setHasRequested(user.personas.some(persona => persona.id === author));
+      });
     }
   }, [
     preprint,
@@ -345,7 +357,7 @@ function ShellContentRead({
   // the extension where it is shell driven
 
   const [moderatedReviewId, setModeratedReviewId] = useState(null);
-  const postReport = usePostRequests(); // #FIXME should be PostReport() when built
+  const postReport = usePostRequests(preprint); // #FIXME should be PostReport() when built
 
   return (
     <div className="shell-content-read">
