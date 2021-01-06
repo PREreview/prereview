@@ -73,7 +73,6 @@ export default function PreprintCard({
   );
 
   useEffect(() => {
-    console.log(preprint);
     if (user) {
       if (preprint.requests.length) {
         let author;
