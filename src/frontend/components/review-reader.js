@@ -24,12 +24,13 @@ const ReviewReader = React.memo(function ReviewReader({
   onModerate,
   rapidContent,
   longContent,
+  newRequest,
 }) {
   const [content, setContent] = useState('');
   const [commentTitle, setCommentTitle] = useState('');
   const [allRapidReviews, setAllRapidReviews] = useState(preprint.rapidReviews);
   const [publishedReviews, setPublishedReviews] = useState(
-    preprint.fullReviews,
+    preprint.fullReviews.filter(review => review.published),
   );
   const [allReviews] = useState(publishedReviews.concat(allRapidReviews));
 
@@ -52,10 +53,6 @@ const ReviewReader = React.memo(function ReviewReader({
   );
 
   useEffect(() => {
-    const allPublished = preprint.fullReviews.filter(
-      review => review.published,
-    );
-    setPublishedReviews(allPublished);
     if (
       rapidContent &&
       Object.keys(rapidContent).length !== 0 &&
@@ -114,9 +111,11 @@ const ReviewReader = React.memo(function ReviewReader({
             ''
           )}
           {preprint.requests.length ? (
-            <span>{`${preprint.requests.length} request${
-              preprint.requests.length > 1 ? 's' : ''
-            }`}</span>
+            <span>{`${
+              newRequest
+                ? preprint.requests.length + 1
+                : preprint.requests.length
+            } request${preprint.requests.length > 1 ? 's' : ''}`}</span>
           ) : (
             ''
           )}
@@ -176,7 +175,6 @@ const ReviewReader = React.memo(function ReviewReader({
             <div className="text-answers">
               <div className="text-answers__question">Longform Reviews</div>
               {publishedReviews.map(review => {
-                console.log(review);
                 if (review.published && review.drafts && review.drafts.length) {
                   return (
                     <div
@@ -318,6 +316,7 @@ ReviewReader.propTypes = {
   onModerate: PropTypes.func,
   rapidContent: PropTypes.object,
   longContent: PropTypes.oneOfType([PropTypes.object, PropTypes.string]),
+  newRequest: PropTypes.bool,
 };
 
 export default ReviewReader;

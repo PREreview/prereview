@@ -47,10 +47,13 @@ const Moderate = React.lazy(() => import('./moderate'));
 export default function App({ user }) {
   const [loading, setLoading] = useState(true);
   const [thisUser, setThisUser] = useState(null);
+
+  useEffect(() => {}, [thisUser]);
+
   useEffect(() => {
     const username = Cookies.get('PRE_user');
     if (username) {
-      fetch(`api/v2/users/${username}`)
+      fetch(`/api/v2/users/${username}`)
         .then(response => {
           if (response.status === 200) {
             return response.json();
