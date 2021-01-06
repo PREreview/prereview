@@ -77,38 +77,43 @@ export default function ShellContent({
 
   useEffect(() => {
     if (user) {
-      preprint.fullReviews.map(review => {
-        review.authors.map(author => {
-          user.personas.some(persona => {
-            if (persona.identity === author.identity) {
-              if (review.published === true) {
-                setHasLongReviewed(true);
-              } else {
-                setInitialContent(
-                  review.drafts[review.drafts.length - 1].contents,
-                );
+      if (preprint.fullReviews.length) {
+        preprint.fullReviews.map(review => {
+          review.authors.map(author => {
+            user.personas.some(persona => {
+              if (persona.identity === author.identity) {
+                if (review.published === true) {
+                  setHasLongReviewed(true);
+                } else {
+                  setInitialContent(
+                    review.drafts[review.drafts.length - 1].contents,
+                  );
+                }
               }
+            });
+          });
+        });
+      }
+
+      if (preprint.rapidReviews.length) {
+        preprint.rapidReviews.map(review => {
+          user.personas.some(persona => {
+            if (persona.identity === review.author.identity) {
+              setHasRapidReviewed(true);
             }
           });
         });
-      });
+      }
 
-      preprint.rapidReviews.map(review => {
-        user.personas.some(persona => {
-          if (persona.identity === review.author.identity) {
-            setHasRapidReviewed(true);
-          }
+      if (preprint.requests.length) {
+        let author;
+        preprint.requests.map(request => {
+          request.author.id
+            ? (author = request.author.id)
+            : (author = request.author);
+          setHasRequested(user.personas.some(persona => persona.id === author));
         });
-      });
-
-      let author;
-
-      preprint.requests.map(request => {
-        request.author.id
-          ? (author = request.author.id)
-          : (author = request.author);
-        setHasRequested(user.personas.some(persona => persona.id === author));
-      });
+      }
     }
   }, [
     preprint,

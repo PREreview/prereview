@@ -75,10 +75,12 @@ export default function PreprintCard({
   useEffect(() => {
     if (user) {
       if (preprint.requests.length) {
+        let author;
         preprint.requests.map(request => {
-          if (request.author === user.id) {
-            setHasRequested(true);
-          }
+          request.author.id
+            ? (author = request.author.id)
+            : (author = request.author);
+          setHasRequested(user.personas.some(persona => persona.id === author));
         });
       }
       if (preprint.fullReviews.length) {
@@ -112,7 +114,6 @@ export default function PreprintCard({
                 to={{
                   pathname: `/preprints/${preprintId}`,
                   state: {
-                    preprint: omit(preprint, ['potentialAction']),
                     tab: 'read',
                   },
                 }}
@@ -248,14 +249,15 @@ export default function PreprintCard({
               {/*</Tooltip>*/}
               <button
                 className="preprint-card__cta-button"
-                disabled={hasReviewed && hasRequested}
                 onClick={() => {
                   if (!hasReviewed && !hasRequested) {
-                    onNew(preprint);
+                    onNew(preprintId);
                   } else if (!hasReviewed && hasRequested) {
-                    onNewReview(preprint);
+                    onNewReview(preprintId);
                   } else if (hasReviewed && !hasRequested) {
-                    onNewRequest(preprint);
+                    onNewRequest(preprintId);
+                  } else {
+                    onNew(preprintId);
                   }
                 }}
               >
@@ -359,7 +361,7 @@ export default function PreprintCard({
               {!hasReviewed && (
                 <Button
                   onClick={() => {
-                    onNewReview(preprint);
+                    onNewReview(preprintId);
                   }}
                 >
                   Add Review
@@ -369,7 +371,7 @@ export default function PreprintCard({
               {!hasRequested && (
                 <Button
                   onClick={() => {
-                    onNewRequest(preprint);
+                    onNewRequest(preprintId);
                   }}
                 >
                   Request Review
