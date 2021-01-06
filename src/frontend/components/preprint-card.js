@@ -42,7 +42,7 @@ export default function PreprintCard({
 }) {
   const [isOpened, setIsOpened] = useState(false);
 
-  const { title, preprintServer, handle, createdAt } = preprint;
+  const { title, preprintServer, handle, datePosted } = preprint;
 
   const preprintId = createPreprintId(handle);
   const { id, scheme } = decodePreprintId(preprintId);
@@ -73,6 +73,7 @@ export default function PreprintCard({
   );
 
   useEffect(() => {
+    console.log(preprint);
     if (user) {
       if (preprint.requests.length) {
         let author;
@@ -127,14 +128,14 @@ export default function PreprintCard({
               </XLink>
             </div>
 
-            {!!createdAt && (
+            {!!datePosted && (
               <span
                 className={classNames('preprint-card__pub-date', {
                   'preprint-card__pub-date--highlighted':
                     hoveredSortOption === 'date',
                 })}
               >
-                {getFormattedDatePosted(createdAt)}
+                {getFormattedDatePosted(datePosted)}
               </span>
             )}
           </div>
@@ -397,7 +398,7 @@ PreprintCard.propTypes = {
   user: PropTypes.object,
   preprint: PropTypes.shape({
     handle: PropTypes.string,
-    createdAt: PropTypes.string,
+    datePosted: PropTypes.string,
     title: PropTypes.string.isRequired,
     preprintServer: PropTypes.string.isRequired,
     fullReviews: PropTypes.array,
