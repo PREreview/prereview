@@ -17,11 +17,9 @@ import {
   Contact,
   FullReview,
   FullReviewDraft,
-  Persona,
   Preprint,
   RapidReview,
   Request,
-  User,
   Work,
 } from '../models/entities/index.ts';
 import PQueue from 'p-queue';
@@ -71,9 +69,9 @@ const processActions = (path, requestHandler, reviewHandler) => {
       if (item['@type'] === 'RequestForRapidPREreviewAction') {
         console.log(`inserting request ${item['@id']}`);
         queue.add(async () => await requestHandler(item));
-      } else if (item['@type'] === 'RequestForRapidPREreviewAction') {
+      } else if (item['@type'] === 'RapidPREreviewAction') {
         console.log(`inserting review ${item['@id']}`);
-        await reviewHandler(item);
+        queue.add(async () => await reviewHandler(item));
       }
     });
   };
@@ -220,9 +218,9 @@ async function OSrPREImportUser(
       }
 
       // Process the deep JSON structure for a given ORCID user
-      let userObject;
+      let userObject, personaObject, anonPersonaObject;
       if (person) {
-        userObject = new User(record.orcid);
+        userObject = userModel.create({ orcid: record.orcid });
         //userObject.createdAt = new Date(record.createdAt);
         let name;
         if (person.name) {
@@ -245,36 +243,45 @@ async function OSrPREImportUser(
         }
 
         if (record.hasRole && Array.isArray(record.hasRole)) {
-          record.hasRole.map(async id => {
-            if (isAnon.get(id) === false) {
-              const personaObject = new Persona(name, userObject);
-              if (person.biography && person.biography['content']) {
-                personaObject.bio = person.biography['content'];
+          await Promise.all(
+            record.hasRole.map(async id => {
+              if (isAnon.get(id) === false) {
+                personaObject = personaModel.create({
+                  name: name,
+                  isAnonymous: false,
+                });
+                if (person.biography && person.biography['content']) {
+                  personaObject.bio = person.biography['content'];
+                }
+                if (!person.is_private) {
+                  userObject.isPrivate = false;
+                  userObject.defaultPersona = personaObject;
+                }
+                userObject.personas.add(personaObject);
+                personasMap.set(id, personaObject);
+              } else if (isAnon.get(id) === true) {
+                let anonName = anonymus.create()[0];
+                while (
+                  (await personaModel.findOne({ name: anonName })) !== null
+                ) {
+                  console.log('OSrPRE: Anonymous name generation collision');
+                  anonName = anonymus.create()[0];
+                }
+                anonPersonaObject = personaModel.create({
+                  name: anonName,
+                  isAnonymous: true,
+                });
+                if (person.is_private) {
+                  userObject.isPrivate = true;
+                  userObject.defaultPersona = anonPersonaObject;
+                }
+                userObject.personas.add(anonPersonaObject);
+                personasMap.set(id, anonPersonaObject);
+              } else {
+                console.warn(`No such role ${id} mapped`);
               }
-              userObject.personas.add(personaObject);
-              if (!person.is_private) {
-                userObject.isPrivate = false;
-                userObject.defaultPersona = personaObject;
-              }
-              personasMap.set(id, personaObject);
-            } else if (isAnon.get(id) === true) {
-              let anonName = anonymus.create()[0];
-              while (
-                (await personaModel.findOne({ name: anonName })) !== null
-              ) {
-                console.log('OSrPRE: Anonymous name generation collision');
-                anonName = anonymus.create()[0];
-              }
-              const anonPersonaObject = new Persona(anonName, userObject, true);
-              if (person.is_private) {
-                userObject.isPrivate = true;
-                userObject.defaultPersona = anonPersonaObject;
-              }
-              personasMap.set(id, anonPersonaObject);
-            } else {
-              console.warn(`No such role ${id} mapped`);
-            }
-          });
+            }),
+          );
         }
 
         let emails = [];
@@ -313,10 +320,6 @@ async function OSrPREImportUser(
           }
           console.log(`OSrPRE: Imported email for ${record.orcid}:`, emails);
         }
-        console.log(`OSrPRE: Imported user for ${record.orcid}:`, {
-          orcid: record.orcid,
-          createdAt: record.dateCreated,
-        });
       }
 
       // Process the deep JSON structure for a given ORCID user's published works
@@ -395,6 +398,12 @@ async function OSrPREImportUser(
           }
         }
       }
+      console.log(`OSrPRE: Imported user for ${record.orcid}:`, {
+        orcid: record.orcid,
+        createdAt: record.dateCreated,
+      });
+
+      personaModel.persist([anonPersonaObject, personaObject]);
       await userModel.persistAndFlush(userObject);
       usersMap.set(record['@id'], userObject);
       return;

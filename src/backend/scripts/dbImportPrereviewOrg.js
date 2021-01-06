@@ -96,7 +96,7 @@ async function prereviewOrgImportPreprints(db, client, preprintsMap) {
   if (oldPreprints) {
     try {
       await importPreprints(
-        'prereviewOrg',
+        'PREreview.org',
         oldPreprints,
         preprintModel,
         preprintsMap,
@@ -360,8 +360,8 @@ async function main() {
   });
 
   await client.connect();
-  await prereviewOrgImportPreprints(db, client, preprintsMap);
   await prereviewOrgImportUsers(db, client, usersMap);
+  await prereviewOrgImportPreprints(db, client, preprintsMap);
   await prereviewOrgImportReviews(db, client, usersMap, preprintsMap);
   await client.end();
 }

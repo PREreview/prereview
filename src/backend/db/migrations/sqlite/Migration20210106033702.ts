@@ -1,28 +1,28 @@
 import { Migration } from '@mikro-orm/migrations';
 
-export class Migration20201227030313 extends Migration {
+export class Migration20210106033702 extends Migration {
 
   async up(): Promise<void> {
     this.addSql('create table `tag` (`id` integer not null primary key autoincrement, `created_at` datetime not null, `updated_at` datetime not null, `name` varchar not null, `color` varchar not null);');
     this.addSql('create unique index `tag_name_unique` on `tag` (`name`);');
 
-    this.addSql('create table `preprint` (`id` integer not null primary key autoincrement, `created_at` datetime not null, `updated_at` datetime not null, `handle` varchar not null, `title` varchar not null, `published` integer not null, `abstract_text` text null, `preprint_server` varchar null, `date_posted` datetime null, `license` varchar null, `publication` varchar null, `url` varchar null, `content_encoding` varchar null, `content_url` varchar null);');
+    this.addSql('create table `preprint` (`id` integer not null primary key autoincrement, `created_at` datetime not null, `updated_at` datetime not null, `handle` varchar not null, `title` text not null, `published` integer not null, `abstract_text` text null, `preprint_server` varchar null, `date_posted` datetime null, `license` varchar null, `publication` varchar null, `url` varchar null, `content_encoding` varchar null, `content_url` varchar null);');
     this.addSql('create unique index `preprint_handle_unique` on `preprint` (`handle`);');
 
     this.addSql('create table `tag_preprints` (`tag_id` integer not null, `preprint_id` integer not null, primary key (`tag_id`, `preprint_id`));');
     this.addSql('create index `tag_preprints_tag_id_index` on `tag_preprints` (`tag_id`);');
     this.addSql('create index `tag_preprints_preprint_id_index` on `tag_preprints` (`preprint_id`);');
 
-    this.addSql('create table `persona` (`id` integer not null primary key autoincrement, `created_at` datetime not null, `updated_at` datetime not null, `name` varchar not null, `is_active` integer not null, `is_anonymous` integer not null, `bio` text null, `avatar` blob null);');
+    this.addSql('create table `user` (`id` integer not null primary key autoincrement, `created_at` datetime not null, `updated_at` datetime not null, `orcid` varchar not null, `is_private` integer not null);');
+
+    this.addSql('create table `persona` (`id` integer not null primary key autoincrement, `created_at` datetime not null, `updated_at` datetime not null, `name` varchar not null, `is_anonymous` integer not null, `bio` text null, `avatar` blob null);');
     this.addSql('create unique index `persona_name_unique` on `persona` (`name`);');
 
     this.addSql('create table `rapid_review` (`id` integer not null primary key autoincrement, `created_at` datetime not null, `updated_at` datetime not null, `yn_novel` text check (`yn_novel` in (\'yes\', \'no\', \'N/A\', \'unsure\')) not null, `yn_future` text check (`yn_future` in (\'yes\', \'no\', \'N/A\', \'unsure\')) not null, `yn_reproducibility` text check (`yn_reproducibility` in (\'yes\', \'no\', \'N/A\', \'unsure\')) not null, `yn_methods` text check (`yn_methods` in (\'yes\', \'no\', \'N/A\', \'unsure\')) not null, `yn_coherent` text check (`yn_coherent` in (\'yes\', \'no\', \'N/A\', \'unsure\')) not null, `yn_limitations` text check (`yn_limitations` in (\'yes\', \'no\', \'N/A\', \'unsure\')) not null, `yn_ethics` text check (`yn_ethics` in (\'yes\', \'no\', \'N/A\', \'unsure\')) not null, `yn_new_data` text check (`yn_new_data` in (\'yes\', \'no\', \'N/A\', \'unsure\')) not null, `yn_recommend` text check (`yn_recommend` in (\'yes\', \'no\', \'N/A\', \'unsure\')) not null, `yn_peer_review` text check (`yn_peer_review` in (\'yes\', \'no\', \'N/A\', \'unsure\')) not null, `yn_available_code` text check (`yn_available_code` in (\'yes\', \'no\', \'N/A\', \'unsure\')) not null, `yn_available_data` text check (`yn_available_data` in (\'yes\', \'no\', \'N/A\', \'unsure\')) not null, `link_to_data` text null);');
 
     this.addSql('create table `request` (`id` integer not null primary key autoincrement, `created_at` datetime not null, `updated_at` datetime not null);');
 
-    this.addSql('create table `user` (`id` integer not null primary key autoincrement, `created_at` datetime not null, `updated_at` datetime not null, `orcid` varchar not null, `name` varchar null, `is_private` text not null);');
-
-    this.addSql('create table `work` (`id` integer not null primary key autoincrement, `created_at` datetime not null, `updated_at` datetime not null, `title` varchar null, `url` varchar null, `type` varchar null, `handle` varchar null, `publication_date` datetime null, `publisher` varchar null);');
+    this.addSql('create table `work` (`id` integer not null primary key autoincrement, `created_at` datetime not null, `updated_at` datetime not null, `title` text null, `url` text null, `type` varchar null, `handle` varchar null, `publication_date` datetime null, `publisher` text null);');
 
     this.addSql('create table `group` (`id` integer not null primary key autoincrement, `created_at` datetime not null, `updated_at` datetime not null, `name` varchar not null);');
     this.addSql('create unique index `group_name_unique` on `group` (`name`);');
@@ -40,7 +40,7 @@ export class Migration20201227030313 extends Migration {
     this.addSql('create index `full_review_authors_full_review_id_index` on `full_review_authors` (`full_review_id`);');
     this.addSql('create index `full_review_authors_persona_id_index` on `full_review_authors` (`persona_id`);');
 
-    this.addSql('create table `contact` (`id` integer not null primary key autoincrement, `created_at` datetime not null, `updated_at` datetime not null, `schema` varchar not null, `value` varchar not null, `is_verified` text not null);');
+    this.addSql('create table `contact` (`id` integer not null primary key autoincrement, `created_at` datetime not null, `updated_at` datetime not null, `schema` varchar not null, `value` varchar not null, `is_verified` integer not null);');
 
     this.addSql('create table `community` (`id` integer not null primary key autoincrement, `created_at` datetime not null, `updated_at` datetime not null, `name` varchar not null, `description` text null, `logo` blob null);');
     this.addSql('create unique index `community_name_unique` on `community` (`name`);');
@@ -55,6 +55,10 @@ export class Migration20201227030313 extends Migration {
 
     this.addSql('create table `comment` (`id` integer not null primary key autoincrement, `created_at` datetime not null, `updated_at` datetime not null, `contents` varchar not null);');
 
+    this.addSql('alter table `user` add column `default_persona_id` integer null;');
+    this.addSql('create index `user_default_persona_id_index` on `user` (`default_persona_id`);');
+    this.addSql('create unique index `user_default_persona_id_unique` on `user` (`default_persona_id`);');
+
     this.addSql('alter table `persona` add column `identity_id` integer null;');
     this.addSql('create index `persona_identity_id_index` on `persona` (`identity_id`);');
 
@@ -67,10 +71,6 @@ export class Migration20201227030313 extends Migration {
     this.addSql('alter table `request` add column `preprint_id` integer null;');
     this.addSql('create index `request_author_id_index` on `request` (`author_id`);');
     this.addSql('create index `request_preprint_id_index` on `request` (`preprint_id`);');
-
-    this.addSql('alter table `user` add column `default_persona_id` integer null;');
-    this.addSql('create index `user_default_persona_id_index` on `user` (`default_persona_id`);');
-    this.addSql('create unique index `user_default_persona_id_unique` on `user` (`default_persona_id`);');
 
     this.addSql('alter table `work` add column `author_id` integer null;');
     this.addSql('create index `work_author_id_index` on `work` (`author_id`);');

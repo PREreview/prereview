@@ -29,10 +29,6 @@ export class Persona extends BaseEntity {
   @ManyToOne({ entity: () => User })
   identity!: User;
 
-  @Fixture(() => true)
-  @Property()
-  isActive!: boolean;
-
   @Fixture(() => false)
   @Property()
   isAnonymous!: boolean;
@@ -67,6 +63,5 @@ export class Persona extends BaseEntity {
     this.isAnonymous = isAnonymous;
     this.bio = bio;
     this.avatar = avatar;
-    this.isActive = true;
   }
 }

@@ -26,16 +26,12 @@ export class User extends BaseEntity {
   @Property()
   orcid!: string;
 
-  @Fixture(faker => faker.name.findName())
-  @Property({ nullable: true })
-  name?: string;
-
-  @OneToOne(() => Persona)
+  @OneToOne({ entity: () => Persona, nullable: true })
   defaultPersona?: Persona;
 
   @Fixture(() => false)
   @Property()
-  isPrivate = false;
+  isPrivate?: boolean;
 
   @ManyToMany({ entity: () => Group, mappedBy: 'members' })
   groups: Collection<Group> = new Collection<Group>(this);
@@ -52,16 +48,12 @@ export class User extends BaseEntity {
   @OneToMany({ entity: () => Work, mappedBy: 'author' })
   works: Collection<Work> = new Collection<Work>(this);
 
-  constructor(
-    orcid: string,
-    isPrivate = false,
-    name?: string,
-    defaultPersona?: Persona,
-  ) {
+  constructor(orcid: string, isPrivate = false, defaultPersona?: Persona) {
     super();
     this.orcid = orcid;
     this.isPrivate = isPrivate;
-    this.name = name;
-    this.defaultPersona = defaultPersona;
+    if (defaultPersona) {
+      this.defaultPersona = defaultPersona;
+    }
   }
 }
