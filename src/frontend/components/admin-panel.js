@@ -1,161 +1,171 @@
-import React, { Fragment, useState, useEffect } from 'react';
+// base imports
+import React, { Fragment, useContext, useEffect, useState} from 'react';
 import PropTypes from 'prop-types';
 import { Helmet } from 'react-helmet-async';
-import { MdClose } from 'react-icons/md';
-import { UserProvider } from '../contexts/user-context';
-import { getId, unprefix } from '../utils/jsonld';
-import HeaderBar from './header-bar';
-import { ORG } from '../constants';
-import { createModeratorQs } from '../utils/search';
+
+// contexts
+import { UserContext } from '../contexts/user-context';
+
+// utils
+import { getId } from '../utils/jsonld';
+
+// hooks
 import {
-  useGetGroups,
-  usePostGroups,
-  usePutUser,
+  useDeleteGroupMember,
+  useGetGroup,
+  usePutGroupMember,
 } from '../hooks/api-hooks.tsx';
+
+// components
 import Button from './button';
-import IconButton from './icon-button';
-import { RoleBadgeUI } from './role-badge';
-import LabelStyle from './label-style';
-import Modal from './modal';
-import TextInput from './text-input';
 import Controls from './controls';
+import HeaderBar from './header-bar';
+import IconButton from './icon-button';
+import LabelStyle from './label-style';
+import Loading from './loading';
+import Modal from './modal';
+import { RoleBadgeUI } from './role-badge';
+import TextInput from './text-input';
+
+// constants
+import { ORG } from '../constants';
+
+// icons
+import { MdClose } from 'react-icons/md';
 
 export default function AdminPanel() {
-  const [user] = UserProvider();
-  const [bookmark, setBookmark] = useState(null);
+  const user = useContext(UserContext);
+  const [loading, setLoading] = useState(true);
+  const [group, setGroup] = useState(null);
+  const [moderators, setModerators] = useState(null);
 
-  const search = createModeratorQs({ bookmark });
-
-  const groups = useGetGroups(search, !!bookmark);
+  const { data: groupData, loadingGroup } = useGetGroup({
+    id: 'moderators',
+  });
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [revokeRole, setRevokeRole] = useState(null);
-
-  const [excluded, setExcluded] = useState(new Set());
-  const [added, setAdded] = useState([]);
+  const [revokeRolePersona, setRevokeRolePersona] = useState(null);
 
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, []);
+  }, [moderators]);
 
-  return (
-    <div className="admin-panel">
-      <Helmet>
-        <title>{ORG} • Admin panel</title>
-      </Helmet>
-      <HeaderBar />
+  useEffect(() => {
+    if (!loadingGroup) {
+      if (groupData && groupData.data[0]) {
+        setGroup(groupData.data[0]);
+        setModerators(groupData.data[0].members);
+        setLoading(false);
+      }
+    }
+  }, [loadingGroup, groupData, user]);
 
-      <section>
-        <header className="admin-panel__header">
-          <span>Manage moderators</span>
-          <Button
-            primary={true}
-            onClick={() => {
-              setIsAddModalOpen(true);
-            }}
-          >
-            Add moderator
-          </Button>
-        </header>
+  if (loading) {
+    return <Loading />;
+  } else {
+    return (
+      <div className="admin-panel">
+        <Helmet>
+          <title>{ORG} • Admin panel</title>
+        </Helmet>
+        <HeaderBar thisUser={user} />
 
-        {groups.total_rows === 0 && !groups.loading && !added.length ? (
-          <div>No moderators.</div>
-        ) : (
-          <div>
-            <ul className="admin-panel__card-list">
-              {added
-                .concat(
-                  groups.rows
-                    .map(row => row.doc)
-                    .filter(
-                      role =>
-                        !excluded.has(getId(role)) &&
-                        !added.some(_role => getId(_role) === getId(role)),
-                    ),
-                )
-                .map(role => (
-                  <li key={getId(role)} className="admin-panel__card-list-item">
-                    <div className="admin-panel__card-list-item__left">
-                      <RoleBadgeUI role={role} />
-                      <span>{role.name || unprefix(getId(role))}</span>
-                    </div>
-                    <div className="admin-panel__card-list-item__right">
-                      <LabelStyle>
-                        {role['@type'] === 'AnonymousReviewerRole'
-                          ? 'Anonymous'
-                          : 'Public'}
-                      </LabelStyle>
-                      <IconButton
-                        className="admin-panel__remove-button"
-                        onClick={() => {
-                          setRevokeRole(role);
-                        }}
-                      >
-                        <MdClose className="admin-panel__remove-button-icon" />
-                      </IconButton>
-                    </div>
-                  </li>
-                ))}
-            </ul>
-          </div>
-        )}
-
-        <div className="admin-panel__page-nav">
-          {/* Cloudant returns the same bookmark when it hits the end of the list */}
-          {!!(
-            groups.rows.length < groups.total_rows &&
-            groups.bookmark !== bookmark
-          ) && (
+        <section>
+          <header className="admin-panel__header">
+            <span>Manage moderators</span>
             <Button
-              onClick={e => {
-                e.preventDefault();
-                setBookmark(groups.bookmark);
+              primary={true}
+              onClick={() => {
+                setIsAddModalOpen(true);
               }}
             >
-              More
+              Add moderator
             </Button>
+          </header>
+
+          {!group.members.length ? (
+            <div>No moderators.</div>
+          ) : (
+            <div>
+              <ul className="admin-panel__card-list">
+                {moderators.map(moderator => {
+                  return moderator.personas.map(persona => {
+                    if (moderator.defaultPersona === persona.identity) {
+                      return (
+                        <li
+                          key={persona.id}
+                          className="admin-panel__card-list-item"
+                        >
+                          <div className="admin-panel__card-list-item__left">
+                            <RoleBadgeUI user={persona} />
+                            <span>{persona.name}</span>
+                          </div>
+                          <div className="admin-panel__card-list-item__right">
+                            <LabelStyle>
+                              {persona.isActive ? 'Public' : 'Anonymous'}
+                            </LabelStyle>
+                            <IconButton
+                              className="admin-panel__remove-button"
+                              onClick={() => {
+                                setRevokeRole(moderator);
+                                setRevokeRolePersona(persona);
+                              }}
+                            >
+                              <MdClose className="admin-panel__remove-button-icon" />
+                            </IconButton>
+                          </div>
+                        </li>
+                      );
+                    }
+                  });
+                })}
+              </ul>
+            </div>
           )}
-        </div>
-      </section>
+        </section>
 
-      {isAddModalOpen && (
-        <AdminPanelAddModal
-          user={user}
-          onClose={() => {
-            setIsAddModalOpen(false);
-          }}
-          onSuccess={action => {
-            setAdded(added.concat(action.result));
-          }}
-        />
-      )}
+        {isAddModalOpen && (
+          <AdminPanelAddModal
+            group={group.id}
+            onClose={() => {
+              setIsAddModalOpen(false);
+            }}
+            onSuccess={mods => {
+              setModerators(mods);
+            }}
+          />
+        )}
 
-      {!!revokeRole && (
-        <AdminPanelRemoveModal
-          user={user}
-          role={revokeRole}
-          onClose={() => {
-            setRevokeRole(null);
-          }}
-          onSuccess={action => {
-            setExcluded(
-              new Set(Array.from(excluded).concat(getId(action.result))),
-            );
-          }}
-        />
-      )}
-    </div>
-  );
+        {!!revokeRole && (
+          <AdminPanelRemoveModal
+            group={group}
+            userToDelete={revokeRole}
+            personaToDelete={revokeRolePersona}
+            onClose={() => {
+              setRevokeRole(null);
+              setRevokeRolePersona(null);
+            }}
+            onSuccess={user => {
+              const filteredMods = moderators.filter(
+                moderator => moderator.id !== user.id,
+              );
+              setModerators(filteredMods);
+            }}
+          />
+        )}
+      </div>
+    );
+  }
 }
 
-function AdminPanelAddModal({ user, onClose, onSuccess }) {
+function AdminPanelAddModal({ group, onClose, onSuccess }) {
   const [value, setValue] = useState('');
-  const postGroup = usePostGroups();
+  const { mutate: updateGroupMember, loading, error } = usePutGroupMember({
+    id: group,
+    uid: value,
+  });
   const [frame, setFrame] = useState('input');
-
-  const pattern =
-    '^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$'; // uuid v4
-  const re = new RegExp(pattern, 'i');
 
   return (
     <Modal title="Add Moderator">
@@ -164,12 +174,11 @@ function AdminPanelAddModal({ user, onClose, onSuccess }) {
           <Fragment>
             <TextInput
               inputId="step-preprint-input-new"
-              label={<span>Enter a role (persona) ID</span>}
+              label={<span>Enter a user ID or ORCID</span>}
               minimal={true}
               autoComplete="off"
-              disabled={postGroup.loading}
+              disabled={loading}
               placeholder=""
-              pattern={pattern}
               onChange={e => {
                 const value = e.target.value;
                 setValue(value);
@@ -178,10 +187,10 @@ function AdminPanelAddModal({ user, onClose, onSuccess }) {
             />
 
             <Controls
-              error={postGroup.error} // #FIXME
+              error={error} // #FIXME
             >
               <Button
-                disabled={postGroup.loading}
+                disabled={loading}
                 onClick={() => {
                   onClose();
                 }}
@@ -189,13 +198,15 @@ function AdminPanelAddModal({ user, onClose, onSuccess }) {
                 Cancel
               </Button>
               <Button
-                disabled={postGroup.loading || !re.test(value)}
-                isWaiting={postGroup.loading}
+                disabled={loading}
                 onClick={() => {
-                  postGroup(user, value)
-                    .then(() => alert('Role posted successfully.'))
-                    .catch(err => alert(`An error occurred: ${err}`));
-                  onSuccess(value);
+                  updateGroupMember({ id: group, uid: value })
+                    .then(response => {
+                      console.log(response.data.members);
+                      onSuccess(response.data.members);
+                      return onClose();
+                    })
+                    .catch(err => alert(`An error occurred: ${err.message}`));
                 }}
               >
                 Add
@@ -204,15 +215,13 @@ function AdminPanelAddModal({ user, onClose, onSuccess }) {
           </Fragment>
         ) : (
           <Fragment>
-            <p>
-              The role (persona) was successfully granted moderator permission.
-            </p>
+            <p>The user was successfully granted moderator permission.</p>
 
             <Controls
-              error={postGroup.error} // #FIXME
+              error={error} // #FIXME
             >
               <Button
-                disabled={postGroup.loading}
+                disabled={loading}
                 onClick={() => {
                   onClose();
                 }}
@@ -228,13 +237,22 @@ function AdminPanelAddModal({ user, onClose, onSuccess }) {
 }
 
 AdminPanelAddModal.propTypes = {
-  user: PropTypes.object.isRequired,
+  group: PropTypes.number.isRequired,
   onClose: PropTypes.func.isRequired,
   onSuccess: PropTypes.func.isRequired,
 };
 
-function AdminPanelRemoveModal({ user, role, onClose, onSuccess }) {
-  const updateUserRole = usePutUser();
+function AdminPanelRemoveModal({
+  userToDelete,
+  personaToDelete,
+  group,
+  onClose,
+  onSuccess,
+}) {
+  const { mutate: deleteGroupMember, loading, error } = useDeleteGroupMember({
+    id: group.id,
+    uid: userToDelete.id,
+  });
   const [frame, setFrame] = useState('submit');
 
   return (
@@ -243,15 +261,20 @@ function AdminPanelRemoveModal({ user, role, onClose, onSuccess }) {
         {frame === 'submit' ? (
           <Fragment>
             <p>
-              Are you sure to want to revoke moderator permission for role
-              (persona) <em>{role.name || unprefix(getId(role))}</em>?
+              Are you sure to want to revoke moderator permission for{' '}
+              <em>
+                {personaToDelete.name ||
+                  personaToDelete.orcid ||
+                  personaToDelete.id}
+              </em>
+              ?
             </p>
 
             <Controls
-              error={updateUserRole.error} // #FIXME
+              error={error} // #FIXME
             >
               <Button
-                disabled={updateUserRole.loading}
+                disabled={loading}
                 onClick={() => {
                   onClose();
                 }}
@@ -259,13 +282,15 @@ function AdminPanelRemoveModal({ user, role, onClose, onSuccess }) {
                 Cancel
               </Button>
               <Button
-                disabled={updateUserRole.loading}
-                isWaiting={updateUserRole.loading}
+                disabled={loading}
+                isWaiting={loading}
                 onClick={() => {
-                  updateUserRole(user, role)
-                    .then(() => alert('User role updated successfully.'))
-                    .catch(err => alert(`An error occurred: ${err}`));
-                  onSuccess(role);
+                  deleteGroupMember({ id: group.id, uid: userToDelete.id })
+                    .then(() => {
+                      onSuccess(userToDelete);
+                      return onClose();
+                    })
+                    .catch(err => alert(`An error occurred: ${err.message}`));
                 }}
               >
                 Revoke
@@ -276,11 +301,17 @@ function AdminPanelRemoveModal({ user, role, onClose, onSuccess }) {
           <Fragment>
             <p>
               The moderator permission was successfuly revoked for role
-              (persona) <em>{role.name || unprefix(getId(role))}</em>.
+              (persona)
+              <em>
+                {personaToDelete.name ||
+                  personaToDelete.orcid ||
+                  personaToDelete.id}
+              </em>
+              .
             </p>
 
             <Controls
-              error={updateUserRole.error} // #FIXME
+              error={error} // #FIXME
             >
               <Button
                 disabled={updateUserRole.loading}
@@ -299,8 +330,9 @@ function AdminPanelRemoveModal({ user, role, onClose, onSuccess }) {
 }
 
 AdminPanelRemoveModal.propTypes = {
-  user: PropTypes.object.isRequired,
-  role: PropTypes.object.isRequired,
+  userToDelete: PropTypes.object.isRequired,
+  personaToDelete: PropTypes.object.isRequired,
+  group: PropTypes.object.isRequired,
   onClose: PropTypes.func.isRequired,
   onSuccess: PropTypes.func.isRequired,
 };

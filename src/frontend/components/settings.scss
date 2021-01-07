@@ -72,16 +72,10 @@
   }
 
   & .settings__persona-list-header {
-    display: contents;
-
     font: var(--ui-basic-font);
     color: var(--ui-basic-font-color--light);
     text-transform: uppercase;
     letter-spacing: 0.035em;
-
-    & > * {
-      padding: 0 var(--xsgrd);
-    }
 
     & .settings__persona-list-header__active {
       padding: 0 var(--sgrd);

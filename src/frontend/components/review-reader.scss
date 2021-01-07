@@ -41,16 +41,14 @@
     outline: 1px solid red;
     width: 100%;
   }
-}
 
-.review-reader--full  {
-  & .barplot {
-    margin-top: var(--mgrd);
-  }
+  & .tags {
+    padding: var(--xsgrd);
 
-  .tags {
-    display: flex;
-    margin-left: -10px;
+    &__content {
+      display: flex;
+      margin-left: -10px;
+    }
 
     &__title {
       font-weight: bold;
@@ -63,6 +61,37 @@
       color: var(--prereview-white);
       margin-left: 10px;
       padding: 5px;
+    }
+  }// end tags
+
+  & .text-answers {
+    padding: var(--xsgrd);
+  }
+}
+
+.review-reader--full  {
+  & .barplot {
+    margin-top: var(--mgrd);
+  }
+
+  & .text-answers {
+    & .comments {
+      margin-top: var(--mgrd);
+
+      &-title {
+        font-weight: bold;
+
+        &-input {
+          margin-bottom: 10px;
+          margin-top: 10px;
+          max-width: 400px;
+          width: 100%;
+        }
+      }
+
+      &__add {
+        margin-top: var(--mgrd);
+      }
     }
   }
 }

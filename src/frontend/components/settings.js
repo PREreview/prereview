@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { UserProvider } from '../contexts/user-context';
+import { UserContext } from '../contexts/user-context';
 import SettingsRoles from './settings-roles';
 import SettingsApi from './settings-api';
 import SettingsNotifications from './settings-notifications';
@@ -8,11 +8,11 @@ import HeaderBar from './header-bar';
 import { ORG } from '../constants';
 
 export default function Settings() {
-  const [user] = UserProvider();
+  const user = useContext(UserContext);
 
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, []);
+  }, [user]);
 
   return (
     <div className="settings">
@@ -20,7 +20,7 @@ export default function Settings() {
         <title>{ORG} • Settings</title>
       </Helmet>
 
-      <HeaderBar closeGap />
+      <HeaderBar thisUser={user} closeGap />
       <div className="settings__content">
         <section className="settings__section">
           <h2 className="settings__title">User Settings</h2>
@@ -34,7 +34,7 @@ export default function Settings() {
 
         <SettingsRoles user={user} />
         <SettingsNotifications user={user} />
-        <SettingsApi user={user} />
+        {/*<SettingsApi user={user} />*/}
       </div>
     </div>
   );

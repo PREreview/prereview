@@ -6,16 +6,16 @@ import { MdPerson } from 'react-icons/md';
 import Button from './button';
 import Controls from './controls';
 import TextInput from './text-input';
-import { PutUser } from '../hooks/api-hooks.tsx';
+import { usePutUser } from '../hooks/api-hooks.tsx';
 
-export default function RoleEditor({ editor, user, onCancel, onSaved }) {
+export default function RoleEditor({ user, onCancel, onSaved }) {
   const editorRef = useRef();
   const [name, setName] = useState(user.name);
   const [image, setImage] = useState(user.avatar && user.avatar.contentUrl);
   const [file, setFile] = useState(null);
   const [scale, setScale] = useState(1);
   const [rotate, setRotate] = useState(0);
-  const updateUser = PutUser();
+  const { mutate: updateUser, loading, error } = usePutUser(user.id);
 
   const onDrop = useCallback(acceptedFiles => {
     const [file] = acceptedFiles;
@@ -149,11 +149,11 @@ export default function RoleEditor({ editor, user, onCancel, onSaved }) {
         </div>
       </div>
       <Controls
-        error={updateUser.error} // #FIXME
+        error={error} // #FIXME
         className="role-editor__controls"
       >
         <Button
-          disabled={updateUser.loading}
+          disabled={loading}
           onClick={() => {
             onCancel();
           }}
@@ -162,8 +162,8 @@ export default function RoleEditor({ editor, user, onCancel, onSaved }) {
         </Button>
 
         <Button
-          isWaiting={updateUser.loading}
-          disabled={(name === user.name && !hasNewAvatar) || updateUser.loading}
+          isWaiting={loading}
+          disabled={(name === user.name && !hasNewAvatar) || loading}
           primary={true}
           onClick={() => {
             const payload = {};
@@ -189,9 +189,9 @@ export default function RoleEditor({ editor, user, onCancel, onSaved }) {
               };
             }
 
-            updateUser(user, editor)
+            updateUser({ payload })
               .then(() => alert('User updated successfully.'))
-              .catch(err => alert(`An error occurred: ${err}`));
+              .catch(err => alert(`An error occurred: ${err.message}`));
             onSaved(user);
           }}
         >
@@ -205,6 +205,5 @@ export default function RoleEditor({ editor, user, onCancel, onSaved }) {
 RoleEditor.propTypes = {
   onCancel: PropTypes.func.isRequired,
   onSaved: PropTypes.func.isRequired,
-  editor: PropTypes.object.isRequired,
   user: PropTypes.object,
 };

@@ -15,7 +15,7 @@ import { ORG } from '../constants';
 
 export default function Profile() {
   const location = useLocation();
-  const [thisUser] = useContext(UserContext);
+  const thisUser = useContext(UserContext);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
   const [persona, setPersona] = useState(null);
@@ -68,7 +68,7 @@ export default function Profile() {
                 <h2 className="profile__username">
                   {persona && persona.name ? persona.name : user.name}
                 </h2>
-                {user && (
+                {user ? (
                   <span className="profile__persona-status">
                     {persona && persona.name != 'Anonymous' ? (
                       <div className="profile__persona-status__icon-container">
@@ -77,12 +77,15 @@ export default function Profile() {
                       </div>
                     ) : (
                       <div className="profile__persona-status__icon-container">
-                        <IncognitoIcon className="profile__persona-status__icon" />{' '}
+                        <img
+                          src={IncognitoIcon}
+                          className="profile__persona-status__icon"
+                        />{' '}
                         Anonymous
                       </div>
                     )}
                   </span>
-                )}
+                ) : null}
               </header>
 
               <dl>
@@ -94,7 +97,7 @@ export default function Profile() {
                     to={`/about/${user.orcid ? user.orcid : user.id}`}
                     href={`/about/${user.orcid ? user.orcid : user.id}`}
                   >
-                    {user.name}
+                    {persona.name}
                   </XLink>
                 </dd>
                 {user && (

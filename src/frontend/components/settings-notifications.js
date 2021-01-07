@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { useLocation, useHistory } from 'react-router-dom';
 import { MdInfoOutline, MdWarning, MdCheck } from 'react-icons/md';
 import { unprefix } from '../utils/jsonld';
-import { PutUser } from '../hooks/api-hooks.tsx';
+import { usePutUser } from '../hooks/api-hooks.tsx';
 import ToggleSwitch from './toggle-switch';
 import TextInput from './text-input';
 import Controls from './controls';
@@ -20,7 +20,8 @@ export default function SettingsNotifications({ user }) {
 
   const params = new URLSearchParams(location.search);
 
-  const updateUser = PutUser();
+  const { mutate: updateUser, loading, error } = usePutUser(user.id);
+
   const [modalType, setModalType] = useState(
     params.get('verified') === 'true' ? 'checked' : null,
   );
@@ -53,12 +54,12 @@ export default function SettingsNotifications({ user }) {
         <span>Enable notifications</span>
         <ToggleSwitch
           id="notification-switch"
-          disabled={updateUser.loading}
+          disabled={loading}
           checked={contactPoint.active || false}
           onChange={() => {
             updateUser({ contactPoint: contactPoint.active })
               .then(() => alert('Contact info updated successfully.'))
-              .catch(err => alert(`An error occurred: ${err}`));
+              .catch(err => alert(`An error occurred: ${err.message}`));
           }}
         />
       </div>
@@ -96,18 +97,18 @@ export default function SettingsNotifications({ user }) {
       </div>
 
       <Controls
-        error={updateUser.error} // #FIXME
+        error={error} // #FIXME
       >
         <Button
-          disabled={!isEmailValid || !email || updateUser.loading}
-          isWaiting={updateUser.loading}
+          disabled={!isEmailValid || !email || loading}
+          isWaiting={loading}
           onClick={() => {
             updateUser({
               contactPoint: contactPoint.active,
               email: `mailto:${email}`,
             })
               .then(() => alert('Contact info updated successfully.'))
-              .catch(err => alert(`An error occurred: ${err}`));
+              .catch(err => alert(`An error occurred: ${err.message}`));
             setModalType('verifying');
           }}
         >

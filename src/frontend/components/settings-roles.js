@@ -1,27 +1,46 @@
+// base imports
 import React, { Fragment, useState } from 'react';
 import PropTypes from 'prop-types';
-import { MdInfoOutline, MdPublic, MdStar, MdStarBorder } from 'react-icons/md';
 import { unprefix } from '../utils/jsonld';
+
+// Material UI
+import { makeStyles } from '@material-ui/core/styles';
+import Table from '@material-ui/core/Table';
+import TableBody from '@material-ui/core/TableBody';
+import TableCell from '@material-ui/core/TableCell';
+import TableContainer from '@material-ui/core/TableContainer';
+import TableHead from '@material-ui/core/TableHead';
+import TableRow from '@material-ui/core/TableRow';
+
+// hooks
+import { useIsFirstTimeOnSettings } from '../hooks/ui-hooks';
+import { usePutUser } from '../hooks/api-hooks.tsx';
+
+// components
 import Button from './button';
+import Controls from './controls';
 import Modal from './modal';
 import RoleEditor from './role-editor';
 import { RoleBadgeUI } from './role-badge';
-import Controls from './controls';
-import { PutUser } from '../hooks/api-hooks.tsx';
-import { useIsFirstTimeOnSettings } from '../hooks/ui-hooks';
-import IncognitoIcon from '../svgs/incognito_icon.svg';
 import XLink from './xlink';
 
-export default function SettingsRoles({ user }) {
-  const isFirstTimeOnSettings = useIsFirstTimeOnSettings();
-  const [editedRoleId, setEditedRoleId] = useState(null);
+// icons
+import { MdInfoOutline, MdPublic, MdStar, MdStarBorder } from 'react-icons/md';
+import incognitoIcon from '../svgs/incognito_icon.svg';
 
-  if (!user) {
-    if (user.error) {
-      console.error(`Error: ${user.error}`);
-    }
-    return null;
-  }
+const useStyles = makeStyles({
+  relative: {
+    position: 'relative',
+  },
+  table: {
+    maxHeight: 650,
+  },
+});
+
+export default function SettingsRoles({ user }) {
+  const classes = useStyles();
+  const isFirstTimeOnSettings = useIsFirstTimeOnSettings();
+  const [userToEdit, setUserToEdit] = useState(null);
 
   return (
     <section className="settings-roles settings__section">
@@ -70,67 +89,105 @@ export default function SettingsRoles({ user }) {
       )}
 
       {/* FIXME fix markup: make a table with proper header so it's accessible */}
-      <ul className="settings__persona-list">
-        <li className="settings__persona-list-header">
-          <div className="settings__persona-list-header__active">
-            <span>Active</span>
-          </div>
-          <span className="settings__persona-list-header__username">
-            Display name
-          </span>
-          <span className="settings__persona-list-header__anon">Anonymity</span>
-          <span />
-        </li>
-        <li className="settings__persona-list-divider">
-          <hr />
-        </li>
+      <TableContainer>
+        <Table
+          stickyHeader
+          className={classes.table}
+          aria-label="personas table"
+        >
+          <TableHead>
+            <TableRow>
+              <TableCell className="settings__persona-list-header">
+                Active
+              </TableCell>
+              <TableCell className="settings__persona-list-header">
+                Display Name
+              </TableCell>
+              <TableCell className="settings__persona-list-header">
+                Anonymity
+              </TableCell>
+              <TableCell>
+                <div className="vh">Controls</div>
+              </TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {user.personas.map(persona => {
+              console.log(persona);
+              return (
+                <TableRow key={persona.id}>
+                  <TableCell>
+                    <div className="settings__persona-list-item__active-state">
+                      {persona.isActive ? (
+                        <span className="settings__persona-list-item__is-active">
+                          <MdStar className="settings__persona-active-icon" />
+                          <span className="settings__persona-active-label">
+                            Active
+                          </span>
+                        </span>
+                      ) : (
+                        <MakeActivePersonaModalButton
+                          user={user}
+                          persona={persona}
+                        />
+                      )}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="settings__persona-list-item__username">
+                      <RoleBadgeUI
+                        user={persona}
+                        className="settings__persona-badge"
+                      />
 
-        <li key={user.id} className="settings__persona-list-item">
-          <div className="settings__persona-list-item__active-state">
-            {!user.public ? (
-              <span className="settings__persona-list-item__is-active">
-                <MdStar className="settings__persona-active-icon" />
-                <span className="settings__persona-active-label">Active</span>
-              </span>
-            ) : (
-              <MakeActivePersonaModalButton user={user} />
-            )}
-          </div>
-          <div className="settings__persona-list-item__username">
-            <RoleBadgeUI user={user} className="settings__persona-badge" />
-
-            <XLink
-              href={`/about/${unprefix(user.id)}`}
-              to={`/about/${unprefix(user.id)}`}
-              className="settings__persona-link"
-            >
-              {user.name || unprefix(user.id)}
-            </XLink>
-          </div>
-          <span className="settings__persona-status">
-            {user.public ? (
-              <div className="settings__persona-status__icon-container">
-                <MdPublic className="settings__persona-status__icon" />{' '}
-                <span className="settings__persona-status__label">Public</span>
-              </div>
-            ) : (
-              <div className="settings__persona-status__icon-container">
-                <IncognitoIcon className="settings__persona-status__icon" />{' '}
-                <span className="settings__persona-status__label">
-                  Anonymous
-                </span>
-              </div>
-            )}
-          </span>
-          <Button
-            onClick={() => {
-              setEditedRoleId(user.id);
-            }}
-          >
-            Edit
-          </Button>
-        </li>
-      </ul>
+                      <XLink
+                        href={`/about/${unprefix(persona.id)}`}
+                        to={`/about/${unprefix(user.id)}`}
+                        className="settings__persona-link"
+                      >
+                        {persona.name || unprefix(persona.id)}
+                      </XLink>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="settings__persona-status">
+                      {persona.isActive ? (
+                        <div className="settings__persona-status__icon-container">
+                          <MdPublic className="settings__persona-status__icon" />{' '}
+                          <span className="settings__persona-status__label">
+                            Public
+                          </span>
+                        </div>
+                      ) : (
+                        <div className="settings__persona-status__icon-container">
+                          <img
+                            src={incognitoIcon}
+                            className="settings__persona-status__icon"
+                          />{' '}
+                          <span className="settings__persona-status__label">
+                            Anonymous
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    {!persona.isAnonymous ? (
+                      <Button
+                        onClick={() => {
+                          setUserToEdit(persona);
+                        }}
+                      >
+                        Edit
+                      </Button>
+                    ) : null}
+                  </TableCell>
+                </TableRow>
+              );
+            })}
+          </TableBody>
+        </Table>
+      </TableContainer>
 
       <Controls className="settings-roles__body-controls">
         <Button element="XLink" to="/" href="/" primary={true}>
@@ -138,22 +195,21 @@ export default function SettingsRoles({ user }) {
         </Button>
       </Controls>
 
-      {!!editedRoleId && (
+      {!!userToEdit && (
         <Modal
           className="settings-role-editor-modal"
           title="Edit Persona Settings"
           onClose={() => {
-            setEditedRoleId(null);
+            setUserToEdit(null);
           }}
         >
           <RoleEditor
-            key={editedRoleId}
-            user={user}
+            user={userToEdit}
             onCancel={() => {
-              setEditedRoleId(null);
+              setUserToEdit(null);
             }}
             onSaved={() => {
-              setEditedRoleId(null);
+              setUserToEdit(null);
             }}
           />
         </Modal>
@@ -163,20 +219,13 @@ export default function SettingsRoles({ user }) {
 }
 
 SettingsRoles.propTypes = {
-  user: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    orcid: PropTypes.string.isRequired,
-    name: PropTypes.string.isRequired,
-    avatar: PropTypes.string.isRequired,
-    public: PropTypes.bool.isRequired,
-    hasRole: PropTypes.arrayOf(PropTypes.string),
-    error: PropTypes.string,
-  }).isRequired,
+  user: PropTypes.object.isRequired,
 };
 
-function MakeActivePersonaModalButton({ user }) {
+function MakeActivePersonaModalButton({ user, persona }) {
   const [isOpen, setIsOpen] = useState(false);
-  const updateUser = PutUser();
+  const { mutate: updateUser, loading, error } = usePutUser({
+    id: user.id});
 
   return (
     <Fragment>
@@ -190,9 +239,7 @@ function MakeActivePersonaModalButton({ user }) {
       </Button>
 
       {isOpen && (
-        <Modal
-          title={`Set active persona to ${user.name || unprefix(user.id)}`}
-        >
+        <Modal title={`Set active persona to ${user.name || user.id}`}>
           <p>
             The <strong>public</strong> persona makes your information viewable
             by other users when you write <em>new</em> reviews or <em>new</em>{' '}
@@ -200,11 +247,9 @@ function MakeActivePersonaModalButton({ user }) {
             cannot be changed.
           </p>
 
-          <Controls
-            error={updateUser.error} // #FIXME
-          >
+          <Controls error={error}>
             <Button
-              disabled={updateUser.loading}
+              disabled={loading}
               onClick={() => {
                 setIsOpen(false);
               }}
@@ -212,12 +257,12 @@ function MakeActivePersonaModalButton({ user }) {
               Cancel
             </Button>
             <Button
-              isWaiting={updateUser.loading}
-              disabled={updateUser.loading}
+              isWaiting={loading}
+              disabled={loading}
               onClick={() => {
-                updateUser(user)
+                updateUser({ defaultPersona: persona.id })
                   .then(() => alert('User updated successfully.'))
-                  .catch(err => alert(`An error occurred: ${err}`));
+                  .catch(err => alert(`An error occurred: ${err.message}`));
                 setIsOpen(false);
               }}
             >
@@ -231,5 +276,5 @@ function MakeActivePersonaModalButton({ user }) {
 }
 MakeActivePersonaModalButton.propTypes = {
   user: PropTypes.object.isRequired,
-  role: PropTypes.object.isRequired,
+  persona: PropTypes.object.isRequired,
 };

@@ -16,14 +16,18 @@ const log = getLogger('backend:middleware:auth');
 const authWrapper = groups => {
   const roles = new Roles();
 
-  roles.isMemberOf = (group, id) => {
+  roles.isMemberOf = async (group, id) => {
+    log.debug(`Checking if ${id} is a member of ${group}.`);
     if (
       config.adminUsers &&
       group === 'admins' &&
       isString(id) &&
       orcidUtils.isValid(id)
     ) {
-      return config.adminUsers.includes(id) || groups.isMemberOf('admins', id);
+      return (
+        config.adminUsers.includes(id) ||
+        (await groups.isMemberOf('admins', id))
+      );
     } else {
       return groups.isMemberOf(group, id);
     }
@@ -34,7 +38,7 @@ const authWrapper = groups => {
     return ctx.isAuthenticated();
   });
 
-  roles.use('access admin pages', ctx => {
+  roles.use('access admin pages', async ctx => {
     log.debug('Checking if user can access admin pages.');
     if (!ctx.isAuthenticated()) return false;
 

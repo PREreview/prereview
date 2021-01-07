@@ -142,6 +142,7 @@ export default function controller(preprints, thisUser) {
           'fullReviews',
           'fullReviews.authors',
           'rapidReviews',
+          'rapidReviews.author',
           'requests',
           'tags',
         ];

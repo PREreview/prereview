@@ -115,6 +115,7 @@ prereview
 
 # RESTful react docs
 hooks.json
+openapi.json
 
 # Junk
 .DS_Store

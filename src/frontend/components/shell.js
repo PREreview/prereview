@@ -30,12 +30,15 @@ import PreReviewLogo from './pre-review-logo';
 const SHELL_HEADER_HEIGHT = 40; // !! keep in sync with CSS
 
 export default function Shell({ children, defaultStatus = 'default' }) {
-  const [user] = useContext(UserContext);
+  const user = useContext(UserContext);
   const [isDown, setIsDown] = useState(false);
   const ref = useRef();
   const nextHeightRef = useRef(null);
   const needForRafRef = useRef(true);
   const rafIdRef = useRef(null);
+
+  const extensionNextURL = new URL(window.location.href);
+  extensionNextURL.hash = '#osrpre-shell';
 
   const loginUrl = process.env.IS_EXTENSION
     ? `/login?next=${encodeURIComponent(extensionNextURL)}`
@@ -351,7 +354,7 @@ export default function Shell({ children, defaultStatus = 'default' }) {
                   </MenuLink>
                 )}
 
-                <MenuLink href={`/logout`}>Logout</MenuLink>
+                <MenuLink href={`/api/v2/logout`}>Logout</MenuLink>
               </UserBadge>
             ) : (
               <XLink href={loginUrl} to={loginUrl}>

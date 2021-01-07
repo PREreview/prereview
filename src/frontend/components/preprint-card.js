@@ -42,7 +42,7 @@ export default function PreprintCard({
 }) {
   const [isOpened, setIsOpened] = useState(false);
 
-  const { title, preprintServer, handle, createdAt } = preprint;
+  const { title, preprintServer, handle, datePosted } = preprint;
 
   const preprintId = createPreprintId(handle);
   const { id, scheme } = decodePreprintId(preprintId);
@@ -75,10 +75,12 @@ export default function PreprintCard({
   useEffect(() => {
     if (user) {
       if (preprint.requests.length) {
+        let author;
         preprint.requests.map(request => {
-          if (request.author === user.id) {
-            setHasRequested(true);
-          }
+          request.author.id
+            ? (author = request.author.id)
+            : (author = request.author);
+          setHasRequested(user.personas.some(persona => persona.id === author));
         });
       }
       if (preprint.fullReviews.length) {
@@ -112,7 +114,6 @@ export default function PreprintCard({
                 to={{
                   pathname: `/preprints/${preprintId}`,
                   state: {
-                    preprint: omit(preprint, ['potentialAction']),
                     tab: 'read',
                   },
                 }}
@@ -126,14 +127,14 @@ export default function PreprintCard({
               </XLink>
             </div>
 
-            {!!createdAt && (
+            {!!datePosted && (
               <span
                 className={classNames('preprint-card__pub-date', {
                   'preprint-card__pub-date--highlighted':
                     hoveredSortOption === 'date',
                 })}
               >
-                {getFormattedDatePosted(createdAt)}
+                {getFormattedDatePosted(datePosted)}
               </span>
             )}
           </div>
@@ -169,12 +170,15 @@ export default function PreprintCard({
             <div className="preprint-card__info-row__right">
               <ul className="preprint-card__tag-list">
                 {subjects.map(subject => (
-                  <li key={subject} className="preprint-card__tag-list__item">
+                  <li
+                    key={subject.id}
+                    className="preprint-card__tag-list__item"
+                  >
                     <Tooltip
-                      label={`Majority of reviewers tagged with ${subject}`}
+                      label={`Reviewers tagged this preprint as ${subject.name}`}
                     >
                       <div>
-                        <TagPill>{subject}</TagPill>
+                        <TagPill>{subject.name}</TagPill>
                       </div>
                     </Tooltip>
                   </li>
@@ -245,14 +249,15 @@ export default function PreprintCard({
               {/*</Tooltip>*/}
               <button
                 className="preprint-card__cta-button"
-                disabled={hasReviewed && hasRequested}
                 onClick={() => {
                   if (!hasReviewed && !hasRequested) {
-                    onNew(preprint);
+                    onNew(preprintId);
                   } else if (!hasReviewed && hasRequested) {
-                    onNewReview(preprint);
+                    onNewReview(preprintId);
                   } else if (hasReviewed && !hasRequested) {
-                    onNewRequest(preprint);
+                    onNewRequest(preprintId);
+                  } else {
+                    onNew(preprintId);
                   }
                 }}
               >
@@ -356,7 +361,7 @@ export default function PreprintCard({
               {!hasReviewed && (
                 <Button
                   onClick={() => {
-                    onNewReview(preprint);
+                    onNewReview(preprintId);
                   }}
                 >
                   Add Review
@@ -366,7 +371,7 @@ export default function PreprintCard({
               {!hasRequested && (
                 <Button
                   onClick={() => {
-                    onNewRequest(preprint);
+                    onNewRequest(preprintId);
                   }}
                 >
                   Request Review
@@ -392,7 +397,7 @@ PreprintCard.propTypes = {
   user: PropTypes.object,
   preprint: PropTypes.shape({
     handle: PropTypes.string,
-    createdAt: PropTypes.string,
+    datePosted: PropTypes.string,
     title: PropTypes.string.isRequired,
     preprintServer: PropTypes.string.isRequired,
     fullReviews: PropTypes.array,

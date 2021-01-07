@@ -18,7 +18,7 @@ export default function RoleActivity({ persona }) {
 
   return (
     <div className="role-activity">
-      {activity && activity.length && (
+      {activity && activity.length ? (
         <dl className="role-activity__summary">
           <dt className="role-activity__summary__label">
             <LabelStyle>Total number of requests</LabelStyle>
@@ -39,7 +39,7 @@ export default function RoleActivity({ persona }) {
             {persona.fullReviews.length || 0}
           </dd>
         </dl>
-      )}
+      ) : null}
 
       {!activity || !activity.length ? (
         <div>No activity yet.</div>

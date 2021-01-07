@@ -1,32 +1,45 @@
+// base imports
 import React, { useContext, useCallback, useEffect, useState } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import omit from 'lodash/omit';
-import { MdChevronRight, MdFirstPage } from 'react-icons/md';
-import PrivateRoute from './private-route';
+
+// contexts
 import { UserContext } from '../contexts/user-context';
+
+// hooks
 import { useGetPreprints } from '../hooks/api-hooks.tsx';
 import {
   useIsNewVisitor,
   useIsMobile,
   useNewPreprints,
 } from '../hooks/ui-hooks';
-import { unprefix, getId } from '../utils/jsonld';
-import HeaderBar from './header-bar';
-import SearchBar from './search-bar';
-import PreprintCard from './preprint-card';
-import SortOptions from './sort-options';
-import NewPreprint from './new-preprint';
-import Modal from './modal';
-import Button from './button';
-import LoginRequiredModal from './login-required-modal';
+
+// utils
 import { createPreprintQs } from '../utils/search';
+import { createPreprintId } from '../../common/utils/ids.js';
+import { getId } from '../utils/jsonld';
+
+// components
+import AddButton from './add-button';
+import Button from './button';
+import HeaderBar from './header-bar';
+import Loading from './loading';
+import LoginRequiredModal from './login-required-modal';
+import Modal from './modal';
+import NewPreprint from './new-preprint';
+import PreprintCard from './preprint-card';
+import PrivateRoute from './private-route';
+import SearchBar from './search-bar';
+import SortOptions from './sort-options';
 import WelcomeModal from './welcome-modal';
 import XLink from './xlink';
-import AddButton from './add-button';
+
+// constants
 import { ORG } from '../constants';
-import Banner from './banner';
-import { createPreprintId } from '../../common/utils/ids.js'
+
+// icons
+import { MdChevronRight, MdFirstPage } from 'react-icons/md';
 
 const searchParamsToObject = params => {
   const obj = {};
@@ -41,7 +54,7 @@ export default function Home() {
   const location = useLocation();
   const params = new URLSearchParams(location.search);
 
-  const [thisUser] = useContext(UserContext);
+  const thisUser = useContext(UserContext);
   const isMobile = useIsMobile();
   const [showLeftPanel, setShowLeftPanel] = useState(!isMobile);
   const [loginModalOpenNext, setLoginModalOpenNext] = useState(null);
@@ -66,59 +79,38 @@ export default function Home() {
     }
   }, []);
 
-  useEffect(() => {}, [thisUser])
+  const handleNewReview = preprintId => {
+    if (thisUser) {
+      history.push(`/preprints/${preprintId}`, {
+        tab: 'reviews',
+        isSingleStep: true,
+      });
+    } else {
+      setLoginModalOpenNext(`/preprints/${preprintId}`);
+    }
+  };
 
-  const handleNewReview = useCallback(
-    preprint => {
-      if (thisUser) {
-        history.push('/new', {
-          preprint: omit(preprint, ['potentialAction']), // #FIXME, do we need omit?
-          tab: 'review',
-          isSingleStep: true,
-        });
-      } else {
-        setLoginModalOpenNext(
-          `/new?identifier=${preprint.doi || preprint.arXivId}&tab=review`,
-        );
-      }
-    },
-    [thisUser, history],
-  );
+  const handleNewRequest = preprintId => {
+    if (thisUser) {
+      history.push(`/preprints/${preprintId}`, {
+        tab: 'request',
+        isSingleStep: true,
+      });
+    } else {
+      setLoginModalOpenNext(`/preprints/${preprintId}`);
+    }
+  };
 
-  const handleNewRequest = useCallback(
-    preprint => {
-      if (thisUser) {
-        history.push('/new', {
-          preprint: omit(preprint, ['potentialAction']), // #FIXME, do we need omit?
-          tab: 'request',
-          isSingleStep: true,
-        });
-      } else {
-        setLoginModalOpenNext(
-          `/new?identifier=${preprint.doi || preprint.arXivId}&tab=request`,
-        );
-      }
-    },
-    [thisUser, history],
-  );
-
-  const handleNew = useCallback(
-    preprint => {
-      if (thisUser) {
-        history.push('/new', {
-          preprint: omit(preprint, ['potentialAction']), // #FIXME, do we need omit?
-        });
-      } else {
-        setLoginModalOpenNext(
-          `/new?identifier=${preprint.doi || preprint.arXivId}`,
-        );
-      }
-    },
-    [thisUser, history],
-  );
+  const handleNew = preprintId => {
+    if (thisUser) {
+      history.push(`/preprints/${preprintId}`);
+    } else {
+      setLoginModalOpenNext(`/preprints/${preprintId}`);
+    }
+  };
 
   if (loadingPreprints) {
-    return <div>Loading...</div>;
+    return <Loading />;
   } else if (error) {
     return <div>An error occurred: {error}</div>;
   } else {
@@ -188,7 +180,7 @@ export default function Home() {
                       {
                         preprint: preprint,
                         tab,
-                      }, 
+                      },
                     );
                   }}
                 />
@@ -259,24 +251,24 @@ export default function Home() {
             ) : preprints.length <= 0 ? (
               <div>No more results.</div>
             ) : (
-                  <ul className="home__preprint-list">
-                    {preprints &&
-                      preprints.data.map(row => (
-                        <li key={row.id} className="home__preprint-list__item">
-                          <PreprintCard
-                            isNew={false}
-                            user={thisUser}
-                            preprint={row}
-                            onNewRequest={handleNewRequest}
-                            onNew={handleNew}
-                            onNewReview={handleNewReview}
-                            hoveredSortOption={hoveredSortOption}
-                            sortOption={params.get('sort') || 'score'}
-                          />
-                        </li>
-                      ))}
-                  </ul>
-                )}
+              <ul className="home__preprint-list">
+                {preprints &&
+                  preprints.data.map(row => (
+                    <li key={row.id} className="home__preprint-list__item">
+                      <PreprintCard
+                        isNew={false}
+                        user={thisUser}
+                        preprint={row}
+                        onNewRequest={handleNewRequest}
+                        onNew={handleNew}
+                        onNewReview={handleNewReview}
+                        hoveredSortOption={hoveredSortOption}
+                        sortOption={params.get('sort') || 'score'}
+                      />
+                    </li>
+                  ))}
+              </ul>
+            )}
 
             <div className="home__pagination">
               {!!(location.state && location.state.bookmark) && (

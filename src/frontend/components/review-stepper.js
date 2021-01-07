@@ -200,7 +200,7 @@ export default function ReviewStepper({
   hasRapidReviewed,
   hasLongReviewed,
   content,
-  onContentChange
+  onContentChange,
 }) {
   const classes = useStyles();
   const [activeStep, setActiveStep] = React.useState(0);
@@ -286,10 +286,9 @@ export default function ReviewStepper({
         )
       ) {
         if (
-          !Object.keys(answerMap).length === 0 &&
+          Object.keys(answerMap).length !== 0 &&
           answerMap.constructor === Object
         ) {
-          console.log('posting rapid...', answerMap);
           postRapidReview({ ...answerMap, preprint: preprint.id })
             .then(() => {
               return;
@@ -317,9 +316,9 @@ export default function ReviewStepper({
               Object.keys(answerMap).length === 0 &&
               answerMap.constructor === Object
             ) {
-              return onClose(answerMap, content);
-            } else {
               return onClose(false, content);
+            } else {
+              return onClose(answerMap, content);
             }
           })
           .catch(err => alert(`An error occurred: ${err.message}`));
