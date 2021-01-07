@@ -94,7 +94,7 @@ const ReviewReader = React.memo(function ReviewReader({
     }
   }, [defaultHighlightedRoleIds, highlightedRoleIds]);
 
-  useEffect(() => {}, [allRapidReviews, publishedReviews]);
+  useEffect(() => {}, [allRapidReviews, publishedReviews, newRequest]);
 
   return (
     <div
@@ -125,7 +125,7 @@ const ReviewReader = React.memo(function ReviewReader({
           ) : (
             ''
           )}
-          {preprint.requests.length ? (
+          {preprint.requests.length || newRequest ? (
             <span>{`${
               newRequest
                 ? preprint.requests.length + 1
