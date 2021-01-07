@@ -28,11 +28,11 @@ export default function Profile() {
     // window.scrollTo(0, 0);
     if (!loadingUser) {
       if (userData) {
-        userData.data.personas.filter(persona => {
-          persona.isActive ? setPersona(persona) : null;
-        });
-        setLoading(false);
-        setUser(userData.data);
+        if(!userData.data.isPrivate && userData.data.defaultPersona) {
+          setPersona(userData.data.defaultPersona);
+          setUser(userData.data);
+          setLoading(false);
+        }
       }
     }
   }, [loadingUser, userData]);
@@ -70,7 +70,7 @@ export default function Profile() {
                 </h2>
                 {user ? (
                   <span className="profile__persona-status">
-                    {persona && persona.name != 'Anonymous' ? (
+                    {persona && !persona.isAnonymous ? (
                       <div className="profile__persona-status__icon-container">
                         <MdPublic className="profile__persona-status__icon" />{' '}
                         Public
@@ -90,7 +90,7 @@ export default function Profile() {
 
               <dl>
                 <dt>
-                  <LabelStyle>Rapid PREreview identifier</LabelStyle>
+                  <LabelStyle>PREreview Name</LabelStyle>
                 </dt>
                 <dd>
                   <XLink
@@ -106,7 +106,7 @@ export default function Profile() {
                       <LabelStyle>Identity</LabelStyle>
                     </dt>
                     <dd>
-                      {persona && persona.name == 'Anonymous'
+                      {persona && persona.isAnonymous
                         ? 'Anonymous'
                         : 'Public'}
                     </dd>
