@@ -259,7 +259,10 @@ export default function controller(groupModel, userModel, thisUser) {
           'members.defaultPersona',
           'members.personas',
         ]);
-        user = await userModel.findOneByIdOrOrcid(ctx.params.uid, ['defaultPersona', 'personas']);
+        user = await userModel.findOneByIdOrOrcid(ctx.params.uid, [
+          'defaultPersona',
+          'personas',
+        ]);
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse query: ${err}`);
