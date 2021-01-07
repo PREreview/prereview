@@ -4,6 +4,7 @@ import {
   fullReviewModelWrapper,
   personaModelWrapper,
   preprintModelWrapper,
+  requestModelWrapper,
   userModelWrapper,
 } from '../models/index.ts';
 import { Client } from 'pg';
@@ -16,6 +17,7 @@ import {
   FullReviewDraft,
   Persona,
   Preprint,
+  Request,
   User,
   Work,
 } from '../models/entities/index.ts';
@@ -346,6 +348,38 @@ async function prereviewOrgImportReviews(db, client, usersMap, preprintsMap) {
   }
 }
 
+async function prereviewOrgImportRequests(db, client, usersMap, preprintsMap) {
+  const requestModel = requestModelWrapper(db);
+  try {
+    const oldRequests = await client.query(
+      'SELECT preprint_id,date_created,author_id FROM prereviews',
+    );
+
+    for (let r of oldRequests.rows) {
+      console.log(
+        `PREreview.org: Fetching preprint ID ${r.preprint_id} for request`,
+      );
+      const preprint = preprintsMap.get(r.preprint_id);
+      console.log(
+        `PREreview.org: Fetching author ID ${r.author_id} for request`,
+      );
+      const author = usersMap.get(r.author_id);
+      if (author && author.defaultPersona) {
+        const request = new Request(author.defaultPersona, preprint);
+        request.createdAt = new Date(r.date_created);
+        await requestModel.persistAndFlush(request);
+      } else {
+        console.log(
+          `PREreview.org: No default persona found for user:`,
+          author,
+        );
+      }
+    }
+  } catch (err) {
+    console.error('PREreview.org: Failed to import:', err);
+  }
+}
+
 async function main() {
   const usersMap = new Map();
   const preprintsMap = new Map();
@@ -363,7 +397,12 @@ async function main() {
   await prereviewOrgImportUsers(db, client, usersMap);
   await prereviewOrgImportPreprints(db, client, preprintsMap);
   await prereviewOrgImportReviews(db, client, usersMap, preprintsMap);
+  await prereviewOrgImportRequests(db, client, usersMap, preprintsMap);
   await client.end();
+  await db.close();
+  return;
 }
 
-main();
+main()
+  .then(() => console.log('Finished importing PREreview.org'))
+  .catch(err => console.error('Error importing PREreview.org:', err));

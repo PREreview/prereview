@@ -448,6 +448,10 @@ async function main() {
       personaMap,
     ),
   );
+  await db.close();
+  return;
 }
 
-main();
+main()
+  .then(() => console.log('Finished importing OSrPRE'))
+  .catch(err => console.error('Error importing OSrPRE:', err));
