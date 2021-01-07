@@ -79,54 +79,35 @@ export default function Home() {
     }
   }, []);
 
-  const handleNewReview = useCallback(
-    preprint => {
-      if (thisUser) {
-        history.push('/new', {
-          preprint: omit(preprint, ['potentialAction']), // #FIXME, do we need omit?
-          tab: 'review',
-          isSingleStep: true,
-        });
-      } else {
-        setLoginModalOpenNext(
-          `/new?identifier=${preprint.doi || preprint.arXivId}&tab=review`,
-        );
-      }
-    },
-    [thisUser, history],
-  );
+  const handleNewReview = preprintId => {
+    if (thisUser) {
+      history.push(`/preprints/${preprintId}`, {
+        tab: 'reviews',
+        isSingleStep: true,
+      });
+    } else {
+      setLoginModalOpenNext(`/preprints/${preprintId}`);
+    }
+  };
 
-  const handleNewRequest = useCallback(
-    preprint => {
-      if (thisUser) {
-        history.push('/new', {
-          preprint: omit(preprint, ['potentialAction']), // #FIXME, do we need omit?
-          tab: 'request',
-          isSingleStep: true,
-        });
-      } else {
-        setLoginModalOpenNext(
-          `/new?identifier=${preprint.doi || preprint.arXivId}&tab=request`,
-        );
-      }
-    },
-    [thisUser, history],
-  );
+  const handleNewRequest = preprintId => {
+    if (thisUser) {
+      history.push(`/preprints/${preprintId}`, {
+        tab: 'request',
+        isSingleStep: true,
+      });
+    } else {
+      setLoginModalOpenNext(`/preprints/${preprintId}`);
+    }
+  };
 
-  const handleNew = useCallback(
-    preprint => {
-      if (thisUser) {
-        history.push('/new', {
-          preprint: omit(preprint, ['potentialAction']), // #FIXME, do we need omit?
-        });
-      } else {
-        setLoginModalOpenNext(
-          `/new?identifier=${preprint.doi || preprint.arXivId}`,
-        );
-      }
-    },
-    [thisUser, history],
-  );
+  const handleNew = preprintId => {
+    if (thisUser) {
+      history.push(`/preprints/${preprintId}`);
+    } else {
+      setLoginModalOpenNext(`/preprints/${preprintId}`);
+    }
+  };
 
   if (loadingPreprints) {
     return <Loading />;

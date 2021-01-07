@@ -21,12 +21,8 @@ export function AdminRoute({ children, ...rest }) {
   const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
-    if (user && user.groups.length) {
-      user.groups.find(group => {
-        if (group.name == 'admin') {
-          setIsAdmin(true);
-        }
-      });
+    if (user && user.isAdmin) {
+      setIsAdmin(true);
     }
   }, []);
 

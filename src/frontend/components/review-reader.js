@@ -28,6 +28,8 @@ const ReviewReader = React.memo(function ReviewReader({
 }) {
   const [content, setContent] = useState('');
   const [commentTitle, setCommentTitle] = useState('');
+  const [publishedTitle, setPublishedTitle] = useState('');
+  const [publishedComment, setPublishedComment] = useState('');
   const [allRapidReviews, setAllRapidReviews] = useState(preprint.rapidReviews);
   const [publishedReviews, setPublishedReviews] = useState(
     preprint.fullReviews.filter(review => review.published),
@@ -44,6 +46,13 @@ const ReviewReader = React.memo(function ReviewReader({
     setContent(value);
   };
 
+  const handleSubmitComment = (title, content) => {
+    setPublishedTitle(title);
+    setPublishedComment(content);
+    setCommentTitle('');
+    setContent('');
+  };
+
   const canSubmit = content => {
     return content && content !== '<p></p>';
   };
@@ -58,19 +67,23 @@ const ReviewReader = React.memo(function ReviewReader({
       Object.keys(rapidContent).length !== 0 &&
       rapidContent.constructor === Object
     ) {
-      console.log('rapid content found: ', rapidContent);
-      setAllRapidReviews(allRapidReviews =>
-        allRapidReviews.concat(rapidContent),
-      );
+      const all = allRapidReviews.concat(rapidContent);
+      setAllRapidReviews(all);
     }
 
     if (longContent) {
-      console.log('long content found: ', longContent);
       setPublishedReviews(allPublishedReviews =>
         allPublishedReviews.concat(longContent),
       );
     }
-  }, [rapidContent, longContent]);
+  }, [
+    rapidContent,
+    longContent,
+    publishedTitle,
+    publishedComment,
+    content,
+    commentTitle,
+  ]);
 
   useEffect(() => {
     if (
@@ -81,7 +94,7 @@ const ReviewReader = React.memo(function ReviewReader({
     }
   }, [defaultHighlightedRoleIds, highlightedRoleIds]);
 
-  useEffect(() => {}, [allRapidReviews, publishedReviews]);
+  useEffect(() => {}, [allRapidReviews, publishedReviews, newRequest]);
 
   return (
     <div
@@ -94,11 +107,7 @@ const ReviewReader = React.memo(function ReviewReader({
         <h3 className="review-reader__title">
           {!allRapidReviews.length &&
           !publishedReviews.length &&
-          !preprint.requests.length ? (
-            <div>
-              No reviews or requests for review. Would you like to add one?
-            </div>
-          ) : allRapidReviews.length ? (
+          !preprint.requests.length ? null : allRapidReviews.length ? (
             <span>{` ${allRapidReviews.length} rapid review${
               allRapidReviews.length > 1 ? 's' : ''
             }`}</span>
@@ -112,7 +121,7 @@ const ReviewReader = React.memo(function ReviewReader({
           ) : (
             ''
           )}
-          {preprint.requests.length ? (
+          {preprint.requests.length || newRequest ? (
             <span>{`${
               newRequest
                 ? preprint.requests.length + 1
@@ -183,36 +192,78 @@ const ReviewReader = React.memo(function ReviewReader({
                       key={review.id}
                       className="text-answers__long-response-row"
                     >
-                      <div className="text-answers__question long">
-                        {review.drafts[review.drafts.length - 1].title}
-                      </div>
-                      <div className="">
+                      {review.drafts[review.drafts.length - 1].title ? (
+                        <div className="text-answers__question long">
+                          {review.drafts[review.drafts.length - 1].title}
+                        </div>
+                      ) : null}
+                      <div>
                         {review.authors.map(author => (
-                          <span key={author.id}>by {author.name}</span>
+                          <span key={author.id}>
+                            <em>by {author.name}</em>
+                          </span>
                         ))}
                       </div>
                       <div
-                        className=""
                         dangerouslySetInnerHTML={{
                           __html: `${
                             review.drafts[review.drafts.length - 1].contents
                           }`,
                         }}
                       />
-                      {review.comments && (
-                        <div>
-                          <div>Comments</div>
-                          {review.comments.map(comment => {
-                            return (
-                              <div key={comment.id}>{comment.contents}</div>
-                            );
-                          })}
+                      {(review.comments || publishedComment) && (
+                        <div className="comments">
+                          <div>
+                            <b>Comments</b>
+                          </div>
+                          {review.comments
+                            ? review.comments.map(comment => {
+                                return (
+                                  <div key={comment.id}>
+                                    {comment.title ? (
+                                      <div className="comments-title">
+                                        {comment.title}
+                                      </div>
+                                    ) : null}
+                                    <div>
+                                      <em>{comment.author.name}</em>
+                                    </div>
+                                    <div
+                                      dangerouslySetInnerHTML={{
+                                        __html: `${comment.contents}`,
+                                      }}
+                                    />
+                                  </div>
+                                );
+                              })
+                            : null}
+                          {publishedComment ? (
+                            <div>
+                              {commentTitle ? (
+                                <div className="comments-title">
+                                  {publishedTitle}
+                                </div>
+                              ) : null}
+                              <div>
+                                <em>{user.name}</em>
+                              </div>
+                              <div
+                                dangerouslySetInnerHTML={{
+                                  __html: `${publishedComment}`,
+                                }}
+                              />
+                            </div>
+                          ) : null}
                         </div>
                       )}
-                      <form>
-                        <div>Add a comment</div>
+                      <form className="comments__add">
+                        <div>
+                          <b>Add a comment</b>
+                        </div>
                         <input
+                          className="comments-title-input"
                           type="text"
+                          placeholder={'Title'}
                           value={commentTitle}
                           onChange={event =>
                             setCommentTitle(event.target.value)
@@ -238,14 +289,18 @@ const ReviewReader = React.memo(function ReviewReader({
                                   title: commentTitle,
                                   contents: content,
                                 })
-                                  .then(() =>
-                                    alert('Comment submitted successfully.'),
-                                  )
+                                  .then(() => {
+                                    alert('Comment submitted successfully.');
+                                    return handleSubmitComment(
+                                      commentTitle,
+                                      content,
+                                    );
+                                  })
                                   .catch(err =>
                                     alert(`An error occurred: ${err.message}`),
                                   );
                               } else {
-                                alert('Review cannot be blank.');
+                                alert('Comment cannot be blank.');
                               }
                             }}
                           >
@@ -282,9 +337,9 @@ const ReviewReader = React.memo(function ReviewReader({
           ) : null}
 
           {preprint.tags && preprint.tags.length ? (
-            <div>
+            <div className="tags">
               <div className="tags__title">Subject Tags</div>
-              <div className="tags">
+              <div className="tags__content">
                 {preprint.tags.map(tag => {
                   return (
                     <div key={tag.name} className="tags__tag">

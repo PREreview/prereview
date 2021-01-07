@@ -5,9 +5,12 @@ import { useLocation } from 'react-router-dom';
 import classNames from 'classnames';
 import { Helmet } from 'react-helmet-async';
 
+// material ui
+import { makeStyles } from '@material-ui/core/styles';
+import Box from '@material-ui/core/Box';
+
 // utils
 import { usePostRequests } from '../hooks/api-hooks.tsx';
-import { checkIfRoleLacksMininmalData } from '../utils/roles';
 
 // components
 import Button from './button';
@@ -18,8 +21,15 @@ import PreprintPreview from './preprint-preview';
 import ReviewReader from './review-reader';
 import ReviewStepper from './review-stepper';
 
-// !! this needs to work both in web and extension use
-// `process.env.IS_EXTENSION` to assess the environment we are in.
+const useStyles = makeStyles(theme => ({
+  root: {
+    width: '100%',
+  },
+  yellow: {
+    backgroundColor: '#FFFAEE',
+    padding: 10,
+  },
+}));
 
 export default function ShellContent({
   preprint,
@@ -52,8 +62,6 @@ export default function ShellContent({
   const [rapidContent, setRapidContent] = useState(null);
 
   const onCloseReviews = (rapidReview, longReview) => {
-    console.log(rapidReview);
-    console.log(longReview);
     if (rapidReview) {
       setRapidContent(rapidReview);
       setHasRapidReviewed(true);
@@ -79,38 +87,43 @@ export default function ShellContent({
 
   useEffect(() => {
     if (user) {
-      preprint.fullReviews.map(review => {
-        review.authors.map(author => {
-          user.personas.some(persona => {
-            if (persona.identity === author.identity) {
-              if (review.published === true) {
-                setHasLongReviewed(true);
-              } else {
-                setInitialContent(
-                  review.drafts[review.drafts.length - 1].contents,
-                );
+      if (preprint.fullReviews.length) {
+        preprint.fullReviews.map(review => {
+          review.authors.map(author => {
+            user.personas.some(persona => {
+              if (persona.identity === author.identity) {
+                if (review.published === true) {
+                  setHasLongReviewed(true);
+                } else {
+                  setInitialContent(
+                    review.drafts[review.drafts.length - 1].contents,
+                  );
+                }
               }
+            });
+          });
+        });
+      }
+
+      if (preprint.rapidReviews.length) {
+        preprint.rapidReviews.map(review => {
+          user.personas.some(persona => {
+            if (persona.identity === review.author.identity) {
+              setHasRapidReviewed(true);
             }
           });
         });
-      });
+      }
 
-      preprint.rapidReviews.map(review => {
-        user.personas.some(persona => {
-          if (persona.identity === review.author.identity) {
-            setHasRapidReviewed(true);
-          }
+      if (preprint.requests.length) {
+        let author;
+        preprint.requests.map(request => {
+          request.author.id
+            ? (author = request.author.id)
+            : (author = request.author);
+          setHasRequested(user.personas.some(persona => persona.id === author));
         });
-      });
-
-      let author;
-
-      preprint.requests.map(request => {
-        request.author.id
-          ? (author = request.author.id)
-          : (author = request.author);
-        setHasRequested(user.personas.some(persona => persona.id === author));
-      });
+      }
     }
   }, [
     preprint,
@@ -182,7 +195,7 @@ export default function ShellContent({
                 className={classNames('shell-content__tab-button', {
                   'shell-content__tab-button--active': tab === 'request',
                 })}
-                disabled={loadingPostReviewRequest || hasRequested}
+                disabled={loadingPostReviewRequest}
                 onClick={() => {
                   if (user) {
                     onRequireScreen();
@@ -229,8 +242,9 @@ export default function ShellContent({
                 .catch(err => alert(`An error occurred: ${err.message}`));
             }}
             isPosting={loadingPostReviewRequest}
-            disabled={hasRequested}
-            error={errorPostReviewRequest} // #FIXME
+            error={errorPostReviewRequest}
+            hasRequested={hasRequested}
+            newRequest={newRequest}
           />
         ) : tab === 'reviews' ? (
           <ShellContentReviews
@@ -241,20 +255,6 @@ export default function ShellContent({
             hasRapidReviewed={hasRapidReviewed}
             hasLongReviewed={hasLongReviewed}
             initialContent={initialContent}
-          />
-        ) : tab === 'rapidReview#success' ? (
-          <ShellContentReviewSuccess
-            preprint={preprint}
-            onClose={() => {
-              setTab('read');
-            }}
-          />
-        ) : tab === 'request#success' ? (
-          <ShellContentRequestSuccess
-            preprint={preprint}
-            onClose={() => {
-              setTab('read');
-            }}
           />
         ) : null}
       </div>
@@ -356,75 +356,48 @@ ShellContentReviews.propTypes = {
 function ShellContentRequest({
   preprint,
   onSubmit,
-  disabled,
   isPosting,
   error,
+  hasRequested,
+  newRequest,
 }) {
-  return (
-    <div className="shell-content-request">
-      <header className="shell-content-request__title">
-        Add a request for review
-      </header>
+  const classes = useStyles();
 
-      <Controls error={error}>
-        <Button
-          primary={true}
-          isWaiting={isPosting}
-          disabled={disabled}
-          onClick={() => {
-            onSubmit(preprint);
-          }}
-        >
-          Submit
-        </Button>
-      </Controls>
+  return (
+    <div>
+      {hasRequested || newRequest ? (
+        <div className="shell-content-request">
+          <Box mt={2} mb={2} className={classes.yellow}>
+            Your request has been successfully posted.
+          </Box>
+        </div>
+      ) : (
+        <div className="shell-content-request">
+          <header className="shell-content-request__title">
+            Add a request for review
+          </header>
+
+          <Controls error={error}>
+            <Button
+              primary={true}
+              isWaiting={isPosting}
+              onClick={() => {
+                onSubmit(preprint);
+              }}
+            >
+              Submit
+            </Button>
+          </Controls>
+        </div>
+      )}
     </div>
   );
 }
 ShellContentRequest.propTypes = {
   preprint: PropTypes.object.isRequired,
   onSubmit: PropTypes.func.isRequired,
-  disabled: PropTypes.bool,
   isPosting: PropTypes.bool,
   error: PropTypes.instanceOf(Error),
-};
-
-function ShellContentReviewSuccess({ preprint, onClose }) {
-  return (
-    <div className="shell-content-review-success">
-      <header className="shell-content-review-success__title">Success</header>
-
-      <PreprintPreview preprint={preprint} />
-
-      <p>Your longform review has been successfully posted.</p>
-
-      <Controls>
-        <Button onClick={onClose}>View</Button>
-      </Controls>
-    </div>
-  );
-}
-ShellContentReviewSuccess.propTypes = {
-  preprint: PropTypes.object.isRequired,
-  onClose: PropTypes.func.isRequired,
-};
-
-function ShellContentRequestSuccess({ preprint, onClose }) {
-  return (
-    <div className="shell-content-request-success">
-      <header className="shell-content-request-success__title">Success</header>
-
-      <PreprintPreview preprint={preprint} />
-
-      <p>Your request has been successfully posted.</p>
-
-      <Controls>
-        <Button onClick={onClose}>View</Button>
-      </Controls>
-    </div>
-  );
-}
-ShellContentRequestSuccess.propTypes = {
-  preprint: PropTypes.object.isRequired,
-  onClose: PropTypes.func.isRequired,
+  hasRequested: PropTypes.bool,
+  newRequest: PropTypes.bool,
 };

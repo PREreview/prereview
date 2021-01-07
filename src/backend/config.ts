@@ -272,19 +272,7 @@ export default program
     '--admin-users <OrcIDs>',
     'Admin OrcIDs',
     validateOrcidArray,
-    getEnvOrDefault('admin_user').asArray(),
-  )
-  .option(
-    '--username <username>',
-    'Admin username',
-    validateUser,
-    getEnvOrDefault('admin_user').asString(),
-  )
-  .option(
-    '--password <password>',
-    'Admin password',
-    validatePassword,
-    getEnvOrDefault('admin_pass').asString(),
+    getEnvOrDefault('admin_users').asArray(),
   )
   .option(
     '-p, --port <number>',

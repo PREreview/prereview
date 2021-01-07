@@ -16,9 +16,6 @@ import { PlaceholderExtension } from 'remirror/extension/placeholder';
 
 let EXTENSIONS = [
   new PlaceholderExtension(),
-  new BoldExtension(),
-  new ItalicExtension(),
-  new UnderlineExtension(),
   new WysiwygPreset(),
 ];
 

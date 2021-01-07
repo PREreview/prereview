@@ -3,16 +3,19 @@ import PropTypes from 'prop-types';
 import { MdChevronRight } from 'react-icons/md';
 import Value from './value';
 import { getFormattedDatePosted } from '../utils/preprints';
-import { createPreprintId, decodePreprintId, getCanonicalDoiUrl, getCanonicalArxivUrl } from '../../common/utils/ids.js';
+import {
+  createPreprintId,
+  decodePreprintId,
+  getCanonicalDoiUrl,
+  getCanonicalArxivUrl,
+} from '../../common/utils/ids.js';
 import XLink from './xlink';
 import ShellIcon from '../svgs/shell_icon.svg';
 
 export default function PreprintPreview({ preprint }) {
-
   const preprintId = createPreprintId(preprint.handle);
   const { id, scheme } = decodePreprintId(preprintId);
 
-  
   return (
     <div className="preprint-preview">
       <div className="preprint-preview__header">
@@ -40,11 +43,13 @@ export default function PreprintPreview({ preprint }) {
           </Value>
         )}
 
-        {!!preprint.datePosted ? (
+        {preprint.datePosted ? (
           <span className="preprint-preview__date">
             {getFormattedDatePosted(preprint.datePosted)}
           </span>
-        ) : ' '}
+        ) : (
+          ' '
+        )}
       </div>
 
       <div className="preprint-preview__info">
@@ -52,27 +57,28 @@ export default function PreprintPreview({ preprint }) {
           <Value className="preprint-preview__server" tagName="span">
             {preprint.preprintServer}
           </Value>
-        ) : ' '}
+        ) : (
+          ' '
+        )}
         <MdChevronRight className="preprint-preview__server-arrow-icon" />
         <span className="preprint-preview__id">
-        { preprint.handle && scheme === 'doi' ? (
-              <a
-                href={`${getCanonicalDoiUrl(id)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {id}
-              </a>
-            ) : (
-              <a
-                    href={`${getCanonicalArxivUrl(id)}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                {id}
-              </a>
-            )
-        } 
+          {preprint.handle && scheme === 'doi' ? (
+            <a
+              href={`${getCanonicalDoiUrl(id)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {id}
+            </a>
+          ) : (
+            <a
+              href={`${getCanonicalArxivUrl(id)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {id}
+            </a>
+          )}
         </span>
       </div>
     </div>

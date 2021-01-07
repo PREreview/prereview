@@ -47,9 +47,14 @@ export default function controller(
         allReviews = await reviewModel.findAll({ preprint: pid }, [
           'authors',
           'comments',
+          'drafts',
         ]);
       } else {
-        allReviews = await reviewModel.findAll(['authors', 'comments']);
+        allReviews = await reviewModel.findAll([
+          'authors',
+          'comments',
+          'drafts',
+        ]);
       }
     } catch (err) {
       log.error('HTTP 400 Error: ', err);
@@ -81,15 +86,13 @@ export default function controller(
       }
 
       try {
-        review = reviewModel.create(ctx.request.body);
-        await reviewModel.persistAndFlush(review);
-
-        await review.authors.init();
+        preprint = await preprintModel.findOne(ctx.request.body.preprint);
+        review = reviewModel.create({
+          ...ctx.request.body,
+          preprint: preprint,
+        });
 
         review.authors.add(authorPersona);
-
-        preprint = await preprintModel.find(ctx.request.body.preprint);
-        review.preprint = preprint[0];
 
         if (ctx.request.body.contents) {
           log.debug(`Adding full review draft.`);
@@ -98,8 +101,9 @@ export default function controller(
             contents: ctx.request.body.contents,
             parent: review,
           });
-          await draftModel.persistAndFlush(draft);
+          review.drafts.add(draft);
         }
+        await reviewModel.persistAndFlush(review);
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse full review schema: ${err}`);
@@ -198,6 +202,7 @@ export default function controller(
         fullReview = await reviewModel.findOne(ctx.params.id, [
           'drafts',
           'authors',
+          'comments',
         ]);
 
         if (!fullReview) {
