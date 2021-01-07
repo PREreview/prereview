@@ -394,8 +394,8 @@ async function main() {
   });
 
   await client.connect();
-  await prereviewOrgImportUsers(db, client, usersMap);
   await prereviewOrgImportPreprints(db, client, preprintsMap);
+  await prereviewOrgImportUsers(db, client, usersMap);
   await prereviewOrgImportReviews(db, client, usersMap, preprintsMap);
   await prereviewOrgImportRequests(db, client, usersMap, preprintsMap);
   await client.end();
