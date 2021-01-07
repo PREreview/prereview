@@ -1,8 +1,7 @@
 // base imports
-import React, { useContext, useCallback, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import omit from 'lodash/omit';
 
 // contexts
 import { UserContext } from '../contexts/user-context';
