@@ -107,11 +107,7 @@ const ReviewReader = React.memo(function ReviewReader({
         <h3 className="review-reader__title">
           {!allRapidReviews.length &&
           !publishedReviews.length &&
-          !preprint.requests.length ? (
-            <div>
-              No reviews or requests for review. Would you like to add one?
-            </div>
-          ) : allRapidReviews.length ? (
+          !preprint.requests.length ? null : allRapidReviews.length ? (
             <span>{` ${allRapidReviews.length} rapid review${
               allRapidReviews.length > 1 ? 's' : ''
             }`}</span>
