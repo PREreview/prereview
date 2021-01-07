@@ -59,7 +59,7 @@ export default function SettingsRoles({ user }) {
       <h3 className="settings__title">Personas</h3>
 
       <p>
-        Personas allow you to manage your identity on Rapid PREreview. Personas
+        Personas allow you to manage your ideSntity on Rapid PREreview. Personas
         can be public (linked to your{' '}
         <a href={`https://orcid.org/${user.orcid}`}>ORCID</a> profile) or kept
         anonymous.
@@ -113,12 +113,13 @@ export default function SettingsRoles({ user }) {
           </TableHead>
           <TableBody>
             {user.personas.map(persona => {
+              console.log(user)
               console.log(persona);
               return (
                 <TableRow key={persona.id}>
                   <TableCell>
                     <div className="settings__persona-list-item__active-state">
-                      {persona.isActive ? (
+                      {user.defaultPersona === persona.id ? (
                         <span className="settings__persona-list-item__is-active">
                           <MdStar className="settings__persona-active-icon" />
                           <span className="settings__persona-active-label">
@@ -235,7 +236,7 @@ function MakeActivePersonaModalButton({ user, persona }) {
         }}
       >
         <MdStarBorder className="settings__persona-active-icon settings__persona-active-icon--inactive" />
-        <span className="settings__persona-active-label">Make public</span>
+        <span className="settings__persona-active-label">Make active</span>
       </Button>
 
       {isOpen && (
