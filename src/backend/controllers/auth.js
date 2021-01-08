@@ -3,6 +3,7 @@ import { Strategy as OrcidStrategy } from 'passport-orcid';
 import router from 'koa-joi-router';
 import merge from 'lodash.merge';
 import { getLogger } from '../log.js';
+import MockStrategy from '../utils/mockStrategy.js';
 
 const log = getLogger('backend:controllers:auth');
 
@@ -47,7 +48,7 @@ export default function controller(users, personas, config, thisUser) {
       name: params.name,
       token: {
         access_token: params.access_token || accessToken,
-        token_type: params.token_type,
+        token_type: params.token_type || 'token_type',
         expires_in: params.expires_in,
       },
     };
@@ -94,16 +95,19 @@ export default function controller(users, personas, config, thisUser) {
         let anonPersona;
         let defaultPersona;
 
+        log.debug('Creating personas for: ', usersName);
         try {
           anonPersona = personas.create({
             name: 'Anonymous',
             identity: newUser,
             isAnonymous: true,
+            isActive: false,
           });
           defaultPersona = personas.create({
             name: usersName,
             identity: newUser,
             isAnonymous: false,
+            isActive: true,
           });
 
           newUser.defaultPersona = defaultPersona;
@@ -115,6 +119,7 @@ export default function controller(users, personas, config, thisUser) {
 
         try {
           await users.em.flush();
+          await personas.em.flush();
         } catch (err) {
           log.debug('Error saving user and personas to database.', err);
         }
@@ -122,6 +127,7 @@ export default function controller(users, personas, config, thisUser) {
 
       if (newUser) {
         log.debug('Authenticated & created user.', newUser);
+        log.debug('profile!!!!, ', profile);
         const completeUser = merge(profile, newUser);
         log.trace('verifyCallback() new completeUser:', completeUser);
         return done(null, completeUser);
@@ -143,7 +149,15 @@ export default function controller(users, personas, config, thisUser) {
     verifyCallback,
   );
 
-  passport.use(strategy);
+  const mockStrategy = new MockStrategy(
+    'orcid',
+    config.orcidCallbackUrl,
+    verifyCallback,
+  );
+
+  process.env.PREREVIEW_ORCID_MOCK_STRATEGY
+    ? passport.use(mockStrategy)
+    : passport.use(strategy);
 
   // TODO: local strategy login
 

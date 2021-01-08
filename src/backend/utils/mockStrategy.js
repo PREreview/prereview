@@ -22,9 +22,9 @@ export default class MockStrategy extends Strategy {
     const refreshToken = 'refreshToken';
     const params = {
       orcid: createRandomOrcid(),
-      username: 'anotherunique',
-      name: 'Test User',
-      email: 'bob@bob3.com',
+      username: 'uniqueUser',
+      name: 'Test Unique User',
+      email: 'bob@unique.com',
       isAdmin: false, // in dev mode we create admin users
       isModerator: true,
       expires_in: 20 * 365 * 24 * 60 * 60, // in secs
