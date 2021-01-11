@@ -65,7 +65,8 @@ export default function App({ user }) {
           return setLoading(false);
         })
         .catch(err => {
-          console.log('An error occurred: ', err.message);
+          console.error(`${err}`);
+          return setLoading(false);
         });
     } else {
       setLoading(false);

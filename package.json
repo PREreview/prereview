@@ -122,6 +122,7 @@
     "@reach/menu-button": "^0.10.5",
     "@reach/tooltip": "^0.10.5",
     "@reach/visually-hidden": "^0.10.4",
+    "@remirror/editor-wysiwyg": "^0.13.1",
     "@remirror/pm": "^1.0.0-next.58",
     "@sendgrid/mail": "^7.2.1",
     "@storybook/addon-actions": "^5.3.19",
