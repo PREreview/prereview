@@ -18,6 +18,7 @@ import { getCanonicalUrl } from '../utils/preprints';
 import { unprefix } from '../utils/jsonld';
 
 // components
+import Loading from './loading';
 import NotFound from './not-found';
 import Shell from './shell';
 import ShellContent from './shell-content';
@@ -71,7 +72,7 @@ export default function ExtensionFallback() {
   }, []);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <Loading />;
   } else if (errorPreprint) {
     return <NotFound />;
   } else {
