@@ -1,16 +1,15 @@
 import _ from 'lodash';
-import { dbWrapper } from '../db.ts';
 import {
   fullReviewModelWrapper,
   personaModelWrapper,
   preprintModelWrapper,
   requestModelWrapper,
   userModelWrapper,
-} from '../models/index.ts';
+} from '../../models/index.ts';
 import { Client } from 'pg';
 import anonymus from 'anonymus';
-import { resolvePreprint } from '../utils/resolve.ts';
-import { getOrcidPerson, getOrcidWorks } from '../utils/orcid.js';
+import { resolvePreprint } from '../../utils/resolve.ts';
+import { getOrcidPerson, getOrcidWorks } from '../../utils/orcid.js';
 import {
   Contact,
   FullReview,
@@ -20,7 +19,7 @@ import {
   Request,
   User,
   Work,
-} from '../models/entities/index.ts';
+} from '../../models/entities/index.ts';
 
 async function importPreprints(site, preprints, preprintModel, preprintsMap) {
   try {
@@ -380,10 +379,9 @@ async function prereviewOrgImportRequests(db, client, usersMap, preprintsMap) {
   }
 }
 
-async function main() {
+export default async function run(db) {
   const usersMap = new Map();
   const preprintsMap = new Map();
-  const [db] = await dbWrapper();
   const client = new Client({
     host: process.env.IMPORT_HOST,
     port: process.env.IMPORT_PORT ? process.env.IMPORT_PORT : 5432,
@@ -399,10 +397,5 @@ async function main() {
   await prereviewOrgImportReviews(db, client, usersMap, preprintsMap);
   await prereviewOrgImportRequests(db, client, usersMap, preprintsMap);
   await client.end();
-  await db.close();
   return;
 }
-
-main()
-  .then(() => console.log('Finished importing PREreview.org'))
-  .catch(err => console.error('Error importing PREreview.org:', err));
