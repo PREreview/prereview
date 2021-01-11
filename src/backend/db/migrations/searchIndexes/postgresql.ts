@@ -5,7 +5,7 @@ export class SearchPostgresql extends Migration {
     this.addSql('ALTER TABLE "preprint" ADD COLUMN "fts" TSVECTOR;');
     this.addSql(
       "CREATE FUNCTION preprint_fts_trigger() RETURNS trigger AS \
-                $$ BEGIN new.fts := setweight(to_tsvector('english', new.title), 'A') || setweight(to_tsvector('english', new.handle), 'B'); return new; END; $$ LANGUAGE plpgsql;",
+                $$ BEGIN new.fts := setweight(to_tsvector('english', new.title), 'A') || setweight(to_tsvector('english', new.handle), 'B') || setweight(to_tsvector('english', new.abstract_text), 'C'); return new; END; $$ LANGUAGE plpgsql;",
     );
     this.addSql(
       'CREATE TRIGGER preprint_fts_trigger_update \
@@ -17,20 +17,18 @@ export class SearchPostgresql extends Migration {
     this.addSql(
       'CREATE INDEX "preprint_fts_idx" ON "preprint" USING GIN (fts);',
     );
-    this.addSql('ALTER TABLE "full_review_draft" ADD COLUMN "fts" TSVECTOR;');
+    this.addSql('ALTER TABLE "persona" ADD COLUMN "fts" TSVECTOR;');
     this.addSql(
-      "CREATE FUNCTION full_review_draft_fts_trigger() RETURNS trigger AS \
-                $$ BEGIN new.fts := to_tsvector('english', new.contents); return new; END; $$ LANGUAGE plpgsql;",
+      "CREATE FUNCTION persona_fts_trigger() RETURNS trigger AS \
+                $$ BEGIN new.fts := setweight(to_tsvector('english', new.name), 'A') || setweight(to_tsvector('english', new.bio), 'B'); return new; END; $$ LANGUAGE plpgsql;",
     );
     this.addSql(
-      'CREATE TRIGGER full_review_draft_fts_trigger_update \
+      'CREATE TRIGGER persona_fts_trigger_update \
                   BEFORE INSERT OR UPDATE \
-                  ON "full_review_draft" \
+                  ON "persona" \
                   FOR EACH ROW \
-                  EXECUTE FUNCTION full_review_draft_fts_trigger();',
+                  EXECUTE FUNCTION persona_fts_trigger();',
     );
-    this.addSql(
-      'CREATE INDEX "full_review_draft_fts_idx" ON "full_review_draft" USING GIN (fts);',
-    );
+    this.addSql('CREATE INDEX "persona_fts_idx" ON "persona" USING GIN (fts);');
   }
 }

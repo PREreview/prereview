@@ -2,6 +2,7 @@
 import React, { useContext, useCallback, useEffect, useState } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
+import Pagination from '@material-ui/lab/Pagination';
 import omit from 'lodash/omit';
 
 // contexts
@@ -41,10 +42,37 @@ import { ORG } from '../constants';
 // icons
 import { MdChevronRight, MdFirstPage } from 'react-icons/md';
 
+const processParams = search => {
+  const unprocessed = new URLSearchParams(search);
+  const processed = new URLSearchParams();
+  let page = 1;
+  let limit = 10;
+  for (const [key, value] of unprocessed) {
+    if (key.toLowerCase() === 'search') {
+      processed.append('search', value);
+    } else if (key.toLowerCase() === 'page') {
+      page = value;
+    } else if (key.toLowerCase() === 'limit') {
+      limit = value;
+    } else if (key.toLowerCase() === 'desc') {
+      processed.append('desc', value === 'true');
+    }
+  }
+
+  processed.append('page', page);
+  processed.append('limit', limit);
+  processed.append('offset', limit * (page - 1));
+
+  return processed;
+};
+
+
 const searchParamsToObject = params => {
   const obj = {};
-  for (const [key, value] of params) {
-    obj[key] = value;
+  for (const [key, value] of params.entries()) {
+    if (key !== 'page') {
+      obj[key] = value;
+    }
   }
   return obj;
 };
@@ -52,7 +80,7 @@ const searchParamsToObject = params => {
 export default function Home() {
   const history = useHistory();
   const location = useLocation();
-  const params = new URLSearchParams(location.search);
+  const params = processParams(location.search);
 
   const thisUser = useContext(UserContext);
   const isMobile = useIsMobile();
@@ -63,6 +91,7 @@ export default function Home() {
   const [newPreprints, setNewPreprints] = useNewPreprints();
 
   const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState(params.get('search') || '');
 
   const { data: preprints, loading: loadingPreprints, error } = useGetPreprints({
     queryParams: searchParamsToObject(params),
@@ -134,7 +163,26 @@ export default function Home() {
           }}
         />
 
-        <SearchBar isFetching={loadingPreprints} />
+        <SearchBar
+          defaultValue={search}
+          isFetching={loadingPreprints}
+          onChange={value => setSearch(value)}
+          onCancelSearch={() => {
+            params.delete('search');
+            setSearch('');
+            history.push({
+              pathname: location.pathame,
+              search: params.toString(),
+            });
+          }}
+          onRequestSearch={() => {
+            params.set('search', search);
+            history.push({
+              pathname: location.pathame,
+              search: params.toString(),
+            });
+          }}
+        />
 
         <div className="home__main">
           <div className="home__content">
@@ -195,9 +243,9 @@ export default function Home() {
                 }}
               />
             )}
-
             <SortOptions
-              value={params.get('sort') || 'score'}
+              sort={params.get('sort') || ''}
+              order={params.get('desc') === 'true' ? 'desc' : 'asc'}
               onMouseEnterSortOption={sortOption => {
                 setHoveredSortOption(sortOption);
               }}
@@ -205,15 +253,13 @@ export default function Home() {
                 setHoveredSortOption(null);
               }}
               onChange={(
-                nextSortOption, // `score` | `new` | `date`
+                sortOption,
+                sortOrder
               ) => {
-                const search = createPreprintQs(
-                  { sort: nextSortOption },
-                  location.search,
-                );
+                params.set('desc', sortOrder === 'desc');
                 history.push({
                   pathname: location.pathame,
-                  search,
+                  search: params.toString(),
                 });
               }}
             />
@@ -232,7 +278,7 @@ export default function Home() {
                       onNew={handleNew}
                       onNewReview={handleNewReview}
                       hoveredSortOption={hoveredSortOption}
-                      sortOption={params.get('sort') || 'score'}
+                      sortOption={params.get('desc') === 'true'}
                     />
                   </li>
                 ))}
@@ -263,7 +309,7 @@ export default function Home() {
                         onNew={handleNew}
                         onNewReview={handleNewReview}
                         hoveredSortOption={hoveredSortOption}
-                        sortOption={params.get('sort') || 'score'}
+                        sortOption={params.get('desc') === 'true'}
                       />
                     </li>
                   ))}
@@ -271,38 +317,17 @@ export default function Home() {
             )}
 
             <div className="home__pagination">
-              {!!(location.state && location.state.bookmark) && (
-                <Button
-                  onClick={() => {
-                    history.push({
-                      pathname: location.pathname,
-                      search: createPreprintQs(
-                        { text: params.get('q') },
-                        location.search,
-                      ),
-                    });
-                  }}
-                >
-                  <MdFirstPage /> First page
-                </Button>
-              )}
-              {/* Cloudant returns the same bookmark when it hits the end of the list */}
-              {preprints && preprints.length > 0 && (
-                <Button
-                  className="home__next-page-button"
-                  onClick={() => {
-                    history.push({
-                      pathname: location.pathname,
-                      search: createPreprintQs(
-                        { text: params.get('q') },
-                        location.search,
-                      ),
-                    });
-                  }}
-                >
-                  Next Page <MdChevronRight />
-                </Button>
-              )}
+              <Pagination
+                count={Math.ceil((preprints.totalCount / params.get('limit')))}
+                page={parseInt("" + params.get('page'))}
+                onChange={(ev, page) => {
+                  params.set('page', page);
+                  history.push({
+                    pathname: location.pathname,
+                    search: params.toString()
+                  });
+                }}
+              />
             </div>
           </div>
         </div>
