@@ -287,7 +287,10 @@ function StepPreprint({
         </Button>
         <Button
           onClick={e => {
-            onStep('NEW_REQUEST');
+            onViewInContext({
+              preprint,
+              tab: 'request'
+            })
           }}
           disabled={
             fetchActionsProgress.isActive ||
