@@ -28,7 +28,7 @@ export class Preprint extends BaseEntity {
   handle!: string;
 
   @Fixture(faker => `${faker.commerce.color()} ${faker.random.word()}`)
-  @Property()
+  @Property({ columnType: 'text' })
   title!: string;
 
   @Fixture(() => true)

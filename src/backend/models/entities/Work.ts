@@ -16,14 +16,14 @@ export class Work extends BaseEntity {
   [EntityRepositoryType]?: WorkModel;
 
   @Fixture(faker => `${faker.commerce.color()} ${faker.random.word()}`)
-  @Property({ nullable: true })
+  @Property({ columnType: 'text', nullable: true })
   title?: string;
 
   @ManyToOne({ entity: () => User })
   author!: User;
 
   @Fixture(faker => faker.internet.url())
-  @Property({ nullable: true })
+  @Property({ columnType: 'text', nullable: true })
   url?: string;
 
   @Fixture(faker => faker.random.word())
@@ -38,7 +38,7 @@ export class Work extends BaseEntity {
   publicationDate?: Date;
 
   @Fixture(faker => faker.random.word())
-  @Property({ nullable: true })
+  @Property({ columnType: 'text', nullable: true })
   publisher?: string;
 
   constructor(

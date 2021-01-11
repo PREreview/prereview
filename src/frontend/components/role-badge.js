@@ -95,7 +95,7 @@ const RoleBadgeUI = React.forwardRef(function RoleBadgeUI(
                       user.orcid
                         ? user.orcid
                         : user.identity
-                        ? user.identity
+                        ? user.identity.orcid
                         : user.id
                     }`
                   : undefined
@@ -108,14 +108,14 @@ const RoleBadgeUI = React.forwardRef(function RoleBadgeUI(
                       user.orcid
                         ? user.orcid
                         : user.identity
-                        ? user.identity
+                        ? user.identity.orcid
                         : user.id
                     }`
               }
             >
               {user && user.orcid
-                ? `View Profile ${user.name} (${user.orcid})`
-                : `View Profile ${user.name} (${user.id})`}
+                ? `View Profile ${user.defaultPersona.name} (${user.orcid})`
+                : `View Profile ${user.name} (${user.identity.orcid})`}
             </MenuLink>
             {children}
           </MenuList>
@@ -130,7 +130,7 @@ const RoleBadgeUI = React.forwardRef(function RoleBadgeUI(
                       user.orcid
                         ? user.orcid
                         : user.identity
-                        ? user.identity
+                        ? user.identity.orcid
                         : user.id
                     }`
                   : undefined
@@ -143,14 +143,14 @@ const RoleBadgeUI = React.forwardRef(function RoleBadgeUI(
                       user.orcid
                         ? user.orcid
                         : user.identity
-                        ? user.identity
+                        ? user.identity.orcid
                         : user.id
                     }`
               }
             >
               {user && user.orcid
-                ? `View Profile ${user.name} (${user.orcid})`
-                : `View Profile ${user.name} (${user.id})`}
+                ? `View Profile ${user.defaultPersona.name} (${user.orcid})`
+                : `View Profile ${user.name} (${user.identity.orcid})`}
             </MenuLink>
           </MenuList>
         )}

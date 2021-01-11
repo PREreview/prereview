@@ -27,7 +27,7 @@ export class Contact extends BaseEntity {
 
   @Fixture(() => false)
   @Property()
-  isVerified = false;
+  isVerified: boolean;
 
   constructor(
     schema: string,

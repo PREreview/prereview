@@ -90,35 +90,33 @@ export default function AdminPanel() {
             <div>
               <ul className="admin-panel__card-list">
                 {moderators.map(moderator => {
-                  return moderator.personas.map(persona => {
-                    if (moderator.defaultPersona === persona.identity) {
-                      return (
-                        <li
-                          key={persona.id}
-                          className="admin-panel__card-list-item"
-                        >
-                          <div className="admin-panel__card-list-item__left">
-                            <RoleBadgeUI user={persona} />
-                            <span>{persona.name}</span>
-                          </div>
-                          <div className="admin-panel__card-list-item__right">
-                            <LabelStyle>
-                              {persona.isActive ? 'Public' : 'Anonymous'}
-                            </LabelStyle>
-                            <IconButton
-                              className="admin-panel__remove-button"
-                              onClick={() => {
-                                setRevokeRole(moderator);
-                                setRevokeRolePersona(persona);
-                              }}
-                            >
-                              <MdClose className="admin-panel__remove-button-icon" />
-                            </IconButton>
-                          </div>
-                        </li>
-                      );
-                    }
-                  });
+                  if (moderator.defaultPersona) {
+                    return (
+                      <li
+                        key={moderator.id}
+                        className="admin-panel__card-list-item"
+                      >
+                        <div className="admin-panel__card-list-item__left">
+                          <RoleBadgeUI user={moderator} />
+                          <span>{moderator.defaultPersona.name}</span>
+                        </div>
+                        <div className="admin-panel__card-list-item__right">
+                          <LabelStyle>
+                            {!moderator.defaultPersona.isAnonymous ? 'Public' : 'Anonymous'}
+                          </LabelStyle>
+                          <IconButton
+                            className="admin-panel__remove-button"
+                            onClick={() => {
+                              setRevokeRole(moderator);
+                              setRevokeRolePersona(moderator.defaultPersona);
+                            }}
+                          >
+                            <MdClose className="admin-panel__remove-button-icon" />
+                          </IconButton>
+                        </div>
+                      </li>
+                    );
+                  }
                 })}
               </ul>
             </div>

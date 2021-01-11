@@ -135,7 +135,7 @@ export default function controller(groupModel, userModel, thisUser) {
 
       try {
         group = await groupModel.find({ name: groupName }, [
-          'members',
+          'members.defaultPersona',
           'members.personas',
         ]);
         if (!group) {
@@ -256,10 +256,10 @@ export default function controller(groupModel, userModel, thisUser) {
 
       try {
         group = await groupModel.findOne(ctx.params.id, [
-          'members',
+          'members.defaultPersona',
           'members.personas',
         ]);
-        user = await userModel.findOneByIdOrOrcid(ctx.params.uid, ['personas']);
+        user = await userModel.findOneByIdOrOrcid(ctx.params.uid, ['defaultPersona', 'personas']);
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse query: ${err}`);
