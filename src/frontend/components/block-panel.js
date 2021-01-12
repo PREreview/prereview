@@ -147,7 +147,7 @@ export default function BlockPanel() {
 function BlockPanelAddModal({ user, onClose, onSuccess }) {
   const [value, setValue] = useState('');
   const postGroup = usePostGroups();
-  const [frame, setFrame] = useState('input');
+  const [frame] = useState('input');
 
   const pattern =
     '^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$'; // uuid v4
@@ -228,8 +228,8 @@ BlockPanelAddModal.propTypes = {
 };
 
 function BlockPanelRemoveModal({ user, role, onClose, onSuccess }) {
-  const postGroup = PostGroup();
-  const [frame, setFrame] = useState('submit');
+  const postGroup = usePostGroups();
+  const [frame] = useState('submit');
 
   return (
     <Modal title="Revoke Moderator Permission">

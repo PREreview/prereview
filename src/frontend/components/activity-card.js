@@ -91,13 +91,13 @@ export default function ActivityCard({ activity }) {
               dateFirstActivity={activity.createdAt}
               onMouseEnter={activity.onStartAnim}
               onMouseLeave={activity.onStopAnim}
-              isAnimating={false}// #FIXME
+              isAnimating={false} // #FIXME
             />
             <div className="activity-card__count">
               <div className="activity-card__count-badge">
                 <AnimatedNumber
                   value={preprint.rapidReviews.length}
-                  isAnimating={false}// #FIXME
+                  isAnimating={false} // #FIXME
                 />
               </div>
               Rapid Review{preprint.rapidReviews.length > 1 ? 's' : ''}
@@ -106,7 +106,7 @@ export default function ActivityCard({ activity }) {
               <div className="activity-card__count-badge">
                 <AnimatedNumber
                   value={preprint.fullReviews.length}
-                  isAnimating={false}// #FIXME
+                  isAnimating={false} // #FIXME
                 />
               </div>
               Longform Review{preprint.fullReviews.length > 1 ? 's' : ''}
@@ -115,7 +115,7 @@ export default function ActivityCard({ activity }) {
               <div className="activity-card__count-badge">
                 <AnimatedNumber
                   value={preprint.requests.length}
-                  isAnimating={false}// #FIXME
+                  isAnimating={false} // #FIXME
                 />{' '}
               </div>
               Request{preprint.requests.length > 1 ? 's' : ''}

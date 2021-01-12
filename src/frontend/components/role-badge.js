@@ -163,6 +163,7 @@ RoleBadgeUI.propTypes = {
   showNotice: PropTypes.bool,
   tooltip: PropTypes.bool,
   user: PropTypes.shape({
+    defaultPersona: PropTypes.object,
     id: PropTypes.number,
     identity: PropTypes.number,
     orcid: PropTypes.string,

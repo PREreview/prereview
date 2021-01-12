@@ -83,17 +83,20 @@ export default function HeaderBar({ onClickMenuButton, closeGap, thisUser }) {
           People
         </a>
         <a
-          className="header-bar__nav-item" href="https://content.prereview.org/programs"
+          className="header-bar__nav-item"
+          href="https://content.prereview.org/programs"
         >
           Programs
         </a>
         <a
-          className="header-bar__nav-item" href="https://content.prereview.org/resources"
+          className="header-bar__nav-item"
+          href="https://content.prereview.org/resources"
         >
           Resources
         </a>
         <a
-          className="header-bar__nav-item" href="https://content.prereview.org/coc"
+          className="header-bar__nav-item"
+          href="https://content.prereview.org/coc"
         >
           {isMobile ? (
             <abbr title="Code of Conduct">CoC</abbr>
@@ -102,7 +105,8 @@ export default function HeaderBar({ onClickMenuButton, closeGap, thisUser }) {
           )}
         </a>
         <a
-          className="header-bar__nav-item" href="https://content.prereview.org"
+          className="header-bar__nav-item"
+          href="https://content.prereview.org"
         >
           Blog
         </a>

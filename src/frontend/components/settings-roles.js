@@ -225,7 +225,8 @@ SettingsRoles.propTypes = {
 function MakeActivePersonaModalButton({ user, persona }) {
   const [isOpen, setIsOpen] = useState(false);
   const { mutate: updateUser, loading, error } = usePutUser({
-    id: user.id});
+    id: user.id,
+  });
 
   return (
     <Fragment>
