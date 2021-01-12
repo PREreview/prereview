@@ -24,7 +24,7 @@ services:
       - "443:443"
       - "80:80"
     volumes:
-      - "${WEBAPP_STORAGE_HOME}/certs:/letsencrypt"
+      - "/certs:/letsencrypt"
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
 
   prereview:
