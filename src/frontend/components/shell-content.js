@@ -107,11 +107,11 @@ export default function ShellContent({
 
       if (preprint.rapidReviews.length) {
         preprint.rapidReviews.map(review => {
-          user.personas.some(persona => {
-            if (persona.identity === review.author.identity) {
-              setHasRapidReviewed(true);
-            }
-          });
+          console.log('review: ', review);
+          console.log('user', user);
+          if (review.author.id === user.defaultPersona.identity) {
+            setHasRapidReviewed(true);
+          }
         });
       }
 

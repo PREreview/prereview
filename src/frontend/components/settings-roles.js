@@ -113,7 +113,6 @@ export default function SettingsRoles({ user }) {
           </TableHead>
           <TableBody>
             {user.personas.map(persona => {
-              console.log(persona);
               return (
                 <TableRow key={persona.id}>
                   <TableCell>
@@ -136,6 +135,7 @@ export default function SettingsRoles({ user }) {
                   <TableCell>
                     <div className="settings__persona-list-item__username">
                       <RoleBadgeUI
+                        disabled={true}
                         user={persona}
                         className="settings__persona-badge"
                       />

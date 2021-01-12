@@ -1,16 +1,27 @@
-import React from 'react';
+// base imports
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { Link } from 'react-router-dom';
-import { MdPerson } from 'react-icons/md';
-import { Menu, MenuList, MenuButton, MenuLink } from '@reach/menu-button';
 import classNames from 'classnames';
 import Tooltip from '@reach/tooltip';
+import ExpandToggle from '@threespot/expand-toggle';
+
+// components
 import NoticeBadge from './notice-badge';
+import XLink from './xlink';
+
+// icons
+import { MdPerson } from 'react-icons/md';
 
 const RoleBadge = React.forwardRef(function RoleBadge(
   { children, className, tooltip, showNotice, disabled, user },
   ref,
 ) {
+  useEffect(() => {
+    const toggles = document.querySelectorAll('[data-expands]');
+
+    toggles.forEach(el => new ExpandToggle(el));
+  }, []);
+
   return (
     <RoleBadgeUI
       ref={ref}
@@ -44,14 +55,20 @@ const RoleBadgeUI = React.forwardRef(function RoleBadgeUI(
   ref,
 ) {
   return (
-    <Menu>
+    <>
       <div className="role-badge-menu-container">
         {showNotice && <NoticeBadge />}
-        <MenuButton
+        <button
+          type="button"
+          data-expands={user.id}
+          data-expands-class="is-expanded"
+          data-expands-height
           className={classNames('role-badge-menu', className)}
           disabled={disabled}
         >
-          {/*NOTE: the `ref` is typically used for Drag and Drop: we need 1 DOM element that will be used as the drag preview */}
+          <span data-expands-text="Close" className="vh">
+            Open
+          </span>
           <Tooltipify tooltip={tooltip} user={user}>
             <div ref={ref}>
               <div
@@ -78,84 +95,42 @@ const RoleBadgeUI = React.forwardRef(function RoleBadgeUI(
               />
             </div>
           </Tooltipify>
-        </MenuButton>
-
-        {/* Note: MenuList is currently bugged if children is undefined hence the ternary */}
-        {children ? (
-          <MenuList
-            className="menu__list"
-            style={{ display: disabled ? 'none' : 'block' }}
-          >
-            <MenuLink
-              as={process.env.IS_EXTENSION ? undefined : Link}
-              className="menu__list__link-item"
-              href={
-                process.env.IS_EXTENSION
-                  ? `about/${
-                      user.orcid
-                        ? user.orcid
-                        : user.identity
-                        ? user.identity.orcid
-                        : user.id
-                    }`
-                  : undefined
-              }
-              target={process.env.IS_EXTENSION ? '_blank' : undefined}
-              to={
-                process.env.IS_EXTENSION
-                  ? undefined
-                  : `/about/${
-                      user.orcid
-                        ? user.orcid
-                        : user.identity
-                        ? user.identity.orcid
-                        : user.id
-                    }`
-              }
-            >
-              {user && user.orcid
-                ? `View Profile ${user.defaultPersona.name} (${user.orcid})`
-                : `View Profile ${user.name} (${user.identity.orcid})`}
-            </MenuLink>
-            {children}
-          </MenuList>
-        ) : (
-          <MenuList className="menu__list">
-            <MenuLink
-              as={process.env.IS_EXTENSION ? undefined : Link}
-              className="menu__list__link-item"
-              href={
-                process.env.IS_EXTENSION
-                  ? `about/${
-                      user.orcid
-                        ? user.orcid
-                        : user.identity
-                        ? user.identity.orcid
-                        : user.id
-                    }`
-                  : undefined
-              }
-              target={process.env.IS_EXTENSION ? '_blank' : undefined}
-              to={
-                process.env.IS_EXTENSION
-                  ? undefined
-                  : `/about/${
-                      user.orcid
-                        ? user.orcid
-                        : user.identity
-                        ? user.identity.orcid
-                        : user.id
-                    }`
-              }
-            >
-              {user && user.orcid
-                ? `View Profile ${user.defaultPersona.name} (${user.orcid})`
-                : `View Profile ${user.name} (${user.identity.orcid})`}
-            </MenuLink>
-          </MenuList>
-        )}
+        </button>
       </div>
-    </Menu>
+      <div className="menu__list expandable" id={user.id}>
+        <XLink
+          className="menu__list__link-item"
+          href={
+            process.env.IS_EXTENSION
+              ? `/about/${
+                  user.orcid
+                    ? user.orcid
+                    : user.identity
+                    ? user.identity.orcid
+                    : user.id
+                }`
+              : undefined
+          }
+          target={process.env.IS_EXTENSION ? '_blank' : undefined}
+          to={
+            process.env.IS_EXTENSION
+              ? undefined
+              : `/about/${
+                  user.orcid
+                    ? user.orcid
+                    : user.identity
+                    ? user.identity.orcid
+                    : user.id
+                }`
+          }
+        >
+          {user && user.defaultPersona
+            ? `View Profile ${user.defaultPersona.name}`
+            : `View Profile ${user.name}`}
+        </XLink>
+        {children}
+      </div>
+    </>
   );
 });
 

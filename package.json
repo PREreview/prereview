@@ -126,6 +126,7 @@
     "@remirror/pm": "^1.0.0-next.58",
     "@sendgrid/mail": "^7.2.1",
     "@storybook/addon-actions": "^5.3.19",
+    "@threespot/expand-toggle": "^1.6.2",
     "@types/statuses": "^2.0.0",
     "anonymus": "^2.0.0",
     "babel-polyfill": "^6.26.0",

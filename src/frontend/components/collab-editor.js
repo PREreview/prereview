@@ -12,7 +12,7 @@ import { WysiwygPreset } from 'remirror/preset/wysiwyg';
 
 let EXTENSIONS = [
   // new PlaceholderExtension(),
-  new WysiwygPreset(),
+  // new WysiwygPreset(),
 ];
 
 const EditorWrapper = ({ initialContent, handleContentChange }) => {
@@ -46,6 +46,7 @@ const EditorWrapper = ({ initialContent, handleContentChange }) => {
         manager={manager}
         value={value}
         onChange={parameter => {
+          console.log(parameter.state);
           // Update the state to the latest value.
           setValue(parameter.state);
           handleContentChange(parameter.getHTML());
