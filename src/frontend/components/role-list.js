@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { useDrag, useDrop } from 'react-dnd';
 import classNames from 'classnames';
 import { MdClear } from 'react-icons/md';
-import { MenuItem } from '@reach/menu-button';
 import RoleBadge from './role-badge';
 import IconButton from './icon-button';
 
@@ -87,14 +86,14 @@ export function PotentialRoles({
                         }}
                       >
                         {user && user.isAdmin && (
-                          <MenuItem
+                          <div
                             disabled={isModerationInProgress || author.identity}
                             onSelect={() => {
                               onModerate(author.identity);
                             }}
                           >
                             Report Review
-                          </MenuItem>
+                          </div>
                         )}
                       </DraggableRoleBadge>
                     </li>
@@ -111,7 +110,7 @@ export function PotentialRoles({
                       }}
                     >
                       {user && user.isAdmin && (
-                        <MenuItem
+                        <div
                           disabled={
                             isModerationInProgress || review.author.identity
                           }
@@ -120,7 +119,7 @@ export function PotentialRoles({
                           }}
                         >
                           Report Review
-                        </MenuItem>
+                        </div>
                       )}
                     </DraggableRoleBadge>
                   </li>
@@ -238,23 +237,23 @@ export function HighlightedRoles({
                       onRemoved([roleId]);
                     }}
                   >
-                    <MenuItem
+                    <div
                       onSelect={() => {
                         onRemoved([roleId]);
                       }}
                     >
                       Remove
-                    </MenuItem>
+                    </div>
 
                     {!!canModerate && !!reviewer && (
-                      <MenuItem
+                      <div
                         disabled={isModerationInProgress || reviewer}
                         onSelect={() => {
                           onModerate(reviewer);
                         }}
                       >
                         Report Review
-                      </MenuItem>
+                      </div>
                     )}
                   </DraggableRoleBadge>
                 </li>

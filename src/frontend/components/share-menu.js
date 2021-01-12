@@ -1,43 +1,56 @@
+// base imports
 import React, { Fragment, useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
-import { MdShare } from 'react-icons/md';
 import copy from 'clipboard-copy';
-import {
-  Menu,
-  MenuList,
-  MenuButton,
-  MenuLink,
-  MenuItem,
-} from '@reach/menu-button';
+import ExpandToggle from '@threespot/expand-toggle';
 import VisuallyHidden from '@reach/visually-hidden';
+
+// utils
 import { createPreprintId } from '../utils/ids';
 import { unprefix } from '../utils/jsonld';
-import Modal from './modal';
+
+// components
 import Button from './button';
 import Controls from './controls';
+import Modal from './modal';
 import XLink from './xlink';
+
+// icons
+import { MdShare } from 'react-icons/md';
 
 export default function ShareMenu({ identifier, roleIds = [] }) {
   const [permalink, setPermalink] = useState(null);
 
+  useEffect(() => {
+    const toggle = document.getElementById('expand-preprint');
+
+    new ExpandToggle(toggle);
+  }, []);
+
   return (
     <Fragment>
-      <Menu>
-        <MenuButton className="share-menu">
+      <div className="share-menu-container">
+        <button
+          className="share-menu"
+          data-expands="preprint"
+          data-expands-class="is-expanded"
+          data-expands-height
+          id="expand-preprint"
+        >
           <VisuallyHidden>Share</VisuallyHidden>
           <MdShare className="share-menu__icon" />
-        </MenuButton>
-        <MenuList>
-          <MenuItem
-            onSelect={() => {
-              setPermalink(`${identifier}`);
-            }}
+        </button>
+        <div className="menu__list expandable" id="preprint">
+          <XLink
+            className="menu__list__link-item"
+            download="rapid-prereview-data.jsonld"
+            href={`/api/v2/preprint/${unprefix(createPreprintId(identifier))}`}
           >
             Permalink
-          </MenuItem>
+          </XLink>
 
           {!!(roleIds && roleIds.length) && (
-            <MenuItem
+            <div
               className="menu__list"
               onSelect={() => {
                 const qs = new URLSearchParams();
@@ -47,18 +60,18 @@ export default function ShareMenu({ identifier, roleIds = [] }) {
               }}
             >
               Permalink (for selected user{roleIds.length > 1 ? 's' : ''})
-            </MenuItem>
+            </div>
           )}
 
-          <MenuLink
+          <XLink
             className="menu__list__link-item"
             download="rapid-prereview-data.jsonld"
-            href={`api/v2/preprint/${unprefix(createPreprintId(identifier))}`}
+            href={`/api/v2/preprint/${unprefix(createPreprintId(identifier))}`}
           >
             Download data (JSON-LD)
-          </MenuLink>
-        </MenuList>
-      </Menu>
+          </XLink>
+        </div>
+      </div>
 
       {!!permalink && (
         <PermalinkModal
