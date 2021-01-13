@@ -115,7 +115,7 @@ export default function controller(users, personas, config, thisUser) {
 
         try {
           await users.em.flush();
-          await personas.em.flush()
+          await personas.em.flush();
         } catch (err) {
           log.debug('Error saving user and personas to database.', err);
         }

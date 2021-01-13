@@ -2,5 +2,5 @@
 // the user object received here is ctx.state.user
 
 export default async function getActivePersona(user) {
-  return user.defaultPersona
+  return user.defaultPersona;
 }
