@@ -113,13 +113,15 @@ export default function SettingsRoles({ user }) {
           </TableHead>
           <TableBody>
             {user.personas.map(persona => {
-              console.log(user)
-              console.log(persona);
+              console.log('USER*******', user.defaultPersona, user)
+              console.log('persona*********', persona);
+              console.log("user.id", user.id)
+              console.log("persona.id", persona.id)
               return (
                 <TableRow key={persona.id}>
                   <TableCell>
                     <div className="settings__persona-list-item__active-state">
-                      {user.defaultPersona === persona.id ? (
+                      {user.defaultPersona === persona.id || user.defaultPersona.id === persona.id ? (
                         <span className="settings__persona-list-item__is-active">
                           <MdStar className="settings__persona-active-icon" />
                           <span className="settings__persona-active-label">
@@ -152,7 +154,7 @@ export default function SettingsRoles({ user }) {
                   </TableCell>
                   <TableCell>
                     <div className="settings__persona-status">
-                      {persona.isActive ? (
+                      {!persona.isAnonymous ? (
                         <div className="settings__persona-status__icon-container">
                           <MdPublic className="settings__persona-status__icon" />{' '}
                           <span className="settings__persona-status__label">
