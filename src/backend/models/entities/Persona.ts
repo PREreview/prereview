@@ -26,8 +26,8 @@ export class Persona extends BaseEntity {
   @Unique()
   name!: string;
 
-  @ManyToOne({ entity: () => User })
-  identity!: User;
+  @ManyToOne({ entity: () => User, nullable: true })
+  identity?: User;
 
   @Fixture(() => false)
   @Property()

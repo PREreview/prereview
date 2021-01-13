@@ -1,12 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { MdArrowUpward } from 'react-icons/md';
+import { MdArrowUpward, MdArrowDownward } from 'react-icons/md';
 import Tooltip from '@reach/tooltip';
 import { useIsMobile } from '../hooks/ui-hooks';
 
 export default function SortOptions({
-  value,
+  sort,
+  order,
   onChange,
   onMouseEnterSortOption,
   onMouseLeaveSortOption,
@@ -15,11 +16,11 @@ export default function SortOptions({
 
   return (
     <div className="sort-options">
-      {['score', 'reviewed', 'requested', 'date'].map(name => (
+      {['date'].map(name => (
         <div
           key={name}
           className={classNames('sort-options__item', {
-            'sort-options__item--active': name === value,
+            'sort-options__item--active': name === sort,
           })}
         >
           <input
@@ -27,11 +28,11 @@ export default function SortOptions({
             id={`sort-options-${name}`}
             name={name}
             value={name}
-            disabled={name === value}
-            checked={name === value}
-            onChange={e => {
+            disabled={name === sort}
+            checked={name === sort}
+            onClick={e => {
               const sortOption = e.target.value;
-              onChange(sortOption);
+              onChange(sort, order === 'asc' ? 'desc' : 'asc');
               if (!isMobile) {
                 onMouseLeaveSortOption(sortOption);
               }
@@ -84,11 +85,19 @@ export default function SortOptions({
             </label>
           </Tooltip>
 
-          <MdArrowUpward
-            className={classNames('sort-options__icon', {
-              'sort-options__icon--selected': name === value,
-            })}
-          />
+          {order === 'asc' ? (
+            <MdArrowUpward
+              className={classNames('sort-options__icon', {
+                'sort-options__icon--selected': name === sort,
+              })}
+            />
+          ) : (
+            <MdArrowDownward
+              className={classNames('sort-options__icon', {
+                'sort-options__icon--selected': name === sort,
+              })}
+            />
+          )}
         </div>
       ))}
     </div>
@@ -97,7 +106,8 @@ export default function SortOptions({
 
 SortOptions.propTypes = {
   onChange: PropTypes.func.isRequired,
-  value: PropTypes.oneOf(['score', 'reviewed', 'requested', 'new', 'date']),
+  sort: PropTypes.oneOf(['score', 'reviewed', 'requested', 'new', 'date']),
+  order: PropTypes.string,
   onMouseEnterSortOption: PropTypes.func.isRequired,
   onMouseLeaveSortOption: PropTypes.func.isRequired,
 };

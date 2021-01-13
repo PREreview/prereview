@@ -43,7 +43,7 @@ export class PreprintModel extends EntityRepository<Preprint> {
         .table('preprint')
         .select('*')
         .whereRaw("fts @@ websearch_to_tsquery('english'::regconfig, ?)", [
-          query.search,
+          `${query.search}:*`,
         ])
         .modify(qb => {
           if (query.desc) {
@@ -60,7 +60,12 @@ export class PreprintModel extends EntityRepository<Preprint> {
             qb.offset(query.offset);
           }
         });
-      count = await knex.table('preprint').count();
+      count = await knex
+        .table('preprint')
+        .count()
+        .whereRaw("fts @@ websearch_to_tsquery('english'::regconfig, ?)", [
+          `${query.search}:*`,
+        ]);
       count = count[0]['count'];
     } else if (connection instanceof SqliteConnection) {
       const knex = connection.getKnex();

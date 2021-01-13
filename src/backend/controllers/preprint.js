@@ -14,7 +14,7 @@ const querySchema = Joi.object({
     .greater(-1),
   offset: Joi.number()
     .integer()
-    .positive(),
+    .greater(-1),
   desc: Joi.boolean(),
   search: Joi.string().allow(''),
 });

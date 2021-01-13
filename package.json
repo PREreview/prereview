@@ -38,10 +38,7 @@
     "watch:backend:dev": "parcel watch --target=backend --no-cache src/backend/index.js",
     "build:frontend": "parcel build --target=frontend --no-scope-hoist src/frontend/index.html",
     "build:frontend:dev": "parcel build --target=frontend --no-minify --no-scope-hoist src/frontend/index.html",
-    "build:scripts:import": "npm run build:scripts:import:prereview && npm run build:scripts:import:osrpre && npm run build:scripts:couchdb",
-    "build:scripts:import:prereview": "parcel build --target=prereview-import-script --no-scope-hoist --no-minify --no-cache src/backend/scripts/dbImportPrereviewOrg.js",
-    "build:scripts:import:osrpre": "parcel build --target=osrpre-import-script --no-scope-hoist --no-minify --no-cache src/backend/scripts/dbImportOSrPRE.js",
-    "build:scripts:couchdb": "parcel build --target=couchdb-backup-script --no-scope-hoist --no-minify --no-cache src/backend/scripts/couchDbBackup.js",
+    "build:scripts:import": "parcel build --target=import-script --no-scope-hoist --no-minify --no-cache src/backend/scripts/dbImport.js",
     "build:scripts:migrations": "npm run scan:migrations && parcel build --target=migrations-script --no-scope-hoist --no-minify --no-cache src/backend/scripts/dbMigrations.ts",
     "build:scripts:seeds": "parcel build --target=seeds-script --no-scope-hoist --no-minify --no-cache src/backend/scripts/dbSeeds.ts",
     "build:scripts:init": "parcel build --target=init-script --no-scope-hoist --no-minify --no-cache src/backend/scripts/dbInit.ts",
@@ -51,10 +48,7 @@
     "db:migrations:test": "ts-node src/backend/scripts/dbMigrations.ts",
     "db:seeds": "ts-node src/backend/scripts/dbSeeds.ts",
     "db:init": "node dist/scripts/dbInit.js",
-    "db:import:prereview": "node dist/scripts/dbImportPrereviewOrg.js",
-    "db:import:osrpre": "node dist/scripts/dbImportOSrPRE.js",
-    "db:import": "npm run db:import:prereview && npm run db:couchdb && npm run db:import:osrpre",
-    "db:couchdb": "node dist/scripts/couchDbBackup.js",
+    "db:import": "node dist/scripts/dbImport.js",
     "scan:migrations": "barrelsby --delete -l below -d src/backend/db/migrations",
     "start:backend": "node dist/backend/index.js",
     "start:backend:dev": "nodemon -w dist/backend --enable-source-maps dist/backend/index.js -p 3001",
@@ -66,9 +60,7 @@
   },
   "backend": "dist/backend/index.js",
   "frontend": "dist/frontend/index.html",
-  "prereview-import-script": "dist/scripts/dbImportPrereviewOrg.js",
-  "osrpre-import-script": "dist/scripts/dbImportOSrPRE.js",
-  "couchdb-backup-script": "dist/scripts/couchDbBackup.js",
+  "import-script": "dist/scripts/dbImport.js",
   "migrations-script": "dist/scripts/dbMigrations.js",
   "seeds-script": "dist/scripts/dbSeeds.js",
   "init-script": "dist/scripts/dbInit.js",
@@ -81,15 +73,7 @@
       "context": "browser",
       "distDir": "dist/frontend"
     },
-    "osrpre-import-script": {
-      "context": "node",
-      "distDir": "dist/scripts"
-    },
-    "prereview-import-script": {
-      "context": "node",
-      "distDir": "dist/scripts"
-    },
-    "couchdb-backup-script": {
+    "import-script": {
       "context": "node",
       "distDir": "dist/scripts"
     },
@@ -125,6 +109,7 @@
     "@koa/router": "^8.0.6",
     "@material-ui/core": "^4.11.2",
     "@material-ui/icons": "^4.9.1",
+    "@material-ui/lab": "^4.0.0-alpha.57",
     "@material-ui/pickers": "^3.2.10",
     "@material-ui/styles": "^4.9.0",
     "@mikro-orm/core": "^4.3.4",
@@ -137,6 +122,7 @@
     "@reach/menu-button": "^0.10.5",
     "@reach/tooltip": "^0.10.5",
     "@reach/visually-hidden": "^0.10.4",
+    "@remirror/editor-wysiwyg": "^0.13.1",
     "@remirror/pm": "^1.0.0-next.58",
     "@sendgrid/mail": "^7.2.1",
     "@storybook/addon-actions": "^5.3.19",
@@ -193,6 +179,7 @@
     "log4js": "^6.3.0",
     "lru-cache": "^6.0.0",
     "match-sorter": "^4.2.0",
+    "material-ui-search-bar": "^1.0.0",
     "moment": "^2.27.0",
     "ndjson": "^2.0.0",
     "node-fetch": "^2.6.1",

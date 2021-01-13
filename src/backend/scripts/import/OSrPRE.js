@@ -1,7 +1,6 @@
 import fs from 'fs';
 import _ from 'lodash';
 import ndjson from 'ndjson';
-import { dbWrapper } from '../db.ts';
 import {
   fullReviewModelWrapper,
   personaModelWrapper,
@@ -9,10 +8,10 @@ import {
   rapidReviewModelWrapper,
   requestModelWrapper,
   userModelWrapper,
-} from '../models/index.ts';
+} from '../../models/index.ts';
 import anonymus from 'anonymus';
-import { resolvePreprint } from '../utils/resolve.ts';
-import { getOrcidPerson, getOrcidWorks } from '../utils/orcid.js';
+import { resolvePreprint } from '../../utils/resolve.ts';
+import { getOrcidPerson, getOrcidWorks } from '../../utils/orcid.js';
 import {
   Contact,
   FullReview,
@@ -21,7 +20,7 @@ import {
   RapidReview,
   Request,
   Work,
-} from '../models/entities/index.ts';
+} from '../../models/entities/index.ts';
 import PQueue from 'p-queue';
 
 const queue = new PQueue({ concurrency: 1 });
@@ -97,7 +96,7 @@ async function OSrPREImportReview(
       let full;
       const rapid = new RapidReview(persona, preprint);
       record.resultReview.reviewAnswer.map(answer => {
-        const key = answer.parentItem.split(':')[1];
+        const key = answer.parentItem['@id'].split(':')[1];
         if (key.startsWith('yn')) {
           if (answer.text === 'n.a.') {
             answer.text = 'N/A';
@@ -186,9 +185,9 @@ async function OSrPREImportPreprint(record, preprintModel) {
     } else {
       console.log(`OSrPRE: Duplicate preprint ${handle}, skipping`);
     }
-    console.log('OSrPRE: Flushing preprints to disk.');
+    //console.log('OSrPRE: Flushing preprints to disk.');
     //await preprintModel.flush();
-    console.log('OSrPRE: Done flushing preprints to disk.');
+    //console.log('OSrPRE: Done flushing preprints to disk.');
     return preprint;
   } catch (err) {
     console.error('Failed to import:', err);
@@ -203,6 +202,10 @@ async function OSrPREImportUser(
   isAnon,
 ) {
   return async record => {
+    if ((await userModel.findOne({ orcid: record.orcid })) !== null) {
+      console.log(`OSrPRE: Duplicate user ${record.orcid}, skipping`);
+      return;
+    }
     try {
       record.createdAt = new Date(record.dateCreated);
       let person, works;
@@ -246,6 +249,12 @@ async function OSrPREImportUser(
           await Promise.all(
             record.hasRole.map(async id => {
               if (isAnon.get(id) === false) {
+                if ((await personaModel.findOne({ name: name })) !== null) {
+                  console.log(
+                    `OSrPRE: Duplicate persona name ${name}, skipping.`,
+                  );
+                  return;
+                }
                 personaObject = personaModel.create({
                   name: name,
                   isAnonymous: false,
@@ -403,7 +412,7 @@ async function OSrPREImportUser(
         createdAt: record.dateCreated,
       });
 
-      personaModel.persist([anonPersonaObject, personaObject]);
+      //personaModel.persist([anonPersonaObject, personaObject]);
       await userModel.persistAndFlush(userObject);
       usersMap.set(record['@id'], userObject);
       return;
@@ -413,11 +422,10 @@ async function OSrPREImportUser(
   };
 }
 
-async function main() {
+export default async function run(db) {
   const userMap = new Map();
   const personaMap = new Map();
   const anonMap = new Map();
-  const [db] = await dbWrapper();
   const fullReviewModel = fullReviewModelWrapper(db);
   const personaModel = personaModelWrapper(db);
   const preprintModel = preprintModelWrapper(db);
@@ -448,10 +456,6 @@ async function main() {
       personaMap,
     ),
   );
-  await db.close();
+  await queue.onIdle();
   return;
 }
-
-main()
-  .then(() => console.log('Finished importing OSrPRE'))
-  .catch(err => console.error('Error importing OSrPRE:', err));
