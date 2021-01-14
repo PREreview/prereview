@@ -1,32 +1,5 @@
 version: "3"
 services:
-  traefik:
-    image: traefik:v2.3
-    container_name: traefik
-    networks:
-      - prereview-private
-      - prereview-public
-    command:
-      - "--log.level=DEBUG"
-      - "--api.insecure=true"
-      - "--providers.docker=true"
-      - "--providers.docker.exposedbydefault=false"
-      - "--entrypoints.web.address=:80"
-      - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
-      - "--entrypoints.web.http.redirections.entryPoint.scheme=https"
-      - "--entrypoints.web.http.redirections.entrypoint.permanent=true"
-      - "--entrypoints.websecure.address=:443"
-      - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
-      #- "--certificatesresolvers.myresolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
-      - "--certificatesresolvers.myresolver.acme.email=daniela@prereview.org"
-      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
-    ports:
-      - "443:443"
-      - "80:80"
-    volumes:
-      - "/certs:/letsencrypt"
-      - "/var/run/docker.sock:/var/run/docker.sock:ro"
-
   prereview:
     image: prereview.azurecr.io/prereview:staging
     depends_on:
@@ -34,6 +7,8 @@ services:
     networks:
       - prereview-private
       - prereview-public
+    ports:
+      - "80:3000"
     environment:
       NODE_ENV: staging
       PREREVIEW_LOG_LEVEL: debug
@@ -45,11 +20,6 @@ services:
       PREREVIEW_DB_USER: prereview
       PREREVIEW_DB_NAME: prereview
       PREREVIEW_ORCID_SANDBOX: true
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.prereview.rule=Host(`${PREREVIEW_DOMAIN}`)"
-      - "traefik.http.routers.prereview.entrypoints=websecure"
-      - "traefik.http.routers.prereview.tls.certresolver=myresolver"
 
   prereview-db:
     image: postgres:12-alpine
