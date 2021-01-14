@@ -86,30 +86,27 @@ export default function ShellContent({
   };
 
   useEffect(() => {
+    console.log(initialContent);
     if (user) {
       if (preprint.fullReviews.length) {
         preprint.fullReviews.map(review => {
           review.authors.map(author => {
-            user.personas.some(persona => {
-              if (persona.identity === author.identity) {
-                if (review.published === true) {
-                  setHasLongReviewed(true);
-                } else {
-                  setInitialContent(
-                    review.drafts[review.drafts.length - 1].contents,
-                  );
-                }
+            if (author.id === user.defaultPersona.id) {
+              if (review.published === true) {
+                setHasLongReviewed(true);
+              } else {
+                setInitialContent(
+                  review.drafts[review.drafts.length - 1].contents,
+                );
               }
-            });
+            }
           });
         });
       }
 
       if (preprint.rapidReviews.length) {
         preprint.rapidReviews.map(review => {
-          console.log('review: ', review);
-          console.log('user', user);
-          if (review.author.id === user.defaultPersona.identity) {
+          if (review.author.id === user.defaultPersona.id) {
             setHasRapidReviewed(true);
           }
         });
@@ -121,7 +118,7 @@ export default function ShellContent({
           request.author.id
             ? (author = request.author.id)
             : (author = request.author);
-          setHasRequested(user.personas.some(persona => persona.id === author));
+          setHasRequested(user.defaultPersona.id === author);
         });
       }
     }
@@ -133,6 +130,7 @@ export default function ShellContent({
     rapidContent,
     longContent,
     hasRequested,
+    initialContent,
   ]);
 
   return (

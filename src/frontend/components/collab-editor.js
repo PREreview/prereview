@@ -1,63 +1,56 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 
 // Remirror
-import { RemirrorProvider, useManager } from 'remirror/react';
+import { useManager } from 'remirror/react';
 import { fromHtml } from 'remirror/core';
 
 // Remirror extensions
-import { WysiwygEditor } from '@remirror/editor-wysiwyg';
+// import { WysiwygEditor } from '@remirror/editor-wysiwyg';
+import {
+  WysiwygEditor,
+  WysiwygProvider,
+} from '@remirror/react-wysiwyg';
 import { WysiwygPreset } from 'remirror/preset/wysiwyg';
 // import { YjsExtension } from 'remirror/extension/yjs';
 
-let EXTENSIONS = [
-  // new PlaceholderExtension(),
-  // new WysiwygPreset(),
-];
+let EXTENSIONS = [];
 
 const EditorWrapper = ({ initialContent, handleContentChange }) => {
-  const manager = useManager(EXTENSIONS);
-  const preset = new WysiwygPreset();
-  preset.createExtensions();
-  console.log(preset);
-  const [isLoaded, setIsLoaded] = useState(false);
+  const manager = useManager();
   const [value, setValue] = useState(() =>
-    // Use the `remirror` manager to create the state.
     manager.createState({
       content: initialContent,
       stringHandler: fromHtml,
     }),
   );
+  // const initialValue = manager.createState({
+  //   content: initialContent,
+  //   stringHandler: fromHtml,
+  // });
+  //
+  // console.log(manager.getState());
 
-  useEffect(() => {
-    if (window) {
-      // EXTENSIONS.push(new YjsExtension(), new CollaborationExtension());
-
-      setIsLoaded(true);
-    }
+  const onChange = useCallback(parameter => {
+    setValue(parameter.state);
+    handleContentChange(parameter.getHTML());
   }, []);
 
-  if (!isLoaded) {
-    return <div>Loading...</div>;
-  } else {
-    return (
-      <RemirrorProvider
-        placeholder={'Start typing...'}
-        manager={manager}
-        value={value}
-        onChange={parameter => {
-          console.log(parameter.state);
-          // Update the state to the latest value.
-          setValue(parameter.state);
-          handleContentChange(parameter.getHTML());
-        }}
-      >
-        <div>
-          <WysiwygEditor />
-        </div>
-      </RemirrorProvider>
-    );
-  }
+  useEffect(() => {
+    console.log(WysiwygProvider);
+  }, [value]);
+
+  return (
+    <WysiwygProvider
+      // manager={manager}
+      stringHandler={fromHtml}
+      // content={value}
+      // value={value}
+      onChange={onChange}
+    >
+      <WysiwygEditor content={value} />
+    </WysiwygProvider>
+  );
 };
 
 EditorWrapper.propTypes = {
