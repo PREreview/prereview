@@ -86,6 +86,17 @@
   & li:last-child {
     margin-right: 0;
   }
+
+  &-item {
+    position: relative;
+
+    & .menu__list {
+      height: 24px !important;
+      left: 0;
+      top: 40px;
+      z-index: 100;
+    }
+  }
 }
 
 .role-list--can-drop {

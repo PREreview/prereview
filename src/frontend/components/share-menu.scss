@@ -43,6 +43,8 @@
 }
 
 .share-menu-container {
+  position: relative;
+
   .expandable {
     $transition-speed: 400ms;
 
@@ -80,7 +82,8 @@
     padding: 1rem 0.5rem;
     position: absolute;
     right: 0;
-    top: 0%;
+    top: 26px;
+    width: 150px;
     z-index: 100;
 
     &[aria-hidden="false"] {

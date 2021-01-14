@@ -249,8 +249,10 @@ async function OSrPREImportUser(
           await Promise.all(
             record.hasRole.map(async id => {
               if (isAnon.get(id) === false) {
-                if (await personaModel.findOne({ name: name }) !== null) {
-                  console.log(`OSrPRE: Duplicate persona name ${name}, skipping.`);
+                if ((await personaModel.findOne({ name: name })) !== null) {
+                  console.log(
+                    `OSrPRE: Duplicate persona name ${name}, skipping.`,
+                  );
                   return;
                 }
                 personaObject = personaModel.create({

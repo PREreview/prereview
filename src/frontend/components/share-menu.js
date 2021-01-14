@@ -2,7 +2,6 @@
 import React, { Fragment, useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import copy from 'clipboard-copy';
-import ExpandToggle from '@threespot/expand-toggle';
 import VisuallyHidden from '@reach/visually-hidden';
 
 // utils
@@ -20,12 +19,6 @@ import { MdShare } from 'react-icons/md';
 
 export default function ShareMenu({ identifier, roleIds = [] }) {
   const [permalink, setPermalink] = useState(null);
-
-  useEffect(() => {
-    const toggle = document.getElementById('expand-preprint');
-
-    new ExpandToggle(toggle);
-  }, []);
 
   return (
     <Fragment>

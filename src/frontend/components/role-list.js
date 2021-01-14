@@ -77,7 +77,7 @@ export function PotentialRoles({
               if (review.authors) {
                 return review.authors.map(author => {
                   return (
-                    <li key={author.identity}>
+                    <li key={author.identity} className="role-list__list-item">
                       <DraggableRoleBadge
                         type={POTENTIAL_ROLE_TYPE}
                         author={author}
@@ -229,7 +229,7 @@ export function HighlightedRoles({
               const reviewer = reviews.find(review => review.id === roleId);
 
               return (
-                <li key={roleId}>
+                <li key={roleId} className="role-list__list-item">
                   <DraggableRoleBadge
                     type={HIGHLIGHTED_ROLE_TYPE}
                     roleId={roleId}
