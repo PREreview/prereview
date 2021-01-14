@@ -59,7 +59,7 @@ export default function SettingsRoles({ user }) {
       <h3 className="settings__title">Personas</h3>
 
       <p>
-        Personas allow you to manage your ideSntity on Rapid PREreview. Personas
+        Personas allow you to manage your identity on Rapid PREreview. Personas
         can be public (linked to your{' '}
         <a href={`https://orcid.org/${user.orcid}`}>ORCID</a> profile) or kept
         anonymous.
