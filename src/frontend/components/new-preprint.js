@@ -276,8 +276,11 @@ function StepPreprint({
           Cancel
         </Button>
         <Button
-          onClick={() => {
-            onStep('NEW_REQUEST');
+          onClick={e => {
+            onViewInContext({
+              preprint,
+              tab: 'request'
+            })
           }}
           disabled={
             fetchActionsProgress.isActive ||

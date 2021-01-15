@@ -249,7 +249,7 @@ export default function controller(groupModel, userModel, thisUser) {
           .required(),
       },
     },
-    pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next),
+    // pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next),
     handler: async ctx => {
       log.debug(`Adding user ${ctx.params.uid} to group ${ctx.params.id}.`);
       let group, user;

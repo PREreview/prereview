@@ -1,6 +1,7 @@
 import passport from 'koa-passport';
 import { Strategy as OrcidStrategy } from 'passport-orcid';
 import router from 'koa-joi-router';
+import anonymus from 'anonymus';
 import merge from 'lodash.merge';
 import { getLogger } from '../log.js';
 
@@ -94,9 +95,15 @@ export default function controller(users, personas, config, thisUser) {
         let anonPersona;
         let defaultPersona;
 
+        let anonName = anonymus.create()[0];
+        while ((await personas.findOne({ name: anonName })) !== null) {
+          console.log('Anonymous name generation collision');
+          anonName = anonymus.create()[0];
+        }
+
         try {
           anonPersona = personas.create({
-            name: 'Anonymous',
+            name: anonName,
             identity: newUser,
             isAnonymous: true,
           });

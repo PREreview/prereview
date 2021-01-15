@@ -163,6 +163,11 @@ export default function controller(users, thisUser) {
 
       users.assign(user, ctx.request.body);
       await users.persistAndFlush(user);
+
+      ctx.status = 200;
+      ctx.body = {
+        data: user,
+      };
     },
   });
 
