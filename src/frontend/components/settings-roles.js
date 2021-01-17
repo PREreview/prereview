@@ -284,5 +284,5 @@ function MakeActivePersonaModalButton({ user, persona, handleClose}) {
 MakeActivePersonaModalButton.propTypes = {
   user: PropTypes.object.isRequired,
   persona: PropTypes.object.isRequired,
-  setActivePersona: PropTypes.func,
+  handleClose: PropTypes.func,
 };
