@@ -42,11 +42,10 @@ export default function SettingsRoles({ user }) {
   const isFirstTimeOnSettings = useIsFirstTimeOnSettings();
   const [personaToEdit, setPersonaToEdit] = useState(null);
   const [activePersona, setActivePersona] = useState(user ? user.defaultPersona : null)
+
   const handleActivePersonaClose = (persona) => {
     setActivePersona(persona)
   }
-
-  console.log("ACTIVE PERSONA: ", activePersona)
 
   return (
     <section className="settings-roles settings__section">
@@ -245,7 +244,7 @@ function MakeActivePersonaModalButton({ user, persona, handleClose}) {
       </Button>
 
       {isOpen && (
-        <Modal title={`Set active persona to ${user.name || user.id}`}>
+        <Modal title={`Set active persona to ${persona.name}`}>
           <p>
             The <strong>public</strong> persona makes your information viewable
             by other users when you write <em>new</em> reviews or <em>new</em>{' '}
@@ -272,7 +271,6 @@ function MakeActivePersonaModalButton({ user, persona, handleClose}) {
                     setIsOpen(false)
                     handleClose(persona)})
                   .catch(err => alert(`An error occurred: ${err.message}`));
-                
               }}
             >
               Make active
