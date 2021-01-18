@@ -67,28 +67,4 @@
       visibility: hidden;
     }
   }
-
-  // We also suggest hiding the button when JS is disabled.
-  // Note: Modernizr looks for a “no-js” class on the html tag and replaces it with “js” on load.
-  //       If not using Modernizr, see https://www.paulirish.com/2009/avoiding-the-fouc-v3/
-  .no-js [data-expands] {
-    display: none;
-  }
-
-  .menu__list {
-    background-color: #fff;
-    border: 1px solid var(--light-grey);
-    box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.15);
-    padding: 1rem 0.5rem;
-    position: absolute;
-    right: 0;
-    top: 26px;
-    width: 150px;
-    z-index: 100;
-
-    &[aria-hidden="false"] {
-      height: 100px !important;
-      max-height: 200px !important;
-    }
-  }
 }

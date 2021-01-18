@@ -129,28 +129,6 @@
       }
     }
   }
-
-  .menu__list {
-    background-color: #fff;
-    border: 1px solid var(--light-grey);
-    box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.15);
-    padding: 1rem 0.5rem;
-    position: absolute;
-    right: 1%;
-    top: 80%;
-    z-index: 102;
-
-    & a {
-      display: block;
-      font-size: 0.75rem;
-      height: 25px;
-    }
-
-    &[aria-hidden="false"] {
-      height: 100px !important;
-      max-height: 200px !important;
-    }
-  }
 }
 
 .shell__mask {
