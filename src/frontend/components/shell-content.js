@@ -77,7 +77,6 @@ export default function ShellContent({
   const [initialContent, setInitialContent] = useState('');
 
   const onContentChange = value => {
-    console.log(value);
     setInitialContent(value);
   };
 

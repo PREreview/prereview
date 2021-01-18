@@ -34,32 +34,57 @@ export function PotentialRoles({
   });
 
   const [reviews, setReviews] = useState(allReviews);
+  const [authors, setAuthors] = useState([]);
 
   useEffect(() => {
     if (hasReviewed) {
-      setReviews(reviews => reviews.concat(user));
+      setAuthors(authors => [...authors, user]);
     }
   }, []);
 
-  const filteredReviews = reviews.filter((review, index, reviews) => {
-    if (review.author) {
-      return (
-        index ===
-        reviews.findIndex(r => {
-          if (r.author) {
-            return r.author.id === review.author.id;
-          }
-        })
-      );
-    } else if (review.authors) {
-      review.authors.filter((author, i, authors) => {
-        i === authors.findIndex(a => a.id === author.id);
-      });
-    }
-    return review;
-  });
+  useEffect(() => {
+    let newAuthors = [];
+    reviews.map(review => {
+      if (review.author) {
+        newAuthors = [...newAuthors, review.author];
+      } else if (review.authors) {
+        if (review.published) {
+          review.authors.map(author => {
+            newAuthors = [...authors, author];
+          });
+        }
+      }
+      return;
+    });
 
-  // const [reviewsList, setReviewsList] = useState(reviews);
+    const filteredAuthors = newAuthors.filter(
+      (author, i, authors) => i === authors.findIndex(a => a.id === author.id),
+    );
+
+    setAuthors(filteredAuthors);
+  }, []);
+
+  // const filteredReviews = reviews.filter((review, index, reviews) => {
+  //   if (review.author) {
+  //     return (
+  //       index ===
+  //       reviews.findIndex(r => {
+  //         if (r.author) {
+  //           if (r.author.identity.defaultPersona) {
+  //             return r.author.identity.defaultPersona.id === review.author.id;
+  //           } else {
+  //             return r.author.identity.id === review.author.id;
+  //           }
+  //         }
+  //       })
+  //     );
+  //   } else if (review.authors) {
+  //     review.authors.filter((author, i, authors) => {
+  //       i === authors.findIndex(a => a.id === author.id);
+  //     });
+  //   }
+  //   return review;
+  // });
 
   return (
     <div
@@ -69,62 +94,33 @@ export function PotentialRoles({
       })}
       ref={dropRef}
     >
-      {!reviews.length && <p className="role-list__tip-text">No Reviewers</p>}
+      {!authors.length && <p className="role-list__tip-text">No Reviewers</p>}
 
       <ul className="role-list__list">
-        {filteredReviews.length
-          ? filteredReviews.map(review => {
-              if (review.authors) {
-                return review.authors.map(author => {
-                  return (
-                    <li key={author.identity} className="role-list__list-item">
-                      <DraggableRoleBadge
-                        type={POTENTIAL_ROLE_TYPE}
-                        author={author}
-                        onDropped={author => {
-                          onRemoved(author.identity);
+        {authors.length
+          ? authors.map(author => {
+              return (
+                <li key={author.id} className="role-list__list-item">
+                  <DraggableRoleBadge
+                    type={POTENTIAL_ROLE_TYPE}
+                    author={author}
+                    onDropped={author => {
+                      onRemoved(author.identity);
+                    }}
+                  >
+                    {user && user.isAdmin && (
+                      <div
+                        disabled={isModerationInProgress || author.identity}
+                        onSelect={() => {
+                          onModerate(author.identity);
                         }}
                       >
-                        {user && user.isAdmin && (
-                          <div
-                            disabled={isModerationInProgress || author.identity}
-                            onSelect={() => {
-                              onModerate(author.identity);
-                            }}
-                          >
-                            Report Review
-                          </div>
-                        )}
-                      </DraggableRoleBadge>
-                    </li>
-                  );
-                });
-              } else if (review.author) {
-                return (
-                  <li key={review.author.identity}>
-                    <DraggableRoleBadge
-                      type={POTENTIAL_ROLE_TYPE}
-                      author={review.author}
-                      onDropped={review => {
-                        onRemoved(review.author.identity);
-                      }}
-                    >
-                      {user && user.isAdmin && (
-                        <div
-                          disabled={
-                            isModerationInProgress || review.author.identity
-                          }
-                          onSelect={() => {
-                            onModerate(review.author.identity);
-                          }}
-                        >
-                          Report Review
-                        </div>
-                      )}
-                    </DraggableRoleBadge>
-                  </li>
-                );
-              }
+                        Report Review
+                      </div>
+                    )}
+                  </DraggableRoleBadge>
+                </li>
+              );
             })
           : null}
       </ul>

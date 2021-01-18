@@ -38,6 +38,7 @@ export default function ShareMenu({ identifier, roleIds = [] }) {
             className="menu__list__link-item"
             download="rapid-prereview-data.jsonld"
             href={`/api/v2/preprint/${unprefix(createPreprintId(identifier))}`}
+            to={`/api/v2/preprint/${unprefix(createPreprintId(identifier))}`}
           >
             Permalink
           </XLink>
@@ -60,6 +61,7 @@ export default function ShareMenu({ identifier, roleIds = [] }) {
             className="menu__list__link-item"
             download="rapid-prereview-data.jsonld"
             href={`/api/v2/preprint/${unprefix(createPreprintId(identifier))}`}
+            to={`/api/v2/preprint/${unprefix(createPreprintId(identifier))}`}
           >
             Download data (JSON-LD)
           </XLink>
@@ -133,7 +135,7 @@ function PermalinkModal({ permalink, onClose }) {
       className="permalink-modal"
     >
       <XLink
-        href={`${url.pathname}${url.search}${url.hash}`}
+        href={`/${url.pathname}${url.search}${url.hash}`}
         to={{
           pathname: url.pathname,
           search: url.search,

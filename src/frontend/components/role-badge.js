@@ -100,17 +100,13 @@ const RoleBadgeUI = React.forwardRef(function RoleBadgeUI(
       <div className="menu__list expandable" id={user.id}>
         <XLink
           className="menu__list__link-item"
-          href={
-            process.env.IS_EXTENSION
-              ? `/about/${
-                  user.orcid
-                    ? user.orcid
-                    : user.identity
-                    ? user.identity.orcid
-                    : user.id
-                }`
-              : undefined
-          }
+          href={`/about/${
+            user.orcid
+              ? user.orcid
+              : user.identity
+              ? user.identity.orcid
+              : user.id
+          }`}
           target={process.env.IS_EXTENSION ? '_blank' : undefined}
           to={
             process.env.IS_EXTENSION
@@ -140,7 +136,7 @@ RoleBadgeUI.propTypes = {
   user: PropTypes.shape({
     defaultPersona: PropTypes.object,
     id: PropTypes.number,
-    identity: PropTypes.number,
+    identity: PropTypes.oneOfType([PropTypes.object, PropTypes.number]),
     orcid: PropTypes.string,
     name: PropTypes.string,
     avatar: PropTypes.object,
@@ -166,7 +162,7 @@ Tooltipify.propTypes = {
   tooltip: PropTypes.bool,
   user: PropTypes.shape({
     name: PropTypes.string,
-    identity: PropTypes.number.required,
+    identity: PropTypes.oneOfType([PropTypes.object, PropTypes.number]),
   }),
   children: PropTypes.any,
 };
