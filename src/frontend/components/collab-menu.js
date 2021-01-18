@@ -3,11 +3,10 @@ import ReactDOM from 'react-dom';
 import { css, jsx } from '@emotion/react';
 import PropTypes from 'prop-types';
 
-export const Button = React.forwardRef(
-  ({ className, active, reversed, ...props }, ref) => (
+export function Button({ className, active, reversed, ...props }) {
+  return (
     <span
       {...props}
-      ref={ref}
       className={jsx(
         className,
         css`
@@ -22,10 +21,8 @@ export const Button = React.forwardRef(
         `,
       )}
     />
-  ),
-);
-
-Button.displayName = 'Button';
+  );
+}
 
 Button.propTypes = {
   className: PropTypes.string,
@@ -85,22 +82,22 @@ EditorValue.propTypes = {
   value: PropTypes.any,
 };
 
-export const Icon = React.forwardRef(({ className, ...props }, ref) => (
-  <span
-    {...props}
-    ref={ref}
-    className={jsx(
-      'material-icons',
-      className,
-      css`
-        font-size: 18px;
-        vertical-align: text-bottom;
-      `,
-    )}
-  />
-));
+export const Icon = ({ className, ...props }) => {
+  return (
+    <span
+      {...props}
+      className={jsx(
+        'material-icons',
+        className,
+        css`
+          font-size: 18px;
+          vertical-align: text-bottom;
+        `,
+      )}
+    />
+  );
+};
 
-Icon.displayName = 'Icon';
 Icon.propTypes = {
   className: PropTypes.string,
 };
@@ -155,24 +152,27 @@ export const Portal = ({ children }) => {
   return ReactDOM.createPortal(children, document.body);
 };
 
-export const Toolbar = React.forwardRef(({ className, ...props }, ref) => (
-  <Menu
-    {...props}
-    ref={ref}
-    className={jsx(
-      className,
-      css`
-        position: relative;
-        padding: 1px 18px 17px;
-        margin: 0 -20px;
-        border-bottom: 2px solid #eee;
-        margin-bottom: 20px;
-      `,
-    )}
-  />
-));
+const Toolbar = ({ className, ...props }) => {
+  return (
+    <Menu
+      {...props}
+      className={jsx(
+        className,
+        css`
+          position: relative;
+          padding: 1px 18px 17px;
+          margin: 0 -20px;
+          border-bottom: 2px solid #eee;
+          margin-bottom: 20px;
+        `,
+      )}
+    />
+  );
+};
 
 Toolbar.displayName = 'Toolbar';
 Toolbar.propTypes = {
   className: PropTypes.string,
 };
+
+export default Toolbar;

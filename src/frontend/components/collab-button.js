@@ -2,11 +2,10 @@ import React from 'react';
 import { css, jsx } from '@emotion/react';
 import PropTypes from 'prop-types';
 
-const Button = React.forwardRef(
-  ({ className, active, reversed, ...props }, ref) => (
+const Button = ({ className, active, reversed, ...props }) => {
+  return (
     <span
       {...props}
-      ref={ref}
       className={jsx(
         className,
         css`
@@ -21,10 +20,8 @@ const Button = React.forwardRef(
         `,
       )}
     />
-  ),
-);
-
-Button.displayName = 'Button';
+  );
+};
 
 Button.propTypes = {
   className: PropTypes.string,

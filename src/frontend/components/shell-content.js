@@ -77,6 +77,7 @@ export default function ShellContent({
   const [initialContent, setInitialContent] = useState('');
 
   const onContentChange = value => {
+    console.log(value);
     setInitialContent(value);
   };
 
@@ -86,7 +87,6 @@ export default function ShellContent({
   };
 
   useEffect(() => {
-    console.log(initialContent);
     if (user) {
       if (preprint.fullReviews.length) {
         preprint.fullReviews.map(review => {
@@ -130,7 +130,6 @@ export default function ShellContent({
     rapidContent,
     longContent,
     hasRequested,
-    initialContent,
   ]);
 
   return (

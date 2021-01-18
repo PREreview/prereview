@@ -406,6 +406,7 @@ export default function ReviewStepper({
   }
 
   useEffect(() => {
+    // console.log(content);
     if (hasLongReviewed) {
       setActiveStep(2);
       handleComplete(4);
