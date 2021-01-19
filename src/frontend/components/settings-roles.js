@@ -40,7 +40,12 @@ const useStyles = makeStyles({
 export default function SettingsRoles({ user }) {
   const classes = useStyles();
   const isFirstTimeOnSettings = useIsFirstTimeOnSettings();
-  const [userToEdit, setUserToEdit] = useState(null);
+  const [personaToEdit, setPersonaToEdit] = useState(null);
+  const [activePersona, setActivePersona] = useState(user ? user.defaultPersona : null)
+
+  const handleActivePersonaClose = (persona) => {
+    setActivePersona(persona)
+  }
 
   return (
     <section className="settings-roles settings__section">
@@ -113,15 +118,11 @@ export default function SettingsRoles({ user }) {
           </TableHead>
           <TableBody>
             {user.personas.map(persona => {
-              console.log('USER*******', user.defaultPersona, user)
-              console.log('persona*********', persona);
-              console.log("user.id", user.id)
-              console.log("persona.id", persona.id)
               return (
                 <TableRow key={persona.id}>
                   <TableCell>
                     <div className="settings__persona-list-item__active-state">
-                      {user.defaultPersona === persona.id || user.defaultPersona.id === persona.id ? (
+                      {activePersona.id === persona.id ? (
                         <span className="settings__persona-list-item__is-active">
                           <MdStar className="settings__persona-active-icon" />
                           <span className="settings__persona-active-label">
@@ -132,6 +133,7 @@ export default function SettingsRoles({ user }) {
                         <MakeActivePersonaModalButton
                           user={user}
                           persona={persona}
+                          handleClose={handleActivePersonaClose}
                         />
                       )}
                     </div>
@@ -178,7 +180,7 @@ export default function SettingsRoles({ user }) {
                     {!persona.isAnonymous ? (
                       <Button
                         onClick={() => {
-                          setUserToEdit(persona);
+                          setPersonaToEdit(persona);
                         }}
                       >
                         Edit
@@ -198,21 +200,21 @@ export default function SettingsRoles({ user }) {
         </Button>
       </Controls>
 
-      {!!userToEdit && (
+      {!!personaToEdit && (
         <Modal
           className="settings-role-editor-modal"
           title="Edit Persona Settings"
           onClose={() => {
-            setUserToEdit(null);
+            setPersonaToEdit(null);
           }}
         >
           <RoleEditor
-            user={userToEdit}
+            user={personaToEdit}
             onCancel={() => {
-              setUserToEdit(null);
+              setPersonaToEdit(null);
             }}
             onSaved={() => {
-              setUserToEdit(null);
+              setPersonaToEdit(null);
             }}
           />
         </Modal>
@@ -225,7 +227,7 @@ SettingsRoles.propTypes = {
   user: PropTypes.object.isRequired,
 };
 
-function MakeActivePersonaModalButton({ user, persona }) {
+function MakeActivePersonaModalButton({ user, persona, handleClose}) {
   const [isOpen, setIsOpen] = useState(false);
   const { mutate: updateUser, loading, error } = usePutUser({
     id: user.id});
@@ -242,7 +244,7 @@ function MakeActivePersonaModalButton({ user, persona }) {
       </Button>
 
       {isOpen && (
-        <Modal title={`Set active persona to ${user.name || user.id}`}>
+        <Modal title={`Set active persona to ${persona.name}`}>
           <p>
             The <strong>public</strong> persona makes your information viewable
             by other users when you write <em>new</em> reviews or <em>new</em>{' '}
@@ -264,9 +266,11 @@ function MakeActivePersonaModalButton({ user, persona }) {
               disabled={loading}
               onClick={() => {
                 updateUser({ defaultPersona: persona.id })
-                  .then(() => alert('User updated successfully.'))
+                  .then(() => {
+                    alert('User updated successfully.')
+                    setIsOpen(false)
+                    handleClose(persona)})
                   .catch(err => alert(`An error occurred: ${err.message}`));
-                setIsOpen(false);
               }}
             >
               Make active
@@ -280,4 +284,5 @@ function MakeActivePersonaModalButton({ user, persona }) {
 MakeActivePersonaModalButton.propTypes = {
   user: PropTypes.object.isRequired,
   persona: PropTypes.object.isRequired,
+  setActivePersona: PropTypes.func,
 };
