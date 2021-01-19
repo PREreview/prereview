@@ -305,11 +305,10 @@ export default function ReviewStepper({
         })
           .then(() => {
             alert(
-                'Rapid review submitted and longform review draft updated successfully.',
-              );
+              'Rapid review submitted and longform review draft updated successfully.',
+            );
             return setDisabledSaveSubmit(true);
-            }
-          )
+          })
           .catch(err => alert(`An error occurred: ${err.message}`));
       }
     }
