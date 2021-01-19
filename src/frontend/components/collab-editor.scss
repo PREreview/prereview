@@ -1,17 +1,5 @@
-.remirror {
-
-  &-container {
-    display: flex;
-  }
-
-  &-editor {
-    background-color: #fff;
-    border: 1px solid #ccc;
-    margin-top: 10px;
-    min-height: 300px;
-    min-width: 400px;
-    resize: vertical;
-    padding: 10px;
-    width: 90%;
+.ql-editor {
+  p {
+    margin-bottom: 1em !important;
   }
 }

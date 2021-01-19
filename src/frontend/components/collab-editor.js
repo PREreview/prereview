@@ -19,7 +19,7 @@ const CollabEditor = ({ initialContent, handleContentChange }) => {
   }, [quill]);
 
   return (
-    <div style={{ width: 500, height: 300 }}>
+    <div>
       <div ref={quillRef} />
     </div>
   );
