@@ -1,3 +1,4 @@
+export * from './Badge';
 export * from './BaseEntity';
 export * from './Comment';
 export * from './Community';

@@ -16,7 +16,7 @@ export class Comment extends BaseEntity {
   [EntityRepositoryType]?: CommentModel;
 
   @Fixture(faker => faker.lorem.sentences())
-  @Property()
+  @Property({ columnType: 'text' })
   contents!: string;
 
   //eslint-disable-next-line

@@ -29,6 +29,7 @@ import authWrapper from './middleware/auth.js'; // authorization/user roles
 
 // Our models
 import {
+  badgeModelWrapper,
   commentModelWrapper,
   communityModelWrapper,
   fullReviewModelWrapper,
@@ -102,6 +103,8 @@ export default async function configServer(config) {
 
   // setup API handlers
   const auth = AuthController(userModel, personaModel, config, authz);
+  // eslint-disable-next-line no-unused-vars
+  const badgeModel = badgeModelWrapper(db);
   const commentModel = commentModelWrapper(db);
   const comments = CommentController(commentModel, authz);
   const communityModel = communityModelWrapper(db);

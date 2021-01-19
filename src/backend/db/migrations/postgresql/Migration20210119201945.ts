@@ -1,6 +1,6 @@
 import { Migration } from '@mikro-orm/migrations';
 
-export class Migration20210119193117 extends Migration {
+export class Migration20210119201945 extends Migration {
 
   async up(): Promise<void> {
     this.addSql('create table "tag" ("id" serial primary key, "created_at" timestamptz(0) not null, "updated_at" timestamptz(0) not null, "name" varchar(255) not null, "color" varchar(255) not null);');
@@ -49,7 +49,13 @@ export class Migration20210119193117 extends Migration {
     this.addSql('create table "community_preprints" ("community_id" int4 not null, "preprint_id" int4 not null);');
     this.addSql('alter table "community_preprints" add constraint "community_preprints_pkey" primary key ("community_id", "preprint_id");');
 
-    this.addSql('create table "comment" ("id" serial primary key, "created_at" timestamptz(0) not null, "updated_at" timestamptz(0) not null, "contents" varchar(255) not null, "is_published" bool not null, "is_flagged" bool not null, "author_id" int4 not null, "parent_id" int4 not null);');
+    this.addSql('create table "comment" ("id" serial primary key, "created_at" timestamptz(0) not null, "updated_at" timestamptz(0) not null, "contents" text not null, "is_published" bool not null, "is_flagged" bool not null, "author_id" int4 not null, "parent_id" int4 not null);');
+
+    this.addSql('create table "badge" ("id" serial primary key, "created_at" timestamptz(0) not null, "updated_at" timestamptz(0) not null, "name" varchar(255) not null, "color" varchar(255) not null);');
+    this.addSql('alter table "badge" add constraint "badge_name_unique" unique ("name");');
+
+    this.addSql('create table "badge_personas" ("badge_id" int4 not null, "persona_id" int4 not null);');
+    this.addSql('alter table "badge_personas" add constraint "badge_personas_pkey" primary key ("badge_id", "persona_id");');
 
     this.addSql('alter table "tag_preprints" add constraint "tag_preprints_tag_id_foreign" foreign key ("tag_id") references "tag" ("id") on update cascade on delete cascade;');
     this.addSql('alter table "tag_preprints" add constraint "tag_preprints_preprint_id_foreign" foreign key ("preprint_id") references "preprint" ("id") on update cascade on delete cascade;');
@@ -86,6 +92,9 @@ export class Migration20210119193117 extends Migration {
 
     this.addSql('alter table "comment" add constraint "comment_author_id_foreign" foreign key ("author_id") references "persona" ("id") on update cascade;');
     this.addSql('alter table "comment" add constraint "comment_parent_id_foreign" foreign key ("parent_id") references "full_review" ("id") on update cascade;');
+
+    this.addSql('alter table "badge_personas" add constraint "badge_personas_badge_id_foreign" foreign key ("badge_id") references "badge" ("id") on update cascade on delete cascade;');
+    this.addSql('alter table "badge_personas" add constraint "badge_personas_persona_id_foreign" foreign key ("persona_id") references "persona" ("id") on update cascade on delete cascade;');
   }
 
 }

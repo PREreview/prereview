@@ -11,6 +11,7 @@ import {
 import { Fixture } from 'class-fixtures-factory';
 import { PersonaModel } from '../personas';
 import { BaseEntity } from './BaseEntity';
+import { Badge } from './Badge';
 import { FullReview } from './FullReview';
 import { RapidReview } from './RapidReview';
 import { Request } from './Request';
@@ -49,6 +50,9 @@ export class Persona extends BaseEntity {
 
   @OneToMany({ entity: () => Request, mappedBy: 'author' })
   requests: Collection<Request> = new Collection<Request>(this);
+
+  @ManyToMany({ entity: () => Badge, mappedBy: 'personas' })
+  badges: Collection<Badge> = new Collection<Badge>(this);
 
   constructor(
     name: string,

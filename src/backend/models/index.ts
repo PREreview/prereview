@@ -1,3 +1,4 @@
+export * from './badges';
 export * from './comments';
 export * from './communities';
 export * from './contacts';

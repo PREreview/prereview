@@ -1,6 +1,6 @@
 import { Migration } from '@mikro-orm/migrations';
 
-export class Migration20210119192655 extends Migration {
+export class Migration20210119201910 extends Migration {
 
   async up(): Promise<void> {
     this.addSql('create table `tag` (`id` integer not null primary key autoincrement, `created_at` datetime not null, `updated_at` datetime not null, `name` varchar not null, `color` varchar not null);');
@@ -53,7 +53,14 @@ export class Migration20210119192655 extends Migration {
     this.addSql('create index `community_preprints_community_id_index` on `community_preprints` (`community_id`);');
     this.addSql('create index `community_preprints_preprint_id_index` on `community_preprints` (`preprint_id`);');
 
-    this.addSql('create table `comment` (`id` integer not null primary key autoincrement, `created_at` datetime not null, `updated_at` datetime not null, `contents` varchar not null, `is_published` integer not null, `is_flagged` integer not null);');
+    this.addSql('create table `comment` (`id` integer not null primary key autoincrement, `created_at` datetime not null, `updated_at` datetime not null, `contents` text not null, `is_published` integer not null, `is_flagged` integer not null);');
+
+    this.addSql('create table `badge` (`id` integer not null primary key autoincrement, `created_at` datetime not null, `updated_at` datetime not null, `name` varchar not null, `color` varchar not null);');
+    this.addSql('create unique index `badge_name_unique` on `badge` (`name`);');
+
+    this.addSql('create table `badge_personas` (`badge_id` integer not null, `persona_id` integer not null, primary key (`badge_id`, `persona_id`));');
+    this.addSql('create index `badge_personas_badge_id_index` on `badge_personas` (`badge_id`);');
+    this.addSql('create index `badge_personas_persona_id_index` on `badge_personas` (`persona_id`);');
 
     this.addSql('alter table `persona` add column `identity_id` integer null;');
     this.addSql('create index `persona_identity_id_index` on `persona` (`identity_id`);');
