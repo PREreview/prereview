@@ -58,7 +58,7 @@ export default function controller(groupModel, userModel, thisUser) {
     },
     method: 'POST',
     path: '/groups',
-    // pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next),
+    pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next),
     validate: validationSchema,
     handler: async ctx => {
       if (ctx.invalid) {
@@ -119,7 +119,7 @@ export default function controller(groupModel, userModel, thisUser) {
 
   groupsRouter.route({
     method: 'GET',
-    path: '/groups/:id',
+    path: '/groups/:name',
     // validate: validationSchema,
     pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
     handler: async ctx => {
@@ -128,7 +128,7 @@ export default function controller(groupModel, userModel, thisUser) {
         return;
       }
 
-      const groupName = ctx.params.id;
+      const groupName = ctx.params.name;
 
       log.debug(`Retrieving group ${groupName}.`);
       let group;
@@ -178,7 +178,7 @@ export default function controller(groupModel, userModel, thisUser) {
       let group;
 
       try {
-        group = await groupModel.findOne(ctx.params.id);
+        group = await groupModel.find({ name: ctx.params.name });
         if (!group) {
           ctx.throw(404, `Group with ID ${ctx.params.id} doesn't exist`);
         }
@@ -237,19 +237,22 @@ export default function controller(groupModel, userModel, thisUser) {
     method: 'put',
     path: '/groups/:id/members/:uid',
     validate: {
-      type: 'json',
       params: {
         id: Joi.number()
           .integer()
           .description('Group id')
           .required(),
-        uid: Joi.alternatives()
-          .try(Joi.number().integer(), Joi.string())
+        uid: Joi.number()
+          .integer()
           .description('User id')
           .required(),
+        // uid: Joi.alternatives()
+        //   .try(Joi.number().integer(), Joi.string())
+        //   .description('User id')
+        //   .required(),
       },
     },
-    // pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next),
+    pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next),
     handler: async ctx => {
       log.debug(`Adding user ${ctx.params.uid} to group ${ctx.params.id}.`);
       let group, user;

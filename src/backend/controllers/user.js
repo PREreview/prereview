@@ -34,7 +34,6 @@ export default function controller(users, thisUser) {
     },
     method: 'get',
     path: '/users',
-    // pre:thisUserthisUser.can('access private pages'),
     handler: async ctx => {
       log.debug(`Retrieving users.`);
       let allUsers;
@@ -65,19 +64,18 @@ export default function controller(users, thisUser) {
     },
     method: 'get',
     path: '/users/:id',
-    // pre: thisUser.can('access private pages'),
     validate: {
+      // params: {
+      //   id: Joi.alternatives()
+      //     .try(Joi.number().integer(), Joi.string())
+      //     .description('User id')
+      //     .required(),
+      // },
       params: {
-        id: Joi.alternatives()
-          .try(Joi.number().integer(), Joi.string())
+        id: Joi.string()
           .description('User id')
           .required(),
       },
-      //params: {
-      //  id: Joi.string()
-      //    .description('User id')
-      //    .required(),
-      //},
       continueOnError: false,
       failure: 400,
     },
@@ -129,17 +127,17 @@ export default function controller(users, thisUser) {
       //   email: Joi.string(),
       // }),
       // type: 'json',
+      // params: {
+      //   id: Joi.alternatives()
+      //     .try(Joi.number().integer(), Joi.string())
+      //     .description('User id')
+      //     .required(),
+      // },
       params: {
-        id: Joi.alternatives()
-          .try(Joi.number().integer(), Joi.string())
+        id: Joi.string()
           .description('User id')
           .required(),
       },
-      //params: {
-      //  id: Joi.string()
-      //    .description('User id')
-      //    .required(),
-      //},
       continueOnError: false,
       false: 400,
     },
@@ -179,20 +177,20 @@ export default function controller(users, thisUser) {
         required: true,
       },
     },
-    method: 'delete',
+    method: 'DELETE',
     path: '/users/:id',
     validate: {
+      // params: {
+      //   id: Joi.alternatives()
+      //     .try(Joi.number().integer(), Joi.string())
+      //     .description('User id')
+      //     .required(),
+      // },
       params: {
-        id: Joi.alternatives()
-          .try(Joi.number().integer(), Joi.string())
+        id: Joi.string()
           .description('User id')
           .required(),
       },
-      //params: {
-      //  id: Joi.string()
-      //    .description('User id')
-      //    .required(),
-      //},
     },
     pre: thisUser.can('access admin pages'), // TODO: can users delete their own account?
     handler: async ctx => {
