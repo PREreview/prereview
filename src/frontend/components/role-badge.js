@@ -185,7 +185,9 @@ export { RoleBadgeUI };
 
 function Tooltipify({ tooltip, user, children }) {
   return tooltip ? (
-    <Tooltip label={`${user.name}`}>
+    <Tooltip
+      label={`${user.defaultPersona ? user.defaultPersona.name : user.name}`}
+    >
       <div>{children}</div>
     </Tooltip>
   ) : (
@@ -197,6 +199,7 @@ Tooltipify.propTypes = {
   tooltip: PropTypes.bool,
   user: PropTypes.shape({
     name: PropTypes.string,
+    defaultPersona: PropTypes.object,
     identity: PropTypes.oneOfType([PropTypes.object, PropTypes.number]),
   }),
   children: PropTypes.any,

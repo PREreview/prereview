@@ -34,7 +34,9 @@ const ReviewReader = React.memo(function ReviewReader({
   const [publishedReviews, setPublishedReviews] = useState(
     preprint.fullReviews.filter(review => review.published),
   );
-  const [allReviews] = useState(publishedReviews.concat(allRapidReviews));
+  const [allReviews, setAllReviews] = useState(
+    publishedReviews.concat(allRapidReviews),
+  );
 
   const {
     mutate: postComment,
@@ -67,14 +69,16 @@ const ReviewReader = React.memo(function ReviewReader({
       Object.keys(rapidContent).length !== 0 &&
       rapidContent.constructor === Object
     ) {
-      const all = allRapidReviews.concat(rapidContent);
+      const all = [...allRapidReviews, rapidContent];
+      console.log(all);
       setAllRapidReviews(all);
+      setAllReviews(allReviews => [...allReviews, rapidContent]);
     }
 
     if (longContent) {
-      setPublishedReviews(allPublishedReviews =>
-        allPublishedReviews.concat(longContent),
-      );
+      const all = [...publishedReviews, longContent];
+      setPublishedReviews(all);
+      setAllReviews(allReviews => [...allReviews, longContent]);
     }
   }, [
     rapidContent,
@@ -94,7 +98,12 @@ const ReviewReader = React.memo(function ReviewReader({
     }
   }, [defaultHighlightedRoleIds, highlightedRoleIds]);
 
-  useEffect(() => {}, [allRapidReviews, publishedReviews, newRequest]);
+  useEffect(() => {}, [
+    allReviews,
+    allRapidReviews,
+    publishedReviews,
+    newRequest,
+  ]);
 
   return (
     <div

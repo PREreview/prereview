@@ -33,14 +33,8 @@ export function PotentialRoles({
     }),
   });
 
-  const [reviews, setReviews] = useState(allReviews);
+  const [reviews] = useState(allReviews);
   const [authors, setAuthors] = useState([]);
-
-  useEffect(() => {
-    if (hasReviewed) {
-      setAuthors(authors => [...authors, user]);
-    }
-  }, []);
 
   useEffect(() => {
     let newAuthors = [];
@@ -57,12 +51,18 @@ export function PotentialRoles({
       return;
     });
 
+    if (hasReviewed) {
+      newAuthors = [...newAuthors, user];
+    }
+
     const filteredAuthors = newAuthors.filter(
       (author, i, authors) => i === authors.findIndex(a => a.id === author.id),
     );
 
     setAuthors(filteredAuthors);
   }, []);
+
+  useEffect(() => {}), [authors];
 
   // const filteredReviews = reviews.filter((review, index, reviews) => {
   //   if (review.author) {
