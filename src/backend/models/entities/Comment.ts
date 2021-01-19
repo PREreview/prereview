@@ -19,6 +19,14 @@ export class Comment extends BaseEntity {
   @Property()
   contents!: string;
 
+  //eslint-disable-next-line
+  @Property()
+  isPublished: boolean = false;
+
+  //eslint-disable-next-line
+  @Property()
+  isFlagged: boolean = false;
+
   @ManyToOne({ entity: () => Persona })
   author!: Persona;
 

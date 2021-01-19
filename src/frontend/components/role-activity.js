@@ -10,7 +10,7 @@ export default function RoleActivity({ persona }) {
 
   useEffect(() => {
     const fullReviews = persona.fullReviews
-      ? persona.fullReviews.filter(item => item.published)
+      ? persona.fullReviews.filter(item => item.isPublished)
       : null;
 
     setActivity(() => [fullReviews, persona.rapidReviews].flat());

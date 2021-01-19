@@ -154,7 +154,7 @@ export default function controller(preprints, thisUser) {
 
           foundPreprints = await preprints.findAll(
             populate,
-            { createdAt: order },
+            { datePosted: order },
             ctx.query.limit,
             ctx.query.offset,
           );

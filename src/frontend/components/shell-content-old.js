@@ -76,7 +76,7 @@ export default function ShellContent({
         review.authors.map(author => {
           user.personas.some(persona => {
             if (persona.identity === author.identity) {
-              if (review.published === true) {
+              if (review.isPublished === true) {
                 setHasLongReviewed(true);
               } else {
                 setLongContent(review.drafts[review.drafts.length - 1].contents);
@@ -208,7 +208,7 @@ export default function ShellContent({
             user={user}
             preprint={preprint}
             onSubmit={preprint => {
-              postReviewRequest({ preprint: preprint})
+              postReviewRequest({ preprint: preprint })
                 .then(() => {
                   alert('PREreview request submitted successfully.');
                   return setTab('read');
@@ -453,7 +453,7 @@ function ShellContentLongReview({
                   postLongReview({
                     preprint: preprint.id,
                     contents: content,
-                    published: true,
+                    isPublished: true,
                   })
                     .then(() => {
                       alert('Full review submitted successfully.');

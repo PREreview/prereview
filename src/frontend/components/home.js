@@ -18,7 +18,6 @@ import {
 } from '../hooks/ui-hooks';
 
 // utils
-import { createPreprintQs } from '../utils/search';
 import { createPreprintId } from '../../common/utils/ids.js';
 import { getId } from '../utils/jsonld';
 
@@ -67,7 +66,6 @@ const processParams = search => {
   return processed;
 };
 
-
 const searchParamsToObject = params => {
   const obj = {};
   for (const [key, value] of params.entries()) {
@@ -94,8 +92,9 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState(params.get('search') || '');
 
-  const { data: preprints, loading: loadingPreprints, error } = useGetPreprints({
-    queryParams: searchParamsToObject(params),
+  const { data: preprints, loading: loadingPreprints, error } = useGetPreprints(
+    {
+      queryParams: searchParamsToObject(params),
     },
   );
 
@@ -167,7 +166,10 @@ export default function Home() {
         <SearchBar
           defaultValue={search}
           isFetching={loadingPreprints}
-          onChange={value => setSearch(value)}
+          onChange={value => {
+            params.delete('page');
+            setSearch(value);
+          }}
           onCancelSearch={() => {
             params.delete('search');
             setSearch('');
@@ -253,10 +255,7 @@ export default function Home() {
               onMouseLeaveSortOption={() => {
                 setHoveredSortOption(null);
               }}
-              onChange={(
-                sortOption,
-                sortOrder
-              ) => {
+              onChange={(sortOption, sortOrder) => {
                 params.set('desc', sortOrder === 'desc');
                 history.push({
                   pathname: location.pathame,
@@ -319,13 +318,13 @@ export default function Home() {
 
             <div className="home__pagination">
               <Pagination
-                count={Math.ceil((preprints.totalCount / params.get('limit')))}
-                page={parseInt("" + params.get('page'))}
+                count={Math.ceil(preprints.totalCount / params.get('limit'))}
+                page={parseInt('' + params.get('page'))}
                 onChange={(ev, page) => {
                   params.set('page', page);
                   history.push({
                     pathname: location.pathname,
-                    search: params.toString()
+                    search: params.toString(),
                   });
                 }}
               />

@@ -69,7 +69,7 @@ export default function PreprintCard({
   } = useAnimatedScore(preprint);
 
   const publishedReviews = preprint.fullReviews.filter(
-    review => review.published,
+    review => review.isPublished,
   );
 
   useEffect(() => {

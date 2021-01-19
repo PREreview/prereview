@@ -32,7 +32,7 @@ const ReviewReader = React.memo(function ReviewReader({
   const [publishedComment, setPublishedComment] = useState('');
   const [allRapidReviews, setAllRapidReviews] = useState(preprint.rapidReviews);
   const [publishedReviews, setPublishedReviews] = useState(
-    preprint.fullReviews.filter(review => review.published),
+    preprint.fullReviews.filter(review => review.isPublished),
   );
   const [allReviews] = useState(publishedReviews.concat(allRapidReviews));
 
@@ -186,7 +186,7 @@ const ReviewReader = React.memo(function ReviewReader({
             <div className="text-answers">
               <div className="text-answers__question">Longform Reviews</div>
               {publishedReviews.map(review => {
-                if (review.published && review.drafts && review.drafts.length) {
+                if (review.isPublished && review.drafts && review.drafts.length) {
                   return (
                     <div
                       key={review.id}

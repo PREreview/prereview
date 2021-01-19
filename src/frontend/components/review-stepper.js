@@ -299,7 +299,7 @@ export default function ReviewStepper({
         postLongReview({
           preprint: preprint.id,
           contents: content,
-          published: true,
+          isPublished: true,
         })
           .then(() => {
             setActiveStep(prevActiveStep => prevActiveStep + 2);
