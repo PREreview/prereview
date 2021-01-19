@@ -92,6 +92,7 @@ export default function controller(users, thisUser) {
           'personas.rapidReviews',
           'personas.requests',
           'groups',
+          'defaultPersona.badges',
         ]);
       } catch (err) {
         log.debug(err);

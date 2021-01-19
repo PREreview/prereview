@@ -1,6 +1,7 @@
 import React, { Fragment, useContext, useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { format } from 'date-fns';
+import Chip from '@material-ui/core/Chip';
 import { UserContext } from '../contexts/user-context';
 import { MdPublic } from 'react-icons/md';
 import { Helmet } from 'react-helmet-async';
@@ -100,6 +101,18 @@ export default function Profile() {
                     {persona.name}
                   </XLink>
                 </dd>
+                {persona && persona.badges.length > 0 && (
+                  <Fragment>
+                    <dt>
+                      <LabelStyle>Tags</LabelStyle>
+                    </dt>
+                    <dd>
+                      {persona.badges.map(badge => (
+                        <Chip label={badge.name} color='primary' size='small' />
+                      ))}
+                    </dd>
+                  </Fragment>
+                )}
                 {user && (
                   <Fragment>
                     <dt>
