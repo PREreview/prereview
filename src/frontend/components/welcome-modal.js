@@ -23,18 +23,21 @@ export default function WelcomeModal(props) {
           </h2>
 
           <p>
-            This platform was designed to facilitate rapid, open review of
-            preprint related to outbreaks.
+            This platform was designed to facilitate rapid and long-form, open
+            review of preprints.
           </p>
           <div>
             Here you can:
             <ol>
-              <li>Find rapid reviews of existing preprints.</li>
+              <li>Find rapid and long-form reviews of existing preprints.</li>
               <li>
                 Request reviews of preprints (your own, or preprints you are
                 interested in).
               </li>
-              <li>Review preprints.</li>
+              <li>
+                Review preprints (as an individual, with a mentor, or in
+                collaboration with co-reviewers).
+              </li>
             </ol>
           </div>
 
