@@ -72,14 +72,16 @@ const ReviewReader = React.memo(function ReviewReader({
   );
 
   const transform = node => {
-    if (node.attribs.class === 'ql-editor') {
-      node.attribs.class = '';
-      node.attribs.contenteditable = false;
-    } else if (
-      node.attribs.class === 'ql-clipboard' ||
-      node.attribs.class === 'ql-tooltip ql-hidden'
-    ) {
-      return null;
+    if (node.attribs) {
+      if (node.attribs.class === 'ql-editor') {
+        node.attribs.class = '';
+        node.attribs.contenteditable = false;
+      } else if (
+        node.attribs.class === 'ql-clipboard' ||
+        node.attribs.class === 'ql-tooltip ql-hidden'
+      ) {
+        return null;
+      }
     }
     return convertNodeToElement(node);
   };

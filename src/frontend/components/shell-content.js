@@ -165,7 +165,7 @@ export default function ShellContent({
                   setTab('read');
                 }}
               >
-                Read reviews
+                Read Reviews
               </Button>
             </li>
             <li>
