@@ -11,7 +11,12 @@ import NoticeBadge from './notice-badge';
 import { useIsMobile } from '../hooks/ui-hooks';
 
 export default function HeaderBar({ onClickMenuButton, closeGap, thisUser }) {
-  const roles = thisUser && thisUser.groups ? thisUser.groups : []; //GetUser(1);
+  const rol = thisUser && thisUser.groups ? thisUser.groups : []; //GetUser(1);
+
+  let roles = []
+
+  console.log("roles>", roles)
+  console.log("thisUser", thisUser)
 
   //const showProfileNotice = checkIfRoleLacksMininmalData(role);
   const showProfileNotice = false;
@@ -157,7 +162,7 @@ export default function HeaderBar({ onClickMenuButton, closeGap, thisUser }) {
                 </MenuLink>
               )}
 
-              {roles.includes('moderators') && !thisUser.isModerated && (
+              { thisUser.isModerator ? (
                 <MenuLink
                   as={process.env.IS_EXTENSION ? undefined : Link}
                   to={process.env.IS_EXTENSION ? undefined : '/moderate'}
@@ -166,7 +171,7 @@ export default function HeaderBar({ onClickMenuButton, closeGap, thisUser }) {
                 >
                   Moderate Reviews
                 </MenuLink>
-              )}
+              ) : null }
               <MenuLink href={`/api/v2/logout`}>Logout</MenuLink>
             </UserBadge>
           ) : (

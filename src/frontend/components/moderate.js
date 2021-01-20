@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useContext } from 'react';
 import { Helmet } from 'react-helmet-async';
 import socketIoClient from 'socket.io-client';
-import { UserProvider } from '../contexts/user-context';
+import { UserContext } from '../contexts/user-context';
 import { getId } from '../utils/jsonld';
 import HeaderBar from './header-bar';
 import { ORG } from '../constants';
@@ -15,7 +15,7 @@ const socket = socketIoClient(window.location.origin, {
 });
 
 export default function Moderate() {
-  const [user] = UserProvider();
+  const user = useContext(UserContext)
   const [bookmark, setBookmark] = useState(null);
   const [excluded, setExcluded] = useState(new Set());
   const [lockersByReviewActionId, setLockersByReviewActionId] = useState({});
@@ -37,26 +37,26 @@ export default function Moderate() {
 
   const search = createModerationQs({ bookmark });
 
-  const results = GetPreprint(search, !!bookmark);
+  let results;
 
-  const [isOpenedMap, setIsOpenedMap] = useState(
-    results.rows.reduce((map, row) => {
-      map[getId(row.doc)] = false;
-      return map;
-    }, {}),
-  );
-  useEffect(() => {
-    setIsOpenedMap(
-      results.rows.reduce((map, row) => {
-        map[getId(row.doc)] = false;
-        return map;
-      }, {}),
-    );
-  }, [results]);
+  // const [isOpenedMap, setIsOpenedMap] = useState(
+  //   results.rows.reduce((map, row) => {
+  //     map[getId(row.doc)] = false;
+  //     return map;
+  //   }, {}),
+  // );
+  // useEffect(() => {
+  //   setIsOpenedMap(
+  //     results.rows.reduce((map, row) => {
+  //       map[getId(row.doc)] = false;
+  //       return map;
+  //     }, {}),
+  //   );
+  // }, [results]);
 
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
+  // useEffect(() => {
+  //   window.scrollTo(0, 0);
+  // }, []);
 
   useEffect(() => {
     socket.connect();
@@ -91,15 +91,16 @@ export default function Moderate() {
       <section>
         <header className="moderate__header">
           <span>Moderate Content</span>
-          <span>{results.total_rows} Flagged Reviews</span>
+          <span>{results ? results.total_rows : 'No'} Flagged Reviews</span>
         </header>
 
-        {results.total_rows === 0 && !results.loading ? (
+        { results ? (
+           results.total_rows === 0 && !results.loading ? (
           <div>No reported reviews.</div>
         ) : (
           <div>
             <ul className="moderate__card-list">
-              {results.rows
+              { results ? results.rows
                 .filter(row => !excluded.has(getId(row.doc)))
                 .map(({ doc }) => (
                   <li key={getId(doc)}>
@@ -166,14 +167,18 @@ export default function Moderate() {
                       }}
                     />
                   </li>
-                ))}
+                )) : null }
             </ul>
           </div>
-        )}
+        )
+        ) : null } 
+
+        
 
         <div>
           {/* Cloudant returns the same bookmark when it hits the end of the list */}
-          {!!(
+          { results ? (
+            !!(
             results.rows.length < results.total_rows &&
             results.bookmark !== bookmark
           ) && (
@@ -187,7 +192,9 @@ export default function Moderate() {
                 More
               </Button>
             </div>
-          )}
+          )
+          ) : null }
+          
         </div>
       </section>
     </div>

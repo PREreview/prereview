@@ -276,7 +276,11 @@ export default function controller(groupModel, userModel, thisUser) {
         ctx.throw(400, `Failed to add user to group: ${err}`);
       }
 
-      ctx.body = { status: 201, message: 'User has been added to group', data: group };
+      ctx.body = {
+        status: 201,
+        message: 'User has been added to group',
+        data: group,
+      };
       ctx.status = 201;
     },
     meta: {

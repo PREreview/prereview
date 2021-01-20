@@ -343,7 +343,7 @@ export default function Shell({ children, defaultStatus = 'default' }) {
                   </MenuLink>
                 )}
 
-                {!!(user && user.isModerator && !user.isModerated) && (
+                {!!(user && user.isModerator) && (
                   <MenuLink
                     as={process.env.IS_EXTENSION ? undefined : Link}
                     to={process.env.IS_EXTENSION ? undefined : '/moderate'}

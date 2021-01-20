@@ -146,7 +146,7 @@ export default function SettingsRoles({ user }) {
                       />
 
                       <XLink
-                        href={`/about/${unprefix(persona.id)}`}
+                        href={`/about/${unprefix(user.id)}`}
                         to={`/about/${unprefix(user.id)}`}
                         className="settings__persona-link"
                       >

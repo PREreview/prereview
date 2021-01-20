@@ -104,11 +104,11 @@ export default function controller(users, thisUser) {
           log.debug(`User ${user.orcid} is an administrator!`);
           isAdmin = true;
         }
-        
-        let isModerator = false
+
+        let isModerator = false;
         if (await thisUser.isMemberOf('moderators', user.orcid)) {
-          log.debug(`User ${user.orcid} is a moderator!`)
-          isModerator = true
+          log.debug(`User ${user.orcid} is a moderator!`);
+          isModerator = true;
         }
 
         ctx.status = 200;
