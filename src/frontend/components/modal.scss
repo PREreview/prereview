@@ -8,6 +8,7 @@
 /* Note the rpos- prefix as modal is a common class in the host sites where the content script is injected */
 .rpos-modal-container {
   left: 50%;
+  margin: 0;
   max-width: 800px;
   min-width: 400px;
   position: fixed;

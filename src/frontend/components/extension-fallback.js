@@ -39,6 +39,7 @@ export default function ExtensionFallback() {
 
   const [loading, setLoading] = useState(true);
   const [preprint, setPreprint] = useState(null);
+  const [authors, setAuthors] = useState(null);
 
   const { id } = useParams();
 
@@ -64,6 +65,14 @@ export default function ExtensionFallback() {
 
   const pdfUrl = preprint ? preprint.contentUrl : '';
   const canonicalUrl = getCanonicalUrl(preprint ? preprint : null);
+
+  useEffect(() => {
+    if (preprint) {
+      const string = preprint.authors.replace(/[|&;$%@"<>()\[\]+]/g, "");
+      setAuthors(string);
+    }
+
+  }, [preprint]);
 
   useEffect(() => {
     if (window) {
@@ -101,38 +110,31 @@ export default function ExtensionFallback() {
               // typemustmatch="true" commented out as it doesn't seem to be currently supported by react
             >
               {/* fallback text in case we can't load the PDF */}
-              <Suspense fallback={<SuspenseLoading>Loading PDF</SuspenseLoading>}>
-                <PdfViewer
-                  docId={id}
-                  loading={<SuspenseLoading>Loading PDF</SuspenseLoading>}
-                />
-              </Suspense>
+              <div className="extension-fallback__no-pdf-message">
+                <div className="extension-fallback__no-pdf-message-inner">
+                  <h2>{preprint.title}</h2>
+                  <div className="extension-fallback__no-pdf-message-inner-authors">{authors}</div>
+                  <h3>Abstract</h3>
+                  <div  className="extension-fallback__no-pdf-message-inner-content" dangerouslySetInnerHTML={{ __html: preprint.abstractText }} />
+                  {!!canonicalUrl && (
+                    <div  className="extension-fallback__no-pdf-message-inner-link">
+                      You can access the{' '}
+                      {
+                        <a
+                          href={canonicalUrl}
+                          target="_blank"
+                          rel="noreferrer noopener"
+                        >
+                          full text of this preprint
+                        </a>
+                      }{' '}
+                      at the preprint server's website.
+                    </div>
+                  )}
+                </div>
+              </div>
             </object>
           )
-        ) : preprint && !pdfUrl && !loadingPreprint ? (
-          <div className="extension-fallback__no-pdf-message">
-            <div>
-              <h2>{preprint.title}</h2>
-              <div>{preprint.author}</div>
-              <h3>Abstract</h3>
-              <div>{preprint.abstract}</div>
-              {!!canonicalUrl && (
-                <div>
-                  You can access the{' '}
-                  {
-                    <a
-                      href={canonicalUrl}
-                      target="_blank"
-                      rel="noreferrer noopener"
-                    >
-                      full text of this preprint
-                    </a>
-                  }{' '}
-                  at the preprint server's website.
-                </div>
-              )}
-            </div>
-          </div>
         ) : null}
 
         <Shell>
