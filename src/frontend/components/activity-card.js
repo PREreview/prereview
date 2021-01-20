@@ -109,7 +109,7 @@ export default function ActivityCard({ activity }) {
                   isAnimating={false} // #FIXME
                 />
               </div>
-              Longform Review{preprint.fullReviews.length > 1 ? 's' : ''}
+              Long-form Review{preprint.fullReviews.length > 1 ? 's' : ''}
             </div>
             <div className="activity-card__count">
               <div className="activity-card__count-badge">

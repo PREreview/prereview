@@ -220,7 +220,7 @@ const ReviewReader = React.memo(function ReviewReader({
 
           {publishedReviews && publishedReviews.length ? (
             <div className="text-answers">
-              <div className="text-answers__question">Longform Reviews</div>
+              <div className="text-answers__question">Long-form Reviews</div>
               {publishedReviews.map(review => {
                 if (review.isPublished && review.drafts && review.drafts.length) {
                   return (

@@ -162,7 +162,7 @@ export default function ShellContent({
                   }
                 }}
               >
-                Add Longform Review
+                Add Long-form Review
               </Button>
             </li>
             <li>
@@ -404,7 +404,7 @@ function ShellContentLongReview({
   return (
     <div className="shell-content-review">
       <header className="shell-content-review__title">
-        Add a longform review
+        Add a long-form review
       </header>
 
       <PreprintPreview preprint={preprint} />
@@ -527,7 +527,7 @@ function ShellContentReviewSuccess({ preprint, onClose }) {
 
       <PreprintPreview preprint={preprint} />
 
-      <p>Your longform review has been successfully posted.</p>
+      <p>Your long-form review has been successfully posted.</p>
 
       <Controls>
         <Button onClick={onClose}>View</Button>

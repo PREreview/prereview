@@ -33,7 +33,7 @@ export default function RoleActivity({ persona }) {
             {persona.rapidReviews.length || 0}
           </dd>
           <dt className="role-activity__summary__label">
-            <LabelStyle>Total number of longform reviews</LabelStyle>
+            <LabelStyle>Total number of long-form reviews</LabelStyle>
           </dt>
           <dd className="role-activity__summary__stat">
             {persona.fullReviews.length || 0}
