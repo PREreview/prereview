@@ -119,7 +119,7 @@ export default function controller(groupModel, userModel, thisUser) {
 
   groupsRouter.route({
     method: 'GET',
-    path: '/groups/:name',
+    path: '/groups/:id',
     // validate: validationSchema,
     pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
     handler: async ctx => {
@@ -128,7 +128,7 @@ export default function controller(groupModel, userModel, thisUser) {
         return;
       }
 
-      const groupName = ctx.params.name;
+      const groupName = ctx.params.id;
 
       log.debug(`Retrieving group ${groupName}.`);
       let group;
@@ -242,12 +242,12 @@ export default function controller(groupModel, userModel, thisUser) {
           .integer()
           .description('Group id')
           .required(),
-        uid: Joi.number()
-          .integer()
+        uid: Joi.alternatives()
+          .try(Joi.number().integer(), Joi.string())
           .description('User id')
           .required(),
-        // uid: Joi.alternatives()
-        //   .try(Joi.number().integer(), Joi.string())
+        // uid: Joi.number()
+        //   .integer()
         //   .description('User id')
         //   .required(),
       },
