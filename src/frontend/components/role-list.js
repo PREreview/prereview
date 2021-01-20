@@ -42,13 +42,11 @@ export function PotentialRoles({
       if (review.author) {
         newAuthors = [...newAuthors, review.author];
       } else if (review.authors) {
-        if (review.published) {
-          review.authors.map(author => {
-            newAuthors = [...authors, author];
-          });
+        if (review.isPublished) {
+          review.authors.map(author => (newAuthors = [...newAuthors, author]));
         }
       }
-      return;
+      return newAuthors;
     });
 
     if (hasReviewed) {
@@ -60,6 +58,7 @@ export function PotentialRoles({
     );
 
     setAuthors(filteredAuthors);
+    // setAuthors(newAuthors);
   }, []);
 
   useEffect(() => {}), [authors];
