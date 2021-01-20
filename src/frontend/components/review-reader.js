@@ -11,6 +11,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import Accordion from '@material-ui/core/Accordion';
 import AccordionSummary from '@material-ui/core/AccordionSummary';
 import AccordionDetails from '@material-ui/core/AccordionDetails';
+import Box from '@material-ui/core/Box';
 import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 
@@ -42,8 +43,17 @@ const useStyles = makeStyles(theme => ({
     fontWeight: '600',
   },
   h4: {
+    flexBasis: '75%',
+    flexShrink: 0,
     fontSize: theme.typography.pxToRem(16),
     fontWeight: '600',
+  },
+  date: {
+    flexBasis: '25%',
+    flexShrink: 1,
+  },
+  spacing: {
+    lineHeight: 1.5,
   },
 }));
 
@@ -108,14 +118,16 @@ const ReviewReader = React.memo(function ReviewReader({
   );
 
   const transform = node => {
-    if (node.attribs.class === 'ql-editor') {
-      node.attribs.class = '';
-      node.attribs.contenteditable = false;
-    } else if (
-      node.attribs.class === 'ql-clipboard' ||
-      node.attribs.class === 'ql-tooltip ql-hidden'
-    ) {
-      return null;
+    if (node.attribs) {
+      if (node.attribs.class === 'ql-editor') {
+        node.attribs.class = '';
+        node.attribs.contenteditable = false;
+      } else if (
+        node.attribs.class === 'ql-clipboard' ||
+        node.attribs.class === 'ql-tooltip ql-hidden'
+      ) {
+        return null;
+      }
     }
     return convertNodeToElement(node);
   };
@@ -133,13 +145,11 @@ const ReviewReader = React.memo(function ReviewReader({
     ) {
       const all = [...allRapidReviews, rapidContent];
       setAllRapidReviews(all);
-      setAllReviews(allReviews => [...allReviews, rapidContent]);
     }
 
     if (longContent) {
       const all = [...publishedReviews, longContent];
       setPublishedReviews(all);
-      setAllReviews(allReviews => [...allReviews, longContent]);
     }
   }, [
     rapidContent,
@@ -242,8 +252,8 @@ const ReviewReader = React.memo(function ReviewReader({
           >
             <AccordionSummary
               expandIcon={<ExpandMoreIcon />}
-              aria-controls="panel2a-content"
-              id="panel2a-header"
+              aria-controls="longform-content"
+              id="longform-header"
             >
               <Typography variant="h3" className={classes.h3}>
                 Longform Reviews
@@ -279,12 +289,12 @@ const ReviewReader = React.memo(function ReviewReader({
                         review.drafts &&
                         review.drafts.length
                       ) {
+                        const reviewDate = new Date(review.updatedAt);
                         const reviewContent =
                           review.drafts[review.drafts.length - 1];
                         return (
                           <Accordion>
                             <AccordionSummary
-                              expandIcon={<ExpandMoreIcon />}
                               aria-controls={`review-content-${review.id}`}
                               id={`review-header-${review.id}`}
                             >
@@ -312,15 +322,20 @@ const ReviewReader = React.memo(function ReviewReader({
                                 )}
                                 {review.authors.length > 2 ? '...' : null}
                               </Typography>
-                              <Typography className={classes.h4}>
-                                {reviewContent.title}
+                              <Typography
+                                className={`${classes.h4} ${classes.date}`}
+                                align="right"
+                              >
+                                {reviewDate.toLocaleDateString('en-US')}
                               </Typography>
                             </AccordionSummary>
-                            <AccordionDetails>
-                              <Typography>
-                                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse malesuada lacus ex,
-                                sit amet blandit leo lobortis eget.
-                              </Typography>
+                            <AccordionDetails className={classes.spacing}>
+                              <Box>
+                                {ReactHtmlParser(
+                                  reviewContent.contents.substring(0, 600),
+                                  options,
+                                )}... Read more
+                              </Box>
                             </AccordionDetails>
                           </Accordion>
                         );

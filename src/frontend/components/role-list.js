@@ -58,7 +58,6 @@ export function PotentialRoles({
     );
 
     setAuthors(filteredAuthors);
-    // setAuthors(newAuthors);
   }, []);
 
   useEffect(() => {}), [authors];
