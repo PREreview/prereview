@@ -7,7 +7,8 @@ export class SearchSqlite extends Migration {
                 title, \
                 handle, \
                 abstract_text, \
-                published UNINDEXED, \
+                authors, \
+                is_published UNINDEXED, \
                 preprint_server UNINDEXED, \
                 date_posted UNINDEXED, \
                 url UNINDEXED, \
@@ -20,24 +21,24 @@ export class SearchSqlite extends Migration {
     this.addSql(
       'CREATE TRIGGER preprint_after_insert AFTER INSERT ON "preprint" \
         BEGIN \
-          INSERT INTO "preprint_fts" (rowid, title, handle, abstract_text, published, preprint_server, date_posted, url, content_encoding, content_url) \
-          VALUES (new.id, new.title, new.handle, new.abstract_text, new.published, new.preprint_server, new.date_posted, new.url, new.content_encoding, new.content_url); \
+          INSERT INTO "preprint_fts" (rowid, title, handle, abstract_text, authors, is_published, preprint_server, date_posted, url, content_encoding, content_url) \
+          VALUES (new.id, new.title, new.handle, new.abstract_text, new.authors, new.is_published, new.preprint_server, new.date_posted, new.url, new.content_encoding, new.content_url); \
         END;',
     );
     this.addSql(
       'CREATE TRIGGER preprint_after_delete AFTER DELETE ON "preprint" \
         BEGIN \
-          INSERT INTO "preprint_fts" (preprint_fts, rowid, title, handle, abstract_text, published, preprint_server, date_posted, url, content_encoding, content_url) \
-          VALUES ("delete", old.id, old.title, old.handle, old.abstract_text, old.published, old.preprint_server, old.date_posted, old.url, old.content_encoding, old.content_url); \
+          INSERT INTO "preprint_fts" (preprint_fts, rowid, title, handle, abstract_text, authors, is_published, preprint_server, date_posted, url, content_encoding, content_url) \
+          VALUES ("delete", old.id, old.title, old.handle, old.abstract_text, old.authors, old.is_published, old.preprint_server, old.date_posted, old.url, old.content_encoding, old.content_url); \
         END;',
     );
     this.addSql(
       'CREATE TRIGGER preprint_after_update AFTER UPDATE ON "preprint" \
         BEGIN \
-          INSERT INTO "preprint_fts" (preprint_fts, rowid, title, handle, abstract_text, published, preprint_server, date_posted, url, content_encoding, content_url) \
-          VALUES ("delete", old.id, old.title, old.handle, old.abstract_text, old.published, old.preprint_server, old.date_posted, old.url, old.content_encoding, old.content_url); \
-          INSERT INTO "preprint_fts" (rowid, title, handle, abstract_text, published, preprint_server, date_posted, url, content_encoding, content_url) \
-          VALUES (new.id, new.title, new.handle, new.abstract_text, new.published, new.preprint_server, new.date_posted, new.url, new.content_encoding, new.content_url); \
+          INSERT INTO "preprint_fts" (preprint_fts, rowid, title, handle, abstract_text, authors, is_published, preprint_server, date_posted, url, content_encoding, content_url) \
+          VALUES ("delete", old.id, old.title, old.handle, old.abstract_text, old.authors, old.is_published, old.preprint_server, old.date_posted, old.url, old.content_encoding, old.content_url); \
+          INSERT INTO "preprint_fts" (rowid, title, handle, abstract_text, authors, is_published, preprint_server, date_posted, url, content_encoding, content_url) \
+          VALUES (new.id, new.title, new.handle, new.abstract_text, new.authors, new.is_published, new.preprint_server, new.date_posted, new.url, new.content_encoding, new.content_url); \
         END;',
     );
     this.addSql(
