@@ -47,11 +47,12 @@ export default function RoleActivity({ persona }) {
         <section className="role-activity__history">
           <h3 className="role-activity__sub-title">History</h3>
           <ul className="role-activity__list">
-            {activity.length && activity.map(activity => (
-              <li key={activity.id} className="role-activity__list-item">
+            {activity.length &&
+              activity.map(activity => (
+                <li key={activity.id} className="role-activity__list-item">
                   <ActivityCard activity={activity} />
-              </li>
-            ))}
+                </li>
+              ))}
           </ul>
         </section>
       )}

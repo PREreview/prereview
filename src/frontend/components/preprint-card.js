@@ -1,6 +1,5 @@
 import React, { Fragment, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import omit from 'lodash/omit';
 import classNames from 'classnames';
 import { formatDistanceStrict } from 'date-fns';
 import {
@@ -175,7 +174,9 @@ export default function PreprintCard({
                     className="preprint-card__tag-list__item"
                   >
                     <Tooltip
-                      label={`Reviewers tagged this preprint as ${subject.name}`}
+                      label={`Reviewers tagged this preprint as ${
+                        subject.name
+                      }`}
                     >
                       <div>
                         <TagPill>{subject.name}</TagPill>
@@ -333,7 +334,7 @@ export default function PreprintCard({
               </span>
               <IconButton
                 className="preprint-card__expansion-toggle"
-                onClick={e => {
+                onClick={() => {
                   setIsOpened(!isOpened);
                 }}
               >

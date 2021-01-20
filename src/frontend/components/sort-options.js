@@ -106,7 +106,7 @@ export default function SortOptions({
 
 SortOptions.propTypes = {
   onChange: PropTypes.func.isRequired,
-  sort: PropTypes.oneOf(['score', 'reviewed', 'requested', 'new', 'date']),
+  sort: PropTypes.oneOf(['score', 'reviewed', 'requested', 'new', 'date', '']),
   order: PropTypes.string,
   onMouseEnterSortOption: PropTypes.func.isRequired,
   onMouseLeaveSortOption: PropTypes.func.isRequired,

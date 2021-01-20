@@ -141,6 +141,7 @@ export default function SettingsRoles({ user }) {
                   <TableCell>
                     <div className="settings__persona-list-item__username">
                       <RoleBadgeUI
+                        disabled={true}
                         user={persona}
                         className="settings__persona-badge"
                       />
@@ -230,7 +231,8 @@ SettingsRoles.propTypes = {
 function MakeActivePersonaModalButton({ user, persona, handleClose}) {
   const [isOpen, setIsOpen] = useState(false);
   const { mutate: updateUser, loading, error } = usePutUser({
-    id: user.id});
+    id: user.id,
+  });
 
   return (
     <Fragment>

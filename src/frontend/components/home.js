@@ -23,7 +23,6 @@ import { getId } from '../utils/jsonld';
 
 // components
 import AddButton from './add-button';
-import Button from './button';
 import HeaderBar from './header-bar';
 import Loading from './loading';
 import LoginRequiredModal from './login-required-modal';
@@ -38,9 +37,6 @@ import XLink from './xlink';
 
 // constants
 import { ORG } from '../constants';
-
-// icons
-import { MdChevronRight, MdFirstPage } from 'react-icons/md';
 
 const processParams = search => {
   const unprocessed = new URLSearchParams(search);

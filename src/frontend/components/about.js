@@ -2,13 +2,12 @@ import React from 'react';
 import { Helmet } from 'react-helmet-async';
 import { ORG } from '../constants';
 import Org from './org';
-import WellcomeLogo from '../svgs/wellcome-logo-black.svg';
 
 export default function About() {
   return (
     <article>
       <Helmet>
-        <title>{ORG} • About </title>
+        <title>{ORG} • About </title>
       </Helmet>
       <h1 id="about">About</h1>
       <section>

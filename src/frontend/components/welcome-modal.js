@@ -3,8 +3,6 @@ import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import Modal from './modal';
 import Button from './button';
-import PrereviewLogo from '../svgs/prereview-logo.svg';
-import OutbreakSciLogo from '../svgs/outbreak-science-logo.svg';
 import Org from './org';
 
 export default function WelcomeModal(props) {

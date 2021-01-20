@@ -31,10 +31,10 @@ export default function Checkbox({
       <label
         htmlFor={inputId}
         className="checkbox__contents"
-        onMouseDown={e => {
+        onMouseDown={() => {
           setFocusSource('mouse');
         }}
-        onFocus={e => {
+        onFocus={() => {
           if (focusSource !== 'mouse') {
             setFocused(true);
             setFocusSource(undefined);

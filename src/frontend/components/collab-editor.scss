@@ -1,17 +1,17 @@
-.remirror {
+.ql-editor {
+  background-color: #fff;
 
-  &-container {
-    display: flex;
+  p {
+    margin-bottom: 1em !important;
   }
+}
 
-  &-editor {
-    background-color: #fff;
-    border: 1px solid #ccc;
-    margin-top: 10px;
-    min-height: 300px;
-    min-width: 400px;
-    resize: vertical;
-    padding: 10px;
-    width: 90%;
-  }
+.ql-hidden {
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  height: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
 }

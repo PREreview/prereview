@@ -21,7 +21,7 @@ import PreprintPreview from './preprint-preview';
 import ReviewReader from './review-reader';
 import ReviewStepper from './review-stepper';
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles(() => ({
   root: {
     width: '100%',
   },
@@ -90,28 +90,24 @@ export default function ShellContent({
       if (preprint.fullReviews.length) {
         preprint.fullReviews.map(review => {
           review.authors.map(author => {
-            user.personas.some(persona => {
-              if (persona.identity === author.identity) {
-                if (review.published === true) {
-                  setHasLongReviewed(true);
-                } else {
-                  setInitialContent(
-                    review.drafts[review.drafts.length - 1].contents,
-                  );
-                }
+            if (author.id === user.defaultPersona.id) {
+              if (review.published === true) {
+                setHasLongReviewed(true);
+              } else {
+                setInitialContent(
+                  review.drafts[review.drafts.length - 1].contents,
+                );
               }
-            });
+            }
           });
         });
       }
 
       if (preprint.rapidReviews.length) {
         preprint.rapidReviews.map(review => {
-          user.personas.some(persona => {
-            if (persona.identity === review.author.identity) {
-              setHasRapidReviewed(true);
-            }
-          });
+          if (review.author.id === user.defaultPersona.id) {
+            setHasRapidReviewed(true);
+          }
         });
       }
 
@@ -121,7 +117,7 @@ export default function ShellContent({
           request.author.id
             ? (author = request.author.id)
             : (author = request.author);
-          setHasRequested(user.personas.some(persona => persona.id === author));
+          setHasRequested(user.defaultPersona.id === author);
         });
       }
     }
