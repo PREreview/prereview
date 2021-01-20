@@ -93,8 +93,7 @@ export default function ExtensionFallback() {
           </title>
         </Helmet>
 
-        {pdfUrl ? (
-          isMobile || isChromeOnMac ? (
+        {isMobile || isChromeOnMac ? (
             /* for mobile devices we always use the fallback */
             <Suspense fallback={<SuspenseLoading>Loading PDF</SuspenseLoading>}>
               <PdfViewer
@@ -134,8 +133,7 @@ export default function ExtensionFallback() {
                 </div>
               </div>
             </object>
-          )
-        ) : null}
+          )}
 
         <Shell>
           {onRequireScreen =>
