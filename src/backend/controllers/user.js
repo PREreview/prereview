@@ -104,9 +104,18 @@ export default function controller(users, thisUser) {
           log.debug(`User ${user.orcid} is an administrator!`);
           isAdmin = true;
         }
+        
+        let isModerator = false
+        if (await thisUser.isMemberOf('moderators', user.orcid)) {
+          log.debug(`User ${user.orcid} is a moderator!`)
+          isModerator = true
+        }
+
         ctx.status = 200;
         ctx.body = {
-          data: { ...user, isAdmin: isAdmin },
+          status: '200',
+          message: 'ok',
+          data: { ...user, isAdmin: isAdmin, isModerator: isModerator },
         };
       } else {
         ctx.throw(404, `That user with ID ${ctx.params.id} does not exist.`);

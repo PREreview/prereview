@@ -58,7 +58,7 @@ export default function controller(groupModel, userModel, thisUser) {
     },
     method: 'POST',
     path: '/groups',
-    // pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next),
+    pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next),
     validate: validationSchema,
     handler: async ctx => {
       if (ctx.invalid) {
@@ -237,7 +237,6 @@ export default function controller(groupModel, userModel, thisUser) {
     method: 'put',
     path: '/groups/:id/members/:uid',
     validate: {
-      type: 'json',
       params: {
         id: Joi.number()
           .integer()
@@ -277,7 +276,7 @@ export default function controller(groupModel, userModel, thisUser) {
         ctx.throw(400, `Failed to add user to group: ${err}`);
       }
 
-      ctx.body = { status: 201, message: 'created', data: group };
+      ctx.body = { status: 201, message: 'User has been added to group', data: group };
       ctx.status = 201;
     },
     meta: {
