@@ -51,7 +51,7 @@ export default function controller(rapidReviews, thisUser) {
       let rapidReview, authorPersona;
 
       try {
-        authorPersona = await getActivePersona(ctx.state.user);
+        authorPersona = ctx.state.user.defaultPersona;
       } catch (err) {
         log.error('Failed to load user personas.');
         ctx.throw(400, err);

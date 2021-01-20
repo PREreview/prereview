@@ -2,14 +2,12 @@ import React, { useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useLocation } from 'react-router-dom';
 import HeaderBar from './header-bar';
-import AnimatedLogo from '../svgs/rapid-prereview-logo-animation.svg';
 import Button from './button';
 import Checkbox from './checkbox';
 import XLink from './xlink';
 import Org from './org';
 import { ORG } from '../constants';
 import { useHasAgreedCoC } from '../hooks/ui-hooks';
-import Banner from './banner';
 
 // TODO make clear that by logging in user accepts the code of conduct
 

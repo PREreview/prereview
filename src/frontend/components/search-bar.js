@@ -40,4 +40,5 @@ SearchBar.propTypes = {
   defaultValue: PropTypes.string,
   onChange: PropTypes.func,
   onRequestSearch: PropTypes.func,
+  onCancelSearch: PropTypes.func,
 };

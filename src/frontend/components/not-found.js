@@ -1,5 +1,5 @@
 // base imports
-import React, { useContext, useEffect } from 'react';
+import React, { useContext } from 'react';
 import { Helmet } from 'react-helmet-async';
 
 // contexts

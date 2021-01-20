@@ -28,7 +28,7 @@ export default function Profile() {
     // window.scrollTo(0, 0);
     if (!loadingUser) {
       if (userData) {
-        if(!userData.data.isPrivate && userData.data.defaultPersona) {
+        if (!userData.data.isPrivate && userData.data.defaultPersona) {
           setPersona(userData.data.defaultPersona);
           setUser(userData.data);
           setLoading(false);
@@ -106,9 +106,7 @@ export default function Profile() {
                       <LabelStyle>Identity</LabelStyle>
                     </dt>
                     <dd>
-                      {persona && persona.isAnonymous
-                        ? 'Anonymous'
-                        : 'Public'}
+                      {persona && persona.isAnonymous ? 'Anonymous' : 'Public'}
                     </dd>
                   </Fragment>
                 )}

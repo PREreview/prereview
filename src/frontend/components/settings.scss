@@ -122,8 +122,11 @@
   }
 
   & .settings__persona-list-item__username {
-    text-overflow: ellipsis;
+    align-items: center;
+    display: flex;
+    justify-content: flex-start;
     overflow: hidden;
+    text-overflow: ellipsis;
   }
   & .settings__persona-badge {
     margin-right: var(--xsgrd);

@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { MenuItem } from '@reach/menu-button';
 import Value from './value';
 import RoleBadge from './role-badge';
 import { getTextAnswers } from '../utils/stats';
@@ -40,7 +39,7 @@ export default function TextAnswers({
                       <div className="text-answers__user-badge-container">
                         <RoleBadge user={author ? author : user}>
                           {isLoggedIn && (
-                            <MenuItem
+                            <div
                               disabled={isModerationInProgress}
                               onSelect={() => {
                                 onModerate(
@@ -49,7 +48,7 @@ export default function TextAnswers({
                               }}
                             >
                               Report Review
-                            </MenuItem>
+                            </div>
                           )}
                         </RoleBadge>
                       </div>

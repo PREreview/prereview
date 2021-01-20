@@ -1,5 +1,5 @@
 // base imports
-import React, { Suspense, useEffect, useMemo, useState } from 'react';
+import React from 'react';
 import { Helmet } from 'react-helmet-async';
 // import { unprefix } from '../utils/jsonld';
 import { ORG } from '../constants';

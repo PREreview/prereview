@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import noop from 'lodash/noop';
 import isEqual from 'lodash/isEqual';
 import classNames from 'classnames';
+import ReactHtmlParser, { convertNodeToElement } from 'react-html-parser';
 
 // material UI
 import { makeStyles } from '@material-ui/core/styles';
@@ -22,7 +23,7 @@ import { usePostComments } from '../hooks/api-hooks.tsx';
 // components
 import Barplot from './barplot';
 import Button from './button';
-import CollabEditor from './collab-editor';
+import CommentEditor from './comment-editor';
 import Controls from './controls';
 import { PotentialRoles } from './role-list';
 import ShareMenu from './share-menu';
@@ -106,20 +107,39 @@ const ReviewReader = React.memo(function ReviewReader({
     defaultHighlightedRoleIds || [],
   );
 
+  const transform = node => {
+    if (node.attribs.class === 'ql-editor') {
+      node.attribs.class = '';
+      node.attribs.contenteditable = false;
+    } else if (
+      node.attribs.class === 'ql-clipboard' ||
+      node.attribs.class === 'ql-tooltip ql-hidden'
+    ) {
+      return null;
+    }
+    return convertNodeToElement(node);
+  };
+
+  const options = {
+    decodeEntities: true,
+    transform,
+  };
+
   useEffect(() => {
     if (
       rapidContent &&
       Object.keys(rapidContent).length !== 0 &&
       rapidContent.constructor === Object
     ) {
-      const all = allRapidReviews.concat(rapidContent);
+      const all = [...allRapidReviews, rapidContent];
       setAllRapidReviews(all);
+      setAllReviews(allReviews => [...allReviews, rapidContent]);
     }
 
     if (longContent) {
-      setPublishedReviews(allPublishedReviews =>
-        allPublishedReviews.concat(longContent),
-      );
+      const all = [...publishedReviews, longContent];
+      setPublishedReviews(all);
+      setAllReviews(allReviews => [...allReviews, longContent]);
     }
   }, [
     rapidContent,
@@ -139,7 +159,12 @@ const ReviewReader = React.memo(function ReviewReader({
     }
   }, [defaultHighlightedRoleIds, highlightedRoleIds]);
 
-  useEffect(() => {}, [allRapidReviews, publishedReviews, newRequest]);
+  useEffect(() => {}, [
+    allReviews,
+    allRapidReviews,
+    publishedReviews,
+    newRequest,
+  ]);
 
   return (
     <div

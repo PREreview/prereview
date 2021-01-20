@@ -13,6 +13,10 @@
   transition: box-shadow 0.2s;
   border: 2px solid white;
 
+  &-container {
+    position: relative;
+  }
+
   &:hover {
     box-shadow: 1px 2px 5px rgba(0, 0, 0, 0.45);
     opacity: 1;
@@ -35,5 +39,32 @@
 .permalink-modal {
   & .controls {
     margin-top: var(--sgrd);
+  }
+}
+
+.share-menu-container {
+  position: relative;
+
+  .expandable {
+    $transition-speed: 400ms;
+
+    // Expanded state
+    &,
+    .js &[aria-hidden="false"] {
+      overflow: hidden;
+      transition: max-height $transition-speed ease-in-out,
+                  visibility 0s linear 0s;
+      visibility: visible;
+    }
+
+    // Collapsed state
+    &[aria-hidden="true"],
+    // Selector below prevents a flash of unstyled content (FOUC)
+    .js &:not([aria-hidden]) {
+      max-height: 0 !important;// !important required to override inline styles added by JS
+      transition: max-height $transition-speed ease-in-out,
+                  visibility 0s linear $transition-speed;
+      visibility: hidden;
+    }
   }
 }
