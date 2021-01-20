@@ -32,6 +32,10 @@ const useStyles = makeStyles(theme => ({
   root: {
     width: '100%',
   },
+  accordion: {
+    borderLeft: '5px solid #EBE9E9',
+    boxShadow: 'none',
+  },
   h3: {
     fontSize: theme.typography.pxToRem(24),
     fontWeight: '600',
@@ -66,10 +70,15 @@ const ReviewReader = React.memo(function ReviewReader({
     preprint.fullReviews.filter(review => review.isPublished),
   );
   const [allReviews] = useState(publishedReviews.concat(allRapidReviews));
-  const [expanded, setExpanded] = React.useState('rapid');
+  const [expandRapid, setExpandRapid] = React.useState(true);
+  const [expandLong, setExpandLong] = React.useState(true);
 
-  const handleChange = panel => (event, newExpanded) => {
-    setExpanded(newExpanded ? panel : false);
+  const handleChangeRapid = panel => (event, newExpanded) => {
+    setExpandRapid(newExpanded ? panel : false);
+  };
+
+  const handleChangeLong = panel => (event, newExpanded) => {
+    setExpandLong(newExpanded ? panel : false);
   };
 
   const {
@@ -142,8 +151,9 @@ const ReviewReader = React.memo(function ReviewReader({
       {allReviews.length ? (
         <div className={classes.root}>
           <Accordion
-            expanded={expanded === 'rapid'}
-            onChange={handleChange('rapid')}
+            className={classes.accordion}
+            expanded={expandRapid}
+            onChange={handleChangeRapid(!expandRapid)}
           >
             <AccordionSummary
               expandIcon={<ExpandMoreIcon />}
@@ -201,30 +211,30 @@ const ReviewReader = React.memo(function ReviewReader({
             </AccordionDetails>
           </Accordion>
           <Accordion
-            expanded={expanded === 'long'}
-            onChange={handleChange('long')}
+            className={classes.accordion}
+            expanded={expandLong}
+            onChange={handleChangeLong(!expandLong)}
           >
             <AccordionSummary
               expandIcon={<ExpandMoreIcon />}
               aria-controls="panel2a-content"
               id="panel2a-header"
             >
-              <Typography className={classes.heading}>
+              <Typography variant="h3" className={classes.h3}>
                 Longform Reviews
               </Typography>
             </AccordionSummary>
             <AccordionDetails>
               {publishedReviews && publishedReviews.length ? (
-                <div className="text-answers">
-                  <div className="text-answers__question">Longform Reviews</div>
-                  <h4 className="review-reader__sub-header">Reviewers</h4>
+                <>
+                  <Typography variant="h4" className={classes.h4} gutterBottom>
+                    Reviewers
+                  </Typography>
                   <div className="review-reader__persona-selector">
                     <PotentialRoles
                       role={role}
-                      allReviews={allReviews}
-                      hasReviewed={
-                        rapidContent || (longContent && longContent.length)
-                      }
+                      allReviews={publishedReviews}
+                      hasReviewed={longContent && longContent.length}
                       user={user}
                       isModerationInProgress={isModerationInProgress}
                       onModerate={onModerate}
@@ -237,159 +247,58 @@ const ReviewReader = React.memo(function ReviewReader({
                       }}
                     />
                   </div>
-                  {publishedReviews.map(review => {
-                    if (
-                      review.isPublished &&
-                      review.drafts &&
-                      review.drafts.length
-                    ) {
-                      return (
-                        <div
-                          key={review.id}
-                          className="text-answers__long-response-row"
-                        >
-                          {review.drafts[review.drafts.length - 1].title ? (
+                  <div className="text-answers">
+                    {publishedReviews.map(review => {
+                      if (
+                        review.isPublished &&
+                        review.drafts &&
+                        review.drafts.length
+                      ) {
+                        const reviewContent = review.drafts[review.drafts.length - 1];
+                        console.log(reviewContent);
+                        return (
+                          <Accordion>
+                            <AccordionSummary
+                              expandIcon={<ExpandMoreIcon />}
+                              aria-controls={`review-content-${review.id}`}
+                              id={`review-header-${review.id}`}
+                            >
+                              <Typography className={classes.h4}>{author.name}</Typography>
+                              <Typography className={classes.h4}>{reviewContent.title}</Typography>
+                            </AccordionSummary>
+                            <AccordionDetails>
+                              <Typography>
+                                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse malesuada lacus ex,
+                                sit amet blandit leo lobortis eget.
+                              </Typography>
+                            </AccordionDetails>
+                          </Accordion>
+                        );
+                      }
+                      if (typeof review === 'string') {
+                        return (
+                          <div
+                            key={'new-review'}
+                            className="text-answers__long-response-row"
+                          >
                             <div className="text-answers__question long">
-                              {review.drafts[review.drafts.length - 1].title}
+                              {'New user review'}
                             </div>
-                          ) : null}
-                          <div>
-                            {review.authors.map(author => (
-                              <span key={author.id}>
-                                <em>by {author.name}</em>
-                              </span>
-                            ))}
-                          </div>
-                          <div
-                            dangerouslySetInnerHTML={{
-                              __html: `${
-                                review.drafts[review.drafts.length - 1].contents
-                              }`,
-                            }}
-                          />
-                          {(review.comments || publishedComment) && (
-                            <div className="comments">
-                              <div>
-                                <b>Comments</b>
-                              </div>
-                              {review.comments
-                                ? review.comments.map(comment => {
-                                    return (
-                                      <div key={comment.id}>
-                                        {comment.title ? (
-                                          <div className="comments-title">
-                                            {comment.title}
-                                          </div>
-                                        ) : null}
-                                        <div>
-                                          <em>{comment.author.name}</em>
-                                        </div>
-                                        <div
-                                          dangerouslySetInnerHTML={{
-                                            __html: `${comment.contents}`,
-                                          }}
-                                        />
-                                      </div>
-                                    );
-                                  })
-                                : null}
-                              {publishedComment ? (
-                                <div>
-                                  {commentTitle ? (
-                                    <div className="comments-title">
-                                      {publishedTitle}
-                                    </div>
-                                  ) : null}
-                                  <div>
-                                    <em>{user.name}</em>
-                                  </div>
-                                  <div
-                                    dangerouslySetInnerHTML={{
-                                      __html: `${publishedComment}`,
-                                    }}
-                                  />
-                                </div>
-                              ) : null}
+                            <div className="">
+                              <span key={user.id}>by {user.name}</span>
                             </div>
-                          )}
-                          <form className="comments__add">
-                            <div>
-                              <b>Add a comment</b>
-                            </div>
-                            <input
-                              className="comments-title-input"
-                              type="text"
-                              placeholder={'Title'}
-                              value={commentTitle}
-                              onChange={event =>
-                                setCommentTitle(event.target.value)
-                              }
-                              required
+                            <div
+                              className=""
+                              dangerouslySetInnerHTML={{
+                                __html: `${review}`,
+                              }}
                             />
-                            <div className="remirror-container">
-                              <CollabEditor
-                                initialContent={''}
-                                handleContentChange={handleCommentChange}
-                              />
-                            </div>
-                            <Controls error={errorPostComment}>
-                              <Button
-                                type="submit"
-                                primary={true}
-                                isWaiting={loadingPostComment}
-                                disabled={!canSubmit(content)}
-                                onClick={event => {
-                                  event.preventDefault();
-                                  if (canSubmit(content)) {
-                                    postComment({
-                                      title: commentTitle,
-                                      contents: content,
-                                    })
-                                      .then(() => {
-                                        alert('Comment submitted successfully.');
-                                        return handleSubmitComment(
-                                          commentTitle,
-                                          content,
-                                        );
-                                      })
-                                      .catch(err =>
-                                        alert(`An error occurred: ${err.message}`),
-                                      );
-                                  } else {
-                                    alert('Comment cannot be blank.');
-                                  }
-                                }}
-                              >
-                                Save
-                              </Button>
-                            </Controls>
-                          </form>
-                        </div>
-                      );
-                    }
-                    if (typeof review === 'string') {
-                      return (
-                        <div
-                          key={'new-review'}
-                          className="text-answers__long-response-row"
-                        >
-                          <div className="text-answers__question long">
-                            {'New user review'}
                           </div>
-                          <div className="">
-                            <span key={user.id}>by {user.name}</span>
-                          </div>
-                          <div
-                            className=""
-                            dangerouslySetInnerHTML={{
-                              __html: `${review}`,
-                            }}
-                          />
-                        </div>
-                      );
-                    }
-                  })}
-                </div>
+                        );
+                      }
+                    })}
+                  </div>
+                </>
               ) : (
                 <div>No longform reviews to display.</div>
               )}
