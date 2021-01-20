@@ -80,8 +80,12 @@
   background-attachment: local, scroll, local, scroll;
 
   & li {
-    margin-right: var(--xxsgrd);
+    // margin-right: var(--xxsgrd);
     height: var(--lgrd);
+
+    &:not(:first-child) {
+      margin-left: -7px;
+    }
   }
   & li:last-child {
     margin-right: 0;
