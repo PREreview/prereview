@@ -39,11 +39,8 @@ const authWrapper = groups => {
   });
 
   roles.use('access admin pages', async ctx => {
-    log.debug('ctx.isAuthenticated', ctx.isAuthenticated());
     log.debug('Checking if user can access admin pages.');
     if (!ctx.isAuthenticated()) return false;
-
-    log.debug('ctx.state.user', ctx.state.user);
 
     return roles.isMemberOf('admins', ctx.state.user.orcid);
   });
