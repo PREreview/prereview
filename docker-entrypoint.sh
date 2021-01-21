@@ -37,6 +37,9 @@ if [ $result -ne 0 ]; then
   if [ $NODE_ENV = "staging" ]; then
     echo "Import legacy data"
     npm run db:import &
+  elif [ $NODE_ENV = "development" ]; then
+    echo "Generate seeds"
+    npm run db:seeds &
   fi
 else
   echo "Updating database schema"

@@ -213,6 +213,7 @@ export default function ReviewStepper({
   const [disabledRapid, setDisabledRapid] = React.useState(false);
   const [disabledSkip, setDisabledSkip] = React.useState(false);
   const [disabledSubmit, setDisabledSubmit] = React.useState(false);
+  const [disabledSaveSubmit, setDisabledSaveSubmit] = React.useState(false);
   const [skipped, setSkipped] = React.useState(new Set());
   const steps = getSteps();
 
@@ -244,7 +245,9 @@ export default function ReviewStepper({
 
   const handleSubmitRapid = () => {
     if (!checkedCOI) {
-      window.prompt('Please tell us about your conflict of interest');
+      window.prompt(
+        'Please tell us about the conflict of interest in your rapid review',
+      );
     }
 
     postRapidReview({ ...answerMap, preprint: preprint.id })
@@ -275,6 +278,39 @@ export default function ReviewStepper({
         .catch(err => alert(`An error occurred: ${err.message}`));
     } else {
       alert('Review cannot be blank.');
+    }
+  };
+
+  const handleSaveAndSubmit = () => {
+    if (canSubmitLong(content)) {
+      if (
+        confirm(
+          'Are you sure you want to publish your rapid review? This action cannot be undone.',
+        )
+      ) {
+        if (
+          Object.keys(answerMap).length !== 0 &&
+          answerMap.constructor === Object
+        ) {
+          postRapidReview({ ...answerMap, preprint: preprint.id })
+            .then(() => {
+              return;
+            })
+            .catch(err => alert(`An error occurred: ${err.message}`));
+        }
+
+        postLongReview({
+          preprint: preprint.id,
+          contents: content,
+        })
+          .then(() => {
+            alert(
+              'Rapid review submitted and long-form review draft updated successfully.',
+            );
+            return setDisabledSaveSubmit(true);
+          })
+          .catch(err => alert(`An error occurred: ${err.message}`));
+      }
     }
   };
 
@@ -332,8 +368,9 @@ export default function ReviewStepper({
       // it should never occur unless someone's actively trying to break something.
       throw new Error("You can't skip a step that isn't optional.");
     }
+    handleSubmitRapid();
     setDisabledSkip(true);
-    setExpandConsent(true);
+    // setExpandConsent(true);
   };
 
   const skippedSteps = () => {
@@ -402,10 +439,14 @@ export default function ReviewStepper({
   }
 
   function getSteps() {
-    return ['Rapid Review', 'Longform Review', 'Submitted'];
+    return ['Rapid Review', 'Long-form Review', 'Submitted'];
   }
 
   useEffect(() => {
+    if (hasRapidReviewed) {
+      setDisabledSaveSubmit(true);
+    }
+
     if (hasLongReviewed) {
       setActiveStep(2);
       handleComplete(4);
@@ -459,7 +500,7 @@ export default function ReviewStepper({
             <Box>
               {hasRapidReviewed ? (
                 <Box mt={2} mb={2} className={classes.yellow}>
-                  You have already submitted a rapid review. Would you like to submit a longform review?
+                  You have already submitted a rapid review. Would you like to submit a long-form review?
                 </Box>
               ) : (
                 <Box>
@@ -477,6 +518,36 @@ export default function ReviewStepper({
                       }}
                     />
                   </form>
+                  <Box mt={2} mb={2} className={classes.yellow}>
+                    Thank you for your contribution!
+                    <br />
+                    Please review{' '}
+                    <Link href="#">PREreview Code of Conduct</Link> before
+                    submitting your review.
+                  </Box>
+                  <FormControlLabel
+                    className={classes.formLabel}
+                    control={
+                      <Checkbox
+                        checked={checkedCOI}
+                        onChange={handleCOIChange}
+                        name="checkedCOI"
+                        color="primary"
+                      />
+                    }
+                    label="I have no conflict of interest in reviewing this preprint."
+                  />
+                  {/*<Box textAlign="right">
+                    <Button
+                      disabled={disabledSubmit}
+                      variant="contained"
+                      color="primary"
+                      onClick={handleSubmitRapid}
+                      className={classes.button}
+                    >
+                      Submit
+                    </Button>
+                  </Box>*/}
                 </Box>
               )}
               <Box textAlign="right">
@@ -492,8 +563,9 @@ export default function ReviewStepper({
               </Box>
               {expandFeedback ? (
                 <Box>
-                  <Box mt={2} mb={2}>
-                    Would you like to expand on your feedback with a longform review?
+                  <Box mt={2} mb={2} className={classes.yellow}>
+                    Would you like to expand on your feedback with a long-form
+                    review?
                   </Box>
                   <Box textAlign="right">
                     <Button
@@ -558,7 +630,7 @@ export default function ReviewStepper({
                       Instructions
                     </Typography>
                     <Typography variant="body2" gutterBottom>
-                      Use the space below to compose your longform review.
+                      Use the space below to compose your long-form review.
                     </Typography>
                     <Typography variant="body2" gutterBottom>
                       Please remember to be constructive and to abide by the{' '}
@@ -585,13 +657,22 @@ export default function ReviewStepper({
                   </Box>
                   <Box textAlign="right">
                     <Button
+                      disabled={disabledSaveSubmit}
+                      variant="outlined"
+                      color="primary"
+                      onClick={handleSaveAndSubmit}
+                      className={classes.button}
+                    >
+                      Save and Submit Rapid
+                    </Button>
+                    <Button
                       disabled={disabledSubmit}
                       variant="outlined"
                       color="primary"
                       onClick={handleSaveLong}
                       className={classes.button}
                     >
-                      Save
+                      Save Draft
                     </Button>
                     <Button
                       disabled={disabledSubmit}

@@ -35,9 +35,9 @@ export default function Profile() {
         }
       }
     }
-  }, [loadingUser, userData]);
+  }, [loadingPersona, personaData]);
 
-  if (error || !persona) {
+  if (error || !personaData) {
     // #FIXME
     return <NotFound />;
   } else if (loading) {
@@ -55,7 +55,7 @@ export default function Profile() {
 
         <section className="profile__content">
           <header className="profile__header">
-            {persona && persona.avatar && persona.avatar.contentUrl ? (
+            {persona && persona.avatar && persona.avatar ? (
               <img
                 src={user.avatar.contentUrl}
                 alt="avatar"

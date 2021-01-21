@@ -4,7 +4,7 @@
 }
 
 .shell {
-  z-index: 2;
+  z-index: 105;
   position: fixed;
   background-color: white;
   -ms-overflow-style: -ms-autohiding-scrollbar;
@@ -49,17 +49,15 @@
 
 .shell__control-bar {
   height: var(--shell-header-height);
-
   position: relative;
-  z-index: 1000001;
+  z-index: 102;
 }
 .shell__controls {
   background: white;
-  z-index: 1000001;
+  z-index: 102;
   height: var(--shell-header-height);
   box-sizing: border-box;
   position: fixed;
-  overflow: hidden;
   display: flex;
   justify-content: space-between;
   align-items: center;

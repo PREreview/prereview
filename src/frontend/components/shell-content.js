@@ -21,7 +21,7 @@ import PreprintPreview from './preprint-preview';
 import ReviewReader from './review-reader';
 import ReviewStepper from './review-stepper';
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles(() => ({
   root: {
     width: '100%',
   },
@@ -38,6 +38,7 @@ export default function ShellContent({
   onRequireScreen,
 }) {
   const location = useLocation();
+  const [height, setHeight] = useState(0);
 
   const {
     mutate: postReviewRequest,
@@ -86,32 +87,36 @@ export default function ShellContent({
   };
 
   useEffect(() => {
+    const newHeight = document.getElementsByClassName(
+      'shell-content__preview',
+    )[0].clientHeight;
+    setHeight(newHeight);
+    console.log(newHeight);
+  }, []);
+
+  useEffect(() => {
     if (user) {
       if (preprint.fullReviews.length) {
         preprint.fullReviews.map(review => {
           review.authors.map(author => {
-            user.personas.some(persona => {
-              if (persona.identity === author.identity) {
-                if (review.published === true) {
-                  setHasLongReviewed(true);
-                } else {
-                  setInitialContent(
-                    review.drafts[review.drafts.length - 1].contents,
-                  );
-                }
+            if (author.id === user.defaultPersona.id) {
+              if (review.published === true) {
+                setHasLongReviewed(true);
+              } else {
+                setInitialContent(
+                  review.drafts[review.drafts.length - 1].contents,
+                );
               }
-            });
+            }
           });
         });
       }
 
       if (preprint.rapidReviews.length) {
         preprint.rapidReviews.map(review => {
-          user.personas.some(persona => {
-            if (persona.identity === review.author.identity) {
-              setHasRapidReviewed(true);
-            }
-          });
+          if (review.author.id === user.defaultPersona.id) {
+            setHasRapidReviewed(true);
+          }
         });
       }
 
@@ -121,7 +126,7 @@ export default function ShellContent({
           request.author.id
             ? (author = request.author.id)
             : (author = request.author);
-          setHasRequested(user.personas.some(persona => persona.id === author));
+          setHasRequested(user.defaultPersona.id === author);
         });
       }
     }
@@ -153,64 +158,63 @@ export default function ShellContent({
 
       <div className="shell-content__preview">
         <PreprintPreview preprint={preprint} />
+        <header className="shell-content__header">
+          <nav>
+            <ul>
+              <li>
+                <Button
+                  className={classNames('shell-content__tab-button', {
+                    'shell-content__tab-button--active': tab === 'read',
+                  })}
+                  disabled={!preprint}
+                  onClick={() => {
+                    onRequireScreen();
+                    setTab('read');
+                  }}
+                >
+                  Read Reviews
+                </Button>
+              </li>
+              <li>
+                <Button
+                  className={classNames('shell-content__tab-button', {
+                    'shell-content__tab-button--active': tab === 'reviews',
+                  })}
+                  disabled={!preprint}
+                  onClick={() => {
+                    if (user) {
+                      onRequireScreen();
+                      setTab('reviews');
+                    } else {
+                      setIsLoginModalOpen(true);
+                    }
+                  }}
+                >
+                  Add Review(s)
+                </Button>
+              </li>
+              <li>
+                <Button
+                  className={classNames('shell-content__tab-button', {
+                    'shell-content__tab-button--active': tab === 'request',
+                  })}
+                  disabled={loadingPostReviewRequest}
+                  onClick={() => {
+                    if (user) {
+                      onRequireScreen();
+                      setTab('request');
+                    } else {
+                      setIsLoginModalOpen(true);
+                    }
+                  }}
+                >
+                  Add Request
+                </Button>
+              </li>
+            </ul>
+          </nav>
+        </header>
       </div>
-
-      <header className="shell-content__header">
-        <nav>
-          <ul>
-            <li>
-              <Button
-                className={classNames('shell-content__tab-button', {
-                  'shell-content__tab-button--active': tab === 'read',
-                })}
-                disabled={!preprint}
-                onClick={() => {
-                  onRequireScreen();
-                  setTab('read');
-                }}
-              >
-                Read reviews
-              </Button>
-            </li>
-            <li>
-              <Button
-                className={classNames('shell-content__tab-button', {
-                  'shell-content__tab-button--active': tab === 'reviews',
-                })}
-                disabled={!preprint}
-                onClick={() => {
-                  if (user) {
-                    onRequireScreen();
-                    setTab('reviews');
-                  } else {
-                    setIsLoginModalOpen(true);
-                  }
-                }}
-              >
-                Add Review(s)
-              </Button>
-            </li>
-            <li>
-              <Button
-                className={classNames('shell-content__tab-button', {
-                  'shell-content__tab-button--active': tab === 'request',
-                })}
-                disabled={loadingPostReviewRequest}
-                onClick={() => {
-                  if (user) {
-                    onRequireScreen();
-                    setTab('request');
-                  } else {
-                    setIsLoginModalOpen(true);
-                  }
-                }}
-              >
-                Add Request
-              </Button>
-            </li>
-          </ul>
-        </nav>
-      </header>
       {isLoginModalOpen && (
         <LoginRequiredModal
           next={process.env.IS_EXTENSION ? undefined : location.pathname}
@@ -219,7 +223,7 @@ export default function ShellContent({
           }}
         />
       )}
-      <div className="shell-content__body">
+      <div className="shell-content__body" style={{ paddingTop: height }}>
         {tab === 'read' ? (
           <ShellContentRead
             user={user}

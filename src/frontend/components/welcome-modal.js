@@ -3,8 +3,6 @@ import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import Modal from './modal';
 import Button from './button';
-import PrereviewLogo from '../svgs/prereview-logo.svg';
-import OutbreakSciLogo from '../svgs/outbreak-science-logo.svg';
 import Org from './org';
 
 export default function WelcomeModal(props) {
@@ -25,18 +23,21 @@ export default function WelcomeModal(props) {
           </h2>
 
           <p>
-            This platform was designed to facilitate rapid, open review of
-            preprint related to outbreaks.
+            This platform was designed to facilitate rapid and long-form, open
+            review of preprints.
           </p>
           <div>
             Here you can:
             <ol>
-              <li>Find rapid reviews of existing preprints.</li>
+              <li>Find rapid and long-form reviews of existing preprints.</li>
               <li>
                 Request reviews of preprints (your own, or preprints you are
                 interested in).
               </li>
-              <li>Review preprints.</li>
+              <li>
+                Review preprints (as an individual, with a mentor, or in
+                collaboration with co-reviewers).
+              </li>
             </ol>
           </div>
 
@@ -44,9 +45,9 @@ export default function WelcomeModal(props) {
             <Button pill={true} primary={true} onClick={props.onClose}>
               Get Started
             </Button>
-            <Link className="welcome-modal__get-app" to="/extension">
+            {/*<Link className="welcome-modal__get-app" to="/extension">
               Get Extension
-            </Link>
+            </Link>*/}
           </div>
         </div>
         <div className="welcome-modal__logo-row">

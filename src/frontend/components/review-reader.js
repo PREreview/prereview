@@ -1,17 +1,25 @@
+// base imports
 import React, { useState, useEffect, Fragment } from 'react';
 import PropTypes from 'prop-types';
 import noop from 'lodash/noop';
 import isEqual from 'lodash/isEqual';
 import classNames from 'classnames';
-import Barplot from './barplot';
-import Controls from './controls';
-import Button from './button';
+import ReactHtmlParser, { convertNodeToElement } from 'react-html-parser';
+
+// utils
 import { getYesNoStats } from '../utils/stats';
-import TextAnswers from './text-answers';
+
+// hooks
+import { usePostComments } from '../hooks/api-hooks.tsx';
+
+// components
+import Barplot from './barplot';
+import Button from './button';
+import CommentEditor from './comment-editor';
+import Controls from './controls';
 import { PotentialRoles } from './role-list';
 import ShareMenu from './share-menu';
-import CollabEditor from './collab-editor';
-import { usePostComments } from '../hooks/api-hooks.tsx';
+import TextAnswers from './text-answers';
 
 const ReviewReader = React.memo(function ReviewReader({
   user,
@@ -34,7 +42,9 @@ const ReviewReader = React.memo(function ReviewReader({
   const [publishedReviews, setPublishedReviews] = useState(
     preprint.fullReviews.filter(review => review.isPublished),
   );
-  const [allReviews] = useState(publishedReviews.concat(allRapidReviews));
+  const [allReviews, setAllReviews] = useState(
+    publishedReviews.concat(allRapidReviews),
+  );
 
   const {
     mutate: postComment,
@@ -61,20 +71,41 @@ const ReviewReader = React.memo(function ReviewReader({
     defaultHighlightedRoleIds || [],
   );
 
+  const transform = node => {
+    if (node.attribs) {
+      if (node.attribs.class === 'ql-editor') {
+        node.attribs.class = '';
+        node.attribs.contenteditable = false;
+      } else if (
+        node.attribs.class === 'ql-clipboard' ||
+        node.attribs.class === 'ql-tooltip ql-hidden'
+      ) {
+        return null;
+      }
+    }
+    return convertNodeToElement(node);
+  };
+
+  const options = {
+    decodeEntities: true,
+    transform,
+  };
+
   useEffect(() => {
     if (
       rapidContent &&
       Object.keys(rapidContent).length !== 0 &&
       rapidContent.constructor === Object
     ) {
-      const all = allRapidReviews.concat(rapidContent);
+      const all = [...allRapidReviews, rapidContent];
       setAllRapidReviews(all);
+      setAllReviews(allReviews => [...allReviews, rapidContent]);
     }
 
     if (longContent) {
-      setPublishedReviews(allPublishedReviews =>
-        allPublishedReviews.concat(longContent),
-      );
+      const all = [...publishedReviews, longContent];
+      setPublishedReviews(all);
+      setAllReviews(allReviews => [...allReviews, longContent]);
     }
   }, [
     rapidContent,
@@ -94,7 +125,12 @@ const ReviewReader = React.memo(function ReviewReader({
     }
   }, [defaultHighlightedRoleIds, highlightedRoleIds]);
 
-  useEffect(() => {}, [allRapidReviews, publishedReviews, newRequest]);
+  useEffect(() => {}, [
+    allReviews,
+    allRapidReviews,
+    publishedReviews,
+    newRequest,
+  ]);
 
   return (
     <div
@@ -184,7 +220,7 @@ const ReviewReader = React.memo(function ReviewReader({
 
           {publishedReviews && publishedReviews.length ? (
             <div className="text-answers">
-              <div className="text-answers__question">Longform Reviews</div>
+              <div className="text-answers__question">Long-form Reviews</div>
               {publishedReviews.map(review => {
                 if (review.isPublished && review.drafts && review.drafts.length) {
                   return (
@@ -204,13 +240,12 @@ const ReviewReader = React.memo(function ReviewReader({
                           </span>
                         ))}
                       </div>
-                      <div
-                        dangerouslySetInnerHTML={{
-                          __html: `${
-                            review.drafts[review.drafts.length - 1].contents
-                          }`,
-                        }}
-                      />
+                      <div>
+                        {ReactHtmlParser(
+                          review.drafts[review.drafts.length - 1].contents,
+                          options,
+                        )}
+                      </div>
                       {(review.comments || publishedComment) && (
                         <div className="comments">
                           <div>
@@ -270,12 +305,10 @@ const ReviewReader = React.memo(function ReviewReader({
                           }
                           required
                         />
-                        <div className="remirror-container">
-                          <CollabEditor
-                            initialContent={''}
-                            handleContentChange={handleCommentChange}
-                          />
-                        </div>
+                        <CommentEditor
+                          initialContent={''}
+                          handleContentChange={handleCommentChange}
+                        />
                         <Controls error={errorPostComment}>
                           <Button
                             type="submit"
@@ -321,7 +354,13 @@ const ReviewReader = React.memo(function ReviewReader({
                         {'New user review'}
                       </div>
                       <div className="">
-                        <span key={user.id}>by {user.name}</span>
+                      {console.log(user)}
+                        <span key={user.id}>
+                          by{' '}
+                          {user.defaultPersona
+                            ? user.defaultPersona.name
+                            : user.name}
+                        </span>
                       </div>
                       <div
                         className=""

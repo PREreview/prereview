@@ -1,4 +1,4 @@
-import React, { Fragment, useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { makeStyles, withStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
 
@@ -22,7 +22,7 @@ import RadioButton from './radio-button';
 import IconButton from './icon-button';
 import Collapse from './collapse';
 
-const StyledTableCell = withStyles(theme => ({
+const StyledTableCell = withStyles(() => ({
   root: {
     borderBottom: 'none',
   },
@@ -50,7 +50,6 @@ const useStyles = makeStyles({
   },
   table: {
     borderBottom: 'none',
-    maxHeight: 650,
   },
   textAnswer: {
     // display: 'inline-block',
@@ -133,7 +132,7 @@ export default function RapidFormFragment({ answerMap = {}, onChange }) {
                       name={identifier}
                       value="yes"
                       checked={answer === 'yes'}
-                      onChange={e => {
+                      onChange={() => {
                         handleChange(identifier, 'yes');
                       }}
                       label="Yes"
@@ -146,7 +145,7 @@ export default function RapidFormFragment({ answerMap = {}, onChange }) {
                       name={identifier}
                       value="no"
                       checked={answer === 'no'}
-                      onChange={e => {
+                      onChange={() => {
                         handleChange(identifier, 'no');
                       }}
                       label="No"
@@ -159,7 +158,7 @@ export default function RapidFormFragment({ answerMap = {}, onChange }) {
                       name={identifier}
                       value="N/A"
                       checked={answer === 'N/A'}
-                      onChange={e => {
+                      onChange={() => {
                         handleChange(identifier, 'N/A');
                       }}
                       label={<abbr title="Not Applicable">N/A</abbr>}
@@ -172,7 +171,7 @@ export default function RapidFormFragment({ answerMap = {}, onChange }) {
                       name={identifier}
                       value="unsure"
                       checked={answer === 'unsure'}
-                      onChange={e => {
+                      onChange={() => {
                         handleChange(identifier, 'unsure');
                       }}
                       label="Unsure"
