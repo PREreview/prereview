@@ -1,7 +1,8 @@
 .preprint-preview {
   font: var(--ui-basic-font);
   background-color: var(--xlight-grey);
-  padding: var(--sgrd) var(--sgrd);
+  padding: var(--sgrd);
+  padding-bottom: calc(var(--sgrd) + 30px);
   border-radius: 2px;
 
   & .preprint-preview__header {

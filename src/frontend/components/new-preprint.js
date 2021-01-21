@@ -1,5 +1,5 @@
 // base imports
-import React, { useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useLocation, useHistory } from 'react-router-dom';
 import identifiersArxiv from 'identifiers-arxiv';
@@ -7,11 +7,10 @@ import doiRegex from 'doi-regex';
 
 // utils
 import { unversionDoi } from '../utils/ids';
-import { unprefix, getId } from '../utils/jsonld';
-import { checkIfHasReviewed, checkIfHasRequested } from '../utils/actions';
+import { unprefix } from '../utils/jsonld';
 
 // hooks
-import { usePreprint, usePreprintActions } from '../hooks/old-hooks';
+import { usePreprint } from '../hooks/old-hooks';
 import { usePostRequests } from '../hooks/api-hooks.tsx';
 
 // components
@@ -20,12 +19,7 @@ import Button from './button';
 import TextInput from './text-input';
 import PreprintPreview from './preprint-preview';
 
-export default function NewPreprint({
-  user,
-  onCancel,
-  onSuccess,
-  onViewInContext,
-}) {
+export default function NewPreprint({ user, onCancel, onSuccess }) {
   const location = useLocation(); // location.state can be {preprint, tab, isSingleStep} with tab being `request` or `review` (so that we know on which tab the shell should be activated with
   const qs = new URLSearchParams(location.search);
 
@@ -48,15 +42,11 @@ export default function NewPreprint({
       null,
   });
 
-  const [actions, fetchActionsProgress] = usePreprintActions(identifier);
-
   const [preprint, resolvePreprintStatus] = usePreprint(
     identifier,
     location.state && location.state.preprint,
     url,
   );
-
-  const [action] = useState(null);
 
   const [step, setStep] = useState(
     location.state && location.state.tab === 'reviews'
@@ -66,23 +56,10 @@ export default function NewPreprint({
       : 'NEW_PREPRINT',
   );
 
-  const isNew =
-    !fetchActionsProgress.isActive &&
-    actions.filter(_action => getId(_action) !== getId(action)).length === 0;
-
-  const handleViewInContext = useCallback(
-    data => {
-      onViewInContext(data, isNew);
-    },
-    [isNew, onViewInContext]
-  );
-
   return (
     <div className="new-preprint">
       {step === 'NEW_PREPRINT' ? (
         <StepPreprint
-          actions={actions}
-          fetchActionsProgress={fetchActionsProgress}
           user={user}
           onCancel={onCancel}
           onStep={setStep}
@@ -92,55 +69,6 @@ export default function NewPreprint({
           identifier={identifier}
           preprint={preprint}
           resolvePreprintStatus={resolvePreprintStatus}
-          onViewInContext={onViewInContext}
-        />
-      ) : preprint && step === 'NEW_REVIEW' ? (
-        <StepReview
-          isSingleStep={isSingleStep}
-          onCancel={e => {
-            if (isSingleStep) {
-              onCancel();
-            } else {
-              setStep('NEW_PREPRINT');
-            }
-          }}
-          preprint={preprint}
-          onSuccess={()=> {
-            setStep('REVIEW_SUCCESS');
-          }}
-          onViewInContext={handleViewInContext}
-        />
-      ) : preprint && step === 'NEW_REQUEST' ? (
-        <StepRequest
-          isSingleStep={isSingleStep}
-          onCancel={() => {
-            if (isSingleStep) {
-              onCancel();
-            } else {
-              setStep('NEW_PREPRINT');
-            }
-          }}
-          preprint={preprint}
-          onSuccess={() => {
-            setStep('REQUEST_SUCCESS');
-          }}
-          onViewInContext={handleViewInContext}
-        />
-      ) : preprint && step === 'REVIEW_SUCCESS' ? (
-        <StepReviewSuccess
-          preprint={preprint}
-          onClose={() => {
-            onSuccess(preprint);
-          }}
-          onViewInContext={handleViewInContext}
-        />
-      ) : preprint && step === 'REQUEST_SUCCESS' ? (
-        <StepRequestSuccess
-          preprint={preprint}
-          onClose={() => {
-            onSuccess(preprint);
-          }}
-          onViewInContext={handleViewInContext}
         />
       ) : null}
     </div>
@@ -150,28 +78,23 @@ NewPreprint.propTypes = {
   user: PropTypes.object,
   onCancel: PropTypes.func.isRequired,
   onSuccess: PropTypes.func.isRequired,
-  onViewInContext: PropTypes.func.isRequired,
 };
 
 function StepPreprint({
-  user,
   onCancel,
-  onStep,
   onIdentifier,
   identifier,
   preprint,
-  actions,
-  fetchActionsProgress,
   resolvePreprintStatus,
-  onViewInContext,
 }) {
   const history = useHistory();
   const location = useLocation();
 
+  const [error, setError] = useState(false);
   const [value, setValue] = useState(unprefix(identifier));
 
-  const hasReviewed = checkIfHasReviewed(user, actions);
-  const hasRequested = checkIfHasRequested(user, actions);
+  // const hasReviewed = checkIfHasReviewed(user, actions);
+  // const hasRequested = checkIfHasRequested(user, actions);
 
   // Note: biorXiv use versioned DOI in URL but do not register those DOIs with
   // doi.org => they 404 when we dereference them
@@ -197,9 +120,10 @@ function StepPreprint({
           minimal={true}
           autoComplete="off"
           placeholder=""
-          onChange={e => {
-            if (location.search) {
-              const qs = new URLSearchParams(location.search);
+          onChange={event => {
+            const value = event.target.value;
+            if (value) {
+              const qs = new URLSearchParams(value);
               if (qs.get('identifier')) {
                 qs.delete('identifier');
                 history.replace({
@@ -209,7 +133,6 @@ function StepPreprint({
               }
             }
 
-            const value = e.target.value;
             const [arxivId] = identifiersArxiv.extract(value);
             let nextIdentifier;
             if (arxivId) {
@@ -221,6 +144,7 @@ function StepPreprint({
                 nextIdentifier = doi;
               } else {
                 nextIdentifier = '';
+                value === '' ? setError(false) : setError(true);
               }
             }
 
@@ -258,13 +182,13 @@ function StepPreprint({
         </p>
       ) : null}
 
-      {fetchActionsProgress.isActive && (
+      {resolvePreprintStatus.loading && (
         <p>Checking for existing reviews or requests for reviews…</p>
       )}
 
       <Controls
         className="new-preprint__button-bar"
-        error={resolvePreprintStatus.error}
+        error={error || resolvePreprintStatus.error}
       >
         <Button
           onClick={() => {
@@ -276,34 +200,24 @@ function StepPreprint({
           Cancel
         </Button>
         <Button
-          onClick={e => {
-            onViewInContext({
-              preprint,
-              tab: 'request'
-            })
+          onClick={() => {
+            history.push(`/preprints/${preprint.id}`, {
+              tab: 'request',
+              isSingleStep: true,
+            });
           }}
-          disabled={
-            fetchActionsProgress.isActive ||
-            hasRequested ||
-            !identifier ||
-            !preprint
-          }
+          disabled={!identifier || !preprint}
         >
           Request reviews
         </Button>
         <Button
           onClick={() => {
-            onViewInContext({
-              preprint,
+            history.push(`/preprints/${preprint.id}`, {
               tab: 'reviews',
+              isSingleStep: true,
             });
           }}
-          disabled={
-            fetchActionsProgress.isActive ||
-            hasReviewed ||
-            !identifier ||
-            !preprint
-          }
+          disabled={!identifier || !preprint}
         >
           Add reviews
         </Button>
@@ -319,9 +233,6 @@ StepPreprint.propTypes = {
   identifier: PropTypes.string,
   preprint: PropTypes.object,
   resolvePreprintStatus: PropTypes.object,
-  onViewInContext: PropTypes.func.isRequired,
-  actions: PropTypes.array.isRequired,
-  fetchActionsProgress: PropTypes.object.isRequired,
 };
 
 function StepRequest({ isSingleStep, preprint, onCancel, onSuccess }) {

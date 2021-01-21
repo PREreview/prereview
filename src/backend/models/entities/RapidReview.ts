@@ -29,6 +29,14 @@ export class RapidReview extends BaseEntity {
   @ManyToOne({ entity: () => Preprint })
   preprint!: Preprint;
 
+  //eslint-disable-next-line
+  @Property()
+  isPublished: boolean = false;
+
+  //eslint-disable-next-line
+  @Property()
+  isFlagged: boolean = false;
+
   @Fixture({ enum: Checkboxes })
   @Enum(() => Checkboxes)
   ynNovel = Checkboxes.na;
@@ -80,6 +88,10 @@ export class RapidReview extends BaseEntity {
   @Fixture(faker => faker.lorem.sentence())
   @Property({ columnType: 'text', nullable: true })
   linkToData?: string;
+
+  @Fixture(faker => faker.lorem.sentence())
+  @Property({ columnType: 'text', nullable: true })
+  coi?: string;
 
   constructor(author: Persona, preprint: Preprint) {
     super();

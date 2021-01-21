@@ -1,13 +1,10 @@
 // base imports
-import React, { Fragment, useContext, useEffect, useState} from 'react';
+import React, { Fragment, useContext, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Helmet } from 'react-helmet-async';
 
 // contexts
 import { UserContext } from '../contexts/user-context';
-
-// utils
-import { getId } from '../utils/jsonld';
 
 // hooks
 import {
@@ -102,7 +99,9 @@ export default function AdminPanel() {
                         </div>
                         <div className="admin-panel__card-list-item__right">
                           <LabelStyle>
-                            {!moderator.defaultPersona.isAnonymous ? 'Public' : 'Anonymous'}
+                            {!moderator.defaultPersona.isAnonymous
+                              ? 'Public'
+                              : 'Anonymous'}
                           </LabelStyle>
                           <IconButton
                             className="admin-panel__remove-button"
@@ -163,7 +162,7 @@ function AdminPanelAddModal({ group, onClose, onSuccess }) {
     id: group,
     uid: value,
   });
-  const [frame, setFrame] = useState('input');
+  const [frame] = useState('input');
 
   return (
     <Modal title="Add Moderator">
@@ -251,7 +250,7 @@ function AdminPanelRemoveModal({
     id: group.id,
     uid: userToDelete.id,
   });
-  const [frame, setFrame] = useState('submit');
+  const [frame] = useState('submit');
 
   return (
     <Modal title="Revoke Moderator Permission">
@@ -312,7 +311,7 @@ function AdminPanelRemoveModal({
               error={error} // #FIXME
             >
               <Button
-                disabled={updateUserRole.loading}
+                disabled={loading}
                 onClick={() => {
                   onClose();
                 }}

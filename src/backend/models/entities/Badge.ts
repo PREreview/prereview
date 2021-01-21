@@ -7,14 +7,14 @@ import {
   Unique,
 } from '@mikro-orm/core';
 import { Fixture } from 'class-fixtures-factory';
-import { TagModel } from '../tags';
+import { BadgeModel } from '../badges';
 import { BaseEntity } from './BaseEntity';
-import { Preprint } from './Preprint';
+import { Persona } from './Persona';
 
 @Entity()
-export class Tag extends BaseEntity {
+export class Badge extends BaseEntity {
   //eslint-disable-next-line
-  [EntityRepositoryType]?: TagModel;
+  [EntityRepositoryType]?: BadgeModel;
 
   @Fixture(faker => `${faker.commerce.color()} ${faker.random.word()}`)
   @Property()
@@ -26,8 +26,8 @@ export class Tag extends BaseEntity {
   @Property()
   color?: string;
 
-  @ManyToMany({ entity: () => Preprint, inversedBy: 'tags' })
-  preprints: Collection<Preprint> = new Collection<Preprint>(this);
+  @ManyToMany({ entity: () => Persona, inversedBy: 'badges' })
+  personas: Collection<Persona> = new Collection<Persona>(this);
 
   constructor(name: string, color = '#FF0000') {
     super();

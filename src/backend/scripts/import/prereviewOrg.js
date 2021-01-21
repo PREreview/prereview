@@ -329,7 +329,7 @@ async function prereviewOrgImportReviews(db, client, usersMap, preprintsMap) {
       const draft = new FullReviewDraft(review, r.content);
       review.drafts.add(draft);
       review.createdAt = new Date(r.date_created);
-      review.published = !r.is_hidden;
+      review.isPublished = !r.is_hidden;
       if (author && author.defaultPersona) {
         review.authors.add(author.defaultPersona);
       } else {

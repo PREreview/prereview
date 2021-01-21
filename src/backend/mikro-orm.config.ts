@@ -1,5 +1,6 @@
 import { Options } from '@mikro-orm/core';
 import {
+  Badge,
   BaseEntity,
   Comment,
   Community,
@@ -27,6 +28,7 @@ const portString = config.dbPort ? `:${config.dbPort}` : '';
 
 const options: Options = {
   entities: [
+    Badge,
     BaseEntity,
     Comment,
     Community,

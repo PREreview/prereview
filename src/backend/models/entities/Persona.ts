@@ -11,6 +11,7 @@ import {
 import { Fixture } from 'class-fixtures-factory';
 import { PersonaModel } from '../personas';
 import { BaseEntity } from './BaseEntity';
+import { Badge } from './Badge';
 import { FullReview } from './FullReview';
 import { RapidReview } from './RapidReview';
 import { Request } from './Request';
@@ -33,6 +34,16 @@ export class Persona extends BaseEntity {
   @Property()
   isAnonymous!: boolean;
 
+  //eslint-disable-next-line
+  @Fixture(() => false)
+  @Property()
+  isLocked: boolean = false;
+
+  //eslint-disable-next-line
+  @Fixture(() => false)
+  @Property()
+  isFlagged: boolean = false;
+
   @Fixture(faker => faker.lorem.paragraph())
   @Property({ columnType: 'text', nullable: true })
   bio?: string;
@@ -50,10 +61,15 @@ export class Persona extends BaseEntity {
   @OneToMany({ entity: () => Request, mappedBy: 'author' })
   requests: Collection<Request> = new Collection<Request>(this);
 
+  @ManyToMany({ entity: () => Badge, mappedBy: 'personas' })
+  badges: Collection<Badge> = new Collection<Badge>(this);
+
   constructor(
     name: string,
     identity: User,
     isAnonymous = false,
+    isFlagged = false,
+    isLocked = false,
     bio: string,
     avatar?: Buffer,
   ) {
@@ -61,6 +77,8 @@ export class Persona extends BaseEntity {
     this.name = name;
     this.identity = identity;
     this.isAnonymous = isAnonymous;
+    this.isFlagged = isFlagged;
+    this.isLocked = isLocked;
     this.bio = bio;
     this.avatar = avatar;
   }

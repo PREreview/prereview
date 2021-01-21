@@ -208,7 +208,7 @@ export function usePreprint(
               emit: false,
             });
             setPreprint(data);
-            setProgress({ isActive: false, error: null });
+            return setProgress({ isActive: false, error: null });
           })
           .catch(err => {
             if (err.name !== 'AbortError') {

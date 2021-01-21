@@ -20,7 +20,7 @@ export function useAnimatedScore(preprint, now = new Date().toISOString()) {
   // };
 
   const publishedReviews = preprint.fullReviews.filter(
-    review => review.published,
+    review => review.isPublished,
   );
 
   const sorted = publishedReviews

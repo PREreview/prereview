@@ -18,13 +18,11 @@ import {
 } from '../hooks/ui-hooks';
 
 // utils
-import { createPreprintQs } from '../utils/search';
 import { createPreprintId } from '../../common/utils/ids.js';
 import { getId } from '../utils/jsonld';
 
 // components
 import AddButton from './add-button';
-import Button from './button';
 import HeaderBar from './header-bar';
 import Loading from './loading';
 import LoginRequiredModal from './login-required-modal';
@@ -39,9 +37,6 @@ import XLink from './xlink';
 
 // constants
 import { ORG } from '../constants';
-
-// icons
-import { MdChevronRight, MdFirstPage } from 'react-icons/md';
 
 const processParams = search => {
   const unprocessed = new URLSearchParams(search);
@@ -66,7 +61,6 @@ const processParams = search => {
 
   return processed;
 };
-
 
 const searchParamsToObject = params => {
   const obj = {};
@@ -94,8 +88,9 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState(params.get('search') || '');
 
-  const { data: preprints, loading: loadingPreprints, error } = useGetPreprints({
-    queryParams: searchParamsToObject(params),
+  const { data: preprints, loading: loadingPreprints, error } = useGetPreprints(
+    {
+      queryParams: searchParamsToObject(params),
     },
   );
 
@@ -167,7 +162,10 @@ export default function Home() {
         <SearchBar
           defaultValue={search}
           isFetching={loadingPreprints}
-          onChange={value => setSearch(value)}
+          onChange={value => {
+            params.delete('page');
+            setSearch(value);
+          }}
           onCancelSearch={() => {
             params.delete('search');
             setSearch('');
@@ -253,10 +251,7 @@ export default function Home() {
               onMouseLeaveSortOption={() => {
                 setHoveredSortOption(null);
               }}
-              onChange={(
-                sortOption,
-                sortOrder
-              ) => {
+              onChange={(sortOption, sortOrder) => {
                 params.set('desc', sortOrder === 'desc');
                 history.push({
                   pathname: location.pathame,
@@ -319,13 +314,13 @@ export default function Home() {
 
             <div className="home__pagination">
               <Pagination
-                count={Math.ceil((preprints.totalCount / params.get('limit')))}
-                page={parseInt("" + params.get('page'))}
+                count={Math.ceil(preprints.totalCount / params.get('limit'))}
+                page={parseInt('' + params.get('page'))}
                 onChange={(ev, page) => {
                   params.set('page', page);
                   history.push({
                     pathname: location.pathname,
-                    search: params.toString()
+                    search: params.toString(),
                   });
                 }}
               />

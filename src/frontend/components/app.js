@@ -48,7 +48,7 @@ export default function App({ user }) {
   const [loading, setLoading] = useState(true);
   const [thisUser, setThisUser] = useState(null);
 
-  useEffect(() => {}, [thisUser]);
+  useEffect(() => { }, [thisUser]);
 
   useEffect(() => {
     const username = Cookies.get('PRE_user');

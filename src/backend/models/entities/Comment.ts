@@ -16,8 +16,16 @@ export class Comment extends BaseEntity {
   [EntityRepositoryType]?: CommentModel;
 
   @Fixture(faker => faker.lorem.sentences())
-  @Property()
+  @Property({ columnType: 'text' })
   contents!: string;
+
+  //eslint-disable-next-line
+  @Property()
+  isPublished: boolean = false;
+
+  //eslint-disable-next-line
+  @Property()
+  isFlagged: boolean = false;
 
   @ManyToOne({ entity: () => Persona })
   author!: Persona;

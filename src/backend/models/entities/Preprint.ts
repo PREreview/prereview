@@ -1,4 +1,5 @@
 import {
+  ArrayType,
   Collection,
   Entity,
   EntityRepositoryType,
@@ -31,9 +32,13 @@ export class Preprint extends BaseEntity {
   @Property({ columnType: 'text' })
   title!: string;
 
+  @Fixture(faker => faker.name.findName())
+  @Property({ columnType: 'text', nullable: true })
+  authors?: string;
+
   @Fixture(() => true)
   @Property()
-  published!: boolean;
+  isPublished!: boolean;
 
   @Fixture(faker => faker.lorem.paragraph())
   @Property({ columnType: 'text', nullable: true })
@@ -105,7 +110,7 @@ export class Preprint extends BaseEntity {
   constructor(
     handle: string,
     title: string,
-    published = false,
+    isPublished = false,
     abstractText?: string,
     preprintServer?: string,
     datePosted?: Date,
@@ -118,7 +123,7 @@ export class Preprint extends BaseEntity {
     super();
     this.handle = handle;
     this.title = title;
-    this.published = published;
+    this.isPublished = isPublished;
     this.abstractText = abstractText;
     this.preprintServer = preprintServer;
     this.datePosted = datePosted;

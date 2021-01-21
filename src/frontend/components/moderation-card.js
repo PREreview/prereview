@@ -14,8 +14,8 @@ import { getTextAnswers, getActiveReports } from '../utils/stats';
 import RoleBadge from './role-badge';
 import Modal from './modal';
 import {
-  // useDeleteRapidReview,
-  // useDeleteFullReview,
+  useDeleteRapidReview,
+  useDeleteFullReview,
   useGetUser,
 } from '../hooks/api-hooks.tsx';
 
@@ -233,9 +233,9 @@ function ModerationCardModal({
   user,
   defaultFrame,
 }) {
-  const [frame, setFrame] = useState(defaultFrame);
-  const deleteRapidReview = DeleteRapidReview();
-  const deleteFullReview = DeleteFullReview();
+  const [frame] = useState(defaultFrame);
+  const deleteRapidReview = useDeleteRapidReview();
+  const deleteFullReview = useDeleteFullReview();
   const ref = useRef();
 
   return (

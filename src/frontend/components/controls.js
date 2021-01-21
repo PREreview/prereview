@@ -3,11 +3,14 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
 export default function Controls({ error, className, children }) {
-  const errMsg = formatError(error);
 
   return (
     <div className={classNames('controls', className)}>
-      {!!errMsg && <div>{errMsg}</div>}
+      {!!error && (
+        <div className="controls__error">
+          Not found. Check for errors and try again.
+        </div>
+      )}
 
       <div className="controls__body">
         <div className="controls__buttons">{children}</div>
@@ -18,15 +21,7 @@ export default function Controls({ error, className, children }) {
 Controls.propTypes = {
   className: PropTypes.string,
   children: PropTypes.any,
-  error: PropTypes.oneOfType([
-    PropTypes.instanceOf(Error),
-    PropTypes.shape({
-      '@type': PropTypes.oneOf(['Error']),
-      name: PropTypes.string,
-      description: PropTypes.string,
-      statusCode: PropTypes.number,
-    }),
-  ]),
+  error: PropTypes.oneOfType([PropTypes.instanceOf(Error), PropTypes.string]),
 };
 
 function formatError(err) {
