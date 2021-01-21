@@ -8,7 +8,7 @@ import HeaderBar from './header-bar';
 import { ORG } from '../constants';
 import { createBlockedRolesQs } from '../utils/search';
 // import { useRolesSearchResults, usePostAction } from '../hooks/api-hooks.tsx';
-import { useGetUsers, usePutUser } from '../hooks/api-hooks.tsx';
+import { useGetPersonas, usePutPersona } from '../hooks/api-hooks.tsx';
 import Button from './button';
 import IconButton from './icon-button';
 import { RoleBadgeUI } from './role-badge';
@@ -22,11 +22,9 @@ export default function BlockPanel() {
   // const [bookmark, setBookmark] = useState(null);
   const [loading, setLoading] = useState(true);
   const [group, setGroup] = useState(null);
-  const [blockedUsers, setBlockedUsers] = useState(null);
+  const [blockedPersonas, setBlockedPersonas] = useState(null);
 
-  // const search = createBlockedRolesQs({ bookmark });
-
-  const { data: users, loadingUsers } = useGetUsers();
+  const { data: personas, loadingPersonas } = useGetPersonas();
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [unmoderatedRole, setUnmoderatedRole] = useState(null);
@@ -39,9 +37,9 @@ export default function BlockPanel() {
   }, []);
 
    useEffect(() => {
-    if (!loadingUsers) {
-      if (users && users.data[0]) {
-        setBlockedUsers(users.data[0].filter(user => user.is))
+    if (!loadingPersonas) {
+      if (personas && personas.data[0]) {
+        setBlockedPersonas(personas.data[0].filter(persona => persona.isFlagged)) // return only personas who have been flagged
         setLoading(false);
       }
     }
@@ -67,22 +65,13 @@ export default function BlockPanel() {
           </Button>
         </header>
 
-        {groups.total_rows === 0 && !loadingGroup && !added.length ? (
+        {!blockedPersonas.length ? (
           <div>No blocked persona.</div>
         ) : (
           <div>
             <ul className="block-panel__card-list">
-              {added
-                .concat(
-                  groups.rows
-                    .map(row => row.doc)
-                    .filter(
-                      role =>
-                        !excluded.has(getId(role)) &&
-                        !added.some(_role => getId(_role) === getId(role)),
-                    ),
-                )
-                .map(role => (
+              { blockedPersonas
+                .map(persona => (
                   <li key={getId(role)} className="block-panel__card-list-item">
                     <div className="block-panel__card-list-item__left">
                       <RoleBadgeUI role={role} />

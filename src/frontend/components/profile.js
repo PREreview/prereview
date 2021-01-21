@@ -6,7 +6,7 @@ import { MdPublic } from 'react-icons/md';
 import { Helmet } from 'react-helmet-async';
 import IncognitoIcon from '../svgs/incognito_icon.svg';
 import HeaderBar from './header-bar';
-import { useGetUser } from '../hooks/api-hooks.tsx';
+import { useGetPersona } from '../hooks/api-hooks.tsx';
 import RoleActivity from './role-activity';
 import LabelStyle from './label-style';
 import XLink from './xlink';
@@ -20,17 +20,17 @@ export default function Profile() {
   const [user, setUser] = useState(null);
   const [persona, setPersona] = useState(null);
 
-  const { data: userData, loading: loadingUser, error } = useGetUser({
+  const { data: personaData, loading: loadingPersona, error } = useGetPersona({
     id: location.pathname.slice(7),
   });
 
   useEffect(() => {
     // window.scrollTo(0, 0);
-    if (!loadingUser) {
-      if (userData) {
-        if(!userData.data.isPrivate && userData.data.defaultPersona) {
-          setPersona(userData.data.defaultPersona);
-          setUser(userData.data);
+    if (!loadingPersona) {
+      if (personaData) {
+        if(!userData) {
+          setPersona(personaData);
+          setUser(personaData.identity);
           setLoading(false);
         }
       }
