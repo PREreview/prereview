@@ -38,6 +38,7 @@ export default function ShellContent({
   onRequireScreen,
 }) {
   const location = useLocation();
+  const [height, setHeight] = useState(0);
 
   const {
     mutate: postReviewRequest,
@@ -84,6 +85,14 @@ export default function ShellContent({
     setNewRequest(true);
     setTab('read');
   };
+
+  useEffect(() => {
+    const newHeight = document.getElementsByClassName(
+      'shell-content__preview',
+    )[0].clientHeight;
+    setHeight(newHeight);
+    console.log(newHeight);
+  }, []);
 
   useEffect(() => {
     if (user) {
@@ -149,64 +158,63 @@ export default function ShellContent({
 
       <div className="shell-content__preview">
         <PreprintPreview preprint={preprint} />
+        <header className="shell-content__header">
+          <nav>
+            <ul>
+              <li>
+                <Button
+                  className={classNames('shell-content__tab-button', {
+                    'shell-content__tab-button--active': tab === 'read',
+                  })}
+                  disabled={!preprint}
+                  onClick={() => {
+                    onRequireScreen();
+                    setTab('read');
+                  }}
+                >
+                  Read Reviews
+                </Button>
+              </li>
+              <li>
+                <Button
+                  className={classNames('shell-content__tab-button', {
+                    'shell-content__tab-button--active': tab === 'reviews',
+                  })}
+                  disabled={!preprint}
+                  onClick={() => {
+                    if (user) {
+                      onRequireScreen();
+                      setTab('reviews');
+                    } else {
+                      setIsLoginModalOpen(true);
+                    }
+                  }}
+                >
+                  Add Review(s)
+                </Button>
+              </li>
+              <li>
+                <Button
+                  className={classNames('shell-content__tab-button', {
+                    'shell-content__tab-button--active': tab === 'request',
+                  })}
+                  disabled={loadingPostReviewRequest}
+                  onClick={() => {
+                    if (user) {
+                      onRequireScreen();
+                      setTab('request');
+                    } else {
+                      setIsLoginModalOpen(true);
+                    }
+                  }}
+                >
+                  Add Request
+                </Button>
+              </li>
+            </ul>
+          </nav>
+        </header>
       </div>
-
-      <header className="shell-content__header">
-        <nav>
-          <ul>
-            <li>
-              <Button
-                className={classNames('shell-content__tab-button', {
-                  'shell-content__tab-button--active': tab === 'read',
-                })}
-                disabled={!preprint}
-                onClick={() => {
-                  onRequireScreen();
-                  setTab('read');
-                }}
-              >
-                Read Reviews
-              </Button>
-            </li>
-            <li>
-              <Button
-                className={classNames('shell-content__tab-button', {
-                  'shell-content__tab-button--active': tab === 'reviews',
-                })}
-                disabled={!preprint}
-                onClick={() => {
-                  if (user) {
-                    onRequireScreen();
-                    setTab('reviews');
-                  } else {
-                    setIsLoginModalOpen(true);
-                  }
-                }}
-              >
-                Add Review(s)
-              </Button>
-            </li>
-            <li>
-              <Button
-                className={classNames('shell-content__tab-button', {
-                  'shell-content__tab-button--active': tab === 'request',
-                })}
-                disabled={loadingPostReviewRequest}
-                onClick={() => {
-                  if (user) {
-                    onRequireScreen();
-                    setTab('request');
-                  } else {
-                    setIsLoginModalOpen(true);
-                  }
-                }}
-              >
-                Add Request
-              </Button>
-            </li>
-          </ul>
-        </nav>
-      </header>
       {isLoginModalOpen && (
         <LoginRequiredModal
           next={process.env.IS_EXTENSION ? undefined : location.pathname}
@@ -215,7 +223,7 @@ export default function ShellContent({
           }}
         />
       )}
-      <div className="shell-content__body">
+      <div className="shell-content__body" style={{ paddingTop: height }}>
         {tab === 'read' ? (
           <ShellContentRead
             user={user}
