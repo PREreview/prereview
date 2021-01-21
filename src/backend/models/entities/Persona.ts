@@ -34,6 +34,16 @@ export class Persona extends BaseEntity {
   @Property()
   isAnonymous!: boolean;
 
+  //eslint-disable-next-line
+  @Fixture(() => false)
+  @Property()
+  isLocked: boolean = false;
+
+  //eslint-disable-next-line
+  @Fixture(() => false)
+  @Property()
+  isFlagged: boolean = false;
+
   @Fixture(faker => faker.lorem.paragraph())
   @Property({ columnType: 'text', nullable: true })
   bio?: string;
@@ -58,6 +68,8 @@ export class Persona extends BaseEntity {
     name: string,
     identity: User,
     isAnonymous = false,
+    isFlagged = false,
+    isLocked = false,
     bio: string,
     avatar?: Buffer,
   ) {
@@ -65,6 +77,8 @@ export class Persona extends BaseEntity {
     this.name = name;
     this.identity = identity;
     this.isAnonymous = isAnonymous;
+    this.isFlagged = isFlagged;
+    this.isLocked = isLocked;
     this.bio = bio;
     this.avatar = avatar;
   }

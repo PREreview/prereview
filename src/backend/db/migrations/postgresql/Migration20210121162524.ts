@@ -1,6 +1,6 @@
 import { Migration } from '@mikro-orm/migrations';
 
-export class Migration20210119201945 extends Migration {
+export class Migration20210121162524 extends Migration {
 
   async up(): Promise<void> {
     this.addSql('create table "tag" ("id" serial primary key, "created_at" timestamptz(0) not null, "updated_at" timestamptz(0) not null, "name" varchar(255) not null, "color" varchar(255) not null);');
@@ -12,7 +12,7 @@ export class Migration20210119201945 extends Migration {
     this.addSql('create table "tag_preprints" ("tag_id" int4 not null, "preprint_id" int4 not null);');
     this.addSql('alter table "tag_preprints" add constraint "tag_preprints_pkey" primary key ("tag_id", "preprint_id");');
 
-    this.addSql('create table "persona" ("id" serial primary key, "created_at" timestamptz(0) not null, "updated_at" timestamptz(0) not null, "name" varchar(255) not null, "identity_id" int4 null, "is_anonymous" bool not null, "bio" text null, "avatar" bytea null);');
+    this.addSql('create table "persona" ("id" serial primary key, "created_at" timestamptz(0) not null, "updated_at" timestamptz(0) not null, "name" varchar(255) not null, "identity_id" int4 null, "is_anonymous" bool not null, "is_locked" bool not null, "is_flagged" bool not null, "bio" text null, "avatar" bytea null);');
     this.addSql('alter table "persona" add constraint "persona_name_unique" unique ("name");');
 
     this.addSql('create table "rapid_review" ("id" serial primary key, "created_at" timestamptz(0) not null, "updated_at" timestamptz(0) not null, "author_id" int4 not null, "preprint_id" int4 not null, "is_published" bool not null, "is_flagged" bool not null, "yn_novel" text check ("yn_novel" in (\'yes\', \'no\', \'N/A\', \'unsure\')) not null, "yn_future" text check ("yn_future" in (\'yes\', \'no\', \'N/A\', \'unsure\')) not null, "yn_reproducibility" text check ("yn_reproducibility" in (\'yes\', \'no\', \'N/A\', \'unsure\')) not null, "yn_methods" text check ("yn_methods" in (\'yes\', \'no\', \'N/A\', \'unsure\')) not null, "yn_coherent" text check ("yn_coherent" in (\'yes\', \'no\', \'N/A\', \'unsure\')) not null, "yn_limitations" text check ("yn_limitations" in (\'yes\', \'no\', \'N/A\', \'unsure\')) not null, "yn_ethics" text check ("yn_ethics" in (\'yes\', \'no\', \'N/A\', \'unsure\')) not null, "yn_new_data" text check ("yn_new_data" in (\'yes\', \'no\', \'N/A\', \'unsure\')) not null, "yn_recommend" text check ("yn_recommend" in (\'yes\', \'no\', \'N/A\', \'unsure\')) not null, "yn_peer_review" text check ("yn_peer_review" in (\'yes\', \'no\', \'N/A\', \'unsure\')) not null, "yn_available_code" text check ("yn_available_code" in (\'yes\', \'no\', \'N/A\', \'unsure\')) not null, "yn_available_data" text check ("yn_available_data" in (\'yes\', \'no\', \'N/A\', \'unsure\')) not null, "link_to_data" text null, "coi" text null);');
