@@ -37,7 +37,7 @@ export default function AdminPanel() {
   const [moderators, setModerators] = useState(null);
 
   const { data: groupData, loadingGroup } = useGetGroup({
-    id: 'moderators',
+    name: 'moderators',
   });
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
