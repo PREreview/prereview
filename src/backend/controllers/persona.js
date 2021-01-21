@@ -67,7 +67,7 @@ export default function controller(personasModel, thisUser) {
           'requests',
           'fullReviews',
           'rapidReviews',
-          'identity'
+          'identity',
         ]);
         if (!persona) {
           ctx.throw(404, `Persona with ID ${ctx.params.id} doesn't exist`);
