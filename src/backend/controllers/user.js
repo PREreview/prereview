@@ -135,17 +135,17 @@ export default function controller(users, thisUser) {
       //   email: Joi.string(),
       // }),
       // type: 'json',
-      // params: {
-      //   id: Joi.alternatives()
-      //     .try(Joi.number().integer(), Joi.string())
-      //     .description('User id')
-      //     .required(),
-      // },
       params: {
-        id: Joi.string()
+        id: Joi.alternatives()
+          .try(Joi.number().integer(), Joi.string())
           .description('User id')
           .required(),
       },
+      // params: {
+      //   id: Joi.string()
+      //     .description('User id')
+      //     .required(),
+      // },
       continueOnError: false,
       false: 400,
     },

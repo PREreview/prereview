@@ -338,14 +338,14 @@ export default function Shell({ children, defaultStatus = 'default' }) {
                 )}
 
                 {!!(user && user.isModerator) && (
-                  <MenuLink
+                  <XLink
                     as={process.env.IS_EXTENSION ? undefined : Link}
                     to={process.env.IS_EXTENSION ? undefined : '/moderate'}
                     href={`/moderate`}
                     target={process.env.IS_EXTENSION ? '_blank' : undefined}
                   >
                     Moderate Reviews
-                  </MenuLink>
+                  </XLink>
                 )}
 
                 <XLink to={'logout'} href={`/api/v2/logout`}>

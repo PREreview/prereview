@@ -13,9 +13,6 @@ export default function HeaderBar({ onClickMenuButton, closeGap, thisUser }) {
 
   let roles = []
 
-  console.log("roles>", roles)
-  console.log("thisUser", thisUser)
-
   //const showProfileNotice = checkIfRoleLacksMininmalData(role);
   const showProfileNotice = false;
   const isMobile = useIsMobile();
@@ -161,16 +158,15 @@ export default function HeaderBar({ onClickMenuButton, closeGap, thisUser }) {
               )}
 
               { thisUser.isModerator ? (
-                <MenuLink
-                  as={process.env.IS_EXTENSION ? undefined : Link}
+                <XLink
                   to={process.env.IS_EXTENSION ? undefined : '/moderate'}
                   href={`/moderate`}
                   target={process.env.IS_EXTENSION ? '_blank' : undefined}
                 > 
                 Moderate Reviews
-                </MenuLink>
+                </XLink>
               ) : null }
-              <MenuLink href={`/api/v2/logout`}>Logout</MenuLink>
+              <XLink to="/logout" href={`/api/v2/logout`}>Logout</XLink>
             </UserBadge>
           ) : (
             <XLink to="/login" href="/login">

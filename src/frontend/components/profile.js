@@ -17,23 +17,20 @@ export default function Profile() {
   const location = useLocation();
   const thisUser = useContext(UserContext);
   const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState(null);
   const [persona, setPersona] = useState(null);
 
   const { data: personaData, loading: loadingPersona, error } = useGetPersona({
     id: location.pathname.slice(7),
   });
 
+  persona ? console.log("&***************", persona) : console.log("no persona yet")
+  
   useEffect(() => {
-    // window.scrollTo(0, 0);
     if (!loadingPersona) {
       if (personaData) {
-        if(!userData) {
-          setPersona(personaData);
-          setUser(personaData.identity);
+          setPersona(personaData.data[0]);
           setLoading(false);
         }
-      }
     }
   }, [loadingPersona, personaData]);
 
@@ -55,9 +52,9 @@ export default function Profile() {
 
         <section className="profile__content">
           <header className="profile__header">
-            {persona && persona.avatar && persona.avatar ? (
+            {persona && persona.avatar ? (
               <img
-                src={user.avatar.contentUrl}
+                src={persona.avatar}
                 alt="avatar"
                 className="profile__avatar-img"
               />
@@ -66,9 +63,9 @@ export default function Profile() {
             <section className="profile__identity-info">
               <header className="profile__indentity-info-header">
                 <h2 className="profile__username">
-                  {persona && persona.name ? persona.name : user.name}
+                  {persona && persona.name ? persona.name : "Name goes here"}
                 </h2>
-                {user ? (
+                { persona ? (
                   <span className="profile__persona-status">
                     {persona && !persona.isAnonymous ? (
                       <div className="profile__persona-status__icon-container">
@@ -94,13 +91,13 @@ export default function Profile() {
                 </dt>
                 <dd>
                   <XLink
-                    to={`/about/${user.orcid ? user.orcid : user.id}`}
-                    href={`/about/${user.orcid ? user.orcid : user.id}`}
+                    to={`/about/${persona.id}`}
+                    href={`/about/${persona.id}`}
                   >
                     {persona.name}
                   </XLink>
                 </dd>
-                {user && (
+                {persona && (
                   <Fragment>
                     <dt>
                       <LabelStyle>Identity</LabelStyle>
@@ -113,25 +110,25 @@ export default function Profile() {
                   </Fragment>
                 )}
 
-                {user.orcid && (
+                { !persona.isAnonymous && (
                   <Fragment>
                     <dt>
                       <LabelStyle>ORCID</LabelStyle>
                     </dt>
                     <dd>
-                      <a href={`https://orcid.org/${user.orcid}`}>
-                        {user.orcid}
+                      <a href={`https://orcid.org/${persona.identity.orcid}`}>
+                        {persona.identity.orcid}
                       </a>
                     </dd>
                   </Fragment>
                 )}
 
-                {user && (
+                { persona && (
                   <Fragment>
                     <dt>
                       <LabelStyle>Member since</LabelStyle>
                     </dt>
-                    <dd>{format(new Date(user.createdAt), 'MMM. d, yyyy')}</dd>
+                    <dd>{format(new Date(persona.createdAt), 'MMM. d, yyyy')}</dd> 
                   </Fragment>
                 )}
               </dl>

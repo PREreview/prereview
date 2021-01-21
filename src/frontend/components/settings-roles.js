@@ -71,7 +71,7 @@ export default function SettingsRoles({ user }) {
       </p>
 
       <p>
-        The <strong>public</strong> persona is the persona that will be used
+        The <strong>active</strong> persona is the persona that will be used
         when you write <em>new</em> reviews or <em>new</em> request for feedback
         on preprints. It can be changed at any time.
       </p>
@@ -147,8 +147,8 @@ export default function SettingsRoles({ user }) {
                       />
 
                       <XLink
-                        href={`/about/${unprefix(user.id)}`}
-                        to={`/about/${unprefix(user.id)}`}
+                        href={`/about/${persona.id}`}
+                        to={`/about/${persona.id}`}
                         className="settings__persona-link"
                       >
                         {persona.name || unprefix(persona.id)}
@@ -248,13 +248,13 @@ function MakeActivePersonaModalButton({ user, persona, handleClose}) {
       {isOpen && (
         <Modal title={`Set active persona to ${persona.name}`}>
           <p>
-            The <strong>public</strong> persona makes your information viewable
+            The <strong>active</strong> persona makes your information viewable
             by other users when you write <em>new</em> reviews or <em>new</em>{' '}
             request for feedback on preprints. Once your profile is public, it
             cannot be changed.
           </p>
 
-          <Controls error={error}>
+          <Controls>
             <Button
               disabled={loading}
               onClick={() => {

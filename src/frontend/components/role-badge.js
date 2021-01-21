@@ -27,7 +27,7 @@ const RoleBadge = React.forwardRef(function RoleBadge(
   { children, className, tooltip, showNotice, disabled, user },
   ref,
 ) {
-  console.log('user in RoleBadge', user)
+  console.log("USER IN ROLEBADGE**********", user)
   return (
     <RoleBadgeUI
       ref={ref}
@@ -60,6 +60,9 @@ const RoleBadgeUI = React.forwardRef(function RoleBadgeUI(
   { user, className, children, tooltip, showNotice = false, disabled = false },
   ref,
 ) {
+
+// ****  USER IN THIS COMPONENT IS ACTUALLY A PERSONA OBJECT **** //
+
   const classes = useStyles();
   const [anchorEl, setAnchorEl] = React.useState(null);
 
@@ -102,10 +105,10 @@ const RoleBadgeUI = React.forwardRef(function RoleBadgeUI(
               <div
                 className={classNames('role-badge-menu__avatar', {
                   'role-badge-menu__avatar--loaded':
-                    user && user.avatar && user.avatar.contentUrl,
+                    user && user.avatar,
                 })}
                 style={
-                  user && user.avatar && user.avatar.contentUrl
+                  user && user.avatar
                     ? {
                         backgroundImage: `url(${user.avatar.contentUrl})`,
                         backgroundSize: 'contain',
@@ -136,22 +139,14 @@ const RoleBadgeUI = React.forwardRef(function RoleBadgeUI(
           <XLink
             className="menu__list__link-item"
             href={`/about/${
-              user.orcid
-                ? user.orcid
-                : user.identity
-                ? user.identity.orcid
-                : user.id
+              user.id
             }`}
             target={process.env.IS_EXTENSION ? '_blank' : undefined}
             to={
               process.env.IS_EXTENSION
                 ? undefined
                 : `/about/${
-                    user.orcid
-                      ? user.orcid
-                      : user.identity
-                      ? user.identity.orcid
-                      : user.id
+                    user.defaultPersona ? user.defaultPersona.id : user.id
                   }`
             }
           >
