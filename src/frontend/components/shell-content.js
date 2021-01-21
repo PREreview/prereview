@@ -40,6 +40,8 @@ export default function ShellContent({
   const location = useLocation();
   const [height, setHeight] = useState(0);
 
+  console.log("USER IN SHELLCONTENT", user)
+
   const {
     mutate: postReviewRequest,
     loadingPostReviewRequest,
@@ -123,11 +125,9 @@ export default function ShellContent({
       if (preprint.requests.length) {
         let author;
         preprint.requests.map(request => {
-          request.author.id
-            ? (author = request.author.id)
-            : (author = request.author);
-          setHasRequested(user.defaultPersona.id === author);
-        });
+          request.author.id ? author = request.author.id : author = request.author
+          setHasRequested(user.personas.some(persona => persona.id === author))
+        })
       }
     }
   }, [
