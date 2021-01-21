@@ -1,14 +1,14 @@
-import React, { Fragment, useState, useEffect } from 'react';
+import React, { Fragment, useContext, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Helmet } from 'react-helmet-async';
 import { MdClose } from 'react-icons/md';
-import { UserProvider } from '../contexts/user-context';
+import { UserContext } from '../contexts/user-context';
 import { getId, unprefix } from '../utils/jsonld';
 import HeaderBar from './header-bar';
 import { ORG } from '../constants';
 import { createBlockedRolesQs } from '../utils/search';
 // import { useRolesSearchResults, usePostAction } from '../hooks/api-hooks.tsx';
-import { useGetGroups, usePostGroups } from '../hooks/api-hooks.tsx';
+import { useGetUsers, usePutUser } from '../hooks/api-hooks.tsx';
 import Button from './button';
 import IconButton from './icon-button';
 import { RoleBadgeUI } from './role-badge';
@@ -18,12 +18,15 @@ import TextInput from './text-input';
 import Controls from './controls';
 
 export default function BlockPanel() {
-  const [user] = UserProvider();
-  const [bookmark, setBookmark] = useState(null);
+  const user = useContext(UserContext);
+  // const [bookmark, setBookmark] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [group, setGroup] = useState(null);
+  const [blockedUsers, setBlockedUsers] = useState(null);
 
-  const search = createBlockedRolesQs({ bookmark });
+  // const search = createBlockedRolesQs({ bookmark });
 
-  const groups = useGetGroups(search, !!bookmark);
+  const { data: users, loadingUsers } = useGetUsers();
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [unmoderatedRole, setUnmoderatedRole] = useState(null);
@@ -34,6 +37,15 @@ export default function BlockPanel() {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+   useEffect(() => {
+    if (!loadingUsers) {
+      if (users && users.data[0]) {
+        setBlockedUsers(users.data[0].filter(user => user.is))
+        setLoading(false);
+      }
+    }
+  }, [loadingUsers, users, user]);
 
   return (
     <div className="block-panel">
@@ -55,7 +67,7 @@ export default function BlockPanel() {
           </Button>
         </header>
 
-        {groups.total_rows === 0 && !groups.loading && !added.length ? (
+        {groups.total_rows === 0 && !loadingGroup && !added.length ? (
           <div>No blocked persona.</div>
         ) : (
           <div>
