@@ -188,6 +188,10 @@ export default function controller(preprints, thisUser) {
     path: '/preprints/:id',
     validate: {
       params: {
+        // id: Joi.number()
+        //   .integer()
+        //   .description('Preprint ID')
+        //   .required(),
         id: Joi.alternatives()
           .try(Joi.number().integer(), Joi.string())
           .description('Preprint ID')
@@ -249,10 +253,11 @@ export default function controller(preprints, thisUser) {
     method: 'PUT',
     path: '/preprints/:id',
     validate: {
-      //params: {
-      //  id: Joi.alternatives().try(Joi.number().integer(), Joi.string()),
-      //},
       params: {
+        // id: Joi.number()
+        //   .integer()
+        //   .description('Preprint ID')
+        //   .required(),
         id: Joi.alternatives()
           .try(Joi.number().integer(), Joi.string())
           .description('Preprint ID')
@@ -313,14 +318,15 @@ export default function controller(preprints, thisUser) {
     method: 'DELETE',
     path: '/preprints/:id',
     validate: {
-      //params: {
-      //  id: Joi.alternatives().try(Joi.number().integer(), Joi.string()),
-      //},
       params: {
         id: Joi.alternatives()
           .try(Joi.number().integer(), Joi.string())
           .description('Preprint ID')
           .required(),
+        // id: Joi.number()
+        //   .integer()
+        //   .description('Preprint ID')
+        //   .required(),
       },
     },
     pre: async (ctx, next) => {

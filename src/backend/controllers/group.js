@@ -178,7 +178,7 @@ export default function controller(groupModel, userModel, thisUser) {
       let group;
 
       try {
-        group = await groupModel.findOne(ctx.params.id);
+        group = await groupModel.find({ name: ctx.params.name });
         if (!group) {
           ctx.throw(404, `Group with ID ${ctx.params.id} doesn't exist`);
         }
@@ -246,9 +246,13 @@ export default function controller(groupModel, userModel, thisUser) {
           .try(Joi.number().integer(), Joi.string())
           .description('User id')
           .required(),
+        // uid: Joi.number()
+        //   .integer()
+        //   .description('User id')
+        //   .required(),
       },
     },
-    // pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next),
+    pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next),
     handler: async ctx => {
       log.debug(`Adding user ${ctx.params.uid} to group ${ctx.params.id}.`);
       let group, user;

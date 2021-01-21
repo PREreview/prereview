@@ -100,9 +100,11 @@ export default function controller(personasModel, thisUser) {
         name: Joi.string(),
       }),
       type: 'json',
-      params: Joi.object({
-        id: Joi.number().integer(),
-      }),
+      params: {
+        id: Joi.number()
+          .integer()
+          .required(),
+      },
       continueOnError: true,
       false: 400,
     },
