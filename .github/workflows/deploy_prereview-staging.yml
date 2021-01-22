@@ -30,12 +30,12 @@ jobs:
 
     - run: |
         docker build . -t prereview.azurecr.io/prereview:${{ github.sha }}
-        docker tag prereview.azurecr.io/prereview:${{ github.sha }} prereview.azurecr.io/prereview:staging
+        docker tag prereview.azurecr.io/prereview:${{ github.sha }} prereview.azurecr.io/prereview:latest
         docker push prereview.azurecr.io/prereview:${{ github.sha }}
-        docker push prereview.azurecr.io/prereview:staging
+        docker push prereview.azurecr.io/prereview:latest
 
     - uses: azure/webapps-deploy@v2
       with:
         app-name: 'prereview2'
         slot-name: 'staging'
-        configuration-file: './deploy/docker-compose-staging.yml'
+        configuration-file: './deploy/docker-compose.yml'

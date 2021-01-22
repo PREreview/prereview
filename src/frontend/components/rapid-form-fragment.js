@@ -50,7 +50,6 @@ const useStyles = makeStyles({
   },
   table: {
     borderBottom: 'none',
-    maxHeight: 650,
   },
   textAnswer: {
     // display: 'inline-block',

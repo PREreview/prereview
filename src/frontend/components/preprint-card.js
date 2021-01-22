@@ -290,7 +290,7 @@ export default function PreprintCard({
                     />
                   </div>
                   <div className="preprint-card__count-label">
-                    Longform Review{publishedReviews.length > 1 ? 's' : ''}
+                    Long-form Review{publishedReviews.length > 1 ? 's' : ''}
                   </div>
                   <div className="preprint-card__count-divider" />
                   <div className="preprint-card__count-badge">

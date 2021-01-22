@@ -1,0 +1,17 @@
+version: "3"
+services:
+  prereview:
+    image: prereview.azurecr.io/prereview:latest
+    networks:
+      - prereview-public
+    ports:
+      - "80:3000"
+    environment:
+      PREREVIEW_HOST: 0.0.0.0
+      PREREVIEW_PORT: 3000
+      PREREVIEW_DB_TYPE: postgresql
+      PREREVIEW_DB_PORT: 5432
+      PREREVIEW_DB_USER: prereview
+
+networks:
+  prereview-public:

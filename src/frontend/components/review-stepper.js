@@ -305,7 +305,7 @@ export default function ReviewStepper({
         })
           .then(() => {
             alert(
-              'Rapid review submitted and longform review draft updated successfully.',
+              'Rapid review submitted and long-form review draft updated successfully.',
             );
             return setDisabledSaveSubmit(true);
           })
@@ -439,7 +439,7 @@ export default function ReviewStepper({
   }
 
   function getSteps() {
-    return ['Rapid Review', 'Longform Review', 'Submitted'];
+    return ['Rapid Review', 'Long-form Review', 'Submitted'];
   }
 
   useEffect(() => {
@@ -500,7 +500,7 @@ export default function ReviewStepper({
             <Box>
               {hasRapidReviewed ? (
                 <Box mt={2} mb={2} className={classes.yellow}>
-                  You have already submitted a rapid review. Would you like to submit a longform review?
+                  You have already submitted a rapid review. Would you like to submit a long-form review?
                 </Box>
               ) : (
                 <Box>
@@ -564,7 +564,7 @@ export default function ReviewStepper({
               {expandFeedback ? (
                 <Box>
                   <Box mt={2} mb={2} className={classes.yellow}>
-                    Would you like to expand on your feedback with a longform
+                    Would you like to expand on your feedback with a long-form
                     review?
                   </Box>
                   <Box textAlign="right">
@@ -630,7 +630,7 @@ export default function ReviewStepper({
                       Instructions
                     </Typography>
                     <Typography variant="body2" gutterBottom>
-                      Use the space below to compose your longform review.
+                      Use the space below to compose your long-form review.
                     </Typography>
                     <Typography variant="body2" gutterBottom>
                       Please remember to be constructive and to abide by the{' '}

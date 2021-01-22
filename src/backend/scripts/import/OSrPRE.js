@@ -433,11 +433,11 @@ export default async function run(db) {
   const requestModel = requestModelWrapper(db);
   const userModel = userModelWrapper(db);
   await processPersonas(
-    `${process.env.COUCH_OUTDIR}/rapid-prereview-docs.jsonl`,
+    `${process.env.IMPORT_COUCH_OUTDIR}/rapid-prereview-docs.jsonl`,
     anonMap,
   );
   await processUsers(
-    `${process.env.COUCH_OUTDIR}/rapid-prereview-users.jsonl`,
+    `${process.env.IMPORT_COUCH_OUTDIR}/rapid-prereview-users.jsonl`,
     await OSrPREImportUser(
       userModel,
       personaModel,
@@ -447,7 +447,7 @@ export default async function run(db) {
     ),
   );
   await processActions(
-    `${process.env.COUCH_OUTDIR}/rapid-prereview-docs.jsonl`,
+    `${process.env.IMPORT_COUCH_OUTDIR}/rapid-prereview-docs.jsonl`,
     await OSrPREImportRequest(requestModel, preprintModel, personaMap),
     await OSrPREImportReview(
       fullReviewModel,
