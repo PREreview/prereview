@@ -90,8 +90,7 @@ export default function ShellContent({
     const newHeight = document.getElementsByClassName(
       'shell-content__preview',
     )[0].clientHeight;
-    setHeight(newHeight);
-    console.log(newHeight);
+    setHeight(newHeight + 20);
   }, []);
 
   useEffect(() => {
