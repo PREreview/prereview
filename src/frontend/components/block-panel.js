@@ -60,7 +60,7 @@ export default function BlockPanel() {
 
         {lockedPersonas ? (
          !lockedPersonas.length ? (
-          <div>No Locked persona.</div>
+          <div>No locked persona.</div>
         ) : (
           <div>
             <ul className="block-panel__card-list">
