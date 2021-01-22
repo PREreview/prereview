@@ -168,9 +168,9 @@ export default function RoleEditor({ user, onCancel, onSaved }) {
           disabled={(name === user.name && !hasNewAvatar) || loading}
           primary={true}
           onClick={() => {
-            const payload = {};
+            const data = {};
             if (user.name !== name) {
-              payload.name = name;
+              data.name = name;
             }
             if (hasNewAvatar) {
               const canvas = editorRef.current.getImage();
@@ -184,16 +184,10 @@ export default function RoleEditor({ user, onCancel, onSaved }) {
                 dataUrl = canvas.toDataURL('image/jpeg', q);
               }
 
-              payload.avatar = {
-                '@type': 'ImageObject',
-                encodingFormat: file ? file.type : user.avatar.encodingFormat,
-                contentUrl: dataUrl,
-              };
+              data.avatar = dataUrl
             }
 
-            console.log("payload", payload)
-
-            updatePersona({ payload })
+            updatePersona({ data })
               .then(resp => { 
                 let updatedUser = resp.data
                 alert('User updated successfully.')
