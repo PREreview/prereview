@@ -29,16 +29,26 @@ export class Contact extends BaseEntity {
   @Property()
   isVerified: boolean;
 
+  @Fixture(() => false)
+  @Property()
+  sendNotifications: boolean;
+
+  @Fixture(faker => faker.random.alphaNumeric(16))
+  @Property()
+  token?: string;
+
   constructor(
     schema: string,
     value: string,
     identity: User,
     isVerified = false,
+    sendNotifications = false,
   ) {
     super();
     this.schema = schema;
     this.value = value;
     this.identity = identity;
     this.isVerified = isVerified;
+    this.sendNotifications = sendNotifications;
   }
 }
