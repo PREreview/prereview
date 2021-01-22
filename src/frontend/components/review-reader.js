@@ -7,13 +7,15 @@ import classNames from 'classnames';
 import ReactHtmlParser, { convertNodeToElement } from 'react-html-parser';
 
 // material UI
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles, withStyles } from '@material-ui/core/styles';
 import Accordion from '@material-ui/core/Accordion';
-import AccordionSummary from '@material-ui/core/AccordionSummary';
+import Button from '@material-ui/core/Button';
+import MuiAccordionSummary from '@material-ui/core/AccordionSummary';
 import AccordionDetails from '@material-ui/core/AccordionDetails';
 import Box from '@material-ui/core/Box';
+import Grid from '@material-ui/core/Grid';
+import Link from '@material-ui/core/Link';
 import Typography from '@material-ui/core/Typography';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 
 // utils
 import { getYesNoStats } from '../utils/stats';
@@ -23,12 +25,14 @@ import { usePostComments } from '../hooks/api-hooks.tsx';
 
 // components
 import Barplot from './barplot';
-import Button from './button';
 import CommentEditor from './comment-editor';
 import Controls from './controls';
 import { PotentialRoles } from './role-list';
 import ShareMenu from './share-menu';
 import TextAnswers from './text-answers';
+
+// icons
+import EmojiFlagsIcon from '@material-ui/icons/EmojiFlags';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -56,6 +60,17 @@ const useStyles = makeStyles(theme => ({
     lineHeight: 1.5,
   },
 }));
+
+const AccordionSummary = withStyles({
+  expandIcon: {
+    color: '#1472E3',
+    fontSize: '0.85rem',
+
+    '&.Mui-expanded': {
+      transform: 'none',
+    },
+  },
+})(MuiAccordionSummary);
 
 const ReviewReader = React.memo(function ReviewReader({
   user,
@@ -111,6 +126,12 @@ const ReviewReader = React.memo(function ReviewReader({
 
   const canSubmit = content => {
     return content && content !== '<p></p>';
+  };
+
+  const handleReport = () => {
+    if (confirm('Are you sure you want to report this review?')) {
+      return; // #FIXME hook up API to report in backend
+    }
   };
 
   const [highlightedRoleIds, setHighlightedRoleIds] = useState(
@@ -191,7 +212,7 @@ const ReviewReader = React.memo(function ReviewReader({
             onChange={handleChangeRapid(!expandRapid)}
           >
             <AccordionSummary
-              expandIcon={<ExpandMoreIcon />}
+              expandIcon={expandRapid ? 'collapse' : 'expand'}
               aria-controls="rapid-reviews-content"
               id="rapid-reviews-header"
             >
@@ -251,7 +272,7 @@ const ReviewReader = React.memo(function ReviewReader({
             onChange={handleChangeLong(!expandLong)}
           >
             <AccordionSummary
-              expandIcon={<ExpandMoreIcon />}
+              expandIcon={expandLong ? 'collapse' : 'expand'}
               aria-controls="longform-content"
               id="longform-header"
             >
@@ -331,10 +352,32 @@ const ReviewReader = React.memo(function ReviewReader({
                             </AccordionSummary>
                             <AccordionDetails className={classes.spacing}>
                               <Box>
-                                {ReactHtmlParser(
-                                  reviewContent.contents.substring(0, 600),
-                                  options,
-                                )}... Read more
+                                <Box>
+                                  {ReactHtmlParser(
+                                    reviewContent.contents
+                                      .substring(0, 600)
+                                      .concat(' ... <a href="#">Read more</a>'),
+                                    options,
+                                  )}
+                                </Box>
+                                <Grid
+                                  container
+                                  justify="space-between"
+                                  alignItems="center"
+                                >
+                                  <Grid item>
+                                    <Link href="#">Comment</Link>
+                                  </Grid>
+                                  <Grid item>
+                                    <Button
+                                      color="primary"
+                                      onClick={handleReport}
+                                    >
+                                      <EmojiFlagsIcon />
+                                      Report
+                                    </Button>
+                                  </Grid>
+                                </Grid>
                               </Box>
                             </AccordionDetails>
                           </Accordion>
