@@ -96,7 +96,7 @@ export default function BlockPanel() {
           onClose={() => {
             setIsAddModalOpen(false);
           }}
-          onSuccess={Locked => setLockedPersonas(lockedPersonas.concat(Locked))}
+          onSuccess={locked => setLockedPersonas(lockedPersonas.concat(locked))}
         />
       )}
 

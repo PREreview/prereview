@@ -126,7 +126,7 @@ export default function controller(personasModel, thisUser) {
             `That persona with ID ${ctx.params.id} does not exist.`,
           );
         }
-        personasModel.assign(persona, ctx.request.body);
+        personasModel.assign(persona, ctx.request.body.payload);
         await personasModel.persistAndFlush(persona);
       } catch (err) {
         log.error('HTTP 400 Error: ', err);

@@ -6,7 +6,7 @@ import { MdPerson } from 'react-icons/md';
 import Button from './button';
 import Controls from './controls';
 import TextInput from './text-input';
-import { usePutUser } from '../hooks/api-hooks.tsx';
+import { usePutPersona } from '../hooks/api-hooks.tsx';
 
 export default function RoleEditor({ user, onCancel, onSaved }) {
   const editorRef = useRef();
@@ -15,7 +15,9 @@ export default function RoleEditor({ user, onCancel, onSaved }) {
   const [file, setFile] = useState(null);
   const [scale, setScale] = useState(1);
   const [rotate, setRotate] = useState(0);
-  const { mutate: updateUser, loading, error } = usePutUser(user.id);
+  const { mutate: updatePersona, loading, error } = usePutPersona( {
+    id: user.id
+  });
 
   const onDrop = useCallback(acceptedFiles => {
     const [file] = acceptedFiles;
@@ -189,10 +191,15 @@ export default function RoleEditor({ user, onCancel, onSaved }) {
               };
             }
 
-            updateUser({ payload })
-              .then(() => alert('User updated successfully.'))
+            console.log("payload", payload)
+
+            updatePersona({ payload })
+              .then(resp => { 
+                let updatedUser = resp.data
+                alert('User updated successfully.')
+                onSaved(updatedUser);
+              })
               .catch(err => alert(`An error occurred: ${err.message}`));
-            onSaved(user);
           }}
         >
           Save
