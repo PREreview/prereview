@@ -339,7 +339,6 @@ export default function Shell({ children, defaultStatus = 'default' }) {
 
                 {!!(user && user.isModerator) && (
                   <XLink
-                    as={process.env.IS_EXTENSION ? undefined : Link}
                     to={process.env.IS_EXTENSION ? undefined : '/moderate'}
                     href={`/moderate`}
                     target={process.env.IS_EXTENSION ? '_blank' : undefined}
@@ -348,7 +347,7 @@ export default function Shell({ children, defaultStatus = 'default' }) {
                   </XLink>
                 )}
 
-                <XLink to={'logout'} href={`/api/v2/logout`}>
+                <XLink to='logout' href={`/api/v2/logout`}>
                   Logout
                 </XLink>
               </UserBadge>

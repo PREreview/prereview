@@ -97,19 +97,18 @@ export default function controller(personasModel, thisUser) {
     method: 'PUT',
     path: '/personas/:id',
     validate: {
-      body: Joi.object({
-        name: Joi.string(),
-      }),
-      type: 'json',
+      // body: Joi.object({
+      //   name: Joi.string(),
+      // }),
+      // type: 'json',
       params: {
         id: Joi.number()
           .integer()
           .required(),
       },
       continueOnError: true,
-      false: 400,
     },
-    // pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next), // TODO: can edit self only no?
+    pre: (ctx, next) => thisUser.can('access private pages')(ctx, next), // TODO: can edit self only no?
     handler: async ctx => {
       if (ctx.invalid) {
         handleInvalid(ctx);
@@ -135,7 +134,11 @@ export default function controller(personasModel, thisUser) {
       }
 
       // if updated
-      ctx.status = 204;
+      ctx.status = 200;
+      ctx.body = {
+        status: 200,
+        data: persona,
+      };
     },
     meta: {
       swagger: {

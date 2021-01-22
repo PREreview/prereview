@@ -31,6 +31,8 @@ export default function ShellContent({
 }) {
   const location = useLocation();
 
+  console.log("USER IN SHELLCONTENT", user)
+
   const {
     mutate: postReviewRequest,
     loadingPostReviewRequest,
@@ -93,6 +95,7 @@ export default function ShellContent({
           }
         });
       });
+
     }
   }, [preprint, user]);
 

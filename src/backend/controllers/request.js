@@ -52,8 +52,6 @@ export default function controller(reqModel, thisUser) {
       if (pid) {
         request = reqModel.create({ preprint: pid, author: authorPersona });
       } else {
-        log.debug('ctx.request.body.preprint', ctx.request.body.preprint);
-        log.debug('authorPersona', authorPersona);
         request = reqModel.create({
           preprint: ctx.request.body.preprint.id, // TODO: figure out ensuring preprint id gets passed this way
           author: authorPersona,

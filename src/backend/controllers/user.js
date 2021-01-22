@@ -89,6 +89,7 @@ export default function controller(users, thisUser) {
           'personas.rapidReviews',
           'personas.requests',
           'groups',
+          'defaultPersona',
         ]);
       } catch (err) {
         log.debug(err);

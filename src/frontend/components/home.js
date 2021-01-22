@@ -153,7 +153,7 @@ export default function Home() {
           />
         )}
         <HeaderBar
-          thisUser={thisUser.defaultPersona}
+          thisUser={thisUser}
           onClickMenuButton={() => {
             setShowLeftPanel(!showLeftPanel);
           }}

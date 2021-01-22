@@ -19,18 +19,12 @@ import Controls from './controls';
 
 export default function BlockPanel() {
   const user = useContext(UserContext);
-  // const [bookmark, setBookmark] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [group, setGroup] = useState(null);
-  const [blockedPersonas, setBlockedPersonas] = useState(null);
+  const [blockedPersonas, setBlockedPersonas] = useState([]);
 
-  const { data: personas, loadingPersonas } = useGetPersonas();
+  const { data: personas, loadingPersonas } = useGetPersonas()
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [unmoderatedRole, setUnmoderatedRole] = useState(null);
-
-  const [excluded, setExcluded] = useState(new Set());
-  const [added, setAdded] = useState([]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -38,19 +32,19 @@ export default function BlockPanel() {
 
    useEffect(() => {
     if (!loadingPersonas) {
-      if (personas && personas.data[0]) {
-        setBlockedPersonas(personas.data[0].filter(persona => persona.isFlagged)) // return only personas who have been flagged
+      if (personas && personas.data) {
+        setBlockedPersonas(personas.data.filter(persona => persona.isLocked))
         setLoading(false);
       }
     }
-  }, [loadingUsers, users, user]);
+  }, [loadingPersonas, personas, user]);
 
   return (
     <div className="block-panel">
       <Helmet>
         <title>{ORG} • Moderate Users</title>
       </Helmet>
-      <HeaderBar closeGap />
+      <HeaderBar thisUser={user} closeGap />
 
       <section>
         <header className="block-panel__header">
@@ -65,28 +59,27 @@ export default function BlockPanel() {
           </Button>
         </header>
 
-        {!blockedPersonas.length ? (
+        { blockedPersonas ? (
+         !blockedPersonas.length ? (
           <div>No blocked persona.</div>
         ) : (
           <div>
             <ul className="block-panel__card-list">
-              { blockedPersonas
-                .map(persona => (
-                  <li key={getId(role)} className="block-panel__card-list-item">
+              { blockedPersonas.map(persona => (
+                  <li key={persona.id} className="block-panel__card-list-item">
                     <div className="block-panel__card-list-item__left">
-                      <RoleBadgeUI role={role} />
-                      <span>{role.name || unprefix(getId(role))}</span>
+                      <RoleBadgeUI user={persona} />
+                      <span>{persona.name}</span>
                     </div>
                     <div className="block-panel__card-list-item__right">
                       <LabelStyle>
-                        {role['@type'] === 'AnonymousReviewerRole'
-                          ? 'Anonymous'
-                          : 'Public'}
+                        { persona.isAnonymous ? 'Anonymous' : 'Public' }
                       </LabelStyle>
                       <IconButton
                         className="block-panel__remove-button"
                         onClick={() => {
-                          setUnmoderatedRole(role);
+                          // FIXME!!!!
+                          // setUnmoderatedRole(role);
                         }}
                       >
                         <MdClose className="block-panel__remove-button-icon" />
@@ -96,9 +89,9 @@ export default function BlockPanel() {
                 ))}
             </ul>
           </div>
-        )}
+        )) : null }
 
-        <div className="block-panel__page-nav">
+        {/* <div className="block-panel__page-nav">
           {!!(
             groups.rows.length < groups.total_rows &&
             groups.bookmark !== bookmark
@@ -112,7 +105,7 @@ export default function BlockPanel() {
               More
             </Button>
           )}
-        </div>
+        </div> */}
       </section>
 
       {isAddModalOpen && (
@@ -121,13 +114,11 @@ export default function BlockPanel() {
           onClose={() => {
             setIsAddModalOpen(false);
           }}
-          onSuccess={action => {
-            setAdded(added.concat(action.result));
-          }}
+          onSuccess={blocked => setBlockedPersonas(blockedPersonas.concat(blocked))}
         />
       )}
 
-      {!!unmoderatedRole && (
+      {/* {!!unmoderatedRole && (
         <BlockPanelRemoveModal
           user={user}
           role={unmoderatedRole}
@@ -140,14 +131,16 @@ export default function BlockPanel() {
             );
           }}
         />
-      )}
+      )} */}
     </div>
   );
 }
 
 function BlockPanelAddModal({ user, onClose, onSuccess }) {
-  const [value, setValue] = useState('');
-  const postGroup = usePostGroups();
+  const [personaToBlock, setPersonaToBlock] = useState('');
+  const { mutate: updatePersona, loading, error } = usePutPersona({
+    id: personaToBlock,
+  }); 
   const [frame] = useState('input');
 
   const pattern =
@@ -155,7 +148,7 @@ function BlockPanelAddModal({ user, onClose, onSuccess }) {
   const re = new RegExp(pattern, 'i');
 
   return (
-    <Modal title="Add Moderator">
+    <Modal title="Block persona">
       <div className="block-panel-add-modal">
         {frame === 'input' ? (
           <Fragment>
@@ -164,21 +157,21 @@ function BlockPanelAddModal({ user, onClose, onSuccess }) {
               label={<span>Enter a role (persona) ID</span>}
               minimal={true}
               autoComplete="off"
-              disabled={postGroup.loading}
+              disabled={loading}
               placeholder=""
               pattern={pattern}
               onChange={e => {
                 const value = e.target.value;
-                setValue(value);
+                setPersonaToBlock(value);
               }}
-              value={value}
+              value={personaToBlock}
             />
 
             <Controls
-              error={postGroup.error} // #FIXME
+              error={error} // #FIXME
             >
               <Button
-                disabled={postGroup.loading}
+                disabled={loading}
                 onClick={() => {
                   onClose();
                 }}
@@ -186,13 +179,18 @@ function BlockPanelAddModal({ user, onClose, onSuccess }) {
                 Cancel
               </Button>
               <Button
-                disabled={postGroup.loading || !re.test(value)}
-                isWaiting={postGroup.loading}
+                disabled={loading}
+                isWaiting={loading}
                 onClick={() => {
-                  postGroup(user, value)
-                    .then(() => alert('Role posted successfully.'))
+                  updatePersona({ isLocked: true })
+                    .then((resp) => {
+                        let blocked = resp.data
+                        alert(`Persona successfully locked`)
+                        onSuccess(blocked)
+                        onClose()
+                      }
+                    )
                     .catch(err => alert(`An error occurred: ${err}`));
-                  onSuccess(value);
                 }}
               >
                 Block
@@ -204,10 +202,10 @@ function BlockPanelAddModal({ user, onClose, onSuccess }) {
             <p>The role (persona) has been successfully blocked.</p>
 
             <Controls
-              error={postGroup.error} // #FIXME
+              error={error} // #FIXME
             >
               <Button
-                disabled={postGroup.loading}
+                disabled={loading}
                 onClick={() => {
                   onClose();
                 }}
