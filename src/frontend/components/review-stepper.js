@@ -13,8 +13,6 @@ import {
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
 import Check from '@material-ui/icons/Check';
-import Checkbox from '@material-ui/core/Checkbox';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Input from '@material-ui/core/Input';
 import InputLabel from '@material-ui/core/InputLabel';
 import Link from '@material-ui/core/Link';
@@ -22,7 +20,6 @@ import Stepper from '@material-ui/core/Stepper';
 import Step from '@material-ui/core/Step';
 import StepConnector from '@material-ui/core/StepConnector';
 import StepLabel from '@material-ui/core/StepLabel';
-import TextareaAutosize from '@material-ui/core/TextareaAutosize';
 import Typography from '@material-ui/core/Typography';
 
 // utils
@@ -222,8 +219,6 @@ export default function ReviewStepper({
   const [answerMap, setAnswerMap] = useState({});
   const [completed, setCompleted] = React.useState(new Set());
   const [expandFeedback, setExpandFeedback] = React.useState(false);
-  const [expandLong, setExpandLong] = React.useState(false);
-  const [disabledSkip, setDisabledSkip] = React.useState(false);
   const [disabledSubmit, setDisabledSubmit] = React.useState(false);
   const [skipped, setSkipped] = React.useState(new Set());
   const steps = getSteps();
@@ -356,22 +351,6 @@ export default function ReviewStepper({
     setSkipped(newSkipped);
   };
 
-  const handleSkip = () => {
-    if (!isStepOptional(activeStep)) {
-      // You probably want to guard against something like this,
-      // it should never occur unless someone's actively trying to break something.
-      throw new Error("You can't skip a step that isn't optional.");
-    }
-
-    setActiveStep(prevActiveStep => prevActiveStep + 1);
-
-    setSkipped(prevSkipped => {
-      const newSkipped = new Set(prevSkipped.values());
-      newSkipped.add(activeStep);
-      return newSkipped;
-    });
-  };
-
   const handleComplete = step => {
     const newCompleted = new Set(completed);
     newCompleted.add(activeStep);
@@ -399,12 +378,6 @@ export default function ReviewStepper({
   function isStepComplete(step) {
     return completed.has(step);
   }
-
-  const handleNextLong = () => {
-    setDisabledSkip(true);
-    setExpandLong(true);
-    handleComplete(activeStep + 1);
-  };
 
   function getSteps() {
     return ['Rapid Review', 'Long-form Review', 'Submitted'];
@@ -477,7 +450,8 @@ export default function ReviewStepper({
                 Thank you for your contribution!
                 <br />
                 Please review the{' '}
-                <Link href="#">PREreview Code of Conduct</Link> before submitting your review.
+                <Link href="#">PREreview Code of Conduct</Link> before
+                submitting your review.
               </Box>
             </form>
           </Box>
