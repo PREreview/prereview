@@ -354,15 +354,13 @@ async function OSrPREImportUser(
               ) &&
               w['work-summary'][0]['external-ids']['external-id'].length > 0
             ) {
-              work.handle = `${
-                w['work-summary'][0]['external-ids']['external-id'][0][
-                  'external-id-type'
+              work.handle = `${w['work-summary'][0]['external-ids']['external-id'][0][
+                'external-id-type'
                 ]
-              }:${
-                w['work-summary'][0]['external-ids']['external-id'][0][
-                  'external-id-value'
+                }:${w['work-summary'][0]['external-ids']['external-id'][0][
+                'external-id-value'
                 ]
-              }`;
+                }`;
             }
             if (w['work-summary'][0].type) {
               work.type = w['work-summary'][0].type;
@@ -433,11 +431,11 @@ export default async function run(db) {
   const requestModel = requestModelWrapper(db);
   const userModel = userModelWrapper(db);
   await processPersonas(
-    `${process.env.COUCH_OUTDIR}/rapid-prereview-docs.jsonl`,
+    `${process.env.IMPORT_COUCH_OUTDIR}/rapid-prereview-docs.jsonl`,
     anonMap,
   );
   await processUsers(
-    `${process.env.COUCH_OUTDIR}/rapid-prereview-users.jsonl`,
+    `${process.env.IMPORT_COUCH_OUTDIR}/rapid-prereview-users.jsonl`,
     await OSrPREImportUser(
       userModel,
       personaModel,
@@ -447,7 +445,7 @@ export default async function run(db) {
     ),
   );
   await processActions(
-    `${process.env.COUCH_OUTDIR}/rapid-prereview-docs.jsonl`,
+    `${process.env.IMPORT_COUCH_OUTDIR}/rapid-prereview-docs.jsonl`,
     await OSrPREImportRequest(requestModel, preprintModel, personaMap),
     await OSrPREImportReview(
       fullReviewModel,
