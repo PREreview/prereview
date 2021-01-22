@@ -55,8 +55,13 @@ const options: Options = {
     },
   },
   migrations: {
+    disableForeignKeys: false,
     path: `src/backend/db/migrations/${config.dbType}`,
   },
 };
+
+if (config.dbType === 'postgresql' && true) {
+  options.driverOptions = { connection: { ssl: true } };
+}
 
 export default options;

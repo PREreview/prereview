@@ -34,11 +34,17 @@ wait_for() {
 
 wait_for
 
-if [ $NODE_ENV = "staging" ] && [ -z $IMPORT_SOURCES ]; then
-  echo "Copying existing database to staging"
-  env -i PGPASSWORD="$FROM_PASS" /usr/bin/pg_dump -U "$FROM_USER" -d "$FROM_NAME" -h "$FROM_HOST" -p "$FROM_PORT" -O -f /tmp/import.sql
-  env -i PGPASSWORD="$PASS" /usr/bin/psql -U "$USER" -d "$NAME" -h "$HOST" -p "$PORT" -tAc "DROP TABLE $NAME; CREATE TABLE $NAME"
-  env -i PGPASSWORD="$PASS" /usr/bin/psql -U "$USER" -d "$NAME" -h "$HOST" -f /tmp/import.sql
+if [ $NODE_ENV == "staging" ] && [ -z $IMPORT_SOURCES ]; then
+  echo "Copying existing database $FROM_NAME to staging"
+  echo "Dumping $FROM_NAME database"
+  env -i PGPASSWORD="$FROM_PASS" /usr/bin/pg_dump -U "$FROM_USER" -d "$FROM_NAME" -h "$FROM_HOST" -p "$FROM_PORT" -f /tmp/import.sql
+  echo "Dropping staging database"
+  env -i PGPASSWORD="$PASS" /usr/bin/psql -U "$USER" -d postgres -h "$HOST" -p "$PORT" -c "DROP DATABASE $NAME"
+  echo "Creating blank staging database"
+  env -i PGPASSWORD="$PASS" /usr/bin/psql -U "$USER" -d postgres -h "$HOST" -p "$PORT" -c "CREATE DATABASE $NAME"
+  echo "Importing dump to staging"
+  env -i PGPASSWORD="$PASS" /usr/bin/psql -U "$USER" -d "$NAME" -h "$HOST" -p "$PORT" -f /tmp/import.sql
+  echo "Done copying!"
 else
   env -i PGPASSWORD="$PASS" /usr/bin/psql -U "$USER" -d "$NAME" -h "$HOST" -p "$PORT" -tAc "SELECT to_regclass('public.users')" | grep -q users
   
@@ -47,10 +53,10 @@ else
     echo "Initializing database schema"
     npm run db:migrations
     npm run db:init
-    if [ $NODE_ENV = "staging" ]; then
+    if [ $NODE_ENV == "staging" ]; then
       echo "Import legacy data"
       npm run db:import &
-    elif [ $NODE_ENV = "development" ]; then
+    elif [ $NODE_ENV == "development" ]; then
       echo "Generate seeds"
       npm run db:seeds &
     fi
@@ -60,6 +66,6 @@ else
   fi
 fi
 
-echo "Running => npm run $@"
+#echo "Running => npm run $@"
 
-npm run "$@"
+#npm run "$@"
