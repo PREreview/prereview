@@ -6,10 +6,17 @@ import 'quill/dist/quill.snow.css'; // Add css for snow theme
 // or import 'quill/dist/quill.bubble.css'; // Add css for bubble theme
 
 const CommentEditor = ({ initialContent, handleContentChange }) => {
-  const placeholder = 'Start typing...';
+  const placeholder = 'Comment section (maximum 150 words)';
   const theme = 'snow';
 
-  const { quill, quillRef } = useQuill({ theme, placeholder });
+  const { quill, quillRef } = useQuill({
+    theme,
+    placeholder,
+    modules: {
+      toolbar: '#comments-toolbar',
+    },
+    formats: ['bold', 'italic', 'underline', 'strike'],
+  });
 
   useEffect(() => {
     if (quill) {
@@ -22,7 +29,14 @@ const CommentEditor = ({ initialContent, handleContentChange }) => {
 
   return (
     <div style={{ width: '100%' }}>
+      <div id="comments-toolbar">
+        <button className="ql-bold" />
+        <button className="ql-italic" />
+        <button className="ql-underline" />
+        <button className="ql-strike" />
+      </div>
       <div ref={quillRef} />
+      <div id="comments-editor" />
     </div>
   );
 };

@@ -306,7 +306,7 @@ const ReviewReader = React.memo(function ReviewReader({
                         const reviewContent =
                           review.drafts[review.drafts.length - 1];
                         return (
-                          <>
+                          <div key={review.id}>
                             <Accordion>
                               <AccordionSummary
                                 aria-controls={`review-content-${review.id}`}
@@ -345,7 +345,7 @@ const ReviewReader = React.memo(function ReviewReader({
                               </AccordionSummary>
                               <AccordionDetails className={classes.spacing}>
                                 <Box>
-                                  <Box>
+                                  <Box key={`content-${review.id}`}>
                                     {ReactHtmlParser(
                                       reviewContent.contents
                                         .substring(0, 600)
@@ -364,6 +364,7 @@ const ReviewReader = React.memo(function ReviewReader({
                                       <LongformReviewReader
                                         height={height}
                                         review={review}
+                                        user={user}
                                       />
                                     </Grid>
                                     <Grid item>
@@ -373,7 +374,7 @@ const ReviewReader = React.memo(function ReviewReader({
                                 </Box>
                               </AccordionDetails>
                             </Accordion>
-                          </>
+                          </div>
                         );
                       }
                       if (typeof review === 'string') {
