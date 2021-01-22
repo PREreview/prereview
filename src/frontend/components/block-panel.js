@@ -54,7 +54,7 @@ export default function BlockPanel() {
               setIsAddModalOpen(true);
             }}
           >
-            Block persona
+            Lock persona
           </Button>
         </header>
 
