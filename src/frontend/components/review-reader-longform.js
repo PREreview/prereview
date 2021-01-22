@@ -1,52 +1,19 @@
 // base imports
 import React from 'react';
 import PropTypes from 'prop-types';
+import ReactHtmlParser, { convertNodeToElement } from 'react-html-parser';
 
 // Material UI imports
 import { makeStyles, withStyles } from '@material-ui/core/styles';
+import Box from '@material-ui/core/Box';
 import Grid from '@material-ui/core/Grid';
 import MuiButton from '@material-ui/core/Button';
 import Popper from '@material-ui/core/Popper';
 import Slide from '@material-ui/core/Slide';
 
 // components
+import ReportButton from './report-button';
 import RoleBadge from './role-badge';
-
-const useStyles = makeStyles(() => ({
-  authors: {
-    fontSize: '1.25rem',
-    fontWeight: '600',
-    justifyContent: 'flex-start',
-    lineHeight: 1.3,
-  },
-  author: {
-    '&:not(:last-child)': {
-      '&:after': {
-        content: '", "',
-      },
-    },
-  },
-  badge: {
-    '&:not(:first-child)': {
-      marginLeft: '-10px',
-    },
-  },
-  date: {
-    fontSize: '1rem',
-  },
-  popper: {
-    backgroundColor: '#fff',
-    height: '100%',
-    left: 'unset !important',
-    right: 0,
-    transform: 'none !important',
-    width: '40vw',
-    zIndex: '10000',
-  },
-  popperContent: {
-    padding: 20,
-  },
-}));
 
 const Button = withStyles({
   root: {
@@ -55,9 +22,48 @@ const Button = withStyles({
 })(MuiButton);
 
 const LongformReviewReader = props => {
-  const { review } = props;
-  const classes = useStyles();
+  const { review, height } = props;
   const [anchorEl, setAnchorEl] = React.useState(null);
+
+  const useStyles = makeStyles(() => ({
+    authors: {
+      fontSize: '1.25rem',
+      fontWeight: '600',
+      justifyContent: 'flex-start',
+      lineHeight: 1.3,
+    },
+    author: {
+      '&:not(:last-child)': {
+        '&:after': {
+          content: '", "',
+        },
+      },
+    },
+    badge: {
+      '&:not(:first-child)': {
+        marginLeft: '-10px',
+      },
+    },
+    date: {
+      fontSize: '1rem',
+    },
+    popper: {
+      backgroundColor: '#fff',
+      height: '100%',
+      left: 'unset !important',
+      position: 'fixed !important',
+      right: 0,
+      top: height ? `${height}px !important` : 0,
+      transform: 'none !important',
+      width: '40vw',
+      zIndex: '10000',
+    },
+    popperContent: {
+      padding: 20,
+    },
+  }));
+
+  const classes = useStyles();
 
   const handleClick = event => {
     setAnchorEl(anchorEl ? null : event.currentTarget);
@@ -66,6 +72,27 @@ const LongformReviewReader = props => {
   const open = Boolean(anchorEl);
   const id = open ? review.id : undefined;
   const reviewDate = new Date(review.updatedAt);
+  const reviewContent = review.drafts[review.drafts.length - 1];
+
+  const transform = node => {
+    if (node.attribs) {
+      if (node.attribs.class === 'ql-editor') {
+        node.attribs.class = '';
+        node.attribs.contenteditable = false;
+      } else if (
+        node.attribs.class === 'ql-clipboard' ||
+        node.attribs.class === 'ql-tooltip ql-hidden'
+      ) {
+        return null;
+      }
+    }
+    return convertNodeToElement(node);
+  };
+
+  const options = {
+    decodeEntities: true,
+    transform,
+  };
 
   return (
     <div>
@@ -92,7 +119,7 @@ const LongformReviewReader = props => {
             timeout={350}
             {...TransitionProps}
           >
-            <div>
+            <div className="review-reader-longform">
               <Button
                 aria-describedby={id}
                 type="button"
@@ -151,6 +178,20 @@ const LongformReviewReader = props => {
                     {reviewDate.toLocaleDateString('en-US')}
                   </Grid>
                 </Grid>
+                <Box border="1px solid #E5E5E5" mt={4} px={3} pb={2}>
+                  <Box>{ReactHtmlParser(reviewContent.contents, options)}</Box>
+                  <Grid
+                    container
+                    alignItems="center"
+                    justify="space-between"
+                    spacing={2}
+                  >
+                    <Grid item>Plaudit FIXME</Grid>
+                    <Grid item>
+                      <ReportButton />
+                    </Grid>
+                  </Grid>
+                </Box>
               </div>
             </div>
           </Slide>
@@ -162,6 +203,7 @@ const LongformReviewReader = props => {
 
 LongformReviewReader.propTypes = {
   review: PropTypes.object.isRequired,
+  height: PropTypes.number,
 };
 
 export default LongformReviewReader;

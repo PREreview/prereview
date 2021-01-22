@@ -9,7 +9,6 @@ import ReactHtmlParser, { convertNodeToElement } from 'react-html-parser';
 // material UI
 import { makeStyles, withStyles } from '@material-ui/core/styles';
 import Accordion from '@material-ui/core/Accordion';
-import MuiButton from '@material-ui/core/Button';
 import MuiAccordionSummary from '@material-ui/core/AccordionSummary';
 import AccordionDetails from '@material-ui/core/AccordionDetails';
 import Box from '@material-ui/core/Box';
@@ -82,6 +81,7 @@ const ReviewReader = React.memo(function ReviewReader({
   rapidContent,
   longContent,
   newRequest,
+  height,
 }) {
   const classes = useStyles();
 
@@ -361,7 +361,10 @@ const ReviewReader = React.memo(function ReviewReader({
                                     alignItems="center"
                                   >
                                     <Grid item>
-                                      <LongformReviewReader review={review} />
+                                      <LongformReviewReader
+                                        height={height}
+                                        review={review}
+                                      />
                                     </Grid>
                                     <Grid item>
                                       <ReportButton reviewId={review.id} />
@@ -426,6 +429,7 @@ ReviewReader.propTypes = {
   rapidContent: PropTypes.object,
   longContent: PropTypes.oneOfType([PropTypes.object, PropTypes.string]),
   newRequest: PropTypes.bool,
+  height: PropTypes.number,
 };
 
 export default ReviewReader;
