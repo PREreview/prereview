@@ -9,12 +9,11 @@ import ReactHtmlParser, { convertNodeToElement } from 'react-html-parser';
 // material UI
 import { makeStyles, withStyles } from '@material-ui/core/styles';
 import Accordion from '@material-ui/core/Accordion';
-import Button from '@material-ui/core/Button';
+import MuiButton from '@material-ui/core/Button';
 import MuiAccordionSummary from '@material-ui/core/AccordionSummary';
 import AccordionDetails from '@material-ui/core/AccordionDetails';
 import Box from '@material-ui/core/Box';
 import Grid from '@material-ui/core/Grid';
-import Link from '@material-ui/core/Link';
 import Typography from '@material-ui/core/Typography';
 
 // utils
@@ -27,12 +26,11 @@ import { usePostComments } from '../hooks/api-hooks.tsx';
 import Barplot from './barplot';
 import CommentEditor from './comment-editor';
 import Controls from './controls';
+import LongformReviewReader from './review-reader-longform';
 import { PotentialRoles } from './role-list';
+import ReportButton from './report-button';
 import ShareMenu from './share-menu';
 import TextAnswers from './text-answers';
-
-// icons
-import EmojiFlagsIcon from '@material-ui/icons/EmojiFlags';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -126,12 +124,6 @@ const ReviewReader = React.memo(function ReviewReader({
 
   const canSubmit = content => {
     return content && content !== '<p></p>';
-  };
-
-  const handleReport = () => {
-    if (confirm('Are you sure you want to report this review?')) {
-      return; // #FIXME hook up API to report in backend
-    }
   };
 
   const [highlightedRoleIds, setHighlightedRoleIds] = useState(
@@ -314,73 +306,73 @@ const ReviewReader = React.memo(function ReviewReader({
                         const reviewContent =
                           review.drafts[review.drafts.length - 1];
                         return (
-                          <Accordion>
-                            <AccordionSummary
-                              aria-controls={`review-content-${review.id}`}
-                              id={`review-header-${review.id}`}
-                            >
-                              <Typography className={classes.h4}>
-                                {review.authors.length >= 2 ? (
-                                  review.authors.slice(0, 2).map(author => (
+                          <>
+                            <Accordion>
+                              <AccordionSummary
+                                aria-controls={`review-content-${review.id}`}
+                                id={`review-header-${review.id}`}
+                              >
+                                <Typography className={classes.h4}>
+                                  {review.authors.length >= 2 ? (
+                                    review.authors.slice(0, 2).map(author => (
+                                      <span
+                                        key={author.id}
+                                        className="review-reader__header-author"
+                                      >
+                                        {author.defaultPersona
+                                          ? author.defaultPersona.name
+                                          : author.name}
+                                      </span>
+                                    ))
+                                  ) : (
                                     <span
-                                      key={author.id}
+                                      key={review.authors[0].id}
                                       className="review-reader__header-author"
                                     >
-                                      {author.defaultPersona
-                                        ? author.defaultPersona.name
-                                        : author.name}
+                                      {review.authors[0].defaultPersona
+                                        ? review.authors[0].defaultPersona.name
+                                        : review.authors[0].name}
                                     </span>
-                                  ))
-                                ) : (
-                                  <span
-                                    key={review.authors[0].id}
-                                    className="review-reader__header-author"
-                                  >
-                                    {review.authors[0].defaultPersona
-                                      ? review.authors[0].defaultPersona.name
-                                      : review.authors[0].name}
-                                  </span>
-                                )}
-                                {review.authors.length > 2 ? '...' : null}
-                              </Typography>
-                              <Typography
-                                className={`${classes.h4} ${classes.date}`}
-                                align="right"
-                              >
-                                {reviewDate.toLocaleDateString('en-US')}
-                              </Typography>
-                            </AccordionSummary>
-                            <AccordionDetails className={classes.spacing}>
-                              <Box>
-                                <Box>
-                                  {ReactHtmlParser(
-                                    reviewContent.contents
-                                      .substring(0, 600)
-                                      .concat(' ... <a href="#">Read more</a>'),
-                                    options,
                                   )}
-                                </Box>
-                                <Grid
-                                  container
-                                  justify="space-between"
-                                  alignItems="center"
+                                  {review.authors.length > 2 ? '...' : null}
+                                </Typography>
+                                <Typography
+                                  className={`${classes.h4} ${classes.date}`}
+                                  align="right"
                                 >
-                                  <Grid item>
-                                    <Link href="#">Comment</Link>
+                                  {reviewDate.toLocaleDateString('en-US')}
+                                </Typography>
+                              </AccordionSummary>
+                              <AccordionDetails className={classes.spacing}>
+                                <Box>
+                                  <Box>
+                                    {ReactHtmlParser(
+                                      reviewContent.contents
+                                        .substring(0, 600)
+                                        .concat(
+                                          ' ... <a href="#">Read more</a>',
+                                        ),
+                                      options,
+                                    )}
+                                  </Box>
+                                  <Grid
+                                    container
+                                    justify="space-between"
+                                    alignItems="center"
+                                  >
+                                    <Grid item>
+                                      <LongformReviewReader
+                                        reviewId={review.id}
+                                      />
+                                    </Grid>
+                                    <Grid item>
+                                      <ReportButton reviewId={review.id} />
+                                    </Grid>
                                   </Grid>
-                                  <Grid item>
-                                    <Button
-                                      color="primary"
-                                      onClick={handleReport}
-                                    >
-                                      <EmojiFlagsIcon />
-                                      Report
-                                    </Button>
-                                  </Grid>
-                                </Grid>
-                              </Box>
-                            </AccordionDetails>
-                          </Accordion>
+                                </Box>
+                              </AccordionDetails>
+                            </Accordion>
+                          </>
                         );
                       }
                       if (typeof review === 'string') {
