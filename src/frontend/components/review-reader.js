@@ -361,9 +361,7 @@ const ReviewReader = React.memo(function ReviewReader({
                                     alignItems="center"
                                   >
                                     <Grid item>
-                                      <LongformReviewReader
-                                        reviewId={review.id}
-                                      />
+                                      <LongformReviewReader review={review} />
                                     </Grid>
                                     <Grid item>
                                       <ReportButton reviewId={review.id} />
