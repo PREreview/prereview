@@ -5,7 +5,9 @@ import importOSrPRE from './import/OSrPRE.js';
 
 async function main() {
   const [db] = await dbWrapper();
-  const sources = process.env.IMPORT_SOURCES ? process.env.IMPORT_SOURCES.split(',') : [];
+  const sources = process.env.IMPORT_SOURCES
+    ? process.env.IMPORT_SOURCES.split(',')
+    : [];
   if (sources.includes('postgres')) {
     try {
       await importPrereviewOrg(db);

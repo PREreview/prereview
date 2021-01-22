@@ -354,13 +354,15 @@ async function OSrPREImportUser(
               ) &&
               w['work-summary'][0]['external-ids']['external-id'].length > 0
             ) {
-              work.handle = `${w['work-summary'][0]['external-ids']['external-id'][0][
-                'external-id-type'
+              work.handle = `${
+                w['work-summary'][0]['external-ids']['external-id'][0][
+                  'external-id-type'
                 ]
-                }:${w['work-summary'][0]['external-ids']['external-id'][0][
-                'external-id-value'
+              }:${
+                w['work-summary'][0]['external-ids']['external-id'][0][
+                  'external-id-value'
                 ]
-                }`;
+              }`;
             }
             if (w['work-summary'][0].type) {
               work.type = w['work-summary'][0].type;

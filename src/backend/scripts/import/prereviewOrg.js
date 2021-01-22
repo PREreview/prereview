@@ -244,13 +244,15 @@ async function prereviewOrgImportUsers(db, client, usersMap) {
               ) &&
               w['work-summary'][0]['external-ids']['external-id'].length > 0
             ) {
-              work.handle = `${w['work-summary'][0]['external-ids']['external-id'][0][
-                'external-id-type'
+              work.handle = `${
+                w['work-summary'][0]['external-ids']['external-id'][0][
+                  'external-id-type'
                 ]
-                }:${w['work-summary'][0]['external-ids']['external-id'][0][
-                'external-id-value'
+              }:${
+                w['work-summary'][0]['external-ids']['external-id'][0][
+                  'external-id-value'
                 ]
-                }`;
+              }`;
             }
             if (w['work-summary'][0].type) {
               work.type = w['work-summary'][0].type;
@@ -382,10 +384,14 @@ export default async function run(db) {
   const preprintsMap = new Map();
   const client = new Client({
     host: process.env.IMPORT_POSTGRES_HOST,
-    port: process.env.IMPORT_POSTGRES_PORT ? process.env.IMPORT_POSTGRES_PORT : 5432,
+    port: process.env.IMPORT_POSTGRES_PORT
+      ? process.env.IMPORT_POSTGRES_PORT
+      : 5432,
     user: process.env.IMPORT_POSTGRES_USER,
     password: process.env.IMPORT_POSTGRES_PASS,
-    database: process.env.IMPORT_POSTGRES_DB ? process.env.IMPORT_POSTGRES_DB : 'prereview',
+    database: process.env.IMPORT_POSTGRES_DB
+      ? process.env.IMPORT_POSTGRES_DB
+      : 'prereview',
     ssl: true,
   });
 
