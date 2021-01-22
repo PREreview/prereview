@@ -66,6 +66,6 @@ else
   fi
 fi
 
-#echo "Running => npm run $@"
+echo "Running => npm run $@"
 
-#npm run "$@"
+npm run "$@"
