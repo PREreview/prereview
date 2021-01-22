@@ -65,6 +65,7 @@ const defaults = {
   db_timeout: '0',
   db_type: defaultEnv === 'production' ? 'postgresql' : 'sqlite',
   db_user: process.env.npm_package_name.toLowerCase(),
+  db_tls: 'false',
   log_level: 'error',
   no_proxy: 'false',
   orcid_sandbox: String(defaultEnv !== 'production'),
@@ -351,6 +352,12 @@ export default program
     'Database password',
     validatePassword,
     getEnvOrDefault('db_pass').asString(),
+  )
+  .option(
+    '--db-tls',
+    'Use TLS to connect to the Postgres database',
+    validateBool,
+    getEnvOrDefault('db_tls').asBool(),
   )
   .option(
     '--cfaccess-url <url>',

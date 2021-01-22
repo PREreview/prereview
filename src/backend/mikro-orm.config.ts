@@ -60,7 +60,7 @@ const options: Options = {
   },
 };
 
-if (config.dbType === 'postgresql' && true) {
+if (config.dbType === 'postgresql' && config.dbTls) {
   options.driverOptions = { connection: { ssl: true } };
 }
 
