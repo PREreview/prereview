@@ -4,17 +4,35 @@ import PropTypes from 'prop-types';
 
 // Material UI imports
 import { makeStyles, withStyles } from '@material-ui/core/styles';
+import Grid from '@material-ui/core/Grid';
 import MuiButton from '@material-ui/core/Button';
 import Popper from '@material-ui/core/Popper';
 import Slide from '@material-ui/core/Slide';
 
+// components
+import RoleBadge from './role-badge';
+
 const useStyles = makeStyles(() => ({
+  authors: {
+    fontSize: '1.25rem',
+    fontWeight: '600',
+    justifyContent: 'flex-start',
+    lineHeight: 1.3,
+  },
   author: {
     '&:not(:last-child)': {
       '&:after': {
-        content: ',',
+        content: '", "',
       },
     },
+  },
+  badge: {
+    '&:not(:first-child)': {
+      marginLeft: '-10px',
+    },
+  },
+  date: {
+    fontSize: '1rem',
   },
   popper: {
     backgroundColor: '#fff',
@@ -47,6 +65,7 @@ const LongformReviewReader = props => {
 
   const open = Boolean(anchorEl);
   const id = open ? review.id : undefined;
+  const reviewDate = new Date(review.updatedAt);
 
   return (
     <div>
@@ -83,18 +102,55 @@ const LongformReviewReader = props => {
                 Back
               </Button>
               <div className={classes.popperContent}>
-                <div>
+                <Grid container justify="space-between" alignItems="center">
                   {review.authors.length > 1 ? (
-                    <span className={classes.author}>
-                      Review by
-                      {review.authors.map(author => (
-                        <span key={author.id}>{author.name}</span>
-                      ))}
-                    </span>
+                    <Grid
+                      container
+                      item
+                      justify="flex-start"
+                      alignItems="center"
+                      spacing={2}
+                      xs={12}
+                      sm={9}
+                    >
+                      <Grid container item xs={12} sm={4}>
+                        {review.authors.map(author => (
+                          <div key={author.id} className={classes.badge}>
+                            <RoleBadge user={author} />
+                          </div>
+                        ))}
+                      </Grid>
+                      <Grid item xs={12} sm={8} className={classes.authors}>
+                        Review by{' '}
+                        {review.authors.map(author => (
+                          <span key={author.id} className={classes.author}>
+                            {author.name}
+                          </span>
+                        ))}
+                      </Grid>
+                    </Grid>
                   ) : (
-                    <span>{`${review.authors[0].name}'s review`}</span>
+                    <Grid
+                      container
+                      item
+                      justify="flex-start"
+                      alignItems="center"
+                      spacing={2}
+                      xs={12}
+                      sm={9}
+                    >
+                      <Grid item>
+                        <RoleBadge user={review.authors[0]} />
+                      </Grid>
+                      <Grid className={classes.authors}>{`${
+                        review.authors[0].name
+                      }'s review`}</Grid>
+                    </Grid>
                   )}
-                </div>
+                  <Grid item xs={12} sm={3} className={classes.date}>
+                    {reviewDate.toLocaleDateString('en-US')}
+                  </Grid>
+                </Grid>
               </div>
             </div>
           </Slide>
