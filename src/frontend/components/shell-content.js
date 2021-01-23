@@ -86,9 +86,6 @@ export default function ShellContent({
     setTab('read');
   };
 
-  console.log("hasLongReviewed", hasLongReviewed)
-  console.log("rapid", hasRapidReviewed)
-
   useEffect(() => {
     const newHeight = document.getElementsByClassName(
       'shell-content__preview',
