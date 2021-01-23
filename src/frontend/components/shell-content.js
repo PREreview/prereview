@@ -86,6 +86,9 @@ export default function ShellContent({
     setTab('read');
   };
 
+  console.log("hasLongReviewed", hasLongReviewed)
+  console.log("rapid", hasRapidReviewed)
+
   useEffect(() => {
     const newHeight = document.getElementsByClassName(
       'shell-content__preview',
@@ -96,36 +99,57 @@ export default function ShellContent({
   useEffect(() => {
     if (user) {
       if (preprint.fullReviews.length) {
-        preprint.fullReviews.map(review => {
+        let authorID;
+        let personaIDs = user.personas.map(persona => persona.id);
+        let authorIDs;
+        let published = [];
+        let drafts = [];
+        let ownReviews = [];
+
+        // ownReviews = preprint.fullReviews.filter(review => {
+        //   authorIDsreview.authors.map(author)
+        //   review.author.id ? authorID = review.author.id : authorID = review.author
+        //   personasIDs.some(id => id === authorID) 
+        // })
+
+        // console.log("ownReviews", ownReviews)
+
+        preprint.fullReviews.forEach(review => {
+          console.log("review", review)
+          if (review.isPublished) {
+            published = published.concat([review])
+          } else {
+            drafts = review.drafts
+          }
+        })
+
+        if (drafts.length) {
+          console.log("drafts", drafts[0])
+        } 
+
+        published.map(review => {
           review.authors.map(author => {
-            if (author.id === user.defaultPersona.id) {
-              if (review.published === true) {
+            author.id ? authorID = author.id : authorID = author
+            if (user.personas.some(persona => persona.id === authorID)) {
                 setHasLongReviewed(true);
-              } else {
-                setInitialContent(
-                  review.drafts[review.drafts.length - 1].contents,
-                );
-              }
-            }
+            } 
           });
         });
       }
 
       if (preprint.rapidReviews.length) {
+        let authorID;
         preprint.rapidReviews.map(review => {
-          if (review.author.id === user.defaultPersona.id) {
-            setHasRapidReviewed(true);
-          }
+          review.author.id ? authorID = review.author.id : authorID = review.author
+          setHasRapidReviewed(user.personas.some(persona => persona.id === authorID));
         });
       }
 
       if (preprint.requests.length) {
-        let author;
+        let authorID;
         preprint.requests.map(request => {
-          request.author.id
-            ? (author = request.author.id)
-            : (author = request.author);
-          setHasRequested(user.defaultPersona.id === author);
+          request.author.id ? authorID = request.author.id : authorID = request.author
+          setHasRequested(user.personas.some(persona => persona.id === authorID));
         });
       }
     }
