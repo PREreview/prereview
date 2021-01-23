@@ -5,6 +5,7 @@ import { UserContext } from '../contexts/user-context';
 import { MdPublic } from 'react-icons/md';
 import { Helmet } from 'react-helmet-async';
 import IncognitoIcon from '../svgs/incognito_icon.svg';
+import Loading from './loading.js'
 import HeaderBar from './header-bar';
 import { useGetPersona } from '../hooks/api-hooks.tsx';
 import RoleActivity from './role-activity';
@@ -22,8 +23,6 @@ export default function Profile() {
   const { data: personaData, loading: loadingPersona, error } = useGetPersona({
     id: location.pathname.slice(7),
   });
-
-  persona ? console.log("&***************", persona) : console.log("no persona yet")
   
   useEffect(() => {
     if (!loadingPersona) {
@@ -34,11 +33,10 @@ export default function Profile() {
     }
   }, [loadingPersona, personaData]);
 
-  if (error || !personaData) {
-    // #FIXME
+  if (loading || !personaData) {
+    return <Loading />;
+  } else if (error) {
     return <NotFound />;
-  } else if (loading) {
-    return <div>Loading...</div>;
   } else {
     return (
       <div className="profile">
