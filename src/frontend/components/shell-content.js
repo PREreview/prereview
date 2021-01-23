@@ -99,36 +99,41 @@ export default function ShellContent({
   useEffect(() => {
     if (user) {
       if (preprint.fullReviews.length) {
-        let authorID;
-        let personaIDs = user.personas.map(persona => persona.id);
-        let authorIDs;
+        // gets an array of the active user's persona IDs
+        let personaIDs = user.personas.map(persona => persona.id); 
+
+        // collects the user's reviews for the current preprint, whether published or not
+        let ownReviews = []; 
+        preprint.fullReviews.map(review => {
+          review.authors.map(author => {
+            let authorID;
+            author.id ? authorID = author.id : authorID = author
+            if (personaIDs.some(id => id === authorID)) {
+              ownReviews = ownReviews.concat([review])
+            }
+          })
+        })
+
+        // get a user's drafts
+        let ownDrafts = ownReviews.length ? ownReviews.filter(review => !review.isPublished).map(review => review.drafts) : []
+
+        const latestDraft = ownDrafts.length ? ownDrafts.sort((a, b) => b.id - a.id)[0] : []
+
+        // get the latest draft content & seed to the text editor
+        latestDraft.length ? setInitialContent(latestDraft[0].contents) : setInitialContent('')
+
+        
+        // gets all published reviews of the preprint
         let published = [];
-        let drafts = [];
-        let ownReviews = [];
-
-        // ownReviews = preprint.fullReviews.filter(review => {
-        //   authorIDsreview.authors.map(author)
-        //   review.author.id ? authorID = review.author.id : authorID = review.author
-        //   personasIDs.some(id => id === authorID) 
-        // })
-
-        // console.log("ownReviews", ownReviews)
-
         preprint.fullReviews.forEach(review => {
-          console.log("review", review)
           if (review.isPublished) {
             published = published.concat([review])
-          } else {
-            drafts = review.drafts
           }
         })
 
-        if (drafts.length) {
-          console.log("drafts", drafts[0])
-        } 
-
         published.map(review => {
           review.authors.map(author => {
+            let authorID;
             author.id ? authorID = author.id : authorID = author
             if (user.personas.some(persona => persona.id === authorID)) {
                 setHasLongReviewed(true);
