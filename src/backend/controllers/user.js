@@ -160,7 +160,7 @@ export default function controller(users, contacts, thisUser) {
         user = await users.findOneByIdOrOrcid(ctx.params.id, [
           'personas',
           'groups',
-          'contacts'
+          'contacts',
         ]);
       } catch (err) {
         ctx.throw(400, err);
@@ -192,16 +192,16 @@ export default function controller(users, contacts, thisUser) {
     // validate: {    },
     // pre: {},
     handler: async ctx => {
-      let userId = ctx.params.id
+      let userId = ctx.params.id;
       let newContact;
-      log.debug(`Adding a new contact email to user ${userId}`)
-      
+      log.debug(`Adding a new contact email to user ${userId}`);
+
       try {
-        log.debug(`Create a new email entry.`)
-        newContact = contacts.create(ctx.request.body)
-        await contacts.persistAndFlush(newContact)
+        log.debug(`Create a new email entry.`);
+        newContact = contacts.create(ctx.request.body);
+        await contacts.persistAndFlush(newContact);
       } catch (err) {
-        log.error('HTTP 400 Error: ', err)
+        log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse contact schema: ${err}`);
       }
 
@@ -210,9 +210,9 @@ export default function controller(users, contacts, thisUser) {
         status: 200,
         message: 'created',
         data: newContact,
-      }
-    }
-  })
+      };
+    },
+  });
 
   userRouter.route({
     meta: {

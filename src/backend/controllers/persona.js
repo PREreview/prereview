@@ -137,7 +137,7 @@ export default function controller(personasModel, thisUser) {
       ctx.status = 200;
       ctx.body = {
         status: 200,
-        data: persona
+        data: persona,
       };
     },
     meta: {
