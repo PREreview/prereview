@@ -272,6 +272,32 @@ export type UseDeleteUserProps = Omit<UseMutateProps<void, unknown, void, string
 export const useDeleteUser = (props: UseDeleteUserProps) => useMutate<void, unknown, void, string, void>("DELETE", `/users`, {   ...props });
 
 
+export interface PutUserContactsPathParams {
+  id: string
+}
+
+export type PutUserContactsProps = Omit<MutateProps<void, unknown, void, void, PutUserContactsPathParams>, "path" | "verb"> & PutUserContactsPathParams;
+
+/**
+ * Endpoint to PUT contacts for a single user.
+ */
+export const PutUserContacts = ({id, ...props}: PutUserContactsProps) => (
+  <Mutate<void, unknown, void, void, PutUserContactsPathParams>
+    verb="PUT"
+    path={`/users/${id}/contacts`}
+    
+    {...props}
+  />
+);
+
+export type UsePutUserContactsProps = Omit<UseMutateProps<void, unknown, void, void, PutUserContactsPathParams>, "path" | "verb"> & PutUserContactsPathParams;
+
+/**
+ * Endpoint to PUT contacts for a single user.
+ */
+export const usePutUserContacts = ({id, ...props}: UsePutUserContactsProps) => useMutate<void, unknown, void, void, PutUserContactsPathParams>("PUT", (paramsInPath: PutUserContactsPathParams) => `/users/${paramsInPath.id}/contacts`, {  pathParams: { id }, ...props });
+
+
 export type PostFullReviewsProps = Omit<MutateProps<void, unknown, void, void, void>, "path" | "verb">;
 
 /**

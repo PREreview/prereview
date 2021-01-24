@@ -24,7 +24,6 @@ export default function ActivityCard({ activity }) {
   });
 
   useEffect(() => {
-    console.log(activity);
     if (!loadingPreprint) {
       if (preprintData) {
         setPreprint(preprintData.data[0]);

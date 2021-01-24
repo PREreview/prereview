@@ -22,7 +22,7 @@ const querySchema = Joi.object({
 });
 
 // eslint-disable-next-line no-unused-vars
-export default function controller(users, thisUser) {
+export default function controller(users, contacts, thisUser) {
   const userRouter = router();
 
   userRouter.route({
@@ -89,6 +89,7 @@ export default function controller(users, thisUser) {
           'personas.rapidReviews',
           'personas.requests',
           'groups',
+          'contacts',
           'defaultPersona',
         ]);
       } catch (err) {
@@ -159,6 +160,7 @@ export default function controller(users, thisUser) {
         user = await users.findOneByIdOrOrcid(ctx.params.id, [
           'personas',
           'groups',
+          'contacts'
         ]);
       } catch (err) {
         ctx.throw(400, err);
@@ -177,6 +179,40 @@ export default function controller(users, thisUser) {
       };
     },
   });
+
+  userRouter.route({
+    meta: {
+      swagger: {
+        operationId: 'PutUserContacts',
+        summary: 'Endpoint to PUT contacts for a single user.',
+      },
+    },
+    method: 'put',
+    path: '/users/:id/contacts',
+    // validate: {    },
+    // pre: {},
+    handler: async ctx => {
+      let userId = ctx.params.id
+      let newContact;
+      log.debug(`Adding a new contact email to user ${userId}`)
+      
+      try {
+        log.debug(`Create a new email entry.`)
+        newContact = contacts.create(ctx.request.body)
+        await contacts.persistAndFlush(newContact)
+      } catch (err) {
+        log.error('HTTP 400 Error: ', err)
+        ctx.throw(400, `Failed to parse contact schema: ${err}`);
+      }
+
+      ctx.status = 200;
+      ctx.body = {
+        status: 200,
+        message: 'created',
+        data: newContact,
+      }
+    }
+  })
 
   userRouter.route({
     meta: {

@@ -36,7 +36,7 @@ export default function RoleActivity({ persona }) {
             <LabelStyle>Total number of long-form reviews</LabelStyle>
           </dt>
           <dd className="role-activity__summary__stat">
-            {persona.fullReviews.length || 0}
+            {persona.fullReviews.filter(review => review.isPublished).length || 0}
           </dd>
         </dl>
       ) : null}
@@ -57,7 +57,7 @@ export default function RoleActivity({ persona }) {
         </section>
       )}
 
-      <div className="role-activity__pagination">
+      {/* <div className="role-activity__pagination">
         <Button
           disabled
           onClick={() => {
@@ -75,7 +75,7 @@ export default function RoleActivity({ persona }) {
         >
           Next Page <MdChevronRight />
         </Button>
-      </div>
+      </div> */}
     </div>
   );
 }

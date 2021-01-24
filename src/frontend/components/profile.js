@@ -19,6 +19,7 @@ export default function Profile() {
   const thisUser = useContext(UserContext);
   const [loading, setLoading] = useState(true);
   const [persona, setPersona] = useState(null);
+  // const [imageUrl, setImageUrl] = useState('') FIXME 
 
   const { data: personaData, loading: loadingPersona, error } = useGetPersona({
     id: location.pathname.slice(7),
@@ -52,7 +53,7 @@ export default function Profile() {
           <header className="profile__header">
             {persona && persona.avatar ? (
               <img
-                src={persona.avatar}
+                src={''}
                 alt="avatar"
                 className="profile__avatar-img"
               />

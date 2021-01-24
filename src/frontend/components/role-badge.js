@@ -27,7 +27,6 @@ const RoleBadge = React.forwardRef(function RoleBadge(
   { children, className, tooltip, showNotice, disabled, user },
   ref,
 ) {
-  console.log("USER IN ROLEBADGE**********", user)
   return (
     <RoleBadgeUI
       ref={ref}

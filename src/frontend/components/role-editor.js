@@ -184,6 +184,7 @@ export default function RoleEditor({ user, onCancel, onSaved }) {
                 dataUrl = canvas.toDataURL('image/jpeg', q);
               }
 
+              console.log("DATAURL***********", dataUrl)
               data.avatar = dataUrl
             }
 
@@ -191,6 +192,7 @@ export default function RoleEditor({ user, onCancel, onSaved }) {
               .then(resp => { 
                 let updatedUser = resp.data
                 alert('User updated successfully.')
+                console.log("updatedUser", updatedUser)
                 onSaved(updatedUser);
               })
               .catch(err => alert(`An error occurred: ${err.message}`));

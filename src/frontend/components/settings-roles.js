@@ -76,15 +76,15 @@ export default function SettingsRoles({ user }) {
         on preprints. It can be changed at any time.
       </p>
 
-      {(!user.name || !user.avatar) && (
+      {(!activePersona.name || !activePersona.avatar) && (
         <p className="settings-roles__notice">
           <MdInfoOutline className="settings-roles__notice-icon" />
 
           <span>
             It is recommended that you set{' '}
-            {!user.name && !user.avatar
+            {!activePersona.name && !activePersona.avatar
               ? 'a display name and an avatar'
-              : !user.name
+              : !activePersona.name
               ? 'a display name'
               : 'an avatar'}{' '}
             for your persona. Click on the <strong>Edit</strong> buttons below
