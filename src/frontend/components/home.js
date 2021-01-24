@@ -141,7 +141,6 @@ export default function Home() {
   } else if (error) {
     return <div>An error occurred: {error}</div>;
   } else {
-    console.log('preprints', preprints);
     return (
       <div className="home">
         <Helmet>
@@ -246,7 +245,7 @@ export default function Home() {
                 }}
               />
             )}
-            {preprints && preprints.totalCount > 0 && !loading && (
+            {preprints && preprints.totalCount > 0 && !loadingPreprints && (
               <SortOptions
                 sort={params.get('sort') || ''}
                 order={params.get('desc') === 'true' ? 'desc' : 'asc'}
