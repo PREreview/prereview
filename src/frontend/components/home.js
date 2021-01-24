@@ -1,5 +1,5 @@
 // base imports
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 
@@ -87,7 +87,6 @@ export default function Home() {
   const [isWelcomeModalOpen, setIsWelcomeModalOpen] = useState(true);
   const [newPreprints, setNewPreprints] = useNewPreprints();
 
-  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState(params.get('search') || '');
 
   const { data: preprints, loading: loadingPreprints, error } = useGetPreprints(
@@ -97,14 +96,6 @@ export default function Home() {
   );
 
   const [hoveredSortOption, setHoveredSortOption] = useState(null);
-
-  useEffect(() => {
-    if (!loadingPreprints) {
-      if (preprints) {
-        setLoading(false);
-      }
-    }
-  }, []);
 
   const handleNewReview = preprintId => {
     if (thisUser) {
@@ -286,40 +277,43 @@ export default function Home() {
                 ))}
               </ul>
             )}
-            {preprints && preprints.totalCount === 0 && !loading ? (
+            {preprints && preprints.totalCount === 0 && !loadingPreprints ? (
               <div>
                 No preprints about this topic have been added to Rapid
                 PREreview.{' '}
-                <Link onClick={() => {
-                  setSearch('');
-                  if (thisUser) {
-                    history.push('/new');
-                  } else {
-                    setLoginModalOpenNext('/new');
-                  }
-                }}>
-                  Review or request a review of a Preprint to add it to the site.
+                <Link
+                  onClick={() => {
+                    setSearch('');
+                    if (thisUser) {
+                      history.push('/new');
+                    } else {
+                      setLoginModalOpenNext('/new');
+                    }
+                  }}
+                >
+                  Review or request a review of a Preprint to add it to the
+                  site.
                 </Link>
               </div>
             ) : (
-                <ul className="home__preprint-list">
-                  {preprints &&
-                    preprints.data.map(row => (
-                      <li key={row.id} className="home__preprint-list__item">
-                        <PreprintCard
-                          isNew={false}
-                          user={thisUser}
-                          preprint={row}
-                          onNewRequest={handleNewRequest}
-                          onNew={handleNew}
-                          onNewReview={handleNewReview}
-                          hoveredSortOption={hoveredSortOption}
-                          sortOption={params.get('desc') === 'true'}
-                        />
-                      </li>
-                    ))}
-                </ul>
-              )}
+              <ul className="home__preprint-list">
+                {preprints &&
+                  preprints.data.map(row => (
+                    <li key={row.id} className="home__preprint-list__item">
+                      <PreprintCard
+                        isNew={false}
+                        user={thisUser}
+                        preprint={row}
+                        onNewRequest={handleNewRequest}
+                        onNew={handleNew}
+                        onNewReview={handleNewReview}
+                        hoveredSortOption={hoveredSortOption}
+                        sortOption={params.get('desc') === 'true'}
+                      />
+                    </li>
+                  ))}
+              </ul>
+            )}
 
             {preprints && preprints.totalCount > params.get('limit') && (
               <div className="home__pagination">
@@ -338,7 +332,7 @@ export default function Home() {
             )}
           </div>
         </div>
-      </div >
+      </div>
     );
   }
 }
