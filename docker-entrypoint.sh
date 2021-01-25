@@ -46,7 +46,7 @@ if [ $NODE_ENV == "staging" ] && [ -z $IMPORT_SOURCES ]; then
   env -i PGPASSWORD="$PASS" /usr/bin/psql -U "$USER" -d "$NAME" -h "$HOST" -p "$PORT" -f /tmp/import.sql
   echo "Done copying!"
 else
-  env -i PGPASSWORD="$PASS" /usr/bin/psql -U "$USER" -d "$NAME" -h "$HOST" -p "$PORT" -tAc "SELECT to_regclass('public.users')" | grep -q users
+  env -i PGPASSWORD="$PASS" /usr/bin/psql -U "$USER" -d "$NAME" -h "$HOST" -p "$PORT" -tAc "SELECT to_regclass('public.user')" | grep -q user
   
   result=$?
   if [ $result -ne 0 ]; then
