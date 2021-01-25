@@ -242,7 +242,8 @@ export default function ReviewStepper({
       if (canSubmitRapid(answerMap)) {
         postRapidReview({ ...answerMap, preprint: preprint.id })
           .then(() => {
-            return onClose(answerMap);
+            onClose(answerMap);
+            return;
           })
           .catch(err => {
             alert(`An error occurred: ${err.message}`);
@@ -254,6 +255,7 @@ export default function ReviewStepper({
         );
         return false;
       }
+      return;
     }
   };
 
@@ -328,11 +330,8 @@ export default function ReviewStepper({
     if (activeStep === 0) {
       if (!hasRapidReviewed && !handleSubmitRapid()) {
         return false;
-      } else if (!expandFeedback) {
-        setExpandFeedback(true);
-        // return false;
       } else {
-        setExpandFeedback(false);
+        setExpandFeedback(expandFeedback => !expandFeedback);
         handleComplete();
       }
     } else if (activeStep === 1) {
@@ -385,7 +384,6 @@ export default function ReviewStepper({
 
   useEffect(() => {
     if (hasRapidReviewed) {
-      // setDisabledSaveSubmit(true);
       handleComplete();
     }
 
@@ -433,7 +431,7 @@ export default function ReviewStepper({
                 }}
               />
               <InputLabel
-                for="competing-interest"
+                htmlFor="competing-interest"
                 className={classes.inputLabel}
               >
                 Please use the space below to declare any existing{' '}
