@@ -41,11 +41,13 @@ export default function SettingsRoles({ user }) {
   const classes = useStyles();
   const isFirstTimeOnSettings = useIsFirstTimeOnSettings();
   const [personaToEdit, setPersonaToEdit] = useState(null);
-  const [activePersona, setActivePersona] = useState(user ? user.defaultPersona : null)
+  const [activePersona, setActivePersona] = useState(
+    user ? user.defaultPersona : null,
+  );
 
-  const handleActivePersonaClose = (persona) => {
-    setActivePersona(persona)
-  }
+  const handleActivePersonaClose = persona => {
+    setActivePersona(persona);
+  };
 
   return (
     <section className="settings-roles settings__section">
@@ -228,9 +230,9 @@ SettingsRoles.propTypes = {
   user: PropTypes.object.isRequired,
 };
 
-function MakeActivePersonaModalButton({ user, persona, handleClose}) {
+function MakeActivePersonaModalButton({ user, persona, handleClose }) {
   const [isOpen, setIsOpen] = useState(false);
-  const { mutate: updateUser, loading, error } = usePutUser({
+  const { mutate: updateUser, loading } = usePutUser({
     id: user.id,
   });
 
@@ -269,9 +271,10 @@ function MakeActivePersonaModalButton({ user, persona, handleClose}) {
               onClick={() => {
                 updateUser({ defaultPersona: persona.id })
                   .then(() => {
-                    alert('User updated successfully.')
-                    setIsOpen(false)
-                    handleClose(persona)})
+                    alert('User updated successfully.');
+                    setIsOpen(false);
+                    return handleClose(persona);
+                  })
                   .catch(err => alert(`An error occurred: ${err.message}`));
               }}
             >

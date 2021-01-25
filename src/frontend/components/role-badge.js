@@ -1,5 +1,5 @@
 // base imports
-import React, { useEffect } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import Tooltip from '@reach/tooltip';
@@ -9,6 +9,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import Popover from '@material-ui/core/Popover';
 
 // components
+import Avatar from './avatar';
 import NoticeBadge from './notice-badge';
 import XLink from './xlink';
 
@@ -103,18 +104,15 @@ const RoleBadgeUI = React.forwardRef(function RoleBadgeUI(
 
               <div
                 className={classNames('role-badge-menu__avatar', {
-                  'role-badge-menu__avatar--loaded':
-                    user && user.avatar,
+                  'role-badge-menu__avatar--loaded': user && user.avatar,
                 })}
-                style={
-                  user && user.avatar
-                    ? {
-                        backgroundImage: `url(${user.avatar.contentUrl})`,
-                        backgroundSize: 'contain',
-                      }
-                    : undefined
-                }
-              />
+              >
+                {user && user.avatar ? (
+                  <Avatar avatar={user.avatar} />
+                ) : (
+                  undefined
+                )}
+              </div>
             </div>
           </Tooltipify>
         </button>
@@ -137,9 +135,7 @@ const RoleBadgeUI = React.forwardRef(function RoleBadgeUI(
         <div className={classes.popoverInner}>
           <XLink
             className="menu__list__link-item"
-            href={`/about/${
-              user.id
-            }`}
+            href={`/about/${user.id}`}
             target={process.env.IS_EXTENSION ? '_blank' : undefined}
             to={
               process.env.IS_EXTENSION

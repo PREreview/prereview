@@ -15,8 +15,8 @@ export default function RoleEditor({ user, onCancel, onSaved }) {
   const [file, setFile] = useState(null);
   const [scale, setScale] = useState(1);
   const [rotate, setRotate] = useState(0);
-  const { mutate: updatePersona, loading, error } = usePutPersona( {
-    id: user.id
+  const { mutate: updatePersona, loading, error } = usePutPersona({
+    id: user.id,
   });
 
   const onDrop = useCallback(acceptedFiles => {
@@ -183,17 +183,14 @@ export default function RoleEditor({ user, onCancel, onSaved }) {
                 q -= 0.05;
                 dataUrl = canvas.toDataURL('image/jpeg', q);
               }
-
-              console.log("DATAURL***********", dataUrl)
-              data.avatar = dataUrl
+              data.avatar = dataUrl;
             }
 
-            updatePersona({ data })
-              .then(resp => { 
-                let updatedUser = resp.data
-                alert('User updated successfully.')
-                console.log("updatedUser", updatedUser)
-                onSaved(updatedUser);
+            updatePersona(data)
+              .then(resp => {
+                let updatedUser = resp.data;
+                alert('User updated successfully.');
+                return onSaved(updatedUser);
               })
               .catch(err => alert(`An error occurred: ${err.message}`));
           }}

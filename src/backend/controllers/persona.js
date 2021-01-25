@@ -120,6 +120,9 @@ export default function controller(personasModel, thisUser) {
 
       try {
         persona = await personasModel.findOne(ctx.params.id);
+        console.log('************************');
+        console.log(ctx.request.body);
+        console.log('************************');
         if (!persona) {
           ctx.throw(
             404,
