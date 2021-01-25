@@ -18,10 +18,7 @@ PrivateRoute.propTypes = {
 
 export function AdminRoute({ children, ...rest }) {
   const user = useContext(UserContext);
-  user ? console.log("admin user***********", user) : console.log("nope no user here")
   const [isAdmin, setIsAdmin] = useState(false);
-
-  children ? console.log("children", { children, ...rest }) : console.log("no children")
 
   useEffect(() => {
     if (user && user.isAdmin) {

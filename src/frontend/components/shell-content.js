@@ -40,8 +40,6 @@ export default function ShellContent({
   const location = useLocation();
   const [height, setHeight] = useState(0);
 
-  console.log("USER IN SHELLCONTENT", user)
-
   const {
     mutate: postReviewRequest,
     loadingPostReviewRequest,

@@ -20,9 +20,9 @@ import Controls from './controls';
 export default function BlockPanel() {
   const user = useContext(UserContext);
   const [lockedPersonas, setLockedPersonas] = useState([]);
-  const [personaToUnlock, setPersonaToUnlock] = useState(null)
+  const [personaToUnlock, setPersonaToUnlock] = useState(null);
 
-  const { data: personas, loadingPersonas } = useGetPersonas()
+  const { data: personas, loadingPersonas } = useGetPersonas();
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
@@ -30,10 +30,10 @@ export default function BlockPanel() {
     window.scrollTo(0, 0);
   }, []);
 
-   useEffect(() => {
+  useEffect(() => {
     if (!loadingPersonas) {
       if (personas && personas.data) {
-        setLockedPersonas(personas.data.filter(persona => persona.isLocked))
+        setLockedPersonas(personas.data.filter(persona => persona.isLocked));
       }
     }
   }, [loadingPersonas, personas, user]);
@@ -59,12 +59,12 @@ export default function BlockPanel() {
         </header>
 
         {lockedPersonas ? (
-         !lockedPersonas.length ? (
-          <div>No locked persona.</div>
-        ) : (
-          <div>
-            <ul className="block-panel__card-list">
-              {lockedPersonas.map(persona => (
+          !lockedPersonas.length ? (
+            <div>No locked persona.</div>
+          ) : (
+            <div>
+              <ul className="block-panel__card-list">
+                {lockedPersonas.map(persona => (
                   <li key={persona.id} className="block-panel__card-list-item">
                     <div className="block-panel__card-list-item__left">
                       <RoleBadgeUI user={persona} />
@@ -72,7 +72,7 @@ export default function BlockPanel() {
                     </div>
                     <div className="block-panel__card-list-item__right">
                       <LabelStyle>
-                        { persona.isAnonymous ? 'Anonymous' : 'Public' }
+                        {persona.isAnonymous ? 'Anonymous' : 'Public'}
                       </LabelStyle>
                       <IconButton
                         className="block-panel__remove-button"
@@ -85,9 +85,10 @@ export default function BlockPanel() {
                     </div>
                   </li>
                 ))}
-            </ul>
-          </div>
-        )) : null }
+              </ul>
+            </div>
+          )
+        ) : null}
       </section>
 
       {isAddModalOpen && (
@@ -100,33 +101,34 @@ export default function BlockPanel() {
         />
       )}
 
-      {
-        !!personaToUnlock ? 
+      {personaToUnlock ? (
         <BlockPanelRemoveModal
           user={user}
           persona={personaToUnlock}
           onClose={() => {
             setPersonaToUnlock(null);
           }}
-          onSuccess={ unlocked => {
-            setLockedPersonas(lockedPersonas.filter(persona => persona.id !== unlocked.id))
+          onSuccess={unlocked => {
+            setLockedPersonas(
+              lockedPersonas.filter(persona => persona.id !== unlocked.id),
+            );
           }}
-        /> : null
-      }
+        />
+      ) : null}
     </div>
   );
 }
 
-function BlockPanelAddModal({ user, onClose, onSuccess }) {
+function BlockPanelAddModal({ onClose, onSuccess }) {
   const [personaToLock, setPersonaToLock] = useState('');
   const { mutate: updatePersona, loading, error } = usePutPersona({
     id: personaToLock,
-  }); 
+  });
   const [frame] = useState('input');
 
   const pattern =
     '^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$'; // uuid v4
-  const re = new RegExp(pattern, 'i');
+  // const re = new RegExp(pattern, 'i');
 
   return (
     <Modal title="Block persona">
@@ -164,14 +166,13 @@ function BlockPanelAddModal({ user, onClose, onSuccess }) {
                 isWaiting={loading}
                 onClick={() => {
                   updatePersona({ isLocked: true })
-                    .then((resp) => {
-                        let locked = resp.data
-                        alert(`Persona successfully locked`)
-                        onSuccess(locked)
-                        onClose()
-                      }
-                    )
-                    .catch(err => alert(`An error occurred: ${err}`));
+                    .then(resp => {
+                      let locked = resp.data;
+                      alert(`Persona successfully locked`);
+                      onSuccess(locked);
+                      return onClose();
+                    })
+                    .catch(err => alert(`An error occurred: ${err.message}`));
                 }}
               >
                 Lock
@@ -202,15 +203,14 @@ function BlockPanelAddModal({ user, onClose, onSuccess }) {
 }
 
 BlockPanelAddModal.propTypes = {
-  user: PropTypes.object.isRequired,
   onClose: PropTypes.func.isRequired,
   onSuccess: PropTypes.func.isRequired,
 };
 
-function BlockPanelRemoveModal({ user, persona, onClose, onSuccess }) {
+function BlockPanelRemoveModal({ persona, onClose, onSuccess }) {
   const { mutate: updatePersona, loading, error } = usePutPersona({
-    id: persona.id
-  }); 
+    id: persona.id,
+  });
   const [frame] = useState('submit');
 
   return (
@@ -219,8 +219,7 @@ function BlockPanelRemoveModal({ user, persona, onClose, onSuccess }) {
         {frame === 'submit' ? (
           <Fragment>
             <p>
-              Are you sure to want to unlock{' '}
-              <em>{persona.name}</em>?
+              Are you sure to want to unlock <em>{persona.name}</em>?
             </p>
 
             <Controls
@@ -240,11 +239,11 @@ function BlockPanelRemoveModal({ user, persona, onClose, onSuccess }) {
                 onClick={() => {
                   updatePersona({ isLocked: false })
                     .then(() => {
-                      alert(`Successfully unlocked ${persona.name}`)
-                      onClose()
-                      onSuccess(persona)
+                      alert(`Successfully unlocked ${persona.name}`);
+                      onClose();
+                      return onSuccess(persona);
                     })
-                    .catch(err => alert(`An error occurred: ${err}`));
+                    .catch(err => alert(`An error occurred: ${err.message}`));
                 }}
               >
                 Unlock
@@ -254,8 +253,7 @@ function BlockPanelRemoveModal({ user, persona, onClose, onSuccess }) {
         ) : (
           <Fragment>
             <p>
-              <em>{persona.name}</em> was successfully
-              unlocked.
+              <em>{persona.name}</em> was successfully unlocked.
             </p>
 
             <Controls
