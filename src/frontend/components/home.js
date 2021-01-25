@@ -8,7 +8,7 @@ import Link from '@material-ui/core/Link';
 import Pagination from '@material-ui/lab/Pagination';
 
 // contexts
-import { UserContext } from '../contexts/user-context';
+import UserProvider from '../contexts/user-context';
 
 // hooks
 import { useGetPreprints } from '../hooks/api-hooks.tsx';
@@ -79,7 +79,8 @@ export default function Home() {
   const location = useLocation();
   const params = processParams(location.search);
 
-  const thisUser = useContext(UserContext);
+  const [thisUser] = useContext(UserProvider.context);
+  console.log(thisUser);
   const isMobile = useIsMobile();
   const [showLeftPanel, setShowLeftPanel] = useState(!isMobile);
   const [loginModalOpenNext, setLoginModalOpenNext] = useState(null);

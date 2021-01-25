@@ -1,13 +1,23 @@
-import React, { useEffect } from 'react';
+// base imports
+import React, { useContext, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useLocation } from 'react-router-dom';
-import HeaderBar from './header-bar';
+
+// contexts
+import UserProvider from '../contexts/user-context';
+
+// hooks
+import { useHasAgreedCoC } from '../hooks/ui-hooks';
+
+// components
 import Button from './button';
 import Checkbox from './checkbox';
-import XLink from './xlink';
+import HeaderBar from './header-bar';
 import Org from './org';
+import XLink from './xlink';
+
+// constants
 import { ORG } from '../constants';
-import { useHasAgreedCoC } from '../hooks/ui-hooks';
 
 // TODO make clear that by logging in user accepts the code of conduct
 
@@ -20,6 +30,8 @@ export default function Login() {
 
   const location = useLocation();
 
+  const [thisUser] = useContext(UserProvider.context);
+
   const next = new URLSearchParams(location.search).get('next');
 
   return (
@@ -27,7 +39,7 @@ export default function Login() {
       <Helmet>
         <title>{ORG} • Login</title>
       </Helmet>
-      <HeaderBar />
+      <HeaderBar thisUser={thisUser} />
       <div className="login__content">
         {/* <div className="login__logo-container">
           <AnimatedLogo />

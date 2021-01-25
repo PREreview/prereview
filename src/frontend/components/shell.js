@@ -12,7 +12,7 @@ import PropTypes from 'prop-types';
 import debounce from 'lodash/debounce';
 
 // utils
-import { UserContext } from '../contexts/user-context';
+import UserProvider from '../contexts/user-context';
 import { checkIfRoleLacksMininmalData } from '../utils/roles';
 
 // components
@@ -28,7 +28,7 @@ import PreReviewLogo from './pre-review-logo';
 const SHELL_HEADER_HEIGHT = 40; // !! keep in sync with CSS
 
 export default function Shell({ children, defaultStatus = 'default' }) {
-  const user = useContext(UserContext);
+  const [user] = useContext(UserProvider.context);
   const [isDown, setIsDown] = useState(false);
   const ref = useRef();
   const nextHeightRef = useRef(null);
@@ -347,7 +347,7 @@ export default function Shell({ children, defaultStatus = 'default' }) {
                   </XLink>
                 )}
 
-                <XLink to={'logout'} href={`/api/v2/logout`}>
+                <XLink to={'/logout'} href={`/logout`}>
                   Logout
                 </XLink>
               </UserBadge>

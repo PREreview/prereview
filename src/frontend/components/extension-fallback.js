@@ -6,7 +6,7 @@ import Cookies from 'js-cookie';
 import mobile from 'is-mobile';
 
 // contexts
-import { UserContext } from '../contexts/user-context';
+import UserProvider from '../contexts/user-context';
 
 // hooks
 import { useGetPreprint } from '../hooks/api-hooks.tsx';
@@ -35,7 +35,7 @@ const PdfViewer = React.lazy(() =>
 
 export default function ExtensionFallback() {
   const location = useLocation(); // location.state can be {preprint, tab} with tab being `request` or `review` (so that we know on which tab the shell should be activated with
-  const user = useContext(UserContext);
+  const [user] = useContext(UserProvider.context);
 
   const [loading, setLoading] = useState(true);
   const [preprint, setPreprint] = useState(null);
