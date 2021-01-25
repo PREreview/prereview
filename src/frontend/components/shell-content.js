@@ -119,15 +119,9 @@ export default function ShellContent({
         // get the latest draft content & seed to the text editor
         latestDraft.length ? setInitialContent(latestDraft[0].contents) : setInitialContent('')
 
-        
         // gets all published reviews of the preprint
-        let published = [];
-        preprint.fullReviews.forEach(review => {
-          if (review.isPublished) {
-            published = published.concat([review])
-          }
-        })
-
+        let published = preprint.fullReviews.filter(review => review.isPublished)
+        
         published.map(review => {
           review.authors.map(author => {
             let authorID;
