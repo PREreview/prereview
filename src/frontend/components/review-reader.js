@@ -18,12 +18,8 @@ import Typography from '@material-ui/core/Typography';
 // utils
 import { getYesNoStats } from '../utils/stats';
 
-// hooks
-import { usePostComments } from '../hooks/api-hooks.tsx';
-
 // components
 import Barplot from './barplot';
-import Controls from './controls';
 import LongformReviewReader from './review-reader-longform';
 import { PotentialRoles } from './role-list';
 import ReportButton from './report-button';
@@ -104,25 +100,15 @@ const ReviewReader = React.memo(function ReviewReader({
     setExpandLong(newExpanded ? panel : false);
   };
 
-  const {
-    mutate: postComment,
-    loadingPostComment,
-    errorPostComment,
-  } = usePostComments();
-
   const handleCommentChange = value => {
     setContent(value);
   };
 
-  const handleSubmitComment = (title, content) => {
+  const handleCommentSubmit = (title, content) => {
     setPublishedTitle(title);
     setPublishedComment(content);
     setCommentTitle('');
     setContent('');
-  };
-
-  const canSubmit = content => {
-    return content && content !== '<p></p>';
   };
 
   const [highlightedRoleIds, setHighlightedRoleIds] = useState(
@@ -361,6 +347,11 @@ const ReviewReader = React.memo(function ReviewReader({
                                   >
                                     <Grid item>
                                       <LongformReviewReader
+                                        content={content}
+                                        commentTitle={commentTitle}
+                                        publishedComment={publishedComment}
+                                        onChange={handleCommentChange}
+                                        onSubmit={handleCommentSubmit}
                                         height={height}
                                         review={review}
                                         user={user}

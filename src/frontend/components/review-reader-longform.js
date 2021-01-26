@@ -28,7 +28,7 @@ const Button = withStyles({
 })(MuiButton);
 
 const LongformReviewReader = props => {
-  const { height, review, user } = props;
+  const { content, commentTitle, publishedComment, onChange, onSubmit, height, review, user } = props;
   const [anchorEl, setAnchorEl] = React.useState(null);
 
   const useStyles = makeStyles(() => ({
@@ -126,27 +126,16 @@ const LongformReviewReader = props => {
   };
 
   // comments
-  const [content, setContent] = useState('');
-  const [commentTitle, setCommentTitle] = useState('');
-  const [publishedComment, setPublishedComment] = useState('');
-  const [publishedTitle, setPublishedTitle] = useState('');
+  // const [content, setContent] = useState('');
+  // const [commentTitle, setCommentTitle] = useState('');
+  // const [publishedComment, setPublishedComment] = useState('');
+  // const [publishedTitle, setPublishedTitle] = useState('');
 
   const {
     mutate: postComment,
     loadingPostComment,
     errorPostComment,
   } = usePostComments();
-
-  const handleCommentChange = value => {
-    setContent(value);
-  };
-
-  const handleSubmitComment = (title, content) => {
-    setPublishedTitle(title);
-    setPublishedComment(content);
-    setCommentTitle('');
-    setContent('');
-  };
 
   const canSubmit = content => {
     return content && content !== '<p></p>';
@@ -389,7 +378,7 @@ const LongformReviewReader = props => {
                         <CommentEditor
                           reviewId={review.id}
                           initialContent={content}
-                          handleContentChange={handleCommentChange}
+                          handleContentChange={onChange}
                         />
                         <Controls error={errorPostComment}>
                           <Button
@@ -406,10 +395,7 @@ const LongformReviewReader = props => {
                                 })
                                   .then(() => {
                                     alert('Comment submitted successfully.');
-                                    return handleSubmitComment(
-                                      commentTitle,
-                                      content,
-                                    );
+                                    return onSubmit(commentTitle, content);
                                   })
                                   .catch(err =>
                                     alert(`An error occurred: ${err.message}`),
@@ -442,6 +428,11 @@ const LongformReviewReader = props => {
 };
 
 LongformReviewReader.propTypes = {
+  content: PropTypes.string,
+  commentTitle: PropTypes.string,
+  publishedComment: PropTypes.string,
+  onChange: PropTypes.func.isRequired,
+  onSubmit: PropTypes.func.isRequired,
   height: PropTypes.number,
   review: PropTypes.object.isRequired,
   user: PropTypes.object,
