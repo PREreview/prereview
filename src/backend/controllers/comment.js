@@ -37,7 +37,6 @@ export default function controller(commentModel, fullReviewModel, thisUser) {
 
   // handler for GET multiple comments
   const getHandler = async ctx => {
- 
     let comments, fid; // fid = fullReview ID
 
     ctx.params.fid ? (fid = ctx.params.fid) : null;
@@ -64,10 +63,10 @@ export default function controller(commentModel, fullReviewModel, thisUser) {
   };
 
   const postHandler = async ctx => {
-     if (ctx.invalid) {
-        handleInvalid(ctx);
-        return;
-      }
+    if (ctx.invalid) {
+      handleInvalid(ctx);
+      return;
+    }
     let fullReview, comment, fid, authorPersona;
 
     ctx.params.fid ? (fid = ctx.params.fid) : null;
@@ -79,12 +78,12 @@ export default function controller(commentModel, fullReviewModel, thisUser) {
         fullReview = await fullReviewModel.findOne(fid);
       }
 
-      log.debug("author", authorPersona)
-      log.debug("fullReview", fullReview)
-      log.debug("ctx.request.body", ctx.request.body)
+      log.debug('author', authorPersona);
+      log.debug('fullReview', fullReview);
+      log.debug('ctx.request.body', ctx.request.body);
 
       if (fullReview && authorPersona) {
-        log.debug("creating a comment")
+        log.debug('creating a comment');
         comment = commentModel.create({
           ...ctx.request.body,
           parent: fullReview,
@@ -97,11 +96,11 @@ export default function controller(commentModel, fullReviewModel, thisUser) {
     } catch (err) {
       log.error(`HTTP 400 error: ${err}`);
     }
-    
+
     ctx.body = {
-        status: 201,
-        message: 'created',
-      };
+      status: 201,
+      message: 'created',
+    };
 
     ctx.status = 201;
   };
