@@ -283,6 +283,7 @@ const LongformReviewReader = props => {
                   <Box mt={2} mb={2} className={classes.yellow}>
                     <form className="comments__add">
                       <CommentEditor
+                        reviewId={review.id}
                         initialContent={content}
                         handleContentChange={handleCommentChange}
                       />

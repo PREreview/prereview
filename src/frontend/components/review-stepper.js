@@ -522,7 +522,12 @@ export default function ReviewStepper({
                     Thank you for your contribution!
                     <br />
                     Please review{' '}
-                    <Link href="#">PREreview Code of Conduct</Link> before
+                    <Link
+                      href="https://content.prereview.org/coc/#toc-anchor_5"
+                      target="_blank"
+                    >
+                      PREreview Code of Conduct
+                    </Link>{' '}
                     submitting your review.
                   </Box>
                   <FormControlLabel
@@ -595,7 +600,12 @@ export default function ReviewStepper({
                     Thank you for your contribution!
                     <br />
                     Please review{' '}
-                    <Link href="#">PREreview Code of Conduct</Link> before
+                    <Link
+                      href="https://content.prereview.org/coc/#toc-anchor_5"
+                      target="_blank"
+                    >
+                      PREreview Code of Conduct
+                    </Link>{' '}
                     submitting your review.
                   </Box>
                   <FormControlLabel

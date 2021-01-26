@@ -5,7 +5,7 @@ import { useQuill } from 'react-quilljs';
 import 'quill/dist/quill.snow.css'; // Add css for snow theme
 // or import 'quill/dist/quill.bubble.css'; // Add css for bubble theme
 
-const CommentEditor = ({ initialContent, handleContentChange }) => {
+const CommentEditor = ({ initialContent, handleContentChange, reviewId }) => {
   const placeholder = 'Comment section (maximum 150 words)';
   const theme = 'snow';
 
@@ -13,30 +13,31 @@ const CommentEditor = ({ initialContent, handleContentChange }) => {
     theme,
     placeholder,
     modules: {
-      toolbar: '#comments-toolbar',
+      toolbar: `#comments-toolbar-${reviewId}`,
     },
     formats: ['bold', 'italic', 'underline', 'strike'],
   });
 
   useEffect(() => {
     if (quill) {
-      quill.clipboard.dangerouslyPasteHTML(initialContent);
+      const delta = quill.clipboard.convert(initialContent);
+      quill.setContents(delta);
       quill.on('text-change', () => {
         handleContentChange(quillRef.current.innerHTML);
       });
     }
-  }, [quill]);
+  }, [quill, quillRef]);
 
   return (
     <div style={{ width: '100%' }}>
-      <div id="comments-toolbar">
+      <div id={`comments-toolbar-${reviewId}`}>
         <button className="ql-bold" />
         <button className="ql-italic" />
         <button className="ql-underline" />
         <button className="ql-strike" />
       </div>
       <div ref={quillRef} />
-      <div id="comments-editor" />
+      <div id={`comments-editor-${reviewId}`} />
     </div>
   );
 };
@@ -44,6 +45,7 @@ const CommentEditor = ({ initialContent, handleContentChange }) => {
 CommentEditor.propTypes = {
   initialContent: PropTypes.string,
   handleContentChange: PropTypes.func.isRequired,
+  reviewId: PropTypes.number.isRequired,
 };
 
 export default CommentEditor;
