@@ -130,7 +130,6 @@ const ReviewReader = React.memo(function ReviewReader({
   );
 
   // expand/collapse longform reviews
-  const popperRefHandler= () => {};
   const [anchorEl, setAnchorEl] = React.useState(null);
   const handleClick = event => {
     setAnchorEl(anchorEl ? null : event.currentTarget);
@@ -391,7 +390,6 @@ const ReviewReader = React.memo(function ReviewReader({
                                       <LongformReviewReader
                                         anchorEl={anchorEl}
                                         handleAnchor={handleClick}
-                                        popperRefHandler={popperRefHandler}
                                         content={content}
                                         commentTitle={commentTitle}
                                         publishedComment={publishedComment}

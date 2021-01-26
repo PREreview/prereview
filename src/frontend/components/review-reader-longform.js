@@ -1,5 +1,5 @@
 // base imports
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import ReactHtmlParser, { convertNodeToElement } from 'react-html-parser';
 
@@ -27,8 +27,6 @@ const Button = withStyles({
   },
 })(MuiButton);
 
-const popperRef = () => {};
-
 const LongformReviewReader = props => {
   const {
     content,
@@ -41,7 +39,6 @@ const LongformReviewReader = props => {
     user,
     anchorEl,
     handleAnchor,
-    popperRefHandler,
   } = props;
 
   const useStyles = makeStyles(() => ({
@@ -107,9 +104,9 @@ const LongformReviewReader = props => {
 
   const classes = useStyles();
 
-  const popperRefObject = useRef(null);
+  const [buttonRefId, setButtonRefId] = useState(null);
 
-  const open = Boolean(anchorEl);
+  const open = Boolean(anchorEl && review.id === buttonRefId);
   const id = open ? review.id : undefined;
   const reviewDate = new Date(review.updatedAt);
   const reviewContent = review.drafts[review.drafts.length - 1];
@@ -151,8 +148,14 @@ const LongformReviewReader = props => {
   const canSubmit = content => {
     return content && content !== '<p></p>';
   };
-  console.log(id);
-  useEffect(() => {}, [anchorEl, content, commentTitle, publishedComment]);
+
+  useEffect(() => {
+    console.log('open: ', open);
+    console.log('id: ', id);
+    if (anchorEl) {
+      setButtonRefId(parseInt(anchorEl.getAttribute('aria-describedby')));
+    }
+  }, [anchorEl, content, commentTitle, publishedComment]);
 
   return (
     <Popper
@@ -161,8 +164,6 @@ const LongformReviewReader = props => {
       anchorEl={anchorEl}
       transition
       className={classes.popper}
-      popperRef={popperRef}
-      ref={popperRefObject}
     >
       {({ TransitionProps }) => (
         <Slide
@@ -429,7 +430,6 @@ const LongformReviewReader = props => {
 };
 
 LongformReviewReader.propTypes = {
-  popperRefHandler: PropTypes.func.isRequired,
   anchorEl: PropTypes.object.isRequired,
   handleAnchor: PropTypes.func.isRequired,
   content: PropTypes.string,
