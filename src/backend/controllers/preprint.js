@@ -212,6 +212,7 @@ export default function controller(preprints, thisUser) {
         preprint = await preprints.findOneByIdOrHandle(ctx.params.id, [
           'fullReviews.authors.identity',
           'fullReviews.drafts',
+          'fullReviews.comments',
           'rapidReviews.author.identity',
           'requests',
           'tags',

@@ -23,7 +23,6 @@ import { usePostComments } from '../hooks/api-hooks.tsx';
 
 // components
 import Barplot from './barplot';
-import CommentEditor from './comment-editor';
 import Controls from './controls';
 import LongformReviewReader from './review-reader-longform';
 import { PotentialRoles } from './role-list';

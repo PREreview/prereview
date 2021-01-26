@@ -50,6 +50,9 @@ const LongformReviewReader = props => {
         marginLeft: '-10px',
       },
     },
+    comment: {
+      borderBottom: '2px solid #EBE9E9',
+    },
     date: {
       fontSize: '1rem',
     },
@@ -247,7 +250,7 @@ const LongformReviewReader = props => {
                 {review.comments ? (
                   review.comments.map(comment => {
                     return (
-                      <div key={comment.id}>
+                      <div key={comment.id} className={classes.comment}>
                         {comment.title ? (
                           <div className="comments-title">{comment.title}</div>
                         ) : null}
