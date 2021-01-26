@@ -46,6 +46,7 @@ import {
 
 // Our controllers
 import AuthController from './controllers/auth.js'; // authentication/logins
+import BadgeController from './controllers/badge.js';
 import CommentController from './controllers/comment.js';
 import CommunityController from './controllers/community.js';
 import FullReviewController from './controllers/fullReview.js';
@@ -104,8 +105,8 @@ export default async function configServer(config) {
 
   // setup API handlers
   const auth = AuthController(userModel, personaModel, config, authz);
-  // eslint-disable-next-line no-unused-vars
   const badgeModel = badgeModelWrapper(db);
+  const badges = BadgeController(badgeModel, authz);
   const commentModel = commentModelWrapper(db);
   const comments = CommentController(commentModel, authz);
   const communityModel = communityModelWrapper(db);
@@ -114,7 +115,7 @@ export default async function configServer(config) {
   const draftModel = fullReviewDraftModelWrapper(db);
   const fullReviewDrafts = DraftController(draftModel, authz);
   const groups = GroupController(groupModel, userModel, authz);
-  const personas = PersonaController(personaModel, authz);
+  const personas = PersonaController(personaModel, badgeModel, authz);
   const preprintModel = preprintModelWrapper(db);
   const preprints = PreprintController(preprintModel, authz);
   const rapidReviewModel = rapidReviewModelWrapper(db);
@@ -139,6 +140,7 @@ export default async function configServer(config) {
 
   const apiV2Router = compose([
     auth.middleware(),
+    badges.middleware(),
     comments.middleware(),
     communities.middleware(),
     fullReviews.middleware(),

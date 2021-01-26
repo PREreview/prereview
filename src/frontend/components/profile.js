@@ -100,13 +100,27 @@ export default function Profile() {
                     {persona.name}
                   </XLink>
                 </dd>
+                {persona && persona.badges.length > 0 && (
+                  <Fragment>
+                    <dt>
+                      <LabelStyle>Tags</LabelStyle>
+                    </dt>
+                    <dd>
+                      {persona.badges.map(badge => (
+                        <Chip label={badge.name} color='primary' size='small' />
+                      ))}
+                    </dd>
+                  </Fragment>
+                )}
                 {user && (
                   <Fragment>
                     <dt>
                       <LabelStyle>Identity</LabelStyle>
                     </dt>
                     <dd>
-                      {persona && persona.isAnonymous ? 'Anonymous' : 'Public'}
+                      {persona && persona.isAnonymous
+                        ? 'Anonymous'
+                        : 'Public'}
                     </dd>
                   </Fragment>
                 )}
