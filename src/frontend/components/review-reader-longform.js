@@ -1,5 +1,5 @@
 // base imports
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import ReactHtmlParser, { convertNodeToElement } from 'react-html-parser';
 
@@ -27,9 +27,22 @@ const Button = withStyles({
   },
 })(MuiButton);
 
+const popperRef = () => {};
+
 const LongformReviewReader = props => {
-  const { content, commentTitle, publishedComment, onChange, onSubmit, height, review, user } = props;
-  const [anchorEl, setAnchorEl] = React.useState(null);
+  const {
+    content,
+    commentTitle,
+    publishedComment,
+    onChange,
+    onSubmit,
+    height,
+    review,
+    user,
+    anchorEl,
+    handleAnchor,
+    popperRefHandler,
+  } = props;
 
   const useStyles = makeStyles(() => ({
     authors: {
@@ -78,7 +91,7 @@ const LongformReviewReader = props => {
       overflowY: 'scroll',
       position: 'fixed !important',
       right: 0,
-      top: height ? `${height + 42}px !important` : 0,
+      top: height ? `${height + 40}px !important` : 0,
       transform: 'none !important',
       width: '40vw',
       zIndex: 10000,
@@ -94,9 +107,7 @@ const LongformReviewReader = props => {
 
   const classes = useStyles();
 
-  const handleClick = event => {
-    setAnchorEl(anchorEl ? null : event.currentTarget);
-  };
+  const popperRefObject = useRef(null);
 
   const open = Boolean(anchorEl);
   const id = open ? review.id : undefined;
@@ -140,294 +151,287 @@ const LongformReviewReader = props => {
   const canSubmit = content => {
     return content && content !== '<p></p>';
   };
-
-  useEffect(() => {}, [content, commentTitle, publishedComment]);
+  console.log(id);
+  useEffect(() => {}, [anchorEl, content, commentTitle, publishedComment]);
 
   return (
-    <div>
-      <Button
-        aria-describedby={id}
-        type="button"
-        onClick={handleClick}
-        color="secondary"
-      >
-        Comment
-      </Button>
-      <Popper
-        id={id}
-        open={open}
-        anchorEl={anchorEl}
-        transition
-        className={classes.popper}
-      >
-        {({ TransitionProps }) => (
-          <Slide
-            direction="left"
-            mountOnEnter
-            unmountOnExit
-            timeout={350}
-            {...TransitionProps}
-          >
-            <div className="review-reader-longform">
-              <Button
-                aria-describedby={id}
-                type="button"
-                onClick={handleClick}
-                color="secondary"
-              >
-                Back
-              </Button>
-              <div className={classes.popperContent}>
-                <Grid container justify="space-between" alignItems="center">
-                  {review.authors.length > 1 ? (
-                    <Grid
-                      container
-                      item
-                      justify="flex-start"
-                      alignItems="center"
-                      spacing={2}
-                      xs={12}
-                      sm={9}
-                    >
-                      <Grid container item xs={12} sm={4}>
-                        {review.authors.map(author => (
-                          <div key={author.id} className={classes.badge}>
-                            <RoleBadge user={author} />
-                          </div>
-                        ))}
-                      </Grid>
-                      <Grid item xs={12} sm={8} className={classes.authors}>
-                        Review by{' '}
-                        {review.authors.map(author => (
-                          <span key={author.id} className={classes.author}>
-                            {author.name}
-                          </span>
-                        ))}
-                      </Grid>
-                    </Grid>
-                  ) : (
-                    <Grid
-                      container
-                      item
-                      justify="flex-start"
-                      alignItems="center"
-                      spacing={2}
-                      xs={12}
-                      sm={9}
-                    >
-                      <Grid item>
-                        <RoleBadge user={review.authors[0]} />
-                      </Grid>
-                      <Grid className={classes.authors}>{`${
-                        review.authors[0].name
-                      }'s review`}</Grid>
-                    </Grid>
-                  )}
-                  <Grid item xs={12} sm={3} className={classes.date}>
-                    {reviewDate.toLocaleDateString('en-US')}
-                  </Grid>
-                </Grid>
-                <Box border="1px solid #E5E5E5" mt={4} px={3} pb={2}>
-                  <Box>{ReactHtmlParser(reviewContent.contents, options)}</Box>
+    <Popper
+      id={id}
+      open={open}
+      anchorEl={anchorEl}
+      transition
+      className={classes.popper}
+      popperRef={popperRef}
+      ref={popperRefObject}
+    >
+      {({ TransitionProps }) => (
+        <Slide
+          direction="left"
+          mountOnEnter
+          unmountOnExit
+          timeout={350}
+          {...TransitionProps}
+        >
+          <div className="review-reader-longform">
+            <Button
+              aria-describedby={id}
+              type="button"
+              onClick={handleAnchor}
+              color="secondary"
+            >
+              Back
+            </Button>
+            <div className={classes.popperContent}>
+              <Grid container justify="space-between" alignItems="center">
+                {review.authors.length > 1 ? (
                   <Grid
                     container
+                    item
+                    justify="flex-start"
                     alignItems="center"
-                    justify="space-between"
                     spacing={2}
+                    xs={12}
+                    sm={9}
                   >
-                    <Grid item>Plaudit</Grid>
-                    {/*#FIXME plaudits*/}
-                    <Grid item>
-                      <ReportButton reviewId={review.id} />
+                    <Grid container item xs={12} sm={4}>
+                      {review.authors.map(author => (
+                        <div key={author.id} className={classes.badge}>
+                          <RoleBadge user={author} />
+                        </div>
+                      ))}
+                    </Grid>
+                    <Grid item xs={12} sm={8} className={classes.authors}>
+                      Review by{' '}
+                      {review.authors.map(author => (
+                        <span key={author.id} className={classes.author}>
+                          {author.name}
+                        </span>
+                      ))}
                     </Grid>
                   </Grid>
-                </Box>
-                <Box my={4} pb={1} borderBottom="5px solid #EBE9E9">
-                  <Typography component="h3" className={classes.h2}>
-                    Comments
-                  </Typography>
-                </Box>
-                {review.comments ? (
-                  review.comments.map(comment => {
-                    return (
-                      <Box key={comment.id} className={classes.comment}>
-                        {comment.title ? (
-                          <div className="comments-title">{comment.title}</div>
-                        ) : null}
-                        <Grid container justify="space-between">
-                          <Grid
-                            container
-                            item
-                            spacing={1}
-                            alignItems="center"
-                            justify="flex-start"
-                            xs={12}
-                            sm={6}
-                          >
-                            <Grid item>
-                              <RoleBadge user={comment.author} />
-                            </Grid>
-                            <Grid item>
-                              <Typography className={classes.commentMeta}>
-                                {comment.author.name}
-                              </Typography>
-                            </Grid>
+                ) : (
+                  <Grid
+                    container
+                    item
+                    justify="flex-start"
+                    alignItems="center"
+                    spacing={2}
+                    xs={12}
+                    sm={9}
+                  >
+                    <Grid item>
+                      <RoleBadge user={review.authors[0]} />
+                    </Grid>
+                    <Grid className={classes.authors}>{`${
+                      review.authors[0].name
+                    }'s review`}</Grid>
+                  </Grid>
+                )}
+                <Grid item xs={12} sm={3} className={classes.date}>
+                  {reviewDate.toLocaleDateString('en-US')}
+                </Grid>
+              </Grid>
+              <Box border="1px solid #E5E5E5" mt={4} px={3} pb={2}>
+                <Box>{ReactHtmlParser(reviewContent.contents, options)}</Box>
+                <Grid
+                  container
+                  alignItems="center"
+                  justify="space-between"
+                  spacing={2}
+                >
+                  <Grid item>Plaudit</Grid>
+                  {/*#FIXME plaudits*/}
+                  <Grid item>
+                    <ReportButton reviewId={review.id} />
+                  </Grid>
+                </Grid>
+              </Box>
+              <Box my={4} pb={1} borderBottom="5px solid #EBE9E9">
+                <Typography component="h3" className={classes.h2}>
+                  Comments
+                </Typography>
+              </Box>
+              {review.comments ? (
+                review.comments.map(comment => {
+                  return (
+                    <Box key={comment.id} className={classes.comment}>
+                      {comment.title ? (
+                        <div className="comments-title">{comment.title}</div>
+                      ) : null}
+                      <Grid container justify="space-between">
+                        <Grid
+                          container
+                          item
+                          spacing={1}
+                          alignItems="center"
+                          justify="flex-start"
+                          xs={12}
+                          sm={6}
+                        >
+                          <Grid item>
+                            <RoleBadge user={comment.author} />
                           </Grid>
-                          <Grid item xs={12} sm={6}>
-                            <Typography
-                              align="right"
-                              className={classes.commentMeta}
-                            >
-                              {new Date(comment.updatedAt).toLocaleDateString(
-                                'en-US',
-                              )}
+                          <Grid item>
+                            <Typography className={classes.commentMeta}>
+                              {comment.author.name}
                             </Typography>
                           </Grid>
                         </Grid>
-                        <div className={classes.p}>
-                          {ReactHtmlParser(comment.contents, options)}
-                        </div>
-                      </Box>
-                    );
-                  })
-                ) : publishedComment ? (
-                  <Box>
-                    <Grid container justify="space-between">
-                      <Grid
-                        container
-                        item
-                        spacing={1}
-                        alignItems="center"
-                        justify="flex-start"
-                        xs={12}
-                        sm={6}
-                        key={`comment-${user.id}`}
-                      >
-                        <Grid item>
-                          <RoleBadge user={user} />
-                        </Grid>
-                        <Grid item>
-                          <Typography className={classes.commentMeta}>
-                            {user.defaultPersona
-                              ? user.defaultPersona.name
-                              : user.name}
-                          </Typography>
-                        </Grid>
-                      </Grid>
-                      <Grid item xs={12} sm={6}>
-                        <Typography
-                          align="right"
-                          className={classes.commentMeta}
-                        >
-                          {new Date().toLocaleDateString('en-US')}
-                        </Typography>
-                      </Grid>
-                    </Grid>
-                    <div className={classes.p}>
-                      {ReactHtmlParser(publishedComment, options)}
-                    </div>
-                  </Box>
-                ) : (
-                  <Typography>No comments have been added yet.</Typography>
-                )}
-                {publishedComment ? (
-                  <Box>
-                    <Grid container justify="space-between">
-                      <Grid
-                        container
-                        item
-                        spacing={1}
-                        alignItems="center"
-                        justify="flex-start"
-                        xs={12}
-                        sm={6}
-                        key={`comment-${user.id}`}
-                      >
-                        <Grid item>
-                          <RoleBadge user={user} />
-                        </Grid>
-                        <Grid item>
-                          <Typography className={classes.commentMeta}>
-                            {user.defaultPersona
-                              ? user.defaultPersona.name
-                              : user.name}
-                          </Typography>
-                        </Grid>
-                      </Grid>
-                      <Grid item xs={12} sm={6}>
-                        <Typography
-                          align="right"
-                          className={classes.commentMeta}
-                        >
-                          {new Date().toLocaleDateString('en-US')}
-                        </Typography>
-                      </Grid>
-                    </Grid>
-                    <div className={classes.p}>
-                      {ReactHtmlParser(publishedComment, options)}
-                    </div>
-                  </Box>
-                ) : null}
-                {user ? (
-                  <Box mt={4} mb={2}>
-                    <Typography component="h4" className={classes.h2}>
-                      Post a comment
-                    </Typography>
-                    <Box mt={2} className={classes.yellow}>
-                      <form className="comments__add">
-                        <CommentEditor
-                          reviewId={review.id}
-                          initialContent={content}
-                          handleContentChange={onChange}
-                        />
-                        <Controls error={errorPostComment}>
-                          <Button
-                            type="submit"
-                            primary="true"
-                            disabled={!canSubmit(content)}
-                            onClick={event => {
-                              event.preventDefault();
-                              if (canSubmit(content)) {
-                                postComment({
-                                  title: `User ${user.id} comment`,
-                                  // #FIXME optional title needed
-                                  contents: content,
-                                })
-                                  .then(() => {
-                                    alert('Comment submitted successfully.');
-                                    return onSubmit(commentTitle, content);
-                                  })
-                                  .catch(err =>
-                                    alert(`An error occurred: ${err.message}`),
-                                  );
-                              } else {
-                                alert('Comment cannot be blank.');
-                              }
-                            }}
+                        <Grid item xs={12} sm={6}>
+                          <Typography
+                            align="right"
+                            className={classes.commentMeta}
                           >
-                            Comment
-                          </Button>
-                        </Controls>
-                      </form>
+                            {new Date(comment.updatedAt).toLocaleDateString(
+                              'en-US',
+                            )}
+                          </Typography>
+                        </Grid>
+                      </Grid>
+                      <div className={classes.p}>
+                        {ReactHtmlParser(comment.contents, options)}
+                      </div>
                     </Box>
+                  );
+                })
+              ) : publishedComment ? (
+                <Box>
+                  <Grid container justify="space-between">
+                    <Grid
+                      container
+                      item
+                      spacing={1}
+                      alignItems="center"
+                      justify="flex-start"
+                      xs={12}
+                      sm={6}
+                      key={`comment-${user.id}`}
+                    >
+                      <Grid item>
+                        <RoleBadge user={user} />
+                      </Grid>
+                      <Grid item>
+                        <Typography className={classes.commentMeta}>
+                          {user.defaultPersona
+                            ? user.defaultPersona.name
+                            : user.name}
+                        </Typography>
+                      </Grid>
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <Typography align="right" className={classes.commentMeta}>
+                        {new Date().toLocaleDateString('en-US')}
+                      </Typography>
+                    </Grid>
+                  </Grid>
+                  <div className={classes.p}>
+                    {ReactHtmlParser(publishedComment, options)}
+                  </div>
+                </Box>
+              ) : (
+                <Typography>No comments have been added yet.</Typography>
+              )}
+              {publishedComment ? (
+                <Box>
+                  <Grid container justify="space-between">
+                    <Grid
+                      container
+                      item
+                      spacing={1}
+                      alignItems="center"
+                      justify="flex-start"
+                      xs={12}
+                      sm={6}
+                      key={`comment-${user.id}`}
+                    >
+                      <Grid item>
+                        <RoleBadge user={user} />
+                      </Grid>
+                      <Grid item>
+                        <Typography className={classes.commentMeta}>
+                          {user.defaultPersona
+                            ? user.defaultPersona.name
+                            : user.name}
+                        </Typography>
+                      </Grid>
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <Typography align="right" className={classes.commentMeta}>
+                        {new Date().toLocaleDateString('en-US')}
+                      </Typography>
+                    </Grid>
+                  </Grid>
+                  <div className={classes.p}>
+                    {ReactHtmlParser(publishedComment, options)}
+                  </div>
+                </Box>
+              ) : null}
+              {user ? (
+                <Box mt={4} mb={2}>
+                  <Typography
+                    id="post-comment"
+                    component="h4"
+                    className={classes.h2}
+                  >
+                    Post a comment
+                  </Typography>
+                  <Box mt={2} className={classes.yellow}>
+                    <form className="comments__add">
+                      <CommentEditor
+                        reviewId={review.id}
+                        initialContent={content}
+                        handleContentChange={onChange}
+                      />
+                      <Controls error={errorPostComment}>
+                        <Button
+                          type="submit"
+                          primary="true"
+                          disabled={!canSubmit(content)}
+                          onClick={event => {
+                            event.preventDefault();
+                            if (canSubmit(content)) {
+                              postComment({
+                                title: `User ${user.id} comment`,
+                                // #FIXME optional title needed
+                                contents: content,
+                              })
+                                .then(() => {
+                                  alert('Comment submitted successfully.');
+                                  return onSubmit(commentTitle, content);
+                                })
+                                .catch(err =>
+                                  alert(`An error occurred: ${err.message}`),
+                                );
+                            } else {
+                              alert('Comment cannot be blank.');
+                            }
+                          }}
+                        >
+                          Comment
+                        </Button>
+                      </Controls>
+                    </form>
                   </Box>
-                ) : (
-                  <Box mt={4} mb={2} className={classes.yellow}>
-                    <Typography component="p">
-                      Login to post a comment.
-                    </Typography>
-                  </Box>
-                )}
-              </div>
+                </Box>
+              ) : (
+                <Box mt={4} mb={2} className={classes.yellow}>
+                  <Typography component="p">
+                    Login to post a comment.
+                  </Typography>
+                </Box>
+              )}
             </div>
-          </Slide>
-        )}
-      </Popper>
-    </div>
+          </div>
+        </Slide>
+      )}
+    </Popper>
   );
 };
 
 LongformReviewReader.propTypes = {
+  popperRefHandler: PropTypes.func.isRequired,
+  anchorEl: PropTypes.object.isRequired,
+  handleAnchor: PropTypes.func.isRequired,
   content: PropTypes.string,
   commentTitle: PropTypes.string,
   publishedComment: PropTypes.string,
