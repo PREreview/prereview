@@ -47,6 +47,11 @@ init_db() {
   npm run db:init
 }
 
+if ([ $NODE_ENV == "staging" ] || [ $NODE_ENV == "development" ]) && [
+  $IMPORT_CLEAR_DB == "true" ]; then
+  clear_db
+fi
+
 if [ $NODE_ENV == "staging" ] && [ -z $IMPORT_SOURCES ]; then
   echo "Copying existing database $FROM_NAME to staging"
   echo "Dumping $FROM_NAME database"
@@ -64,16 +69,10 @@ else
   if [ $result -ne 0 ]; then
     if [ $NODE_ENV == "staging" ]; then
       echo "Import legacy data"
-      if [ $IMPORT_CLEAR_DB == "true" ]; then
-        clear_db
-      fi
       init_db
       npm run db:import &
     elif [ $NODE_ENV == "development" ]; then
       echo "Generate seeds"
-      if [ $IMPORT_CLEAR_DB == "true" ]; then
-        clear_db
-      fi
       init_db
       npm run db:seeds &
     fi
