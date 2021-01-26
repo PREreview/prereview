@@ -373,6 +373,7 @@ const LongformReviewReader = props => {
                     <form className="comments__add">
                       <CommentEditor
                         reviewId={review.id}
+                        initialContent={content}
                         handleContentChange={onChange}
                       />
                       <Controls error={errorPostComment}>
