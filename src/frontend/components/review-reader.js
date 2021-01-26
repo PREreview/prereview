@@ -13,6 +13,7 @@ import MuiAccordionSummary from '@material-ui/core/AccordionSummary';
 import AccordionDetails from '@material-ui/core/AccordionDetails';
 import Box from '@material-ui/core/Box';
 import Grid from '@material-ui/core/Grid';
+import Link from '@material-ui/core/Link';
 import Typography from '@material-ui/core/Typography';
 
 // utils
@@ -21,10 +22,17 @@ import { getYesNoStats } from '../utils/stats';
 // components
 import Barplot from './barplot';
 import LongformReviewReader from './review-reader-longform';
+import MuiButton from '@material-ui/core/Button';
 import { PotentialRoles } from './role-list';
 import ReportButton from './report-button';
 import ShareMenu from './share-menu';
 import TextAnswers from './text-answers';
+
+const Button = withStyles({
+  root: {
+    textTransform: 'none',
+  },
+})(MuiButton);
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -43,6 +51,10 @@ const useStyles = makeStyles(theme => ({
     flexShrink: 0,
     fontSize: theme.typography.pxToRem(16),
     fontWeight: '600',
+  },
+  link: {
+    paddingBottom: 5,
+    paddingLeft: 2,
   },
   date: {
     flexBasis: '25%',
@@ -92,6 +104,7 @@ const ReviewReader = React.memo(function ReviewReader({
   const [expandRapid, setExpandRapid] = React.useState(true);
   const [expandLong, setExpandLong] = React.useState(true);
 
+  // expand and collapse rapid and longform review sections
   const handleChangeRapid = panel => (event, newExpanded) => {
     setExpandRapid(newExpanded ? panel : false);
   };
@@ -100,6 +113,7 @@ const ReviewReader = React.memo(function ReviewReader({
     setExpandLong(newExpanded ? panel : false);
   };
 
+  // comment methods for the longform review reader to persist to
   const handleCommentChange = value => {
     setContent(value);
   };
@@ -115,6 +129,14 @@ const ReviewReader = React.memo(function ReviewReader({
     defaultHighlightedRoleIds || [],
   );
 
+  // expand/collapse longform reviews
+  const popperRefHandler= () => {};
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const handleClick = event => {
+    setAnchorEl(anchorEl ? null : event.currentTarget);
+  };
+
+  // react html parser options so the comments do not create an editable interface
   const transform = node => {
     if (node.attribs) {
       if (node.attribs.class === 'ql-editor') {
@@ -330,23 +352,46 @@ const ReviewReader = React.memo(function ReviewReader({
                               </AccordionSummary>
                               <AccordionDetails className={classes.spacing}>
                                 <Box>
-                                  <Box key={`content-${review.id}`}>
+                                  <Typography
+                                    component="div"
+                                    key={`content-${review.id}`}
+                                  >
                                     {ReactHtmlParser(
                                       reviewContent.contents
                                         .substring(0, 600)
-                                        .concat(
-                                          ' ... <a href="#">Read more</a>',
-                                        ),
+                                        .concat('...'),
                                       options,
                                     )}
-                                  </Box>
+                                    <Link
+                                      component="button"
+                                      className={classes.link}
+                                      variant="body1"
+                                      aria-describedby={review.id}
+                                      type="button"
+                                      onClick={handleClick}
+                                      color="secondary"
+                                    >
+                                      Read more
+                                    </Link>
+                                  </Typography>
                                   <Grid
                                     container
                                     justify="space-between"
                                     alignItems="center"
                                   >
                                     <Grid item>
+                                      <Button
+                                        aria-describedby={review.id}
+                                        type="button"
+                                        onClick={handleClick}
+                                        color="secondary"
+                                      >
+                                        Comment
+                                      </Button>
                                       <LongformReviewReader
+                                        anchorEl={anchorEl}
+                                        handleAnchor={handleClick}
+                                        popperRefHandler={popperRefHandler}
                                         content={content}
                                         commentTitle={commentTitle}
                                         publishedComment={publishedComment}
