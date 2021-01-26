@@ -1,5 +1,5 @@
 // base imports
-import React, { useEffect } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import Tooltip from '@reach/tooltip';
@@ -16,6 +16,9 @@ import XLink from './xlink';
 import { MdPerson } from 'react-icons/md';
 
 const useStyles = makeStyles(theme => ({
+  popover: {
+    zIndex: '20000 !important',
+  },
   popoverInner: {
     display: 'flex',
     flexDirection: 'column',

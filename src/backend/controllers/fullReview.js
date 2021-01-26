@@ -79,7 +79,7 @@ export default function controller(
       let review, draft, authorPersona, preprint;
 
       try {
-        authorPersona = await getActivePersona(ctx.state.user);
+        authorPersona = getActivePersona(ctx.state.user);
       } catch (err) {
         log.error('Failed to load user personas.');
         ctx.throw(400, err);
@@ -215,12 +215,17 @@ export default function controller(
 
       if (fullReview) {
         // gets latest draft associated with this review
-        latestDraft = fullReview.drafts[fullReview.drafts.length - 1];
+        fullReview.drafts.length
+          ? (latestDraft = fullReview.drafts[fullReview.drafts.length - 1])
+          : null;
+        latestDraft
+          ? (fullReview = { ...fullReview, contents: latestDraft.contents })
+          : null;
 
         ctx.body = {
           status: 200,
           message: 'ok',
-          body: [{ ...fullReview, contents: latestDraft.contents }],
+          body: [fullReview],
         };
         ctx.status = 200;
       }
