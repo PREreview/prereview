@@ -97,38 +97,48 @@ export default function ShellContent({
     if (user) {
       if (preprint.fullReviews.length) {
         // gets an array of the active user's persona IDs
-        let personaIDs = user.personas.map(persona => persona.id); 
+        let personaIDs = user.personas.map(persona => persona.id);
 
         // collects the user's reviews for the current preprint, whether published or not
-        let ownReviews = []; 
+        let ownReviews = [];
         preprint.fullReviews.map(review => {
           review.authors.map(author => {
             let authorID;
-            author.id ? authorID = author.id : authorID = author
+            author.id ? (authorID = author.id) : (authorID = author);
             if (personaIDs.some(id => id === authorID)) {
-              ownReviews = ownReviews.concat([review])
+              ownReviews = ownReviews.concat([review]);
             }
-          })
-        })
+          });
+        });
 
         // get a user's drafts
-        let ownDrafts = ownReviews.length ? ownReviews.filter(review => !review.isPublished).map(review => review.drafts) : []
+        let ownDrafts = ownReviews.length
+          ? ownReviews
+              .filter(review => !review.isPublished)
+              .map(review => review.drafts)
+          : [];
 
-        const latestDraft = ownDrafts.length ? ownDrafts.sort((a, b) => b.id - a.id)[0] : []
+        const latestDraft = ownDrafts.length
+          ? ownDrafts.sort((a, b) => b.id - a.id)[0]
+          : [];
 
         // get the latest draft content & seed to the text editor
-        latestDraft.length ? setInitialContent(latestDraft[0].contents) : setInitialContent('')
+        latestDraft.length
+          ? setInitialContent(latestDraft[0].contents)
+          : setInitialContent('');
 
         // gets all published reviews of the preprint
-        let published = preprint.fullReviews.filter(review => review.isPublished)
-        
+        let published = preprint.fullReviews.filter(
+          review => review.isPublished,
+        );
+
         published.map(review => {
           review.authors.map(author => {
             let authorID;
-            author.id ? authorID = author.id : authorID = author
+            author.id ? (authorID = author.id) : (authorID = author);
             if (user.personas.some(persona => persona.id === authorID)) {
-                setHasLongReviewed(true);
-            } 
+              setHasLongReviewed(true);
+            }
           });
         });
       }
@@ -136,28 +146,28 @@ export default function ShellContent({
       if (preprint.rapidReviews.length) {
         let authorID;
         preprint.rapidReviews.map(review => {
-          review.author.id ? authorID = review.author.id : authorID = review.author
-          setHasRapidReviewed(user.personas.some(persona => persona.id === authorID));
+          review.author.id
+            ? (authorID = review.author.id)
+            : (authorID = review.author);
+          setHasRapidReviewed(
+            user.personas.some(persona => persona.id === authorID),
+          );
         });
       }
 
       if (preprint.requests.length) {
         let authorID;
         preprint.requests.map(request => {
-          request.author.id ? authorID = request.author.id : authorID = request.author
-          setHasRequested(user.personas.some(persona => persona.id === authorID));
+          request.author.id
+            ? (authorID = request.author.id)
+            : (authorID = request.author);
+          setHasRequested(
+            user.personas.some(persona => persona.id === authorID),
+          );
         });
       }
     }
-  }, [
-    preprint,
-    user,
-    hasRapidReviewed,
-    hasLongReviewed,
-    rapidContent,
-    longContent,
-    hasRequested,
-  ]);
+  }, [preprint, user, rapidContent, longContent, hasRequested]);
 
   return (
     <div className="shell-content">

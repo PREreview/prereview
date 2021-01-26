@@ -391,7 +391,7 @@ export default function ReviewStepper({
       setActiveStep(2);
       handleComplete(4);
     }
-  }, []);
+  }, [hasRapidReviewed, hasLongReviewed]);
 
   function getStepContent(step) {
     switch (step) {

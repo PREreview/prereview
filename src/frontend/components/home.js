@@ -80,7 +80,6 @@ export default function Home() {
   const params = processParams(location.search);
 
   const [thisUser] = useContext(UserProvider.context);
-  console.log(thisUser);
   const isMobile = useIsMobile();
   const [showLeftPanel, setShowLeftPanel] = useState(!isMobile);
   const [loginModalOpenNext, setLoginModalOpenNext] = useState(null);
