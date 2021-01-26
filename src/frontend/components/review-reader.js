@@ -123,6 +123,8 @@ const ReviewReader = React.memo(function ReviewReader({
     setPublishedComment(content);
     setCommentTitle('');
     setContent('');
+    const quill = document.getElementsByClassName('ql-editor');
+    quill[0].innerHTML = '';
   };
 
   const [highlightedRoleIds, setHighlightedRoleIds] = useState(
