@@ -5,7 +5,7 @@ import { useQuill } from 'react-quilljs';
 import 'quill/dist/quill.snow.css'; // Add css for snow theme
 // or import 'quill/dist/quill.bubble.css'; // Add css for bubble theme
 
-const CommentEditor = ({ initialContent, handleContentChange, reviewId }) => {
+const CommentEditor = ({ handleContentChange, reviewId }) => {
   const placeholder = 'Comment section (maximum 150 words)';
   const theme = 'snow';
 
@@ -20,13 +20,11 @@ const CommentEditor = ({ initialContent, handleContentChange, reviewId }) => {
 
   useEffect(() => {
     if (quill) {
-      const delta = quill.clipboard.convert(initialContent);
-      quill.setContents(delta);
       quill.on('text-change', () => {
         handleContentChange(quillRef.current.innerHTML);
       });
     }
-  }, [quill, quillRef, initialContent]);
+  }, [quill, quillRef]);
 
   return (
     <div style={{ width: '100%' }}>
@@ -43,7 +41,6 @@ const CommentEditor = ({ initialContent, handleContentChange, reviewId }) => {
 };
 
 CommentEditor.propTypes = {
-  initialContent: PropTypes.string,
   handleContentChange: PropTypes.func.isRequired,
   reviewId: PropTypes.number.isRequired,
 };

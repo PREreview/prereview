@@ -134,24 +134,17 @@ const LongformReviewReader = props => {
   };
 
   // comments
-  // const [content, setContent] = useState('');
-  // const [commentTitle, setCommentTitle] = useState('');
-  // const [publishedComment, setPublishedComment] = useState('');
-  // const [publishedTitle, setPublishedTitle] = useState('');
-
   const {
     mutate: postComment,
     loadingPostComment,
     errorPostComment,
-  } = usePostComments();
+  } = usePostComments({ fid: review.id });
 
   const canSubmit = content => {
     return content && content !== '<p></p>';
   };
 
   useEffect(() => {
-    console.log('open: ', open);
-    console.log('id: ', id);
     if (anchorEl) {
       setButtonRefId(parseInt(anchorEl.getAttribute('aria-describedby')));
     }
@@ -380,7 +373,6 @@ const LongformReviewReader = props => {
                     <form className="comments__add">
                       <CommentEditor
                         reviewId={review.id}
-                        initialContent={content}
                         handleContentChange={onChange}
                       />
                       <Controls error={errorPostComment}>

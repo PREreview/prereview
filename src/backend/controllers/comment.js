@@ -62,9 +62,17 @@ export default function controller(commentModel, fullReviewModel, thisUser) {
   };
 
   const postHandler = async ctx => {
-    let fullReview, comment, fid;
+    log.debug('Posting a comment on a review.');
+    let fullReview, comment, authorPersona, fid;
 
     ctx.params.fid ? (fid = ctx.params.fid) : null;
+
+    try {
+      authorPersona = ctx.state.user.defaultPersona;
+    } catch (err) {
+      log.error('Failed to load user personas.');
+      ctx.throw(400, err);
+    }
 
     try {
       if (fid) {
@@ -72,7 +80,11 @@ export default function controller(commentModel, fullReviewModel, thisUser) {
       }
 
       if (fullReview) {
-        comment = await commentModel.create(ctx.request.body);
+        comment = commentModel.create({
+          ...ctx.request.body,
+          author: authorPersona,
+          parent: fullReview,
+        });
         await commentModel.persistAndFlush(comment);
       }
     } catch (err) {
