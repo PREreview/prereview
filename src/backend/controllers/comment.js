@@ -37,6 +37,7 @@ export default function controller(commentModel, fullReviewModel, thisUser) {
 
   // handler for GET multiple comments
   const getHandler = async ctx => {
+ 
     let comments, fid; // fid = fullReview ID
 
     ctx.params.fid ? (fid = ctx.params.fid) : null;
@@ -63,6 +64,10 @@ export default function controller(commentModel, fullReviewModel, thisUser) {
   };
 
   const postHandler = async ctx => {
+     if (ctx.invalid) {
+        handleInvalid(ctx);
+        return;
+      }
     let fullReview, comment, fid, authorPersona;
 
     ctx.params.fid ? (fid = ctx.params.fid) : null;
@@ -70,18 +75,16 @@ export default function controller(commentModel, fullReviewModel, thisUser) {
     authorPersona = getActivePersona(ctx.state.user);
 
     try {
-      authorPersona = ctx.state.user.defaultPersona;
-    } catch (err) {
-      log.error('Failed to load user personas.');
-      ctx.throw(400, err);
-    }
-
-    try {
       if (fid) {
         fullReview = await fullReviewModel.findOne(fid);
       }
 
+      log.debug("author", authorPersona)
+      log.debug("fullReview", fullReview)
+      log.debug("ctx.request.body", ctx.request.body)
+
       if (fullReview && authorPersona) {
+        log.debug("creating a comment")
         comment = commentModel.create({
           ...ctx.request.body,
           parent: fullReview,
@@ -94,6 +97,11 @@ export default function controller(commentModel, fullReviewModel, thisUser) {
     } catch (err) {
       log.error(`HTTP 400 error: ${err}`);
     }
+    
+    ctx.body = {
+        status: 201,
+        message: 'created',
+      };
 
     ctx.status = 201;
   };
@@ -128,13 +136,7 @@ export default function controller(commentModel, fullReviewModel, thisUser) {
     validate: {
       query: querySchema,
     },
-    handler: async ctx => {
-      if (ctx.invalid) {
-        handleInvalid(ctx);
-        return;
-      }
-      getHandler(ctx);
-    },
+    handler: async ctx => getHandler(ctx),
     meta: {
       swagger: {
         operationId: 'GetFullReviewComments',
@@ -153,13 +155,7 @@ export default function controller(commentModel, fullReviewModel, thisUser) {
       type: 'json',
       continueOnError: true,
     },
-    handler: async ctx => {
-      if (ctx.invalid) {
-        handleInvalid(ctx);
-        return;
-      }
-      postHandler(ctx);
-    },
+    handler: postHandler,
     meta: {
       swagger: {
         operationId: 'PostComments',
