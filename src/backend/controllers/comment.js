@@ -70,6 +70,13 @@ export default function controller(commentModel, fullReviewModel, thisUser) {
     authorPersona = getActivePersona(ctx.state.user);
 
     try {
+      authorPersona = ctx.state.user.defaultPersona;
+    } catch (err) {
+      log.error('Failed to load user personas.');
+      ctx.throw(400, err);
+    }
+
+    try {
       if (fid) {
         fullReview = await fullReviewModel.findOne(fid);
       }
