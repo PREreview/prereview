@@ -383,11 +383,15 @@ export default async function run(db) {
   const usersMap = new Map();
   const preprintsMap = new Map();
   const client = new Client({
-    host: process.env.IMPORT_HOST,
-    port: process.env.IMPORT_PORT ? process.env.IMPORT_PORT : 5432,
-    user: process.env.IMPORT_USER,
-    password: process.env.IMPORT_PASS,
-    database: process.env.IMPORT_DB ? process.env.IMPORT_DB : 'prereview',
+    host: process.env.IMPORT_POSTGRES_HOST,
+    port: process.env.IMPORT_POSTGRES_PORT
+      ? process.env.IMPORT_POSTGRES_PORT
+      : 5432,
+    user: process.env.IMPORT_POSTGRES_USER,
+    password: process.env.IMPORT_POSTGRES_PASS,
+    database: process.env.IMPORT_POSTGRES_DB
+      ? process.env.IMPORT_POSTGRES_DB
+      : 'prereview',
     ssl: true,
   });
 

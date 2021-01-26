@@ -1,8 +1,7 @@
 import React, { Fragment, useContext, useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { format } from 'date-fns';
-import Chip from '@material-ui/core/Chip';
-import { UserContext } from '../contexts/user-context';
+import UserProvider from '../contexts/user-context';
 import { MdPublic } from 'react-icons/md';
 import { Helmet } from 'react-helmet-async';
 import IncognitoIcon from '../svgs/incognito_icon.svg';
@@ -16,7 +15,7 @@ import { ORG } from '../constants';
 
 export default function Profile() {
   const location = useLocation();
-  const thisUser = useContext(UserContext);
+  const [thisUser] = useContext(UserProvider.context);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
   const [persona, setPersona] = useState(null);
@@ -29,7 +28,7 @@ export default function Profile() {
     // window.scrollTo(0, 0);
     if (!loadingUser) {
       if (userData) {
-        if(!userData.data.isPrivate && userData.data.defaultPersona) {
+        if (!userData.data.isPrivate && userData.data.defaultPersona) {
           setPersona(userData.data.defaultPersona);
           setUser(userData.data);
           setLoading(false);

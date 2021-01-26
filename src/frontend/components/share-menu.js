@@ -1,64 +1,120 @@
+// base imports
 import React, { Fragment, useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
-import { MdShare } from 'react-icons/md';
 import copy from 'clipboard-copy';
-import {
-  Menu,
-  MenuList,
-  MenuButton,
-  MenuLink,
-  MenuItem,
-} from '@reach/menu-button';
 import VisuallyHidden from '@reach/visually-hidden';
+
+// material UI
+import { makeStyles } from '@material-ui/core/styles';
+import Popover from '@material-ui/core/Popover';
+
+// utils
 import { createPreprintId } from '../utils/ids';
 import { unprefix } from '../utils/jsonld';
-import Modal from './modal';
+
+// components
 import Button from './button';
 import Controls from './controls';
+import Modal from './modal';
 import XLink from './xlink';
 
+// icons
+import { MdShare } from 'react-icons/md';
+
+const useStyles = makeStyles(theme => ({
+  popoverInner: {
+    display: 'flex',
+    flexDirection: 'column',
+    padding: theme.spacing(2),
+  },
+}));
+
 export default function ShareMenu({ identifier, roleIds = [] }) {
+  const classes = useStyles();
+
   const [permalink, setPermalink] = useState(null);
+
+  const [anchorEl, setAnchorEl] = React.useState(null);
+
+  const handleClick = event => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const open = Boolean(anchorEl);
+  const id = open ? 'share-menu' : undefined;
 
   return (
     <Fragment>
-      <Menu>
-        <MenuButton className="share-menu">
+      <div className="share-menu-container">
+        <button
+          className="share-menu"
+          type="button"
+          aria-describedby={id}
+          variant="contained"
+          color="primary"
+          onClick={handleClick}
+        >
           <VisuallyHidden>Share</VisuallyHidden>
           <MdShare className="share-menu__icon" />
-        </MenuButton>
-        <MenuList>
-          <MenuItem
-            onSelect={() => {
-              setPermalink(`${identifier}`);
-            }}
-          >
-            Permalink
-          </MenuItem>
-
-          {!!(roleIds && roleIds.length) && (
-            <MenuItem
-              className="menu__list"
-              onSelect={() => {
-                const qs = new URLSearchParams();
-                qs.set('role', roleIds.map(unprefix));
-
-                setPermalink(`${identifier}?${qs.toString()}`);
-              }}
+        </button>
+        <Popover
+          id={id}
+          open={open}
+          anchorEl={anchorEl}
+          onClose={handleClose}
+          anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'left',
+          }}
+          transformOrigin={{
+            vertical: 'top',
+            horizontal: 'left',
+          }}
+          className={classes.popover}
+        >
+          <div className={classes.popoverInner}>
+            <XLink
+              className="menu__list__link-item"
+              download="rapid-prereview-data.jsonld"
+              href={`/api/v2/preprint/${unprefix(
+                createPreprintId(identifier),
+              )}`}
+              to={`/api/v2/preprint/${unprefix(createPreprintId(identifier))}`}
             >
-              Permalink (for selected user{roleIds.length > 1 ? 's' : ''})
-            </MenuItem>
-          )}
+              Permalink
+            </XLink>
 
-          <MenuLink
-            className="menu__list__link-item"
-            download="rapid-prereview-data.jsonld"
-            href={`api/v2/preprint/${unprefix(createPreprintId(identifier))}`}
-          >
-            Download data (JSON-LD)
-          </MenuLink>
-        </MenuList>
-      </Menu>
+            {!!(roleIds && roleIds.length) && (
+              <div
+                className="menu__list"
+                onSelect={() => {
+                  const qs = new URLSearchParams();
+                  qs.set('role', roleIds.map(unprefix));
+
+                  setPermalink(`${identifier}?${qs.toString()}`);
+                }}
+              >
+                Permalink (for selected user{roleIds.length > 1 ? 's' : ''})
+              </div>
+            )}
+
+            <XLink
+              className="menu__list__link-item"
+              download="rapid-prereview-data.jsonld"
+              href={`/api/v2/preprint/${unprefix(
+                createPreprintId(identifier),
+              )}`}
+              to={`/api/v2/preprint/${unprefix(createPreprintId(identifier))}`}
+            >
+              Download data (JSON-LD)
+            </XLink>
+          </div>
+        </Popover>
+      </div>
 
       {!!permalink && (
         <PermalinkModal
@@ -127,7 +183,7 @@ function PermalinkModal({ permalink, onClose }) {
       className="permalink-modal"
     >
       <XLink
-        href={`${url.pathname}${url.search}${url.hash}`}
+        href={`/${url.pathname}${url.search}${url.hash}`}
         to={{
           pathname: url.pathname,
           search: url.search,

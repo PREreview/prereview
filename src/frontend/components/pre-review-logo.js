@@ -5,10 +5,7 @@ import XLink from './xlink';
 
 import preReviewLogo from '../svgs/prereview-logo.svg';
 
-export default function PreReviewLogo({
-  short = false,
-  responsive = true,
-}) {
+export default function PreReviewLogo({ short = false, responsive = true }) {
   return (
     <div
       className={classNames('rapid-pre-review-logo', {

@@ -65,6 +65,7 @@ const defaults = {
   db_timeout: '0',
   db_type: defaultEnv === 'production' ? 'postgresql' : 'sqlite',
   db_user: process.env.npm_package_name.toLowerCase(),
+  db_tls: 'false',
   log_level: 'error',
   no_proxy: 'false',
   orcid_sandbox: String(defaultEnv !== 'production'),
@@ -134,6 +135,12 @@ function validateUrl(value: string, previous: string): string {
   const url = value ? value : previous;
   Joi.assert(url, Joi.string().uri());
   return url;
+}
+
+function validateEmail(value: string, previous: string): string {
+  const email = value ? value : previous;
+  Joi.assert(email, Joi.string().email());
+  return email;
 }
 
 function validateToken(value: string, previous: string): string {
@@ -353,6 +360,12 @@ export default program
     getEnvOrDefault('db_pass').asString(),
   )
   .option(
+    '--db-tls',
+    'Use TLS to connect to the Postgres database',
+    validateBool,
+    getEnvOrDefault('db_tls').asBool(),
+  )
+  .option(
     '--cfaccess-url <url>',
     'Cloudflare Access URL',
     validateUrl,
@@ -363,6 +376,24 @@ export default program
     'Cloudflare Access Audience',
     validateToken,
     getEnvOrDefault('cfaccess_audience').asString(),
+  )
+  .option(
+    '--email-address <email>',
+    'From address for email notifications',
+    validateEmail,
+    getEnvOrDefault('email_address').asString(),
+  )
+  .option(
+    '--email-sendgrid-user <username>',
+    'Sendgrid user for sending emails',
+    validateToken,
+    getEnvOrDefault('email_sendgrid_user').asString(),
+  )
+  .option(
+    '--email-sendgrid-key <key>',
+    'Sendgrid token for sending emails',
+    validateToken,
+    getEnvOrDefault('email_sendgrid_key').asString(),
   )
   .option(
     '--orcid-client-id <id>',

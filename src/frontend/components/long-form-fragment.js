@@ -13,12 +13,10 @@ export default function LongFormFragment({ content, onContentChange }) {
     <div className="rapid-form-fragment">
       <fieldset className="rapid-form-fragment__text-response-questions">
         <Fragment key={'longform'}>
-          <div className="remirror-container">
-            <CollabEditor
-              initialContent={content}
-              handleContentChange={handleContentChange}
-            />
-          </div>
+          <CollabEditor
+            initialContent={content}
+            handleContentChange={handleContentChange}
+          />
         </Fragment>
       </fieldset>
     </div>

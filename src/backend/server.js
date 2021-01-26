@@ -26,6 +26,7 @@ import { dbWrapper } from './db.ts';
 // Our middlewares
 import cloudflareAccess from './middleware/cloudflare.js';
 import authWrapper from './middleware/auth.js'; // authorization/user roles
+import { mailWrapper } from './middleware/mail.js';
 
 // Our models
 import {
@@ -190,6 +191,7 @@ export default async function configServer(config) {
     .use(passport.initialize())
     .use(passport.session())
     .use(cors())
+    .use(mailWrapper(config))
     .use(mount('/api/v2', apiV2Router))
     .use(mount('/api', apiDocs.middleware()))
     .use(serveStatic(STATIC_DIR))

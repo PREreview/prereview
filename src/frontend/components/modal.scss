@@ -1,13 +1,18 @@
 [data-reach-dialog-overlay] {
+  bottom: 0;
+  height: 100%;
   left: 0;
   position: fixed;
+  right: 0;
   top: 0;
+  width: 100%;
   z-index: 100000;
 }
 
 /* Note the rpos- prefix as modal is a common class in the host sites where the content script is injected */
 .rpos-modal-container {
   left: 50%;
+  margin: 0;
   max-width: 800px;
   min-width: 400px;
   position: fixed;
@@ -20,13 +25,13 @@
     background-color: rgba(0, 0, 0, 0.5);
     bottom: 0;
     content: '';
-    height: 8500%;
+    height: 850%;
     left: 50%;
     position: fixed;
     right: 0;
     top: 50%;
     transform: translate(-50%, -50%);
-    width: 400%;
+    width: 500%;
     z-index: -1;
   }
 }

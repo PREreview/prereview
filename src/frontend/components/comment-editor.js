@@ -5,9 +5,11 @@ import { useQuill } from 'react-quilljs';
 import 'quill/dist/quill.snow.css'; // Add css for snow theme
 // or import 'quill/dist/quill.bubble.css'; // Add css for bubble theme
 
-const CollabEditor = ({ initialContent, handleContentChange }) => {
+const CommentEditor = ({ initialContent, handleContentChange }) => {
   const placeholder = 'Start typing...';
-  const { quill, quillRef } = useQuill({ placeholder });
+  const theme = 'snow';
+
+  const { quill, quillRef } = useQuill({ theme, placeholder });
 
   useEffect(() => {
     if (quill) {
@@ -19,15 +21,15 @@ const CollabEditor = ({ initialContent, handleContentChange }) => {
   }, [quill]);
 
   return (
-    <div>
+    <div style={{ width: '100%' }}>
       <div ref={quillRef} />
     </div>
   );
 };
 
-CollabEditor.propTypes = {
+CommentEditor.propTypes = {
   initialContent: PropTypes.string,
   handleContentChange: PropTypes.func.isRequired,
 };
 
-export default CollabEditor;
+export default CommentEditor;

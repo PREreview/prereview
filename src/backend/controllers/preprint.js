@@ -1,5 +1,6 @@
 import router from 'koa-joi-router';
 import { QueryOrder } from '@mikro-orm/core';
+import { PostgreSqlConnection } from '@mikro-orm/postgresql';
 import { getLogger } from '../log.js';
 import { resolvePreprint } from '../utils/resolve.ts';
 import { createPreprintId } from '../../common/utils/ids';
@@ -17,6 +18,13 @@ const querySchema = Joi.object({
     .greater(-1),
   desc: Joi.boolean(),
   search: Joi.string().allow(''),
+  sort: Joi.string().allow(
+    'datePosted',
+    'recentRequests',
+    'recentRapid',
+    'recentFull',
+    '',
+  ),
 });
 
 const preprintSchema = {};
@@ -147,14 +155,54 @@ export default function controller(preprints, thisUser) {
           'tags',
         ];
         let foundPreprints, count;
+        const order = ctx.query.desc ? QueryOrder.DESC : QueryOrder.ASC;
+        let orderBy;
+        switch (ctx.query.sort) {
+          case 'recentRequests':
+            orderBy = { requests: { createdAt: order } };
+            break;
+          case 'recentRapid':
+            orderBy = { rapidReviews: { createdAt: order } };
+            break;
+          case 'recentFull':
+            orderBy = { fullReviews: { createdAt: order } };
+            break;
+          default:
+            orderBy = { datePosted: order };
+        }
         if (ctx.query.search && ctx.query.search !== '') {
-          [foundPreprints, count] = await preprints.search(ctx.query, populate);
+          const connection = preprints.em.getConnection();
+          let query;
+          if (connection instanceof PostgreSqlConnection) {
+            query = {
+              $or: [
+                { title: { $ilike: `%${ctx.query.search}%` } },
+                { handle: { $ilike: `%${ctx.query.search}%` } },
+                { abstract_text: { $ilike: `%${ctx.query.search}%` } },
+                { authors: { $ilike: `%${ctx.query.search}%` } },
+              ],
+            };
+          } else {
+            query = {
+              $or: [
+                { title: { $like: `%${ctx.query.search}%` } },
+                { handle: { $like: `%${ctx.query.search}%` } },
+                { abstract_text: { $like: `%${ctx.query.search}%` } },
+                { authors: { $like: `%${ctx.query.search}%` } },
+              ],
+            };
+          }
+          [foundPreprints, count] = await preprints.findAndCount(
+            query,
+            populate,
+            orderBy,
+            ctx.query.limit,
+            ctx.query.offset,
+          );
         } else {
-          const order = ctx.query.desc ? QueryOrder.DESC : QueryOrder.ASC;
-
           foundPreprints = await preprints.findAll(
             populate,
-            { datePosted: order },
+            orderBy,
             ctx.query.limit,
             ctx.query.offset,
           );
@@ -188,6 +236,10 @@ export default function controller(preprints, thisUser) {
     path: '/preprints/:id',
     validate: {
       params: {
+        // id: Joi.number()
+        //   .integer()
+        //   .description('Preprint ID')
+        //   .required(),
         id: Joi.alternatives()
           .try(Joi.number().integer(), Joi.string())
           .description('Preprint ID')
@@ -249,10 +301,11 @@ export default function controller(preprints, thisUser) {
     method: 'PUT',
     path: '/preprints/:id',
     validate: {
-      //params: {
-      //  id: Joi.alternatives().try(Joi.number().integer(), Joi.string()),
-      //},
       params: {
+        // id: Joi.number()
+        //   .integer()
+        //   .description('Preprint ID')
+        //   .required(),
         id: Joi.alternatives()
           .try(Joi.number().integer(), Joi.string())
           .description('Preprint ID')
@@ -313,14 +366,15 @@ export default function controller(preprints, thisUser) {
     method: 'DELETE',
     path: '/preprints/:id',
     validate: {
-      //params: {
-      //  id: Joi.alternatives().try(Joi.number().integer(), Joi.string()),
-      //},
       params: {
         id: Joi.alternatives()
           .try(Joi.number().integer(), Joi.string())
           .description('Preprint ID')
           .required(),
+        // id: Joi.number()
+        //   .integer()
+        //   .description('Preprint ID')
+        //   .required(),
       },
     },
     pre: async (ctx, next) => {

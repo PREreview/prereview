@@ -33,7 +33,7 @@ export default function RoleActivity({ persona }) {
             {persona.rapidReviews.length || 0}
           </dd>
           <dt className="role-activity__summary__label">
-            <LabelStyle>Total number of longform reviews</LabelStyle>
+            <LabelStyle>Total number of long-form reviews</LabelStyle>
           </dt>
           <dd className="role-activity__summary__stat">
             {persona.fullReviews.length || 0}
@@ -47,11 +47,12 @@ export default function RoleActivity({ persona }) {
         <section className="role-activity__history">
           <h3 className="role-activity__sub-title">History</h3>
           <ul className="role-activity__list">
-            {activity.length && activity.map(activity => (
-              <li key={activity.id} className="role-activity__list-item">
+            {activity.length &&
+              activity.map(activity => (
+                <li key={activity.id} className="role-activity__list-item">
                   <ActivityCard activity={activity} />
-              </li>
-            ))}
+                </li>
+              ))}
           </ul>
         </section>
       )}

@@ -45,9 +45,9 @@ const options: Options = {
     Work,
   ],
   type: dbType,
-  clientUrl: `${dbType}://${authString}${config.dbHost}${portString}/${
-    config.dbName
-  }`,
+  debug: config.logLevel === 'trace',
+  clientUrl: `
+  ${dbType}://${authString}${config.dbHost}${portString}/${config.dbName}`,
   cache: {
     pretty: true,
     options: {
@@ -55,8 +55,13 @@ const options: Options = {
     },
   },
   migrations: {
+    disableForeignKeys: false,
     path: `src/backend/db/migrations/${config.dbType}`,
   },
 };
+
+if (config.dbType === 'postgresql' && config.dbTls) {
+  options.driverOptions = { connection: { ssl: true } };
+}
 
 export default options;

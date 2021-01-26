@@ -24,8 +24,8 @@ export default function SearchBar({
           className="search-bar__search-box__input"
           placeholder={
             isMobile
-              ? 'Search by DOI, arXiv ID or title'
-              : 'Search preprints with reviews or requests for reviews by DOI, arXiv ID or title'
+              ? 'Search by DOI, arXiv ID, title, author, or abstract'
+              : 'Search preprints with reviews or requests for reviews by DOI, arXiv ID, title, author, or abstract'
           }
           disabled={isFetching}
         />
@@ -40,4 +40,5 @@ SearchBar.propTypes = {
   defaultValue: PropTypes.string,
   onChange: PropTypes.func,
   onRequestSearch: PropTypes.func,
+  onCancelSearch: PropTypes.func,
 };

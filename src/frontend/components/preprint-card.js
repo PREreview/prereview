@@ -1,6 +1,5 @@
 import React, { Fragment, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import omit from 'lodash/omit';
 import classNames from 'classnames';
 import { formatDistanceStrict } from 'date-fns';
 import {
@@ -131,7 +130,7 @@ export default function PreprintCard({
               <span
                 className={classNames('preprint-card__pub-date', {
                   'preprint-card__pub-date--highlighted':
-                    hoveredSortOption === 'date',
+                    hoveredSortOption === 'datePosted',
                 })}
               >
                 {getFormattedDatePosted(datePosted)}
@@ -156,14 +155,14 @@ export default function PreprintCard({
                     {id}
                   </a>
                 ) : (
-                  <a
-                    href={`${getCanonicalArxivUrl(id)}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    {id}
-                  </a>
-                )}
+                    <a
+                      href={`${getCanonicalArxivUrl(id)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {id}
+                    </a>
+                  )}
               </Value>
             </div>
 
@@ -175,7 +174,8 @@ export default function PreprintCard({
                     className="preprint-card__tag-list__item"
                   >
                     <Tooltip
-                      label={`Reviewers tagged this preprint as ${subject.name}`}
+                      label={`Reviewers tagged this preprint as ${subject.name
+                        }`}
                     >
                       <div>
                         <TagPill>{subject.name}</TagPill>
@@ -192,11 +192,10 @@ export default function PreprintCard({
                     }
                   >
                     <div
-                      className={`preprint-card__tag-icon ${
-                        hasData
-                          ? 'preprint-card__tag-icon--active'
-                          : 'preprint-card__tag-icon--inactive'
-                      }`}
+                      className={`preprint-card__tag-icon ${hasData
+                        ? 'preprint-card__tag-icon--active'
+                        : 'preprint-card__tag-icon--inactive'
+                        }`}
                     >
                       <MdTimeline className="preprint-card__tag-icon__icon" />
                     </div>
@@ -211,11 +210,10 @@ export default function PreprintCard({
                     }
                   >
                     <div
-                      className={`preprint-card__tag-icon ${
-                        hasCode
-                          ? 'preprint-card__tag-icon--active'
-                          : 'preprint-card__tag-icon--inactive'
-                      }`}
+                      className={`preprint-card__tag-icon ${hasCode
+                        ? 'preprint-card__tag-icon--active'
+                        : 'preprint-card__tag-icon--inactive'
+                        }`}
                     >
                       <MdCode className="preprint-card__tag-icon__icon" />
                     </div>
@@ -233,18 +231,18 @@ export default function PreprintCard({
                 {isNew ? (
                   <div className="preprint-card__new-badge">new</div>
                 ) : (
-                  <ScoreBadge
-                    isHighlighted={hoveredSortOption === 'score'}
-                    now={now}
-                    nRequests={nRequests}
-                    nRapidReviews={nRapidReviews}
-                    nLongReviews={nLongReviews}
-                    dateFirstActivity={dateFirstActivity}
-                    onMouseEnter={onStartAnim}
-                    onMouseLeave={onStopAnim}
-                    isAnimating={isAnimating}
-                  />
-                )}
+                    <ScoreBadge
+                      isHighlighted={hoveredSortOption === 'score'}
+                      now={now}
+                      nRequests={nRequests}
+                      nRapidReviews={nRapidReviews}
+                      nLongReviews={nLongReviews}
+                      dateFirstActivity={dateFirstActivity}
+                      onMouseEnter={onStartAnim}
+                      onMouseLeave={onStopAnim}
+                      isAnimating={isAnimating}
+                    />
+                  )}
               </div>
               {/*</Tooltip>*/}
               <button
@@ -289,7 +287,7 @@ export default function PreprintCard({
                     />
                   </div>
                   <div className="preprint-card__count-label">
-                    Longform Review{publishedReviews.length > 1 ? 's' : ''}
+                    Long-form Review{publishedReviews.length > 1 ? 's' : ''}
                   </div>
                   <div className="preprint-card__count-divider" />
                   <div className="preprint-card__count-badge">
@@ -317,31 +315,31 @@ export default function PreprintCard({
               <span
                 className={classNames('preprint-card__days-ago', {
                   'preprint-card__days-ago--highlighted':
-                    hoveredSortOption === 'new' ||
-                    hoveredSortOption === 'reviewed' ||
-                    hoveredSortOption === 'requested',
+                    hoveredSortOption === 'recentRequests' ||
+                    hoveredSortOption === 'recentRapid' ||
+                    hoveredSortOption === 'recentFull',
                 })}
               >
                 <span className="preprint-card__days-ago__prefix">
                   {dateLastActivity
                     ? `Last activity ${formatDistanceStrict(
-                        new Date(dateLastActivity),
-                        new Date(),
-                      )} ago`
+                      new Date(dateLastActivity),
+                      new Date(),
+                    )} ago`
                     : `No activity yet`}
                 </span>
               </span>
               <IconButton
                 className="preprint-card__expansion-toggle"
-                onClick={e => {
+                onClick={() => {
                   setIsOpened(!isOpened);
                 }}
               >
                 {isOpened ? (
                   <MdExpandLess className="preprint-card__expansion-toggle-icon" />
                 ) : (
-                  <MdExpandMore className="preprint-card__expansion-toggle-icon" />
-                )}
+                    <MdExpandMore className="preprint-card__expansion-toggle-icon" />
+                  )}
               </IconButton>
             </div>
           </div>
@@ -409,10 +407,9 @@ PreprintCard.propTypes = {
   onNew: PropTypes.func.isRequired,
   isNew: PropTypes.bool,
   hoveredSortOption: PropTypes.oneOf([
-    'score',
-    'new',
-    'reviewed',
-    'requested',
-    'date',
+    'recentRequests',
+    'recentRapid',
+    'recentFull',
+    'datePosted',
   ]),
 };

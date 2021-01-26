@@ -1,6 +1,5 @@
 import router from 'koa-joi-router';
 import { getLogger } from '../log.js';
-import getActivePersona from '../utils/persona.js';
 
 const log = getLogger('backend:controllers:rapidReview');
 // const Joi = router.Joi;
@@ -51,7 +50,7 @@ export default function controller(rapidReviews, thisUser) {
       let rapidReview, authorPersona;
 
       try {
-        authorPersona = await getActivePersona(ctx.state.user);
+        authorPersona = ctx.state.user.defaultPersona;
       } catch (err) {
         log.error('Failed to load user personas.');
         ctx.throw(400, err);

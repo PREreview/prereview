@@ -7,14 +7,12 @@ import React, {
   useState,
   useCallback,
 } from 'react';
-import { Link } from 'react-router-dom';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
 import debounce from 'lodash/debounce';
-import { MenuLink } from '@reach/menu-button';
 
 // utils
-import { UserContext } from '../contexts/user-context';
+import UserProvider from '../contexts/user-context';
 import { checkIfRoleLacksMininmalData } from '../utils/roles';
 
 // components
@@ -30,7 +28,7 @@ import PreReviewLogo from './pre-review-logo';
 const SHELL_HEADER_HEIGHT = 40; // !! keep in sync with CSS
 
 export default function Shell({ children, defaultStatus = 'default' }) {
-  const user = useContext(UserContext);
+  const [user] = useContext(UserProvider.context);
   const [isDown, setIsDown] = useState(false);
   const ref = useRef();
   const nextHeightRef = useRef(null);
@@ -299,62 +297,59 @@ export default function Shell({ children, defaultStatus = 'default' }) {
                 showNotice={showProfileNotice}
               >
                 {showProfileNotice && (
-                  <MenuLink
-                    as={process.env.IS_EXTENSION ? undefined : Link}
+                  <XLink
                     to={process.env.IS_EXTENSION ? undefined : '/settings'}
-                    href={process.env.IS_EXTENSION ? `settings` : undefined}
+                    href={`/settings`}
                     target={process.env.IS_EXTENSION ? '_blank' : undefined}
                   >
                     Complete Profile
                     <div className="menu__link-item__icon">
                       <NoticeBadge />
                     </div>
-                  </MenuLink>
+                  </XLink>
                 )}
 
-                <MenuLink
-                  as={process.env.IS_EXTENSION ? undefined : Link}
+                <XLink
                   to={process.env.IS_EXTENSION ? undefined : '/settings'}
-                  href={process.env.IS_EXTENSION ? `settings` : undefined}
+                  href={`/settings`}
                   target={process.env.IS_EXTENSION ? '_blank' : undefined}
                 >
                   User Settings
-                </MenuLink>
+                </XLink>
 
                 {user.isAdmin && (
-                  <MenuLink
-                    as={process.env.IS_EXTENSION ? undefined : Link}
+                  <XLink
                     to={process.env.IS_EXTENSION ? undefined : '/admin'}
-                    href={process.env.IS_EXTENSION ? `admin` : undefined}
+                    href={`/admin`}
                     target={process.env.IS_EXTENSION ? '_blank' : undefined}
                   >
                     Admin Settings
-                  </MenuLink>
+                  </XLink>
                 )}
 
                 {user.isAdmin && (
-                  <MenuLink
-                    as={process.env.IS_EXTENSION ? undefined : Link}
+                  <XLink
                     to={process.env.IS_EXTENSION ? undefined : '/block'}
-                    href={process.env.IS_EXTENSION ? `block` : undefined}
+                    href={`/block`}
                     target={process.env.IS_EXTENSION ? '_blank' : undefined}
                   >
                     Moderate Users
-                  </MenuLink>
+                  </XLink>
                 )}
 
                 {!!(user && user.isModerator && !user.isModerated) && (
-                  <MenuLink
-                    as={process.env.IS_EXTENSION ? undefined : Link}
+                  <XLink
                     to={process.env.IS_EXTENSION ? undefined : '/moderate'}
-                    href={process.env.IS_EXTENSION ? `moderate` : undefined}
+                    href={`/moderate`}
                     target={process.env.IS_EXTENSION ? '_blank' : undefined}
                   >
                     Moderate Reviews
-                  </MenuLink>
+                  </XLink>
                 )}
 
-                <MenuLink href={`/api/v2/logout`}>Logout</MenuLink>
+                <XLink to={'/logout'} href={`/logout`}>
+                  Logout
+                </XLink>
               </UserBadge>
             ) : (
               <XLink href={loginUrl} to={loginUrl}>

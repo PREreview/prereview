@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { MdMenu } from 'react-icons/md';
-import { Link } from 'react-router-dom';
-import { MenuLink } from '@reach/menu-button';
 import PreReviewLogo from './pre-review-logo';
 import IconButton from './icon-button';
 import UserBadge from './user-badge';
@@ -83,17 +81,20 @@ export default function HeaderBar({ onClickMenuButton, closeGap, thisUser }) {
           People
         </a>
         <a
-          className="header-bar__nav-item" href="https://content.prereview.org/programs"
+          className="header-bar__nav-item"
+          href="https://content.prereview.org/programs"
         >
           Programs
         </a>
         <a
-          className="header-bar__nav-item" href="https://content.prereview.org/resources"
+          className="header-bar__nav-item"
+          href="https://content.prereview.org/resources"
         >
           Resources
         </a>
         <a
-          className="header-bar__nav-item" href="https://content.prereview.org/coc"
+          className="header-bar__nav-item"
+          href="https://content.prereview.org/coc"
         >
           {isMobile ? (
             <abbr title="Code of Conduct">CoC</abbr>
@@ -102,7 +103,8 @@ export default function HeaderBar({ onClickMenuButton, closeGap, thisUser }) {
           )}
         </a>
         <a
-          className="header-bar__nav-item" href="https://content.prereview.org"
+          className="header-bar__nav-item"
+          href="https://content.prereview.org"
         >
           Blog
         </a>
@@ -113,61 +115,58 @@ export default function HeaderBar({ onClickMenuButton, closeGap, thisUser }) {
           {thisUser ? (
             <UserBadge user={thisUser} showNotice={showProfileNotice}>
               {showProfileNotice && (
-                <MenuLink
-                  as={process.env.IS_EXTENSION ? undefined : Link}
+                <XLink
                   to={process.env.IS_EXTENSION ? undefined : '/settings'}
-                  href={process.env.IS_EXTENSION ? `/settings` : undefined}
+                  href={`/settings`}
                   target={process.env.IS_EXTENSION ? '_blank' : undefined}
                 >
                   Complete Profile
                   <div className="menu__link-item__icon">
                     <NoticeBadge />
                   </div>
-                </MenuLink>
+                </XLink>
               )}
 
-              <MenuLink
-                as={process.env.IS_EXTENSION ? undefined : Link}
+              <XLink
                 to={process.env.IS_EXTENSION ? undefined : '/settings'}
-                href={process.env.IS_EXTENSION ? `settings` : undefined}
+                href={`/settings`}
                 target={process.env.IS_EXTENSION ? '_blank' : undefined}
               >
                 User Settings
-              </MenuLink>
+              </XLink>
 
               {thisUser.isAdmin && (
-                <MenuLink
-                  as={process.env.IS_EXTENSION ? undefined : Link}
+                <XLink
                   to={process.env.IS_EXTENSION ? undefined : '/admin'}
-                  href={process.env.IS_EXTENSION ? `admin` : undefined}
+                  href={`/admin`}
                   target={process.env.IS_EXTENSION ? '_blank' : undefined}
                 >
                   Admin Settings
-                </MenuLink>
+                </XLink>
               )}
 
               {thisUser.isAdmin && (
-                <MenuLink
-                  as={process.env.IS_EXTENSION ? undefined : Link}
+                <XLink
                   to={process.env.IS_EXTENSION ? undefined : '/block'}
-                  href={process.env.IS_EXTENSION ? `block` : undefined}
+                  href={`/block`}
                   target={process.env.IS_EXTENSION ? '_blank' : undefined}
                 >
                   Moderate Users
-                </MenuLink>
+                </XLink>
               )}
 
               {roles.includes('moderators') && !thisUser.isModerated && (
-                <MenuLink
-                  as={process.env.IS_EXTENSION ? undefined : Link}
+                <XLink
                   to={process.env.IS_EXTENSION ? undefined : '/moderate'}
-                  href={process.env.IS_EXTENSION ? `moderate` : undefined}
+                  href={`/moderate`}
                   target={process.env.IS_EXTENSION ? '_blank' : undefined}
                 >
                   Moderate Reviews
-                </MenuLink>
+                </XLink>
               )}
-              <MenuLink href={`/api/v2/logout`}>Logout</MenuLink>
+              <XLink to="/logout" href={`/logout`}>
+                Logout
+              </XLink>
             </UserBadge>
           ) : (
             <XLink to="/login" href="/login">
