@@ -11,6 +11,7 @@ interface PreprintQuery {
   offset: number;
   desc: boolean;
   search: string;
+  order: string;
 }
 
 @Repository(Preprint)
@@ -41,15 +42,32 @@ export class PreprintModel extends EntityRepository<Preprint> {
       const knex = connection.getKnex();
       res = await knex
         .table('preprint')
-        .select('*')
-        .whereRaw("fts @@ websearch_to_tsquery('english'::regconfig, ?)", [
-          `${query.search}:*`,
-        ])
+        .select('preprint.*')
+        .where('title', 'ilike', `%${query.search}%`)
+        .orWhere('handle', 'ilike', `%${query.search}%`)
+        .orWhere('abstract_text', 'ilike', `%${query.search}%`)
+        .orWhere('authors', 'ilike', `%${query.search}%`)
+        //.whereRaw("fts @@ websearch_to_tsquery('english'::regconfig, ?)", [
+        //  `${query.search}:*`,
+        //])
         .modify(qb => {
+          let order = 'date_posted';
+          if (query.order) {
+            if (query.order === 'recentRequests') {
+              qb.max('request.created_at AS requested_at').leftJoin('request', 'request.preprint_id', 'preprint.id').groupBy('preprint.id');
+              order = 'requested_at';
+            } else if (query.order === 'recentRapid') {
+              qb.max('rapid_review.created_at AS rapidreviewed_at').leftJoin('rapid_review', 'rapid_review.preprint_id', 'preprint.id').groupBy('preprint.id');
+              order = 'rapidreviewed_at';
+            } else if (query.order === 'recentFull') {
+              qb.max('full_review.created_at AS fullreviewed_at').leftJoin('full_review', 'full_review.preprint_id', 'preprint.id').groupBy('preprint.id');
+              order = 'fullreviewed_at';
+            }
+          }
           if (query.desc) {
-            qb.orderBy('created_at', 'desc');
+            qb.orderBy(order, 'desc');
           } else {
-            qb.orderBy('created_at', 'asc');
+            qb.orderBy(order, 'asc');
           }
 
           if (query.limit) {
@@ -63,21 +81,39 @@ export class PreprintModel extends EntityRepository<Preprint> {
       count = await knex
         .table('preprint')
         .count()
-        .whereRaw("fts @@ websearch_to_tsquery('english'::regconfig, ?)", [
-          `${query.search}:*`,
-        ]);
+        .where('title', 'ilike', `%${query.search}%`)
+        .orWhere('handle', 'ilike', `%${query.search}%`)
+        .orWhere('abstract_text', 'ilike', `%${query.search}%`)
+        .orWhere('authors', 'ilike', `%${query.search}%`);
+      //.whereRaw("fts @@ websearch_to_tsquery('english'::regconfig, ?)", [
+      //  `${query.search}:*`,
+      //]);
       count = count[0]['count'];
     } else if (connection instanceof SqliteConnection) {
       const knex = connection.getKnex();
+      const subquery = knex.select('rowid').from('preprint_fts').whereRaw('preprint_fts MATCH ?', [query.search]);
       res = await knex
-        .table('preprint_fts')
-        .select(['rowid AS id', '*'])
-        .whereRaw('preprint_fts MATCH ?', [query.search])
+        .table('preprint')
+        .select('preprint.*')
+        .whereIn('preprint.id', subquery)
         .modify(qb => {
+          let order = 'date_posted';
+          if (query.order) {
+            if (query.order === 'recentRequests') {
+              qb.max('request.created_at AS requested_at').leftJoin('request', 'request.preprint_id', 'preprint.id').groupBy('preprint.id');
+              order = 'requested_at';
+            } else if (query.order === 'recentRapid') {
+              qb.max('rapid_review.created_at AS rapidreviewed_at').leftJoin('rapid_review', 'rapid_review.preprint_id', 'preprint.id').groupBy('preprint.id');
+              order = 'rapidreviewed_at';
+            } else if (query.order === 'recentFull') {
+              qb.max('full_review.created_at AS fullreviewed_at').leftJoin('full_review', 'full_review.preprint_id', 'preprint.id').groupBy('preprint.id');
+              order = 'fullreviewed_at';
+            }
+          }
           if (query.desc) {
-            qb.orderBy('rank', 'desc');
+            qb.orderBy(order, 'desc');
           } else {
-            qb.orderBy('rank', 'asc');
+            qb.orderBy(order, 'asc');
           }
 
           if (query.limit) {

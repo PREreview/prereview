@@ -1,6 +1,6 @@
 import { Migration } from '@mikro-orm/migrations';
 
-export class Migration20210121162524 extends Migration {
+export class Migration20210122201051 extends Migration {
 
   async up(): Promise<void> {
     this.addSql('create table "tag" ("id" serial primary key, "created_at" timestamptz(0) not null, "updated_at" timestamptz(0) not null, "name" varchar(255) not null, "color" varchar(255) not null);');
@@ -38,7 +38,7 @@ export class Migration20210121162524 extends Migration {
     this.addSql('create table "full_review_authors" ("full_review_id" int4 not null, "persona_id" int4 not null);');
     this.addSql('alter table "full_review_authors" add constraint "full_review_authors_pkey" primary key ("full_review_id", "persona_id");');
 
-    this.addSql('create table "contact" ("id" serial primary key, "created_at" timestamptz(0) not null, "updated_at" timestamptz(0) not null, "schema" varchar(255) not null, "value" varchar(255) not null, "identity_id" int4 not null, "is_verified" bool not null);');
+    this.addSql('create table "contact" ("id" serial primary key, "created_at" timestamptz(0) not null, "updated_at" timestamptz(0) not null, "schema" varchar(255) not null, "value" varchar(255) not null, "identity_id" int4 not null, "is_verified" bool not null, "send_notifications" bool not null, "token" varchar(255) null);');
 
     this.addSql('create table "community" ("id" serial primary key, "created_at" timestamptz(0) not null, "updated_at" timestamptz(0) not null, "name" varchar(255) not null, "description" text null, "logo" bytea null);');
     this.addSql('alter table "community" add constraint "community_name_unique" unique ("name");');

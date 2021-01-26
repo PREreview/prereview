@@ -32,7 +32,10 @@ async function main() {
 
     const orm = await MikroORM.init({
       ...options,
-      migrations: { migrationsList },
+      migrations: {
+        disableForeignKeys: false,
+        migrationsList,
+      },
     });
 
     const migrator = orm.getMigrator();

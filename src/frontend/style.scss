@@ -11,7 +11,9 @@
 @import "./components/extension-splash.scss";
 @import "./components/extension-fallback.scss";
 
-/* etc */
+/* reach */
+@import "@reach/dialog/styles.css";
+@import "@reach/menu-button/styles.css";
 @import "@reach/tooltip/styles.css";
 
 /* modules */

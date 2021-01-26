@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { Helmet } from 'react-helmet-async';
 
 // contexts
-import { UserContext } from '../contexts/user-context';
+import UserProvider from '../contexts/user-context';
 
 // hooks
 import {
@@ -31,7 +31,7 @@ import { ORG } from '../constants';
 import { MdClose } from 'react-icons/md';
 
 export default function AdminPanel() {
-  const user = useContext(UserContext);
+  const [user] = useContext(UserProvider.context);
   const [loading, setLoading] = useState(true);
   const [group, setGroup] = useState(null);
   const [moderators, setModerators] = useState(null);

@@ -164,7 +164,7 @@ export default function HeaderBar({ onClickMenuButton, closeGap, thisUser }) {
                   Moderate Reviews
                 </XLink>
               )}
-              <XLink to="/logout" href={`/api/v2/logout`}>
+              <XLink to="/logout" href={`/logout`}>
                 Logout
               </XLink>
             </UserBadge>

@@ -1,6 +1,6 @@
 import { Migration } from '@mikro-orm/migrations';
 
-export class Migration20210121162504 extends Migration {
+export class Migration20210122200947 extends Migration {
 
   async up(): Promise<void> {
     this.addSql('create table `tag` (`id` integer not null primary key autoincrement, `created_at` datetime not null, `updated_at` datetime not null, `name` varchar not null, `color` varchar not null);');
@@ -40,7 +40,7 @@ export class Migration20210121162504 extends Migration {
     this.addSql('create index `full_review_authors_full_review_id_index` on `full_review_authors` (`full_review_id`);');
     this.addSql('create index `full_review_authors_persona_id_index` on `full_review_authors` (`persona_id`);');
 
-    this.addSql('create table `contact` (`id` integer not null primary key autoincrement, `created_at` datetime not null, `updated_at` datetime not null, `schema` varchar not null, `value` varchar not null, `is_verified` integer not null);');
+    this.addSql('create table `contact` (`id` integer not null primary key autoincrement, `created_at` datetime not null, `updated_at` datetime not null, `schema` varchar not null, `value` varchar not null, `is_verified` integer not null, `send_notifications` integer not null, `token` varchar null);');
 
     this.addSql('create table `community` (`id` integer not null primary key autoincrement, `created_at` datetime not null, `updated_at` datetime not null, `name` varchar not null, `description` text null, `logo` blob null);');
     this.addSql('create unique index `community_name_unique` on `community` (`name`);');

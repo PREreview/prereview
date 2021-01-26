@@ -3,7 +3,7 @@ import React, { useContext } from 'react';
 import { Helmet } from 'react-helmet-async';
 
 // contexts
-import { UserContext } from '../contexts/user-context';
+import UserProvider from '../contexts/user-context';
 
 // components
 import HeaderBar from './header-bar';
@@ -14,7 +14,7 @@ import XLink from './xlink';
 import { ORG } from '../constants';
 
 export default function NotFound() {
-  const thisUser = useContext(UserContext);
+  const [thisUser] = useContext(UserProvider.context);
 
   return (
     <div className="not-found">

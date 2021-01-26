@@ -18,8 +18,9 @@ const theme = createMuiTheme({
     },
   },
   typography: {
-    fontFamily: ['Open Sans', 'sans-serif'].join(','),
     lineHeight: 1.2,
+    color: '#000',
+    fontFamily: ['Open Sans', 'sans-serif'],
   },
 });
 
