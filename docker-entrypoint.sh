@@ -47,9 +47,6 @@ init_db() {
   npm run db:init
 }
 
-echo "NODE_ENV: $NODE_ENV"
-echo "IMPORT_CLEAR_DB: $IMPORT_CLEAR_DB"
-
 if [ $NODE_ENV == "staging" -o $NODE_ENV == "development" ] && [ $IMPORT_CLEAR_DB == "true" ]; then
   echo "Clearing database"
   clear_db
