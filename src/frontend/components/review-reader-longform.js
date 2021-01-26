@@ -52,6 +52,12 @@ const LongformReviewReader = props => {
     },
     comment: {
       borderBottom: '2px solid #EBE9E9',
+      marginBottom: '1rem',
+      paddingBottom: '1rem',
+    },
+    commentMeta: {
+      fontSize: '0.9rem !important',
+      fontStyle: 'italic',
     },
     date: {
       fontSize: '1rem',
@@ -59,6 +65,11 @@ const LongformReviewReader = props => {
     h2: {
       fontSize: '1.2rem',
       fontWeight: '600',
+    },
+    p: {
+      fontSize: '0.9rem',
+      letterSpacing: '0.1px',
+      lineHeight: 1.5,
     },
     popper: {
       backgroundColor: '#fff',
@@ -70,7 +81,7 @@ const LongformReviewReader = props => {
       top: height ? `${height + 42}px !important` : 0,
       transform: 'none !important',
       width: '40vw',
-      zIndex: '10000',
+      zIndex: 10000,
     },
     popperContent: {
       padding: 20,
@@ -243,85 +254,176 @@ const LongformReviewReader = props => {
                   </Grid>
                 </Box>
                 <Box my={4} pb={1} borderBottom="5px solid #EBE9E9">
-                  <Typography component="p" className={classes.h2}>
+                  <Typography component="h3" className={classes.h2}>
                     Comments
                   </Typography>
                 </Box>
                 {review.comments ? (
                   review.comments.map(comment => {
                     return (
-                      <div key={comment.id} className={classes.comment}>
+                      <Box key={comment.id} className={classes.comment}>
                         {comment.title ? (
                           <div className="comments-title">{comment.title}</div>
                         ) : null}
-                        <div>
-                          <em>{comment.author.name}</em>
+                        <Grid container justify="space-between">
+                          <Grid
+                            container
+                            item
+                            spacing={1}
+                            alignItems="center"
+                            justify="flex-start"
+                            xs={12}
+                            sm={6}
+                          >
+                            <Grid item>
+                              <RoleBadge user={comment.author} />
+                            </Grid>
+                            <Grid item>
+                              <Typography className={classes.commentMeta}>
+                                {comment.author.name}
+                              </Typography>
+                            </Grid>
+                          </Grid>
+                          <Grid item xs={12} sm={6}>
+                            <Typography
+                              align="right"
+                              className={classes.commentMeta}
+                            >
+                              {new Date(comment.updatedAt).toLocaleDateString(
+                                'en-US',
+                              )}
+                            </Typography>
+                          </Grid>
+                        </Grid>
+                        <div className={classes.p}>
+                          {ReactHtmlParser(comment.contents, options)}
                         </div>
-                        <div>{ReactHtmlParser(comment.contents, options)}</div>
-                      </div>
+                      </Box>
                     );
                   })
                 ) : publishedComment ? (
-                  <div key={`comment-${user.id}`}>
-                    <div>
-                      <em>{user.name}</em>
+                  <Box>
+                    <Grid container justify="space-between">
+                      <Grid
+                        container
+                        item
+                        spacing={1}
+                        alignItems="center"
+                        justify="flex-start"
+                        xs={12}
+                        sm={6}
+                        key={`comment-${user.id}`}
+                      >
+                        <Grid item>
+                          <RoleBadge user={user} />
+                        </Grid>
+                        <Grid item>
+                          <Typography className={classes.commentMeta}>
+                            {user.defaultPersona
+                              ? user.defaultPersona.name
+                              : user.name}
+                          </Typography>
+                        </Grid>
+                      </Grid>
+                      <Grid item xs={12} sm={6}>
+                        <Typography
+                          align="right"
+                          className={classes.commentMeta}
+                        >
+                          {new Date().toLocaleDateString('en-US')}
+                        </Typography>
+                      </Grid>
+                    </Grid>
+                    <div className={classes.p}>
+                      {ReactHtmlParser(publishedComment, options)}
                     </div>
-                    <div>{ReactHtmlParser(publishedComment, options)}</div>
-                  </div>
+                  </Box>
                 ) : (
                   <Typography>No comments have been added yet.</Typography>
                 )}
                 {publishedComment ? (
-                  <div>
-                    {commentTitle ? (
-                      <div className="comments-title">{publishedTitle}</div>
-                    ) : null}
-                    <div>
-                      <em>{user.name}</em>
+                  <Box>
+                    <Grid container justify="space-between">
+                      <Grid
+                        container
+                        item
+                        spacing={1}
+                        alignItems="center"
+                        justify="flex-start"
+                        xs={12}
+                        sm={6}
+                        key={`comment-${user.id}`}
+                      >
+                        <Grid item>
+                          <RoleBadge user={user} />
+                        </Grid>
+                        <Grid item>
+                          <Typography className={classes.commentMeta}>
+                            {user.defaultPersona
+                              ? user.defaultPersona.name
+                              : user.name}
+                          </Typography>
+                        </Grid>
+                      </Grid>
+                      <Grid item xs={12} sm={6}>
+                        <Typography
+                          align="right"
+                          className={classes.commentMeta}
+                        >
+                          {new Date().toLocaleDateString('en-US')}
+                        </Typography>
+                      </Grid>
+                    </Grid>
+                    <div className={classes.p}>
+                      {ReactHtmlParser(publishedComment, options)}
                     </div>
-                    <div>{ReactHtmlParser(publishedComment, options)}</div>
-                  </div>
+                  </Box>
                 ) : null}
                 {user ? (
-                  <Box mt={2} mb={2} className={classes.yellow}>
-                    <form className="comments__add">
-                      <CommentEditor
-                        reviewId={review.id}
-                        initialContent={content}
-                        handleContentChange={handleCommentChange}
-                      />
-                      <Controls error={errorPostComment}>
-                        <Button
-                          type="submit"
-                          primary="true"
-                          disabled={!canSubmit(content)}
-                          onClick={event => {
-                            event.preventDefault();
-                            if (canSubmit(content)) {
-                              postComment({
-                                title: `User ${user.id} comment`,
-                                // #FIXME optional title needed
-                                contents: content,
-                              })
-                                .then(() => {
-                                  alert('Comment submitted successfully.');
-                                  return handleSubmitComment(
-                                    commentTitle,
-                                    content,
-                                  );
+                  <Box mt={4} mb={2}>
+                    <Typography component="h4" className={classes.h2}>
+                      Post a comment
+                    </Typography>
+                    <Box mt={2} className={classes.yellow}>
+                      <form className="comments__add">
+                        <CommentEditor
+                          reviewId={review.id}
+                          initialContent={content}
+                          handleContentChange={handleCommentChange}
+                        />
+                        <Controls error={errorPostComment}>
+                          <Button
+                            type="submit"
+                            primary="true"
+                            disabled={!canSubmit(content)}
+                            onClick={event => {
+                              event.preventDefault();
+                              if (canSubmit(content)) {
+                                postComment({
+                                  title: `User ${user.id} comment`,
+                                  // #FIXME optional title needed
+                                  contents: content,
                                 })
-                                .catch(err =>
-                                  alert(`An error occurred: ${err.message}`),
-                                );
-                            } else {
-                              alert('Comment cannot be blank.');
-                            }
-                          }}
-                        >
-                          Comment
-                        </Button>
-                      </Controls>
-                    </form>
+                                  .then(() => {
+                                    alert('Comment submitted successfully.');
+                                    return handleSubmitComment(
+                                      commentTitle,
+                                      content,
+                                    );
+                                  })
+                                  .catch(err =>
+                                    alert(`An error occurred: ${err.message}`),
+                                  );
+                              } else {
+                                alert('Comment cannot be blank.');
+                              }
+                            }}
+                          >
+                            Comment
+                          </Button>
+                        </Controls>
+                      </form>
+                    </Box>
                   </Box>
                 ) : (
                   <Box mt={4} mb={2} className={classes.yellow}>

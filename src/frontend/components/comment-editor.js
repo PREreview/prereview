@@ -26,7 +26,7 @@ const CommentEditor = ({ initialContent, handleContentChange, reviewId }) => {
         handleContentChange(quillRef.current.innerHTML);
       });
     }
-  }, [quill, quillRef]);
+  }, [quill, quillRef, initialContent]);
 
   return (
     <div style={{ width: '100%' }}>

@@ -16,6 +16,9 @@ import XLink from './xlink';
 import { MdPerson } from 'react-icons/md';
 
 const useStyles = makeStyles(theme => ({
+  popover: {
+    zIndex: '20000 !important',
+  },
   popoverInner: {
     display: 'flex',
     flexDirection: 'column',
