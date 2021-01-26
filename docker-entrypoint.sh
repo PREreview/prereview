@@ -35,6 +35,8 @@ wait_for() {
 wait_for
 
 clear_db() {
+  echo "Force-disconnecting clients"
+  env -i PGPASSWORD="$PASS" /usr/bin/psql -U "$USER" -d postgres -h "$HOST" -p "$PORT" -c "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = $NAME"
   echo "Dropping $NODE_ENV database"
   env -i PGPASSWORD="$PASS" /usr/bin/psql -U "$USER" -d postgres -h "$HOST" -p "$PORT" -c "DROP DATABASE $NAME"
   echo "Creating blank $NODE_ENV database"
