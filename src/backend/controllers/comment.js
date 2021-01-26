@@ -72,7 +72,7 @@ export default function controller(commentModel, fullReviewModel, thisUser) {
       }
 
       if (fullReview) {
-        comment = await commentModel(ctx.request.body);
+        comment = await commentModel.create(ctx.request.body);
         await commentModel.persistAndFlush(comment);
       }
     } catch (err) {
