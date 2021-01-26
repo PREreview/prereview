@@ -88,11 +88,9 @@ export default function controller(commentModel, fullReviewModel, thisUser) {
           author: authorPersona,
           isPublished: true,
         });
-
         fullReview.comments.add(comment);
-
-        await commentModel.persistAndFlush(comment);
       }
+      await commentModel.persistAndFlush(comment);
     } catch (err) {
       log.error(`HTTP 400 error: ${err}`);
     }
