@@ -62,32 +62,32 @@ export default function BlockPanel() {
           !lockedPersonas.length ? (
             <div>No locked persona.</div>
           ) : (
-            <div>
-              <ul className="block-panel__card-list">
-                {lockedPersonas.map(persona => (
-                  <li key={persona.id} className="block-panel__card-list-item">
-                    <div className="block-panel__card-list-item__left">
-                      <RoleBadgeUI user={persona} />
-                      <span>{persona.name}</span>
-                    </div>
-                    <div className="block-panel__card-list-item__right">
-                      <LabelStyle>
-                        {persona.isAnonymous ? 'Anonymous' : 'Public'}
-                      </LabelStyle>
-                      <IconButton
-                        className="block-panel__remove-button"
-                        onClick={() => {
-                          setPersonaToUnlock(persona);
-                        }}
-                      >
-                        <MdClose className="block-panel__remove-button-icon" />
-                      </IconButton>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )
+              <div>
+                <ul className="block-panel__card-list">
+                  {lockedPersonas.map(persona => (
+                    <li key={persona.id} className="block-panel__card-list-item">
+                      <div className="block-panel__card-list-item__left">
+                        <RoleBadgeUI user={persona} />
+                        <span>{persona.name}</span>
+                      </div>
+                      <div className="block-panel__card-list-item__right">
+                        <LabelStyle>
+                          {persona.isAnonymous ? 'Anonymous' : 'Public'}
+                        </LabelStyle>
+                        <IconButton
+                          className="block-panel__remove-button"
+                          onClick={() => {
+                            setPersonaToUnlock(persona);
+                          }}
+                        >
+                          <MdClose className="block-panel__remove-button-icon" />
+                        </IconButton>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )
         ) : null}
       </section>
 
@@ -137,7 +137,7 @@ function BlockPanelAddModal({ onClose, onSuccess }) {
           <Fragment>
             <TextInput
               inputId="step-preprint-input-new"
-              label={<span>Enter a persona ID</span>}
+              label={<span>Enter a persona name</span>}
               minimal={true}
               autoComplete="off"
               disabled={loading}
@@ -180,23 +180,23 @@ function BlockPanelAddModal({ onClose, onSuccess }) {
             </Controls>
           </Fragment>
         ) : (
-          <Fragment>
-            <p>The persona has been successfully locked.</p>
+            <Fragment>
+              <p>The persona has been successfully locked.</p>
 
-            <Controls
-              error={error} // #FIXME
-            >
-              <Button
-                disabled={loading}
-                onClick={() => {
-                  onClose();
-                }}
+              <Controls
+                error={error} // #FIXME
               >
-                Close
+                <Button
+                  disabled={loading}
+                  onClick={() => {
+                    onClose();
+                  }}
+                >
+                  Close
               </Button>
-            </Controls>
-          </Fragment>
-        )}
+              </Controls>
+            </Fragment>
+          )}
       </div>
     </Modal>
   );
@@ -209,7 +209,7 @@ BlockPanelAddModal.propTypes = {
 
 function BlockPanelRemoveModal({ persona, onClose, onSuccess }) {
   const { mutate: updatePersona, loading, error } = usePutPersona({
-    id: persona.id,
+    id: persona.name,
   });
   const [frame] = useState('submit');
 
@@ -251,25 +251,25 @@ function BlockPanelRemoveModal({ persona, onClose, onSuccess }) {
             </Controls>
           </Fragment>
         ) : (
-          <Fragment>
-            <p>
-              <em>{persona.name}</em> was successfully unlocked.
+            <Fragment>
+              <p>
+                <em>{persona.name}</em> was successfully unlocked.
             </p>
 
-            <Controls
-              error={error} // #FIXME
-            >
-              <Button
-                disabled={loading}
-                onClick={() => {
-                  onClose();
-                }}
+              <Controls
+                error={error} // #FIXME
               >
-                Close
+                <Button
+                  disabled={loading}
+                  onClick={() => {
+                    onClose();
+                  }}
+                >
+                  Close
               </Button>
-            </Controls>
-          </Fragment>
-        )}
+              </Controls>
+            </Fragment>
+          )}
       </div>
     </Modal>
   );

@@ -234,22 +234,74 @@ export default function controller(groupModel, userModel, thisUser) {
   });
 
   groupsRouter.route({
+    method: 'delete',
+    path: '/groups/:id/members/:uid',
+    validate: {
+      params: {
+        id: Joi.string()
+          .description('Group id')
+          .required(),
+        uid: Joi.string()
+          .description('User id')
+          .required(),
+      },
+      continueOnError: true,
+    },
+    pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next),
+    handler: async ctx => {
+      log.debug(`Removing user ${ctx.params.uid} from group ${ctx.params.id}.`);
+      let group, user;
+
+      try {
+        group = await groupModel.findOne({ name: ctx.params.id }, ['members']);
+        user = await userModel.findOne({ orcid: ctx.params.uid });
+      } catch (err) {
+        log.error('HTTP 400 Error: ', err);
+        ctx.throw(400, `Failed to parse query: ${err}`);
+      }
+
+      if (user && group) {
+        try {
+          log.debug(
+            `Group ${group.id} found. Removing user ${user.orcid} from group.`,
+          );
+          group.members.remove(user);
+          await groupModel.persistAndFlush(group);
+        } catch (err) {
+          log.error('HTTP 400 Error: ', err);
+          ctx.throw(400, `Failed to remove user from group: ${err}`);
+        }
+      } else {
+        log.error('HTTP 404 Error: user or group not found');
+        ctx.throw(
+          404,
+          'Failed to remove user from group: user or group not found',
+        );
+      }
+      // if deleted
+      ctx.status = 204;
+    },
+    meta: {
+      swagger: {
+        operationId: 'DeleteGroupMember',
+        summary:
+          'Endpoint to DELETE one user from a group by ID from PREreview. Admin users only.',
+        required: true,
+      },
+    },
+  });
+
+  groupsRouter.route({
     method: 'put',
     path: '/groups/:id/members/:uid',
     validate: {
       params: {
-        id: Joi.number()
-          .integer()
+        id: Joi.string()
           .description('Group id')
           .required(),
-        uid: Joi.alternatives()
-          .try(Joi.number().integer(), Joi.string())
+        uid: Joi.string()
           .description('User id')
           .required(),
-        // uid: Joi.number()
-        //   .integer()
-        //   .description('User id')
-        //   .required(),
       },
     },
     pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next),
@@ -258,7 +310,7 @@ export default function controller(groupModel, userModel, thisUser) {
       let group, user;
 
       try {
-        group = await groupModel.findOne(ctx.params.id, [
+        group = await groupModel.findOne({ name: ctx.params.id }, [
           'members.defaultPersona',
           'members.personas',
         ]);
@@ -292,46 +344,6 @@ export default function controller(groupModel, userModel, thisUser) {
         operationId: 'PutGroupMember',
         summary:
           'Endpoint to PUT one user to a group by ID from PREreview. Admin users only.',
-        required: true,
-      },
-    },
-  });
-
-  groupsRouter.route({
-    method: 'DELETE',
-    path: '/groups/:id/members/:uid',
-    pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next),
-    handler: async ctx => {
-      log.debug(`Removing user ${ctx.params.uid} from group ${ctx.params.id}.`);
-      let group, user;
-
-      try {
-        group = await groupModel.findOne(ctx.params.id, ['members']);
-        user = await userModel.findOne({ id: ctx.params.uid });
-      } catch (err) {
-        log.error('HTTP 400 Error: ', err);
-        ctx.throw(400, `Failed to parse query: ${err}`);
-      }
-
-      try {
-        log.debug(
-          `Group ${group.id} found. Removing user ${user.id} from group.`,
-        );
-        group.members.remove(user);
-        await groupModel.persistAndFlush(group);
-      } catch (err) {
-        log.error('HTTP 400 Error: ', err);
-        ctx.throw(400, `Failed to remove user from group: ${err}`);
-      }
-
-      // if deleted
-      ctx.status = 204;
-    },
-    meta: {
-      swagger: {
-        operationId: 'DeleteGroupMember',
-        summary:
-          'Endpoint to DELETE one user from a group by ID from PREreview. Admin users only.',
         required: true,
       },
     },

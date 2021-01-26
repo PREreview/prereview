@@ -1,3 +1,4 @@
+import { v4 as uuidv4 } from 'uuid';
 import router from 'koa-joi-router';
 import { getLogger } from '../log.js';
 
@@ -65,15 +66,15 @@ export default function controller(users, contacts, thisUser) {
     method: 'get',
     path: '/users/:id',
     validate: {
+      //params: {
+      //  id: Joi.alternatives()
+      //    .try(Joi.number().integer(), Joi.string())
+      //    .description('User id')
+      //    .required(),
       params: {
-        id: Joi.alternatives()
-          .try(Joi.number().integer(), Joi.string())
+        id: Joi.string()
           .description('User id')
           .required(),
-        // params: {
-        //   id: Joi.string()
-        //     .description('User id')
-        //     .required(),      },
       },
       continueOnError: false,
       failure: 400,
@@ -138,8 +139,11 @@ export default function controller(users, contacts, thisUser) {
       // }),
       // type: 'json',
       params: {
-        id: Joi.alternatives()
-          .try(Joi.number().integer(), Joi.string())
+        //id: Joi.alternatives()
+        //  .try(Joi.number().integer(), Joi.string())
+        //  .description('User id')
+        //  .required(),
+        id: Joi.string()
           .description('User id')
           .required(),
       },
@@ -183,34 +187,112 @@ export default function controller(users, contacts, thisUser) {
   userRouter.route({
     meta: {
       swagger: {
-        operationId: 'PutUserContacts',
-        summary: 'Endpoint to PUT contacts for a single user.',
+        operationId: 'PostUserContacts',
+        summary: 'Endpoint to POST new contacts for a single user.',
       },
     },
-    method: 'put',
+    method: 'post',
     path: '/users/:id/contacts',
     // validate: {    },
     // pre: {},
     handler: async ctx => {
-      let userId = ctx.params.id;
+      const userId = ctx.params.id;
       let newContact;
-      log.debug(`Adding a new contact email to user ${userId}`);
+      log.debug(`Adding a new contact to user ${userId}`);
+
+      let conflict, schema, value;
+      try {
+        log.debug(`Create a new contact entry.`);
+        let { schema, value } = ctx.request.body;
+        conflict = contacts.findOne({ schema, value, id: userId });
+      } catch (err) {
+        log.error('HTTP 400 Error: ', err);
+        ctx.throw(400, `Failed to parse contact schema: ${err}`);
+      }
+
+      if (conflict) {
+        log.error(
+          `HTTP 409 Error: Contact ${schema}:${value} already exists for user ${userId}`,
+        );
+        ctx.throw(
+          409,
+          `Contact ${schema}:${value} already exists for user ${userId}`,
+        );
+      }
 
       try {
-        log.debug(`Create a new email entry.`);
-        newContact = contacts.create(ctx.request.body);
+        newContact = contacts.create({
+          ...ctx.request.body,
+          identity: userId,
+          isVerified: false,
+          token: uuidv4(),
+        });
         await contacts.persistAndFlush(newContact);
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse contact schema: ${err}`);
       }
 
-      ctx.status = 200;
+      ctx.status = 201;
       ctx.body = {
-        status: 200,
+        status: 201,
         message: 'created',
         data: newContact,
       };
+    },
+  });
+
+  userRouter.route({
+    meta: {
+      swagger: {
+        operationId: 'PutUserContacts',
+        summary: 'Endpoint to PUT contacts for a single user.',
+      },
+    },
+    method: 'put',
+    path: '/users/:id/contacts/:cid',
+    // validate: {    },
+    // pre: {},
+    handler: async ctx => {
+      const userId = ctx.params.id;
+      const contactId = ctx.params.cid;
+      let newContact;
+      log.debug(`Updating contact for user ${userId}`);
+
+      try {
+        const { sendNotifications } = ctx.request.body;
+        const exists = await contacts.findOne(contactId);
+        if (exists) {
+          log.debug('Contact already exists, updating.');
+          exists.sendNotifications = sendNotifications;
+          await contacts.flush();
+          ctx.status = 200;
+          ctx.body = {
+            status: 200,
+            message: 'ok',
+            data: exists,
+          };
+        } else {
+          log.debug('Contact does not yet exist, creating.');
+          newContact = contacts.create({
+            ...ctx.request.body,
+            identity: userId,
+            token: uuidv4(),
+          });
+          await contacts.persistAndFlush(newContact);
+          ctx.status = 201;
+          ctx.body = {
+            status: 201,
+            message: 'created',
+            data: newContact,
+          };
+        }
+        newContact = contacts.create({ ...ctx.request.body, identity: userId });
+        await contacts.persistAndFlush(newContact);
+      } catch (err) {
+        log.error('HTTP 400 Error: ', err);
+        ctx.throw(400, `Failed to parse contact schema: ${err}`);
+      }
     },
   });
 
@@ -225,17 +307,17 @@ export default function controller(users, contacts, thisUser) {
     method: 'DELETE',
     path: '/users/:id',
     validate: {
+      //params: {
+      //  id: Joi.alternatives()
+      //    .try(Joi.number().integer(), Joi.string())
+      //    .description('User id')
+      //    .required(),
+      //},
       params: {
-        id: Joi.alternatives()
-          .try(Joi.number().integer(), Joi.string())
+        id: Joi.string()
           .description('User id')
           .required(),
       },
-      // params: {
-      //   id: Joi.string()
-      //     .description('User id')
-      //     .required(),
-      // },
     },
     pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next), // TODO: can users delete their own account?
     handler: async ctx => {

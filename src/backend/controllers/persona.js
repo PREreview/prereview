@@ -102,8 +102,12 @@ export default function controller(personasModel, thisUser) {
       // }),
       // type: 'json',
       params: {
-        id: Joi.number()
-          .integer()
+        //id: Joi.alternatives()
+        //  .try(Joi.number().integer(), Joi.string())
+        //  .description('Persona id or name')
+        //  .required(),
+        id: Joi.string()
+          .description('Persona id or name')
           .required(),
       },
       continueOnError: true,
@@ -119,10 +123,7 @@ export default function controller(personasModel, thisUser) {
       let persona;
 
       try {
-        persona = await personasModel.findOne(ctx.params.id);
-        console.log('************************');
-        console.log(ctx.request.body);
-        console.log('************************');
+        persona = await personasModel.findOneByIdOrName(ctx.params.id);
         if (!persona) {
           ctx.throw(
             404,

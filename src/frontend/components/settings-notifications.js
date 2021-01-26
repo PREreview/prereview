@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { useLocation, useHistory } from 'react-router-dom';
 import { MdInfoOutline, MdWarning, MdCheck } from 'react-icons/md';
 import { unprefix } from '../utils/jsonld';
-import { usePutUser, usePutUserContacts } from '../hooks/api-hooks.tsx';
+import { usePutUser, usePutUserContacts, usePostUserContacts } from '../hooks/api-hooks.tsx';
 import ToggleSwitch from './toggle-switch';
 import TextInput from './text-input';
 import Controls from './controls';
@@ -11,7 +11,7 @@ import Button from './button';
 import IconButton from './icon-button';
 import Modal from './modal';
 
-export default function SettingsNotifications({ user }) {
+export default function SettingsNotifications({ user, error }) {
   const history = useHistory();
   const location = useLocation();
   const [userContacts, setUserContacts] = useState(user ? user.contacts : [])
@@ -20,7 +20,7 @@ export default function SettingsNotifications({ user }) {
 
   const params = new URLSearchParams(location.search);
 
-  const { mutate: updateUser, loading, error } = usePutUserContacts({id: user.id});
+  const { mutate: postContact } = usePostUserContacts({ id: user.id });
 
   const [modalType, setModalType] = useState(
     params.get('verified') === 'true' ? 'checked' : null,
@@ -49,25 +49,13 @@ export default function SettingsNotifications({ user }) {
         </span>
       </p>
 
-      { userContacts.length ?  
-        userContacts.map(contact => 
-        <div className="settings-notifications__toggle">
-            <span>{`${contact.value}`}</span>
-            <ToggleSwitch
-              id="notification-switch"
-              disabled={loading}
-              checked={contact.sendNotifications}
-              onChange={() => {
-                updateUser({  })
-                  .then(() => alert('Contact info updated successfully.'))
-                  .catch(err => alert(`An error occurred: ${err.message}`));
-              }}
-            />
-        </div>
+      { userContacts.length ?
+        userContacts.map(contact =>
+            <EmailToggle userId={user.id} contact={contact} />
         )
-      : null }
+        : null}
 
-     
+
 
       <div className="settings-notifications__email">
         <TextInput
@@ -105,16 +93,13 @@ export default function SettingsNotifications({ user }) {
         error={error} // #FIXME
       >
         <Button
-          disabled={!isEmailValid || !email || loading}
-          isWaiting={loading}
+          disabled={!isEmailValid || !email}
           onClick={() => {
-            updateUser(
-              { value: email,
+            postContact(
+              {
+                value: email,
                 schema: 'mailto',
-                identity: user.id,
-                isVerified: false,
-                token: 'dffa543e-5e74-11eb-ae93-0242ac130002'
-            })
+              })
               .then(resp => {
                 let newContact = resp.data
                 setUserContacts(userContacts.concat([newContact]))
@@ -125,7 +110,7 @@ export default function SettingsNotifications({ user }) {
             setModalType('verifying');
           }}
         >
-          {userContacts ? 'Update' : 'Submit'}
+          Add email address
         </Button>
       </Controls>
 
@@ -135,8 +120,8 @@ export default function SettingsNotifications({ user }) {
             {modalType === 'checked'
               ? 'The email address was successfully verified.'
               : modalType === 'verifying'
-              ? 'An email with a verification link has been sent and we are waiting for you to click on it.'
-              : 'An email must be set to be able to receive notifications'}
+                ? 'An email with a verification link has been sent and we are waiting for you to click on it.'
+                : 'An email must be set to be able to receive notifications'}
           </p>
 
           <Controls>
@@ -151,3 +136,26 @@ export default function SettingsNotifications({ user }) {
 SettingsNotifications.propTypes = {
   user: PropTypes.object.isRequired,
 };
+
+function EmailToggle({ userId, contact }) {
+  const { mutate: updateUser, loading, error } = usePutUserContacts({ id: userId, cid: contact.id });
+
+  return (
+    <div className="settings-notifications__toggle">
+      <span>{`${contact.value}`}</span>
+      <ToggleSwitch
+        id="notification-switch"
+        disabled={loading}
+        checked={contact.sendNotifications}
+        onChange={() => {
+          updateUser(
+            {
+              sendNotifications: !contact.sendNotifications,
+            })
+            .then(() => alert('Contact info updated successfully.'))
+            .catch(err => alert(`An error occurred: ${err.message}`));
+        }}
+      />
+    </div>
+  );
+}
