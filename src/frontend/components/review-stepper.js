@@ -13,14 +13,13 @@ import {
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
 import Check from '@material-ui/icons/Check';
-import Checkbox from '@material-ui/core/Checkbox';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Input from '@material-ui/core/Input';
+import InputLabel from '@material-ui/core/InputLabel';
 import Link from '@material-ui/core/Link';
 import Stepper from '@material-ui/core/Stepper';
 import Step from '@material-ui/core/Step';
 import StepConnector from '@material-ui/core/StepConnector';
 import StepLabel from '@material-ui/core/StepLabel';
-import TextareaAutosize from '@material-ui/core/TextareaAutosize';
 import Typography from '@material-ui/core/Typography';
 
 // utils
@@ -66,12 +65,22 @@ const useStyles = makeStyles(theme => ({
   },
   formLabel: {
     '& span:last-child': {
-      fontSize: '0.8rem',
+      fontSize: '0.9rem',
     },
   },
   fullWidth: {
     padding: 5,
     width: '100%',
+  },
+  input: {
+    border: '1px solid #ccc',
+    margin: 15,
+    width: '98%',
+  },
+  inputLabel: {
+    color: 'rgba(0, 0, 0, 0.87)',
+    fontSize: '0.9rem',
+    margin: '0 15px',
   },
   instructions: {
     marginTop: theme.spacing(1),
@@ -82,10 +91,13 @@ const useStyles = makeStyles(theme => ({
   },
   red: {
     backgroundColor: '#FAB7B7',
+    margin: '0 15px',
     padding: 10,
   },
   yellow: {
     backgroundColor: '#FFFAEE',
+    fontSize: '0.9rem',
+    lineHeight: '1.4',
     padding: 10,
   },
 }));
@@ -206,24 +218,14 @@ export default function ReviewStepper({
   const [activeStep, setActiveStep] = React.useState(0);
   const [answerMap, setAnswerMap] = useState({});
   const [completed, setCompleted] = React.useState(new Set());
-  const [checkedCOI, setCheckedCOI] = React.useState(false);
-  const [expandConsent, setExpandConsent] = React.useState(false);
   const [expandFeedback, setExpandFeedback] = React.useState(false);
-  const [expandLong, setExpandLong] = React.useState(false);
-  const [disabledRapid, setDisabledRapid] = React.useState(false);
-  const [disabledSkip, setDisabledSkip] = React.useState(false);
   const [disabledSubmit, setDisabledSubmit] = React.useState(false);
-  const [disabledSaveSubmit, setDisabledSaveSubmit] = React.useState(false);
   const [skipped, setSkipped] = React.useState(new Set());
   const steps = getSteps();
 
   const { mutate: postRapidReview } = usePostRapidReviews();
 
   const { mutate: postLongReview } = usePostFullReviews();
-
-  const handleCOIChange = event => {
-    setCheckedCOI(event.target.checked);
-  };
 
   const canSubmitRapid = answerMap => {
     return QUESTIONS.filter(q => q.type == 'YesNoQuestion').every(
@@ -235,36 +237,26 @@ export default function ReviewStepper({
     return content && content !== '<p></p>';
   };
 
-  const totalSteps = () => {
-    return getSteps().length;
-  };
-
-  const isStepOptional = step => {
-    return step === 1;
-  };
-
   const handleSubmitRapid = () => {
-    if (!checkedCOI) {
-      window.prompt(
-        'Please tell us about the conflict of interest in your rapid review',
-      );
+    if (!hasRapidReviewed) {
+      if (canSubmitRapid(answerMap)) {
+        postRapidReview({ ...answerMap, preprint: preprint.id })
+          .then(() => {
+            onClose(answerMap);
+            return;
+          })
+          .catch(err => {
+            alert(`An error occurred: ${err.message}`);
+            return false;
+          });
+      } else {
+        alert(
+          'Please complete the required fields. All multiple choice questions are required.',
+        );
+        return false;
+      }
+      return;
     }
-
-    postRapidReview({ ...answerMap, preprint: preprint.id })
-      .then(() => {
-        setActiveStep(prevActiveStep => prevActiveStep + 2);
-
-        setSkipped(prevSkipped => {
-          const newSkipped = new Set(prevSkipped.values());
-          newSkipped.add(activeStep);
-          return newSkipped;
-        });
-        setExpandFeedback(false);
-        setDisabledSubmit(true);
-        handleComplete();
-        return onClose(answerMap);
-      })
-      .catch(err => alert(`An error occurred: ${err.message}`));
   };
 
   const handleSaveLong = event => {
@@ -281,57 +273,13 @@ export default function ReviewStepper({
     }
   };
 
-  const handleSaveAndSubmit = () => {
-    if (canSubmitLong(content)) {
-      if (
-        confirm(
-          'Are you sure you want to publish your rapid review? This action cannot be undone.',
-        )
-      ) {
-        if (
-          Object.keys(answerMap).length !== 0 &&
-          answerMap.constructor === Object
-        ) {
-          postRapidReview({ ...answerMap, preprint: preprint.id })
-            .then(() => {
-              return;
-            })
-            .catch(err => alert(`An error occurred: ${err.message}`));
-        }
-
-        postLongReview({
-          preprint: preprint.id,
-          contents: content,
-        })
-          .then(() => {
-            alert(
-              'Rapid review submitted and long-form review draft updated successfully.',
-            );
-            return setDisabledSaveSubmit(true);
-          })
-          .catch(err => alert(`An error occurred: ${err.message}`));
-      }
-    }
-  };
-
-  const handleSubmitBoth = () => {
+  const handleSubmitLong = () => {
     if (canSubmitLong(content)) {
       if (
         confirm(
           'Are you sure you want to publish this review? This action cannot be undone.',
         )
       ) {
-        if (
-          Object.keys(answerMap).length !== 0 &&
-          answerMap.constructor === Object
-        ) {
-          postRapidReview({ ...answerMap, preprint: preprint.id })
-            .then(() => {
-              return;
-            })
-            .catch(err => alert(`An error occurred: ${err.message}`));
-        }
-
         postLongReview({
           preprint: preprint.id,
           contents: content,
@@ -362,57 +310,53 @@ export default function ReviewStepper({
     }
   };
 
-  const handleSkip = () => {
-    if (!isStepOptional(activeStep + 1)) {
-      // You probably want to guard against something like this
-      // it should never occur unless someone's actively trying to break something.
-      throw new Error("You can't skip a step that isn't optional.");
-    }
-    handleSubmitRapid();
-    setDisabledSkip(true);
-    // setExpandConsent(true);
+  const totalSteps = () => {
+    return getSteps().length;
+  };
+
+  const isStepOptional = step => {
+    return step === 1;
+  };
+
+  const isStepSkipped = step => {
+    return skipped.has(step);
   };
 
   const skippedSteps = () => {
     return skipped.size;
   };
 
-  const handleNext = step => {
-    const newActiveStep = step ? activeStep + 1 : activeStep + 2;
-    setActiveStep(newActiveStep);
-  };
-
-  const handleNextRapid = () => {
-    if (!hasRapidReviewed) {
-      if (canSubmitRapid(answerMap)) {
-        setExpandFeedback(true);
-        setDisabledRapid(true);
+  const handleNext = () => {
+    if (activeStep === 0) {
+      if (!hasRapidReviewed && !handleSubmitRapid()) {
+        return false;
       } else {
-        alert(
-          'Please complete the required fields. All multiple choice questions are required.',
-        );
+        setExpandFeedback(expandFeedback => !expandFeedback);
+        handleComplete();
       }
-    } else {
-      setExpandLong(true);
-      setDisabledRapid(true);
-      handleComplete(activeStep + 1);
+    } else if (activeStep === 1) {
+      if (!handleSubmitLong()) {
+        return false;
+      }
     }
-  };
 
-  const handleNextLong = () => {
-    setDisabledSkip(true);
-    setExpandLong(true);
-    handleComplete(activeStep + 1);
+    let newSkipped = skipped;
+    if (isStepSkipped(activeStep)) {
+      newSkipped = new Set(newSkipped.values());
+      newSkipped.delete(activeStep);
+    }
+
+    setActiveStep(prevActiveStep => prevActiveStep + 1);
+    setSkipped(newSkipped);
   };
 
   const handleComplete = step => {
     const newCompleted = new Set(completed);
     newCompleted.add(activeStep);
 
-    if (!step) {
-      newCompleted.add(activeStep + 2);
-    } else if (step === 2) {
-      newCompleted.add(activeStep + 1);
+    if (step === 2) {
+      newCompleted.add(activeStep + step);
+      setActiveStep(step);
     } else if (step === 4) {
       newCompleted.add(activeStep + 1);
       newCompleted.add(activeStep + 2);
@@ -426,12 +370,8 @@ export default function ReviewStepper({
      * thus we have to resort to not being very DRY.
      */
     if (completed.size !== totalSteps() - skippedSteps()) {
-      handleNext(step);
+      // handleNext(activeStep);
     }
-  };
-
-  const isStepSkipped = step => {
-    return skipped.has(step);
   };
 
   function isStepComplete(step) {
@@ -444,7 +384,7 @@ export default function ReviewStepper({
 
   useEffect(() => {
     if (hasRapidReviewed) {
-      setDisabledSaveSubmit(true);
+      handleComplete();
     }
 
     if (hasLongReviewed) {
@@ -452,6 +392,141 @@ export default function ReviewStepper({
       handleComplete(4);
     }
   }, []);
+
+  function getStepContent(step) {
+    switch (step) {
+      case 0:
+        return hasRapidReviewed || expandFeedback ? (
+          <>
+            <Box textAlign="right">
+              <Button
+                disabled
+                variant="contained"
+                color="primary"
+                className={classes.button}
+              >
+                <Check />
+                Submit
+              </Button>
+            </Box>
+            <Box mt={2} mb={2} className={classes.yellow}>
+              Congratulations! You have successfully submitted your rapid
+              review. Would you like to expand on your feedback with a long-form
+              review?
+            </Box>
+          </>
+        ) : (
+          <Box>
+            <header className="shell-content-reviews__title">
+              Rapid Review
+            </header>
+            <form>
+              <RapidFormFragment
+                answerMap={answerMap}
+                onChange={(key, value) => {
+                  setAnswerMap(answerMap => ({
+                    ...answerMap,
+                    [key]: value,
+                  }));
+                }}
+              />
+              <InputLabel
+                htmlFor="competing-interest"
+                className={classes.inputLabel}
+              >
+                Please use the space below to declare any existing{' '}
+                <Link href="#">Competing Interest</Link>.
+              </InputLabel>
+              <Input
+                className={classes.input}
+                id="competing-interest"
+                multiline
+                rows={2}
+                disableUnderline
+              />
+              <Box mt={2} mb={2} className={classes.yellow}>
+                Thank you for your contribution!
+                <br />
+                Please review the{' '}
+                <Link href="#">PREreview Code of Conduct</Link> before
+                submitting your review.
+              </Box>
+            </form>
+          </Box>
+        );
+      case 1:
+        return (
+          <Box mt={2}>
+            <Box className={classes.red}>
+              <Typography variant="button" display="block" gutterBottom>
+                Instructions
+              </Typography>
+              <Typography variant="body2" gutterBottom>
+                Use the space below to compose your long-form review.
+              </Typography>
+              <Typography variant="body2" gutterBottom>
+                Please remember to be constructive and to abide by the{' '}
+                <Link href="#">PREreview Code of Conduct</Link>.
+              </Typography>
+            </Box>
+            <Box mt={2} mb={2}>
+              <form>
+                <Box m={2}>
+                  <LongFormFragment
+                    onContentChange={onContentChange}
+                    content={content}
+                  />
+                </Box>
+                <Box mt={2}>
+                  <InputLabel
+                    for="competing-interest"
+                    className={classes.inputLabel}
+                  >
+                    Please use the space below to declare any existing{' '}
+                    <Link href="#">Competing Interest</Link>.
+                  </InputLabel>
+                  <Input
+                    className={classes.input}
+                    id="competing-interest"
+                    multiline
+                    rows={2}
+                    disableUnderline
+                  />
+                </Box>
+              </form>
+            </Box>
+            <Box textAlign="right">
+              <Button
+                disabled={disabledSubmit}
+                variant="outlined"
+                color="primary"
+                onClick={handleSaveLong}
+                className={classes.button}
+              >
+                Save
+              </Button>
+              <Button
+                disabled={disabledSubmit}
+                variant="contained"
+                color="primary"
+                onClick={handleSubmitLong}
+                className={classes.button}
+              >
+                Submit
+              </Button>
+            </Box>
+          </Box>
+        );
+      case 2:
+        return (
+          <Box mt={2} mb={2} className={classes.yellow}>
+            Congratulations! You have successfully submitted your PREreview.
+          </Box>
+        );
+      default:
+        return 'Unknown step';
+    }
+  }
 
   return (
     <ThemeProvider theme={prereviewTheme}>
@@ -488,205 +563,43 @@ export default function ReviewStepper({
           })}
         </Stepper>
         <div>
-          {disabledSubmit ? (
-            <Box mt={2} mb={2} className={classes.yellow}>
-              Congratulations! You have successfully submitted your PREreview.
-            </Box>
-          ) : hasLongReviewed ? (
+          {activeStep === steps.length ? (
             <Box mt={2} mb={2} className={classes.yellow}>
               Congratulations! You have successfully submitted your PREreview.
             </Box>
           ) : (
-            <Box>
-              {hasRapidReviewed ? (
-                <Box mt={2} mb={2} className={classes.yellow}>
-                  You have already submitted a rapid review. Would you like to submit a long-form review?
-                </Box>
-              ) : (
-                <Box>
-                  <header className="shell-content-reviews__title">
-                    Rapid Review
-                  </header>
-                  <form>
-                    <RapidFormFragment
-                      answerMap={answerMap}
-                      onChange={(key, value) => {
-                        setAnswerMap(answerMap => ({
-                          ...answerMap,
-                          [key]: value,
-                        }));
-                      }}
-                    />
-                  </form>
-                  <Box mt={2} mb={2} className={classes.yellow}>
-                    Thank you for your contribution!
-                    <br />
-                    Please review{' '}
-                    <Link href="#">PREreview Code of Conduct</Link> before
-                    submitting your review.
-                  </Box>
-                  <FormControlLabel
-                    className={classes.formLabel}
-                    control={
-                      <Checkbox
-                        checked={checkedCOI}
-                        onChange={handleCOIChange}
-                        name="checkedCOI"
-                        color="primary"
-                      />
-                    }
-                    label="I have no conflict of interest in reviewing this preprint."
-                  />
-                  {/*<Box textAlign="right">
-                    <Button
-                      disabled={disabledSubmit}
-                      variant="contained"
-                      color="primary"
-                      onClick={handleSubmitRapid}
-                      className={classes.button}
-                    >
-                      Submit
-                    </Button>
-                  </Box>*/}
-                </Box>
-              )}
+            <div>
+              {getStepContent(activeStep)}
               <Box textAlign="right">
-                <Button
-                  disabled={disabledRapid}
-                  variant="contained"
-                  color="primary"
-                  onClick={handleNextRapid}
-                  className={classes.button}
-                >
-                  {hasRapidReviewed ? 'Yes' : 'Next'}
-                </Button>
-              </Box>
-              {expandFeedback ? (
-                <Box>
-                  <Box mt={2} mb={2} className={classes.yellow}>
-                    Would you like to expand on your feedback with a long-form
-                    review?
-                  </Box>
-                  <Box textAlign="right">
-                    <Button
-                      disabled={disabledSkip}
-                      variant="outlined"
-                      color="primary"
-                      onClick={handleSkip}
-                      className={classes.button}
-                    >
-                      Skip
-                    </Button>
-                    <Button
-                      disabled={disabledSkip}
-                      variant="contained"
-                      color="primary"
-                      onClick={handleNextLong}
-                      className={classes.button}
-                    >
-                      Yes
-                    </Button>
-                  </Box>
-                </Box>
-              ) : null}
-              {expandConsent ? (
-                <Box>
-                  <Box mt={2} mb={2} className={classes.yellow}>
-                    Thank you for your contribution!
-                    <br />
-                    Please review{' '}
-                    <Link href="#">PREreview Code of Conduct</Link> before
-                    submitting your review.
-                  </Box>
-                  <FormControlLabel
-                    className={classes.formLabel}
-                    control={
-                      <Checkbox
-                        checked={checkedCOI}
-                        onChange={handleCOIChange}
-                        name="checkedCOI"
+                {activeStep === 0 ? (
+                  <>
+                    {hasRapidReviewed && (
+                      <Button
+                        variant="outlined"
                         color="primary"
-                      />
-                    }
-                    label="I have no conflict of interest in reviewing this preprint."
-                  />
-                  <Box textAlign="right">
-                    <Button
-                      disabled={disabledSubmit}
-                      variant="contained"
-                      color="primary"
-                      onClick={handleSubmitRapid}
-                      className={classes.button}
-                    >
-                      Submit
-                    </Button>
-                  </Box>
-                </Box>
-              ) : null}
-              {expandLong ? (
-                <Box mt={2}>
-                  <Box className={classes.red}>
-                    <Typography variant="button" display="block" gutterBottom>
-                      Instructions
-                    </Typography>
-                    <Typography variant="body2" gutterBottom>
-                      Use the space below to compose your long-form review.
-                    </Typography>
-                    <Typography variant="body2" gutterBottom>
-                      Please remember to be constructive and to abide by the{' '}
-                      <Link href="#">PREreview Code of Conduct</Link>.
-                    </Typography>
-                  </Box>
-                  <Box mt={2} mb={2}>
-                    <form>
-                      <LongFormFragment
-                        onContentChange={onContentChange}
-                        content={content}
-                      />
-                      <Box mt={2}>
-                        <Typography variant="body2" gutterBottom>
-                          Please use the space below to declare any existing{' '}
-                          <Link href="#">competing interest</Link>.
-                        </Typography>
-                        <TextareaAutosize
-                          aria-label="coi"
-                          className={classes.fullWidth}
-                        />
-                      </Box>
-                    </form>
-                  </Box>
-                  <Box textAlign="right">
-                    <Button
-                      disabled={disabledSaveSubmit}
-                      variant="outlined"
-                      color="primary"
-                      onClick={handleSaveAndSubmit}
-                      className={classes.button}
-                    >
-                      Save and Submit Rapid
-                    </Button>
-                    <Button
-                      disabled={disabledSubmit}
-                      variant="outlined"
-                      color="primary"
-                      onClick={handleSaveLong}
-                      className={classes.button}
-                    >
-                      Save Draft
-                    </Button>
-                    <Button
-                      disabled={disabledSubmit}
-                      variant="contained"
-                      color="primary"
-                      onClick={handleSubmitBoth}
-                      className={classes.button}
-                    >
-                      Submit
-                    </Button>
-                  </Box>
-                </Box>
-              ) : null}
-            </Box>
+                        onClick={() => handleComplete(2)}
+                        className={classes.button}
+                      >
+                        No
+                      </Button>
+                    )}
+
+                    {!hasLongReviewed ? (
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={handleNext}
+                        className={classes.button}
+                      >
+                        {!hasRapidReviewed && activeStep === 0
+                          ? 'Submit'
+                          : 'Yes'}
+                      </Button>
+                    ) : null}
+                  </>
+                ) : null}
+              </Box>
+            </div>
           )}
         </div>
       </div>
