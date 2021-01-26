@@ -1,6 +1,7 @@
 import router from 'koa-joi-router';
 import { getLogger } from '../log.js';
 import { getErrorMessages } from '../utils/errors';
+import getActivePersona from '../utils/persona.js';
 
 const log = getLogger('backend:controller:comment');
 const Joi = router.Joi;
@@ -62,30 +63,34 @@ export default function controller(commentModel, fullReviewModel, thisUser) {
   };
 
   const postHandler = async ctx => {
-    let fullReview, comment, fid;
+    let fullReview, comment, fid, authorPersona;
 
     ctx.params.fid ? (fid = ctx.params.fid) : null;
+
+    authorPersona = getActivePersona(ctx.state.user);
 
     try {
       if (fid) {
         fullReview = await fullReviewModel.findOne(fid);
       }
 
-      if (fullReview) {
-        comment = await commentModel.create(ctx.request.body);
+      if (fullReview && authorPersona) {
+        comment = commentModel.create({
+          ...ctx.request.body,
+          parent: fullReview,
+          author: authorPersona,
+          isPublished: true,
+        });
+
+        fullReview.comments.add(comment);
+
         await commentModel.persistAndFlush(comment);
       }
     } catch (err) {
       log.error(`HTTP 400 error: ${err}`);
     }
 
-    if (comment) {
-      ctx.body = {
-        status: 201,
-        message: 'created',
-      };
-      ctx.status = 201;
-    }
+    ctx.status = 201;
   };
 
   commentsRouter.route({
