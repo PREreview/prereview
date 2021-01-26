@@ -7,7 +7,7 @@ export default async function run() {
     new Promise((resolve, reject) => {
       couchbackup.backup(
         `https://${process.env.IMPORT_COUCH_USERNAME}:${
-          process.env.COUCH_PASSWORD
+          process.env.IMPORT_COUCH_PASSWORD
         }@${process.env.IMPORT_COUCH_HOST}:${
           process.env.IMPORT_COUCH_PORT
         }/rapid-prereview-docs`,
@@ -32,7 +32,7 @@ export default async function run() {
     new Promise((resolve, reject) => {
       couchbackup.backup(
         `https://${process.env.IMPORT_COUCH_USERNAME}:${
-          process.env.COUCH_PASSWORD
+          process.env.IMPORT_COUCH_PASSWORD
         }@${process.env.IMPORT_COUCH_HOST}:${
           process.env.IMPORT_COUCH_PORT
         }/rapid-prereview-users`,

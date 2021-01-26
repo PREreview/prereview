@@ -34,30 +34,48 @@ wait_for() {
 
 wait_for
 
+clear_db() {
+  echo "Force-disconnecting clients"
+  env -i PGPASSWORD="$PASS" /usr/bin/psql -U "$USER" -d postgres -h "$HOST" -p "$PORT" -c "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = '$NAME'"
+  echo "Dropping $NODE_ENV database"
+  env -i PGPASSWORD="$PASS" /usr/bin/psql -U "$USER" -d postgres -h "$HOST" -p "$PORT" -c "DROP DATABASE $NAME"
+  echo "Creating blank $NODE_ENV database"
+  env -i PGPASSWORD="$PASS" /usr/bin/psql -U "$USER" -d postgres -h "$HOST" -p "$PORT" -c "CREATE DATABASE $NAME"
+}
+
+init_db() {
+  echo "Initializing database schema"
+  npm run db:migrations
+  npm run db:init
+}
+
+if [ $NODE_ENV == "staging" -o $NODE_ENV == "development" ] && [ $IMPORT_CLEAR_DB == "true" ]; then
+  echo "Clearing database"
+  clear_db
+fi
+
 if [ $NODE_ENV == "staging" ] && [ -z $IMPORT_SOURCES ]; then
   echo "Copying existing database $FROM_NAME to staging"
   echo "Dumping $FROM_NAME database"
   env -i PGPASSWORD="$FROM_PASS" /usr/bin/pg_dump -U "$FROM_USER" -d "$FROM_NAME" -h "$FROM_HOST" -p "$FROM_PORT" -f /tmp/import.sql
-  echo "Dropping staging database"
-  env -i PGPASSWORD="$PASS" /usr/bin/psql -U "$USER" -d postgres -h "$HOST" -p "$PORT" -c "DROP DATABASE $NAME"
-  echo "Creating blank staging database"
-  env -i PGPASSWORD="$PASS" /usr/bin/psql -U "$USER" -d postgres -h "$HOST" -p "$PORT" -c "CREATE DATABASE $NAME"
+
+  clear_db
+
   echo "Importing dump to staging"
   env -i PGPASSWORD="$PASS" /usr/bin/psql -U "$USER" -d "$NAME" -h "$HOST" -p "$PORT" -f /tmp/import.sql
   echo "Done copying!"
 else
-  env -i PGPASSWORD="$PASS" /usr/bin/psql -U "$USER" -d "$NAME" -h "$HOST" -p "$PORT" -tAc "SELECT to_regclass('public.users')" | grep -q users
+  env -i PGPASSWORD="$PASS" /usr/bin/psql -U "$USER" -d "$NAME" -h "$HOST" -p "$PORT" -tAc "SELECT to_regclass('public.user')" | grep -q user
   
   result=$?
   if [ $result -ne 0 ]; then
-    echo "Initializing database schema"
-    npm run db:migrations
-    npm run db:init
     if [ $NODE_ENV == "staging" ]; then
       echo "Import legacy data"
+      init_db
       npm run db:import &
     elif [ $NODE_ENV == "development" ]; then
       echo "Generate seeds"
+      init_db
       npm run db:seeds &
     fi
   else

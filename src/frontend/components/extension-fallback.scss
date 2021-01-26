@@ -4,17 +4,24 @@
   background-color: rgb(83, 86, 89);
 
   & .extension-fallback__no-pdf-message {
-    text-align: center;
-    padding: var(--sgrd);
-    display: flex;
-    justify-content: center;
     align-items: center;
+    background-color: #fff;
+    color: #000;
+    display: flex;
     height: 50vh;
-    color: white;
-    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
-    & a {
-      &:hover {
-        color: white;
+    justify-content: center;
+
+    &-inner {
+      padding: 3em;
+
+      &-authors, &-content, &-link {
+        font-size: 1rem;
+        // letter-spacing: 1.2;
+        line-height: 1.5;
+      }
+
+      &-link {
+        margin-top: 1rem;
       }
     }
   }

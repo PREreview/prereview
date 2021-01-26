@@ -3,7 +3,6 @@
   font: var(--ui-basic-font);
   margin: 0;
   position: relative;
-  /* min-height: 100vh; */
   top: calc(var(--announcement-bar-height) + var(--header-bar-height));
   /* padding: calc(var(--header-bar-height) + var(--lgrd)) 0 var(--lgrd); */
   box-sizing: border-box;
@@ -16,7 +15,6 @@
     max-width: var(--middle-column-default-width);
     margin: 0 auto;
     background-color: white;
-    min-height: calc(100vh - (calc(var(--announcement-bar-height) + var(--header-bar-height))));
     padding: 0 var(--xlgrd);
   }
 

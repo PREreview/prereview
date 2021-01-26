@@ -1,6 +1,6 @@
 import React, { useContext, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { UserContext } from '../contexts/user-context';
+import UserProvider from '../contexts/user-context';
 import SettingsRoles from './settings-roles';
 import SettingsApi from './settings-api';
 import SettingsNotifications from './settings-notifications';
@@ -8,7 +8,7 @@ import HeaderBar from './header-bar';
 import { ORG } from '../constants';
 
 export default function Settings() {
-  const user = useContext(UserContext);
+  const [user] = useContext(UserProvider.context);
 
   useEffect(() => {
     window.scrollTo(0, 0);

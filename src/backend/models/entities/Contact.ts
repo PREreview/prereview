@@ -34,7 +34,7 @@ export class Contact extends BaseEntity {
   sendNotifications: boolean;
 
   @Fixture(faker => faker.random.alphaNumeric(16))
-  @Property()
+  @Property({ nullable: true })
   token?: string;
 
   constructor(

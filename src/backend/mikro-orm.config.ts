@@ -45,9 +45,9 @@ const options: Options = {
     Work,
   ],
   type: dbType,
-  clientUrl: `${dbType}://${authString}${config.dbHost}${portString}/${
-    config.dbName
-  }`,
+  debug: config.logLevel === 'trace',
+  clientUrl: `
+  ${dbType}://${authString}${config.dbHost}${portString}/${config.dbName}`,
   cache: {
     pretty: true,
     options: {

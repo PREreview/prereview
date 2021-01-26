@@ -5,7 +5,7 @@ import { useLocation } from 'react-router-dom';
 import { format } from 'date-fns';
 
 // contexts
-import { UserContext } from '../contexts/user-context';
+import UserProvider from '../contexts/user-context';
 
 // hooks
 import { useGetPersona } from '../hooks/api-hooks.tsx';
@@ -28,7 +28,7 @@ import { ORG } from '../constants';
 
 export default function Profile() {
   const location = useLocation();
-  const thisUser = useContext(UserContext);
+  const [thisUser] = useContext(UserProvider.context);
   const [loading, setLoading] = useState(true);
   const [persona, setPersona] = useState(null);
   // const [imageUrl, setImageUrl] = useState('') FIXME

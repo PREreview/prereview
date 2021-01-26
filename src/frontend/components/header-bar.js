@@ -9,9 +9,7 @@ import NoticeBadge from './notice-badge';
 import { useIsMobile } from '../hooks/ui-hooks';
 
 export default function HeaderBar({ onClickMenuButton, closeGap, thisUser }) {
-  const rol = thisUser && thisUser.groups ? thisUser.groups : []; //GetUser(1);
-
-  let roles = []
+  const roles = thisUser && thisUser.groups ? thisUser.groups : []; //GetUser(1);
 
   //const showProfileNotice = checkIfRoleLacksMininmalData(role);
   const showProfileNotice = false;
@@ -157,16 +155,18 @@ export default function HeaderBar({ onClickMenuButton, closeGap, thisUser }) {
                 </XLink>
               )}
 
-              { thisUser.isModerator ? (
+              {roles.includes('moderators') && !thisUser.isModerated && (
                 <XLink
                   to={process.env.IS_EXTENSION ? undefined : '/moderate'}
                   href={`/moderate`}
                   target={process.env.IS_EXTENSION ? '_blank' : undefined}
-                > 
-                Moderate Reviews
+                >
+                  Moderate Reviews
                 </XLink>
-              ) : null }
-              <XLink to="/logout" href={`/api/v2/logout`}>Logout</XLink>
+              )}
+              <XLink to="/logout" href={`/logout`}>
+                Logout
+              </XLink>
             </UserBadge>
           ) : (
             <XLink to="/login" href="/login">

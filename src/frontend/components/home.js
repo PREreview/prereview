@@ -1,13 +1,14 @@
 // base imports
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 
 // Material UI
+import Link from '@material-ui/core/Link';
 import Pagination from '@material-ui/lab/Pagination';
 
 // contexts
-import { UserContext } from '../contexts/user-context';
+import UserProvider from '../contexts/user-context';
 
 // hooks
 import { useGetPreprints } from '../hooks/api-hooks.tsx';
@@ -33,7 +34,6 @@ import PrivateRoute from './private-route';
 import SearchBar from './search-bar';
 import SortOptions from './sort-options';
 import WelcomeModal from './welcome-modal';
-import XLink from './xlink';
 
 // constants
 import { ORG } from '../constants';
@@ -50,6 +50,8 @@ const processParams = search => {
       page = value;
     } else if (key.toLowerCase() === 'limit') {
       limit = value;
+    } else if (key.toLowerCase() === 'sort') {
+      processed.append('sort', value);
     } else if (key.toLowerCase() === 'desc') {
       processed.append('desc', value === 'true');
     }
@@ -77,7 +79,8 @@ export default function Home() {
   const location = useLocation();
   const params = processParams(location.search);
 
-  const thisUser = useContext(UserContext);
+  const [thisUser] = useContext(UserProvider.context);
+  console.log(thisUser);
   const isMobile = useIsMobile();
   const [showLeftPanel, setShowLeftPanel] = useState(!isMobile);
   const [loginModalOpenNext, setLoginModalOpenNext] = useState(null);
@@ -85,7 +88,6 @@ export default function Home() {
   const [isWelcomeModalOpen, setIsWelcomeModalOpen] = useState(true);
   const [newPreprints, setNewPreprints] = useNewPreprints();
 
-  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState(params.get('search') || '');
 
   const { data: preprints, loading: loadingPreprints, error } = useGetPreprints(
@@ -95,14 +97,6 @@ export default function Home() {
   );
 
   const [hoveredSortOption, setHoveredSortOption] = useState(null);
-
-  useEffect(() => {
-    if (!loadingPreprints) {
-      if (preprints) {
-        setLoading(false);
-      }
-    }
-  }, []);
 
   const handleNewReview = preprintId => {
     if (thisUser) {
@@ -176,6 +170,7 @@ export default function Home() {
           }}
           onRequestSearch={() => {
             params.set('search', search);
+            params.delete('page');
             history.push({
               pathname: location.pathame,
               search: params.toString(),
@@ -242,23 +237,26 @@ export default function Home() {
                 }}
               />
             )}
-            <SortOptions
-              sort={params.get('sort') || ''}
-              order={params.get('desc') === 'true' ? 'desc' : 'asc'}
-              onMouseEnterSortOption={sortOption => {
-                setHoveredSortOption(sortOption);
-              }}
-              onMouseLeaveSortOption={() => {
-                setHoveredSortOption(null);
-              }}
-              onChange={(sortOption, sortOrder) => {
-                params.set('desc', sortOrder === 'desc');
-                history.push({
-                  pathname: location.pathame,
-                  search: params.toString(),
-                });
-              }}
-            />
+            {preprints && preprints.totalCount > 0 && !loadingPreprints && (
+              <SortOptions
+                sort={params.get('sort') || ''}
+                order={params.get('desc') === 'true' ? 'desc' : 'asc'}
+                onMouseEnterSortOption={sortOption => {
+                  setHoveredSortOption(sortOption);
+                }}
+                onMouseLeaveSortOption={() => {
+                  setHoveredSortOption(null);
+                }}
+                onChange={(sortOption, sortOrder) => {
+                  params.set('desc', sortOrder === 'desc');
+                  params.set('sort', sortOption);
+                  history.push({
+                    pathname: location.pathame,
+                    search: params.toString(),
+                  });
+                }}
+              />
+            )}
 
             {newPreprints.length > 0 && (
               <ul className="home__preprint-list home__preprint-list--new">
@@ -280,18 +278,24 @@ export default function Home() {
                 ))}
               </ul>
             )}
-            {preprints && preprints.length === 0 && !loading ? (
+            {preprints && preprints.totalCount === 0 && !loadingPreprints ? (
               <div>
                 No preprints about this topic have been added to Rapid
                 PREreview.{' '}
-                {!!location.search && (
-                  <XLink to={location.pathname} href={location.pathname}>
-                    Clear search terms.
-                  </XLink>
-                )}
+                <Link
+                  onClick={() => {
+                    setSearch('');
+                    if (thisUser) {
+                      history.push('/new');
+                    } else {
+                      setLoginModalOpenNext('/new');
+                    }
+                  }}
+                >
+                  Review or request a review of a Preprint to add it to the
+                  site.
+                </Link>
               </div>
-            ) : preprints.length <= 0 ? (
-              <div>No more results.</div>
             ) : (
               <ul className="home__preprint-list">
                 {preprints &&
@@ -312,19 +316,21 @@ export default function Home() {
               </ul>
             )}
 
-            <div className="home__pagination">
-              <Pagination
-                count={Math.ceil(preprints.totalCount / params.get('limit'))}
-                page={parseInt('' + params.get('page'))}
-                onChange={(ev, page) => {
-                  params.set('page', page);
-                  history.push({
-                    pathname: location.pathname,
-                    search: params.toString(),
-                  });
-                }}
-              />
-            </div>
+            {preprints && preprints.totalCount > params.get('limit') && (
+              <div className="home__pagination">
+                <Pagination
+                  count={Math.ceil(preprints.totalCount / params.get('limit'))}
+                  page={parseInt('' + params.get('page'))}
+                  onChange={(ev, page) => {
+                    params.set('page', page);
+                    history.push({
+                      pathname: location.pathname,
+                      search: params.toString(),
+                    });
+                  }}
+                />
+              </div>
+            )}
           </div>
         </div>
       </div>

@@ -16,7 +16,7 @@ export default function RoleEditor({ user, onCancel, onSaved }) {
   const [scale, setScale] = useState(1);
   const [rotate, setRotate] = useState(0);
   const { mutate: updatePersona, loading, error } = usePutPersona({
-    id: user.id,
+    id: user.name,
   });
 
   const onDrop = useCallback(acceptedFiles => {
