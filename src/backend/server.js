@@ -106,12 +106,12 @@ export default async function configServer(config) {
   // eslint-disable-next-line no-unused-vars
   const badgeModel = badgeModelWrapper(db);
   const commentModel = commentModelWrapper(db);
-  const comments = CommentController(commentModel, authz);
   const communityModel = communityModelWrapper(db);
   const communities = CommunityController(communityModel, authz);
   const fullReviewModel = fullReviewModelWrapper(db);
   const draftModel = fullReviewDraftModelWrapper(db);
   const fullReviewDrafts = DraftController(draftModel, authz);
+  const comments = CommentController(commentModel, fullReviewModel, authz);
   const groups = GroupController(groupModel, userModel, authz);
   const personas = PersonaController(personaModel, authz);
   const preprintModel = preprintModelWrapper(db);

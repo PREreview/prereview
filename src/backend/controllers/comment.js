@@ -31,7 +31,7 @@ const handleInvalid = ctx => {
 };
 
 // eslint-disable-next-line no-unused-vars
-export default function controller(commentModel, thisUser) {
+export default function controller(commentModel, fullReviewModel, thisUser) {
   const commentsRouter = router();
 
   // handler for GET multiple comments
@@ -61,46 +61,32 @@ export default function controller(commentModel, thisUser) {
     ctx.status = 200;
   };
 
-  commentsRouter.route({
-    method: 'POST',
-    path: '/comments',
-    pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
-    validate: {
-      body: commentSchema,
-      type: 'json',
-      continueOnError: true,
-    },
-    handler: async ctx => {
-      if (ctx.invalid) {
-        handleInvalid(ctx);
-        return;
+  const postHandler = async ctx => {
+    let fullReview, comment, fid;
+
+    ctx.params.fid ? (fid = ctx.params.fid) : null;
+
+    try {
+      if (fid) {
+        fullReview = await fullReviewModel.findOne(fid);
       }
 
-      log.debug('Posting a comment.');
-      let newComment;
-
-      try {
-        newComment = commentModel.create(ctx.request.body);
-        await commentModel.persistAndFlush(newComment);
-      } catch (err) {
-        log.error('HTTP 400 Error: ', err);
-        ctx.throw(400, `Failed to parse comment schema: ${err}`);
+      if (fullReview) {
+        comment = await commentModel(ctx.request.body);
+        await commentModel.persistAndFlush(comment);
       }
+    } catch (err) {
+      log.error(`HTTP 400 error: ${err}`);
+    }
 
+    if (comment) {
       ctx.body = {
         status: 201,
         message: 'created',
       };
       ctx.status = 201;
-    },
-    meta: {
-      swagger: {
-        operationId: 'PostComments',
-        summary:
-          'Endpoint to POST comments on full-length reviews of preprints. Returns a 201 if a comment has been successfully created.',
-      },
-    },
-  });
+    }
+  };
 
   commentsRouter.route({
     method: 'GET',
@@ -144,6 +130,31 @@ export default function controller(commentModel, thisUser) {
         operationId: 'GetFullReviewComments',
         summary:
           'Endpoint to GET all comments related to a specific full-length review of a preprint.',
+      },
+    },
+  });
+
+  commentsRouter.route({
+    method: 'POST',
+    path: '/fullReviews/:fid/comments',
+    pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
+    validate: {
+      body: commentSchema,
+      type: 'json',
+      continueOnError: true,
+    },
+    handler: async ctx => {
+      if (ctx.invalid) {
+        handleInvalid(ctx);
+        return;
+      }
+      postHandler(ctx);
+    },
+    meta: {
+      swagger: {
+        operationId: 'PostComments',
+        summary:
+          'Endpoint to POST comments on full-length reviews of preprints. Returns a 201 if a comment has been successfully created.',
       },
     },
   });
