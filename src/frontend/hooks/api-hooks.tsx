@@ -272,6 +272,32 @@ export type UseDeleteUserProps = Omit<UseMutateProps<void, unknown, void, string
 export const useDeleteUser = (props: UseDeleteUserProps) => useMutate<void, unknown, void, string, void>("DELETE", `/users`, {   ...props });
 
 
+export interface PutUserContactsPathParams {
+  id: string
+}
+
+export type PutUserContactsProps = Omit<MutateProps<void, unknown, void, void, PutUserContactsPathParams>, "path" | "verb"> & PutUserContactsPathParams;
+
+/**
+ * Endpoint to PUT contacts for a single user.
+ */
+export const PutUserContacts = ({id, ...props}: PutUserContactsProps) => (
+  <Mutate<void, unknown, void, void, PutUserContactsPathParams>
+    verb="PUT"
+    path={`/users/${id}/contacts`}
+    
+    {...props}
+  />
+);
+
+export type UsePutUserContactsProps = Omit<UseMutateProps<void, unknown, void, void, PutUserContactsPathParams>, "path" | "verb"> & PutUserContactsPathParams;
+
+/**
+ * Endpoint to PUT contacts for a single user.
+ */
+export const usePutUserContacts = ({id, ...props}: UsePutUserContactsProps) => useMutate<void, unknown, void, void, PutUserContactsPathParams>("PUT", (paramsInPath: PutUserContactsPathParams) => `/users/${paramsInPath.id}/contacts`, {  pathParams: { id }, ...props });
+
+
 export type PostFullReviewsProps = Omit<MutateProps<void, unknown, void, void, void>, "path" | "verb">;
 
 /**
@@ -597,28 +623,6 @@ export type UseDeleteGroupMemberProps = Omit<UseMutateProps<void, unknown, void,
 export const useDeleteGroupMember = ({id, ...props}: UseDeleteGroupMemberProps) => useMutate<void, unknown, void, string, DeleteGroupMemberPathParams>("DELETE", (paramsInPath: DeleteGroupMemberPathParams) => `/groups/${paramsInPath.id}/members`, {  pathParams: { id }, ...props });
 
 
-export type PostCommentsProps = Omit<MutateProps<void, unknown, void, PostCommentsBodyRequestBody, void>, "path" | "verb">;
-
-/**
- * Endpoint to POST comments on full-length reviews of preprints. Returns a 201 if a comment has been successfully created.
- */
-export const PostComments = (props: PostCommentsProps) => (
-  <Mutate<void, unknown, void, PostCommentsBodyRequestBody, void>
-    verb="POST"
-    path={`/comments`}
-    
-    {...props}
-  />
-);
-
-export type UsePostCommentsProps = Omit<UseMutateProps<void, unknown, void, PostCommentsBodyRequestBody, void>, "path" | "verb">;
-
-/**
- * Endpoint to POST comments on full-length reviews of preprints. Returns a 201 if a comment has been successfully created.
- */
-export const usePostComments = (props: UsePostCommentsProps) => useMutate<void, unknown, void, PostCommentsBodyRequestBody, void>("POST", `/comments`, props);
-
-
 export interface GetCommentsQueryParams {
   start?: number;
   end?: number;
@@ -681,6 +685,32 @@ export type UseGetFullReviewCommentsProps = Omit<UseGetProps<void, unknown, GetF
  * Endpoint to GET all comments related to a specific full-length review of a preprint.
  */
 export const useGetFullReviewComments = ({fid, ...props}: UseGetFullReviewCommentsProps) => useGet<void, unknown, GetFullReviewCommentsQueryParams, GetFullReviewCommentsPathParams>((paramsInPath: GetFullReviewCommentsPathParams) => `/fullReviews/${paramsInPath.fid}/comments`, {  pathParams: { fid }, ...props });
+
+
+export interface PostCommentsPathParams {
+  fid: string
+}
+
+export type PostCommentsProps = Omit<MutateProps<void, unknown, void, PostCommentsBodyRequestBody, PostCommentsPathParams>, "path" | "verb"> & PostCommentsPathParams;
+
+/**
+ * Endpoint to POST comments on full-length reviews of preprints. Returns a 201 if a comment has been successfully created.
+ */
+export const PostComments = ({fid, ...props}: PostCommentsProps) => (
+  <Mutate<void, unknown, void, PostCommentsBodyRequestBody, PostCommentsPathParams>
+    verb="POST"
+    path={`/fullReviews/${fid}/comments`}
+    
+    {...props}
+  />
+);
+
+export type UsePostCommentsProps = Omit<UseMutateProps<void, unknown, void, PostCommentsBodyRequestBody, PostCommentsPathParams>, "path" | "verb"> & PostCommentsPathParams;
+
+/**
+ * Endpoint to POST comments on full-length reviews of preprints. Returns a 201 if a comment has been successfully created.
+ */
+export const usePostComments = ({fid, ...props}: UsePostCommentsProps) => useMutate<void, unknown, void, PostCommentsBodyRequestBody, PostCommentsPathParams>("POST", (paramsInPath: PostCommentsPathParams) => `/fullReviews/${paramsInPath.fid}/comments`, {  pathParams: { fid }, ...props });
 
 
 export interface GetCommentPathParams {
