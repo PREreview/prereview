@@ -19,6 +19,7 @@ import About from './about';
 import AdminPanel from './admin-panel';
 import BlockPanel from './block-panel';
 import CodeOfConduct from './code-of-conduct';
+import Community from './Community.jsx';
 import ExtensionFallback from './extension-fallback';
 import ExtensionSplash from './extension-splash';
 import Home from './home';
@@ -107,6 +108,12 @@ export default function App({ user }) {
                 path="/preprints/:id"
               >
                 <ExtensionFallback />
+              </Route>
+              <Route
+                exact={true}
+                path="/communities/:id"
+              >
+                <Community />
               </Route>
 
               <Route>
