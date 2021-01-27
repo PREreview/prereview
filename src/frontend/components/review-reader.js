@@ -321,28 +321,37 @@ const ReviewReader = React.memo(function ReviewReader({
                                 id={`review-header-${review.id}`}
                               >
                                 <Typography className={classes.h4}>
-                                  {review.authors.length >= 2 ? (
-                                    review.authors.slice(0, 2).map(author => (
-                                      <span
-                                        key={author.id}
-                                        className="review-reader__header-author"
-                                      >
-                                        {author.defaultPersona
-                                          ? author.defaultPersona.name
-                                          : author.name}
-                                      </span>
-                                    ))
+                                  {review.authors.length ? (
+                                    <>
+                                      {review.authors.length >= 2 ? (
+                                        review.authors
+                                          .slice(0, 2)
+                                          .map(author => (
+                                            <span
+                                              key={author.id}
+                                              className="review-reader__header-author"
+                                            >
+                                              {author.defaultPersona
+                                                ? author.defaultPersona.name
+                                                : author.name}
+                                            </span>
+                                          ))
+                                      ) : (
+                                        <span
+                                          key={review.authors[0].id}
+                                          className="review-reader__header-author"
+                                        >
+                                          {review.authors[0].defaultPersona
+                                            ? review.authors[0].defaultPersona
+                                                .name
+                                            : review.authors[0].name}
+                                        </span>
+                                      )}
+                                      {review.authors.length > 2 ? '...' : null}
+                                    </>
                                   ) : (
-                                    <span
-                                      key={review.authors[0].id}
-                                      className="review-reader__header-author"
-                                    >
-                                      {review.authors[0].defaultPersona
-                                        ? review.authors[0].defaultPersona.name
-                                        : review.authors[0].name}
-                                    </span>
+                                    <span>Anonymous</span>
                                   )}
-                                  {review.authors.length > 2 ? '...' : null}
                                 </Typography>
                                 <Typography
                                   className={`${classes.h4} ${classes.date}`}

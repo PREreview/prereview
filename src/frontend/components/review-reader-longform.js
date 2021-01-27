@@ -88,7 +88,7 @@ const LongformReviewReader = props => {
       overflowY: 'scroll',
       position: 'fixed !important',
       right: 0,
-      top: height ? `${height + 40}px !important` : 0,
+      top: height ? `${height + 20}px !important` : 0,
       transform: 'none !important',
       width: '40vw',
       zIndex: 10000,
@@ -188,19 +188,25 @@ const LongformReviewReader = props => {
                     sm={9}
                   >
                     <Grid container item xs={12} sm={4}>
-                      {review.authors.map(author => (
-                        <div key={author.id} className={classes.badge}>
-                          <RoleBadge user={author} />
-                        </div>
-                      ))}
+                      {review.authors.length
+                        ? review.authors.map(author => (
+                            <div key={author.id} className={classes.badge}>
+                              <RoleBadge user={author} />
+                            </div>
+                          ))
+                        : null}
                     </Grid>
                     <Grid item xs={12} sm={8} className={classes.authors}>
                       Review by{' '}
-                      {review.authors.map(author => (
-                        <span key={author.id} className={classes.author}>
-                          {author.name}
-                        </span>
-                      ))}
+                      {review.authors.length ? (
+                        review.authors.map(author => (
+                          <span key={author.id} className={classes.author}>
+                            {author.name}
+                          </span>
+                        ))
+                      ) : (
+                        <span className={classes.author}>Anonymous</span>
+                      )}
                     </Grid>
                   </Grid>
                 ) : (
