@@ -261,7 +261,6 @@ export default function ReviewStepper({
 
   const handleSaveLong = event => {
     event.preventDefault();
-    console.log(content);
     if (canSubmitLong(content)) {
       postLongReview({
         preprint: preprint.id,
