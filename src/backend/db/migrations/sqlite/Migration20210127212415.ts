@@ -1,6 +1,6 @@
 import { Migration } from '@mikro-orm/migrations';
 
-export class Migration20210122200947 extends Migration {
+export class Migration20210127212415 extends Migration {
 
   async up(): Promise<void> {
     this.addSql('create table `tag` (`id` integer not null primary key autoincrement, `created_at` datetime not null, `updated_at` datetime not null, `name` varchar not null, `color` varchar not null);');
@@ -44,6 +44,8 @@ export class Migration20210122200947 extends Migration {
 
     this.addSql('create table `community` (`id` integer not null primary key autoincrement, `created_at` datetime not null, `updated_at` datetime not null, `name` varchar not null, `description` text null, `logo` blob null);');
     this.addSql('create unique index `community_name_unique` on `community` (`name`);');
+
+    this.addSql('create table `template` (`id` integer not null primary key autoincrement, `created_at` datetime not null, `updated_at` datetime not null, `contents` text not null);');
 
     this.addSql('create table `community_members` (`community_id` integer not null, `user_id` integer not null, primary key (`community_id`, `user_id`));');
     this.addSql('create index `community_members_community_id_index` on `community_members` (`community_id`);');
@@ -90,6 +92,9 @@ export class Migration20210122200947 extends Migration {
 
     this.addSql('alter table `contact` add column `identity_id` integer null;');
     this.addSql('create index `contact_identity_id_index` on `contact` (`identity_id`);');
+
+    this.addSql('alter table `template` add column `community_id` integer null;');
+    this.addSql('create index `template_community_id_index` on `template` (`community_id`);');
 
     this.addSql('alter table `comment` add column `author_id` integer null;');
     this.addSql('alter table `comment` add column `parent_id` integer null;');

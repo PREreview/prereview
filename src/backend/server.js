@@ -41,6 +41,7 @@ import {
   rapidReviewModelWrapper,
   requestModelWrapper,
   tagModelWrapper,
+  templateModelWrapper,
   userModelWrapper,
 } from './models/index.ts';
 
@@ -58,6 +59,7 @@ import PreprintController from './controllers/preprint.js';
 import RapidController from './controllers/rapidReview.js';
 import RequestController from './controllers/request.js';
 import TagController from './controllers/tag.js';
+import TemplateController from './controllers/template.js';
 import DocsController from './controllers/docs.js';
 import SearchesController from './controllers/searches.js';
 
@@ -131,6 +133,8 @@ export default async function configServer(config) {
   );
   const tagModel = tagModelWrapper(db);
   const tags = TagController(tagModel, authz);
+  const templateModel = templateModelWrapper(db);
+  const templates = TemplateController(templateModel, communityModel, authz);
   const users = UserController(userModel, authz);
   const searches = SearchesController(preprintModel, draftModel, authz);
 
@@ -152,6 +156,7 @@ export default async function configServer(config) {
     requests.middleware(),
     searches.middleware(),
     tags.middleware(),
+    templates.middleware(),
     users.middleware(),
   ]);
 
