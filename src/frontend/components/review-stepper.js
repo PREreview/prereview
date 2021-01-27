@@ -29,6 +29,7 @@ import {
 } from '../hooks/api-hooks.tsx';
 
 // components
+import AddAuthors from './add-authors';
 import RapidFormFragment from './rapid-form-fragment';
 import LongFormFragment from './long-form-fragment';
 
@@ -462,7 +463,8 @@ export default function ReviewStepper({
                 Instructions
               </Typography>
               <Typography variant="body2" gutterBottom>
-                Use the space below to compose your long-form review.
+                Use the space below to compose your long-form review. For
+                guidance, you can load one of our templates.
               </Typography>
               <Typography variant="body2" gutterBottom>
                 Please remember to be constructive and to abide by the{' '}
@@ -470,6 +472,8 @@ export default function ReviewStepper({
               </Typography>
             </Box>
             <Box mt={2} mb={2}>
+              <AddAuthors />
+              <AddAuthors isMentor={true} />
               <form>
                 <Box m={2}>
                   <LongFormFragment
