@@ -9,8 +9,8 @@ import { Helmet } from 'react-helmet-async';
 import { makeStyles } from '@material-ui/core/styles';
 import Box from '@material-ui/core/Box';
 
-// utils
-import { usePostRequests } from '../hooks/api-hooks.tsx';
+// hooks
+import { useGetFullReview, usePostRequests } from '../hooks/api-hooks.tsx';
 
 // components
 import Button from './button';
@@ -36,9 +36,35 @@ export default function ShellContent({
   user,
   defaultTab = 'read',
   onRequireScreen,
+  cid,
 }) {
   const location = useLocation();
   const [height, setHeight] = useState(0);
+
+  // if cid, fetch review from api
+  const [review, setReview] = useState(null);
+
+  const { data: reviewData, loadingReview, errorReview } = useGetFullReview({
+    id: cid,
+  });
+
+  useEffect(() => {
+    if (!loadingReview) {
+      if (reviewData) {
+        const thisReview = reviewData.body[0];
+        if (thisReview.isPublished) {
+          return;
+        }
+        if (thisReview.authors.length) {
+          thisReview.authors.map(author => {
+            let authorID;
+            author.id ? (authorID = author.id) : (authorID = author);
+            user.defaultPersona.id === authorID ? setReview(thisReview) : false;
+          });
+        }
+      }
+    }
+  }, [reviewData, review]);
 
   const {
     mutate: postReviewRequest,
@@ -119,7 +145,7 @@ export default function ShellContent({
           : [];
 
         const latestDraft = ownDrafts.length
-          ? ownDrafts.sort((a, b) => b.id - a.id)[0]
+          ? ownDrafts.sort((a, b) => a[0].id - b[0].id)[ownDrafts.length - 1]
           : [];
 
         // get the latest draft content & seed to the text editor
@@ -282,6 +308,8 @@ export default function ShellContent({
           />
         ) : tab === 'reviews' ? (
           <ShellContentReviews
+            cid={cid}
+            review={review}
             user={user}
             preprint={preprint}
             onClose={onCloseReviews}
@@ -301,6 +329,7 @@ ShellContent.propTypes = {
   preprint: PropTypes.object.isRequired,
   user: PropTypes.object,
   defaultTab: PropTypes.oneOf(['read', 'review', 'request']),
+  cid: PropTypes.number,
 };
 
 function ShellContentRead({
@@ -365,8 +394,29 @@ function ShellContentReviews({
   hasRapidReviewed,
   hasLongReviewed,
   initialContent,
+  cid,
+  review
 }) {
-  return (
+  // console.log('cid: ', cid);
+  // console.log('review: ', review);
+  // console.log('initialContent: ', initialContent);
+  return cid ? (
+    review ? (
+      <div className="shell-content-review">
+        <ReviewStepper
+          preprint={preprint}
+          disabled={disabled}
+          onClose={onClose}
+          onContentChange={onContentChange}
+          hasRapidReviewed={hasRapidReviewed}
+          hasLongReviewed={hasLongReviewed}
+          content={initialContent}
+        />
+      </div>
+    ) : (
+      <div>Sorry, you are not authorized to contribute to this review.</div>
+    )
+  ) : (
     <div className="shell-content-review">
       <ReviewStepper
         preprint={preprint}
@@ -388,6 +438,8 @@ ShellContentReviews.propTypes = {
   hasLongReviewed: PropTypes.bool.isRequired,
   hasRapidReviewed: PropTypes.bool.isRequired,
   initialContent: PropTypes.string,
+  cid: PropTypes.number,
+  review: PropTypes.object,
 };
 
 function ShellContentRequest({

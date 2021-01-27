@@ -19,7 +19,6 @@ const provider = new WebrtcProvider('prereview-collab', ydoc);
 const CollabEditor = ({ initialContent, handleContentChange }) => {
   /* collaboration needs */
   // provider.connect();
-  const type = ydoc.getText('quill');
 
   // quill options
   const placeholder = 'Start typing...';
@@ -75,8 +74,15 @@ const CollabEditor = ({ initialContent, handleContentChange }) => {
   useEffect(() => {
     if (quill) {
       // quill.clipboard.dangerouslyPasteHTML(initialContent);
-      const delta = quill.clipboard.convert(initialContent);
-      quill.setContents(delta);
+      // const delta = quill.clipboard.convert(initialContent);
+      // quill.setContents(delta);
+
+      // quill.container.firstChild.innerHTML = initialContent;
+
+      const type = ydoc.getText(initialContent);
+      type.insert(0, initialContent);
+
+      console.log(type);
 
       const binding = new QuillBinding(type, quill, provider.awareness);
       quill.on('text-change', () => {

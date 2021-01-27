@@ -179,7 +179,9 @@ export default function controller(personasModel, badgesModel, thisUser) {
       }
 
       try {
-        log.debug(`Persona ${persona.id} found. Adding badge ${badge.id} to persona.`);
+        log.debug(
+          `Persona ${persona.id} found. Adding badge ${badge.id} to persona.`,
+        );
         badge.personas.add(persona);
         await badgesModel.persistAndFlush(badge);
       } catch (err) {
@@ -205,7 +207,9 @@ export default function controller(personasModel, badgesModel, thisUser) {
     path: '/personas/:id/badges/:bid',
     pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next),
     handler: async ctx => {
-      log.debug(`Removing badge ${ctx.params.uid} from persona ${ctx.params.id}.`);
+      log.debug(
+        `Removing badge ${ctx.params.uid} from persona ${ctx.params.id}.`,
+      );
       let persona, badge;
 
       try {
@@ -220,7 +224,9 @@ export default function controller(personasModel, badgesModel, thisUser) {
 
       try {
         log.debug(
-          `Persona ${persona.id} found. Removing badge ${badge.id} from persona.`,
+          `Persona ${persona.id} found. Removing badge ${
+            badge.id
+          } from persona.`,
         );
         badge.personas.remove(persona);
         await badgesModel.persistAndFlush(badge);

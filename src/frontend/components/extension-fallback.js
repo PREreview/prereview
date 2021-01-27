@@ -41,7 +41,7 @@ export default function ExtensionFallback() {
   const [preprint, setPreprint] = useState(null);
   const [authors, setAuthors] = useState(null);
 
-  const { id } = useParams();
+  const { id, cid } = useParams();
 
   const { data: preprintData, loadingPreprint, errorPreprint } = useGetPreprint({id: id});
 
@@ -139,6 +139,7 @@ export default function ExtensionFallback() {
           {onRequireScreen =>
             !!preprint && (
               <ShellContent
+                cid={cid}
                 onRequireScreen={onRequireScreen}
                 preprint={preprint}
                 user={user}
