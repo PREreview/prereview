@@ -1,13 +1,33 @@
+// base imports
 import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { useQuill } from 'react-quilljs';
 
+// yjs imports
+import * as Y from 'yjs';
+import { WebrtcProvider } from 'y-webrtc';
+
+// react quill js imports
+import { QuillBinding } from 'y-quill';
+import QuillCursors from 'quill-cursors';
+import { useQuill } from 'react-quilljs';
 import 'quill/dist/quill.snow.css'; // Add css for snow theme
 // or import 'quill/dist/quill.bubble.css'; // Add css for bubble theme
 
+const ydoc = new Y.Doc();
+const provider = new WebrtcProvider('prereview-collab', ydoc);
+
 const CollabEditor = ({ initialContent, handleContentChange }) => {
+  /* collaboration needs */
+  // provider.connect();
+  const type = ydoc.getText('quill');
+
+  // quill options
   const placeholder = 'Start typing...';
   const modules = {
+    cursors: true,
+    history: {
+      userOnly: true,
+    },
     toolbar: [
       ['bold', 'italic', 'underline', 'strike'],
       [{ align: [] }],
@@ -39,15 +59,28 @@ const CollabEditor = ({ initialContent, handleContentChange }) => {
     'clean',
   ];
 
-  const { quill, quillRef } = useQuill({
+  const { quill, quillRef, Quill } = useQuill({
     placeholder,
     modules,
     formats,
   });
 
+  // To execute this line only once
+  if (Quill && !quill) {
+    Quill.register('modules/cursors', QuillCursors);
+  }
+
+  if (quill) {
+    // provider.connect();
+  }
+
   useEffect(() => {
     if (quill) {
-      quill.clipboard.dangerouslyPasteHTML(initialContent);
+      // quill.clipboard.dangerouslyPasteHTML(initialContent);
+      const delta = quill.clipboard.convert(initialContent);
+      quill.setContents(delta);
+
+      const binding = new QuillBinding(type, quill, provider.awareness);
       quill.on('text-change', () => {
         handleContentChange(quillRef.current.innerHTML);
       });

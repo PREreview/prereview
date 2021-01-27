@@ -261,6 +261,7 @@ export default function ReviewStepper({
 
   const handleSaveLong = event => {
     event.preventDefault();
+    console.log(content);
     if (canSubmitLong(content)) {
       postLongReview({
         preprint: preprint.id,
@@ -479,7 +480,7 @@ export default function ReviewStepper({
                 </Box>
                 <Box mt={2}>
                   <InputLabel
-                    for="competing-interest"
+                    htmlFor="competing-interest"
                     className={classes.inputLabel}
                   >
                     Please use the space below to declare any existing{' '}
