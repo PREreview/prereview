@@ -66,11 +66,6 @@ export default function controller(users, contacts, thisUser) {
     method: 'get',
     path: '/users/:id',
     validate: {
-      //params: {
-      //  id: Joi.alternatives()
-      //    .try(Joi.number().integer(), Joi.string())
-      //    .description('User id')
-      //    .required(),
       params: {
         id: Joi.string()
           .description('User id')
@@ -91,7 +86,7 @@ export default function controller(users, contacts, thisUser) {
           'personas.requests',
           'groups',
           'contacts',
-          'defaultPersona',
+          'defaultPersona.badges',
         ]);
       } catch (err) {
         log.debug(err);
@@ -133,25 +128,11 @@ export default function controller(users, contacts, thisUser) {
     method: 'put',
     path: '/users/:id',
     validate: {
-      // body: Joi.object({
-      //   name: Joi.string(),
-      //   email: Joi.string(),
-      // }),
-      // type: 'json',
       params: {
-        //id: Joi.alternatives()
-        //  .try(Joi.number().integer(), Joi.string())
-        //  .description('User id')
-        //  .required(),
         id: Joi.string()
           .description('User id')
           .required(),
       },
-      // params: {
-      //   id: Joi.string()
-      //     .description('User id')
-      //     .required(),
-      // },
       continueOnError: false,
       false: 400,
     },
@@ -307,12 +288,6 @@ export default function controller(users, contacts, thisUser) {
     method: 'DELETE',
     path: '/users/:id',
     validate: {
-      //params: {
-      //  id: Joi.alternatives()
-      //    .try(Joi.number().integer(), Joi.string())
-      //    .description('User id')
-      //    .required(),
-      //},
       params: {
         id: Joi.string()
           .description('User id')

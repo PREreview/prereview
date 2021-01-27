@@ -12,7 +12,7 @@ const handleInvalid = ctx => {
   ctx.message = getErrorMessages(ctx.invalid);
 };
 
-export default function controller(personasModel, thisUser) {
+export default function controller(personasModel, badgesModel, thisUser) {
   const personaRouter = router();
 
   // no POST because personas are only created by the auth controller when
@@ -32,6 +32,7 @@ export default function controller(personasModel, thisUser) {
           'fullReviews',
           'rapidReviews',
           'requests',
+          'badges',
         ]);
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
@@ -67,7 +68,7 @@ export default function controller(personasModel, thisUser) {
           'requests',
           'fullReviews',
           'rapidReviews',
-          'identity',
+          'badges',
         ]);
         if (!persona) {
           ctx.throw(404, `Persona with ID ${ctx.params.id} doesn't exist`);
@@ -97,22 +98,19 @@ export default function controller(personasModel, thisUser) {
     method: 'PUT',
     path: '/personas/:id',
     validate: {
-      // body: Joi.object({
-      //   name: Joi.string(),
-      // }),
-      // type: 'json',
+      body: Joi.object({
+        name: Joi.string(),
+      }),
+      type: 'json',
       params: {
-        //id: Joi.alternatives()
-        //  .try(Joi.number().integer(), Joi.string())
-        //  .description('Persona id or name')
-        //  .required(),
-        id: Joi.string()
-          .description('Persona id or name')
+        id: Joi.number()
+          .integer()
           .required(),
       },
       continueOnError: true,
+      false: 400,
     },
-    pre: (ctx, next) => thisUser.can('access private pages')(ctx, next), // TODO: can edit self only no?
+    // pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next), // TODO: can edit self only no?
     handler: async ctx => {
       if (ctx.invalid) {
         handleInvalid(ctx);
@@ -123,7 +121,7 @@ export default function controller(personasModel, thisUser) {
       let persona;
 
       try {
-        persona = await personasModel.findOneByIdOrName(ctx.params.id);
+        persona = await personasModel.findOne(ctx.params.id);
         if (!persona) {
           ctx.throw(
             404,
@@ -138,16 +136,113 @@ export default function controller(personasModel, thisUser) {
       }
 
       // if updated
-      ctx.status = 200;
-      ctx.body = {
-        status: 200,
-        data: persona,
-      };
+      ctx.status = 204;
     },
     meta: {
       swagger: {
         operationId: 'PutPersona',
         summary: 'Endpoint to PUT one persona by ID. Admin users only.',
+        required: true,
+      },
+    },
+  });
+
+  personaRouter.route({
+    method: 'put',
+    path: '/personas/:id/badges/:bid',
+    validate: {
+      type: 'json',
+      params: {
+        id: Joi.number()
+          .integer()
+          .description('Persona id')
+          .required(),
+        bid: Joi.alternatives()
+          .try(Joi.number().integer(), Joi.string())
+          .description('Badge id')
+          .required(),
+      },
+    },
+    // pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next),
+    handler: async ctx => {
+      log.debug(`Adding badge ${ctx.params.bid} to persona ${ctx.params.id}.`);
+      let persona, badge;
+
+      try {
+        badge = await badgesModel.findOneByIdOrName(ctx.params.bid, [
+          'personas',
+        ]);
+        persona = await personasModel.findOne(ctx.params.id);
+      } catch (err) {
+        log.error('HTTP 400 Error: ', err);
+        ctx.throw(400, `Failed to parse query: ${err}`);
+      }
+
+      try {
+        log.debug(
+          `Persona ${persona.id} found. Adding badge ${badge.id} to persona.`,
+        );
+        badge.personas.add(persona);
+        await badgesModel.persistAndFlush(badge);
+      } catch (err) {
+        log.error('HTTP 400 Error: ', err);
+        ctx.throw(400, `Failed to add user to badge: ${err}`);
+      }
+
+      ctx.body = { status: 200, message: 'ok', data: persona };
+      ctx.status = 200;
+    },
+    meta: {
+      swagger: {
+        operationId: 'PutPersonaBadge',
+        summary:
+          'Endpoint to PUT one badge to a persona by ID from PREreview. Admin users only.',
+        required: true,
+      },
+    },
+  });
+
+  personaRouter.route({
+    method: 'DELETE',
+    path: '/personas/:id/badges/:bid',
+    pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next),
+    handler: async ctx => {
+      log.debug(
+        `Removing badge ${ctx.params.uid} from persona ${ctx.params.id}.`,
+      );
+      let persona, badge;
+
+      try {
+        badge = await badgesModel.findOneByIdOrName(ctx.params.bid, [
+          'personas',
+        ]);
+        persona = await personasModel.findOne(ctx.params.id);
+      } catch (err) {
+        log.error('HTTP 400 Error: ', err);
+        ctx.throw(400, `Failed to parse query: ${err}`);
+      }
+
+      try {
+        log.debug(
+          `Persona ${persona.id} found. Removing badge ${
+            badge.id
+          } from persona.`,
+        );
+        badge.personas.remove(persona);
+        await badgesModel.persistAndFlush(badge);
+      } catch (err) {
+        log.error('HTTP 400 Error: ', err);
+        ctx.throw(400, `Failed to remove user from group: ${err}`);
+      }
+
+      // if deleted
+      ctx.status = 204;
+    },
+    meta: {
+      swagger: {
+        operationId: 'DeleteGroupMember',
+        summary:
+          'Endpoint to DELETE one user from a group by ID from PREreview. Admin users only.',
         required: true,
       },
     },

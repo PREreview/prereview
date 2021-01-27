@@ -31,7 +31,6 @@ export default function Profile() {
   const [thisUser] = useContext(UserProvider.context);
   const [loading, setLoading] = useState(true);
   const [persona, setPersona] = useState(null);
-  // const [imageUrl, setImageUrl] = useState('') FIXME
 
   const { data: personaData, loading: loadingPersona, error } = useGetPersona({
     id: location.pathname.slice(7),
@@ -106,7 +105,19 @@ export default function Profile() {
                     {persona.name}
                   </XLink>
                 </dd>
-                {persona && (
+                {persona && persona.badges.length > 0 && (
+                  <Fragment>
+                    <dt>
+                      <LabelStyle>Tags</LabelStyle>
+                    </dt>
+                    <dd>
+                      {persona.badges.map(badge => (
+                        <Chip label={badge.name} color='primary' size='small' />
+                      ))}
+                    </dd>
+                  </Fragment>
+                )}
+                {user && (
                   <Fragment>
                     <dt>
                       <LabelStyle>Identity</LabelStyle>
