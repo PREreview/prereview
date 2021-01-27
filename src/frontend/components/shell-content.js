@@ -167,7 +167,15 @@ export default function ShellContent({
         });
       }
     }
-  }, [preprint, user, rapidContent, longContent, hasRequested]);
+  }, [
+    preprint,
+    user,
+    rapidContent,
+    longContent,
+    hasRequested,
+    hasRapidReviewed,
+    hasLongReviewed,
+  ]);
 
   return (
     <div className="shell-content">
@@ -261,6 +269,7 @@ export default function ShellContent({
             rapidContent={rapidContent}
             longContent={longContent}
             newRequest={newRequest}
+            height={height}
           />
         ) : tab === 'request' ? (
           <ShellContentRequest
@@ -309,6 +318,7 @@ function ShellContentRead({
   rapidContent,
   longContent,
   newRequest,
+  height,
 }) {
   // Note: !! this needs to work both in the webApp where it is URL driven and in
   // the extension where it is shell driven
@@ -325,6 +335,7 @@ function ShellContentRead({
         rapidContent={rapidContent}
         longContent={longContent}
         newRequest={newRequest}
+        height={height}
       />
       {!!moderatedReviewId && (
         <ModerationModal
@@ -351,6 +362,7 @@ ShellContentRead.propTypes = {
   rapidContent: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]),
   longContent: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]),
   newRequest: PropTypes.bool,
+  height: PropTypes.number,
 };
 
 function ShellContentReviews({

@@ -109,13 +109,13 @@ export default async function configServer(config) {
   const badgeModel = badgeModelWrapper(db);
   const badges = BadgeController(badgeModel, authz);
   const commentModel = commentModelWrapper(db);
-  const comments = CommentController(commentModel, authz);
   const communityModel = communityModelWrapper(db);
   const communities = CommunityController(communityModel, authz);
   const contactModel = contactModelWrapper(db);
   const fullReviewModel = fullReviewModelWrapper(db);
   const draftModel = fullReviewDraftModelWrapper(db);
   const fullReviewDrafts = DraftController(draftModel, authz);
+  const comments = CommentController(commentModel, fullReviewModel, authz);
   const groups = GroupController(groupModel, userModel, authz);
   const personas = PersonaController(personaModel, badgeModel, authz);
   const preprintModel = preprintModelWrapper(db);
