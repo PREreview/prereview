@@ -3,6 +3,7 @@ import {
   Entity,
   EntityRepositoryType,
   ManyToMany,
+  OneToMany,
   Property,
   Unique,
 } from '@mikro-orm/core';
@@ -10,6 +11,7 @@ import { Fixture } from 'class-fixtures-factory';
 import { CommunityModel } from '../communities';
 import { BaseEntity } from './BaseEntity';
 import { Preprint } from './Preprint';
+import { Template } from './Template';
 import { User } from './User';
 
 @Entity()
@@ -37,6 +39,9 @@ export class Community extends BaseEntity {
 
   @ManyToMany({ entity: () => Preprint, inversedBy: 'communities' })
   preprints: Collection<Preprint> = new Collection<Preprint>(this);
+
+  @OneToMany({ entity: () => Template, mappedBy: 'community' })
+  templates: Collection<Template> = new Collection<Template>(this);
 
   constructor(name: string, description?: string, logo?: Buffer) {
     super();

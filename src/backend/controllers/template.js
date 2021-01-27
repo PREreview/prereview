@@ -49,6 +49,7 @@ export default function controller(templateModel, communityModel, thisUser) {
       ctx.throw(400, `Failed to retrieve templates`);
     }
 
+    console.log('HANDLER: ', templates);
     ctx.response.body = {
       status: 200,
       message: 'ok',
@@ -120,13 +121,14 @@ export default function controller(templateModel, communityModel, thisUser) {
     pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
     validate: {
       query: querySchema,
+      continueOnError: true,
     },
     handler: async ctx => {
       if (ctx.invalid) {
         handleInvalid(ctx);
         return;
       }
-      getHandler(ctx);
+      await getHandler(ctx);
     },
     meta: {
       swagger: {
@@ -143,7 +145,7 @@ export default function controller(templateModel, communityModel, thisUser) {
     validate: {
       query: querySchema,
     },
-    handler: async ctx => getHandler(ctx),
+    handler: async ctx => await getHandler(ctx),
     meta: {
       swagger: {
         operationId: 'GetCommunityTemplates',
