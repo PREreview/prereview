@@ -17,9 +17,7 @@ const querySchema = Joi.object({
   sort_by: Joi.string(),
   from: Joi.string(),
   to: Joi.string(),
-  group: Joi.number()
-    .integer()
-    .positive(),
+  group: Joi.string(),
 });
 
 // eslint-disable-next-line no-unused-vars
@@ -79,7 +77,7 @@ export default function controller(users, contacts, thisUser) {
 
       let user;
       try {
-        user = await users.findOneByIdOrOrcid(ctx.params.id, [
+        user = await users.findOneByUuidOrOrcid(ctx.params.id, [
           'personas',
           'personas.fullReviews',
           'personas.rapidReviews',
@@ -106,11 +104,23 @@ export default function controller(users, contacts, thisUser) {
           isModerator = true;
         }
 
+        let avatar;
+        if (
+          user.defaultPersona.avatar &&
+          Buffer.isBuffer(user.defaultPersona.avatar)
+        ) {
+          avatar = user.defaultPersona.avatar.toString();
+        }
         ctx.status = 200;
         ctx.body = {
           status: '200',
           message: 'ok',
-          data: { ...user, isAdmin: isAdmin, isModerator: isModerator },
+          data: {
+            ...user,
+            isAdmin: isAdmin,
+            isModerator: isModerator,
+            defaultPersona: { ...user.defaultPersona, avatar: avatar },
+          },
         };
       } else {
         ctx.throw(404, `That user with ID ${ctx.params.id} does not exist.`);
@@ -142,7 +152,7 @@ export default function controller(users, contacts, thisUser) {
 
       let user;
       try {
-        user = await users.findOneByIdOrOrcid(ctx.params.id, [
+        user = await users.findOneByUuidOrOrcid(ctx.params.id, [
           'personas',
           'groups',
           'contacts',
@@ -185,7 +195,7 @@ export default function controller(users, contacts, thisUser) {
       try {
         log.debug(`Create a new contact entry.`);
         let { schema, value } = ctx.request.body;
-        conflict = contacts.findOne({ schema, value, id: userId });
+        conflict = await contacts.findOne({ schema, value, uuid: userId });
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse contact schema: ${err}`);
@@ -241,12 +251,11 @@ export default function controller(users, contacts, thisUser) {
       log.debug(`Updating contact for user ${userId}`);
 
       try {
-        const { sendNotifications } = ctx.request.body;
-        const exists = await contacts.findOne(contactId);
+        const exists = await contacts.findOne({ uuid: contactId });
         if (exists) {
           log.debug('Contact already exists, updating.');
-          exists.sendNotifications = sendNotifications;
-          await contacts.flush();
+          contacts.assign(exists, ctx.request.body);
+          await contacts.persistAndFlush(exists);
           ctx.status = 200;
           ctx.body = {
             status: 200,
@@ -301,7 +310,7 @@ export default function controller(users, contacts, thisUser) {
       let toDelete;
 
       try {
-        toDelete = await users.findOne(ctx.params.id);
+        toDelete = await users.findOne({ uuid: ctx.params.id });
         if (!toDelete) {
           ctx.throw(404, `User with ID ${ctx.params.id} doesn't exist`);
         }

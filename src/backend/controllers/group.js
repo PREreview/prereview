@@ -211,7 +211,7 @@ export default function controller(groupModel, userModel, thisUser) {
       let group;
 
       try {
-        group = await groupModel.findOne(ctx.params.id);
+        group = await groupModel.findOne({ uuid: ctx.params.id });
         if (!group) {
           ctx.throw(404, `Group with ID ${ctx.params.id} doesn't exist`);
         }
@@ -235,16 +235,17 @@ export default function controller(groupModel, userModel, thisUser) {
 
   groupsRouter.route({
     method: 'delete',
-    path: '/groups/:id/members/:uid',
+    path: '/groups/:id/members',
     validate: {
+      body: Joi.object({
+        uid: Joi.string(),
+      }),
       params: {
         id: Joi.string()
           .description('Group id')
           .required(),
-        uid: Joi.string()
-          .description('User id')
-          .required(),
       },
+      type: 'json',
       continueOnError: true,
     },
     pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next),
@@ -253,8 +254,11 @@ export default function controller(groupModel, userModel, thisUser) {
       let group, user;
 
       try {
-        group = await groupModel.findOne({ name: ctx.params.id }, ['members']);
-        user = await userModel.findOne({ orcid: ctx.params.uid });
+        group = await groupModel.findOne({ uuid: ctx.params.id }, ['members']);
+        user = await userModel.findOne({ orcid: ctx.request.body.uid });
+        console.log('group:', group);
+        console.log('user:', user);
+        console.log('body:', ctx.request.body);
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse query: ${err}`);
@@ -314,7 +318,7 @@ export default function controller(groupModel, userModel, thisUser) {
           'members.defaultPersona',
           'members.personas',
         ]);
-        user = await userModel.findOneByIdOrOrcid(ctx.params.uid, [
+        user = await userModel.findOneByUuidOrOrcid(ctx.params.uid, [
           'defaultPersona',
           'personas',
         ]);

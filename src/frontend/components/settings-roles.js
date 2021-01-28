@@ -121,10 +121,10 @@ export default function SettingsRoles({ user }) {
           <TableBody>
             {user.personas.map(persona => {
               return (
-                <TableRow key={persona.id}>
+                <TableRow key={persona.uuid}>
                   <TableCell>
                     <div className="settings__persona-list-item__active-state">
-                      {activePersona.id === persona.id ? (
+                      {activePersona.uuid === persona.uuid ? (
                         <span className="settings__persona-list-item__is-active">
                           <MdStar className="settings__persona-active-icon" />
                           <span className="settings__persona-active-label">
@@ -149,11 +149,11 @@ export default function SettingsRoles({ user }) {
                       />
 
                       <XLink
-                        href={`/about/${persona.id}`}
-                        to={`/about/${persona.id}`}
+                        href={`/about/${persona.uuid}`}
+                        to={`/about/${persona.uuid}`}
                         className="settings__persona-link"
                       >
-                        {persona.name || unprefix(persona.id)}
+                        {persona.name || unprefix(persona.uuid)}
                       </XLink>
                     </div>
                   </TableCell>
@@ -212,7 +212,7 @@ export default function SettingsRoles({ user }) {
           }}
         >
           <RoleEditor
-            user={personaToEdit}
+            persona={personaToEdit}
             onCancel={() => {
               setPersonaToEdit(null);
             }}
@@ -233,7 +233,7 @@ SettingsRoles.propTypes = {
 function MakeActivePersonaModalButton({ user, persona, handleClose }) {
   const [isOpen, setIsOpen] = useState(false);
   const { mutate: updateUser, loading } = usePutUser({
-    id: user.id,
+    id: user.uuid,
   });
 
   return (

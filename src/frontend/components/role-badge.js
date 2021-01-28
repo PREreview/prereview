@@ -79,6 +79,7 @@ const RoleBadgeUI = React.forwardRef(function RoleBadgeUI(
 
   const open = Boolean(anchorEl);
   const id = open ? 'user-menu' : undefined;
+  console.log('user:', user);
 
   return (
     <>
@@ -138,13 +139,13 @@ const RoleBadgeUI = React.forwardRef(function RoleBadgeUI(
         <div className={classes.popoverInner}>
           <XLink
             className="menu__list__link-item"
-            href={`/about/${user.id}`}
+            href={`/about/${user.uuid}`}
             target={process.env.IS_EXTENSION ? '_blank' : undefined}
             to={
               process.env.IS_EXTENSION
                 ? undefined
                 : `/about/${
-                    user.defaultPersona ? user.defaultPersona.id : user.id
+                    user.defaultPersona ? user.defaultPersona.uuid : user.uuid
                   }`
             }
           >

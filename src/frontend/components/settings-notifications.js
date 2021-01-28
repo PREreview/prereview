@@ -20,7 +20,7 @@ export default function SettingsNotifications({ user, error }) {
 
   const params = new URLSearchParams(location.search);
 
-  const { mutate: postContact } = usePostUserContacts({ id: user.id });
+  const { mutate: postContact } = usePostUserContacts({ id: user.uuid });
 
   const [modalType, setModalType] = useState(
     params.get('verified') === 'true' ? 'checked' : null,
@@ -51,7 +51,7 @@ export default function SettingsNotifications({ user, error }) {
 
       { userContacts.length ?
         userContacts.map(contact =>
-            <EmailToggle userId={user.id} contact={contact} />
+          <EmailToggle userId={user.uuid} contact={contact} />
         )
         : null}
 
@@ -114,22 +114,24 @@ export default function SettingsNotifications({ user, error }) {
         </Button>
       </Controls>
 
-      {!!modalType && (
-        <Modal title="Info" showCloseButton={true} onClose={handleClose}>
-          <p>
-            {modalType === 'checked'
-              ? 'The email address was successfully verified.'
-              : modalType === 'verifying'
-                ? 'An email with a verification link has been sent and we are waiting for you to click on it.'
-                : 'An email must be set to be able to receive notifications'}
-          </p>
+      {
+        !!modalType && (
+          <Modal title="Info" showCloseButton={true} onClose={handleClose}>
+            <p>
+              {modalType === 'checked'
+                ? 'The email address was successfully verified.'
+                : modalType === 'verifying'
+                  ? 'An email with a verification link has been sent and we are waiting for you to click on it.'
+                  : 'An email must be set to be able to receive notifications'}
+            </p>
 
-          <Controls>
-            <Button onClick={handleClose}>Close</Button>
-          </Controls>
-        </Modal>
-      )}
-    </section>
+            <Controls>
+              <Button onClick={handleClose}>Close</Button>
+            </Controls>
+          </Modal>
+        )
+      }
+    </section >
   );
 }
 
@@ -138,7 +140,7 @@ SettingsNotifications.propTypes = {
 };
 
 function EmailToggle({ userId, contact }) {
-  const { mutate: updateUser, loading, error } = usePutUserContacts({ id: userId, cid: contact.id });
+  const { mutate: updateUser, loading, error } = usePutUserContacts({ id: userId, cid: contact.uuid });
 
   return (
     <div className="settings-notifications__toggle">

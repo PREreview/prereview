@@ -240,7 +240,7 @@ export default function ReviewStepper({
   const handleSubmitRapid = () => {
     if (!hasRapidReviewed) {
       if (canSubmitRapid(answerMap)) {
-        postRapidReview({ ...answerMap, preprint: preprint.id })
+        postRapidReview({ ...answerMap, preprint: preprint.uuid })
           .then(() => {
             onClose(answerMap);
             return;
@@ -263,7 +263,7 @@ export default function ReviewStepper({
     event.preventDefault();
     if (canSubmitLong(content)) {
       postLongReview({
-        preprint: preprint.id,
+        preprint: preprint.uuid,
         contents: content,
       })
         .then(() => alert('Draft updated successfully.'))
@@ -281,7 +281,7 @@ export default function ReviewStepper({
         )
       ) {
         postLongReview({
-          preprint: preprint.id,
+          preprint: preprint.uuid,
           contents: content,
           isPublished: true,
         })

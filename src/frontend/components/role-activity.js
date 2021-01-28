@@ -49,7 +49,7 @@ export default function RoleActivity({ persona }) {
           <ul className="role-activity__list">
             {activity.length &&
               activity.map(activity => (
-                <li key={activity.id} className="role-activity__list-item">
+                <li key={activity.handle} className="role-activity__list-item">
                   <ActivityCard activity={activity} />
                 </li>
               ))}

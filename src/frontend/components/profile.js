@@ -10,6 +10,9 @@ import UserProvider from '../contexts/user-context';
 // hooks
 import { useGetPersona } from '../hooks/api-hooks.tsx';
 
+// Material UI components
+import Chip from '@material-ui/core/Chip';
+
 // components
 import Avatar from './avatar';
 import HeaderBar from './header-bar';
@@ -99,8 +102,8 @@ export default function Profile() {
                 </dt>
                 <dd>
                   <XLink
-                    to={`/about/${persona.id}`}
-                    href={`/about/${persona.id}`}
+                    to={`/about/${persona.uuid}`}
+                    href={`/about/${persona.uuid}`}
                   >
                     {persona.name}
                   </XLink>
@@ -112,12 +115,17 @@ export default function Profile() {
                     </dt>
                     <dd>
                       {persona.badges.map(badge => (
-                        <Chip label={badge.name} color='primary' size='small' />
+                        <Chip
+                          key={badge.uuid}
+                          label={badge.name}
+                          color="primary"
+                          size="small"
+                        />
                       ))}
                     </dd>
                   </Fragment>
                 )}
-                {user && (
+                {persona && (
                   <Fragment>
                     <dt>
                       <LabelStyle>Identity</LabelStyle>

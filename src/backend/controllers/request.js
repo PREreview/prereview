@@ -141,7 +141,10 @@ export default function controller(reqModel, thisUser) {
       let request;
 
       try {
-        request = await reqModel.findOne(ctx.params.id, ['author', 'preprint']);
+        request = await reqModel.findOne({ uuid: ctx.params.id }, [
+          'author',
+          'preprint',
+        ]);
         if (!request) {
           ctx.throw(404, `Request with ID ${ctx.params.id} doesn't exist`);
         }
@@ -176,7 +179,7 @@ export default function controller(reqModel, thisUser) {
       let toDelete;
 
       try {
-        toDelete = await reqModel.findOne(ctx.params.id);
+        toDelete = await reqModel.findOne({ uuid: ctx.params.id });
         if (!toDelete) {
           ctx.throw(404, `Request with ID ${ctx.params.id} doesn't exist`);
         }

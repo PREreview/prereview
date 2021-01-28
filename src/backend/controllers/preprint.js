@@ -16,7 +16,7 @@ const querySchema = Joi.object({
   offset: Joi.number()
     .integer()
     .greater(-1),
-  desc: Joi.boolean(),
+  asc: Joi.boolean(),
   search: Joi.string().allow(''),
   sort: Joi.string().allow(
     'datePosted',
@@ -55,7 +55,7 @@ export default function controller(preprints, thisUser) {
       log.debug(`Resolving preprint with ID: ${identifier}`);
       let preprint, data;
       try {
-        preprint = await preprints.findOneByIdOrHandle(
+        preprint = await preprints.findOneByUuidOrHandle(
           createPreprintId(identifier),
           [
             'fullReviews.authors',
@@ -155,7 +155,9 @@ export default function controller(preprints, thisUser) {
           'tags',
         ];
         let foundPreprints, count;
-        const order = ctx.query.desc ? QueryOrder.DESC : QueryOrder.ASC;
+        const order = ctx.query.asc
+          ? QueryOrder.ASC_NULLS_LAST
+          : QueryOrder.DESC_NULLS_LAST;
         let orderBy;
         switch (ctx.query.sort) {
           case 'recentRequests':
@@ -256,7 +258,7 @@ export default function controller(preprints, thisUser) {
       let preprint;
 
       try {
-        preprint = await preprints.findOneByIdOrHandle(ctx.params.id, [
+        preprint = await preprints.findOneByUuidOrHandle(ctx.params.id, [
           'fullReviews.authors.identity',
           'fullReviews.drafts',
           'fullReviews.comments.author',
@@ -330,7 +332,7 @@ export default function controller(preprints, thisUser) {
       let preprint;
 
       try {
-        preprint = preprints.findOneByIdOrHandle(ctx.params.id);
+        preprint = preprints.findOneByUuidOrHandle(ctx.params.id);
         await preprints.persistAndFlush(ctx.request.body.data[0]);
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
@@ -384,7 +386,7 @@ export default function controller(preprints, thisUser) {
       let preprint;
 
       try {
-        preprint = preprints.findOneByIdOrHandle(ctx.params.id);
+        preprint = preprints.findOneByUuidOrHandle(ctx.params.id);
         await preprints.removeAndFlush(preprint);
       } catch (err) {
         log.error('HTTP 400 Error: ', err);

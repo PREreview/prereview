@@ -249,7 +249,7 @@ function AdminPanelRemoveModal({
   onSuccess,
 }) {
   const { mutate: deleteGroupMember, loading, error } = useDeleteGroupMember({
-    id: group.name,
+    id: group.uuid,
     uid: userToDelete.orcid,
   });
   const [frame] = useState('submit');
@@ -264,7 +264,7 @@ function AdminPanelRemoveModal({
               <em>
                 {personaToDelete.name ||
                   userToDelete.orcid ||
-                  personaToDelete.id}
+                  personaToDelete.uuid}
               </em>
               ?
             </p>
@@ -304,7 +304,7 @@ function AdminPanelRemoveModal({
               <em>
                 {personaToDelete.name ||
                   personaToDelete.orcid ||
-                  personaToDelete.id}
+                  personaToDelete.uuid}
               </em>
               .
             </p>

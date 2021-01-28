@@ -88,7 +88,7 @@ export default function controller(badgeModel, thisUser) {
       let badge;
 
       try {
-        badge = await badgeModel.findOne(ctx.params.id, ['personas']);
+        badge = await badgeModel.findOne({ uuid: ctx.params.id }, ['personas']);
         if (!badge) {
           ctx.throw(404, `badge with ID ${ctx.params.id} doesn't exist`);
         }
@@ -123,7 +123,7 @@ export default function controller(badgeModel, thisUser) {
       let badge;
 
       try {
-        badge = await badgeModel.findOne(ctx.params.id);
+        badge = await badgeModel.findOne({ uuid: ctx.params.id });
         if (!badge) {
           ctx.throw(404, `Badge with ID ${ctx.params.id} doesn't exist`);
         }
@@ -156,7 +156,7 @@ export default function controller(badgeModel, thisUser) {
       let badge;
 
       try {
-        badge = await badgeModel.findOne(ctx.params.id);
+        badge = await badgeModel.findOne({ name: ctx.params.id });
         if (!badge) {
           ctx.throw(404, `Badge with ID ${ctx.params.id} doesn't exist`);
         }

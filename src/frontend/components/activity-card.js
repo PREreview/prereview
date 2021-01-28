@@ -6,7 +6,6 @@ import { createPreprintId } from '../../common/utils/ids.js';
 import Value from './value';
 import LabelStyle from './label-style';
 import XLink from './xlink';
-import ScoreBadge from './score-badge';
 import AnimatedNumber from './animated-number';
 import NotFound from './not-found';
 import { MdChevronRight } from 'react-icons/md';
@@ -20,7 +19,7 @@ export default function ActivityCard({ activity }) {
     loading: loadingPreprint,
     error,
   } = useGetPreprint({
-    id: activity.preprint,
+    id: createPreprintId(activity.preprint.handle),
   });
 
   useEffect(() => {
@@ -81,17 +80,6 @@ export default function ActivityCard({ activity }) {
           </div>
 
           <div className="activity-card__stats">
-            <ScoreBadge
-              now={new Date()}
-              nRequests={preprint.requests.length}
-              nReviews={
-                preprint.fullReviews.length + preprint.rapidReviews.length
-              }
-              dateFirstActivity={activity.createdAt}
-              onMouseEnter={activity.onStartAnim}
-              onMouseLeave={activity.onStopAnim}
-              isAnimating={false} // #FIXME
-            />
             <div className="activity-card__count">
               <div className="activity-card__count-badge">
                 <AnimatedNumber

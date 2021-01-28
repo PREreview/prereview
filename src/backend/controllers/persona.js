@@ -64,15 +64,20 @@ export default function controller(personasModel, badgesModel, thisUser) {
       let persona;
 
       try {
-        persona = await personasModel.findOne(ctx.params.id, [
+        persona = await personasModel.findOne({ uuid: ctx.params.id }, [
           'requests',
-          'fullReviews',
-          'rapidReviews',
+          'fullReviews.preprint',
+          'rapidReviews.preprint',
           'badges',
+          'identity',
         ]);
         if (!persona) {
           ctx.throw(404, `Persona with ID ${ctx.params.id} doesn't exist`);
         }
+        if (persona.avatar && Buffer.isBuffer(persona.avatar)) {
+          persona.avatar = persona.avatar.toString();
+        }
+        console.log('persona.avatar:', persona.avatar);
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse schema: ${err}`);
@@ -100,12 +105,12 @@ export default function controller(personasModel, badgesModel, thisUser) {
     validate: {
       body: Joi.object({
         name: Joi.string(),
+        avatar: Joi.string(),
+        isLocked: Joi.boolean(),
       }),
       type: 'json',
       params: {
-        id: Joi.number()
-          .integer()
-          .required(),
+        id: Joi.string().required(),
       },
       continueOnError: true,
       false: 400,
@@ -121,7 +126,7 @@ export default function controller(personasModel, badgesModel, thisUser) {
       let persona;
 
       try {
-        persona = await personasModel.findOne(ctx.params.id);
+        persona = await personasModel.findOne({ uuid: ctx.params.id });
         if (!persona) {
           ctx.throw(
             404,
@@ -136,7 +141,12 @@ export default function controller(personasModel, badgesModel, thisUser) {
       }
 
       // if updated
-      ctx.status = 204;
+      ctx.status = 200;
+      ctx.body = {
+        status: 200,
+        message: 'ok',
+        data: persona,
+      };
     },
     meta: {
       swagger: {
@@ -153,12 +163,10 @@ export default function controller(personasModel, badgesModel, thisUser) {
     validate: {
       type: 'json',
       params: {
-        id: Joi.number()
-          .integer()
+        id: Joi.string()
           .description('Persona id')
           .required(),
-        bid: Joi.alternatives()
-          .try(Joi.number().integer(), Joi.string())
+        bid: Joi.string()
           .description('Badge id')
           .required(),
       },
@@ -172,7 +180,7 @@ export default function controller(personasModel, badgesModel, thisUser) {
         badge = await badgesModel.findOneByIdOrName(ctx.params.bid, [
           'personas',
         ]);
-        persona = await personasModel.findOne(ctx.params.id);
+        persona = await personasModel.findOne({ uuid: ctx.params.id });
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse query: ${err}`);
@@ -208,7 +216,7 @@ export default function controller(personasModel, badgesModel, thisUser) {
     pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next),
     handler: async ctx => {
       log.debug(
-        `Removing badge ${ctx.params.uid} from persona ${ctx.params.id}.`,
+        `Removing badge ${ctx.params.bid} from persona ${ctx.params.id}.`,
       );
       let persona, badge;
 
@@ -216,7 +224,7 @@ export default function controller(personasModel, badgesModel, thisUser) {
         badge = await badgesModel.findOneByIdOrName(ctx.params.bid, [
           'personas',
         ]);
-        persona = await personasModel.findOne(ctx.params.id);
+        persona = await personasModel.findOne({ uuid: ctx.params.id });
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse query: ${err}`);
@@ -240,9 +248,9 @@ export default function controller(personasModel, badgesModel, thisUser) {
     },
     meta: {
       swagger: {
-        operationId: 'DeleteGroupMember',
+        operationId: 'DeletePersonaBadge',
         summary:
-          'Endpoint to DELETE one user from a group by ID from PREreview. Admin users only.',
+          'Endpoint to DELETE one badge from a persona by ID from PREreview. Admin users only.',
         required: true,
       },
     },
