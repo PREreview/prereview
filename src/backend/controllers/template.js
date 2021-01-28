@@ -16,6 +16,7 @@ const querySchema = Joi.object({
 });
 
 const templateSchema = Joi.object({
+  title: Joi.string().required(),
   contents: Joi.string().required(),
 });
 
