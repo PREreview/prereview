@@ -44,7 +44,7 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const AddAuthors = ({ isMentor }) => {
+const AddAuthors = ({ isMentor, reviewId }) => {
   const classes = useStyles();
 
   // fetch users from API
@@ -66,7 +66,7 @@ const AddAuthors = ({ isMentor }) => {
   } else {
     return (
       <div>
-        <Button type="button" onClick={handleOpen}>
+        <Button type="button" onClick={handleOpen} disabled={!reviewId}>
           <AddCircleOutlineIcon />
           <span className={classes.buttonText}>
             {isMentor ? 'Add mentor' : 'Add co-reviewer(s)'}
@@ -79,7 +79,12 @@ const AddAuthors = ({ isMentor }) => {
           aria-describedby="simple-modal-description"
         >
           <div className={classes.paper}>
-            <Search isMentor={isMentor} users={users.data} />
+            <Search
+              handleClose={handleClose}
+              isMentor={isMentor}
+              reviewId={reviewId}
+              users={users.data}
+            />
           </div>
         </Modal>
       </div>
@@ -89,6 +94,7 @@ const AddAuthors = ({ isMentor }) => {
 
 AddAuthors.propTypes = {
   isMentor: PropTypes.bool,
+  reviewId: PropTypes.number.isRequired,
 };
 
 export default AddAuthors;

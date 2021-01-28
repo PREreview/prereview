@@ -90,6 +90,10 @@ export default function ShellContent({
     setTab('read');
   };
 
+  const onReviewChange = review => {
+    setReview(review);
+  };
+
   useEffect(() => {
     const newHeight = document.getElementsByClassName(
       'shell-content__preview',
@@ -322,6 +326,7 @@ export default function ShellContent({
             preprint={preprint}
             onClose={onCloseReviews}
             onContentChange={onContentChange}
+            onReviewChange={onReviewChange}
             hasRapidReviewed={hasRapidReviewed}
             hasLongReviewed={hasLongReviewed}
             initialContent={initialContent}
@@ -404,6 +409,7 @@ function ShellContentReviews({
   initialContent,
   cid,
   review,
+  onReviewChange,
 }) {
   return cid ? (
     review ? (
@@ -417,6 +423,7 @@ function ShellContentReviews({
           hasLongReviewed={hasLongReviewed}
           content={initialContent}
           review={review}
+          onReviewChange={onReviewChange}
         />
       </div>
     ) : (
@@ -433,6 +440,7 @@ function ShellContentReviews({
         hasLongReviewed={hasLongReviewed}
         content={initialContent}
         review={review}
+        onReviewChange={onReviewChange}
       />
     </div>
   );
@@ -441,6 +449,7 @@ ShellContentReviews.propTypes = {
   preprint: PropTypes.object.isRequired,
   onClose: PropTypes.func.isRequired,
   onContentChange: PropTypes.func.isRequired,
+  onReviewChange: PropTypes.func.isRequired,
   disabled: PropTypes.bool,
   hasLongReviewed: PropTypes.bool.isRequired,
   hasRapidReviewed: PropTypes.bool.isRequired,

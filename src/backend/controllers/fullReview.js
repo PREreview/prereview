@@ -108,7 +108,7 @@ export default function controller(
     ctx.body = {
       status: 201,
       message: 'created',
-      body: review.id,
+      body: review,
     };
     ctx.status = 201;
   };
@@ -181,8 +181,8 @@ export default function controller(
             parent: fullReview,
           });
           await draftModel.persistAndFlush(draft);
+          fullReview.drafts.add(draft);
         }
-        fullReview.drafts.add(draft);
         // reviewModel.assign(fullReview, ctx.request.body);
         await reviewModel.persistAndFlush(fullReview);
       } catch (err) {

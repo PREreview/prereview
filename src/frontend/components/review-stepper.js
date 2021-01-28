@@ -216,6 +216,7 @@ export default function ReviewStepper({
   hasLongReviewed,
   content,
   onContentChange,
+  onReviewChange,
   review,
 }) {
   const history = useHistory();
@@ -249,8 +250,7 @@ export default function ReviewStepper({
       if (canSubmitRapid(answerMap)) {
         postRapidReview({ ...answerMap, preprint: preprint.id })
           .then(response => {
-            onClose(answerMap);
-            return setReviewId(response.body.id);
+            return onClose(answerMap);
           })
           .catch(err => {
             alert(`An error occurred: ${err.message}`);
@@ -282,7 +282,9 @@ export default function ReviewStepper({
         })
           .then(response => {
             alert('Draft updated successfully.');
-            return history.push(`${location.pathname}/${response.body}`)
+            setReviewId(response.body.id);
+            onReviewChange(response.body);
+            return history.push(`${location.pathname}/${response.body.id}`);
           })
           .catch(err => alert(`An error occurred: ${err.message}`));
       }
@@ -495,8 +497,11 @@ export default function ReviewStepper({
               </Typography>
             </Box>
             <Box mt={2} mb={2}>
-              <AddAuthors />
-              <AddAuthors isMentor={true} />
+              <AddAuthors reviewId={review ? review.id : null} />
+              <AddAuthors
+                isMentor={true}
+                reviewId={review ? review.id : null}
+              />
               <form>
                 <Box m={2}>
                   <LongFormFragment
@@ -638,6 +643,7 @@ ReviewStepper.propTypes = {
   preprint: PropTypes.object.isRequired,
   onClose: PropTypes.func.isRequired,
   onContentChange: PropTypes.func.isRequired,
+  onReviewChange: PropTypes.func.isRequired,
   hasLongReviewed: PropTypes.bool.isRequired,
   hasRapidReviewed: PropTypes.bool.isRequired,
   content: PropTypes.string,
