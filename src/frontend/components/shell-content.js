@@ -10,7 +10,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import Box from '@material-ui/core/Box';
 
 // hooks
-import { useGetFullReview, usePostRequests } from '../hooks/api-hooks.tsx';
+import { usePostRequests } from '../hooks/api-hooks.tsx';
 
 // components
 import Button from './button';
@@ -39,32 +39,9 @@ export default function ShellContent({
   cid,
 }) {
   const location = useLocation();
+
+  // initial height of the header
   const [height, setHeight] = useState(0);
-
-  // if cid, fetch review from api
-  const [review, setReview] = useState(null);
-
-  const { data: reviewData, loadingReview, errorReview } = useGetFullReview({
-    id: cid,
-  });
-
-  useEffect(() => {
-    if (!loadingReview) {
-      if (reviewData) {
-        const thisReview = reviewData.body[0];
-        if (thisReview.isPublished) {
-          return;
-        }
-        if (thisReview.authors.length) {
-          thisReview.authors.map(author => {
-            let authorID;
-            author.id ? (authorID = author.id) : (authorID = author);
-            user.defaultPersona.id === authorID ? setReview(thisReview) : false;
-          });
-        }
-      }
-    }
-  }, [reviewData, review]);
 
   const {
     mutate: postReviewRequest,
@@ -76,6 +53,7 @@ export default function ShellContent({
   const [hasLongReviewed, setHasLongReviewed] = useState(false);
   const [hasRequested, setHasRequested] = useState(false);
   const [newRequest, setNewRequest] = useState(false);
+  const [review, setReview] = useState(null);
 
   const [tab, setTab] = useState(defaultTab);
 
@@ -137,21 +115,47 @@ export default function ShellContent({
           });
         });
 
-        // get a user's drafts
-        let ownDrafts = ownReviews.length
-          ? ownReviews
-              .filter(review => !review.isPublished)
-              .map(review => review.drafts)
-          : [];
+        // get a user's drafts of the correct review if cid is present, or latest if not
+        let ownDrafts, latestDraft = [];
+        if (cid) {
+          ownDrafts = ownReviews.length
+            ? ownReviews.find(
+                review => review.id === parseInt(cid) && !review.isPublished,
+              )
+            : [];
 
-        const latestDraft = ownDrafts.length
-          ? ownDrafts.sort((a, b) => a[0].id - b[0].id)[ownDrafts.length - 1]
-          : [];
+          ownDrafts = ownDrafts.drafts;
 
-        // get the latest draft content & seed to the text editor
-        latestDraft.length
-          ? setInitialContent(latestDraft[0].contents)
-          : setInitialContent('');
+          latestDraft = ownDrafts.length
+            ? ownDrafts.sort((a, b) => a.id - b.id)[ownDrafts.length - 1]
+            : [];
+
+          // get the latest draft content & seed to the text editor
+          if (latestDraft) {
+            setInitialContent(latestDraft.contents);
+            setReview(latestDraft);
+          } else {
+            setInitialContent('');
+          }
+        } else {
+          ownDrafts = ownReviews.length
+            ? ownReviews
+                .filter(review => !review.isPublished)
+                .map(review => review.drafts)
+            : [];
+
+          latestDraft = ownDrafts.length
+            ? ownDrafts.sort((a, b) => a[0].id - b[0].id)[ownDrafts.length - 1]
+            : [];
+
+          // get the latest draft content & seed to the text editor
+          if (latestDraft.length) {
+            setInitialContent(latestDraft[0].contents);
+            setReview(latestDraft[0]);
+          } else {
+            setInitialContent('');
+          }
+        }
 
         // gets all published reviews of the preprint
         let published = preprint.fullReviews.filter(
@@ -193,7 +197,9 @@ export default function ShellContent({
         });
       }
     }
-  }, [preprint, user, rapidContent, longContent, hasRequested]);
+
+    console.log(review);
+  }, [preprint, review, user, rapidContent, longContent, hasRequested]);
 
   return (
     <div className="shell-content">
@@ -329,7 +335,7 @@ ShellContent.propTypes = {
   preprint: PropTypes.object.isRequired,
   user: PropTypes.object,
   defaultTab: PropTypes.oneOf(['read', 'review', 'request']),
-  cid: PropTypes.number,
+  cid: PropTypes.string,
 };
 
 function ShellContentRead({
@@ -395,11 +401,8 @@ function ShellContentReviews({
   hasLongReviewed,
   initialContent,
   cid,
-  review
+  review,
 }) {
-  // console.log('cid: ', cid);
-  // console.log('review: ', review);
-  // console.log('initialContent: ', initialContent);
   return cid ? (
     review ? (
       <div className="shell-content-review">
@@ -411,6 +414,7 @@ function ShellContentReviews({
           hasRapidReviewed={hasRapidReviewed}
           hasLongReviewed={hasLongReviewed}
           content={initialContent}
+          review={review}
         />
       </div>
     ) : (
@@ -426,6 +430,7 @@ function ShellContentReviews({
         hasRapidReviewed={hasRapidReviewed}
         hasLongReviewed={hasLongReviewed}
         content={initialContent}
+        review={review}
       />
     </div>
   );

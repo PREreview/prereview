@@ -423,7 +423,7 @@ const LongformReviewReader = props => {
 };
 
 LongformReviewReader.propTypes = {
-  anchorEl: PropTypes.object.isRequired,
+  anchorEl: PropTypes.object,
   handleAnchor: PropTypes.func.isRequired,
   content: PropTypes.string,
   commentTitle: PropTypes.string,

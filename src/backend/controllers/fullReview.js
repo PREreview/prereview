@@ -69,53 +69,55 @@ export default function controller(
     ctx.status = 200;
   };
 
+  const postHandler = async ctx => {
+    log.debug('Adding full review.');
+    log.debug('ctx.body,', ctx.request.body);
+    let review, draft, authorPersona, preprint;
+
+    try {
+      authorPersona = getActivePersona(ctx.state.user);
+    } catch (err) {
+      log.error('Failed to load user personas.');
+      ctx.throw(400, err);
+    }
+
+    try {
+      preprint = await preprintModel.findOne(ctx.request.body.preprint);
+      review = reviewModel.create({
+        ...ctx.request.body,
+        preprint: preprint,
+      });
+
+      review.authors.add(authorPersona);
+
+      if (ctx.request.body.contents) {
+        log.debug(`Adding full review draft.`);
+        draft = draftModel.create({
+          title: 'Review of a preprint', //TODO: remove when we make title optional
+          contents: ctx.request.body.contents,
+          parent: review,
+        });
+        review.drafts.add(draft);
+      }
+      await reviewModel.persistAndFlush(review);
+    } catch (err) {
+      log.error('HTTP 400 Error: ', err);
+      ctx.throw(400, `Failed to parse full review schema: ${err}`);
+    }
+
+    ctx.body = {
+      status: 201,
+      message: 'created',
+      body: review.id,
+    };
+    ctx.status = 201;
+  };
+
   reviewsRouter.route({
     method: 'POST',
     path: '/fullReviews',
     // pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
-    handler: async ctx => {
-      log.debug('Adding full review.');
-      log.debug('ctx.body,', ctx.request.body);
-      let review, draft, authorPersona, preprint;
-
-      try {
-        authorPersona = getActivePersona(ctx.state.user);
-      } catch (err) {
-        log.error('Failed to load user personas.');
-        ctx.throw(400, err);
-      }
-
-      try {
-        preprint = await preprintModel.findOne(ctx.request.body.preprint);
-        review = reviewModel.create({
-          ...ctx.request.body,
-          preprint: preprint,
-        });
-
-        review.authors.add(authorPersona);
-
-        if (ctx.request.body.contents) {
-          log.debug(`Adding full review draft.`);
-          draft = draftModel.create({
-            title: 'Review of a preprint', //TODO: remove when we make title optional
-            contents: ctx.request.body.contents,
-            parent: review,
-          });
-          review.drafts.add(draft);
-        }
-        await reviewModel.persistAndFlush(review);
-      } catch (err) {
-        log.error('HTTP 400 Error: ', err);
-        ctx.throw(400, `Failed to parse full review schema: ${err}`);
-      }
-
-      ctx.body = {
-        status: 201,
-        message: 'created',
-        body: review.id,
-      };
-      ctx.status = 201;
-    },
+    handler: postHandler,
     meta: {
       swagger: {
         operationId: 'PostFullReviews',
@@ -161,7 +163,14 @@ export default function controller(
       try {
         fullReview = await reviewModel.findOne(ctx.params.id);
         if (!fullReview) {
-          ctx.throw(404, `Full review with ID ${ctx.params.id} doesn't exist`);
+          try {
+            postHandler();
+          } catch {
+            ctx.throw(
+              404,
+              `Full review with ID ${ctx.params.id} doesn't exist and`,
+            );
+          }
         }
 
         if (ctx.request.body.contents) {
@@ -173,8 +182,9 @@ export default function controller(
           });
           await draftModel.persistAndFlush(draft);
         }
-        reviewModel.assign(fullReview, ctx.request.body);
-        await reviewModel.persistAndFlush(reviewModel);
+        fullReview.drafts.add(draft);
+        // reviewModel.assign(fullReview, ctx.request.body);
+        await reviewModel.persistAndFlush(fullReview);
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse query: ${err}`);
@@ -182,11 +192,6 @@ export default function controller(
 
       // if updated
       ctx.status = 204;
-      ctx.body = {
-        status: 204,
-        message: 'ok',
-        body: [fullReview.id],
-      };
     },
     meta: {
       swagger: {

@@ -27,6 +27,7 @@ import Typography from '@material-ui/core/Typography';
 import {
   usePostFullReviews,
   usePostRapidReviews,
+  usePutFullReview,
 } from '../hooks/api-hooks.tsx';
 
 // components
@@ -215,21 +216,23 @@ export default function ReviewStepper({
   hasLongReviewed,
   content,
   onContentChange,
+  review,
 }) {
   const history = useHistory();
   const location = useLocation();
   const classes = useStyles();
-  const [activeStep, setActiveStep] = React.useState(0);
+  const [activeStep, setActiveStep] = useState(0);
   const [answerMap, setAnswerMap] = useState({});
-  const [completed, setCompleted] = React.useState(new Set());
-  const [expandFeedback, setExpandFeedback] = React.useState(false);
-  const [disabledSubmit, setDisabledSubmit] = React.useState(false);
-  const [skipped, setSkipped] = React.useState(new Set());
+  const [completed, setCompleted] = useState(new Set());
+  const [expandFeedback, setExpandFeedback] = useState(false);
+  const [disabledSubmit, setDisabledSubmit] = useState(false);
+  const [reviewId, setReviewId] = useState(review ? review.parent : null);
+  const [skipped, setSkipped] = useState(new Set());
   const steps = getSteps();
 
   const { mutate: postRapidReview } = usePostRapidReviews();
-
   const { mutate: postLongReview } = usePostFullReviews();
+  const { mutate: putLongReview } = usePutFullReview({ id: reviewId });
 
   const canSubmitRapid = answerMap => {
     return QUESTIONS.filter(q => q.type == 'YesNoQuestion').every(
@@ -245,9 +248,9 @@ export default function ReviewStepper({
     if (!hasRapidReviewed) {
       if (canSubmitRapid(answerMap)) {
         postRapidReview({ ...answerMap, preprint: preprint.id })
-          .then(() => {
+          .then(response => {
             onClose(answerMap);
-            return;
+            return setReviewId(response.body.id);
           })
           .catch(err => {
             alert(`An error occurred: ${err.message}`);
@@ -266,16 +269,23 @@ export default function ReviewStepper({
   const handleSaveLong = event => {
     event.preventDefault();
     if (canSubmitLong(content)) {
-      postLongReview({
-        preprint: preprint.id,
-        contents: content,
-      })
-        .then(response => {
-          alert('Draft updated successfully.');
-          console.log(response);
-          return history.push(`${location.pathname}/${response.body}`);
+      if (reviewId) {
+        putLongReview({
+          contents: content,
         })
-        .catch(err => alert(`An error occurred: ${err.message}`));
+          .then(() => alert('Draft updated successfully.'))
+          .catch(err => alert(`An error occurred: ${err.message}`));
+      } else {
+        postLongReview({
+          preprint: preprint.id,
+          contents: content,
+        })
+          .then(response => {
+            alert('Draft updated successfully.');
+            return history.push(`${location.pathname}/${response.body}`)
+          })
+          .catch(err => alert(`An error occurred: ${err.message}`));
+      }
     } else {
       alert('Review cannot be blank.');
     }
@@ -390,7 +400,15 @@ export default function ReviewStepper({
     return ['Rapid Review', 'Long-form Review', 'Submitted'];
   }
 
+  // useEffect(() => {
+  //   if (reviewId) {
+  //     history.push(`${location.pathname}/${reviewId}`);
+  //   }
+  // }, []);
+
   useEffect(() => {
+    console.log(review);
+    console.log(reviewId);
     if (hasRapidReviewed) {
       handleComplete();
     }
@@ -399,7 +417,7 @@ export default function ReviewStepper({
       setActiveStep(2);
       handleComplete(4);
     }
-  }, [hasRapidReviewed, hasLongReviewed]);
+  }, [hasRapidReviewed, hasLongReviewed, reviewId]);
 
   function getStepContent(step) {
     switch (step) {
@@ -625,4 +643,5 @@ ReviewStepper.propTypes = {
   hasLongReviewed: PropTypes.bool.isRequired,
   hasRapidReviewed: PropTypes.bool.isRequired,
   content: PropTypes.string,
+  review: PropTypes.object,
 };
