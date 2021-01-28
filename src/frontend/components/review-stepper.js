@@ -14,9 +14,11 @@ import {
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
 import Check from '@material-ui/icons/Check';
+import Grid from '@material-ui/core/Grid';
 import Input from '@material-ui/core/Input';
 import InputLabel from '@material-ui/core/InputLabel';
 import Link from '@material-ui/core/Link';
+import Modal from '@material-ui/core/Modal';
 import Stepper from '@material-ui/core/Stepper';
 import Step from '@material-ui/core/Step';
 import StepConnector from '@material-ui/core/StepConnector';
@@ -91,6 +93,15 @@ const useStyles = makeStyles(theme => ({
   },
   label: {
     textAlign: 'center',
+  },
+  paper: {
+    top: `50%`,
+    left: `50%`,
+    transform: `translate(-50%, -50%)`,
+    position: 'absolute',
+    backgroundColor: theme.palette.background.paper,
+    boxShadow: theme.shadows[5],
+    padding: theme.spacing(2, 4, 3),
   },
   red: {
     backgroundColor: '#FAB7B7',
@@ -234,6 +245,17 @@ export default function ReviewStepper({
   const { mutate: postRapidReview } = usePostRapidReviews();
   const { mutate: postLongReview } = usePostFullReviews();
   const { mutate: putLongReview } = usePutFullReview({ id: reviewId });
+
+  // handle open/close templates
+  const [open, setOpen] = useState(false);
+
+  const handleOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
 
   const canSubmitRapid = answerMap => {
     return QUESTIONS.filter(q => q.type == 'YesNoQuestion').every(
@@ -497,11 +519,43 @@ export default function ReviewStepper({
               </Typography>
             </Box>
             <Box mt={2} mb={2}>
-              <AddAuthors reviewId={review ? review.id : null} />
-              <AddAuthors
-                isMentor={true}
-                reviewId={review ? review.id : null}
-              />
+              <Grid
+                container
+                justify="space-between"
+                alignItems="flex-end"
+                spacing={2}
+              >
+                <Grid item xs={12} sm={6}>
+                  <AddAuthors reviewId={review ? review.id : null} />
+                  <AddAuthors
+                    isMentor={true}
+                    reviewId={review ? review.id : null}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <Box textAlign="right" mr={2}>
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      type="button"
+                      onClick={handleOpen}
+                      disabled={!reviewId}
+                    >
+                      Load templates
+                    </Button>
+                    <Modal
+                      open={open}
+                      onClose={handleClose}
+                      aria-labelledby="simple-modal-title"
+                      aria-describedby="simple-modal-description"
+                    >
+                      <div className={classes.paper}>
+                        Hello!!!
+                      </div>
+                    </Modal>
+                  </Box>
+                </Grid>
+              </Grid>
               <form>
                 <Box m={2}>
                   <LongFormFragment
