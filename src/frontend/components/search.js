@@ -1,6 +1,6 @@
 // base imports
 /* eslint-disable no-use-before-define */
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 
 // material ui components
@@ -10,6 +10,9 @@ import NoSsr from '@material-ui/core/NoSsr';
 import CheckIcon from '@material-ui/icons/Check';
 import CloseIcon from '@material-ui/icons/Close';
 import styled from 'styled-components';
+
+// hooks
+import { usePutFullReview } from '../hooks/api-hooks.tsx';
 
 const Button = styled(MuiButton)`
   margin-top: 1rem;
@@ -137,7 +140,7 @@ const Listbox = styled('ul')`
   }
 `;
 
-const Search = ({ isMentor, users }) => {
+const Search = ({ handleClose, isMentor, reviewId, users }) => {
   const {
     getRootProps,
     getInputLabelProps,
@@ -160,12 +163,30 @@ const Search = ({ isMentor, users }) => {
         : option.name || option.orcid,
   });
 
+  const [disabledSubmit, setDisabledSubmit] = useState(true);
   const [invitees, setInvitees] = useState(null);
 
+  const { mutate: putLongReview } = usePutFullReview({ id: reviewId });
+
+
   const handleInvite = () => {
+    console.log('mentor: ', isMentor);
     console.log('invited: ', invitees);
     console.log('value: ', value);
-  }
+    handleClose();
+    alert('Invites have been sent.');
+
+    //
+    // putLongReview({
+    //   authors: value,
+    // })
+    //   .then(() => alert('Invites sent successfully.'))
+    //   .catch(err => alert(`An error occurred: ${err.message}`));
+  };
+
+  useEffect(() => {
+    value.length ? setDisabledSubmit(false) : setDisabledSubmit(true);
+  }, [value]);
 
   return (
     <NoSsr>
@@ -210,6 +231,7 @@ const Search = ({ isMentor, users }) => {
           </Listbox>
         ) : null}
         <Button
+          disabled={disabledSubmit}
           variant="contained"
           color="primary"
           type="button"
@@ -223,7 +245,9 @@ const Search = ({ isMentor, users }) => {
 };
 
 Search.propTypes = {
+  handleClose: PropTypes.func.isRequired,
   isMentor: PropTypes.bool,
+  reviewId: PropTypes.number,
   users: PropTypes.array.isRequired,
 };
 
