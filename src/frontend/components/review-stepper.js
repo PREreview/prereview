@@ -407,8 +407,6 @@ export default function ReviewStepper({
   // }, []);
 
   useEffect(() => {
-    console.log(review);
-    console.log(reviewId);
     if (hasRapidReviewed) {
       handleComplete();
     }

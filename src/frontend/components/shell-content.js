@@ -95,7 +95,7 @@ export default function ShellContent({
       'shell-content__preview',
     )[0].clientHeight;
     setHeight(newHeight + 20);
-  }, []);
+  }, [review]);
 
   useEffect(() => {
     if (user) {
@@ -124,18 +124,19 @@ export default function ShellContent({
               )
             : [];
 
-          ownDrafts = ownDrafts.drafts;
-
-          latestDraft = ownDrafts.length
-            ? ownDrafts.sort((a, b) => a.id - b.id)[ownDrafts.length - 1]
-            : [];
+          latestDraft =
+            ownDrafts && ownDrafts.drafts.length
+              ? ownDrafts.drafts.length > 1
+                ? ownDrafts.drafts.sort((a, b) => a.id - b.id)[
+                    ownDrafts.drafts.length - 1
+                  ]
+                : ownDrafts.drafts[0]
+              : null;
 
           // get the latest draft content & seed to the text editor
           if (latestDraft) {
             setInitialContent(latestDraft.contents);
             setReview(latestDraft);
-          } else {
-            setInitialContent('');
           }
         } else {
           ownDrafts = ownReviews.length
@@ -148,12 +149,14 @@ export default function ShellContent({
             ? ownDrafts.sort((a, b) => a[0].id - b[0].id)[ownDrafts.length - 1]
             : [];
 
+          latestDraft = latestDraft.length
+            ? latestDraft[latestDraft.length - 1]
+            : null;
+
           // get the latest draft content & seed to the text editor
-          if (latestDraft.length) {
-            setInitialContent(latestDraft[0].contents);
-            setReview(latestDraft[0]);
-          } else {
-            setInitialContent('');
+          if (latestDraft) {
+            setInitialContent(latestDraft.contents);
+            setReview(latestDraft);
           }
         }
 
@@ -198,8 +201,7 @@ export default function ShellContent({
       }
     }
 
-    console.log(review);
-  }, [preprint, review, user, rapidContent, longContent, hasRequested]);
+  }, [preprint, user, rapidContent, longContent, hasRequested]);
 
   return (
     <div className="shell-content">
@@ -443,7 +445,7 @@ ShellContentReviews.propTypes = {
   hasLongReviewed: PropTypes.bool.isRequired,
   hasRapidReviewed: PropTypes.bool.isRequired,
   initialContent: PropTypes.string,
-  cid: PropTypes.number,
+  cid: PropTypes.string,
   review: PropTypes.object,
 };
 
