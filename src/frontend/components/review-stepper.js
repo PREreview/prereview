@@ -1,5 +1,6 @@
 // base imports
 import React, { useState, useEffect } from 'react';
+import { useHistory, useLocation } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import clsx from 'clsx';
 
@@ -215,6 +216,8 @@ export default function ReviewStepper({
   content,
   onContentChange,
 }) {
+  const history = useHistory();
+  const location = useLocation();
   const classes = useStyles();
   const [activeStep, setActiveStep] = React.useState(0);
   const [answerMap, setAnswerMap] = useState({});
@@ -267,7 +270,11 @@ export default function ReviewStepper({
         preprint: preprint.id,
         contents: content,
       })
-        .then(() => alert('Draft updated successfully.'))
+        .then(response => {
+          alert('Draft updated successfully.');
+          console.log(response);
+          return history.push(`${location.pathname}/${response.body}`);
+        })
         .catch(err => alert(`An error occurred: ${err.message}`));
     } else {
       alert('Review cannot be blank.');

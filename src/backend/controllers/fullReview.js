@@ -112,6 +112,7 @@ export default function controller(
       ctx.body = {
         status: 201,
         message: 'created',
+        body: review.id,
       };
       ctx.status = 201;
     },
@@ -181,6 +182,11 @@ export default function controller(
 
       // if updated
       ctx.status = 204;
+      ctx.body = {
+        status: 204,
+        message: 'ok',
+        body: [fullReview.id],
+      };
     },
     meta: {
       swagger: {

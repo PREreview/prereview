@@ -73,23 +73,23 @@ const CollabEditor = ({ initialContent, handleContentChange }) => {
 
   useEffect(() => {
     if (quill) {
-      // quill.clipboard.dangerouslyPasteHTML(initialContent);
-      // const delta = quill.clipboard.convert(initialContent);
-      // quill.setContents(delta);
-
-      // quill.container.firstChild.innerHTML = initialContent;
-
-      const type = ydoc.getText(initialContent);
-      type.insert(0, initialContent);
-
-      console.log(type);
+      // create yjs binding for web socket collaboration
+      const type = ydoc.getText('quill');
 
       const binding = new QuillBinding(type, quill, provider.awareness);
+
+      // paste initial value into editor
+      quill.clipboard.dangerouslyPasteHTML(initialContent);
+      const delta = quill.clipboard.convert(initialContent);
+      quill.setContents(delta);
+
       quill.on('text-change', () => {
-        handleContentChange(quillRef.current.innerHTML);
+        handleContentChange(
+          quillRef.current ? quillRef.current.innerHTML : initialContent,
+        );
       });
     }
-  }, [quill]);
+  }, [quill, quillRef]);
 
   return (
     <div>
