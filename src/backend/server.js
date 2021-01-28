@@ -42,6 +42,7 @@ import {
   requestModelWrapper,
   tagModelWrapper,
   userModelWrapper,
+  contactModelWrapper,
 } from './models/index.ts';
 
 // Our controllers
@@ -110,6 +111,7 @@ export default async function configServer(config) {
   const commentModel = commentModelWrapper(db);
   const communityModel = communityModelWrapper(db);
   const communities = CommunityController(communityModel, authz);
+  const contactModel = contactModelWrapper(db);
   const fullReviewModel = fullReviewModelWrapper(db);
   const draftModel = fullReviewDraftModelWrapper(db);
   const fullReviewDrafts = DraftController(draftModel, authz);
@@ -131,7 +133,7 @@ export default async function configServer(config) {
   );
   const tagModel = tagModelWrapper(db);
   const tags = TagController(tagModel, authz);
-  const users = UserController(userModel, authz);
+  const users = UserController(userModel, contactModel, authz);
   const searches = SearchesController(preprintModel, draftModel, authz);
 
   server.use(authz.middleware());

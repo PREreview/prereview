@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useRef } from 'react';
+import React, { useCallback, useEffect, useState, useRef } from 'react';
 import PropTypes from 'prop-types';
 import AvatarEditor from 'react-avatar-editor';
 import { useDropzone } from 'react-dropzone';
@@ -6,16 +6,30 @@ import { MdPerson } from 'react-icons/md';
 import Button from './button';
 import Controls from './controls';
 import TextInput from './text-input';
-import { usePutUser } from '../hooks/api-hooks.tsx';
+import { usePutPersona } from '../hooks/api-hooks.tsx';
 
-export default function RoleEditor({ user, onCancel, onSaved }) {
+export default function RoleEditor({ persona, onCancel, onSaved }) {
   const editorRef = useRef();
-  const [name, setName] = useState(user.name);
-  const [image, setImage] = useState(user.avatar && user.avatar.contentUrl);
+  const [name, setName] = useState(persona.name);
+  const [image, setImage] = useState(null);
   const [file, setFile] = useState(null);
   const [scale, setScale] = useState(1);
   const [rotate, setRotate] = useState(0);
-  const { mutate: updateUser, loading, error } = usePutUser(user.id);
+  const { mutate: updatePersona, loading, error } = usePutPersona({
+    id: persona.name,
+  });
+
+  const dataUrlToFile = async dataURL => {
+    const blob = await (await fetch(dataURL)).blob();
+    const file = new File([blob], 'fileName.jpg', {type:"image/jpeg", lastModified:new Date()});
+    return file;
+  };
+
+  useEffect(() => {
+    if (persona && persona.avatar) {
+      dataUrlToFile(persona.avatar).then(file => setImage(file));
+    }
+  }, [persona]);
 
   const onDrop = useCallback(acceptedFiles => {
     const [file] = acceptedFiles;
@@ -163,12 +177,12 @@ export default function RoleEditor({ user, onCancel, onSaved }) {
 
         <Button
           isWaiting={loading}
-          disabled={(name === user.name && !hasNewAvatar) || loading}
+          disabled={(name === persona.name && !hasNewAvatar) || loading}
           primary={true}
           onClick={() => {
-            const payload = {};
-            if (user.name !== name) {
-              payload.name = name;
+            const data = {};
+            if (persona.name !== name) {
+              data.name = name;
             }
             if (hasNewAvatar) {
               const canvas = editorRef.current.getImage();
@@ -181,18 +195,16 @@ export default function RoleEditor({ user, onCancel, onSaved }) {
                 q -= 0.05;
                 dataUrl = canvas.toDataURL('image/jpeg', q);
               }
-
-              payload.avatar = {
-                '@type': 'ImageObject',
-                encodingFormat: file ? file.type : user.avatar.encodingFormat,
-                contentUrl: dataUrl,
-              };
+              data.avatar = dataUrl;
             }
 
-            updateUser({ payload })
-              .then(() => alert('User updated successfully.'))
+            updatePersona(data)
+              .then(resp => {
+                let updatedPersona = resp.data;
+                alert('Persona updated successfully.');
+                return onSaved(updatedPersona);
+              })
               .catch(err => alert(`An error occurred: ${err.message}`));
-            onSaved(user);
           }}
         >
           Save
@@ -205,5 +217,5 @@ export default function RoleEditor({ user, onCancel, onSaved }) {
 RoleEditor.propTypes = {
   onCancel: PropTypes.func.isRequired,
   onSaved: PropTypes.func.isRequired,
-  user: PropTypes.object,
+  persona: PropTypes.object,
 };

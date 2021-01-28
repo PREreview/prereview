@@ -88,7 +88,7 @@ export default function controller(tagModel, thisUser) {
       let tag;
 
       try {
-        tag = await tagModel.findOne(ctx.params.id, ['preprints']);
+        tag = await tagModel.findOne({ uuid: ctx.params.id }, ['preprints']);
         if (!tag) {
           ctx.throw(404, `tag with ID ${ctx.params.id} doesn't exist`);
         }
@@ -123,7 +123,7 @@ export default function controller(tagModel, thisUser) {
       let tag;
 
       try {
-        tag = await tagModel.findOne(ctx.params.id);
+        tag = await tagModel.findOne({ uuid: ctx.params.id });
         if (!tag) {
           ctx.throw(404, `Tag with ID ${ctx.params.id} doesn't exist`);
         }
@@ -156,7 +156,7 @@ export default function controller(tagModel, thisUser) {
       let tag;
 
       try {
-        tag = await tagModel.findOne(ctx.params.id);
+        tag = await tagModel.findOne({ uuid: ctx.params.id });
         if (!tag) {
           ctx.throw(404, `Tag with ID ${ctx.params.id} doesn't exist`);
         }

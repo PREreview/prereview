@@ -135,7 +135,7 @@ export default function controller(communityModel, thisUser) {
       let community;
 
       try {
-        community = await communityModel.findOne(ctx.params.id, [
+        community = await communityModel.findOne({ uuid: ctx.params.id }, [
           'members',
           'preprints',
         ]);
@@ -182,7 +182,7 @@ export default function controller(communityModel, thisUser) {
       let community;
 
       try {
-        community = await communityModel.findOne(ctx.params.id);
+        community = await communityModel.findOne({ uuid: ctx.params.id });
         if (!community) {
           ctx.throw(404, `Community with ID ${ctx.params.id} doesn't exist`);
         }
@@ -219,7 +219,7 @@ export default function controller(communityModel, thisUser) {
       let community;
 
       try {
-        community = await communityModel.findOne(ctx.params.id);
+        community = await communityModel.findOne({ uuid: ctx.params.id });
         if (!community) {
           ctx.throw(404, `Community with ID ${ctx.params.id} doesn't exist`);
         }

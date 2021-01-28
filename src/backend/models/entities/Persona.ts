@@ -48,9 +48,13 @@ export class Persona extends BaseEntity {
   @Property({ columnType: 'text', nullable: true })
   bio?: string;
 
-  @Fixture(faker => faker.image.avatar())
+  @Fixture(() => 'wT17FWtRIPTQGkGhi0UMSYZhVbQyfms1')
   @Property({ nullable: true })
   avatar?: Buffer;
+
+  @Fixture(() => 'image/jpeg')
+  @Property({ nullable: true })
+  avatar_encoding?: string;
 
   @OneToMany({ entity: () => RapidReview, mappedBy: 'author' })
   rapidReviews: Collection<RapidReview> = new Collection<RapidReview>(this);
@@ -78,6 +82,7 @@ export class Persona extends BaseEntity {
     isLocked = false,
     bio: string,
     avatar?: Buffer,
+    avatar_encoding?: string,
   ) {
     super();
     this.name = name;
@@ -87,5 +92,6 @@ export class Persona extends BaseEntity {
     this.isLocked = isLocked;
     this.bio = bio;
     this.avatar = avatar;
+    this.avatar_encoding = avatar_encoding;
   }
 }

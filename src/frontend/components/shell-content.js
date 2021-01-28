@@ -204,8 +204,15 @@ export default function ShellContent({
         });
       }
     }
-
-  }, [preprint, user, rapidContent, longContent, hasRequested]);
+  }, [
+    preprint,
+    user,
+    rapidContent,
+    longContent,
+    hasRequested,
+    hasRapidReviewed,
+    hasLongReviewed,
+  ]);
 
   return (
     <div className="shell-content">

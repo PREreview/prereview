@@ -69,10 +69,13 @@ export default function controller(
     ctx.status = 200;
   };
 
-  const postHandler = async ctx => {
-    log.debug('Adding full review.');
-    log.debug('ctx.body,', ctx.request.body);
-    let review, draft, authorPersona, preprint;
+  reviewsRouter.route({
+    method: 'POST',
+    path: '/fullReviews',
+    // pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
+    handler: async ctx => {
+      log.debug('Adding full review.');
+      let review, draft, authorPersona, preprint;
 
     try {
       authorPersona = getActivePersona(ctx.state.user);
@@ -161,7 +164,7 @@ export default function controller(
       let fullReview, draft;
 
       try {
-        fullReview = await reviewModel.findOne(ctx.params.id);
+        fullReview = await reviewModel.findOne({ uuid: ctx.params.id });
         if (!fullReview) {
           try {
             postHandler();
@@ -402,7 +405,7 @@ export default function controller(
       let fullReview, latestDraft;
 
       try {
-        fullReview = await reviewModel.findOne(ctx.params.id, [
+        fullReview = await reviewModel.findOne({ uuid: ctx.params.id }, [
           'drafts',
           'authors',
           'comments',
@@ -453,7 +456,7 @@ export default function controller(
       let fullReview;
 
       try {
-        fullReview = await reviewModel.findOne(ctx.params.id);
+        fullReview = await reviewModel.findOne({ uuid: ctx.params.id });
         if (!fullReview) {
           ctx.throw(404, `Full review with ID ${ctx.params.id} doesn't exist`);
         }

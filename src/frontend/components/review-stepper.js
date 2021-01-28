@@ -270,9 +270,10 @@ export default function ReviewStepper({
   const handleSubmitRapid = () => {
     if (!hasRapidReviewed) {
       if (canSubmitRapid(answerMap)) {
-        postRapidReview({ ...answerMap, preprint: preprint.id })
-          .then(response => {
-            return onClose(answerMap);
+        postRapidReview({ ...answerMap, preprint: preprint.uuid })
+          .then(() => {
+            onClose(answerMap);
+            return;
           })
           .catch(err => {
             alert(`An error occurred: ${err.message}`);
@@ -323,7 +324,7 @@ export default function ReviewStepper({
         )
       ) {
         postLongReview({
-          preprint: preprint.id,
+          preprint: preprint.uuid,
           contents: content,
           isPublished: true,
         })

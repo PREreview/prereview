@@ -76,8 +76,8 @@ export default function PreprintCard({
       if (preprint.requests.length) {
         let author;
         preprint.requests.map(request => {
-          request.author.id
-            ? (author = request.author.id)
+          request.author.uuid
+            ? (author = request.author.uuid)
             : (author = request.author);
           setHasRequested(user.personas.some(persona => persona.id === author));
         });
