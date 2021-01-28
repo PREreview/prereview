@@ -6,24 +6,15 @@ import { ChainError } from '../../common/errors';
 
 @Repository(User)
 export class UserModel extends EntityRepository<User> {
-  findOneByOrcid(value: string, params: string[]): any {
+  findOneByUuidOrOrcid(value: string, params: string[]): any {
     try {
-      if (!orcidUtils.isValid(value)) {
-        throw new ChainError(`Invalid ORCID: ${value}`);
+      if (orcidUtils.isValid(value)) {
+        return this.findOne({ orcid: value }, params);
       }
-      return this.findOne({ orcid: value }, params);
+      return this.findOne({ uuid: value }, params);
     } catch (err) {
       throw new ChainError('Failed to parse ORCID for user.', err);
     }
-  }
-
-  findOneByIdOrOrcid(value: number | string, params: string[]): any {
-    if (Number.isInteger(value)) {
-      return this.findOne(value as number, params);
-    } else if (isString(value)) {
-      return this.findOneByOrcid(value as string, params);
-    }
-    throw new ChainError(`'${value}' is not a valid ID or ORCID`);
   }
 }
 

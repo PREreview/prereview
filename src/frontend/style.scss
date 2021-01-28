@@ -11,7 +11,9 @@
 @import "./components/extension-splash.scss";
 @import "./components/extension-fallback.scss";
 
-/* etc */
+/* reach */
+@import "@reach/dialog/styles.css";
+@import "@reach/menu-button/styles.css";
 @import "@reach/tooltip/styles.css";
 
 /* modules */
@@ -58,6 +60,7 @@
 @import "./components/rapid-form-fragment.scss";
 @import "./components/rapid-pre-review-logo.scss";
 @import "./components/review-reader.scss";
+@import "./components/review-reader-longform.scss";
 @import "./components/role-activity.scss";
 @import "./components/role-badge.scss";
 @import "./components/role-editor.scss";

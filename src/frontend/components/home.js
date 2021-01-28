@@ -52,8 +52,8 @@ const processParams = search => {
       limit = value;
     } else if (key.toLowerCase() === 'sort') {
       processed.append('sort', value);
-    } else if (key.toLowerCase() === 'desc') {
-      processed.append('desc', value === 'true');
+    } else if (key.toLowerCase() === 'asc') {
+      processed.append('asc', value === 'true');
     }
   }
 
@@ -80,7 +80,6 @@ export default function Home() {
   const params = processParams(location.search);
 
   const [thisUser] = useContext(UserProvider.context);
-  console.log(thisUser);
   const isMobile = useIsMobile();
   const [showLeftPanel, setShowLeftPanel] = useState(!isMobile);
   const [loginModalOpenNext, setLoginModalOpenNext] = useState(null);
@@ -240,7 +239,7 @@ export default function Home() {
             {preprints && preprints.totalCount > 0 && !loadingPreprints && (
               <SortOptions
                 sort={params.get('sort') || ''}
-                order={params.get('desc') === 'true' ? 'desc' : 'asc'}
+                order={params.get('asc') === 'true' ? 'asc' : 'desc'}
                 onMouseEnterSortOption={sortOption => {
                   setHoveredSortOption(sortOption);
                 }}
@@ -248,7 +247,7 @@ export default function Home() {
                   setHoveredSortOption(null);
                 }}
                 onChange={(sortOption, sortOrder) => {
-                  params.set('desc', sortOrder === 'desc');
+                  params.set('asc', sortOrder === 'asc');
                   params.set('sort', sortOption);
                   history.push({
                     pathname: location.pathame,
@@ -272,7 +271,7 @@ export default function Home() {
                       onNew={handleNew}
                       onNewReview={handleNewReview}
                       hoveredSortOption={hoveredSortOption}
-                      sortOption={params.get('desc') === 'true'}
+                      sortOption={params.get('asc') === 'true'}
                     />
                   </li>
                 ))}
@@ -309,7 +308,7 @@ export default function Home() {
                         onNew={handleNew}
                         onNewReview={handleNewReview}
                         hoveredSortOption={hoveredSortOption}
-                        sortOption={params.get('desc') === 'true'}
+                        sortOption={params.get('asc') === 'true'}
                       />
                     </li>
                   ))}

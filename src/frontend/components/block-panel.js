@@ -1,14 +1,14 @@
-import React, { Fragment, useState, useEffect } from 'react';
+import React, { Fragment, useContext, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Helmet } from 'react-helmet-async';
 import { MdClose } from 'react-icons/md';
-import { UserProvider } from '../contexts/user-context';
-import { getId, unprefix } from '../utils/jsonld';
+import UserProvider from '../contexts/user-context';
+// import { getId, unprefix } from '../utils/jsonld';
 import HeaderBar from './header-bar';
 import { ORG } from '../constants';
-import { createBlockedRolesQs } from '../utils/search';
+// import { createLockedRolesQs } from '../utils/search';
 // import { useRolesSearchResults, usePostAction } from '../hooks/api-hooks.tsx';
-import { useGetGroups, usePostGroups } from '../hooks/api-hooks.tsx';
+import { useGetPersonas, usePutPersona } from '../hooks/api-hooks.tsx';
 import Button from './button';
 import IconButton from './icon-button';
 import { RoleBadgeUI } from './role-badge';
@@ -18,74 +18,66 @@ import TextInput from './text-input';
 import Controls from './controls';
 
 export default function BlockPanel() {
-  const [user] = UserProvider();
-  const [bookmark, setBookmark] = useState(null);
+  const [user] = useContext(UserProvider.context);
+  const [lockedPersonas, setLockedPersonas] = useState([]);
+  const [personaToUnlock, setPersonaToUnlock] = useState(null);
 
-  const search = createBlockedRolesQs({ bookmark });
-
-  const groups = useGetGroups(search, !!bookmark);
+  const { data: personas, loadingPersonas } = useGetPersonas();
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [unmoderatedRole, setUnmoderatedRole] = useState(null);
-
-  const [excluded, setExcluded] = useState(new Set());
-  const [added, setAdded] = useState([]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  useEffect(() => {
+    if (!loadingPersonas) {
+      if (personas && personas.data) {
+        setLockedPersonas(personas.data.filter(persona => persona.isLocked));
+      }
+    }
+  }, [loadingPersonas, personas, user]);
 
   return (
     <div className="block-panel">
       <Helmet>
         <title>{ORG} • Moderate Users</title>
       </Helmet>
-      <HeaderBar closeGap />
+      <HeaderBar thisUser={user} closeGap />
 
       <section>
         <header className="block-panel__header">
-          <span>Blocked Personas</span>
+          <span>Locked Personas</span>
           <Button
             primary={true}
             onClick={() => {
               setIsAddModalOpen(true);
             }}
           >
-            Block persona
+            Lock persona
           </Button>
         </header>
 
-        {groups.total_rows === 0 && !groups.loading && !added.length ? (
-          <div>No blocked persona.</div>
-        ) : (
-          <div>
-            <ul className="block-panel__card-list">
-              {added
-                .concat(
-                  groups.rows
-                    .map(row => row.doc)
-                    .filter(
-                      role =>
-                        !excluded.has(getId(role)) &&
-                        !added.some(_role => getId(_role) === getId(role)),
-                    ),
-                )
-                .map(role => (
-                  <li key={getId(role)} className="block-panel__card-list-item">
+        {lockedPersonas ? (
+          !lockedPersonas.length ? (
+            <div>No locked persona.</div>
+          ) : (
+            <div>
+              <ul className="block-panel__card-list">
+                {lockedPersonas.map(persona => (
+                  <li key={persona.id} className="block-panel__card-list-item">
                     <div className="block-panel__card-list-item__left">
-                      <RoleBadgeUI role={role} />
-                      <span>{role.name || unprefix(getId(role))}</span>
+                      <RoleBadgeUI user={persona} />
+                      <span>{persona.name}</span>
                     </div>
                     <div className="block-panel__card-list-item__right">
                       <LabelStyle>
-                        {role['@type'] === 'AnonymousReviewerRole'
-                          ? 'Anonymous'
-                          : 'Public'}
+                        {persona.isAnonymous ? 'Anonymous' : 'Public'}
                       </LabelStyle>
                       <IconButton
                         className="block-panel__remove-button"
                         onClick={() => {
-                          setUnmoderatedRole(role);
+                          setPersonaToUnlock(persona);
                         }}
                       >
                         <MdClose className="block-panel__remove-button-icon" />
@@ -93,25 +85,10 @@ export default function BlockPanel() {
                     </div>
                   </li>
                 ))}
-            </ul>
-          </div>
-        )}
-
-        <div className="block-panel__page-nav">
-          {!!(
-            groups.rows.length < groups.total_rows &&
-            groups.bookmark !== bookmark
-          ) && (
-            <Button
-              onClick={e => {
-                e.preventDefault();
-                setBookmark(groups.bookmark);
-              }}
-            >
-              More
-            </Button>
-          )}
-        </div>
+              </ul>
+            </div>
+          )
+        ) : null}
       </section>
 
       {isAddModalOpen && (
@@ -120,64 +97,64 @@ export default function BlockPanel() {
           onClose={() => {
             setIsAddModalOpen(false);
           }}
-          onSuccess={action => {
-            setAdded(added.concat(action.result));
-          }}
+          onSuccess={locked => setLockedPersonas(lockedPersonas.concat(locked))}
         />
       )}
 
-      {!!unmoderatedRole && (
+      {personaToUnlock ? (
         <BlockPanelRemoveModal
           user={user}
-          role={unmoderatedRole}
+          persona={personaToUnlock}
           onClose={() => {
-            setUnmoderatedRole(null);
+            setPersonaToUnlock(null);
           }}
-          onSuccess={action => {
-            setExcluded(
-              new Set(Array.from(excluded).concat(getId(action.result))),
+          onSuccess={unlocked => {
+            setLockedPersonas(
+              lockedPersonas.filter(persona => persona.uuid !== unlocked.uuid),
             );
           }}
         />
-      )}
+      ) : null}
     </div>
   );
 }
 
-function BlockPanelAddModal({ user, onClose, onSuccess }) {
-  const [value, setValue] = useState('');
-  const postGroup = usePostGroups();
+function BlockPanelAddModal({ onClose, onSuccess }) {
+  const [personaToLock, setPersonaToLock] = useState('');
+  const { mutate: updatePersona, loading, error } = usePutPersona({
+    id: personaToLock,
+  });
   const [frame] = useState('input');
 
   const pattern =
     '^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$'; // uuid v4
-  const re = new RegExp(pattern, 'i');
+  // const re = new RegExp(pattern, 'i');
 
   return (
-    <Modal title="Add Moderator">
+    <Modal title="Block persona">
       <div className="block-panel-add-modal">
         {frame === 'input' ? (
           <Fragment>
             <TextInput
               inputId="step-preprint-input-new"
-              label={<span>Enter a role (persona) ID</span>}
+              label={<span>Enter a persona name</span>}
               minimal={true}
               autoComplete="off"
-              disabled={postGroup.loading}
+              disabled={loading}
               placeholder=""
               pattern={pattern}
               onChange={e => {
                 const value = e.target.value;
-                setValue(value);
+                setPersonaToLock(value);
               }}
-              value={value}
+              value={personaToLock}
             />
 
             <Controls
-              error={postGroup.error} // #FIXME
+              error={error} // #FIXME
             >
               <Button
-                disabled={postGroup.loading}
+                disabled={loading}
                 onClick={() => {
                   onClose();
                 }}
@@ -185,28 +162,32 @@ function BlockPanelAddModal({ user, onClose, onSuccess }) {
                 Cancel
               </Button>
               <Button
-                disabled={postGroup.loading || !re.test(value)}
-                isWaiting={postGroup.loading}
+                disabled={loading}
+                isWaiting={loading}
                 onClick={() => {
-                  postGroup(user, value)
-                    .then(() => alert('Role posted successfully.'))
-                    .catch(err => alert(`An error occurred: ${err}`));
-                  onSuccess(value);
+                  updatePersona({ isLocked: true })
+                    .then(resp => {
+                      let locked = resp.data;
+                      alert(`Persona successfully locked`);
+                      onSuccess(locked);
+                      return onClose();
+                    })
+                    .catch(err => alert(`An error occurred: ${err.message}`));
                 }}
               >
-                Block
+                Lock
               </Button>
             </Controls>
           </Fragment>
         ) : (
           <Fragment>
-            <p>The role (persona) has been successfully blocked.</p>
+            <p>The persona has been successfully locked.</p>
 
             <Controls
-              error={postGroup.error} // #FIXME
+              error={error} // #FIXME
             >
               <Button
-                disabled={postGroup.loading}
+                disabled={loading}
                 onClick={() => {
                   onClose();
                 }}
@@ -222,30 +203,30 @@ function BlockPanelAddModal({ user, onClose, onSuccess }) {
 }
 
 BlockPanelAddModal.propTypes = {
-  user: PropTypes.object.isRequired,
   onClose: PropTypes.func.isRequired,
   onSuccess: PropTypes.func.isRequired,
 };
 
-function BlockPanelRemoveModal({ user, role, onClose, onSuccess }) {
-  const postGroup = usePostGroups();
+function BlockPanelRemoveModal({ persona, onClose, onSuccess }) {
+  const { mutate: updatePersona, loading, error } = usePutPersona({
+    id: persona.uuid,
+  });
   const [frame] = useState('submit');
 
   return (
-    <Modal title="Revoke Moderator Permission">
+    <Modal title="Unlock persona">
       <div className="block-panel-remove-modal">
         {frame === 'submit' ? (
           <Fragment>
             <p>
-              Are you sure to want to unblock{' '}
-              <em>{role.name || unprefix(getId(role))}</em>?
+              Are you sure to want to unlock <em>{persona.name}</em>?
             </p>
 
             <Controls
-              error={postGroup.error} // #FIXME
+              error={error} // #FIXME
             >
               <Button
-                disabled={postGroup.loading}
+                disabled={loading}
                 onClick={() => {
                   onClose();
                 }}
@@ -253,31 +234,33 @@ function BlockPanelRemoveModal({ user, role, onClose, onSuccess }) {
                 Cancel
               </Button>
               <Button
-                disabled={postGroup.loading}
-                isWaiting={postGroup.loading}
+                disabled={loading}
+                isWaiting={loading}
                 onClick={() => {
-                  postGroup(user, role)
-                    .then(() => alert('Role posted successfully.'))
-                    .catch(err => alert(`An error occurred: ${err}`));
-                  onSuccess(role);
+                  updatePersona({ isLocked: false })
+                    .then(() => {
+                      alert(`Successfully unlocked ${persona.name}`);
+                      onClose();
+                      return onSuccess(persona);
+                    })
+                    .catch(err => alert(`An error occurred: ${err.message}`));
                 }}
               >
-                Unblock
+                Unlock
               </Button>
             </Controls>
           </Fragment>
         ) : (
           <Fragment>
             <p>
-              <em>{role.name || unprefix(getId(role))}</em> was successfully
-              unblocked.
+              <em>{persona.name}</em> was successfully unlocked.
             </p>
 
             <Controls
-              error={postGroup.error} // #FIXME
+              error={error} // #FIXME
             >
               <Button
-                disabled={postGroup.loading}
+                disabled={loading}
                 onClick={() => {
                   onClose();
                 }}
@@ -294,7 +277,7 @@ function BlockPanelRemoveModal({ user, role, onClose, onSuccess }) {
 
 BlockPanelRemoveModal.propTypes = {
   user: PropTypes.object.isRequired,
-  role: PropTypes.object.isRequired,
+  persona: PropTypes.object.isRequired,
   onClose: PropTypes.func.isRequired,
   onSuccess: PropTypes.func.isRequired,
 };

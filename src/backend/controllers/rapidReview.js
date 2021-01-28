@@ -127,7 +127,7 @@ export default function controller(rapidReviews, thisUser) {
       let rapid;
 
       try {
-        rapid = await rapidReviews.findOne(ctx.params.id, [
+        rapid = await rapidReviews.findOne({ uuid: ctx.params.id }, [
           'author',
           'preprint',
         ]);
@@ -170,7 +170,7 @@ export default function controller(rapidReviews, thisUser) {
       let rapid;
 
       try {
-        rapid = await rapidReviews.findOne(ctx.params.id);
+        rapid = await rapidReviews.findOne({ uuid: ctx.params.id });
         if (!rapid) {
           ctx.throw(404, `Rapid review with ID ${ctx.params.id} doesn't exist`);
         }
@@ -203,7 +203,7 @@ export default function controller(rapidReviews, thisUser) {
       let rapid;
 
       try {
-        rapid = await rapidReviews.findOne(ctx.params.id);
+        rapid = await rapidReviews.findOne({ uuid: ctx.params.id });
         if (!rapid) {
           ctx.throw(404, `Rapid review with ID ${ctx.params.id} doesn't exist`);
         }

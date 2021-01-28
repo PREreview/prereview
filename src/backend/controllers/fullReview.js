@@ -75,11 +75,10 @@ export default function controller(
     // pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
     handler: async ctx => {
       log.debug('Adding full review.');
-      log.debug('ctx.body,', ctx.request.body);
       let review, draft, authorPersona, preprint;
 
       try {
-        authorPersona = await getActivePersona(ctx.state.user);
+        authorPersona = getActivePersona(ctx.state.user);
       } catch (err) {
         log.error('Failed to load user personas.');
         ctx.throw(400, err);
@@ -158,7 +157,7 @@ export default function controller(
       let fullReview, draft;
 
       try {
-        fullReview = await reviewModel.findOne(ctx.params.id);
+        fullReview = await reviewModel.findOne({ uuid: ctx.params.id });
         if (!fullReview) {
           ctx.throw(404, `Full review with ID ${ctx.params.id} doesn't exist`);
         }
@@ -199,7 +198,7 @@ export default function controller(
       let fullReview, latestDraft;
 
       try {
-        fullReview = await reviewModel.findOne(ctx.params.id, [
+        fullReview = await reviewModel.findOne({ uuid: ctx.params.id }, [
           'drafts',
           'authors',
           'comments',
@@ -215,12 +214,17 @@ export default function controller(
 
       if (fullReview) {
         // gets latest draft associated with this review
-        latestDraft = fullReview.drafts[fullReview.drafts.length - 1];
+        fullReview.drafts.length
+          ? (latestDraft = fullReview.drafts[fullReview.drafts.length - 1])
+          : null;
+        latestDraft
+          ? (fullReview = { ...fullReview, contents: latestDraft.contents })
+          : null;
 
         ctx.body = {
           status: 200,
           message: 'ok',
-          body: [{ ...fullReview, contents: latestDraft.contents }],
+          body: [fullReview],
         };
         ctx.status = 200;
       }
@@ -244,7 +248,7 @@ export default function controller(
       let fullReview;
 
       try {
-        fullReview = await reviewModel.findOne(ctx.params.id);
+        fullReview = await reviewModel.findOne({ uuid: ctx.params.id });
         if (!fullReview) {
           ctx.throw(404, `Full review with ID ${ctx.params.id} doesn't exist`);
         }

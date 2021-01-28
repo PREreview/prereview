@@ -1,6 +1,7 @@
 import router from 'koa-joi-router';
 import { getLogger } from '../log.js';
 import { getErrorMessages } from '../utils/errors';
+import getActivePersona from '../utils/persona.js';
 
 const log = getLogger('backend:controller:comment');
 const Joi = router.Joi;
@@ -31,7 +32,7 @@ const handleInvalid = ctx => {
 };
 
 // eslint-disable-next-line no-unused-vars
-export default function controller(commentModel, thisUser) {
+export default function controller(commentModel, fullReviewModel, thisUser) {
   const commentsRouter = router();
 
   // handler for GET multiple comments
@@ -61,46 +62,48 @@ export default function controller(commentModel, thisUser) {
     ctx.status = 200;
   };
 
-  commentsRouter.route({
-    method: 'POST',
-    path: '/comments',
-    pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
-    validate: {
-      body: commentSchema,
-      type: 'json',
-      continueOnError: true,
-    },
-    handler: async ctx => {
-      if (ctx.invalid) {
-        handleInvalid(ctx);
-        return;
+  const postHandler = async ctx => {
+    if (ctx.invalid) {
+      handleInvalid(ctx);
+      return;
+    }
+    let fullReview, comment, fid, authorPersona;
+
+    ctx.params.fid ? (fid = ctx.params.fid) : null;
+
+    authorPersona = getActivePersona(ctx.state.user);
+
+    try {
+      if (fid) {
+        fullReview = await fullReviewModel.findOne(fid);
       }
 
-      log.debug('Posting a comment.');
-      let newComment;
+      log.debug('author', authorPersona);
+      log.debug('fullReview', fullReview);
+      log.debug('ctx.request.body', ctx.request.body);
 
-      try {
-        newComment = commentModel.create(ctx.request.body);
-        await commentModel.persistAndFlush(newComment);
-      } catch (err) {
-        log.error('HTTP 400 Error: ', err);
-        ctx.throw(400, `Failed to parse comment schema: ${err}`);
+      if (fullReview && authorPersona) {
+        log.debug('creating a comment');
+        comment = commentModel.create({
+          ...ctx.request.body,
+          parent: fullReview,
+          author: authorPersona,
+          isPublished: true,
+        });
+        fullReview.comments.add(comment);
       }
+      await commentModel.persistAndFlush(comment);
+    } catch (err) {
+      log.error(`HTTP 400 error: ${err}`);
+    }
 
-      ctx.body = {
-        status: 201,
-        message: 'created',
-      };
-      ctx.status = 201;
-    },
-    meta: {
-      swagger: {
-        operationId: 'PostComments',
-        summary:
-          'Endpoint to POST comments on full-length reviews of preprints. Returns a 201 if a comment has been successfully created.',
-      },
-    },
-  });
+    ctx.body = {
+      status: 201,
+      message: 'created',
+    };
+
+    ctx.status = 201;
+  };
 
   commentsRouter.route({
     method: 'GET',
@@ -132,18 +135,31 @@ export default function controller(commentModel, thisUser) {
     validate: {
       query: querySchema,
     },
-    handler: async ctx => {
-      if (ctx.invalid) {
-        handleInvalid(ctx);
-        return;
-      }
-      getHandler(ctx);
-    },
+    handler: async ctx => getHandler(ctx),
     meta: {
       swagger: {
         operationId: 'GetFullReviewComments',
         summary:
           'Endpoint to GET all comments related to a specific full-length review of a preprint.',
+      },
+    },
+  });
+
+  commentsRouter.route({
+    method: 'POST',
+    path: '/fullReviews/:fid/comments',
+    pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
+    validate: {
+      body: commentSchema,
+      type: 'json',
+      continueOnError: true,
+    },
+    handler: postHandler,
+    meta: {
+      swagger: {
+        operationId: 'PostComments',
+        summary:
+          'Endpoint to POST comments on full-length reviews of preprints. Returns a 201 if a comment has been successfully created.',
       },
     },
   });
@@ -158,7 +174,7 @@ export default function controller(commentModel, thisUser) {
       let comment;
 
       try {
-        comment = await commentModel.findOne(ctx.params.id);
+        comment = await commentModel.findOne({ uuid: ctx.params.id });
 
         if (!comment) {
           ctx.throw(404, `Comment with ID ${ctx.params.id} doesn't exist`);
@@ -203,7 +219,7 @@ export default function controller(commentModel, thisUser) {
       let comment;
 
       try {
-        comment = await commentModel.findOne(ctx.params.id);
+        comment = await commentModel.findOne({ uuid: ctx.params.id });
 
         if (!comment) {
           ctx.throw(404, `A comment with ID ${ctx.params.id} doesn't exist`);
@@ -238,7 +254,7 @@ export default function controller(commentModel, thisUser) {
       let comment;
 
       try {
-        comment = await commentModel.findOne(ctx.params.id);
+        comment = await commentModel.findOne({ uuid: ctx.params.id });
 
         if (!comment) {
           ctx.throw(404, `A comment with ID ${ctx.params.id} doesn't exist`);

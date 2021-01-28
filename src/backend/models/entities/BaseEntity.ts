@@ -1,8 +1,15 @@
-import { PrimaryKey, Property } from '@mikro-orm/core';
+import { v4 as uuidv4 } from 'uuid';
+import { PrimaryKey, Property, Unique } from '@mikro-orm/core';
+import { Fixture } from 'class-fixtures-factory';
 
 export abstract class BaseEntity {
   @PrimaryKey()
   id!: number;
+
+  @Fixture(() => uuidv4())
+  @Property({ type: 'string' })
+  @Unique()
+  uuid = uuidv4();
 
   @Property()
   createdAt: Date = new Date();

@@ -39,7 +39,9 @@
 
     & p {
       display: inline-block;
+      font-size: 0.9rem;
       hyphens: auto;
+      line-height: 1.2;
       padding-right: var(--mgrd); /* reserve space for help icon */
     }
   }
@@ -96,10 +98,11 @@
 
   & .radid-form-fragment__text-answer {
     left: 20px;
-    min-width: 180px;
+    min-width: 200px;
     position: absolute;
     resize: vertical;
     top: 50%;
     transform: translateY(-50%);
+    width: 100%;
   }
 }

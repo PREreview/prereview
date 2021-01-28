@@ -52,8 +52,6 @@ export default function controller(reqModel, thisUser) {
       if (pid) {
         request = reqModel.create({ preprint: pid, author: authorPersona });
       } else {
-        log.debug('ctx.request.body.preprint', ctx.request.body.preprint);
-        log.debug('authorPersona', authorPersona);
         request = reqModel.create({
           preprint: ctx.request.body.preprint.id, // TODO: figure out ensuring preprint id gets passed this way
           author: authorPersona,
@@ -143,7 +141,10 @@ export default function controller(reqModel, thisUser) {
       let request;
 
       try {
-        request = await reqModel.findOne(ctx.params.id, ['author', 'preprint']);
+        request = await reqModel.findOne({ uuid: ctx.params.id }, [
+          'author',
+          'preprint',
+        ]);
         if (!request) {
           ctx.throw(404, `Request with ID ${ctx.params.id} doesn't exist`);
         }
@@ -178,7 +179,7 @@ export default function controller(reqModel, thisUser) {
       let toDelete;
 
       try {
-        toDelete = await reqModel.findOne(ctx.params.id);
+        toDelete = await reqModel.findOne({ uuid: ctx.params.id });
         if (!toDelete) {
           ctx.throw(404, `Request with ID ${ctx.params.id} doesn't exist`);
         }

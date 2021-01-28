@@ -41,11 +41,13 @@ export default function SettingsRoles({ user }) {
   const classes = useStyles();
   const isFirstTimeOnSettings = useIsFirstTimeOnSettings();
   const [personaToEdit, setPersonaToEdit] = useState(null);
-  const [activePersona, setActivePersona] = useState(user ? user.defaultPersona : null)
+  const [activePersona, setActivePersona] = useState(
+    user ? user.defaultPersona : null,
+  );
 
-  const handleActivePersonaClose = (persona) => {
-    setActivePersona(persona)
-  }
+  const handleActivePersonaClose = persona => {
+    setActivePersona(persona);
+  };
 
   return (
     <section className="settings-roles settings__section">
@@ -71,20 +73,20 @@ export default function SettingsRoles({ user }) {
       </p>
 
       <p>
-        The <strong>public</strong> persona is the persona that will be used
+        The <strong>active</strong> persona is the persona that will be used
         when you write <em>new</em> reviews or <em>new</em> request for feedback
         on preprints. It can be changed at any time.
       </p>
 
-      {(!user.name || !user.avatar) && (
+      {(!activePersona.name || !activePersona.avatar) && (
         <p className="settings-roles__notice">
           <MdInfoOutline className="settings-roles__notice-icon" />
 
           <span>
             It is recommended that you set{' '}
-            {!user.name && !user.avatar
+            {!activePersona.name && !activePersona.avatar
               ? 'a display name and an avatar'
-              : !user.name
+              : !activePersona.name
               ? 'a display name'
               : 'an avatar'}{' '}
             for your persona. Click on the <strong>Edit</strong> buttons below
@@ -119,10 +121,10 @@ export default function SettingsRoles({ user }) {
           <TableBody>
             {user.personas.map(persona => {
               return (
-                <TableRow key={persona.id}>
+                <TableRow key={persona.uuid}>
                   <TableCell>
                     <div className="settings__persona-list-item__active-state">
-                      {activePersona.id === persona.id ? (
+                      {activePersona.uuid === persona.uuid ? (
                         <span className="settings__persona-list-item__is-active">
                           <MdStar className="settings__persona-active-icon" />
                           <span className="settings__persona-active-label">
@@ -147,11 +149,11 @@ export default function SettingsRoles({ user }) {
                       />
 
                       <XLink
-                        href={`/about/${unprefix(persona.id)}`}
-                        to={`/about/${unprefix(user.id)}`}
+                        href={`/about/${persona.uuid}`}
+                        to={`/about/${persona.uuid}`}
                         className="settings__persona-link"
                       >
-                        {persona.name || unprefix(persona.id)}
+                        {persona.name || unprefix(persona.uuid)}
                       </XLink>
                     </div>
                   </TableCell>
@@ -210,7 +212,7 @@ export default function SettingsRoles({ user }) {
           }}
         >
           <RoleEditor
-            user={personaToEdit}
+            persona={personaToEdit}
             onCancel={() => {
               setPersonaToEdit(null);
             }}
@@ -228,10 +230,10 @@ SettingsRoles.propTypes = {
   user: PropTypes.object.isRequired,
 };
 
-function MakeActivePersonaModalButton({ user, persona, handleClose}) {
+function MakeActivePersonaModalButton({ user, persona, handleClose }) {
   const [isOpen, setIsOpen] = useState(false);
-  const { mutate: updateUser, loading, error } = usePutUser({
-    id: user.id,
+  const { mutate: updateUser, loading } = usePutUser({
+    id: user.uuid,
   });
 
   return (
@@ -248,13 +250,13 @@ function MakeActivePersonaModalButton({ user, persona, handleClose}) {
       {isOpen && (
         <Modal title={`Set active persona to ${persona.name}`}>
           <p>
-            The <strong>public</strong> persona makes your information viewable
+            The <strong>active</strong> persona makes your information viewable
             by other users when you write <em>new</em> reviews or <em>new</em>{' '}
             request for feedback on preprints. Once your profile is public, it
             cannot be changed.
           </p>
 
-          <Controls error={error}>
+          <Controls>
             <Button
               disabled={loading}
               onClick={() => {
@@ -269,9 +271,10 @@ function MakeActivePersonaModalButton({ user, persona, handleClose}) {
               onClick={() => {
                 updateUser({ defaultPersona: persona.id })
                   .then(() => {
-                    alert('User updated successfully.')
-                    setIsOpen(false)
-                    handleClose(persona)})
+                    alert('User updated successfully.');
+                    setIsOpen(false);
+                    return handleClose(persona);
+                  })
                   .catch(err => alert(`An error occurred: ${err.message}`));
               }}
             >

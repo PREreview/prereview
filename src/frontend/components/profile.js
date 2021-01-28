@@ -1,47 +1,59 @@
+// base imports
 import React, { Fragment, useContext, useEffect, useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { useLocation } from 'react-router-dom';
 import { format } from 'date-fns';
+
+// contexts
 import UserProvider from '../contexts/user-context';
-import { MdPublic } from 'react-icons/md';
-import { Helmet } from 'react-helmet-async';
-import IncognitoIcon from '../svgs/incognito_icon.svg';
+
+// hooks
+import { useGetPersona } from '../hooks/api-hooks.tsx';
+
+// Material UI components
+import Chip from '@material-ui/core/Chip';
+
+// components
+import Avatar from './avatar';
 import HeaderBar from './header-bar';
-import { useGetUser } from '../hooks/api-hooks.tsx';
-import RoleActivity from './role-activity';
 import LabelStyle from './label-style';
-import XLink from './xlink';
+import Loading from './loading.js';
 import NotFound from './not-found';
+import RoleActivity from './role-activity';
+import XLink from './xlink';
+
+// icons
+import { MdPublic } from 'react-icons/md';
+import IncognitoIcon from '../svgs/incognito_icon.svg';
+
+// constants
 import { ORG } from '../constants';
 
 export default function Profile() {
   const location = useLocation();
   const [thisUser] = useContext(UserProvider.context);
   const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState(null);
   const [persona, setPersona] = useState(null);
 
-  const { data: userData, loading: loadingUser, error } = useGetUser({
+  const { data: personaData, loading: loadingPersona, error } = useGetPersona({
     id: location.pathname.slice(7),
   });
 
   useEffect(() => {
-    // window.scrollTo(0, 0);
-    if (!loadingUser) {
-      if (userData) {
-        if (!userData.data.isPrivate && userData.data.defaultPersona) {
-          setPersona(userData.data.defaultPersona);
-          setUser(userData.data);
-          setLoading(false);
-        }
+    if (!loadingPersona) {
+      if (personaData) {
+        setPersona(personaData.data[0]);
+        setLoading(false);
       }
     }
-  }, [loadingUser, userData]);
+  }, [loadingPersona, personaData]);
 
-  if (error || !persona) {
-    // #FIXME
+  console.log(persona);
+
+  if (loading || !personaData) {
+    return <Loading />;
+  } else if (error) {
     return <NotFound />;
-  } else if (loading) {
-    return <div>Loading...</div>;
   } else {
     return (
       <div className="profile">
@@ -55,20 +67,16 @@ export default function Profile() {
 
         <section className="profile__content">
           <header className="profile__header">
-            {persona && persona.avatar && persona.avatar.contentUrl ? (
-              <img
-                src={user.avatar.contentUrl}
-                alt="avatar"
-                className="profile__avatar-img"
-              />
+            {persona && persona.avatar ? (
+              <Avatar avatar={persona.avatar} className="profile__avatar-img" />
             ) : null}
 
             <section className="profile__identity-info">
               <header className="profile__indentity-info-header">
                 <h2 className="profile__username">
-                  {persona && persona.name ? persona.name : user.name}
+                  {persona && persona.name ? persona.name : 'Name goes here'}
                 </h2>
-                {user ? (
+                {persona ? (
                   <span className="profile__persona-status">
                     {persona && !persona.isAnonymous ? (
                       <div className="profile__persona-status__icon-container">
@@ -94,13 +102,30 @@ export default function Profile() {
                 </dt>
                 <dd>
                   <XLink
-                    to={`/about/${user.orcid ? user.orcid : user.id}`}
-                    href={`/about/${user.orcid ? user.orcid : user.id}`}
+                    to={`/about/${persona.uuid}`}
+                    href={`/about/${persona.uuid}`}
                   >
                     {persona.name}
                   </XLink>
                 </dd>
-                {user && (
+                {persona && persona.badges.length > 0 && (
+                  <Fragment>
+                    <dt>
+                      <LabelStyle>Tags</LabelStyle>
+                    </dt>
+                    <dd>
+                      {persona.badges.map(badge => (
+                        <Chip
+                          key={badge.uuid}
+                          label={badge.name}
+                          color="primary"
+                          size="small"
+                        />
+                      ))}
+                    </dd>
+                  </Fragment>
+                )}
+                {persona && (
                   <Fragment>
                     <dt>
                       <LabelStyle>Identity</LabelStyle>
@@ -111,25 +136,27 @@ export default function Profile() {
                   </Fragment>
                 )}
 
-                {user.orcid && (
+                {!persona.isAnonymous && (
                   <Fragment>
                     <dt>
                       <LabelStyle>ORCID</LabelStyle>
                     </dt>
                     <dd>
-                      <a href={`https://orcid.org/${user.orcid}`}>
-                        {user.orcid}
+                      <a href={`https://orcid.org/${persona.identity.orcid}`}>
+                        {persona.identity.orcid}
                       </a>
                     </dd>
                   </Fragment>
                 )}
 
-                {user && (
+                {persona && (
                   <Fragment>
                     <dt>
                       <LabelStyle>Member since</LabelStyle>
                     </dt>
-                    <dd>{format(new Date(user.createdAt), 'MMM. d, yyyy')}</dd>
+                    <dd>
+                      {format(new Date(persona.createdAt), 'MMM. d, yyyy')}
+                    </dd>
                   </Fragment>
                 )}
               </dl>
