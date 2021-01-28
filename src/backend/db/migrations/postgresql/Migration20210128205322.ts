@@ -1,6 +1,6 @@
 import { Migration } from '@mikro-orm/migrations';
 
-export class Migration20210122201051 extends Migration {
+export class Migration20210128205322 extends Migration {
 
   async up(): Promise<void> {
     this.addSql('create table "tag" ("id" serial primary key, "created_at" timestamptz(0) not null, "updated_at" timestamptz(0) not null, "name" varchar(255) not null, "color" varchar(255) not null);');
@@ -34,6 +34,12 @@ export class Migration20210122201051 extends Migration {
     this.addSql('alter table "full_review" add constraint "full_review_doi_unique" unique ("doi");');
 
     this.addSql('create table "full_review_draft" ("id" serial primary key, "created_at" timestamptz(0) not null, "updated_at" timestamptz(0) not null, "parent_id" int4 not null, "contents" text not null);');
+
+    this.addSql('create table "full_review_mentors" ("full_review_id" int4 not null, "persona_id" int4 not null);');
+    this.addSql('alter table "full_review_mentors" add constraint "full_review_mentors_pkey" primary key ("full_review_id", "persona_id");');
+
+    this.addSql('create table "full_review_invitees" ("full_review_id" int4 not null, "persona_id" int4 not null);');
+    this.addSql('alter table "full_review_invitees" add constraint "full_review_invitees_pkey" primary key ("full_review_id", "persona_id");');
 
     this.addSql('create table "full_review_authors" ("full_review_id" int4 not null, "persona_id" int4 not null);');
     this.addSql('alter table "full_review_authors" add constraint "full_review_authors_pkey" primary key ("full_review_id", "persona_id");');
@@ -78,6 +84,12 @@ export class Migration20210122201051 extends Migration {
     this.addSql('alter table "full_review" add constraint "full_review_preprint_id_foreign" foreign key ("preprint_id") references "preprint" ("id") on update cascade;');
 
     this.addSql('alter table "full_review_draft" add constraint "full_review_draft_parent_id_foreign" foreign key ("parent_id") references "full_review" ("id") on update cascade;');
+
+    this.addSql('alter table "full_review_mentors" add constraint "full_review_mentors_full_review_id_foreign" foreign key ("full_review_id") references "full_review" ("id") on update cascade on delete cascade;');
+    this.addSql('alter table "full_review_mentors" add constraint "full_review_mentors_persona_id_foreign" foreign key ("persona_id") references "persona" ("id") on update cascade on delete cascade;');
+
+    this.addSql('alter table "full_review_invitees" add constraint "full_review_invitees_full_review_id_foreign" foreign key ("full_review_id") references "full_review" ("id") on update cascade on delete cascade;');
+    this.addSql('alter table "full_review_invitees" add constraint "full_review_invitees_persona_id_foreign" foreign key ("persona_id") references "persona" ("id") on update cascade on delete cascade;');
 
     this.addSql('alter table "full_review_authors" add constraint "full_review_authors_full_review_id_foreign" foreign key ("full_review_id") references "full_review" ("id") on update cascade on delete cascade;');
     this.addSql('alter table "full_review_authors" add constraint "full_review_authors_persona_id_foreign" foreign key ("persona_id") references "persona" ("id") on update cascade on delete cascade;');

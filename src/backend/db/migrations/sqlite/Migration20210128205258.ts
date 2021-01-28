@@ -1,6 +1,6 @@
 import { Migration } from '@mikro-orm/migrations';
 
-export class Migration20210122200947 extends Migration {
+export class Migration20210128205258 extends Migration {
 
   async up(): Promise<void> {
     this.addSql('create table `tag` (`id` integer not null primary key autoincrement, `created_at` datetime not null, `updated_at` datetime not null, `name` varchar not null, `color` varchar not null);');
@@ -35,6 +35,14 @@ export class Migration20210122200947 extends Migration {
     this.addSql('create unique index `full_review_doi_unique` on `full_review` (`doi`);');
 
     this.addSql('create table `full_review_draft` (`id` integer not null primary key autoincrement, `created_at` datetime not null, `updated_at` datetime not null, `contents` text not null);');
+
+    this.addSql('create table `full_review_mentors` (`full_review_id` integer not null, `persona_id` integer not null, primary key (`full_review_id`, `persona_id`));');
+    this.addSql('create index `full_review_mentors_full_review_id_index` on `full_review_mentors` (`full_review_id`);');
+    this.addSql('create index `full_review_mentors_persona_id_index` on `full_review_mentors` (`persona_id`);');
+
+    this.addSql('create table `full_review_invitees` (`full_review_id` integer not null, `persona_id` integer not null, primary key (`full_review_id`, `persona_id`));');
+    this.addSql('create index `full_review_invitees_full_review_id_index` on `full_review_invitees` (`full_review_id`);');
+    this.addSql('create index `full_review_invitees_persona_id_index` on `full_review_invitees` (`persona_id`);');
 
     this.addSql('create table `full_review_authors` (`full_review_id` integer not null, `persona_id` integer not null, primary key (`full_review_id`, `persona_id`));');
     this.addSql('create index `full_review_authors_full_review_id_index` on `full_review_authors` (`full_review_id`);');

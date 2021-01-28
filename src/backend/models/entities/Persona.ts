@@ -58,6 +58,12 @@ export class Persona extends BaseEntity {
   @ManyToMany({ entity: () => FullReview, mappedBy: 'authors' })
   fullReviews: Collection<FullReview> = new Collection<FullReview>(this);
 
+  @ManyToMany({ entity: () => FullReview, mappedBy: 'invitees' })
+  invitedTo: Collection<FullReview> = new Collection<FullReview>(this);
+
+  @ManyToMany({ entity: () => FullReview, mappedBy: 'mentors' })
+  mentoring: Collection<FullReview> = new Collection<FullReview>(this);
+
   @OneToMany({ entity: () => Request, mappedBy: 'author' })
   requests: Collection<Request> = new Collection<Request>(this);
 
