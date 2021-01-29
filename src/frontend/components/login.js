@@ -37,8 +37,8 @@ export default function Login() {
   const [joinModalOpen, setJoinModalOpen] = useState(false)
 
   const handleJoinModalClose = () => {
-    setJoinModalOpen(false)
     setLoginModalOpen(true)
+    setJoinModalOpen(false)
   }
 
   const handleLoginModalClose = () => {

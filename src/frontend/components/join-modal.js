@@ -62,7 +62,9 @@ export default function JoinModal({
 }) {
 
   const classes = styles();
-  
+
+  const next = new URLSearchParams(location.search).get('next');
+
   return (
     <ThemeProvider theme={prereviewTheme}> 
       <Dialog open={open}>
@@ -77,14 +79,15 @@ export default function JoinModal({
         >
           Sign up for an account
         </Button>
+
         <Button
-          disabled={false}
-          element={'button'}
-          onClick={()=>console.log("click this button")}
+          href={`/api/v2/orcid/login${
+            next ? `?next=${encodeURIComponent(next)}` : ''
+          }`}
           className={classes.button}
         >
           Log In
-        </Button>    
+        </Button>  
       </Dialog>          
     </ThemeProvider>
   )
