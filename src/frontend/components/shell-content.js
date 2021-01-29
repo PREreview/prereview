@@ -103,6 +103,7 @@ export default function ShellContent({
 
   useEffect(() => {
     if (user) {
+      console.log(preprint);
       if (preprint.fullReviews.length) {
         // gets an array of the active user's persona IDs
         let personaIDs = user.personas.map(persona => persona.id);

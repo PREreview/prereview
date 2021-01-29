@@ -18,7 +18,9 @@ import Grid from '@material-ui/core/Grid';
 import Input from '@material-ui/core/Input';
 import InputLabel from '@material-ui/core/InputLabel';
 import Link from '@material-ui/core/Link';
+import MenuItem from '@material-ui/core/MenuItem';
 import Modal from '@material-ui/core/Modal';
+import Select from '@material-ui/core/Select';
 import Stepper from '@material-ui/core/Stepper';
 import Step from '@material-ui/core/Step';
 import StepConnector from '@material-ui/core/StepConnector';
@@ -27,6 +29,7 @@ import Typography from '@material-ui/core/Typography';
 
 // utils
 import {
+  useGetTemplates,
   usePostFullReviews,
   usePostRapidReviews,
   usePutFullReview,
@@ -241,6 +244,14 @@ export default function ReviewStepper({
   const [reviewId, setReviewId] = useState(review ? review.parent : null);
   const [skipped, setSkipped] = useState(new Set());
   const steps = getSteps();
+
+  const { data: templates } = useGetTemplates();
+
+  const [template, setTemplate] = useState(null);
+
+  const handleTemplateChange = contents => {
+    setTemplate(contents);
+  };
 
   const { mutate: postRapidReview } = usePostRapidReviews();
   const { mutate: postLongReview } = usePostFullReviews();
@@ -540,7 +551,6 @@ export default function ReviewStepper({
                       color="primary"
                       type="button"
                       onClick={handleOpen}
-                      disabled={!reviewId}
                     >
                       Load templates
                     </Button>
@@ -551,7 +561,22 @@ export default function ReviewStepper({
                       aria-describedby="simple-modal-description"
                     >
                       <div className={classes.paper}>
-                        Hello!!!
+                        <Select
+                          labelId="demo-simple-select-label"
+                          id="demo-simple-select"
+                          value={template}
+                          onChange={() =>
+                            handleTemplateChange(template.contents)
+                          }
+                        >
+                          {templates
+                            ? templates.forEach(template => (
+                                <MenuItem value={template.uuid}>
+                                  {template.title}
+                                </MenuItem>
+                              ))
+                            : null}
+                        </Select>
                       </div>
                     </Modal>
                   </Box>
@@ -561,7 +586,7 @@ export default function ReviewStepper({
                 <Box m={2}>
                   <LongFormFragment
                     onContentChange={onContentChange}
-                    content={content}
+                    content={template ? template : content}
                   />
                 </Box>
                 <Box mt={2}>
