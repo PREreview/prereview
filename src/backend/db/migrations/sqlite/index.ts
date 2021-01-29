@@ -3,3 +3,4 @@
  */
 
 export * from "./Migration20210128021031";
+export * from "./Migration20210128205258";

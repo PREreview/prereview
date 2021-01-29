@@ -69,13 +69,9 @@ export default function controller(
     ctx.status = 200;
   };
 
-  reviewsRouter.route({
-    method: 'POST',
-    path: '/fullReviews',
-    // pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
-    handler: async ctx => {
-      log.debug('Adding full review.');
-      let review, draft, authorPersona, preprint;
+  const postHandler = async ctx => {
+    log.debug('Adding full review.');
+    let review, draft, authorPersona, preprint;
 
     try {
       authorPersona = getActivePersona(ctx.state.user);
