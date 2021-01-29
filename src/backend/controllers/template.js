@@ -185,7 +185,7 @@ export default function controller(templateModel, communityModel, thisUser) {
       let template;
 
       try {
-        template = await templateModel.findOne(ctx.params.id);
+        template = await templateModel.findOne({ uuid: ctx.params.id });
 
         if (!template) {
           ctx.throw(404, `template with ID ${ctx.params.id} doesn't exist`);
@@ -230,7 +230,7 @@ export default function controller(templateModel, communityModel, thisUser) {
       let template;
 
       try {
-        template = await templateModel.findOne(ctx.params.id);
+        template = await templateModel.findOne({ uuid: ctx.params.id });
 
         if (!template) {
           ctx.throw(404, `A template with ID ${ctx.params.id} doesn't exist`);
@@ -265,7 +265,7 @@ export default function controller(templateModel, communityModel, thisUser) {
       let template;
 
       try {
-        template = await templateModel.findOne(ctx.params.id);
+        template = await templateModel.findOne({ uuid: ctx.params.id });
 
         if (!template) {
           ctx.throw(404, `A template with ID ${ctx.params.id} doesn't exist`);

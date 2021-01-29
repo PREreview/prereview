@@ -1,6 +1,6 @@
 import { Migration } from '@mikro-orm/migrations';
 
-export class Migration20210128014243 extends Migration {
+export class Migration20210128021031 extends Migration {
 
   async up(): Promise<void> {
     this.addSql('create table `tag` (`id` integer not null primary key autoincrement, `uuid` varchar not null, `created_at` datetime not null, `updated_at` datetime not null, `name` varchar not null, `color` varchar not null);');
@@ -57,7 +57,8 @@ export class Migration20210128014243 extends Migration {
     this.addSql('create unique index `community_uuid_unique` on `community` (`uuid`);');
     this.addSql('create unique index `community_name_unique` on `community` (`name`);');
 
-    this.addSql('create table `template` (`id` integer not null primary key autoincrement, `created_at` datetime not null, `updated_at` datetime not null, `title` varchar not null, `contents` text not null);');
+    this.addSql('create table `template` (`id` integer not null primary key autoincrement, `uuid` varchar not null, `created_at` datetime not null, `updated_at` datetime not null, `title` varchar not null, `contents` text not null);');
+    this.addSql('create unique index `template_uuid_unique` on `template` (`uuid`);');
     this.addSql('create unique index `template_title_unique` on `template` (`title`);');
 
     this.addSql('create table `community_members` (`community_id` integer not null, `user_id` integer not null, primary key (`community_id`, `user_id`));');
