@@ -13,6 +13,7 @@ import { useHasAgreedCoC } from '../hooks/ui-hooks';
 import Button from './button';
 import Checkbox from './checkbox';
 import HeaderBar from './header-bar';
+import JoinModal from './join-modal';
 import LoginModal from './login-modal';
 import Org from './org';
 import XLink from './xlink';
@@ -33,7 +34,16 @@ export default function Login() {
 
   const [thisUser] = useContext(UserProvider.context);
   const [loginModalOpen, setLoginModalOpen] = useState(false)
+  const [joinModalOpen, setJoinModalOpen] = useState(false)
 
+  const handleJoinModalClose = () => {
+    setJoinModalOpen(false)
+    setLoginModalOpen(true)
+  }
+
+  const handleLoginModalClose = () => {
+    setLoginModalOpen(false)
+  }
 
   const next = new URLSearchParams(location.search).get('next');
 
@@ -78,13 +88,15 @@ export default function Login() {
         <Button
           disabled={!hasAgreed}
           element={hasAgreed ? 'a' : 'button'}
-          onClick={() => setLoginModalOpen(true)}
+          onClick={() => setJoinModalOpen(true)}
           primary={true}
           className="login__login-button"
         >
           Sign in with ORCID
         </Button>
-        { loginModalOpen ? <LoginModal open={loginModalOpen} handleClose={() => setLoginModalOpen(false)} /> : null }
+
+        { joinModalOpen ? <JoinModal open={joinModalOpen} handleClose={handleJoinModalClose}/> : null }
+        { loginModalOpen ? <LoginModal open={loginModalOpen} handleClose={(handleLoginModalClose)} /> : null }
       </div>
     </div>
   );

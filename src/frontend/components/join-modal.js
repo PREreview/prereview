@@ -30,18 +30,47 @@ const prereviewTheme = createMuiTheme({
   },
 });
 
-export default function JoinModal() {
-  
-  
+const styles = (theme) => ({
+  root: {
+    margin: 0,
+    padding: theme.spacing(2),
+  },
+  closeButton: {
+    position: 'absolute',
+    right: theme.spacing(1),
+    top: theme.spacing(1),
+    color: theme.palette.grey[500],
+  },
+});
+
+const DialogTitle = withStyles(styles)((props) => {
+  const { children, classes, onClose, ...other } = props;
+  return (
+    <MuiDialogTitle disableTypography className={classes.root} {...other}>
+      <Typography variant="h6">{children}</Typography>
+      {onClose ? (
+        <IconButton aria-label="close" className={classes.closeButton} onClick={onClose}>
+          <CloseIcon />
+        </IconButton>
+      ) : null}
+    </MuiDialogTitle>
+  );
+});
+
+export default function JoinModal({
+  open,
+  handleClose
+}) {
   return (
     <ThemeProvider theme={prereviewTheme}> 
-      <DialogTitle id="customized-dialog-title" onClose={handleClose} >
-        <PreReviewLogo />
-        Join a constructive community of peer reviewers!
-      </DialogTitle>
+      <Dialog open={open}>
+        <DialogTitle id="customized-dialog-title" onClose={handleClose} >
+          <PreReviewLogo />
+          Join a constructive community of peer reviewers!
+        </DialogTitle>
         <Button
           disabled={false}
-          element={button}
+          element={'button'}
           onClick={()=>console.log("click this button")}
           primary={true}
           className="login__login-button"
@@ -50,13 +79,14 @@ export default function JoinModal() {
         </Button>
         <Button
           disabled={false}
-          element={button}
+          element={'button'}
           onClick={()=>console.log("click this button")}
           primary={true}
           className="login__login-button"
         >
           Log In
-        </Button>               
+        </Button>    
+      </Dialog>          
     </ThemeProvider>
   )
 }

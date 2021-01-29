@@ -39,14 +39,31 @@ const styles = (theme) => ({
   },
 });
 
+const DialogTitle = withStyles(styles)((props) => {
+  const { children, classes, onClose, ...other } = props;
+  return (
+    <MuiDialogTitle disableTypography className={classes.root} {...other}>
+      <Typography variant="h6">{children}</Typography>
+      {onClose ? (
+        <IconButton aria-label="close" className={classes.closeButton} onClick={onClose}>
+          <CloseIcon />
+        </IconButton>
+      ) : null}
+    </MuiDialogTitle>
+  );
+});
+
 export default function LoginModal({
   open,
   handleClose
 }) {
   return (
   <ThemeProvider theme={prereviewTheme}>
-    <Dialog open={open}>
-        <CoCStepper />     
+    <Dialog open={open} aria-labelledby="customized-dialog-title" onClose={handleClose}>
+      <DialogTitle id="customized-dialog-title" onClose={handleClose}>
+          Welcome to PREreview!
+      </DialogTitle>
+      <CoCStepper />     
     </Dialog>
   </ThemeProvider>
   )
