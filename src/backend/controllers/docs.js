@@ -13,6 +13,7 @@ import rapidReviewRoutes from './rapidReview.js';
 import requestRoutes from './request.js';
 import searchesRoutes from './searches.js';
 import tagRoutes from './tag.js';
+import templateRoutes from './template.js';
 
 const log = getLogger('apiDocs:::');
 
@@ -31,6 +32,7 @@ export default function docs(authz) {
   generator.addJoiRouter(requestRoutes({}, authz));
   generator.addJoiRouter(searchesRoutes({}, authz));
   generator.addJoiRouter(tagRoutes({}, authz));
+  generator.addJoiRouter(templateRoutes({}, authz));
 
   const spec = generator.generateSpec(
     {

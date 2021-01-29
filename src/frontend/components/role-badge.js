@@ -79,7 +79,6 @@ const RoleBadgeUI = React.forwardRef(function RoleBadgeUI(
 
   const open = Boolean(anchorEl);
   const id = open ? 'user-menu' : undefined;
-  console.log('user:', user);
 
   return (
     <>
@@ -169,7 +168,7 @@ RoleBadgeUI.propTypes = {
     identity: PropTypes.oneOfType([PropTypes.object, PropTypes.number]),
     orcid: PropTypes.string,
     name: PropTypes.string,
-    avatar: PropTypes.object,
+    avatar: PropTypes.oneOfType([PropTypes.object, PropTypes.string]),
   }),
   children: PropTypes.any,
   className: PropTypes.string,

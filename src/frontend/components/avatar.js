@@ -12,7 +12,7 @@ const Avatar = ({ avatar, className }) => {
 };
 
 Avatar.propTypes = {
-  avatar: PropTypes.object.isRequired,
+  avatar: PropTypes.PropTypes.oneOfType([PropTypes.object, PropTypes.string]).isRequired,
   className: PropTypes.string,
 };
 

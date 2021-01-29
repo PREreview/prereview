@@ -4,6 +4,7 @@ import UserProvider from '../contexts/user-context';
 import SettingsRoles from './settings-roles';
 import SettingsApi from './settings-api';
 import SettingsNotifications from './settings-notifications';
+import SettingsTemplates from './settings-templates';
 import HeaderBar from './header-bar';
 import { ORG } from '../constants';
 
@@ -35,6 +36,9 @@ export default function Settings() {
         <SettingsRoles user={user} />
         <SettingsNotifications user={user} />
         {/*<SettingsApi user={user} />*/}
+
+        {/* FIXME only if user is admin */}
+        <SettingsTemplates />
       </div>
     </div>
   );

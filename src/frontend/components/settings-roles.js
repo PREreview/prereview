@@ -197,11 +197,12 @@ export default function SettingsRoles({ user }) {
         </Table>
       </TableContainer>
 
-      <Controls className="settings-roles__body-controls">
+      {/* TODO: do we need these? */}
+      {/*<Controls className="settings-roles__body-controls">
         <Button element="XLink" to="/" href="/" primary={true}>
           {isFirstTimeOnSettings ? 'Start Reviewing' : 'Done'}
         </Button>
-      </Controls>
+      </Controls>*/}
 
       {!!personaToEdit && (
         <Modal

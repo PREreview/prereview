@@ -176,7 +176,7 @@ export default function controller(users, personas, config, thisUser) {
     handler: async ctx => {
       return passport.authenticate('orcid', (err, user) => {
         log.debug('Finishing authenticating with ORCID.');
-        log.debug('Received user object: ', user);
+        log.debug('Received user: ', user.uuid);
         if (!user) {
           ctx.body = { success: false };
           log.error('Authentication failed.');
