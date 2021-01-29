@@ -210,8 +210,7 @@ export default function controller(
           .integer()
           .description('Full Review id')
           .required(),
-        pid: Joi.alternatives()
-          .try(Joi.number().integer(), Joi.string())
+        pid: Joi.string()
           .description('Persona id')
           .required(),
       },
@@ -271,8 +270,7 @@ export default function controller(
           .integer()
           .description('Full Review id')
           .required(),
-        pid: Joi.alternatives()
-          .try(Joi.number().integer(), Joi.string())
+        pid: Joi.string()
           .description('Persona id')
           .required(),
       },
@@ -332,8 +330,7 @@ export default function controller(
           .integer()
           .description('Full Review id')
           .required(),
-        pid: Joi.alternatives()
-          .try(Joi.number().integer(), Joi.string())
+        pid: Joi.string()
           .description('Persona id')
           .required(),
       },
