@@ -19,7 +19,7 @@ import About from './about';
 import AdminPanel from './admin-panel';
 import BlockPanel from './block-panel';
 import CodeOfConduct from './code-of-conduct';
-import Community from './Community.jsx';
+import Community from './Community';
 import ExtensionFallback from './extension-fallback';
 import ExtensionSplash from './extension-splash';
 import Home from './home';
@@ -32,6 +32,7 @@ import Profile from './profile';
 import Settings from './settings';
 import SuspenseLoading from './suspense-loading';
 import ToCPage from './toc-page';
+import PersonaSearch from './PersonaSearch';
 
 // constants
 import API from './api';
@@ -83,6 +84,9 @@ export default function App({ user }) {
                 </ToCPage>
               </Route>
 
+              <Route exact={true} path="/personas">
+                <PersonaSearch />
+              </Route>
               <Route exact={true} path="/about/:id">
                 <Profile />
               </Route>

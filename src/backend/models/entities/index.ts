@@ -3,6 +3,7 @@ export * from './BaseEntity';
 export * from './Comment';
 export * from './Community';
 export * from './Contact';
+export * from './Event';
 export * from './FullReview';
 export * from './FullReviewDraft';
 export * from './Group';

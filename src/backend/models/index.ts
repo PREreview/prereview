@@ -2,6 +2,7 @@ export * from './badges';
 export * from './comments';
 export * from './communities';
 export * from './contacts';
+export * from './events';
 export * from './fullReviews';
 export * from './fullReviewDrafts';
 export * from './groups';

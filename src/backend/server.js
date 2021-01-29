@@ -33,6 +33,7 @@ import {
   badgeModelWrapper,
   commentModelWrapper,
   communityModelWrapper,
+  eventModelWrapper,
   fullReviewModelWrapper,
   fullReviewDraftModelWrapper,
   groupModelWrapper,
@@ -110,8 +111,8 @@ export default async function configServer(config) {
   const badges = BadgeController(badgeModel, authz);
   const commentModel = commentModelWrapper(db);
   const communityModel = communityModelWrapper(db);
-  const communities = CommunityController(communityModel, authz);
   const contactModel = contactModelWrapper(db);
+  const eventModel = eventModelWrapper(db);
   const fullReviewModel = fullReviewModelWrapper(db);
   const draftModel = fullReviewDraftModelWrapper(db);
   const fullReviewDrafts = DraftController(draftModel, authz);
@@ -135,6 +136,7 @@ export default async function configServer(config) {
   const tags = TagController(tagModel, authz);
   const users = UserController(userModel, contactModel, authz);
   const searches = SearchesController(preprintModel, draftModel, authz);
+  const communities = CommunityController(communityModel, userModel, eventModel, tagModel, authz);
 
   server.use(authz.middleware());
 

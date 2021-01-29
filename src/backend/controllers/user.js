@@ -251,7 +251,10 @@ export default function controller(users, contacts, thisUser) {
       log.debug(`Updating contact for user ${userId}`);
 
       try {
-        const exists = await contacts.findOne({ uuid: contactId });
+        const exists = await contacts.findOne({
+          uuid: contactId,
+          identity: userId,
+        });
         if (exists) {
           log.debug('Contact already exists, updating.');
           contacts.assign(exists, ctx.request.body);

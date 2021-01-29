@@ -148,11 +148,11 @@ function EmailToggle({ userId, contact }) {
       <ToggleSwitch
         id="notification-switch"
         disabled={loading}
-        checked={contact.sendNotifications}
+        checked={contact.isNotified}
         onChange={() => {
           updateUser(
             {
-              sendNotifications: !contact.sendNotifications,
+              isNotified: !contact.isNotified,
             })
             .then(() => alert('Contact info updated successfully.'))
             .catch(err => alert(`An error occurred: ${err.message}`));

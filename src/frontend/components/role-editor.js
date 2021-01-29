@@ -16,7 +16,7 @@ export default function RoleEditor({ persona, onCancel, onSaved }) {
   const [scale, setScale] = useState(1);
   const [rotate, setRotate] = useState(0);
   const { mutate: updatePersona, loading, error } = usePutPersona({
-    id: persona.name,
+    id: persona.uuid,
   });
 
   const dataUrlToFile = async dataURL => {

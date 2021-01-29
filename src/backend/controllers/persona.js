@@ -1,4 +1,6 @@
 import router from 'koa-joi-router';
+import { QueryOrder } from '@mikro-orm/core';
+import { PostgreSqlConnection } from '@mikro-orm/postgresql';
 import { getLogger } from '../log.js';
 import { getErrorMessages } from '../utils/errors';
 
@@ -12,6 +14,27 @@ const handleInvalid = ctx => {
   ctx.message = getErrorMessages(ctx.invalid);
 };
 
+const querySchema = Joi.object({
+  limit: Joi.number()
+    .integer()
+    .greater(-1),
+  offset: Joi.number()
+    .integer()
+    .greater(-1),
+  asc: Joi.boolean(),
+  search: Joi.string().allow(''),
+  communities: Joi.string().allow(''),
+  badges: Joi.string().allow(''),
+  sort: Joi.string().allow(
+    'name',
+    'dateJoined',
+    'recentRequests',
+    'recentRapid',
+    'recentFull',
+    '',
+  ),
+});
+
 export default function controller(personasModel, badgesModel, thisUser) {
   const personaRouter = router();
 
@@ -19,38 +42,128 @@ export default function controller(personasModel, badgesModel, thisUser) {
   // a new user first registers with PREreview
 
   personaRouter.route({
+    meta: {
+      swagger: {
+        operationId: 'GetPersonas',
+        summary:
+          'Each user registered on the PREreview platform has two corresponding personas: one which has their public name and another which is anonymous. This endpoint GETs all personas on PREreview and the reviews attributed to each. Returns a 200 if successful, and an array of personas in the `data` attribute of the response body.',
+      },
+    },
     method: 'GET',
     path: '/personas',
-    pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
-    // validate: {},
+    validate: {
+      query: querySchema, // #TODO
+      continueOnError: true,
+    },
     handler: async ctx => {
+      if (ctx.invalid) {
+        handleInvalid(ctx);
+        return;
+      }
+
       log.debug(`Retrieving personas.`);
-      let allPersonas;
 
       try {
-        allPersonas = await personasModel.findAll([
+        const populate = [
+          'communities',
           'fullReviews',
           'rapidReviews',
           'requests',
           'badges',
-        ]);
+        ];
+        let foundPersonas, count;
+        const order = ctx.query.asc
+          ? QueryOrder.ASC_NULLS_LAST
+          : QueryOrder.DESC_NULLS_LAST;
+        let orderBy;
+        switch (ctx.query.sort) {
+          case 'dateJoined':
+            orderBy = { createdAt: order };
+            break;
+          case 'recentRequests':
+            orderBy = { requests: { createdAt: order } };
+            break;
+          case 'recentRapid':
+            orderBy = { rapidReviews: { createdAt: order } };
+            break;
+          case 'recentFull':
+            orderBy = { fullReviews: { createdAt: order } };
+            break;
+          default:
+            orderBy = { name: order === QueryOrder.ASC_NULLS_LAST ? QueryOrder.DESC_NULLS_LAST : QueryOrder.ASC_NULLS_LAST };
+        }
+        let queries = [];
+        if (ctx.query.search && ctx.query.search !== '') {
+          const connection = personasModel.em.getConnection();
+          if (connection instanceof PostgreSqlConnection) {
+            queries.push({
+              $or: [
+                { name: { $ilike: `%${ctx.query.search}%` } },
+                { bio: { $ilike: `%${ctx.query.search}%` } },
+              ],
+            });
+          } else {
+            queries.push({
+              $or: [
+                { name: { $like: `%${ctx.query.search}%` } },
+                { bio: { $like: `%${ctx.query.search}%` } },
+              ],
+            });
+          }
+        }
+
+        if (ctx.query.badges) {
+          const badges = ctx.query.badges.split(',');
+          console.log('badges', badges);
+          queries.push({ badges: { uuid: { $in: badges } } });
+        }
+
+        if (ctx.query.communities) {
+          const communities = ctx.query.communities.split(',');
+          queries.push({
+            $or: [
+              { communities: { uuid: { $in: communities } } },
+              { communities: { slug: { $in: communities } } },
+            ],
+          });
+        }
+
+        if (queries.length > 0) {
+          let query;
+          if (queries.length > 1) {
+            query = { $and: queries };
+          } else {
+            query = queries[0];
+          }
+          log.debug('Querying personas:', query);
+          [foundPersonas, count] = await personasModel.findAndCount(
+            query,
+            populate,
+            orderBy,
+            ctx.query.limit,
+            ctx.query.offset,
+          );
+        } else {
+          foundPersonas = await personasModel.findAll(
+            populate,
+            orderBy,
+            ctx.query.limit,
+            ctx.query.offset,
+          );
+          count = await personasModel.count();
+        }
+        if (foundPersonas) {
+          ctx.body = {
+            statusCode: 200,
+            status: 'ok',
+            totalCount: count,
+            data: foundPersonas,
+          };
+        }
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse query: ${err}`);
       }
-
-      ctx.body = {
-        status: 200,
-        message: 'ok',
-        data: allPersonas,
-      };
-    },
-    meta: {
-      swagger: {
-        operationId: 'GetPersonas',
-        description:
-          'Each user registered on the PREreview platform has two corresponding personas: one which has their public name and another which is anonymous. This endpoint GETs all personas on PREreview and the reviews attributed to each. Returns a 200 if successful, and an array of personas in the `data` attribute of the response body.',
-      },
     },
   });
 
@@ -232,8 +345,7 @@ export default function controller(personasModel, badgesModel, thisUser) {
 
       try {
         log.debug(
-          `Persona ${persona.id} found. Removing badge ${
-            badge.id
+          `Persona ${persona.id} found. Removing badge ${badge.id
           } from persona.`,
         );
         badge.personas.remove(persona);

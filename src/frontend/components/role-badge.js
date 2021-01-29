@@ -6,10 +6,11 @@ import Tooltip from '@reach/tooltip';
 
 // material UI
 import { makeStyles } from '@material-ui/core/styles';
+import Avatar from '@material-ui/core/Avatar';
 import Popover from '@material-ui/core/Popover';
 
 // components
-import Avatar from './avatar';
+//import Avatar from './avatar';
 import NoticeBadge from './notice-badge';
 import XLink from './xlink';
 
@@ -98,25 +99,7 @@ const RoleBadgeUI = React.forwardRef(function RoleBadgeUI(
           </span>
           <Tooltipify tooltip={tooltip} user={user}>
             <div ref={ref}>
-              <div
-                className={classNames(
-                  'role-badge-menu__generic-icon-container',
-                )}
-              >
-                <MdPerson className="role-badge-menu__generic-icon" />
-              </div>
-
-              <div
-                className={classNames('role-badge-menu__avatar', {
-                  'role-badge-menu__avatar--loaded': user && user.avatar,
-                })}
-              >
-                {user && user.avatar ? (
-                  <Avatar avatar={user.avatar} />
-                ) : (
-                  undefined
-                )}
-              </div>
+              <Avatar src={user.avatar} />
             </div>
           </Tooltipify>
         </button>

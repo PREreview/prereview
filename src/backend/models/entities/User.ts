@@ -36,8 +36,8 @@ export class User extends BaseEntity {
   @ManyToMany({ entity: () => Group, mappedBy: 'members' })
   groups: Collection<Group> = new Collection<Group>(this);
 
-  @ManyToMany({ entity: () => Community, mappedBy: 'members' })
-  communities: Collection<Community> = new Collection<Community>(this);
+  @ManyToMany({ entity: () => Community, mappedBy: 'owners' })
+  owned: Collection<Community> = new Collection<Community>(this);
 
   @OneToMany({ entity: () => Persona, mappedBy: 'identity' })
   personas: Collection<Persona> = new Collection<Persona>(this);
