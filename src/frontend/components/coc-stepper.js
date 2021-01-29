@@ -1,5 +1,5 @@
 // base imports
-import React, { useState, useEffect } from 'react';
+import React, { Fragment, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 
 // material ui
@@ -9,7 +9,12 @@ import {
   makeStyles,
   withStyles,
 } from '@material-ui/core/styles';
+import CheckIcon from '@material-ui/icons/Check';
 import Button from '@material-ui/core/Button';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
+import ListItemText from '@material-ui/core/ListItemText';
 import Stepper from '@material-ui/core/Stepper';
 import Step from '@material-ui/core/Step';
 import StepLabel from '@material-ui/core/StepLabel';
@@ -48,10 +53,10 @@ const prereviewTheme = createMuiTheme({
 });
 
 const getSteps = () => {
-  return ['Welcome to PREreview.org!', 'Code of conduct', 'Openness', 'Log in and data sharing', 'Continue or not'];
+  return ['Welcome to PREreview.org!', 'Code of conduct', 'Openness', 'Log in and data sharing'];
 }
 
-export default function CoCStepper(){
+export default function CoCStepper({openNext}){
   const steps = getSteps()
   const classes = useStyles()
 
@@ -59,6 +64,9 @@ export default function CoCStepper(){
 
 
   const handleNext = () => {
+    if (activeStep === steps.length - 1) {
+      openNext()
+    }
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
   };
 
@@ -80,13 +88,56 @@ export default function CoCStepper(){
                 Please read the following information carefully to fully understand 
                 the implications of becoming a member of our community.`;
       case 1:
-        return `In the interest of fostering an open and welcoming environment we, as leadership, 
-                contributors, and maintainers, pledge to make participation in our project and our 
-                community a harassment-free experience for everyone, regardless of background, 
-                family status, gender, gender identity or expression, marital status, sex, 
-                sexual orientation, native language, age, ability, race/ethnicity, caste, 
-                national origin, socioeconomic status, religion, geographic location, and 
-                any other dimension of diversity.`;
+        return (<Fragment>
+
+                  In the interest of fostering an open and welcoming environment we, as PREreview's leaders, 
+                  contributors, and maintainers, pledge to make participation in our project and our 
+                  community a harassment-free experience for everyone, regardless of background, 
+                  family status, gender, gender identity or expression, marital status, sex, 
+                  sexual orientation, native language, age, ability, race/ethnicity, caste, 
+                  national origin, socioeconomic status, religion, geographic location, and 
+                  any other dimension of diversity. 
+                  You, as a member of our community, are expected to abide by PREreview Code of Conduct. 
+                  In short, you are expected to:
+                  <List>
+                    <ListItem>
+                      <ListItemIcon>
+                        <CheckIcon />
+                      </ListItemIcon>
+                      <ListItemText primary='Use welcoming and inclusive language'></ListItemText>
+                    </ListItem>
+                    <ListItem>
+                      <ListItemIcon>
+                        <CheckIcon />
+                      </ListItemIcon>                   
+                      <ListItemText primary='Providing feedback that is constructive, i.e., useful to the receiver'></ListItemText>
+                    </ListItem>
+                    <ListItem>
+                      <ListItemIcon>
+                        <CheckIcon />
+                      </ListItemIcon>   
+                      <ListItemText primary='Be respectful of differing viewpoints and experiences'></ListItemText>
+                    </ListItem>
+                    <ListItem>
+                      <ListItemIcon>
+                        <CheckIcon />
+                      </ListItemIcon>   
+                      <ListItemText primary='Gracefully accept constructive criticism'></ListItemText>
+                    </ListItem>
+                    <ListItem>
+                      <ListItemIcon>
+                        <CheckIcon />
+                      </ListItemIcon>   
+                      <ListItemText primary='Focus on what is best for the community'></ListItemText>
+                    </ListItem>
+                    <ListItem>
+                      <ListItemIcon>
+                        <CheckIcon />
+                      </ListItemIcon>   
+                      <ListItemText primary='Show empathy towards other community members'></ListItemText>
+                    </ListItem>
+                  </List>
+                </Fragment>);
       case 2:
         return `PREreview operates as a non-for-profit organization via 
                 the fiscal sponsorship of Code for Science and Society. 
@@ -101,20 +152,6 @@ export default function CoCStepper(){
                 or public. We DO NOT share your data with advertisers, social media companies, 
                 or analytics partners. However, the reviews, comments, and endorsements via Plaudit.pub 
                 can be downloaded openly, stripped of any personal information for meta-analysis purposes. Learn more.`
-      case 4:
-        return `Continue if: 
-              You are okay with us connecting your ORCID public information to your PREreview account and storing it in our database.
-
-              You are willing to share an email address with our team for the purposes of accessing notifications options and receiving occasional emails on platoform updates.
-
-              You understand the implications of, and commit to abiding by our Code of Conduct.  
-              
-              Do not continue if:
-              You DO NOT want to have your ORCID proflie’s public information imported to PREreview.
-
-              You are NOT willing to abide by our Code of Conduct.
-
-              You DO NOT wish  your reviews and comments to be shared under a CC-BY 4.0 licence.`
       default:
         return 'Unknown step';
     }
@@ -144,7 +181,7 @@ export default function CoCStepper(){
                       onClick={handleNext}
                       className={classes.button}
                     >
-                      {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
+                      Next
                     </Button>
                   </div>
                 </div>
