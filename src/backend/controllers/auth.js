@@ -4,6 +4,7 @@ import router from 'koa-joi-router';
 import anonymus from 'anonymus';
 import merge from 'lodash.merge';
 import { getLogger } from '../log.js';
+import { getOrcidPerson } from '../utils/orcid.js'
 
 const log = getLogger('backend:controllers:auth');
 
@@ -47,8 +48,8 @@ export default function controller(users, personas, config, thisUser) {
       orcid: params.orcid,
       name: params.name,
       token: {
-        access_token: params.access_token || accessToken,
-        token_type: params.token_type,
+        accessToken: params.access_token || accessToken,
+        tokenType: params.token_type,
         expires_in: params.expires_in,
       },
     };
@@ -68,6 +69,13 @@ export default function controller(users, personas, config, thisUser) {
     } catch (err) {
       log.error('Error fetching user:', err);
     }
+
+     try {
+        log.debug("************", profile.orcid, profile.token)
+        const fullProfile = await getOrcidPerson(profile.orcid, profile.token)
+      } catch (err) {
+        log.error('Error getting orcid profile.')
+      }
 
     if (user) {
       const completeUser = merge(profile, user); // including the access.token in the user that gets sent to the passport serializer
@@ -89,11 +97,14 @@ export default function controller(users, personas, config, thisUser) {
         log.error('Error creating user:', err);
       }
 
+  
       // create personas
       if (newUser) {
         log.debug('Authenticated & created user:', newUser);
         let anonPersona;
         let defaultPersona;
+
+
 
         let anonName = anonymus.create()[0];
         while ((await personas.findOne({ name: anonName })) !== null) {
@@ -129,7 +140,6 @@ export default function controller(users, personas, config, thisUser) {
       }
 
       if (newUser) {
-        log.debug('Authenticated & created user.', newUser);
         const completeUser = merge(profile, newUser);
         log.trace('verifyCallback() new completeUser:', completeUser);
         return done(null, completeUser);
