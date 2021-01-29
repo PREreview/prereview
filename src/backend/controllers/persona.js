@@ -90,7 +90,12 @@ export default function controller(personasModel, badgesModel, thisUser) {
             orderBy = { fullReviews: { createdAt: order } };
             break;
           default:
-            orderBy = { name: order === QueryOrder.ASC_NULLS_LAST ? QueryOrder.DESC_NULLS_LAST : QueryOrder.ASC_NULLS_LAST };
+            orderBy = {
+              name:
+                order === QueryOrder.ASC_NULLS_LAST
+                  ? QueryOrder.DESC_NULLS_LAST
+                  : QueryOrder.ASC_NULLS_LAST,
+            };
         }
         let queries = [];
         if (ctx.query.search && ctx.query.search !== '') {
@@ -345,7 +350,8 @@ export default function controller(personasModel, badgesModel, thisUser) {
 
       try {
         log.debug(
-          `Persona ${persona.id} found. Removing badge ${badge.id
+          `Persona ${persona.id} found. Removing badge ${
+            badge.id
           } from persona.`,
         );
         badge.personas.remove(persona);
