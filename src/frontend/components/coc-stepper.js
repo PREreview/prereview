@@ -74,22 +74,23 @@ export default function CoCStepper({openNext}){
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
   };
 
-  const handleReset = () => {
-    setActiveStep(0);
-  };
-
   const getStepContent = (step) => {
     switch (step) {
       case 0:
-        return `PREreview.org is a platform for the crowdsourcing of preprint reviews. 
-                By making an account on this platform, you effectively enter the PREreview 
-                community and will be able to review preprints, request reviews of preprints, 
-                as well as comment on, endorse, and report other community members’ reviews.
-                Please read the following information carefully to fully understand 
-                the implications of becoming a member of our community.`;
+        return (
+              <List>
+                <ListItem>
+                  <ListItemText primary={`PREreview.org is a platform for the crowdsourcing of preprint reviews. 
+                  By making an account on this platform, you effectively enter the PREreview 
+                  community and will be able to review preprints, request reviews of preprints, 
+                  as well as comment on, endorse, and report other community members’ reviews. `}/>
+                 </ListItem>
+                 <ListItem><ListItemText primary={`Please read the following information carefully to fully understand the implications of becoming a member of our community.`}/>
+                 </ListItem>
+                </List>
+              )
       case 1:
         return (<Fragment>
-
                   <List>
                     <ListItem>
                       <ListItemText primary={`In the interest of fostering an open and welcoming environment we, as PREreview's leaders, contributors, and maintainers, pledge to make participation in our project and our  community a harassment-free experience for everyone, regardless of background, family status, gender, gender identity or expression, marital status, sex, sexual orientation, native language, age, ability, race/ethnicity, caste, national origin, socioeconomic status, religion, geographic location, and any other dimension of diversity. `}/>
@@ -107,7 +108,7 @@ export default function CoCStepper({openNext}){
                       <ListItemIcon>
                         <ArrowRightAltIcon />
                       </ListItemIcon>                   
-                      <ListItemText primary='Providing feedback that is constructive, i.e., useful to the receiver'></ListItemText>
+                      <ListItemText primary='Provide constructive feedback'/>
                     </ListItem>
                     <ListItem>
                       <ListItemIcon>
@@ -152,22 +153,13 @@ export default function CoCStepper({openNext}){
       case 3:
         return ( <List>
                     <ListItem>
-                      <ListItemIcon>
-                        <ArrowRightAltIcon />
-                      </ListItemIcon>
                       <ListItemText primary='Our login is via the ORCID public API. If you
                       do not already have an account with ORCID, to sign up on PREreview you will need to make one. Register here.' />
                     </ListItem>
                     <ListItem>
-                      <ListItemIcon>
-                        <ArrowRightAltIcon />
-                      </ListItemIcon>
                       <ListItemText primary='The reviews published on this platform will be licensed CC-BY 4.0 and be openly available to everyone. However, you will be able to set your account to anonymous or public. '/>
                     </ListItem>
                    <ListItem>
-                      <ListItemIcon>
-                        <ArrowRightAltIcon />
-                      </ListItemIcon>
                       <ListItemText primary='We DO NOT share your data with advertisers, social media companies, or analytics partners. However, the reviews, comments, and endorsements via Plaudit.pub can be downloaded openly for meta-analysis purposes, stripped of any personal information. Learn more.`'/>
                     </ListItem>  
                 </List>

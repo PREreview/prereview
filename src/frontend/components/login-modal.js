@@ -98,7 +98,7 @@ export default function LoginModal({
   }
 
   const handleBack = () => {
-    setModalContent('coc')
+    console.log("this is what happens when you cancel")
   }
 
   const classes = useStyles()
