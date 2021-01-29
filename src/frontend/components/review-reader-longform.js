@@ -138,7 +138,7 @@ const LongformReviewReader = props => {
     mutate: postComment,
     loadingPostComment,
     errorPostComment,
-  } = usePostComments({ fid: review.id });
+  } = usePostComments({ fid: review.uuid });
 
   const canSubmit = content => {
     return content && content !== '<p></p>';
@@ -242,7 +242,7 @@ const LongformReviewReader = props => {
                   <Grid item>Plaudit</Grid>
                   {/*#FIXME plaudits*/}
                   <Grid item>
-                    <ReportButton reviewId={review.id} />
+                    <ReportButton reviewId={review.uuid} />
                   </Grid>
                 </Grid>
               </Box>

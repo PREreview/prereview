@@ -1,12 +1,10 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useContext } from 'react';
 import { Helmet } from 'react-helmet-async';
 import socketIoClient from 'socket.io-client';
-import { UserProvider } from '../contexts/user-context';
+import { UserContext } from '../contexts/user-context';
 import { getId } from '../utils/jsonld';
 import HeaderBar from './header-bar';
 import { ORG } from '../constants';
-import { createModerationQs } from '../utils/search';
-import { GetPreprint } from '../hooks/api-hooks.tsx';
 import Button from './button';
 import ModerationCard from './moderation-card';
 
@@ -15,7 +13,7 @@ const socket = socketIoClient(window.location.origin, {
 });
 
 export default function Moderate() {
-  const [user] = UserProvider();
+  const user = useContext(UserContext);
   const [bookmark, setBookmark] = useState(null);
   const [excluded, setExcluded] = useState(new Set());
   const [lockersByReviewActionId, setLockersByReviewActionId] = useState({});
@@ -35,28 +33,26 @@ export default function Moderate() {
     [user],
   );
 
-  const search = createModerationQs({ bookmark });
+  let results;
 
-  const results = GetPreprint(search, !!bookmark);
+  // const [isOpenedMap, setIsOpenedMap] = useState(
+  //   results.rows.reduce((map, row) => {
+  //     map[getId(row.doc)] = false;
+  //     return map;
+  //   }, {}),
+  // );
+  // useEffect(() => {
+  //   setIsOpenedMap(
+  //     results.rows.reduce((map, row) => {
+  //       map[getId(row.doc)] = false;
+  //       return map;
+  //     }, {}),
+  //   );
+  // }, [results]);
 
-  const [isOpenedMap, setIsOpenedMap] = useState(
-    results.rows.reduce((map, row) => {
-      map[getId(row.doc)] = false;
-      return map;
-    }, {}),
-  );
-  useEffect(() => {
-    setIsOpenedMap(
-      results.rows.reduce((map, row) => {
-        map[getId(row.doc)] = false;
-        return map;
-      }, {}),
-    );
-  }, [results]);
-
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
+  // useEffect(() => {
+  //   window.scrollTo(0, 0);
+  // }, []);
 
   useEffect(() => {
     socket.connect();
@@ -91,103 +87,112 @@ export default function Moderate() {
       <section>
         <header className="moderate__header">
           <span>Moderate Content</span>
-          <span>{results.total_rows} Flagged Reviews</span>
+          <span>{results ? results.total_rows : 'No'} Flagged Reviews</span>
         </header>
 
-        {results.total_rows === 0 && !results.loading ? (
-          <div>No reported reviews.</div>
-        ) : (
-          <div>
-            <ul className="moderate__card-list">
-              {results.rows
-                .filter(row => !excluded.has(getId(row.doc)))
-                .map(({ doc }) => (
-                  <li key={getId(doc)}>
-                    <ModerationCard
-                      user={user}
-                      reviewAction={doc}
-                      isOpened={isOpenedMap[getId(doc)] || false}
-                      isLockedBy={lockersByReviewActionId[getId(doc)]}
-                      onOpen={() => {
-                        socket.emit(
-                          'lock',
-                          {
-                            reviewActionId: getId(doc),
-                            roleId: user.defaultRole,
-                          },
-                          isLocked => {
-                            if (!isLocked) {
+        {results ? (
+          results.total_rows === 0 && !results.loading ? (
+            <div>No reported reviews.</div>
+          ) : (
+            <div>
+              <ul className="moderate__card-list">
+                {results
+                  ? results.rows
+                      .filter(row => !excluded.has(getId(row.doc)))
+                      .map(({ doc }) => (
+                        <li key={getId(doc)}>
+                          <ModerationCard
+                            user={user}
+                            reviewAction={doc}
+                            isOpened={isOpenedMap[getId(doc)] || false}
+                            isLockedBy={lockersByReviewActionId[getId(doc)]}
+                            onOpen={() => {
+                              socket.emit(
+                                'lock',
+                                {
+                                  reviewActionId: getId(doc),
+                                  roleId: user.defaultRole,
+                                },
+                                isLocked => {
+                                  if (!isLocked) {
+                                    setIsOpenedMap(
+                                      results.rows.reduce((map, row) => {
+                                        map[getId(row.doc)] =
+                                          getId(row.doc) === getId(doc);
+                                        return map;
+                                      }, {}),
+                                    );
+                                  }
+                                },
+                              );
+                            }}
+                            onClose={() => {
+                              socket.emit('unlock', {
+                                reviewActionId: getId(doc),
+                                roleId: user.defaultRole,
+                              });
+
                               setIsOpenedMap(
                                 results.rows.reduce((map, row) => {
-                                  map[getId(row.doc)] =
-                                    getId(row.doc) === getId(doc);
+                                  map[getId(row.doc)] = false;
                                   return map;
                                 }, {}),
                               );
-                            }
-                          },
-                        );
-                      }}
-                      onClose={() => {
-                        socket.emit('unlock', {
-                          reviewActionId: getId(doc),
-                          roleId: user.defaultRole,
-                        });
+                            }}
+                            onSuccess={(
+                              moderationActionType,
+                              reviewActionId,
+                            ) => {
+                              if (
+                                moderationActionType ===
+                                  'ModerateRapidPREreviewAction' ||
+                                moderationActionType ===
+                                  'IgnoreReportRapidPREreviewAction'
+                              ) {
+                                socket.emit('unlock', {
+                                  reviewActionId: getId(doc),
+                                  roleId: user.defaultRole,
+                                });
+                                socket.emit('exclude', {
+                                  reviewActionId: getId(doc),
+                                  roleId: user.defaultRole,
+                                });
 
-                        setIsOpenedMap(
-                          results.rows.reduce((map, row) => {
-                            map[getId(row.doc)] = false;
-                            return map;
-                          }, {}),
-                        );
-                      }}
-                      onSuccess={(moderationActionType, reviewActionId) => {
-                        if (
-                          moderationActionType ===
-                            'ModerateRapidPREreviewAction' ||
-                          moderationActionType ===
-                            'IgnoreReportRapidPREreviewAction'
-                        ) {
-                          socket.emit('unlock', {
-                            reviewActionId: getId(doc),
-                            roleId: user.defaultRole,
-                          });
-                          socket.emit('exclude', {
-                            reviewActionId: getId(doc),
-                            roleId: user.defaultRole,
-                          });
-
-                          setExcluded(
-                            new Set(
-                              Array.from(excluded).concat(reviewActionId),
-                            ),
-                          );
-                        }
-                      }}
-                    />
-                  </li>
-                ))}
-            </ul>
-          </div>
-        )}
+                                setExcluded(
+                                  new Set(
+                                    Array.from(excluded).concat(reviewActionId),
+                                  ),
+                                );
+                              }
+                            }}
+                          />
+                        </li>
+                      ))
+                  : null}
+              </ul>
+            </div>
+          )
+        ) : null}
 
         <div>
           {/* Cloudant returns the same bookmark when it hits the end of the list */}
-          {!!(
-            results.rows.length < results.total_rows &&
-            results.bookmark !== bookmark
-          ) && (
-            <div className="moderate__more">
-              <Button
-                onClick={e => {
-                  e.preventDefault();
-                  setBookmark(results.bookmark);
-                }}
-              >
-                More
-              </Button>
-            </div>
-          )}
+          {results
+            ? !!(
+                results.rows.length < results.total_rows &&
+                results.bookmark !== bookmark
+              ) && (
+                <div className="moderate__more">
+                  <Button
+                    onClick={e => {
+                      e.preventDefault();
+                      setBookmark(results.bookmark);
+                    }}
+                  >
+                    More
+                  </Button>
+                </div>
+              )
+            : null}
         </div>
       </section>
     </div>

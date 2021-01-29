@@ -9,6 +9,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import Popover from '@material-ui/core/Popover';
 
 // components
+import Avatar from './avatar';
 import NoticeBadge from './notice-badge';
 import XLink from './xlink';
 
@@ -62,6 +63,9 @@ const RoleBadgeUI = React.forwardRef(function RoleBadgeUI(
   { user, className, children, tooltip, showNotice = false, disabled = false },
   ref,
 ) {
+
+// ****  USER IN THIS COMPONENT IS ACTUALLY A PERSONA OBJECT **** //
+
   const classes = useStyles();
   const [anchorEl, setAnchorEl] = React.useState(null);
 
@@ -75,6 +79,7 @@ const RoleBadgeUI = React.forwardRef(function RoleBadgeUI(
 
   const open = Boolean(anchorEl);
   const id = open ? 'user-menu' : undefined;
+  console.log('user:', user);
 
   return (
     <>
@@ -103,18 +108,15 @@ const RoleBadgeUI = React.forwardRef(function RoleBadgeUI(
 
               <div
                 className={classNames('role-badge-menu__avatar', {
-                  'role-badge-menu__avatar--loaded':
-                    user && user.avatar && user.avatar.contentUrl,
+                  'role-badge-menu__avatar--loaded': user && user.avatar,
                 })}
-                style={
-                  user && user.avatar && user.avatar.contentUrl
-                    ? {
-                        backgroundImage: `url(${user.avatar.contentUrl})`,
-                        backgroundSize: 'contain',
-                      }
-                    : undefined
-                }
-              />
+              >
+                {user && user.avatar ? (
+                  <Avatar avatar={user.avatar} />
+                ) : (
+                  undefined
+                )}
+              </div>
             </div>
           </Tooltipify>
         </button>
@@ -137,23 +139,13 @@ const RoleBadgeUI = React.forwardRef(function RoleBadgeUI(
         <div className={classes.popoverInner}>
           <XLink
             className="menu__list__link-item"
-            href={`/about/${
-              user.orcid
-                ? user.orcid
-                : user.identity
-                ? user.identity.orcid
-                : user.id
-            }`}
+            href={`/about/${user.uuid}`}
             target={process.env.IS_EXTENSION ? '_blank' : undefined}
             to={
               process.env.IS_EXTENSION
                 ? undefined
                 : `/about/${
-                    user.orcid
-                      ? user.orcid
-                      : user.identity
-                      ? user.identity.orcid
-                      : user.id
+                    user.defaultPersona ? user.defaultPersona.uuid : user.uuid
                   }`
             }
           >

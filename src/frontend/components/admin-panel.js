@@ -37,7 +37,7 @@ export default function AdminPanel() {
   const [moderators, setModerators] = useState(null);
 
   const { data: groupData, loadingGroup } = useGetGroup({
-    name: 'moderators',
+    id: 'moderators',
   });
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -51,6 +51,8 @@ export default function AdminPanel() {
   useEffect(() => {
     if (!loadingGroup) {
       if (groupData && groupData.data[0]) {
+        console.log('groupData', groupData);
+        console.log('groupData.data', groupData.data);
         setGroup(groupData.data[0]);
         setModerators(groupData.data[0].members);
         setLoading(false);
@@ -124,7 +126,7 @@ export default function AdminPanel() {
 
         {isAddModalOpen && (
           <AdminPanelAddModal
-            group={group.id}
+            group={group.name}
             onClose={() => {
               setIsAddModalOpen(false);
             }}
@@ -145,7 +147,7 @@ export default function AdminPanel() {
             }}
             onSuccess={user => {
               const filteredMods = moderators.filter(
-                moderator => moderator.id !== user.id,
+                moderator => moderator.orcid !== user.orcid,
               );
               setModerators(filteredMods);
             }}
@@ -247,8 +249,8 @@ function AdminPanelRemoveModal({
   onSuccess,
 }) {
   const { mutate: deleteGroupMember, loading, error } = useDeleteGroupMember({
-    id: group.id,
-    uid: userToDelete.id,
+    id: group.uuid,
+    uid: userToDelete.orcid,
   });
   const [frame] = useState('submit');
 
@@ -261,8 +263,8 @@ function AdminPanelRemoveModal({
               Are you sure to want to revoke moderator permission for{' '}
               <em>
                 {personaToDelete.name ||
-                  personaToDelete.orcid ||
-                  personaToDelete.id}
+                  userToDelete.orcid ||
+                  personaToDelete.uuid}
               </em>
               ?
             </p>
@@ -282,7 +284,7 @@ function AdminPanelRemoveModal({
                 disabled={loading}
                 isWaiting={loading}
                 onClick={() => {
-                  deleteGroupMember({ id: group.id, uid: userToDelete.id })
+                  deleteGroupMember({ id: group.name, uid: userToDelete.orcid })
                     .then(() => {
                       onSuccess(userToDelete);
                       return onClose();
@@ -302,7 +304,7 @@ function AdminPanelRemoveModal({
               <em>
                 {personaToDelete.name ||
                   personaToDelete.orcid ||
-                  personaToDelete.id}
+                  personaToDelete.uuid}
               </em>
               .
             </p>

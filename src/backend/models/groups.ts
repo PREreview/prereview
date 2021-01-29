@@ -16,10 +16,10 @@ export class GroupModel extends EntityRepository<Group> {
   ): Promise<boolean> {
     const group = await this.findOne({ name: groupName }, ['members']);
     let user: any;
+
     if (isString(userId) && orcidUtils.isValid(userId)) {
-      user = this.em.findOne(User, { orcid: userId as string });
-    }
-    user = this.em.getReference(User, userId as number);
+      user = await this.em.findOne(User, { orcid: userId as string });
+    }    
 
     if (!user) return false;
     if (!group) {

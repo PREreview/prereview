@@ -6,6 +6,7 @@ import identifiersArxiv from 'identifiers-arxiv';
 import doiRegex from 'doi-regex';
 
 // utils
+import { createPreprintId } from '../../common/utils/ids';
 import { unversionDoi } from '../utils/ids';
 import { unprefix } from '../utils/jsonld';
 
@@ -201,7 +202,7 @@ function StepPreprint({
         </Button>
         <Button
           onClick={() => {
-            history.push(`/preprints/${preprint.id}`, {
+            history.push(`/preprints/${createPreprintId(preprint.handle)}`, {
               tab: 'request',
               isSingleStep: true,
             });
@@ -212,7 +213,7 @@ function StepPreprint({
         </Button>
         <Button
           onClick={() => {
-            history.push(`/preprints/${preprint.id}`, {
+            history.push(`/preprints/${createPreprintId(preprint.handle)}`, {
               tab: 'reviews',
               isSingleStep: true,
             });
@@ -240,7 +241,7 @@ function StepRequest({ isSingleStep, preprint, onCancel, onSuccess }) {
     mutate: postReviewRequest,
     loadingPostReviewRequest,
     errorPostReviewRequest,
-  } = usePostRequests({ preprint: preprint.id });
+  } = usePostRequests({ preprint: preprint.uuid });
 
   return (
     <div className="new-preprint__step-request">

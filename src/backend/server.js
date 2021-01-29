@@ -43,6 +43,7 @@ import {
   tagModelWrapper,
   templateModelWrapper,
   userModelWrapper,
+  contactModelWrapper,
 } from './models/index.ts';
 
 // Our controllers
@@ -112,6 +113,7 @@ export default async function configServer(config) {
   const commentModel = commentModelWrapper(db);
   const communityModel = communityModelWrapper(db);
   const communities = CommunityController(communityModel, authz);
+  const contactModel = contactModelWrapper(db);
   const fullReviewModel = fullReviewModelWrapper(db);
   const draftModel = fullReviewDraftModelWrapper(db);
   const fullReviewDrafts = DraftController(draftModel, authz);

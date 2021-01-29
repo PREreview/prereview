@@ -174,7 +174,7 @@ export default function controller(commentModel, fullReviewModel, thisUser) {
       let comment;
 
       try {
-        comment = await commentModel.findOne(ctx.params.id);
+        comment = await commentModel.findOne({ uuid: ctx.params.id });
 
         if (!comment) {
           ctx.throw(404, `Comment with ID ${ctx.params.id} doesn't exist`);
@@ -219,7 +219,7 @@ export default function controller(commentModel, fullReviewModel, thisUser) {
       let comment;
 
       try {
-        comment = await commentModel.findOne(ctx.params.id);
+        comment = await commentModel.findOne({ uuid: ctx.params.id });
 
         if (!comment) {
           ctx.throw(404, `A comment with ID ${ctx.params.id} doesn't exist`);
@@ -254,7 +254,7 @@ export default function controller(commentModel, fullReviewModel, thisUser) {
       let comment;
 
       try {
-        comment = await commentModel.findOne(ctx.params.id);
+        comment = await commentModel.findOne({ uuid: ctx.params.id });
 
         if (!comment) {
           ctx.throw(404, `A comment with ID ${ctx.params.id} doesn't exist`);
