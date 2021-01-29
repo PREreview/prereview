@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
 // material ui
-import { ThemeProvider, createMuiTheme, withStyles } from '@material-ui/core/styles';
+import { ThemeProvider, createMuiTheme, withStyles, makeStyles } from '@material-ui/core/styles';
 import Dialog from '@material-ui/core/Dialog';
 import MuiDialogTitle from '@material-ui/core/DialogTitle';
 import MuiDialogContent from '@material-ui/core/DialogContent';
@@ -9,11 +9,11 @@ import MuiDialogActions from '@material-ui/core/DialogActions';
 import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
 import Typography from '@material-ui/core/Typography';
-import CoCStepper from './coc-stepper'
+import Button from '@material-ui/core/Button';
+
 
 // components
 import PreReviewLogo from './pre-review-logo';
-import Button from './button'
 
 const prereviewTheme = createMuiTheme({
   palette: {
@@ -30,10 +30,14 @@ const prereviewTheme = createMuiTheme({
   },
 });
 
-const styles = (theme) => ({
+const styles = makeStyles((theme) => ({
   root: {
     margin: 0,
     padding: theme.spacing(2),
+  },
+  button: {
+    marginTop: theme.spacing(1),
+    marginRight: theme.spacing(1),
   },
   closeButton: {
     position: 'absolute',
@@ -41,18 +45,13 @@ const styles = (theme) => ({
     top: theme.spacing(1),
     color: theme.palette.grey[500],
   },
-});
+}));
 
 const DialogTitle = withStyles(styles)((props) => {
-  const { children, classes, onClose, ...other } = props;
+  const { children, classes, ...other } = props;
   return (
     <MuiDialogTitle disableTypography className={classes.root} {...other}>
       <Typography variant="h6">{children}</Typography>
-      {onClose ? (
-        <IconButton aria-label="close" className={classes.closeButton} onClick={onClose}>
-          <CloseIcon />
-        </IconButton>
-      ) : null}
     </MuiDialogTitle>
   );
 });
@@ -61,6 +60,9 @@ export default function JoinModal({
   open,
   handleClose
 }) {
+
+  const classes = styles();
+  
   return (
     <ThemeProvider theme={prereviewTheme}> 
       <Dialog open={open}>
@@ -70,19 +72,16 @@ export default function JoinModal({
         </DialogTitle>
         <Button
           disabled={false}
-          element={'button'}
-          onClick={()=>console.log("click this button")}
-          primary={true}
-          className="login__login-button"
+          onClick={handleClose}
+          className={classes.button}
         >
-          Sign Up
+          Sign up for an account
         </Button>
         <Button
           disabled={false}
           element={'button'}
           onClick={()=>console.log("click this button")}
-          primary={true}
-          className="login__login-button"
+          className={classes.button}
         >
           Log In
         </Button>    
