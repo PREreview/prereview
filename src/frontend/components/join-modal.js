@@ -1,4 +1,6 @@
-import React, { Fragment, useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
+
+// material ui
 import { ThemeProvider, createMuiTheme, withStyles } from '@material-ui/core/styles';
 import Dialog from '@material-ui/core/Dialog';
 import MuiDialogTitle from '@material-ui/core/DialogTitle';
@@ -8,6 +10,8 @@ import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
 import Typography from '@material-ui/core/Typography';
 import CoCStepper from './coc-stepper'
+
+// components
 import PreReviewLogo from './pre-review-logo';
 import Button from './button'
 
@@ -26,28 +30,33 @@ const prereviewTheme = createMuiTheme({
   },
 });
 
-const styles = (theme) => ({
-  root: {
-    margin: 0,
-    padding: theme.spacing(2),
-  },
-  closeButton: {
-    position: 'absolute',
-    right: theme.spacing(1),
-    top: theme.spacing(1),
-    color: theme.palette.grey[500],
-  },
-});
-
-export default function LoginModal({
-  open,
-  handleClose
-}) {
+export default function JoinModal() {
+  
+  
   return (
-  <ThemeProvider theme={prereviewTheme}>
-    <Dialog open={open}>
-        <CoCStepper />     
-    </Dialog>
-  </ThemeProvider>
+    <ThemeProvider theme={prereviewTheme}> 
+      <DialogTitle id="customized-dialog-title" onClose={handleClose} >
+        <PreReviewLogo />
+        Join a constructive community of peer reviewers!
+      </DialogTitle>
+        <Button
+          disabled={false}
+          element={button}
+          onClick={()=>console.log("click this button")}
+          primary={true}
+          className="login__login-button"
+        >
+          Sign Up
+        </Button>
+        <Button
+          disabled={false}
+          element={button}
+          onClick={()=>console.log("click this button")}
+          primary={true}
+          className="login__login-button"
+        >
+          Log In
+        </Button>               
+    </ThemeProvider>
   )
 }
