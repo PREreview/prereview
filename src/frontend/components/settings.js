@@ -37,8 +37,7 @@ export default function Settings() {
         <SettingsNotifications user={user} />
         {/*<SettingsApi user={user} />*/}
 
-        {/* FIXME only if user is admin */}
-        <SettingsTemplates />
+        {user.isAdmin ? <SettingsTemplates /> : null}
       </div>
     </div>
   );

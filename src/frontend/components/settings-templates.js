@@ -1,6 +1,5 @@
 // base imports
 import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
 
 // material ui imports
 import { makeStyles, withStyles } from '@material-ui/core/styles';
@@ -20,16 +19,16 @@ import Typography from '@material-ui/core/Typography';
 
 // utils
 import {
+  useDeleteTemplate,
   useGetTemplates,
   usePostTemplates,
-  usePutTemplate,
 } from '../hooks/api-hooks.tsx';
 
 // components
+import EditTemplate from './edit-template';
 import TemplateEditor from './template-editor';
 
 // icons
-import EditOutlinedIcon from '@material-ui/icons/EditOutlined';
 import DeleteIcon from '@material-ui/icons/Delete';
 
 const Button = withStyles({
@@ -77,14 +76,16 @@ const useStyles = makeStyles(theme => ({
 export default function SettingsTemplates() {
   const classes = useStyles();
 
-  const [id, setId] = useState(1);
-
   // fetch all templates from the API
   const [templates, setTemplates] = useState(null);
+  const [id, setId] = useState(undefined);
   const { data: templatesData, loading: loading, error } = useGetTemplates();
 
-  // post new template to the API
+  // post new template via the API
   const { mutate: postTemplate } = usePostTemplates();
+
+  // delete template from the database
+  const { mutate: deleteTemplate } = useDeleteTemplate();
 
   // template content
   const [title, setTitle] = useState('');
@@ -93,6 +94,10 @@ export default function SettingsTemplates() {
 
   const onContentChange = value => {
     setContent(value);
+  };
+
+  const onTitleChange = value => {
+    setTitle(value);
   };
 
   const canSubmit = () => {
@@ -111,36 +116,32 @@ export default function SettingsTemplates() {
     return true;
   };
 
-  const handleSubmit = id => {
+  const handleSubmit = () => {
     if (canSubmit()) {
-      if (id) {
-        const { mutate: putTemplate } = usePutTemplate({ uuid: id });
-
-        putTemplate({
-          title: title,
-          contents: content,
+      postTemplate({
+        title: title,
+        contents: content,
+      })
+        .then(response => {
+          alert('Template updated successfully.');
+          handleCloseAdd(response.data);
+          return;
         })
-          .then(() => handleCloseEdit())
-          .then(() => {
-            setTitle('');
-            setContent('');
-            return;
-          })
-          .catch(err => alert(`An error occurred: ${err.message}`));
-      } else {
-        postTemplate({
-          title: title,
-          contents: content,
-        })
-          .then(() => handleCloseAdd(title, content))
-          .then(() => {
-            setTitle('');
-            setContent('');
-            return;
-          })
-          .catch(err => alert(`An error occurred: ${err.message}`));
-      }
+        .catch(err => alert(`An error occurred: ${err.message}`));
     }
+  };
+
+  const handleDelete = id => {
+    if (confirm('Are you sure you want to delete this template?')) {
+      deleteTemplate({ id: id })
+        .then(() => alert('Template deleted successfully.'))
+        .catch(err => alert(`An error occurred: ${err.message}`));
+    }
+  }
+
+  const resetContent = () => {
+    setTitle('');
+    setContent('');
   };
 
   // handle open and close of add template modal
@@ -150,20 +151,10 @@ export default function SettingsTemplates() {
     setOpenAdd(true);
   };
 
-  const handleCloseAdd = (title, content) => {
-    const newTemplates = [...templates, { title, content }];
+  const handleCloseAdd = template => {
+    const newTemplates = [...templates, template];
     setTemplates(newTemplates);
-    setOpenAdd(false);
-  };
-
-  // handle open and close of edit template modal
-  const [openEdit, setOpenEdit] = useState(false);
-
-  const handleOpenEdit = () => {
-    setOpenEdit(true);
-  };
-
-  const handleCloseEdit = () => {
+    resetContent();
     setOpenAdd(false);
   };
 
@@ -173,7 +164,7 @@ export default function SettingsTemplates() {
         setTemplates(templatesData.data);
       }
     }
-  }, [templates, templatesData, title, content]);
+  }, [id, templates, templatesData, title, content]);
 
   if (loading) {
     return <CircularProgress className={classes.spinning} />;
@@ -210,7 +201,7 @@ export default function SettingsTemplates() {
               placeholder="Add a name for this template"
               className={classes.input}
               error={errorTitle}
-              onChange={event => setTitle(event.target.value)}
+              onChange={() => onTitleChange(event.target.value)}
               helperText={error ? 'This field is required' : null}
               required
             />
@@ -250,54 +241,18 @@ export default function SettingsTemplates() {
                         {template.title}
                       </TableCell>
                       <TableCell align="right">
-                        <IconButton onClick={handleOpenEdit} type="button">
-                          <div className="vh">{`Edit ${template.title}`}</div>
-                          <EditOutlinedIcon />
-                        </IconButton>
-                        <Modal
-                          open={openEdit}
-                          onClose={handleCloseEdit}
-                          aria-labelledby="simple-modal-title"
-                          aria-describedby="simple-modal-description"
-                        >
-                          <div className={classes.paper}>
-                            <Typography
-                              variant="h5"
-                              component="h2"
-                              gutterBottom
-                            >
-                              Edit template
-                            </Typography>
-                            <TextField
-                              id="template-title"
-                              label="Title"
-                              variant="outlined"
-                              placeholder="Add a name for this template"
-                              className={classes.input}
-                              error={errorTitle}
-                              onChange={event => setTitle(event.target.value)}
-                              required
-                            />
-                            <TemplateEditor
-                              id={'add'}
-                              initialContent={template.contents}
-                              handleContentChange={onContentChange}
-                            />
-                            <Button
-                              onClick={() => handleSubmit(template.id)}
-                              type="button"
-                              variant="contained"
-                              color="secondary"
-                              className={classes.submit}
-                            >
-                              Submit
-                            </Button>
-                          </div>
-                        </Modal>
+                        <EditTemplate
+                          title={title}
+                          content={content}
+                          template={template}
+                          handleTitleChange={onTitleChange}
+                          handleContentChange={onContentChange}
+                          resetContent={resetContent}
+                        />
                       </TableCell>
                       <TableCell align="right">
                         <IconButton
-                          onClick={() => handleDelete(template.title)}
+                          onClick={() => handleDelete(template.uuid)}
                           type="button"
                         >
                           <div className="vh">{`Delete ${template.title}`}</div>

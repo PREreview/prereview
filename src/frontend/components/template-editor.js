@@ -41,6 +41,11 @@ const TemplateEditor = ({ initialContent, handleContentChange, id }) => {
 
   useEffect(() => {
     if (quill) {
+      // paste initial value into editor
+      quill.clipboard.dangerouslyPasteHTML(initialContent);
+      const delta = quill.clipboard.convert(initialContent);
+      quill.setContents(delta);
+
       quill.on('text-change', () => {
         handleContentChange(quillRef.current.innerHTML);
       });

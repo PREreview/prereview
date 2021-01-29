@@ -88,6 +88,7 @@ export default function controller(templateModel, communityModel, thisUser) {
         ctx.body = {
           status: 201,
           message: 'created',
+          body: template,
         };
 
         ctx.status = 201;
@@ -110,6 +111,7 @@ export default function controller(templateModel, communityModel, thisUser) {
     ctx.body = {
       status: 201,
       message: 'created',
+      data: template,
     };
 
     ctx.status = 201;
@@ -262,6 +264,11 @@ export default function controller(templateModel, communityModel, thisUser) {
       }
 
       // if updated
+      ctx.body = {
+        status: 204,
+        message: 'updated',
+        data: template,
+      };
       ctx.status = 204;
     },
     meta: {
