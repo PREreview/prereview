@@ -41,8 +41,9 @@ import {
   rapidReviewModelWrapper,
   requestModelWrapper,
   tagModelWrapper,
+  templateModelWrapper,
   userModelWrapper,
-  contactModelWrapper,
+  // contactModelWrapper, // #FIXME uncomment when in use; removing for linting
 } from './models/index.ts';
 
 // Our controllers
@@ -59,6 +60,7 @@ import PreprintController from './controllers/preprint.js';
 import RapidController from './controllers/rapidReview.js';
 import RequestController from './controllers/request.js';
 import TagController from './controllers/tag.js';
+import TemplateController from './controllers/template.js';
 import DocsController from './controllers/docs.js';
 import SearchesController from './controllers/searches.js';
 
@@ -111,7 +113,7 @@ export default async function configServer(config) {
   const commentModel = commentModelWrapper(db);
   const communityModel = communityModelWrapper(db);
   const communities = CommunityController(communityModel, authz);
-  const contactModel = contactModelWrapper(db);
+  // const contactModel = contactModelWrapper(db); // #FIXME uncomment when in use; removing for linting
   const fullReviewModel = fullReviewModelWrapper(db);
   const draftModel = fullReviewDraftModelWrapper(db);
   const fullReviewDrafts = DraftController(draftModel, authz);
@@ -133,7 +135,9 @@ export default async function configServer(config) {
   );
   const tagModel = tagModelWrapper(db);
   const tags = TagController(tagModel, authz);
-  const users = UserController(userModel, contactModel, authz);
+  const templateModel = templateModelWrapper(db);
+  const templates = TemplateController(templateModel, communityModel, authz);
+  const users = UserController(userModel, authz);
   const searches = SearchesController(preprintModel, draftModel, authz);
 
   server.use(authz.middleware());
@@ -154,6 +158,7 @@ export default async function configServer(config) {
     requests.middleware(),
     searches.middleware(),
     tags.middleware(),
+    templates.middleware(),
     users.middleware(),
   ]);
 

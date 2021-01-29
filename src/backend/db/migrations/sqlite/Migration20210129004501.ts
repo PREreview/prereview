@@ -65,6 +65,10 @@ export class Migration20210129004501 extends Migration {
     this.addSql('create unique index `community_uuid_unique` on `community` (`uuid`);');
     this.addSql('create unique index `community_name_unique` on `community` (`name`);');
 
+    this.addSql('create table `template` (`id` integer not null primary key autoincrement, `uuid` varchar not null, `created_at` datetime not null, `updated_at` datetime not null, `title` varchar not null, `contents` text not null);');
+    this.addSql('create unique index `template_uuid_unique` on `template` (`uuid`);');
+    this.addSql('create unique index `template_title_unique` on `template` (`title`);');
+
     this.addSql('create table `community_members` (`community_id` integer not null, `user_id` integer not null, primary key (`community_id`, `user_id`));');
     this.addSql('create index `community_members_community_id_index` on `community_members` (`community_id`);');
     this.addSql('create index `community_members_user_id_index` on `community_members` (`user_id`);');
@@ -112,6 +116,9 @@ export class Migration20210129004501 extends Migration {
 
     this.addSql('alter table `contact` add column `identity_id` integer null;');
     this.addSql('create index `contact_identity_id_index` on `contact` (`identity_id`);');
+
+    this.addSql('alter table `template` add column `community_id` integer null;');
+    this.addSql('create index `template_community_id_index` on `template` (`community_id`);');
 
     this.addSql('alter table `comment` add column `author_id` integer null;');
     this.addSql('alter table `comment` add column `parent_id` integer null;');
