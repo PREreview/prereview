@@ -1,5 +1,5 @@
 // base imports
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useLocation } from 'react-router-dom';
 
@@ -13,6 +13,7 @@ import { useHasAgreedCoC } from '../hooks/ui-hooks';
 import Button from './button';
 import Checkbox from './checkbox';
 import HeaderBar from './header-bar';
+import LoginModal from './login-modal';
 import Org from './org';
 import XLink from './xlink';
 
@@ -31,6 +32,8 @@ export default function Login() {
   const location = useLocation();
 
   const [thisUser] = useContext(UserProvider.context);
+  const [loginModalOpen, setLoginModalOpen] = useState(false)
+
 
   const next = new URLSearchParams(location.search).get('next');
 
@@ -75,15 +78,19 @@ export default function Login() {
         <Button
           disabled={!hasAgreed}
           element={hasAgreed ? 'a' : 'button'}
-          href={`/api/v2/orcid/login${
-            next ? `?next=${encodeURIComponent(next)}` : ''
-          }`}
+          onClick={() => setLoginModalOpen(true)}
           primary={true}
           className="login__login-button"
         >
           Sign in with ORCID
         </Button>
+        { loginModalOpen ? <LoginModal open={loginModalOpen} handleClose={() => setLoginModalOpen(false)} /> : null }
       </div>
     </div>
   );
 }
+
+
+//  href={`/api/v2/orcid/login${
+//             next ? `?next=${encodeURIComponent(next)}` : ''
+//           }`}
