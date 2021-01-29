@@ -45,8 +45,6 @@ export default function Login() {
     setLoginModalOpen(false)
   }
 
-  const next = new URLSearchParams(location.search).get('next');
-
   return (
     <div className="login">
       <Helmet>
@@ -101,8 +99,3 @@ export default function Login() {
     </div>
   );
 }
-
-
-//  href={`/api/v2/orcid/login${
-//             next ? `?next=${encodeURIComponent(next)}` : ''
-//           }`}

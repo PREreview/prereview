@@ -48,7 +48,7 @@ const prereviewTheme = createMuiTheme({
 });
 
 const getSteps = () => {
-  return ['Welcome to PREreview!', 'Code of conduct', 'Openness', 'Log in and data sharing', 'Continue or not'];
+  return ['Welcome to PREreview.org!', 'Code of conduct', 'Openness', 'Log in and data sharing', 'Continue or not'];
 }
 
 export default function CoCStepper(){
@@ -74,19 +74,33 @@ export default function CoCStepper(){
     switch (step) {
       case 0:
         return `PREreview.org is a platform for the crowdsourcing of preprint reviews. 
-        By making an account on this platform, you effectively enter the PREreview community and will be able to review preprints, 
-        request reviews preprints, as well as comment on, endorse, and report other community members’ reviews.
-        Please read the following information carefully to fully understand the implications of becoming a member of our community.`;
+                By making an account on this platform, you effectively enter the PREreview 
+                community and will be able to review preprints, request reviews of preprints, 
+                as well as comment on, endorse, and report other community members’ reviews.
+                Please read the following information carefully to fully understand 
+                the implications of becoming a member of our community.`;
       case 1:
-        return `In the interest of fostering an open and welcoming environment we, as leadership, contributors, and maintainers, pledge to make participation in our project and our community a harassment-free experience for everyone, regardless of background, family status, gender, gender identity or expression, marital status, sex, sexual orientation, native language, age, ability, race/ethnicity, caste, national origin, socioeconomic status, religion, geographic location, and any other dimension of diversity.`;
+        return `In the interest of fostering an open and welcoming environment we, as leadership, 
+                contributors, and maintainers, pledge to make participation in our project and our 
+                community a harassment-free experience for everyone, regardless of background, 
+                family status, gender, gender identity or expression, marital status, sex, 
+                sexual orientation, native language, age, ability, race/ethnicity, caste, 
+                national origin, socioeconomic status, religion, geographic location, and 
+                any other dimension of diversity.`;
       case 2:
-        return `PREreview operates as a non-for-profit organization via the fiscal sponsorship of Code for Science and Society. Thi platform is funded by public grants and private donations. The code that runs this platform is open-source and can be found on our GitHub repository under the MIT licence.`;
+        return `PREreview operates as a non-for-profit organization via 
+                the fiscal sponsorship of Code for Science and Society. 
+                This platform is funded by public grants and private donations. 
+                The code that runs this platform is open-source and can be found on 
+                our GitHub repository under the MIT licence.`;
       case 3:
-        return `Our login is via the ORCID public API. If you do not alread have an accoun with ORCID, to sign up on PREreview you will need to make one. Register here.
-
-        The reviews published on this platform will be licensed CC-BY 4.0 and be openly available to everyone. However, you will be able to set your account to anonymous or public. .
-
-        We DO NOT share your data with advertisers, social media companies, or analytics partners. However, the reviews, comments, and endorcements via Plaudit.pub can be downloaded openly stripped of any personal information for mata-analysis purposes. Lern more.`
+        return `Our login is via the ORCID public API. If you do not already have an account 
+                with ORCID, to sign up on PREreview you will need to make one. Register here.
+                The reviews published on this platform will be licensed CC-BY 4.0 and be openly 
+                available to everyone. However, you will be able to set your account to anonymous 
+                or public. We DO NOT share your data with advertisers, social media companies, 
+                or analytics partners. However, the reviews, comments, and endorsements via Plaudit.pub 
+                can be downloaded openly, stripped of any personal information for meta-analysis purposes. Learn more.`
       case 4:
         return `Continue if: 
               You are okay with us connecting your ORCID public information to your PREreview account and storing it in our database.
@@ -101,7 +115,6 @@ export default function CoCStepper(){
               You are NOT willing to abide by our Code of Conduct.
 
               You DO NOT wish  your reviews and comments to be shared under a CC-BY 4.0 licence.`
-
       default:
         return 'Unknown step';
     }

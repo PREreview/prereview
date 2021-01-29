@@ -30,6 +30,7 @@ const styles = (theme) => ({
   root: {
     margin: 0,
     padding: theme.spacing(2),
+    align: 'center',
   },
   closeButton: {
     position: 'absolute',
@@ -61,7 +62,7 @@ export default function LoginModal({
   <ThemeProvider theme={prereviewTheme}>
     <Dialog open={open} aria-labelledby="customized-dialog-title" onClose={handleClose}>
       <DialogTitle id="customized-dialog-title" onClose={handleClose}>
-          Welcome to PREreview!
+        <PreReviewLogo />
       </DialogTitle>
       <CoCStepper />     
     </Dialog>
