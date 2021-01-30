@@ -72,6 +72,7 @@ export default function controller(users, personas, config, thisUser) {
 
     try {
       log.debug('************', profile.orcid, profile.token);
+      // eslint-disable-next-line no-unused-vars
       const fullProfile = await getOrcidPerson(profile.orcid, profile.token);
     } catch (err) {
       log.error('Error getting orcid profile.');
