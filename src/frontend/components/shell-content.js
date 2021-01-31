@@ -103,8 +103,7 @@ export default function ShellContent({
 
   useEffect(() => {
     if (user) {
-      console.log(preprint);
-      if (preprint.fullReviews.length) {
+      if (!hasLongReviewed && preprint.fullReviews.length) {
         // gets an array of the active user's persona IDs
         let personaIDs = user.personas.map(persona => persona.id);
 
@@ -181,7 +180,7 @@ export default function ShellContent({
         });
       }
 
-      if (preprint.rapidReviews.length) {
+      if (!hasRapidReviewed && preprint.rapidReviews.length) {
         let authorID;
         preprint.rapidReviews.map(review => {
           review.author.id

@@ -98,19 +98,25 @@ const useStyles = makeStyles(theme => ({
     textAlign: 'center',
   },
   paper: {
-    top: `50%`,
-    left: `50%`,
-    transform: `translate(-50%, -50%)`,
-    position: 'absolute',
     backgroundColor: theme.palette.background.paper,
     boxShadow: theme.shadows[5],
+    left: `50%`,
+    minWidth: 300,
     padding: theme.spacing(2, 4, 3),
+    position: 'absolute',
+    top: `50%`,
+    transform: `translate(-50%, -50%)`,
   },
   red: {
     backgroundColor: '#FAB7B7',
     margin: '0 15px',
     padding: 10,
   },
+  select: {
+    marginTop: '1rem',
+    width: '100%',
+  },
+  template: {},
   yellow: {
     backgroundColor: '#FFFAEE',
     fontSize: '0.9rem',
@@ -247,10 +253,10 @@ export default function ReviewStepper({
 
   const { data: templates } = useGetTemplates();
 
-  const [template, setTemplate] = useState(null);
+  const [template, setTemplate] = useState('');
 
-  const handleTemplateChange = contents => {
-    setTemplate(contents);
+  const handleTemplateChange = template => {
+    setTemplate(template.contents);
   };
 
   const { mutate: postRapidReview } = usePostRapidReviews();
@@ -436,12 +442,6 @@ export default function ReviewStepper({
     return ['Rapid Review', 'Long-form Review', 'Submitted'];
   }
 
-  // useEffect(() => {
-  //   if (reviewId) {
-  //     history.push(`${location.pathname}/${reviewId}`);
-  //   }
-  // }, []);
-
   useEffect(() => {
     if (hasRapidReviewed) {
       handleComplete();
@@ -451,7 +451,7 @@ export default function ReviewStepper({
       setActiveStep(2);
       handleComplete(4);
     }
-  }, [hasRapidReviewed, hasLongReviewed, reviewId]);
+  }, [hasRapidReviewed, hasLongReviewed, reviewId, templates, template]);
 
   function getStepContent(step) {
     switch (step) {
@@ -561,17 +561,25 @@ export default function ReviewStepper({
                       aria-describedby="simple-modal-description"
                     >
                       <div className={classes.paper}>
+                        <InputLabel id="templates-select-label">
+                          Choose a template
+                        </InputLabel>
                         <Select
-                          labelId="demo-simple-select-label"
-                          id="demo-simple-select"
+                          className={classes.select}
+                          labelId="templates-select-label"
+                          id="templates-select"
                           value={template}
-                          onChange={() =>
-                            handleTemplateChange(template.contents)
+                          onChange={event =>
+                            handleTemplateChange(event.target.value)
                           }
                         >
                           {templates
-                            ? templates.forEach(template => (
-                                <MenuItem value={template.uuid}>
+                            ? templates.data.map(template => (
+                                <MenuItem
+                                  key={template.uuid}
+                                  value={template.uuid}
+                                  className={classes.template}
+                                >
                                   {template.title}
                                 </MenuItem>
                               ))
