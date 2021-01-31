@@ -16,7 +16,12 @@ import 'quill/dist/quill.snow.css'; // Add css for snow theme
 const ydoc = new Y.Doc();
 const provider = new WebrtcProvider('prereview-collab', ydoc);
 
-const CollabEditor = ({ initialContent, handleContentChange }) => {
+const CollabEditor = ({
+  initialContent,
+  handleContentChange,
+  template,
+  hasTemplate,
+}) => {
   /* collaboration needs */
   // provider.connect();
 
@@ -73,6 +78,7 @@ const CollabEditor = ({ initialContent, handleContentChange }) => {
 
   useEffect(() => {
     if (quill) {
+      let delta;
       // create yjs binding for web socket collaboration
       const type = ydoc.getText('quill');
 
@@ -80,7 +86,7 @@ const CollabEditor = ({ initialContent, handleContentChange }) => {
 
       // paste initial value into editor
       quill.clipboard.dangerouslyPasteHTML(initialContent);
-      const delta = quill.clipboard.convert(initialContent);
+      delta = quill.clipboard.convert(initialContent);
       quill.setContents(delta);
 
       quill.on('text-change', () => {
@@ -88,8 +94,15 @@ const CollabEditor = ({ initialContent, handleContentChange }) => {
           quillRef.current ? quillRef.current.innerHTML : initialContent,
         );
       });
+
+      // paste template if one is chosen
+      // if (hasTemplate) {
+      //   quill.clipboard.dangerouslyPasteHTML(template);
+      //   delta = quill.clipboard.convert(template);
+      //   quill.setContents(delta);
+      // }
     }
-  }, [quill, quillRef]);
+  }, [quill, quillRef, hasTemplate]);
 
   return (
     <div>
@@ -103,6 +116,8 @@ const CollabEditor = ({ initialContent, handleContentChange }) => {
 CollabEditor.propTypes = {
   initialContent: PropTypes.string,
   handleContentChange: PropTypes.func.isRequired,
+  template: PropTypes.string,
+  hasTemplate: PropTypes.bool,
 };
 
 export default CollabEditor;

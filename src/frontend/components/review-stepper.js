@@ -254,9 +254,14 @@ export default function ReviewStepper({
   const { data: templates } = useGetTemplates();
 
   const [template, setTemplate] = useState('');
+  const [hasTemplate, setHasTemplate] = useState(false);
 
-  const handleTemplateChange = template => {
-    setTemplate(template.contents);
+  const handleTemplateChange = contents => {
+    setTemplate(contents);
+  };
+
+  const handleHasTemplate = template => {
+    template ? setHasTemplate(true) : setHasTemplate(false);
   };
 
   const { mutate: postRapidReview } = usePostRapidReviews();
@@ -451,7 +456,14 @@ export default function ReviewStepper({
       setActiveStep(2);
       handleComplete(4);
     }
-  }, [hasRapidReviewed, hasLongReviewed, reviewId, templates, template]);
+  }, [
+    hasRapidReviewed,
+    hasLongReviewed,
+    reviewId,
+    templates,
+    template,
+    setHasTemplate,
+  ]);
 
   function getStepContent(step) {
     switch (step) {
@@ -577,7 +589,7 @@ export default function ReviewStepper({
                             ? templates.data.map(template => (
                                 <MenuItem
                                   key={template.uuid}
-                                  value={template.uuid}
+                                  value={template.contents}
                                   className={classes.template}
                                 >
                                   {template.title}
@@ -585,6 +597,36 @@ export default function ReviewStepper({
                               ))
                             : null}
                         </Select>
+                        <Box mt={2}>
+                          <Grid container spacing={2} justify="flex-end">
+                            <Grid item>
+                              <Button
+                                variant="outlined"
+                                color="primary"
+                                type="button"
+                                onClick={() => {
+                                  handleHasTemplate();
+                                  handleClose();
+                                }}
+                              >
+                                Cancel
+                              </Button>
+                            </Grid>
+                            <Grid item>
+                              <Button
+                                variant="contained"
+                                color="primary"
+                                type="button"
+                                onClick={() => {
+                                  handleHasTemplate(template);
+                                  handleClose();
+                                }}
+                              >
+                                Apply
+                              </Button>
+                            </Grid>
+                          </Grid>
+                        </Box>
                       </div>
                     </Modal>
                   </Box>
@@ -594,7 +636,9 @@ export default function ReviewStepper({
                 <Box m={2}>
                   <LongFormFragment
                     onContentChange={onContentChange}
-                    content={template ? template : content}
+                    content={content}
+                    template={template}
+                    hasTemplate={hasTemplate}
                   />
                 </Box>
                 <Box mt={2}>
