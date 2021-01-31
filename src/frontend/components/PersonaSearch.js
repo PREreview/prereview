@@ -13,7 +13,7 @@ import classNames from 'classnames';
 import UserProvider from '../contexts/user-context';
 
 // hooks
-import { useGetBadges, useGetPersonas } from '../hooks/api-hooks.tsx';
+import { useGetBadges, useGetCommunities, useGetPersonas } from '../hooks/api-hooks.tsx';
 
 // components
 import HeaderBar from './header-bar';
@@ -132,18 +132,23 @@ export default function UserSearch() {
   const classes = useStyles();
   const [search, setSearch] = useState(params.get('search') || '');
   const [loginModalOpenNext, setLoginModalOpenNext] = useState(null);
-  const [selectedTags, setSelectedTags] = useState([]);
+  const [selectedBadges, setSelectedBadges] = useState([]);
+  const [selectedCommunities, setSelectedCommunities] = useState([]);
 
-  const { data: personas, loading: loadingPersonas, error } = useGetPersonas({
+  const { data: personas, loading: loadingPersonas, error: personaError } = useGetPersonas({
     //queryParams: { ...searchParamsToObject(params), communities: community.uuid, tags: selectedTags.toString() },
     queryParams: searchParamsToObject(params),
   });
+  //const { data: badges, loading: loadingBadges, error: badgeError } = useGetBadges();
+  //const { data: communities, loading: loadingCommunities, error: communityError } = useGetCommunities();
   const [hoveredSortOption, setHoveredSortOption] = useState(null);
 
   if (loadingPersonas) {
+  //if (loadingPersonas || loadingBadges || loadingCommunities) {
     return <Loading />;
-  } else if (error) {
-    return <div>An error occurred: {error}</div>;
+  //} else if (personaError || badgeError || communityError) {
+  } else if (personaError) {
+    return <div>An error occurred: {personaError ? personaError : badgeError ? badgeError : communityError}</div>;
   } else {
     return (
       <div className="home">
@@ -195,31 +200,31 @@ export default function UserSearch() {
               <Grid container direction="column">
                 <h3 className="home__content-title">PREreview User Personas</h3>
                 {/*
-        <FormControl className={classes.formControl}>
-          <InputLabel id="demo-mutiple-chip-label">Tags</InputLabel>
-          <Select
-            labelId="demo-mutiple-chip-label"
-            id="demo-mutiple-chip"
-            multiple
-            value={selectedTags}
-            onChange={ev => setSelectedTags(ev.target.value)}
-            input={<Input id="select-multiple-chip" />}
-            renderValue={selected => (
-              <div className={classes.chips}>
-                {selected.map(value => (
-                  <Chip key={value} label={value} className={classes.chip} />
-                ))}
-              </div>
-            )}
-          >
-            {community.tags.map(tag => (
-              <MenuItem key={tag.uuid} value={tag.name}>
-                {tag.name}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-          */}
+                <FormControl className={classes.formControl}>
+                  <InputLabel id="demo-mutiple-chip-label">Badges</InputLabel>
+                  <Select
+                    labelId="demo-mutiple-chip-label"
+                    id="demo-mutiple-chip"
+                    multiple
+                    value={selectedBadges}
+                    onChange={ev => setSelectedBadges(ev.target.value)}
+                    input={<Input id="select-multiple-chip" />}
+                    renderValue={selected => (
+                      <div className={classes.chips}>
+                        {selected.map(value => (
+                          <Chip key={value} label={value} className={classes.chip} />
+                        ))}
+                      </div>
+                    )}
+                  >
+                    {community.tags.map(tag => (
+                      <MenuItem key={tag.uuid} value={tag.name}>
+                        {tag.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+                  */}
                 <Grid container>
                   {personas && personas.totalCount > 0 && !loadingPersonas && (
                     <UserSortOptions

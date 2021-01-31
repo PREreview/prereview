@@ -101,7 +101,13 @@ export default function controller(
       let allCommunities;
 
       try {
-        allCommunities = await communityModel.findAll(['members', 'preprints', 'owners', 'tags', 'events']);
+        allCommunities = await communityModel.findAll([
+          'members',
+          'preprints',
+          'owners',
+          'tags',
+          'events',
+        ]);
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse community schema: ${err}`);
@@ -276,7 +282,8 @@ export default function controller(
 
       try {
         log.debug(
-          `Community ${community.id} found. Adding user ${user.id
+          `Community ${community.id} found. Adding user ${
+            user.id
           } to community.`,
         );
         community.members.add(user);
@@ -346,7 +353,8 @@ export default function controller(
       if (user && community && community.members.contains(user)) {
         try {
           log.debug(
-            `Community ${community.id} found. Removing user ${user.orcid
+            `Community ${community.id} found. Removing user ${
+              user.orcid
             } from community.`,
           );
           community.members.remove(user);
@@ -468,7 +476,8 @@ export default function controller(
       if (event && community && community.events.contains(event)) {
         try {
           log.debug(
-            `Community ${community.id} found. Removing event ${event.orcid
+            `Community ${community.id} found. Removing event ${
+              event.orcid
             } from community.`,
           );
           community.events.remove(event);
@@ -590,7 +599,8 @@ export default function controller(
       if (tag && community && community.tags.contains(tag)) {
         try {
           log.debug(
-            `Community ${community.id} found. Removing tag ${tag.orcid
+            `Community ${community.id} found. Removing tag ${
+              tag.orcid
             } from community.`,
           );
           community.tags.remove(tag);

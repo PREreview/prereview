@@ -136,7 +136,13 @@ export default async function configServer(config) {
   const tags = TagController(tagModel, authz);
   const users = UserController(userModel, contactModel, authz);
   const searches = SearchesController(preprintModel, draftModel, authz);
-  const communities = CommunityController(communityModel, userModel, eventModel, tagModel, authz);
+  const communities = CommunityController(
+    communityModel,
+    userModel,
+    eventModel,
+    tagModel,
+    authz,
+  );
 
   server.use(authz.middleware());
 
