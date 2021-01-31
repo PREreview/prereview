@@ -4,12 +4,7 @@ import PropTypes from 'prop-types';
 // components
 import CollabEditor from './collab-editor';
 
-export default function LongFormFragment({
-  content,
-  onContentChange,
-  template,
-  hasTemplate,
-}) {
+export default function LongFormFragment({ content, onContentChange }) {
   return (
     <div className="rapid-form-fragment">
       <fieldset className="rapid-form-fragment__text-response-questions">
@@ -17,8 +12,6 @@ export default function LongFormFragment({
           <CollabEditor
             initialContent={content}
             handleContentChange={onContentChange}
-            template={template}
-            hasTemplate={hasTemplate}
           />
         </Fragment>
       </fieldset>
@@ -29,6 +22,4 @@ export default function LongFormFragment({
 LongFormFragment.propTypes = {
   content: PropTypes.string.isRequired,
   onContentChange: PropTypes.func.isRequired,
-  template: PropTypes.string,
-  hasTemplate: PropTypes.bool,
 };

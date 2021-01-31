@@ -16,12 +16,7 @@ import 'quill/dist/quill.snow.css'; // Add css for snow theme
 const ydoc = new Y.Doc();
 const provider = new WebrtcProvider('prereview-collab', ydoc);
 
-const CollabEditor = ({
-  initialContent,
-  handleContentChange,
-  template,
-  hasTemplate,
-}) => {
+const CollabEditor = ({ initialContent, handleContentChange }) => {
   /* collaboration needs */
   // provider.connect();
 
@@ -94,15 +89,8 @@ const CollabEditor = ({
           quillRef.current ? quillRef.current.innerHTML : initialContent,
         );
       });
-
-      // paste template if one is chosen
-      // if (hasTemplate) {
-      //   quill.clipboard.dangerouslyPasteHTML(template);
-      //   delta = quill.clipboard.convert(template);
-      //   quill.setContents(delta);
-      // }
     }
-  }, [quill, quillRef, hasTemplate]);
+  }, [quill, quillRef]);
 
   return (
     <div>
@@ -116,8 +104,6 @@ const CollabEditor = ({
 CollabEditor.propTypes = {
   initialContent: PropTypes.string,
   handleContentChange: PropTypes.func.isRequired,
-  template: PropTypes.string,
-  hasTemplate: PropTypes.bool,
 };
 
 export default CollabEditor;

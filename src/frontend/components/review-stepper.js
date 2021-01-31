@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import PropTypes from 'prop-types';
+import ReactHtmlParser, { convertNodeToElement } from 'react-html-parser';
 import clsx from 'clsx';
 
 // material ui
@@ -20,7 +21,10 @@ import InputLabel from '@material-ui/core/InputLabel';
 import Link from '@material-ui/core/Link';
 import MenuItem from '@material-ui/core/MenuItem';
 import Modal from '@material-ui/core/Modal';
+import MuiAlert from '@material-ui/lab/Alert';
+import Paper from '@material-ui/core/Paper';
 import Select from '@material-ui/core/Select';
+import Snackbar from '@material-ui/core/Snackbar';
 import Stepper from '@material-ui/core/Stepper';
 import Step from '@material-ui/core/Step';
 import StepConnector from '@material-ui/core/StepConnector';
@@ -97,7 +101,7 @@ const useStyles = makeStyles(theme => ({
   label: {
     textAlign: 'center',
   },
-  paper: {
+  modal: {
     backgroundColor: theme.palette.background.paper,
     boxShadow: theme.shadows[5],
     left: `50%`,
@@ -106,6 +110,9 @@ const useStyles = makeStyles(theme => ({
     position: 'absolute',
     top: `50%`,
     transform: `translate(-50%, -50%)`,
+  },
+  paper: {
+    padding: '1rem',
   },
   red: {
     backgroundColor: '#FAB7B7',
@@ -229,6 +236,10 @@ QontoStepIcon.propTypes = {
   completed: PropTypes.bool,
 };
 
+function Alert(props) {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
+
 export default function ReviewStepper({
   preprint,
   onClose,
@@ -251,19 +262,8 @@ export default function ReviewStepper({
   const [skipped, setSkipped] = useState(new Set());
   const steps = getSteps();
 
+  // API queries
   const { data: templates } = useGetTemplates();
-
-  const [template, setTemplate] = useState('');
-  const [hasTemplate, setHasTemplate] = useState(false);
-
-  const handleTemplateChange = contents => {
-    setTemplate(contents);
-  };
-
-  const handleHasTemplate = template => {
-    template ? setHasTemplate(true) : setHasTemplate(false);
-  };
-
   const { mutate: postRapidReview } = usePostRapidReviews();
   const { mutate: postLongReview } = usePostFullReviews();
   const { mutate: putLongReview } = usePutFullReview({ id: reviewId });
@@ -279,6 +279,50 @@ export default function ReviewStepper({
     setOpen(false);
   };
 
+  // handle open/close copy success
+  const [openCopied, setOpenCopied] = React.useState(false);
+
+  const handleCopied = () => {
+    setOpenCopied(true);
+  };
+
+  const handleCloseCopied = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setOpenCopied(false);
+  };
+
+  const [template, setTemplate] = useState('');
+
+  const handleTemplateChange = contents => {
+    setTemplate(contents);
+  };
+
+  // react html parser functionality
+  const transform = node => {
+    if (node.attribs) {
+      if (node.attribs.class === 'ql-editor') {
+        node.attribs.class = '';
+        node.attribs.contenteditable = false;
+      } else if (
+        node.attribs.class === 'ql-clipboard' ||
+        node.attribs.class === 'ql-tooltip ql-hidden'
+      ) {
+        return null;
+      }
+    }
+    return convertNodeToElement(node);
+  };
+
+  // react html parser options
+  const options = {
+    decodeEntities: true,
+    transform,
+  };
+
+  // handle submit functions
   const canSubmitRapid = answerMap => {
     return QUESTIONS.filter(q => q.type == 'YesNoQuestion').every(
       question => question.identifier in answerMap,
@@ -448,6 +492,7 @@ export default function ReviewStepper({
   }
 
   useEffect(() => {
+    console.log(template);
     if (hasRapidReviewed) {
       handleComplete();
     }
@@ -456,14 +501,7 @@ export default function ReviewStepper({
       setActiveStep(2);
       handleComplete(4);
     }
-  }, [
-    hasRapidReviewed,
-    hasLongReviewed,
-    reviewId,
-    templates,
-    template,
-    setHasTemplate,
-  ]);
+  }, [hasRapidReviewed, hasLongReviewed, reviewId, templates, template]);
 
   function getStepContent(step) {
     switch (step) {
@@ -572,9 +610,9 @@ export default function ReviewStepper({
                       aria-labelledby="simple-modal-title"
                       aria-describedby="simple-modal-description"
                     >
-                      <div className={classes.paper}>
+                      <div className={classes.modal}>
                         <InputLabel id="templates-select-label">
-                          Choose a template
+                          Choose a template to paste into the editor
                         </InputLabel>
                         <Select
                           className={classes.select}
@@ -597,6 +635,13 @@ export default function ReviewStepper({
                               ))
                             : null}
                         </Select>
+                        {template ? (
+                          <Box my={2}>
+                            <Paper elevation={3} className={classes.paper}>
+                              {ReactHtmlParser(template, options)}
+                            </Paper>
+                          </Box>
+                        ) : null}
                         <Box mt={2}>
                           <Grid container spacing={2} justify="flex-end">
                             <Grid item>
@@ -604,12 +649,9 @@ export default function ReviewStepper({
                                 variant="outlined"
                                 color="primary"
                                 type="button"
-                                onClick={() => {
-                                  handleHasTemplate();
-                                  handleClose();
-                                }}
+                                onClick={handleClose}
                               >
-                                Cancel
+                                Close
                               </Button>
                             </Grid>
                             <Grid item>
@@ -618,12 +660,25 @@ export default function ReviewStepper({
                                 color="primary"
                                 type="button"
                                 onClick={() => {
-                                  handleHasTemplate(template);
-                                  handleClose();
+                                  console.log(template);
+                                  navigator.clipboard.writeText(template);
+                                  handleCopied();
                                 }}
                               >
-                                Apply
+                                Copy
                               </Button>
+                              <Snackbar
+                                open={openCopied}
+                                autoHideDuration={6000}
+                                onClose={handleCloseCopied}
+                              >
+                                <Alert
+                                  onClose={handleCloseCopied}
+                                  severity="success"
+                                >
+                                  Template copied
+                                </Alert>
+                              </Snackbar>
                             </Grid>
                           </Grid>
                         </Box>
@@ -638,7 +693,6 @@ export default function ReviewStepper({
                     onContentChange={onContentChange}
                     content={content}
                     template={template}
-                    hasTemplate={hasTemplate}
                   />
                 </Box>
                 <Box mt={2}>
