@@ -5,8 +5,8 @@ import classNames from 'classnames';
 import Tooltip from '@reach/tooltip';
 
 // material UI
-import { makeStyles } from '@material-ui/core/styles';
-import Avatar from '@material-ui/core/Avatar';
+import { makeStyles, withStyles } from '@material-ui/core/styles';
+import MuiAvatar from '@material-ui/core/Avatar';
 import Popover from '@material-ui/core/Popover';
 
 // components
@@ -16,6 +16,13 @@ import XLink from './xlink';
 
 // icons
 import { MdPerson } from 'react-icons/md';
+
+const Avatar = withStyles({
+  root: {
+    height: 28,
+    width: 28,
+  }
+})(MuiAvatar);
 
 const useStyles = makeStyles(theme => ({
   popover: {
@@ -80,7 +87,6 @@ const RoleBadgeUI = React.forwardRef(function RoleBadgeUI(
 
   const open = Boolean(anchorEl);
   const id = open ? 'user-menu' : undefined;
-  console.log('user:', user);
 
   return (
     <>
@@ -98,9 +104,7 @@ const RoleBadgeUI = React.forwardRef(function RoleBadgeUI(
             Open
           </span>
           <Tooltipify tooltip={tooltip} user={user}>
-            <div ref={ref}>
-              <Avatar src={user.avatar} />
-            </div>
+            <Avatar src={user.avatar} ref={ref} />
           </Tooltipify>
         </button>
       </div>
