@@ -1,6 +1,7 @@
 import router from 'koa-joi-router';
 import { getLogger } from '../log.js';
 import getActivePersona from '../utils/persona.js';
+import generateDOI from '../utils/generateDOI.js';
 
 const log = getLogger('backend:controllers:fullReviews');
 const Joi = router.Joi;
@@ -72,13 +73,15 @@ export default function controller(
   reviewsRouter.route({
     method: 'POST',
     path: '/fullReviews',
-    // pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
+    pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
     handler: async ctx => {
       log.debug('Adding full review.');
-      let review, draft, authorPersona, preprint;
+      let review, draft, personaId, authorPersona, preprint;
+
+      log.debug('ctx.request.body', ctx.request.body);
 
       try {
-        authorPersona = getActivePersona(ctx.state.user);
+        personaId = getActivePersona(ctx.state.user); // FIXME: when there's multiple authors
       } catch (err) {
         log.error('Failed to load user personas.');
         ctx.throw(400, err);
@@ -91,6 +94,8 @@ export default function controller(
           preprint: preprint,
         });
 
+        authorPersona = await personaModel.findOne(personaId);
+
         review.authors.add(authorPersona);
 
         if (ctx.request.body.contents) {
@@ -102,15 +107,35 @@ export default function controller(
           });
           review.drafts.add(draft);
         }
+
         await reviewModel.persistAndFlush(review);
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse full review schema: ${err}`);
       }
 
+      let reviewData;
+
+      if (review.isPublished) {
+        reviewData = {
+          title:
+            review.title || `Review of ${preprint.title}`,
+          content: draft.contents,
+          authorName: authorPersona.name,
+          orcid: authorPersona.isPrivate ? '' : authorPersona.identity.orcid,
+        };
+        try {
+          review.doi = await generateDOI(reviewData);
+        } catch (err) {
+          log.error(`Error generating DOI from Zenodo. ${err}`);
+          ctx.throw(400, `Failed to generate DOI.`);
+        }
+      }
+
       ctx.body = {
         status: 201,
         message: 'created',
+        body: review,
       };
       ctx.status = 201;
     },
