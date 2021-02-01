@@ -25,8 +25,7 @@ const zenodoPayload = (body = {}, headers = {}) => ({
 });
 
 export default async function generateDOI(prereviewData) {
-  
-  // shaping required metadata as 
+  // shaping required metadata as
   // laid out in https://developers.zenodo.org/#depositions
   const data = {
     metadata: {
@@ -99,5 +98,3 @@ export default async function generateDOI(prereviewData) {
 
   return publishData.doi;
 }
-// Testing:
-// generateDOI({ title: "test", authorName: "Daniel", authorOrcid: "0000-0001-9596-7596", content: "<h1>test</h1>" })

@@ -118,8 +118,7 @@ export default function controller(
 
       if (review.isPublished) {
         reviewData = {
-          title:
-            review.title || `Review of ${preprint.title}`,
+          title: review.title || `Review of ${preprint.title}`,
           content: draft.contents,
           authorName: authorPersona.name,
           orcid: authorPersona.isPrivate ? '' : authorPersona.identity.orcid,
