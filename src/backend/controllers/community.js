@@ -156,6 +156,9 @@ export default function controller(
         if (!community) {
           ctx.throw(404, `Community with ID ${ctx.params.id} doesn't exist`);
         }
+        if (community.banner && Buffer.isBuffer(community.banner)) {
+          community.banner = community.banner.toString();
+        }
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse community schema: ${err}`);

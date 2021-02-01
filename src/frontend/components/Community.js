@@ -49,12 +49,15 @@ const useStyles = makeStyles(theme => ({
     marginBottom: theme.spacing(2),
   },
   banner: {
+    background: 'rgba(255, 255, 255, 0.75)',
     maxWidth: theme.breakpoints.values['md'],
     marginLeft: 'auto',
     marginRight: 'auto',
+    marginBottom: theme.spacing(4),
+    paddingBottom: theme.spacing(6),
+    paddingLeft: theme.spacing(4),
+    paddingRight: theme.spacing(4),
     paddingTop: theme.spacing(12),
-    paddingBottom: theme.spacing(8),
-    textAlign: 'center',
     [theme.breakpoints.up('lg')]: {
       paddingTop: theme.spacing(16),
       paddingBottom: theme.spacing(8),
@@ -70,6 +73,7 @@ const useStyles = makeStyles(theme => ({
     textDecoration: 'none !important',
   },
   paper: {
+    backgroundColor: '#fff',
     borderRadius: 20,
     boxShadow: '1px 1px 5px 3px #DADADA',
     maxWidth: theme.breakpoints.values['md'],
@@ -180,70 +184,105 @@ export default function Community() {
         <React.Fragment>
           <CommunityHeader
             name={community.name}
+            banner={community.banner}
             description={community.description}
             members={community.members}
             membersLimit={5}
           />
-          <Grid container spacing={2}>
-            <Grid item xs={12} md={8}>
-              <CommunityContent
-                thisUser={user}
-                community={community}
-                params={params}
-              />
+          <Box pt={4} px={4} bgcolor="rgba(229, 229, 229, 0.35)">
+            <Grid container spacing={4}>
+              <Grid item xs={12} md={8}>
+                <CommunityContent
+                  thisUser={user}
+                  community={community}
+                  params={params}
+                />
+              </Grid>
+              <Grid item xs={12} md={4}>
+                {community.members &&
+                  Array.isArray(community.members) &&
+                  community.members.length > 0 && (
+                    <CommunityPersonas
+                      title="Members"
+                      personas={community.members}
+                      isSearchable="true"
+                    />
+                  )}
+                {community.events &&
+                  Array.isArray(community.events) &&
+                  community.events.length > 0 && (
+                    <CommunityEvents
+                      community={community}
+                      events={community.events}
+                    />
+                  )}
+                {community.owners &&
+                  Array.isArray(community.owners) &&
+                  community.owners.length > 0 && (
+                    <CommunityPersonas
+                      title="Moderators"
+                      personas={community.owners}
+                      isSearchable="false"
+                    />
+                  )}
+              </Grid>
             </Grid>
-            <Grid item xs={12} md={4}>
-              {community.members &&
-                Array.isArray(community.members) &&
-                community.members.length > 0 && (
-                  <CommunityPersonas
-                    title="Members"
-                    personas={community.members}
-                    isSearchable="true"
-                  />
-                )}
-              {community.events &&
-                Array.isArray(community.events) &&
-                community.events.length > 0 && (
-                  <CommunityEvents
-                    community={community}
-                    events={community.events}
-                  />
-                )}
-              {community.owners &&
-                Array.isArray(community.owners) &&
-                community.owners.length > 0 && (
-                  <CommunityPersonas
-                    title="Moderators"
-                    personas={community.owners}
-                    isSearchable="false"
-                  />
-                )}
-            </Grid>
-          </Grid>
+          </Box>
         </React.Fragment>
       </div>
     );
   }
 }
 
-function CommunityHeader({ name, description, members, membersLimit = 5 }) {
+function CommunityHeader({
+  name,
+  banner,
+  description,
+  members,
+  membersLimit = 5,
+}) {
   const classes = useStyles();
+
+  console.log(banner);
 
   return (
     <section>
-      <Container maxWidth="lg">
+      <Container
+        maxWidth="lg"
+        style={
+          banner
+            ? {
+                backgroundImage: `url(${banner})`,
+                backgroundSize: 'cover',
+                backgroundRepeat: 'no-repeat',
+              }
+            : null
+        }
+      >
         <Grid container>
           <Grid item xs={12} lg={6}>
             <Box className={classes.banner}>
               <Typography variant="h3" component="h2" gutterBottom={true}>
                 {name}
               </Typography>
-              <AvatarGroup max={membersLimit}>
-                {members.map(member => (
-                  <Avatar alt={member.name} src={member.avatar} />
-                ))}
-              </AvatarGroup>
+              <Grid container spacing={2} alignItems="center">
+                <Grid item>
+                  <AvatarGroup max={membersLimit}>
+                    {members.map(member => (
+                      <Avatar
+                        key={member.uuid}
+                        alt={member.name}
+                        src={member.avatar}
+                      />
+                    ))}
+                  </AvatarGroup>
+                </Grid>
+                <Grid item>
+                  <Typography variant="h6" component="p" gutterBottom={true}>
+                    {members.length} Members
+                  </Typography>
+                </Grid>
+              </Grid>
               <Typography variant="h5" color="textSecondary" paragraph>
                 {description}
               </Typography>
@@ -255,13 +294,21 @@ function CommunityHeader({ name, description, members, membersLimit = 5 }) {
   );
 }
 
+CommunityHeader.propTypes = {
+  name: PropTypes.string.isRequired,
+  banner: PropTypes.string,
+  description: PropTypes.string,
+  members: PropTypes.array,
+  membersLimit: PropTypes.number.isRequired,
+};
+
 function CommunityPersonas({ title, personas, isSearchable = false }) {
   const classes = useStyles();
 
   return (
     <section>
       <Box p={4} mb={2} className={classes.paper}>
-        <Box mb={8}>
+        <Box mb={4}>
           <Typography variant="h5" component="h2" gutterBottom={true}>
             {title}
           </Typography>
@@ -301,7 +348,7 @@ function CommunityPersonas({ title, personas, isSearchable = false }) {
 CommunityPersonas.propTypes = {
   title: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]).isRequired,
   personas: PropTypes.array.isRequired,
-  isSearchable: PropTypes.bool,
+  isSearchable: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
 };
 
 function CommunityEvents({ community, events }) {
@@ -310,55 +357,58 @@ function CommunityEvents({ community, events }) {
 
   return (
     <section>
-      <Container maxWidth="md">
-        <Box pt={8} pb={12} textAlign="center">
-          <Box mb={8}>
-            <Typography variant="h4" component="h2" gutterBottom={true}>
-              Events
-            </Typography>
-            <Typography variant="subtitle1" color="textSecondary" />
-          </Box>
-          <Grid container spacing={8}>
-            {events.map(event => {
-              return (
-                <Link
-                  key={event.uuid}
-                  href={
-                    '/communities' + community.uuid + '/events/' + event.uuid
-                  }
-                >
-                  <Grid container spacing={8}>
-                    <Grid item xs={6} md={3}>
-                      <Typography
-                        variant="h6"
-                        component="h4"
-                        gutterBottom={true}
-                      >
-                        {new Intl.DateTimeFormat(intl.locale, {
-                          month: 'long',
-                          day: 'numeric',
-                        }).format(Date.parse(event.start))}
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={6} md={3}>
-                      <Typography
-                        variant="h6"
-                        component="h4"
-                        gutterBottom={true}
-                      >
-                        {event.title}
-                      </Typography>
-                    </Grid>
-                  </Grid>
-                </Link>
-              );
-            })}
-          </Grid>
+      <Box p={4} className={classes.paper}>
+        <Box mb={4}>
+          <Typography variant="h5" component="h2" gutterBottom={true}>
+            Events
+          </Typography>
+          <Typography variant="subtitle1" color="textSecondary" />
         </Box>
-      </Container>
+        <Grid container spacing={2} direction="column">
+          {events.map(event => {
+            return (
+              <Link
+                key={event.uuid}
+                href={'/communities' + community.uuid + '/events/' + event.uuid}
+              >
+                <Grid container spacing={2}>
+                  <Grid item xs={6} md={3}>
+                    <Typography
+                      color="primary"
+                      variant="h6"
+                      component="h4"
+                      gutterBottom={true}
+                    >
+                      {new Intl.DateTimeFormat(intl.locale, {
+                        month: 'short',
+                        day: 'numeric',
+                      }).format(Date.parse(event.start))}
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={6} md={9}>
+                    <Typography
+                      color="textPrimary"
+                      variant="h6"
+                      component="h4"
+                      gutterBottom={true}
+                    >
+                      {event.title}
+                    </Typography>
+                  </Grid>
+                </Grid>
+              </Link>
+            );
+          })}
+        </Grid>
+      </Box>
     </section>
   );
 }
+
+CommunityEvents.propTypes = {
+  community: PropTypes.object,
+  events: PropTypes.array,
+};
 
 function CommunityContent({ thisUser, community, params }) {
   const classes = useStyles();
@@ -414,7 +464,7 @@ function CommunityContent({ thisUser, community, params }) {
     return <div>An error occurred: {error}</div>;
   } else {
     return (
-      <Box m={2}>
+      <Box>
         <CommunitySearch
           defaultValue={search}
           isFetching={loadingPreprints}
@@ -572,9 +622,9 @@ function CommunityContent({ thisUser, community, params }) {
 }
 
 CommunityContent.propTypes = {
-  thisUser: PropTypes.obj,
-  community: PropTypes.obj,
-  params: PropTypes.obj,
+  thisUser: PropTypes.object,
+  community: PropTypes.object,
+  params: PropTypes.object,
 };
 
 function CommunitySearch({
