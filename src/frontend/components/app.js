@@ -9,6 +9,7 @@ import { Switch, Route } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 //import smoothscroll from 'smoothscroll-polyfill';
 import 'url-search-params-polyfill'; /* pollyfill for IE / Edge */
+import { IntlProvider } from 'react-intl';
 
 // contexts
 import UserProvider from '../contexts/user-context';
@@ -50,83 +51,85 @@ export default function App({ user }) {
 
   return (
     <HelmetProvider>
-      <DndProvider
-        backend={mobile({ tablet: true }) ? TouchBackend : HTML5Backend}
-      >
-        <StoresProvider>
-          <UserProvider user={user}>
-            <Switch>
-              <Route path="/:new(new)?" exact={true}>
-                <Home />
-              </Route>
-              <Route exact={true} path="/login">
-                <Login />
-              </Route>
-              <Route exact={true} path="/logout">
-                <Logout />
-              </Route>
+      <IntlProvider>
+        <DndProvider
+          backend={mobile({ tablet: true }) ? TouchBackend : HTML5Backend}
+        >
+          <StoresProvider>
+            <UserProvider user={user}>
+              <Switch>
+                <Route path="/:new(new)?" exact={true}>
+                  <Home />
+                </Route>
+                <Route exact={true} path="/login">
+                  <Login />
+                </Route>
+                <Route exact={true} path="/logout">
+                  <Logout />
+                </Route>
 
-              <Route exact={true} path="/about">
-                <ToCPage>
-                  <About />
-                </ToCPage>
-              </Route>
+                <Route exact={true} path="/about">
+                  <ToCPage>
+                    <About />
+                  </ToCPage>
+                </Route>
 
-              <Route exact={true} path="/code-of-conduct">
-                <ToCPage>
-                  <CodeOfConduct />
-                </ToCPage>
-              </Route>
+                <Route exact={true} path="/code-of-conduct">
+                  <ToCPage>
+                    <CodeOfConduct />
+                  </ToCPage>
+                </Route>
 
-              <Route exact={true} path="/api">
-                <ToCPage>
-                  <API />
-                </ToCPage>
-              </Route>
+                <Route exact={true} path="/api">
+                  <ToCPage>
+                    <API />
+                  </ToCPage>
+                </Route>
 
-              <Route exact={true} path="/personas">
-                <PersonaSearch />
-              </Route>
-              <Route exact={true} path="/about/:id">
-                <Profile />
-              </Route>
-              <Route exact={true} path="/extension">
-                <ExtensionSplash />
-              </Route>
-              <PrivateRoute exact={true} path="/settings">
-                <Settings />
-              </PrivateRoute>
-              <AdminRoute exact={true} path="/admin">
-                <AdminPanel />
-              </AdminRoute>
-              <AdminRoute exact={true} path="/block">
-                <BlockPanel />
-              </AdminRoute>
-              <ModeratorRoute exact={true} path="/moderate">
-                <Suspense fallback={<SuspenseLoading>Loading</SuspenseLoading>}>
-                  <Moderate />
-                </Suspense>
-              </ModeratorRoute>
-              <Route
-                exact={true}
-                path="/preprints/:id"
-              >
-                <ExtensionFallback />
-              </Route>
-              <Route
-                exact={true}
-                path="/communities/:id"
-              >
-                <Community />
-              </Route>
+                <Route exact={true} path="/personas">
+                  <PersonaSearch />
+                </Route>
+                <Route exact={true} path="/about/:id">
+                  <Profile />
+                </Route>
+                <Route exact={true} path="/extension">
+                  <ExtensionSplash />
+                </Route>
+                <PrivateRoute exact={true} path="/settings">
+                  <Settings />
+                </PrivateRoute>
+                <AdminRoute exact={true} path="/admin">
+                  <AdminPanel />
+                </AdminRoute>
+                <AdminRoute exact={true} path="/block">
+                  <BlockPanel />
+                </AdminRoute>
+                <ModeratorRoute exact={true} path="/moderate">
+                  <Suspense fallback={<SuspenseLoading>Loading</SuspenseLoading>}>
+                    <Moderate />
+                  </Suspense>
+                </ModeratorRoute>
+                <Route
+                  exact={true}
+                  path="/preprints/:id"
+                >
+                  <ExtensionFallback />
+                </Route>
+                <Route
+                  exact={true}
+                  path="/communities/:id"
+                >
+                  <Community />
+                </Route>
 
-              <Route>
-                <NotFound />
-              </Route>
-            </Switch>
-          </UserProvider>
-        </StoresProvider>
-      </DndProvider>
+                <Route>
+                  <NotFound />
+                </Route>
+              </Switch>
+            </UserProvider>
+          </StoresProvider>
+        </DndProvider>
+      </IntlProvider>
     </HelmetProvider>
   );
 }

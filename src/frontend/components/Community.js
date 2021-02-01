@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import { useHistory, useLocation, useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import MuiSearchBar from 'material-ui-search-bar';
+import { useIntl } from 'react-intl';
 
 // contexts
 import UserProvider from '../contexts/user-context';
@@ -24,6 +25,7 @@ import LoginRequiredModal from './login-required-modal';
 // Material-ui components
 import { makeStyles } from '@material-ui/core/styles';
 import Avatar from '@material-ui/core/Avatar';
+import AvatarGroup from '@material-ui/lab/AvatarGroup';
 import Box from '@material-ui/core/Box';
 import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
@@ -36,6 +38,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import Chip from '@material-ui/core/Chip';
+import Link from '@material-ui/core/Link';
 
 const useStyles = makeStyles(theme => ({
   avatar: {
@@ -145,7 +148,13 @@ export default function Community() {
         Array.isArray(community.data) &&
         community.data.length > 0
       ) {
-        return community.data[0];
+        const owners = community.data[0].owners.reduce((results, owner) => {
+          if (owner.defaultPersona && owner.defaultPersona.uuid) {
+            return results.concat(owner.defaultPersona);
+          }
+          return results;
+        }, []);
+        return { ...community.data[0], owners };
       }
     },
     id: id,
@@ -168,6 +177,8 @@ export default function Community() {
           <CommunityHeader
             name={community.name}
             description={community.description}
+            members={community.members}
+            membersLimit={5}
           />
           <Grid container spacing={2}>
             <Grid item xs={12} md={8}>
@@ -187,14 +198,20 @@ export default function Community() {
                     isSearchable="true"
                   />
                 )}
+              {community.events &&
+                Array.isArray(community.events) &&
+                community.events.length > 0 && (
+                  <CommunityEvents
+                    community={community}
+                    events={community.events}
+                  />
+                )}
               {community.owners &&
                 Array.isArray(community.owners) &&
                 community.owners.length > 0 && (
                   <CommunityPersonas
                     title="Moderators"
-                    personas={community.owners.map(
-                      owner => owner.defaultPersona,
-                    )}
+                    personas={community.owners}
                     isSearchable="false"
                   />
                 )}
@@ -206,7 +223,7 @@ export default function Community() {
   }
 }
 
-function CommunityHeader({ name, description }) {
+function CommunityHeader({ name, description, members, membersLimit = 5 }) {
   const classes = useStyles();
 
   return (
@@ -218,6 +235,11 @@ function CommunityHeader({ name, description }) {
               <Typography variant="h3" component="h2" gutterBottom={true}>
                 {name}
               </Typography>
+              <AvatarGroup max={membersLimit}>
+                {members.map(member => (
+                  <Avatar alt={member.name} src={member.avatar} />
+                ))}
+              </AvatarGroup>
               <Typography variant="h5" color="textSecondary" paragraph>
                 {description}
               </Typography>
@@ -242,19 +264,79 @@ function CommunityPersonas({ title, personas, isSearchable = false }) {
             </Typography>
             <Typography variant="subtitle1" color="textSecondary" />
           </Box>
-          <Grid container spacing={8}>
-            {personas.map(persona => {
-              return (
-                <Grid key={persona.uuid} item xs={6} md={3}>
-                  <Avatar
-                    alt={persona.name}
-                    src={persona.avatar}
-                    className={classes.avatar}
-                  />
-                  <Typography variant="h6" component="h4" gutterBottom={true}>
-                    {persona.name}
-                  </Typography>
+          {personas.map(persona => {
+            return (
+              <Link key={persona.uuid} href={'/about/' + persona.uuid}>
+                <Grid container spacing={8}>
+                  <Grid item xs={6} md={3}>
+                    <Avatar
+                      alt={persona.name}
+                      src={persona.avatar}
+                      className={classes.avatar}
+                    />
+                  </Grid>
+                  <Grid item xs={6} md={3}>
+                    <Typography variant="h6" component="h4" gutterBottom={true}>
+                      {persona.name}
+                    </Typography>
+                  </Grid>
                 </Grid>
+              </Link>
+            );
+          })}
+        </Box>
+      </Container>
+    </section>
+  );
+}
+
+function CommunityEvents({ community, events }) {
+  const classes = useStyles();
+  const intl = useIntl();
+
+  return (
+    <section>
+      <Container maxWidth="md">
+        <Box pt={8} pb={12} textAlign="center">
+          <Box mb={8}>
+            <Typography variant="h4" component="h2" gutterBottom={true}>
+              Events
+            </Typography>
+            <Typography variant="subtitle1" color="textSecondary" />
+          </Box>
+          <Grid container spacing={8}>
+            {events.map(event => {
+              return (
+                <Link
+                  key={event.uuid}
+                  href={
+                    '/communities' + community.uuid + '/events/' + event.uuid
+                  }
+                >
+                  <Grid container spacing={8}>
+                    <Grid item xs={6} md={3}>
+                      <Typography
+                        variant="h6"
+                        component="h4"
+                        gutterBottom={true}
+                      >
+                        {new Intl.DateTimeFormat('en-US', {
+                          month: 'long',
+                          day: 'numeric',
+                        }).format(Date.parse(event.start))}
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={6} md={3}>
+                      <Typography
+                        variant="h6"
+                        component="h4"
+                        gutterBottom={true}
+                      >
+                        {event.title}
+                      </Typography>
+                    </Grid>
+                  </Grid>
+                </Link>
               );
             })}
           </Grid>
@@ -273,7 +355,11 @@ function CommunityContent({ thisUser, community, params }) {
 
   const { data: preprints, loading: loadingPreprints, error } = useGetPreprints(
     {
-      queryParams: { ...searchParamsToObject(params), communities: community.uuid, tags: selectedTags.toString() },
+      queryParams: {
+        ...searchParamsToObject(params),
+        communities: community.uuid,
+        tags: selectedTags.toString(),
+      },
     },
   );
   const [hoveredSortOption, setHoveredSortOption] = useState(null);
@@ -468,6 +554,12 @@ function CommunityContent({ thisUser, community, params }) {
     );
   }
 }
+
+CommunityContent.propTypes = {
+  thisUser: PropTypes.obj,
+  community: PropTypes.obj,
+  params: PropTypes.obj,
+};
 
 function CommunitySearch({
   isFetching,

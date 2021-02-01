@@ -7,6 +7,8 @@ import { getLogger } from '../log.js';
 
 const log = getLogger('backend:controllers:auth');
 
+const ANON_TRIES_LIMIT = 5;
+
 export default function controller(users, personas, config, thisUser) {
   const authRouter = router();
 
@@ -61,7 +63,6 @@ export default function controller(users, personas, config, thisUser) {
       // if a user already exists
       user = await users.findOne({ orcid: params.orcid }, [
         'personas',
-        'communities',
         'groups',
       ]);
       log.trace('verifyCallback() user:', user);
@@ -83,7 +84,7 @@ export default function controller(users, personas, config, thisUser) {
 
       try {
         log.debug('Creating new user.');
-        newUser = users.create({ orcid: params.orcid, name: usersName });
+        newUser = users.create({ orcid: params.orcid });
         log.trace('verifyCallback() newUser:', newUser);
       } catch (err) {
         log.error('Error creating user:', err);
@@ -95,10 +96,19 @@ export default function controller(users, personas, config, thisUser) {
         let anonPersona;
         let defaultPersona;
 
-        let anonName = anonymus.create()[0];
+        let anonName = anonymus
+          .create()[0]
+          .replace(/(^|\s)\S/g, l => l.toUpperCase());
+        let tries = 0;
         while ((await personas.findOne({ name: anonName })) !== null) {
-          console.log('Anonymous name generation collision');
-          anonName = anonymus.create()[0];
+          log.debug('Anonymous name generation collision');
+          anonName = anonymus
+            .create()[0]
+            .replace(/(^|\s)\S/g, l => l.toUpperCase());
+          tries = tries + 1;
+          if (tries >= ANON_TRIES_LIMIT) {
+            anonName = anonName + ` ${tries - ANON_TRIES_LIMIT}`;
+          }
         }
 
         try {
