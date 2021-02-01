@@ -160,10 +160,10 @@ export default function controller(
       let fullReview, draft;
 
       try {
-        fullReview = await reviewModel.findOne({ uuid: ctx.params.id });
+        fullReview = await reviewModel.findOne({ id: ctx.params.id });
         if (!fullReview) {
           try {
-            postHandler();
+            postHandler(ctx);
           } catch {
             ctx.throw(
               404,

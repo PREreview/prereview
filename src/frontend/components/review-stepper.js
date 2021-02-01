@@ -261,7 +261,7 @@ export default function ReviewStepper({
   const [reviewId, setReviewId] = useState(review ? review.parent : null);
   const [skipped, setSkipped] = useState(new Set());
   const steps = getSteps();
-
+  console.log(review);
   // API queries
   const { data: templates } = useGetTemplates();
   const { mutate: postRapidReview } = usePostRapidReviews();
@@ -366,12 +366,12 @@ export default function ReviewStepper({
           .catch(err => alert(`An error occurred: ${err.message}`));
       } else {
         postLongReview({
-          preprint: preprint.id,
+          preprint: preprint.uuid,
           contents: content,
         })
           .then(response => {
             alert('Draft updated successfully.');
-            setReviewId(response.body.id);
+            setReviewId(response.body.uuid);
             onReviewChange(response.body);
             return history.push(`${location.pathname}/${response.body.id}`);
           })
