@@ -27,18 +27,19 @@ import { makeStyles } from '@material-ui/core/styles';
 import Avatar from '@material-ui/core/Avatar';
 import AvatarGroup from '@material-ui/lab/AvatarGroup';
 import Box from '@material-ui/core/Box';
+import Button from '@material-ui/core/Button';
+import Chip from '@material-ui/core/Chip';
 import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
-import Link from '@material-ui/core/Link';
-import Paper from '@material-ui/core/Paper';
-import Typography from '@material-ui/core/Typography';
-import Pagination from '@material-ui/lab/Pagination';
 import Input from '@material-ui/core/Input';
 import InputLabel from '@material-ui/core/InputLabel';
+import Link from '@material-ui/core/Link';
 import MenuItem from '@material-ui/core/MenuItem';
-import FormControl from '@material-ui/core/FormControl';
+import Modal from '@material-ui/core/Modal';
+import Paper from '@material-ui/core/Paper';
+import Pagination from '@material-ui/lab/Pagination';
 import Select from '@material-ui/core/Select';
-import Chip from '@material-ui/core/Chip';
+import Typography from '@material-ui/core/Typography';
 
 const useStyles = makeStyles(theme => ({
   avatar: {
@@ -64,6 +65,10 @@ const useStyles = makeStyles(theme => ({
       textAlign: 'left',
     },
   },
+  button: {
+    color: '#197CF4',
+    textTransform: 'none',
+  },
   contentMain: {
     marginTop: '2rem',
     padding: theme.spacing(2),
@@ -71,6 +76,17 @@ const useStyles = makeStyles(theme => ({
   link: {
     color: '#000 !important',
     textDecoration: 'none !important',
+  },
+  modal: {
+    backgroundColor: theme.palette.background.paper,
+    border: '2px solid #000',
+    boxShadow: theme.shadows[5],
+    left: '50%',
+    minWidth: 300,
+    padding: theme.spacing(2, 4, 3),
+    position: 'absolute',
+    top: '50%',
+    transform: 'translate(-50%, -50%)',
   },
   paper: {
     backgroundColor: '#fff',
@@ -305,6 +321,16 @@ CommunityHeader.propTypes = {
 function CommunityPersonas({ title, personas, isSearchable = false }) {
   const classes = useStyles();
 
+  const [open, setOpen] = React.useState(false);
+
+  const handleOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
   return (
     <section>
       <Box p={4} mb={2} className={classes.paper}>
@@ -315,7 +341,7 @@ function CommunityPersonas({ title, personas, isSearchable = false }) {
           <Typography variant="subtitle1" color="textSecondary" />
         </Box>
         <Grid container spacing={2} direction="column">
-          {personas.map(persona => {
+          {personas.slice(0, 3).map(persona => {
             return (
               <Link
                 href={`/about/${persona.uuid}`}
@@ -340,6 +366,52 @@ function CommunityPersonas({ title, personas, isSearchable = false }) {
             );
           })}
         </Grid>
+        <Box borderTop={'1px solid #DADADA'} mt={2} pt={2} textAlign="center">
+          <Button
+            color="secondary"
+            className={classes.button}
+            onClick={handleOpen}
+          >
+            See All {title}
+          </Button>
+          <Modal
+            open={open}
+            onClose={handleClose}
+            aria-labelledby="see-members-title"
+            aria-describedby="see-members-description"
+          >
+            <div className={classes.modal}>
+              {personas.map(persona => {
+                return (
+                  <Link
+                    href={`/about/${persona.uuid}`}
+                    key={persona.uuid}
+                    className={classes.link}
+                  >
+                    <Grid container item alignItems="center" spacing={2}>
+                      <Grid item>
+                        <Avatar
+                          alt={persona.name}
+                          src={persona.avatar}
+                          className={classes.avatar}
+                        />
+                      </Grid>
+                      <Grid item>
+                        <Typography
+                          variant="h6"
+                          component="h4"
+                          gutterBottom={true}
+                        >
+                          {persona.name}
+                        </Typography>
+                      </Grid>
+                    </Grid>
+                  </Link>
+                );
+              })}
+            </div>
+          </Modal>
+        </Box>
       </Box>
     </section>
   );
@@ -355,6 +427,16 @@ function CommunityEvents({ community, events }) {
   const classes = useStyles();
   const intl = useIntl();
 
+  const [open, setOpen] = React.useState(false);
+
+  const handleOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
   return (
     <section>
       <Box p={4} className={classes.paper}>
@@ -365,11 +447,12 @@ function CommunityEvents({ community, events }) {
           <Typography variant="subtitle1" color="textSecondary" />
         </Box>
         <Grid container spacing={2} direction="column">
-          {events.map(event => {
+          {events.slice(0,3).map(event => {
             return (
               <Link
                 key={event.uuid}
                 href={'/communities' + community.uuid + '/events/' + event.uuid}
+                className={classes.link}
               >
                 <Grid container spacing={2}>
                   <Grid item xs={6} md={3}>
@@ -400,6 +483,61 @@ function CommunityEvents({ community, events }) {
             );
           })}
         </Grid>
+        <Box borderTop={'1px solid #DADADA'} mt={2} pt={2} textAlign="center">
+          <Button
+            color="secondary"
+            className={classes.button}
+            onClick={handleOpen}
+          >
+            See All Events
+          </Button>
+          <Modal
+            open={open}
+            onClose={handleClose}
+            aria-labelledby="see-members-title"
+            aria-describedby="see-members-description"
+          >
+            <div className={classes.modal}>
+              {events.map(event => {
+                return (
+                  <Link
+                    key={event.uuid}
+                    href={
+                      '/communities' + community.uuid + '/events/' + event.uuid
+                    }
+                    className={classes.link}
+                  >
+                    <Grid container spacing={2}>
+                      <Grid item xs={6} md={3}>
+                        <Typography
+                          color="primary"
+                          variant="h6"
+                          component="h4"
+                          gutterBottom={true}
+                        >
+                          {new Intl.DateTimeFormat(intl.locale, {
+                            month: 'short',
+                            day: 'numeric',
+                          }).format(Date.parse(event.start))}
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={6} md={9}>
+                        <Typography
+                          color="textPrimary"
+                          variant="h6"
+                          component="h4"
+                          gutterBottom={true}
+                        >
+                          {event.title}
+                        </Typography>
+                      </Grid>
+                    </Grid>
+                  </Link>
+                );
+              })}
+            </div>
+          </Modal>
+        </Box>
       </Box>
     </section>
   );
