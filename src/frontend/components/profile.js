@@ -68,7 +68,7 @@ export default function Profile() {
 
         <section className="profile__content">
           <header className="profile__header">
-            <Avatar src={persona.avatar} classes="profile__avatar-img" />
+            <Avatar src={persona.avatar} className="profile__avatar-img" />
 
             <section className="profile__identity-info">
               <header className="profile__indentity-info-header">
@@ -112,13 +112,14 @@ export default function Profile() {
                     <dt>
                       <LabelStyle>Badges</LabelStyle>
                     </dt>
-                    <dd>
+                    <dd className="profile__chips">
                       {persona.badges.map(badge => (
                         <Chip
                           key={badge.uuid}
                           label={badge.name}
                           color="primary"
                           size="small"
+                          className="profile__chip"
                         />
                       ))}
                     </dd>

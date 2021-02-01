@@ -27,10 +27,10 @@
     }
   }
   & .profile__avatar-img {
-    max-height: 350px;
-    max-width: 350px;
+    height: 218px;
+    width: 218px;
     margin-right: var(--mgrd);
-    flex: 0 0 350px;
+    flex: 0 0 218px;
     object-fit: scale-down;
   }
 
@@ -53,6 +53,14 @@
       /* text-align: right; */
       margin: var(--xxsgrd) 0 var(--sgrd);
       display: block;
+
+      &.profile__chips {
+        margin-left: -0.5rem;
+        
+        & .profile__chip {
+          margin-left: 0.5rem;
+        }
+      }
     }
   }
   & .profile__indentity-info-header {

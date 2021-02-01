@@ -19,26 +19,26 @@ export default function RoleActivity({ persona }) {
   return (
     <div className="role-activity">
       {activity && activity.length ? (
-        <dl className="role-activity__summary">
-          <dt className="role-activity__summary__label">
-            <LabelStyle>Total number of requests</LabelStyle>
-          </dt>
-          <dd className="role-activity__summary__stat">
-            {persona.requests.length || 0}
-          </dd>
-          <dt className="role-activity__summary__label">
-            <LabelStyle>Total number of rapid reviews</LabelStyle>
-          </dt>
-          <dd className="role-activity__summary__stat">
-            {persona.rapidReviews.length || 0}
-          </dd>
-          <dt className="role-activity__summary__label">
-            <LabelStyle>Total number of long-form reviews</LabelStyle>
-          </dt>
-          <dd className="role-activity__summary__stat">
-            {persona.fullReviews.filter(review => review.isPublished).length || 0}
-          </dd>
-        </dl>
+        <div className="role-activity__summary">
+          <div className="role-activity__summary">
+            <LabelStyle>
+              Total number of requests: {persona.requests.length || 0}
+            </LabelStyle>
+          </div>
+          <div className="role-activity__summary">
+            <LabelStyle>
+              Total number of rapid reviews: {persona.rapidReviews.length || 0}
+            </LabelStyle>
+          </div>
+
+          <div className="role-activity__summary">
+            <LabelStyle>
+              Total number of long-form reviews:{' '}
+              {persona.fullReviews.filter(review => review.isPublished)
+                .length || 0}
+            </LabelStyle>
+          </div>
+        </div>
       ) : null}
 
       {!activity || !activity.length ? (
