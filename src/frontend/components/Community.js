@@ -27,6 +27,7 @@ import Avatar from '@material-ui/core/Avatar';
 import Box from '@material-ui/core/Box';
 import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
+import Link from '@material-ui/core/Link';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import Pagination from '@material-ui/lab/Pagination';
@@ -61,6 +62,10 @@ const useStyles = makeStyles(theme => ({
   contentMain: {
     marginTop: '2rem',
     padding: theme.spacing(2),
+  },
+  link: {
+    color: '#000 !important',
+    textDecoration: 'none !important',
   },
   paper: {
     borderRadius: 20,
@@ -234,35 +239,49 @@ function CommunityPersonas({ title, personas, isSearchable = false }) {
 
   return (
     <section>
-      <Container maxWidth="md">
-        <Box pt={8} pb={12} textAlign="center">
-          <Box mb={8}>
-            <Typography variant="h4" component="h2" gutterBottom={true}>
-              {title}
-            </Typography>
-            <Typography variant="subtitle1" color="textSecondary" />
-          </Box>
-          <Grid container spacing={8}>
-            {personas.map(persona => {
-              return (
-                <Grid key={persona.uuid} item xs={6} md={3}>
-                  <Avatar
-                    alt={persona.name}
-                    src={persona.avatar}
-                    className={classes.avatar}
-                  />
-                  <Typography variant="h6" component="h4" gutterBottom={true}>
-                    {persona.name}
-                  </Typography>
-                </Grid>
-              );
-            })}
-          </Grid>
+      <Box p={4} mb={2} className={classes.paper}>
+        <Box mb={8}>
+          <Typography variant="h5" component="h2" gutterBottom={true}>
+            {title}
+          </Typography>
+          <Typography variant="subtitle1" color="textSecondary" />
         </Box>
-      </Container>
+        <Grid container spacing={2} direction="column">
+          {personas.map(persona => {
+            return (
+              <Link
+                href={`/about/${persona.uuid}`}
+                key={persona.uuid}
+                className={classes.link}
+              >
+                <Grid container item alignItems="center" spacing={2}>
+                  <Grid item>
+                    <Avatar
+                      alt={persona.name}
+                      src={persona.avatar}
+                      className={classes.avatar}
+                    />
+                  </Grid>
+                  <Grid item>
+                    <Typography variant="h6" component="h4" gutterBottom={true}>
+                      {persona.name}
+                    </Typography>
+                  </Grid>
+                </Grid>
+              </Link>
+            );
+          })}
+        </Grid>
+      </Box>
     </section>
   );
 }
+
+CommunityPersonas.propTypes = {
+  title: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]).isRequired,
+  personas: PropTypes.array.isRequired,
+  isSearchable: PropTypes.bool,
+};
 
 function CommunityContent({ thisUser, community, params }) {
   const classes = useStyles();
@@ -273,7 +292,11 @@ function CommunityContent({ thisUser, community, params }) {
 
   const { data: preprints, loading: loadingPreprints, error } = useGetPreprints(
     {
-      queryParams: { ...searchParamsToObject(params), communities: community.uuid, tags: selectedTags.toString() },
+      queryParams: {
+        ...searchParamsToObject(params),
+        communities: community.uuid,
+        tags: selectedTags.toString(),
+      },
     },
   );
   const [hoveredSortOption, setHoveredSortOption] = useState(null);
@@ -377,35 +400,38 @@ function CommunityContent({ thisUser, community, params }) {
             </Grid>
           </Box>
           <Grid className={classes.formControl} container spacing={2}>
-            <Grid item xs={12} sm={6} md={3}>
-              <InputLabel id="community-tags-label">Tags</InputLabel>
-              <Select
-                labelId="community-tags-label"
-                id="community-tags"
-                className={classes.select}
-                multiple
-                value={selectedTags}
-                onChange={ev => setSelectedTags(ev.target.value)}
-                input={<Input id="community-tags-select-multiple" />}
-                renderValue={selected => (
-                  <div className={classes.chips}>
-                    {selected.map(value => (
-                      <Chip
-                        key={value}
-                        label={value}
-                        className={classes.chip}
-                      />
-                    ))}
-                  </div>
-                )}
-              >
-                {community.tags.map(tag => (
-                  <MenuItem key={tag.uuid} value={tag.name}>
-                    {tag.name}
-                  </MenuItem>
-                ))}
-              </Select>
-            </Grid>
+            {community.tags.length ? (
+              <Grid item xs={12} sm={6} md={3}>
+                <InputLabel id="community-tags-label">Tags</InputLabel>
+                <Select
+                  labelId="community-tags-label"
+                  id="community-tags"
+                  className={classes.select}
+                  multiple
+                  value={selectedTags}
+                  onChange={ev => setSelectedTags(ev.target.value)}
+                  input={<Input id="community-tags-select-multiple" />}
+                  renderValue={selected => (
+                    <div className={classes.chips}>
+                      {selected.map(value => (
+                        <Chip
+                          key={value}
+                          label={value}
+                          className={classes.chip}
+                        />
+                      ))}
+                    </div>
+                  )}
+                >
+                  {community.tags.map(tag => (
+                    <MenuItem key={tag.uuid} value={tag.name}>
+                      {tag.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </Grid>
+            ) : null}
+
           </Grid>
           <Box mt={4}>
             {preprints && preprints.totalCount > 0 && !loadingPreprints && (
