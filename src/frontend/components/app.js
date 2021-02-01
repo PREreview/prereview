@@ -21,6 +21,7 @@ import AdminPanel from './admin-panel';
 import BlockPanel from './block-panel';
 import CodeOfConduct from './code-of-conduct';
 import Community from './Community';
+import CommunityPanel from './community-panel';
 import ExtensionFallback from './extension-fallback';
 import ExtensionSplash from './extension-splash';
 import Home from './home';
@@ -103,6 +104,9 @@ export default function App({ user }) {
                 </AdminRoute>
                 <AdminRoute exact={true} path="/block">
                   <BlockPanel />
+                </AdminRoute>
+                <AdminRoute exact={true} path="/community-settings/:id">
+                  <CommunityPanel />
                 </AdminRoute>
                 <ModeratorRoute exact={true} path="/moderate">
                   <Suspense fallback={<SuspenseLoading>Loading</SuspenseLoading>}>

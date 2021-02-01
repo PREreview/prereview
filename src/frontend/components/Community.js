@@ -31,6 +31,8 @@ import Button from '@material-ui/core/Button';
 import Chip from '@material-ui/core/Chip';
 import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
+import Hidden from '@material-ui/core/Hidden';
+import IconButton from '@material-ui/core/IconButton';
 import Input from '@material-ui/core/Input';
 import InputLabel from '@material-ui/core/InputLabel';
 import Link from '@material-ui/core/Link';
@@ -40,6 +42,9 @@ import Paper from '@material-ui/core/Paper';
 import Pagination from '@material-ui/lab/Pagination';
 import Select from '@material-ui/core/Select';
 import Typography from '@material-ui/core/Typography';
+
+// icons
+import SettingsIcon from '@material-ui/icons/Settings';
 
 const useStyles = makeStyles(theme => ({
   avatar: {
@@ -107,6 +112,16 @@ const useStyles = makeStyles(theme => ({
   select: {
     minWidth: 200,
   },
+  settings: {
+    display: 'block',
+    marginBottom: '2rem',
+    marginLeft: 'auto',
+    marginRight: 0,
+    width: 40,
+  },
+  settingsIcon: {
+    color: '#000',
+  },
   sidebarBox: {
     maxWidth: theme.breakpoints.values['md'],
     marginLeft: 'auto',
@@ -159,6 +174,7 @@ const searchParamsToObject = params => {
 };
 
 export default function Community() {
+  const classes = useStyles();
   const location = useLocation();
   const params = processParams(location.search);
   const [user] = useContext(UserProvider.context);
@@ -206,6 +222,20 @@ export default function Community() {
             membersLimit={5}
           />
           <Box pt={4} px={4} bgcolor="rgba(229, 229, 229, 0.35)">
+            {user.isAdmin ? (
+              <IconButton
+                href={`/community-settings/${community.uuid}`}
+                className={classes.settings}
+              >
+                <SettingsIcon
+                  className={classes.settingsIcon}
+                  style={{ fontSize: 40 }}
+                />
+                <Hidden xsUp>
+                  <span>Settings</span>
+                </Hidden>
+              </IconButton>
+            ) : null}
             <Grid container spacing={4}>
               <Grid item xs={12} md={8}>
                 <CommunityContent
@@ -258,8 +288,6 @@ function CommunityHeader({
   membersLimit = 5,
 }) {
   const classes = useStyles();
-
-  console.log(banner);
 
   return (
     <section>

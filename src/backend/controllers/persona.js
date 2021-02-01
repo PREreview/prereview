@@ -195,7 +195,6 @@ export default function controller(personasModel, badgesModel, thisUser) {
         if (persona.avatar && Buffer.isBuffer(persona.avatar)) {
           persona.avatar = persona.avatar.toString();
         }
-        console.log('persona.avatar:', persona.avatar);
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse schema: ${err}`);
