@@ -31,7 +31,7 @@ export default function controller(
 
   // handler for GET multiple reviews methods
   const getHandler = async ctx => {
-    let allReviews, pid; // fid = fullReview ID
+    let allReviews, pid, preprint; // fid = fullReview ID
 
     if (ctx.params.pid) {
       pid = ctx.params.pid;
@@ -44,7 +44,8 @@ export default function controller(
 
     try {
       if (pid) {
-        allReviews = await reviewModel.findAll({ preprint: pid }, [
+        preprint = await preprintModel.findOneByUuidOrHandle(pid);
+        allReviews = await reviewModel.findAll({ preprint: preprint }, [
           'authors',
           'comments',
           'drafts',
@@ -81,7 +82,9 @@ export default function controller(
     }
 
     try {
-      preprint = await preprintModel.findOne(ctx.request.body.preprint);
+      preprint = await preprintModel.findOneByUuidOrHandle(
+        ctx.request.body.preprint,
+      );
       review = reviewModel.create({
         ...ctx.request.body,
         preprint: preprint,
