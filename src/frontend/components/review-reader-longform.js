@@ -20,6 +20,7 @@ import CommentEditor from './comment-editor';
 import Controls from './controls';
 import ReportButton from './report-button';
 import RoleBadge from './role-badge';
+import PlauditScript from './plaudit-script';
 
 const Button = withStyles({
   root: {
@@ -239,7 +240,7 @@ const LongformReviewReader = props => {
                   justify="space-between"
                   spacing={2}
                 >
-                  <Grid item>Plaudit</Grid>
+                  <Grid item><PlauditScript /></Grid>
                   {/*#FIXME plaudits*/}
                   <Grid item>
                     <ReportButton reviewId={review.uuid} />
