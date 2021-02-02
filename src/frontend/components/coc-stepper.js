@@ -53,121 +53,136 @@ const prereviewTheme = createMuiTheme({
 });
 
 const getSteps = () => {
-  return ['Welcome to PREreview.org!', 'Code of conduct', 'Openness', 'Log in and data sharing'];
-}
+  return [
+    'Welcome to PREreview.org!',
+    'Code of conduct',
+    'Openness',
+    'Log in and data sharing',
+  ];
+};
 
-export default function CoCStepper({openNext}){
-  const steps = getSteps()
-  const classes = useStyles()
+export default function CoCStepper({ openNext }) {
+  const steps = getSteps();
+  const classes = useStyles();
 
   const [activeStep, setActiveStep] = React.useState(0);
 
-
   const handleNext = () => {
     if (activeStep === steps.length - 1) {
-      openNext()
+      openNext();
     }
-    setActiveStep((prevActiveStep) => prevActiveStep + 1);
+    setActiveStep(prevActiveStep => prevActiveStep + 1);
   };
 
   const handleBack = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep - 1);
+    setActiveStep(prevActiveStep => prevActiveStep - 1);
   };
 
-  const getStepContent = (step) => {
+  const getStepContent = step => {
     switch (step) {
       case 0:
         return (
-              <List>
-                <ListItem>
-                  <ListItemText primary={`PREreview.org is a platform for the crowdsourcing of preprint reviews. 
-                  By making an account on this platform, you effectively enter the PREreview 
-                  community and will be able to review preprints, request reviews of preprints, 
-                  as well as comment on, endorse, and report other community members’ reviews. `}/>
-                 </ListItem>
-                 <ListItem><ListItemText primary={`Please read the following information carefully to fully understand the implications of becoming a member of our community.`}/>
-                 </ListItem>
-                </List>
-              )
+          <List>
+            <ListItem>
+              <ListItemText
+                primary={`PREreview.org is a platform for the crowdsourcing of preprint reviews.
+                By making an account on this platform, you effectively enter the PREreview
+                community and will be able to review preprints, request reviews of preprints,
+                as well as comment on, endorse, and report other community members’ reviews.`}
+              />
+            </ListItem>
+            <ListItem>
+              <ListItemText
+                primary={`Please read the following information carefully to fully understand the implications of becoming a member of our community.`}
+              />
+            </ListItem>
+          </List>
+        );
       case 1:
-        return (<Fragment>
-                  <List>
-                    <ListItem>
-                      <ListItemText primary={`In the interest of fostering an open and welcoming environment we, as PREreview's leaders, contributors, and maintainers, pledge to make participation in our project and our  community a harassment-free experience for everyone, regardless of background, family status, gender, gender identity or expression, marital status, sex, sexual orientation, native language, age, ability, race/ethnicity, caste, national origin, socioeconomic status, religion, geographic location, and any other dimension of diversity. `}/>
-                    </ListItem>
-                    <ListItem>
-                      <ListItemText primary={`You, as a member of our community, are expected to abide by PREreview Code of Conduct. In short, you are expected to: `}/>
-                    </ListItem>
-                    <ListItem>
-                      <ListItemIcon>
-                        <ArrowRightAltIcon />
-                      </ListItemIcon>
-                      <ListItemText primary='Use welcoming and inclusive language'></ListItemText>
-                    </ListItem>
-                    <ListItem>
-                      <ListItemIcon>
-                        <ArrowRightAltIcon />
-                      </ListItemIcon>                   
-                      <ListItemText primary='Provide constructive feedback'/>
-                    </ListItem>
-                    <ListItem>
-                      <ListItemIcon>
-                        <ArrowRightAltIcon />
-                      </ListItemIcon>   
-                      <ListItemText primary='Be respectful of differing viewpoints and experiences'></ListItemText>
-                    </ListItem>
-                    <ListItem>
-                      <ListItemIcon>
-                        <ArrowRightAltIcon />
-                      </ListItemIcon>   
-                      <ListItemText primary='Gracefully accept constructive criticism'></ListItemText>
-                    </ListItem>
-                    <ListItem>
-                      <ListItemIcon>
-                        <ArrowRightAltIcon />
-                      </ListItemIcon>   
-                      <ListItemText primary='Focus on what is best for the community'></ListItemText>
-                    </ListItem>
-                    <ListItem>
-                      <ListItemIcon>
-                        <ArrowRightAltIcon />
-                      </ListItemIcon>   
-                      <ListItemText primary='Show empathy towards other community members'></ListItemText>
-                    </ListItem>
-                  </List>
-                </Fragment>);
+        return (
+          <Fragment>
+            <List>
+              <ListItem>
+                <ListItemText
+                  primary={`In the interest of fostering an open and welcoming environment we, as PREreview's leaders, contributors, and maintainers, pledge to make participation in our project and our  community a harassment-free experience for everyone, regardless of background, family status, gender, gender identity or expression, marital status, sex, sexual orientation, native language, age, ability, race/ethnicity, caste, national origin, socioeconomic status, religion, geographic location, and any other dimension of diversity. `}
+                />
+              </ListItem>
+              <ListItem>
+                <ListItemText
+                  primary={`You, as a member of our community, are expected to abide by PREreview Code of Conduct. In short, you are expected to: `}
+                />
+              </ListItem>
+              <ListItem>
+                <ListItemIcon>
+                  <ArrowRightAltIcon />
+                </ListItemIcon>
+                <ListItemText primary="Use welcoming and inclusive language" />
+              </ListItem>
+              <ListItem>
+                <ListItemIcon>
+                  <ArrowRightAltIcon />
+                </ListItemIcon>
+                <ListItemText primary="Provide constructive feedback" />
+              </ListItem>
+              <ListItem>
+                <ListItemIcon>
+                  <ArrowRightAltIcon />
+                </ListItemIcon>
+                <ListItemText primary="Be respectful of differing viewpoints and experiences" />
+              </ListItem>
+              <ListItem>
+                <ListItemIcon>
+                  <ArrowRightAltIcon />
+                </ListItemIcon>
+                <ListItemText primary="Gracefully accept constructive criticism" />
+              </ListItem>
+              <ListItem>
+                <ListItemIcon>
+                  <ArrowRightAltIcon />
+                </ListItemIcon>
+                <ListItemText primary="Focus on what is best for the community" />
+              </ListItem>
+              <ListItem>
+                <ListItemIcon>
+                  <ArrowRightAltIcon />
+                </ListItemIcon>
+                <ListItemText primary="Show empathy towards other community members" />
+              </ListItem>
+            </List>
+          </Fragment>
+        );
       case 2:
         return (
-                <List>
-                  <ListItem>
-                    <ListItemText primary='PREreview operates as a non-for-profit organization via the fiscal sponsorship of Code for Science and Society.'/> 
-                  </ListItem>
-                  <ListItem>
-                    <ListItemText primary='This platform is funded by public grants and private donations.'/>
-                  </ListItem>
-                  <ListItem>
-                    <ListItemText primary='The code that runs this platform is open-source and can be found on our GitHub repository under the MIT licence.' />
-                  </ListItem>
-                </List>
-        )
+          <List>
+            <ListItem>
+              <ListItemText primary="PREreview operates as a non-for-profit organization via the fiscal sponsorship of Code for Science and Society." />
+            </ListItem>
+            <ListItem>
+              <ListItemText primary="This platform is funded by public grants and private donations." />
+            </ListItem>
+            <ListItem>
+              <ListItemText primary="The code that runs this platform is open-source and can be found on our GitHub repository under the MIT licence." />
+            </ListItem>
+          </List>
+        );
       case 3:
-        return ( <List>
-                    <ListItem>
-                      <ListItemText primary='Our login is via the ORCID public API. If you
-                      do not already have an account with ORCID, to sign up on PREreview you will need to make one. Register here.' />
-                    </ListItem>
-                    <ListItem>
-                      <ListItemText primary='The reviews published on this platform will be licensed CC-BY 4.0 and be openly available to everyone. However, you will be able to set your account to anonymous or public. '/>
-                    </ListItem>
-                   <ListItem>
-                      <ListItemText primary='We DO NOT share your data with advertisers, social media companies, or analytics partners. However, the reviews, comments, and endorsements via Plaudit.pub can be downloaded openly for meta-analysis purposes, stripped of any personal information. Learn more.`'/>
-                    </ListItem>  
-                </List>
-                )
+        return (
+          <List>
+            <ListItem>
+              <ListItemText primary="Our login is via the ORCID public API. If you do not already have an account with ORCID, to sign up on PREreview you will need to make one. Register here." />
+            </ListItem>
+            <ListItem>
+              <ListItemText primary="The reviews published on this platform will be licensed CC-BY 4.0 and be openly available to everyone. However, you will be able to set your account to anonymous or public." />
+            </ListItem>
+            <ListItem>
+              <ListItemText primary="We DO NOT share your data with advertisers, social media companies, or analytics partners. However, the reviews, comments, and endorsements via Plaudit.pub can be downloaded openly for meta-analysis purposes, stripped of any personal information. Learn more." />
+            </ListItem>
+          </List>
+        );
       default:
         return 'Unknown step';
     }
-  }
+  };
 
   return (
     <ThemeProvider theme={prereviewTheme}>

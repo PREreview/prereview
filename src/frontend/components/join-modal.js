@@ -1,16 +1,18 @@
-import React, { useEffect, useState } from 'react';
+// base imports
+import React from 'react';
+import PropTypes from 'prop-types';
 
 // material ui
-import { ThemeProvider, createMuiTheme, withStyles, makeStyles } from '@material-ui/core/styles';
+import {
+  ThemeProvider,
+  createMuiTheme,
+  withStyles,
+  makeStyles,
+} from '@material-ui/core/styles';
 import Dialog from '@material-ui/core/Dialog';
 import MuiDialogTitle from '@material-ui/core/DialogTitle';
-import MuiDialogContent from '@material-ui/core/DialogContent';
-import MuiDialogActions from '@material-ui/core/DialogActions';
-import IconButton from '@material-ui/core/IconButton';
-import CloseIcon from '@material-ui/icons/Close';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
-
 
 // components
 import PreReviewLogo from './pre-review-logo';
@@ -30,7 +32,7 @@ const prereviewTheme = createMuiTheme({
   },
 });
 
-const styles = makeStyles((theme) => ({
+const styles = makeStyles(theme => ({
   root: {
     margin: 0,
     padding: theme.spacing(2),
@@ -47,7 +49,7 @@ const styles = makeStyles((theme) => ({
   },
 }));
 
-const DialogTitle = withStyles(styles)((props) => {
+const DialogTitle = withStyles(styles)(props => {
   const { children, classes, ...other } = props;
   return (
     <MuiDialogTitle disableTypography className={classes.root} {...other}>
@@ -56,19 +58,15 @@ const DialogTitle = withStyles(styles)((props) => {
   );
 });
 
-export default function JoinModal({
-  open,
-  handleClose
-}) {
-
+function JoinModal({ open, handleClose }) {
   const classes = styles();
 
   const next = new URLSearchParams(location.search).get('next');
 
   return (
-    <ThemeProvider theme={prereviewTheme}> 
+    <ThemeProvider theme={prereviewTheme}>
       <Dialog open={open}>
-        <DialogTitle id="customized-dialog-title" onClose={handleClose} >
+        <DialogTitle id="login-modal-title" onClose={handleClose}>
           <PreReviewLogo />
           Join a constructive community of peer reviewers!
         </DialogTitle>
@@ -87,8 +85,15 @@ export default function JoinModal({
           className={classes.button}
         >
           Log In
-        </Button>  
-      </Dialog>          
+        </Button>
+      </Dialog>
     </ThemeProvider>
-  )
+  );
 }
+
+JoinModal.propTypes = {
+  open: PropTypes.bool,
+  handleClose: PropTypes.func.isRequired,
+};
+
+export default JoinModal;
