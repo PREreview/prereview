@@ -94,7 +94,7 @@ const AddAuthors = ({ isMentor, reviewId }) => {
 
 AddAuthors.propTypes = {
   isMentor: PropTypes.bool,
-  reviewId: PropTypes.number,
+  reviewId: PropTypes.string,
 };
 
 export default AddAuthors;

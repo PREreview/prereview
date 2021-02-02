@@ -12,7 +12,7 @@ import CloseIcon from '@material-ui/icons/Close';
 import styled from 'styled-components';
 
 // hooks
-import { usePutFullReview } from '../hooks/api-hooks.tsx';
+import { usePostFullReviewInvite } from '../hooks/api-hooks.tsx';
 
 const Button = styled(MuiButton)`
   margin-top: 1rem;
@@ -140,7 +140,7 @@ const Listbox = styled('ul')`
   }
 `;
 
-const Search = ({ handleClose, isMentor, reviewId, users }) => {
+const Search = ({ handleClose, isMentor, reviewId, users, authors, mentors }) => {
   const {
     getRootProps,
     getInputLabelProps,
@@ -166,22 +166,28 @@ const Search = ({ handleClose, isMentor, reviewId, users }) => {
   const [disabledSubmit, setDisabledSubmit] = useState(true);
   const [invitees, setInvitees] = useState(null);
 
-  const { mutate: putLongReview } = usePutFullReview({ id: reviewId });
+  const { mutate: postInvite } = usePostFullReviewInvite({
+      id: reviewId,
+      role: isMentor ? 'mentors' : 'authors',
+    });
 
 
   const handleInvite = () => {
     console.log('mentor: ', isMentor);
     console.log('invited: ', invitees);
     console.log('value: ', value);
-    handleClose();
-    alert('Invites have been sent.');
 
-    //
-    // putLongReview({
-    //   authors: value,
-    // })
-    //   .then(() => alert('Invites sent successfully.'))
-    //   .catch(err => alert(`An error occurred: ${err.message}`));
+    postInvite({
+      pid: value[0].defaultPersona.uuid,
+    })
+      .then(() => {
+        alert('Invites sent successfully.');
+        handleClose();
+      })
+      .catch(err => {
+        alert(`An error occurred: ${err.message}`);
+        handleClose();
+      });
   };
 
   useEffect(() => {
@@ -247,7 +253,7 @@ const Search = ({ handleClose, isMentor, reviewId, users }) => {
 Search.propTypes = {
   handleClose: PropTypes.func.isRequired,
   isMentor: PropTypes.bool,
-  reviewId: PropTypes.number,
+  reviewId: PropTypes.string,
   users: PropTypes.array.isRequired,
 };
 

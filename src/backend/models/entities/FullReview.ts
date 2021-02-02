@@ -39,11 +39,14 @@ export class FullReview extends BaseEntity {
   @OneToMany({ entity: () => FullReviewDraft, mappedBy: 'parent' })
   drafts: Collection<FullReviewDraft> = new Collection<FullReviewDraft>(this);
 
+  @ManyToMany({ entity: () => Persona, inversedBy: 'invitedToMentor' })
+  mentorInvites: Collection<Persona> = new Collection<Persona>(this);
+
   @ManyToMany({ entity: () => Persona, inversedBy: 'mentoring' })
   mentors: Collection<Persona> = new Collection<Persona>(this);
 
-  @ManyToMany({ entity: () => Persona, inversedBy: 'invitedTo' })
-  invitees: Collection<Persona> = new Collection<Persona>(this);
+  @ManyToMany({ entity: () => Persona, inversedBy: 'invitedToAuthor' })
+  authorInvites: Collection<Persona> = new Collection<Persona>(this);
 
   @ManyToMany({ entity: () => Persona, inversedBy: 'fullReviews' })
   authors: Collection<Persona> = new Collection<Persona>(this);

@@ -120,11 +120,12 @@ export default function ShellContent({
         });
 
         // get a user's drafts of the correct review if cid is present, or latest if not
-        let ownDrafts, latestDraft = [];
+        let ownDrafts,
+          latestDraft = [];
         if (cid) {
           ownDrafts = ownReviews.length
             ? ownReviews.find(
-                review => review.id === parseInt(cid) && !review.isPublished,
+                review => review.uuid === cid && !review.isPublished,
               )
             : [];
 

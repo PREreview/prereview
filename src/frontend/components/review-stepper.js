@@ -1,6 +1,6 @@
 // base imports
 import React, { useState, useEffect } from 'react';
-import { useHistory, useLocation } from 'react-router-dom';
+import { useHistory, useLocation, useParams } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import ReactHtmlParser, { convertNodeToElement } from 'react-html-parser';
 import clsx from 'clsx';
@@ -253,6 +253,7 @@ export default function ReviewStepper({
   const history = useHistory();
   const location = useLocation();
   const classes = useStyles();
+  const { cid } = useParams();
   const [activeStep, setActiveStep] = useState(0);
   const [answerMap, setAnswerMap] = useState({});
   const [completed, setCompleted] = useState(new Set());
@@ -266,7 +267,7 @@ export default function ReviewStepper({
   const { data: templates } = useGetTemplates();
   const { mutate: postRapidReview } = usePostRapidReviews();
   const { mutate: postLongReview } = usePostFullReviews();
-  const { mutate: putLongReview } = usePutFullReview({ id: reviewId });
+  const { mutate: putLongReview } = usePutFullReview({ id: cid });
 
   // handle open/close templates
   const [open, setOpen] = useState(false);
@@ -358,7 +359,7 @@ export default function ReviewStepper({
   const handleSaveLong = event => {
     event.preventDefault();
     if (canSubmitLong(content)) {
-      if (reviewId) {
+      if (cid) {
         putLongReview({
           contents: content,
         })
@@ -373,7 +374,7 @@ export default function ReviewStepper({
             alert('Draft updated successfully.');
             setReviewId(response.body.uuid);
             onReviewChange(response.body);
-            return history.push(`${location.pathname}/${response.body.id}`);
+            return history.push(`${location.pathname}/reviews/${response.body.uuid}`);
           })
           .catch(err => alert(`An error occurred: ${err.message}`));
       }
@@ -588,10 +589,10 @@ export default function ReviewStepper({
                 spacing={2}
               >
                 <Grid item xs={12} sm={6}>
-                  <AddAuthors reviewId={review ? review.id : null} />
+                  <AddAuthors reviewId={cid} />
                   <AddAuthors
                     isMentor={true}
-                    reviewId={review ? review.id : null}
+                    reviewId={cid}
                   />
                 </Grid>
                 <Grid item xs={12} sm={6}>

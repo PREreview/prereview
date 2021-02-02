@@ -104,7 +104,13 @@ export default function App({ user }) {
               </ModeratorRoute>
               <Route
                 exact={true}
-                path="/preprints/:id/:cid?"
+                path="/preprints/:id"
+              >
+                <ExtensionFallback />
+              </Route>
+              <Route
+                exact={true}
+                path="/preprints/:id/reviews/:cid?"
               >
                 <ExtensionFallback />
               </Route>

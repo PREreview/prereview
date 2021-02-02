@@ -5,6 +5,7 @@ import noop from 'lodash/noop';
 import isEqual from 'lodash/isEqual';
 import classNames from 'classnames';
 import ReactHtmlParser, { convertNodeToElement } from 'react-html-parser';
+import { useHistory } from 'react-router-dom';
 
 // material UI
 import { makeStyles, withStyles } from '@material-ui/core/styles';
@@ -91,6 +92,7 @@ const ReviewReader = React.memo(function ReviewReader({
   height,
 }) {
   const classes = useStyles();
+  const history = useHistory();
 
   const [content, setContent] = useState('');
   const [commentTitle, setCommentTitle] = useState('');
