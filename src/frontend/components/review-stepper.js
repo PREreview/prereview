@@ -493,7 +493,7 @@ export default function ReviewStepper({
   }
 
   useEffect(() => {
-    console.log(template);
+    console.log(hasRapidReviewed);
     if (hasRapidReviewed) {
       handleComplete();
     }
@@ -661,7 +661,6 @@ export default function ReviewStepper({
                                 color="primary"
                                 type="button"
                                 onClick={() => {
-                                  console.log(template);
                                   navigator.clipboard.writeText(template);
                                   handleCopied();
                                 }}

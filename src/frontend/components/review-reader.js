@@ -435,12 +435,9 @@ const ReviewReader = React.memo(function ReviewReader({
                             <div className="">
                               <span key={user.id}>by {user.name}</span>
                             </div>
-                            <div
-                              className=""
-                              dangerouslySetInnerHTML={{
-                                __html: `${review}`,
-                              }}
-                            />
+                            <Typography component="div">
+                              {ReactHtmlParser(review, options)}
+                            </Typography>
                           </div>
                         );
                       }

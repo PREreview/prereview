@@ -130,7 +130,7 @@ export default function ShellContent({
             : [];
 
           latestDraft =
-            ownDrafts && ownDrafts.drafts.length
+            ownDrafts && ownDrafts.drafts && ownDrafts.drafts.length
               ? ownDrafts.drafts.length > 1
                 ? ownDrafts.drafts.sort((a, b) => a.id - b.id)[
                     ownDrafts.drafts.length - 1
@@ -193,7 +193,7 @@ export default function ShellContent({
         });
       }
 
-      if (preprint.requests.length) {
+      if (!hasRequested && preprint.requests.length) {
         let authorID;
         preprint.requests.map(request => {
           request.author.id
