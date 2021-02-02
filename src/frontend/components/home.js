@@ -21,6 +21,7 @@ import {
 // utils
 import { createPreprintId } from '../../common/utils/ids.js';
 import { getId } from '../utils/jsonld';
+import { processParams, searchParamsToObject } from '../utils/search';
 
 // components
 import AddButton from './add-button';
@@ -37,42 +38,6 @@ import WelcomeModal from './welcome-modal';
 
 // constants
 import { ORG } from '../constants';
-
-const processParams = search => {
-  const unprocessed = new URLSearchParams(search);
-  const processed = new URLSearchParams();
-  let page = 1;
-  let limit = 10;
-  for (const [key, value] of unprocessed) {
-    if (key.toLowerCase() === 'search') {
-      processed.append('search', value);
-    } else if (key.toLowerCase() === 'page') {
-      page = value;
-    } else if (key.toLowerCase() === 'limit') {
-      limit = value;
-    } else if (key.toLowerCase() === 'sort') {
-      processed.append('sort', value);
-    } else if (key.toLowerCase() === 'asc') {
-      processed.append('asc', value === 'true');
-    }
-  }
-
-  processed.append('page', page);
-  processed.append('limit', limit);
-  processed.append('offset', limit * (page - 1));
-
-  return processed;
-};
-
-const searchParamsToObject = params => {
-  const obj = {};
-  for (const [key, value] of params.entries()) {
-    if (key !== 'page') {
-      obj[key] = value;
-    }
-  }
-  return obj;
-};
 
 export default function Home() {
   const history = useHistory();

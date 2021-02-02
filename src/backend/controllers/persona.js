@@ -173,7 +173,7 @@ export default function controller(personasModel, badgesModel, thisUser) {
     },
     // pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next),
     handler: async ctx => {
-      log.debug(`Adding badge ${ctx.params.bid} to persona ${ctx.params.id}.`);
+      log.debug(`Adding badge ${ctx.params.uid} to persona ${ctx.params.id}.`);
       let persona, badge;
 
       try {

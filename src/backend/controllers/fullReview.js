@@ -31,7 +31,7 @@ export default function controller(
 
   // handler for GET multiple reviews methods
   const getHandler = async ctx => {
-    let allReviews, pid; // fid = fullReview ID
+    let allReviews, pid, preprint; // fid = fullReview ID
 
     if (ctx.params.pid) {
       pid = ctx.params.pid;
@@ -44,7 +44,8 @@ export default function controller(
 
     try {
       if (pid) {
-        allReviews = await reviewModel.findAll({ preprint: pid }, [
+        preprint = await preprintModel.findOneByUuidOrHandle(pid);
+        allReviews = await reviewModel.findAll({ preprint: preprint }, [
           'authors',
           'comments',
           'drafts',
@@ -69,51 +70,56 @@ export default function controller(
     ctx.status = 200;
   };
 
+  const postHandler = async ctx => {
+    log.debug('Adding full review.');
+    let review, draft, authorPersona, preprint;
+
+    try {
+      authorPersona = getActivePersona(ctx.state.user);
+    } catch (err) {
+      log.error('Failed to load user personas.');
+      ctx.throw(400, err);
+    }
+
+    try {
+      preprint = await preprintModel.findOneByUuidOrHandle(
+        ctx.request.body.preprint,
+      );
+      review = reviewModel.create({
+        ...ctx.request.body,
+        preprint: preprint,
+      });
+
+      review.authors.add(authorPersona);
+
+      if (ctx.request.body.contents) {
+        log.debug(`Adding full review draft.`);
+        draft = draftModel.create({
+          title: 'Review of a preprint', //TODO: remove when we make title optional
+          contents: ctx.request.body.contents,
+          parent: review,
+        });
+        review.drafts.add(draft);
+      }
+      await reviewModel.persistAndFlush(review);
+    } catch (err) {
+      log.error('HTTP 400 Error: ', err);
+      ctx.throw(400, `Failed to parse full review schema: ${err}`);
+    }
+
+    ctx.body = {
+      status: 201,
+      message: 'created',
+      body: review,
+    };
+    ctx.status = 201;
+  };
+
   reviewsRouter.route({
     method: 'POST',
     path: '/fullReviews',
     // pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
-    handler: async ctx => {
-      log.debug('Adding full review.');
-      let review, draft, authorPersona, preprint;
-
-      try {
-        authorPersona = getActivePersona(ctx.state.user);
-      } catch (err) {
-        log.error('Failed to load user personas.');
-        ctx.throw(400, err);
-      }
-
-      try {
-        preprint = await preprintModel.findOne(ctx.request.body.preprint);
-        review = reviewModel.create({
-          ...ctx.request.body,
-          preprint: preprint,
-        });
-
-        review.authors.add(authorPersona);
-
-        if (ctx.request.body.contents) {
-          log.debug(`Adding full review draft.`);
-          draft = draftModel.create({
-            title: 'Review of a preprint', //TODO: remove when we make title optional
-            contents: ctx.request.body.contents,
-            parent: review,
-          });
-          review.drafts.add(draft);
-        }
-        await reviewModel.persistAndFlush(review);
-      } catch (err) {
-        log.error('HTTP 400 Error: ', err);
-        ctx.throw(400, `Failed to parse full review schema: ${err}`);
-      }
-
-      ctx.body = {
-        status: 201,
-        message: 'created',
-      };
-      ctx.status = 201;
-    },
+    handler: postHandler,
     meta: {
       swagger: {
         operationId: 'PostFullReviews',
@@ -159,7 +165,14 @@ export default function controller(
       try {
         fullReview = await reviewModel.findOne({ uuid: ctx.params.id });
         if (!fullReview) {
-          ctx.throw(404, `Full review with ID ${ctx.params.id} doesn't exist`);
+          try {
+            postHandler(ctx);
+          } catch {
+            ctx.throw(
+              404,
+              `Full review with ID ${ctx.params.id} doesn't exist and`,
+            );
+          }
         }
 
         if (ctx.request.body.contents) {
@@ -170,9 +183,10 @@ export default function controller(
             parent: fullReview,
           });
           await draftModel.persistAndFlush(draft);
+          fullReview.drafts.add(draft);
         }
-        reviewModel.assign(fullReview, ctx.request.body);
-        await reviewModel.persistAndFlush(reviewModel);
+        // reviewModel.assign(fullReview, ctx.request.body);
+        await reviewModel.persistAndFlush(fullReview);
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse query: ${err}`);
@@ -191,6 +205,347 @@ export default function controller(
   });
 
   reviewsRouter.route({
+    method: 'POST',
+    path: '/fullReviews/:id/:role',
+    validate: {
+      params: {
+        id: Joi.string()
+          .description('Full Review id')
+          .required(),
+        role: Joi.string()
+          .description('Role')
+          .required(),
+      },
+      body: Joi.object({
+        pid: Joi.string()
+          .description('Persona id')
+          .required(),
+      }),
+      type: 'json',
+    },
+    pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
+    handler: async ctx => {
+      log.debug(
+        `Adding persona ${ctx.request.body.pid} to review ${
+          ctx.params.id
+        } with role ${ctx.params.role}.`,
+      );
+      let review, persona;
+
+      try {
+        if (ctx.params.role === 'authors') {
+          review = await reviewModel.findOne({ uuid: ctx.params.id }, [
+            'authorInvites',
+          ]);
+        } else if (ctx.params.role === 'mentors') {
+          review = await reviewModel.findOne({ uuid: ctx.params.id }, [
+            'mentorInvites',
+          ]);
+        }
+        persona = await personaModel.findOne({ uuid: ctx.request.body.pid }, [
+          'identity.contacts',
+        ]);
+      } catch (err) {
+        log.error('HTTP 400 Error: ', err);
+        ctx.throw(400, `Failed to parse query: ${err}`);
+      }
+
+      console.log('***persona***:', persona);
+      if (!review || !persona) {
+        log.error('HTTP 400: Invalid review or Persona');
+        ctx.throw(400, 'Invalid Review or Persona');
+      }
+
+      if (ctx.params.role === 'authors') {
+        try {
+          log.debug(
+            `Full review ${review.id} found. Inviting persona ${
+              persona.id
+            } to review.`,
+          );
+          review.authorInvites.add(persona);
+          await reviewModel.persistAndFlush(review);
+          for (let contact of persona.identity.contacts) {
+            if (
+              contact.schema === 'mailto' &&
+              contact.value &&
+              contact.isNotified
+            ) {
+              await ctx.mail.send({
+                template: 'inviteAuthor',
+                message: {
+                  to: contact.value,
+                },
+                locals: {
+                  pid: persona.uuid,
+                  rid: review.uuid,
+                },
+              });
+              log.info(
+                `Sent author invitation email to ${contact.value} for review ${
+                  review.uuid
+                }`,
+              );
+            }
+          }
+        } catch (err) {
+          log.error('HTTP 400 Error: ', err);
+          ctx.throw(400, `Failed to add persona to review: ${err}`);
+        }
+
+        ctx.status = 204;
+        return;
+      } else if (ctx.params.role === 'mentors') {
+        try {
+          log.debug(
+            `Full review ${review.id} found. Inviting persona ${
+              persona.id
+            } to review.`,
+          );
+          review.mentorInvites.add(persona);
+          await reviewModel.persistAndFlush(review);
+          for (let contact of persona.identity.contacts) {
+            if (
+              contact.schema === 'mailto' &&
+              contact.value &&
+              contact.isNotified
+            ) {
+              await ctx.mail.send({
+                template: 'inviteMentor',
+                message: {
+                  to: contact.value,
+                },
+                locals: {
+                  pid: persona.uuid,
+                  rid: review.uuid,
+                },
+              });
+              log.info(
+                `Sent mentor invitation email to ${contact.value} for review ${
+                  review.uuid
+                }`,
+              );
+            }
+          }
+        } catch (err) {
+          log.error('HTTP 400 Error: ', err);
+          ctx.throw(400, `Failed to add persona to review: ${err}`);
+        }
+
+        ctx.status = 204;
+        return;
+      } else {
+        log.error('HTTP 400: Invalid invite');
+        ctx.throw(400, 'Invalid invite');
+      }
+    },
+    meta: {
+      swagger: {
+        operationId: 'PostFullReviewInvite',
+        summary:
+          'Endpoint to PUT one persona an invite to a review by ID from PREreview.',
+        required: true,
+      },
+    },
+  });
+
+  reviewsRouter.route({
+    method: 'DELETE',
+    path: '/fullReviews/:id/:role/:pid',
+    validate: {
+      params: {
+        id: Joi.string()
+          .description('Full Review id')
+          .required(),
+        role: Joi.string()
+          .description('Role')
+          .required(),
+        pid: Joi.string()
+          .description('Persona id')
+          .required(),
+      },
+    },
+    pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
+    handler: async ctx => {
+      log.debug(
+        `Removing persona ${ctx.params.pid} from review ${ctx.params.id}.`,
+      );
+      let review, persona;
+
+      try {
+        if (ctx.params.role === 'authors') {
+          review = await reviewModel.findOne({ uuid: ctx.params.id }, [
+            'authorInvites',
+          ]);
+        } else if (ctx.params.role === 'mentors') {
+          review = await reviewModel.findOne({ uuid: ctx.params.id }, [
+            'mentorInvites',
+          ]);
+        }
+        persona = await personaModel.findOne({ uuid: ctx.params.pid });
+      } catch (err) {
+        log.error('HTTP 400 Error: ', err);
+        ctx.throw(400, `Failed to parse query: ${err}`);
+      }
+
+      if (!review || !persona) {
+        log.error('HTTP 404: Review or Persona not found');
+        ctx.throw(404, 'Review or Persona not found');
+      }
+
+      if (
+        ctx.params.role === 'authors' &&
+        review.authorInvites.contains(persona)
+      ) {
+        try {
+          log.debug(
+            `Full review ${review.id} found. Inviting persona ${
+              persona.id
+            } to review.`,
+          );
+          review.authorInvites.remove(persona);
+          await reviewModel.persistAndFlush(review);
+        } catch (err) {
+          log.error('HTTP 400 Error: ', err);
+          ctx.throw(400, `Failed to add persona to review: ${err}`);
+        }
+
+        ctx.status = 204;
+        return;
+      } else if (
+        ctx.params.role === 'mentors' &&
+        review.mentorInvites.contains(persona)
+      ) {
+        try {
+          log.debug(
+            `Full review ${review.id} found. Inviting persona ${
+              persona.id
+            } to review.`,
+          );
+          review.mentorInvites.remove(persona);
+          await reviewModel.persistAndFlush(review);
+        } catch (err) {
+          log.error('HTTP 400 Error: ', err);
+          ctx.throw(400, `Failed to add persona to review: ${err}`);
+        }
+
+        ctx.status = 204;
+        return;
+      } else {
+        log.error('HTTP 404: Invite not found');
+        ctx.throw(404, 'Invite not found');
+      }
+    },
+    meta: {
+      swagger: {
+        operationId: 'DeleteFullReviewInvite',
+        summary:
+          'Endpoint to DELETE one persona from an invite by ID from PREreview.',
+        required: true,
+      },
+    },
+  });
+
+  reviewsRouter.route({
+    method: 'POST',
+    path: '/fullReviews/:id/:role/:pid',
+    validate: {
+      params: {
+        id: Joi.string()
+          .description('Full Review id')
+          .required(),
+        role: Joi.string()
+          .description('Role')
+          .required(),
+        pid: Joi.string()
+          .description('Persona id')
+          .required(),
+      },
+    },
+    pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
+    handler: async ctx => {
+      log.debug(`Adding persona ${ctx.params.pid} to review ${ctx.params.id}.`);
+      let review, persona;
+
+      try {
+        if (ctx.params.role === 'authors') {
+          review = await reviewModel.findOne({ uuid: ctx.params.id }, [
+            'authorInvites',
+            'authors',
+          ]);
+        } else if (ctx.params.role === 'mentors') {
+          review = await reviewModel.findOne({ uuid: ctx.params.id }, [
+            'mentorInvites',
+            'mentors',
+          ]);
+        }
+        persona = await personaModel.findOne({ uuid: ctx.params.pid });
+      } catch (err) {
+        log.error('HTTP 400 Error: ', err);
+        ctx.throw(400, `Failed to parse query: ${err}`);
+      }
+
+      if (!review || !persona) {
+        log.error('HTTP 404: Review or Persona not found');
+        ctx.throw(404, 'Review or Persona not found');
+      }
+
+      if (
+        ctx.params.role === 'authors' &&
+        review.authorInvites.contains(persona)
+      ) {
+        try {
+          log.debug(
+            `Full review ${review.id} found. Inviting persona ${
+              persona.id
+            } to review.`,
+          );
+          review.authorInvites.remove(persona);
+          review.authors.add(persona);
+          await reviewModel.persistAndFlush(review);
+        } catch (err) {
+          log.error('HTTP 400 Error: ', err);
+          ctx.throw(400, `Failed to add persona to review: ${err}`);
+        }
+
+        ctx.status = 204;
+        return;
+      } else if (
+        ctx.params.role === 'mentors' &&
+        review.mentorInvites.contains(persona)
+      ) {
+        try {
+          log.debug(
+            `Full review ${review.id} found. Inviting persona ${
+              persona.id
+            } to review.`,
+          );
+          review.mentorInvites.remove(persona);
+          review.mentors.add(persona);
+          await reviewModel.persistAndFlush(review);
+        } catch (err) {
+          log.error('HTTP 400 Error: ', err);
+          ctx.throw(400, `Failed to add persona to review: ${err}`);
+        }
+
+        ctx.status = 204;
+        return;
+      } else {
+        log.error('HTTP 404: Invite not found');
+        ctx.throw(404, 'Invite not found');
+      }
+    },
+    meta: {
+      swagger: {
+        operationId: 'PostFullReviewInviteAccept',
+        summary:
+          'Endpoint to POST to accept one invite to collaborate on a FullReview.',
+        required: true,
+      },
+    },
+  });
+
+  reviewsRouter.route({
     method: 'GET',
     path: '/fullReviews/:id',
     handler: async ctx => {
@@ -202,6 +557,7 @@ export default function controller(
           'drafts',
           'authors',
           'comments',
+          'mentors',
         ]);
 
         if (!fullReview) {

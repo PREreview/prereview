@@ -131,7 +131,7 @@ export default async function configServer(config) {
   const preprintModel = preprintModelWrapper(db);
   const preprints = PreprintController(preprintModel, authz);
   const rapidReviewModel = rapidReviewModelWrapper(db);
-  const rapidReviews = RapidController(rapidReviewModel, authz);
+  const rapidReviews = RapidController(rapidReviewModel, preprintModel, authz);
   const requestModel = requestModelWrapper(db);
   const requests = RequestController(requestModel, authz);
   const fullReviews = FullReviewController(

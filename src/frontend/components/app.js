@@ -108,7 +108,12 @@ export default function App({ user }) {
               >
                 <ExtensionFallback />
               </Route>
-
+              <Route
+                exact={true}
+                path="/preprints/:id/reviews/:cid?"
+              >
+                <ExtensionFallback />
+              </Route>
               <Route>
                 <NotFound />
               </Route>

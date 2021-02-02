@@ -168,7 +168,7 @@ RoleBadgeUI.propTypes = {
     identity: PropTypes.oneOfType([PropTypes.object, PropTypes.number]),
     orcid: PropTypes.string,
     name: PropTypes.string,
-    avatar: PropTypes.object,
+    avatar: PropTypes.oneOfType([PropTypes.object, PropTypes.string]),
   }),
   children: PropTypes.any,
   className: PropTypes.string,

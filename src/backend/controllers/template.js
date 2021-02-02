@@ -50,7 +50,6 @@ export default function controller(templateModel, communityModel, thisUser) {
       ctx.throw(400, `Failed to retrieve templates`);
     }
 
-    console.log('HANDLER: ', templates);
     ctx.response.body = {
       status: 200,
       message: 'ok',
@@ -89,6 +88,7 @@ export default function controller(templateModel, communityModel, thisUser) {
         ctx.body = {
           status: 201,
           message: 'created',
+          body: template,
         };
 
         ctx.status = 201;
@@ -111,6 +111,7 @@ export default function controller(templateModel, communityModel, thisUser) {
     ctx.body = {
       status: 201,
       message: 'created',
+      data: template,
     };
 
     ctx.status = 201;
@@ -159,6 +160,25 @@ export default function controller(templateModel, communityModel, thisUser) {
   templatesRouter.route({
     method: 'POST',
     path: '/communities/:cid/templates',
+    pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
+    validate: {
+      body: templateSchema,
+      type: 'json',
+      continueOnError: true,
+    },
+    handler: postHandler,
+    meta: {
+      swagger: {
+        operationId: 'PostCommunityTemplates',
+        summary:
+          'Endpoint to POST templates within a community on full-length reviews of preprints. Returns a 201 if a template has been successfully created.',
+      },
+    },
+  });
+
+  templatesRouter.route({
+    method: 'POST',
+    path: '/templates',
     pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
     validate: {
       body: templateSchema,
@@ -244,6 +264,11 @@ export default function controller(templateModel, communityModel, thisUser) {
       }
 
       // if updated
+      ctx.body = {
+        status: 204,
+        message: 'updated',
+        data: template,
+      };
       ctx.status = 204;
     },
     meta: {

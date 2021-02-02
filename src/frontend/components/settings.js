@@ -5,6 +5,7 @@ import SettingsRoles from './settings-roles';
 import SettingsApi from './settings-api';
 import SettingsInvites from './settings-invites';
 import SettingsNotifications from './settings-notifications';
+import SettingsTemplates from './settings-templates';
 import HeaderBar from './header-bar';
 import { ORG } from '../constants';
 
@@ -37,6 +38,8 @@ export default function Settings() {
         <SettingsNotifications user={user} />
         <SettingsInvites user={user} />
         {/*<SettingsApi user={user} />*/}
+
+        {user.isAdmin ? <SettingsTemplates /> : null}
       </div>
     </div>
   );
