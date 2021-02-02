@@ -78,14 +78,7 @@ export default function controller(
       log.debug('Adding full review.');
       let review, draft, personaId, authorPersona, preprint;
 
-      log.debug('ctx.request.body', ctx.request.body);
-
-      try {
-        personaId = getActivePersona(ctx.state.user); // FIXME: when there's multiple authors
-      } catch (err) {
-        log.error('Failed to load user personas.');
-        ctx.throw(400, err);
-      }
+      personaId = getActivePersona(ctx.state.user); // FIXME: when there's multiple authors
 
       try {
         preprint = await preprintModel.findOne(ctx.request.body.preprint);
@@ -107,8 +100,6 @@ export default function controller(
           });
           review.drafts.add(draft);
         }
-
-        await reviewModel.persistAndFlush(review);
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse full review schema: ${err}`);
@@ -124,11 +115,19 @@ export default function controller(
           orcid: authorPersona.isPrivate ? '' : authorPersona.identity.orcid,
         };
         try {
+          // yay, the review gets a DOI!
           review.doi = await generateDOI(reviewData);
         } catch (err) {
           log.error(`Error generating DOI from Zenodo. ${err}`);
           ctx.throw(400, `Failed to generate DOI.`);
         }
+      }
+
+      try {
+        await reviewModel.persistAndFlush(review);
+      } catch (err) {
+        log.error(`HTTP 400 error: ${err}`);
+        ctx.throw(400, `Failed to persist review.`);
       }
 
       ctx.body = {
