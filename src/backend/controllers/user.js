@@ -94,16 +94,14 @@ export default function controller(users, contacts, thisUser) {
       let isAdmin,
         isModerator = false;
       if (user) {
-        if (thisUser) {
-          if (await thisUser.isMemberOf('admins', user.orcid)) {
-            log.debug(`User ${user.orcid} is an administrator!`);
-            isAdmin = true;
-          }
+        if (await thisUser.isMemberOf('admins', user.orcid)) {
+          log.debug(`User ${user.orcid} is an administrator!`);
+          isAdmin = true;
+        }
 
-          if (await thisUser.isMemberOf('moderators', user.orcid)) {
-            log.debug(`User ${user.orcid} is a moderator!`);
-            isModerator = true;
-          }
+        if (await thisUser.isMemberOf('moderators', user.orcid)) {
+          log.debug(`User ${user.orcid} is a moderator!`);
+          isModerator = true;
         }
 
         let avatar;
