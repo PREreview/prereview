@@ -12,6 +12,7 @@ import { Fixture } from 'class-fixtures-factory';
 import { PersonaModel } from '../personas';
 import { BaseEntity } from './BaseEntity';
 import { Badge } from './Badge';
+import { Community } from './Community';
 import { FullReview } from './FullReview';
 import { RapidReview } from './RapidReview';
 import { Request } from './Request';
@@ -55,6 +56,9 @@ export class Persona extends BaseEntity {
   @Fixture(() => 'image/jpeg')
   @Property({ nullable: true })
   avatar_encoding?: string;
+
+  @ManyToMany({ entity: () => Community, mappedBy: 'members' })
+  communities: Collection<Community> = new Collection<Community>(this);
 
   @OneToMany({ entity: () => RapidReview, mappedBy: 'author' })
   rapidReviews: Collection<RapidReview> = new Collection<RapidReview>(this);

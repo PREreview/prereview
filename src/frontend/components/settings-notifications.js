@@ -2,15 +2,16 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useLocation, useHistory } from 'react-router-dom';
-
-// hooks
-import {
-  usePutUserContacts,
-  usePostUserContacts,
-} from '../hooks/api-hooks.tsx';
+import { MdInfoOutline, MdWarning, MdCheck } from 'react-icons/md';
+import { unprefix } from '../utils/jsonld';
+import { usePutUser, usePutUserContacts, usePostUserContacts } from '../hooks/api-hooks.tsx';
+import ToggleSwitch from './toggle-switch';
+import TextInput from './text-input';
 
 // components
 import Controls from './controls';
+import Button from './button';
+import IconButton from './icon-button';
 import Modal from './modal';
 import TextInput from './text-input';
 import ToggleSwitch from './toggle-switch';
@@ -172,11 +173,12 @@ function EmailToggle({ userId, contact }) {
       <ToggleSwitch
         id="notification-switch"
         disabled={loading}
-        checked={contact.sendNotifications}
+        checked={contact.isNotified}
         onChange={() => {
-          updateUser({
-            sendNotifications: !contact.sendNotifications,
-          })
+          updateUser(
+            {
+              isNotified: !contact.isNotified,
+            })
             .then(() => alert('Contact info updated successfully.'))
             .catch(err => alert(`An error occurred: ${err.message}`));
         }}
@@ -184,8 +186,3 @@ function EmailToggle({ userId, contact }) {
     </div>
   );
 }
-
-EmailToggle.propTypes = {
-  userId: PropTypes.string,
-  contact: PropTypes.object,
-};

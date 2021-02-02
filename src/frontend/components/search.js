@@ -171,7 +171,31 @@ const Search = ({ handleClose, isMentor, reviewId, users, authors, mentors }) =>
       role: isMentor ? 'mentors' : 'authors',
     });
 
+  // add users to a community if a community is present
+  const handleAddUsers = () => {
+    console.log(community);
+    if (value.length) {
+      value.map(user => {
+        fetch(`/api/v2/communities/${community}/members/${user.uuid}`, {
+          method: 'PUT',
+        })
+          .then(response => {
+            if (response.status === 201) {
+              return response.json();
+            }
+            throw new Error(response.message);
+          })
+          .then(() => {
+            handleClose();
+            alert('User(s) successfully added to community.');
+            return;
+          })
+          .catch(err => alert(`An error occurred: ${err.message}`));
+      });
+    }
+  };
 
+  // send invites to users if being added to a review
   const handleInvite = () => {
     console.log('mentor: ', isMentor);
     console.log('invited: ', invitees);
@@ -241,9 +265,9 @@ const Search = ({ handleClose, isMentor, reviewId, users, authors, mentors }) =>
           variant="contained"
           color="primary"
           type="button"
-          onClick={handleInvite}
+          onClick={community ? handleAddUsers : handleInvite}
         >
-          Send invitations
+          {community ? `Add users` : `Send invitations`}
         </Button>
       </div>
     </NoSsr>
@@ -252,6 +276,7 @@ const Search = ({ handleClose, isMentor, reviewId, users, authors, mentors }) =>
 
 Search.propTypes = {
   handleClose: PropTypes.func.isRequired,
+  community: PropTypes.string,
   isMentor: PropTypes.bool,
   reviewId: PropTypes.string,
   users: PropTypes.array.isRequired,

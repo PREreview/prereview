@@ -1,6 +1,6 @@
 import { Migration } from '@mikro-orm/migrations';
 
-export class Migration20210202032201 extends Migration {
+export class Migration20210202204603 extends Migration {
 
   async up(): Promise<void> {
     this.addSql('create table `tag` (`id` integer not null primary key autoincrement, `uuid` varchar not null, `created_at` datetime not null, `updated_at` datetime not null, `name` varchar not null, `color` varchar not null);');
@@ -62,24 +62,36 @@ export class Migration20210202032201 extends Migration {
     this.addSql('create index `full_review_authors_full_review_id_index` on `full_review_authors` (`full_review_id`);');
     this.addSql('create index `full_review_authors_persona_id_index` on `full_review_authors` (`persona_id`);');
 
-    this.addSql('create table `contact` (`id` integer not null primary key autoincrement, `uuid` varchar not null, `created_at` datetime not null, `updated_at` datetime not null, `schema` varchar not null, `value` varchar not null, `is_verified` integer not null, `send_notifications` integer not null, `token` varchar null);');
+    this.addSql('create table `contact` (`id` integer not null primary key autoincrement, `uuid` varchar not null, `created_at` datetime not null, `updated_at` datetime not null, `schema` varchar not null, `value` varchar not null, `is_verified` integer not null, `is_notified` integer not null, `token` varchar null);');
     this.addSql('create unique index `contact_uuid_unique` on `contact` (`uuid`);');
 
-    this.addSql('create table `community` (`id` integer not null primary key autoincrement, `uuid` varchar not null, `created_at` datetime not null, `updated_at` datetime not null, `name` varchar not null, `description` text null, `logo` blob null);');
+    this.addSql('create table `community` (`id` integer not null primary key autoincrement, `uuid` varchar not null, `created_at` datetime not null, `updated_at` datetime not null, `name` varchar not null, `slug` varchar not null, `description` text null, `banner` blob null, `logo` blob null);');
     this.addSql('create unique index `community_uuid_unique` on `community` (`uuid`);');
     this.addSql('create unique index `community_name_unique` on `community` (`name`);');
+    this.addSql('create unique index `community_slug_unique` on `community` (`slug`);');
+
+    this.addSql('create table `event` (`id` integer not null primary key autoincrement, `uuid` varchar not null, `created_at` datetime not null, `updated_at` datetime not null, `title` varchar not null, `start` datetime not null, `is_private` integer not null, `description` text null);');
+    this.addSql('create unique index `event_uuid_unique` on `event` (`uuid`);');
 
     this.addSql('create table `template` (`id` integer not null primary key autoincrement, `uuid` varchar not null, `created_at` datetime not null, `updated_at` datetime not null, `title` varchar not null, `contents` text not null);');
     this.addSql('create unique index `template_uuid_unique` on `template` (`uuid`);');
     this.addSql('create unique index `template_title_unique` on `template` (`title`);');
 
-    this.addSql('create table `community_members` (`community_id` integer not null, `user_id` integer not null, primary key (`community_id`, `user_id`));');
+    this.addSql('create table `community_members` (`community_id` integer not null, `persona_id` integer not null, primary key (`community_id`, `persona_id`));');
     this.addSql('create index `community_members_community_id_index` on `community_members` (`community_id`);');
-    this.addSql('create index `community_members_user_id_index` on `community_members` (`user_id`);');
+    this.addSql('create index `community_members_persona_id_index` on `community_members` (`persona_id`);');
+
+    this.addSql('create table `community_owners` (`community_id` integer not null, `user_id` integer not null, primary key (`community_id`, `user_id`));');
+    this.addSql('create index `community_owners_community_id_index` on `community_owners` (`community_id`);');
+    this.addSql('create index `community_owners_user_id_index` on `community_owners` (`user_id`);');
 
     this.addSql('create table `community_preprints` (`community_id` integer not null, `preprint_id` integer not null, primary key (`community_id`, `preprint_id`));');
     this.addSql('create index `community_preprints_community_id_index` on `community_preprints` (`community_id`);');
     this.addSql('create index `community_preprints_preprint_id_index` on `community_preprints` (`preprint_id`);');
+
+    this.addSql('create table `community_tags` (`community_id` integer not null, `tag_id` integer not null, primary key (`community_id`, `tag_id`));');
+    this.addSql('create index `community_tags_community_id_index` on `community_tags` (`community_id`);');
+    this.addSql('create index `community_tags_tag_id_index` on `community_tags` (`tag_id`);');
 
     this.addSql('create table `comment` (`id` integer not null primary key autoincrement, `uuid` varchar not null, `created_at` datetime not null, `updated_at` datetime not null, `contents` text not null, `is_published` integer not null, `is_flagged` integer not null);');
     this.addSql('create unique index `comment_uuid_unique` on `comment` (`uuid`);');
@@ -120,6 +132,9 @@ export class Migration20210202032201 extends Migration {
 
     this.addSql('alter table `contact` add column `identity_id` integer null;');
     this.addSql('create index `contact_identity_id_index` on `contact` (`identity_id`);');
+
+    this.addSql('alter table `event` add column `community_id` integer null;');
+    this.addSql('create index `event_community_id_index` on `event` (`community_id`);');
 
     this.addSql('alter table `template` add column `community_id` integer null;');
     this.addSql('create index `template_community_id_index` on `template` (`community_id`);');
