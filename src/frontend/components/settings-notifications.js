@@ -1,20 +1,38 @@
-import React, { useState } from 'react';
+// base imports
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useLocation, useHistory } from 'react-router-dom';
-import { MdInfoOutline, MdWarning, MdCheck } from 'react-icons/md';
-import { unprefix } from '../utils/jsonld';
-import { usePutUser, usePutUserContacts, usePostUserContacts } from '../hooks/api-hooks.tsx';
-import ToggleSwitch from './toggle-switch';
-import TextInput from './text-input';
-import Controls from './controls';
-import Button from './button';
-import IconButton from './icon-button';
-import Modal from './modal';
 
-export default function SettingsNotifications({ user, error }) {
+// hooks
+import {
+  usePutUserContacts,
+  usePostUserContacts,
+} from '../hooks/api-hooks.tsx';
+
+// components
+import Controls from './controls';
+import Modal from './modal';
+import TextInput from './text-input';
+import ToggleSwitch from './toggle-switch';
+
+// MaterialUI components
+import { makeStyles } from '@material-ui/core/styles';
+import Button from '@material-ui/core/Button';
+
+// icons
+import { MdInfoOutline } from 'react-icons/md';
+
+const useStyles = makeStyles(theme => ({
+  button: {
+    textTransform: 'none',
+  },
+}));
+
+export default function SettingsNotifications({ user }) {
+  const classes = useStyles();
   const history = useHistory();
   const location = useLocation();
-  const [userContacts, setUserContacts] = useState(user ? user.contacts : [])
+  const [userContacts, setUserContacts] = useState(user ? user.contacts : []);
   const [email, setEmail] = useState('');
   const [isEmailValid, setIsEmailValid] = useState(true);
 
@@ -35,6 +53,8 @@ export default function SettingsNotifications({ user, error }) {
     setModalType(null);
   }
 
+  useEffect(() => {}, [userContacts]);
+
   return (
     <section className="settings-notifications settings__section">
       <h3 className="settings__title">Enable notifications</h3>
@@ -49,13 +69,15 @@ export default function SettingsNotifications({ user, error }) {
         </span>
       </p>
 
-      { userContacts.length ?
-        userContacts.map(contact =>
-          <EmailToggle userId={user.uuid} contact={contact} />
-        )
+      {userContacts.length
+        ? userContacts.map(contact => (
+            <EmailToggle
+              key={contact.uuid}
+              userId={user.uuid}
+              contact={contact}
+            />
+          ))
         : null}
-
-
 
       <div className="settings-notifications__email">
         <TextInput
@@ -89,22 +111,23 @@ export default function SettingsNotifications({ user, error }) {
         </IconButton> */}
       </div>
 
-      <Controls
-        error={error} // #FIXME
-      >
+      <Controls>
         <Button
+          className={classes.button}
+          color="primary"
+          variant="contained"
           disabled={!isEmailValid || !email}
           onClick={() => {
-            postContact(
-              {
-                value: email,
-                schema: 'mailto',
-              })
+            postContact({
+              value: email,
+              schema: 'mailto',
+            })
               .then(resp => {
-                let newContact = resp.data
-                setUserContacts(userContacts.concat([newContact]))
+                let newContact = resp.data;
+                setUserContacts(userContacts.concat([newContact]));
                 // FIXME: update user context
-                setEmail('')
+                setEmail('');
+                return;
               })
               .catch(err => alert(`An error occurred: ${err.message}`));
             setModalType('verifying');
@@ -114,24 +137,22 @@ export default function SettingsNotifications({ user, error }) {
         </Button>
       </Controls>
 
-      {
-        !!modalType && (
-          <Modal title="Info" showCloseButton={true} onClose={handleClose}>
-            <p>
-              {modalType === 'checked'
-                ? 'The email address was successfully verified.'
-                : modalType === 'verifying'
-                  ? 'An email with a verification link has been sent and we are waiting for you to click on it.'
-                  : 'An email must be set to be able to receive notifications'}
-            </p>
+      {!!modalType && (
+        <Modal title="Info" showCloseButton={true} onClose={handleClose}>
+          <p>
+            {modalType === 'checked'
+              ? 'The email address was successfully verified.'
+              : modalType === 'verifying'
+              ? 'An email with a verification link has been sent. Please check your inbox and follow the instructions.'
+              : 'An email must be set to be able to receive notifications.'}
+          </p>
 
-            <Controls>
-              <Button onClick={handleClose}>Close</Button>
-            </Controls>
-          </Modal>
-        )
-      }
-    </section >
+          <Controls>
+            <Button onClick={handleClose}>Close</Button>
+          </Controls>
+        </Modal>
+      )}
+    </section>
   );
 }
 
@@ -140,7 +161,10 @@ SettingsNotifications.propTypes = {
 };
 
 function EmailToggle({ userId, contact }) {
-  const { mutate: updateUser, loading, error } = usePutUserContacts({ id: userId, cid: contact.uuid });
+  const { mutate: updateUser, loading } = usePutUserContacts({
+    id: userId,
+    cid: contact.uuid,
+  });
 
   return (
     <div className="settings-notifications__toggle">
@@ -150,10 +174,9 @@ function EmailToggle({ userId, contact }) {
         disabled={loading}
         checked={contact.sendNotifications}
         onChange={() => {
-          updateUser(
-            {
-              sendNotifications: !contact.sendNotifications,
-            })
+          updateUser({
+            sendNotifications: !contact.sendNotifications,
+          })
             .then(() => alert('Contact info updated successfully.'))
             .catch(err => alert(`An error occurred: ${err.message}`));
         }}
@@ -161,3 +184,8 @@ function EmailToggle({ userId, contact }) {
     </div>
   );
 }
+
+EmailToggle.propTypes = {
+  userId: PropTypes.string,
+  contact: PropTypes.object,
+};

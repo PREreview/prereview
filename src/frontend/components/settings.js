@@ -3,6 +3,7 @@ import { Helmet } from 'react-helmet-async';
 import UserProvider from '../contexts/user-context';
 import SettingsRoles from './settings-roles';
 import SettingsApi from './settings-api';
+import SettingsInvites from './settings-invites';
 import SettingsNotifications from './settings-notifications';
 import SettingsTemplates from './settings-templates';
 import HeaderBar from './header-bar';
@@ -35,6 +36,7 @@ export default function Settings() {
 
         <SettingsRoles user={user} />
         <SettingsNotifications user={user} />
+        <SettingsInvites user={user} />
         {/*<SettingsApi user={user} />*/}
 
         {user.isAdmin ? <SettingsTemplates /> : null}

@@ -29,6 +29,10 @@
     }
   }
 
+  & .settings__subtitle {
+    font: var(--ui-header-2-font);
+  }
+
   & .settings__info-list {
     margin: var(--sgrd) 0;
     position: relative;
