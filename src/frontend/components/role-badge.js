@@ -79,7 +79,6 @@ const RoleBadgeUI = React.forwardRef(function RoleBadgeUI(
 
   const open = Boolean(anchorEl);
   const id = open ? 'user-menu' : undefined;
-  console.log('user:', user);
 
   return (
     <>

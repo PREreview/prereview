@@ -28,7 +28,7 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-export default function SettingsNotifications({ user, error }) {
+export default function SettingsNotifications({ user }) {
   const classes = useStyles();
   const history = useHistory();
   const location = useLocation();
@@ -111,9 +111,7 @@ export default function SettingsNotifications({ user, error }) {
         </IconButton> */}
       </div>
 
-      <Controls
-        error={error} // #FIXME
-      >
+      <Controls>
         <Button
           className={classes.button}
           color="primary"
@@ -160,7 +158,6 @@ export default function SettingsNotifications({ user, error }) {
 
 SettingsNotifications.propTypes = {
   user: PropTypes.object.isRequired,
-  error: PropTypes.object,
 };
 
 function EmailToggle({ userId, contact }) {
