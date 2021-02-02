@@ -8,7 +8,13 @@ import { getOrcidPerson } from '../utils/orcid.js';
 
 const log = getLogger('backend:controllers:auth');
 
-export default function controller(users, personas, config, thisUser) {
+export default function controller(
+  users,
+  personas,
+  contacts,
+  config,
+  thisUser,
+) {
   const authRouter = router();
 
   passport.serializeUser((user, done) => {
@@ -70,14 +76,6 @@ export default function controller(users, personas, config, thisUser) {
       log.error('Error fetching user:', err);
     }
 
-    try {
-      log.debug('************', profile.orcid, profile.token);
-      // eslint-disable-next-line no-unused-vars
-      const fullProfile = await getOrcidPerson(profile.orcid, profile.token);
-    } catch (err) {
-      log.error('Error getting orcid profile.');
-    }
-
     if (user) {
       const completeUser = merge(profile, user); // including the access.token in the user that gets sent to the passport serializer
       log.debug('Authenticated user: ', completeUser);
@@ -130,8 +128,38 @@ export default function controller(users, personas, config, thisUser) {
         }
 
         try {
+          const fullProfile = await getOrcidPerson(
+            profile.orcid,
+            profile.token,
+          );
+
+          if (
+            Array.isArray(fullProfile.emails.email) &&
+            fullProfile.emails.email.length > 0
+          ) {
+            for (const e of fullProfile.emails.email) {
+              let emailAddr;
+              emailAddr = contacts.create({
+                schema: 'mailto',
+                value: e.email,
+                identity: newUser,
+                isVerified: !!e.isVerified,
+                sendNotifications: false,
+              });
+              contacts.persist(emailAddr);
+            }
+          }
+        } catch (err) {
+          log.error(
+            `Failed resolving user ${profile.orcid}'s emails from ORCID's 
+            public API: ${err}.`,
+          );
+        }
+
+        try {
           await users.em.flush();
           await personas.em.flush();
+          await contacts.em.flush();
         } catch (err) {
           log.debug('Error saving user and personas to database.', err);
         }
