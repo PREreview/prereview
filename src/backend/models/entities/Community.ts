@@ -14,6 +14,7 @@ import { Event } from './Event';
 import { Persona } from './Persona';
 import { Preprint } from './Preprint';
 import { Tag } from './Tag';
+import { Template } from './Template';
 import { User } from './User';
 
 @Entity()
@@ -59,6 +60,9 @@ export class Community extends BaseEntity {
 
   @ManyToMany({ entity: () => Tag, inversedBy: 'communities' })
   tags: Collection<Tag> = new Collection<Tag>(this);
+
+  @OneToMany({ entity: () => Template, mappedBy: 'community' })
+  templates: Collection<Template> = new Collection<Template>(this);
 
   constructor(name: string, description?: string, logo?: Buffer) {
     super();

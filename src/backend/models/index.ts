@@ -11,5 +11,6 @@ export * from './preprints';
 export * from './rapidReviews';
 export * from './requests';
 export * from './tags';
+export * from './templates';
 export * from './users';
 export * from './works';

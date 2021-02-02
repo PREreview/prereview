@@ -1,6 +1,6 @@
 import { Migration } from '@mikro-orm/migrations';
 
-export class Migration20210128182917 extends Migration {
+export class Migration20210202202853 extends Migration {
 
   async up(): Promise<void> {
     this.addSql('create table "tag" ("id" serial primary key, "uuid" varchar(255) not null, "created_at" timestamptz(0) not null, "updated_at" timestamptz(0) not null, "name" varchar(255) not null, "color" varchar(255) not null);');
@@ -59,6 +59,10 @@ export class Migration20210128182917 extends Migration {
     this.addSql('create table "event" ("id" serial primary key, "uuid" varchar(255) not null, "created_at" timestamptz(0) not null, "updated_at" timestamptz(0) not null, "title" varchar(255) not null, "start" timestamptz(0) not null, "is_private" bool not null, "description" text null, "community_id" int4 null);');
     this.addSql('alter table "event" add constraint "event_uuid_unique" unique ("uuid");');
 
+    this.addSql('create table "template" ("id" serial primary key, "uuid" varchar(255) not null, "created_at" timestamptz(0) not null, "updated_at" timestamptz(0) not null, "title" varchar(255) not null, "contents" text not null, "community_id" int4 null);');
+    this.addSql('alter table "template" add constraint "template_uuid_unique" unique ("uuid");');
+    this.addSql('alter table "template" add constraint "template_title_unique" unique ("title");');
+
     this.addSql('create table "community_members" ("community_id" int4 not null, "persona_id" int4 not null);');
     this.addSql('alter table "community_members" add constraint "community_members_pkey" primary key ("community_id", "persona_id");');
 
@@ -109,6 +113,8 @@ export class Migration20210128182917 extends Migration {
     this.addSql('alter table "contact" add constraint "contact_identity_id_foreign" foreign key ("identity_id") references "user" ("id") on update cascade;');
 
     this.addSql('alter table "event" add constraint "event_community_id_foreign" foreign key ("community_id") references "community" ("id") on update cascade on delete set null;');
+
+    this.addSql('alter table "template" add constraint "template_community_id_foreign" foreign key ("community_id") references "community" ("id") on update cascade on delete set null;');
 
     this.addSql('alter table "community_members" add constraint "community_members_community_id_foreign" foreign key ("community_id") references "community" ("id") on update cascade on delete cascade;');
     this.addSql('alter table "community_members" add constraint "community_members_persona_id_foreign" foreign key ("persona_id") references "persona" ("id") on update cascade on delete cascade;');

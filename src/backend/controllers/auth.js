@@ -4,12 +4,19 @@ import router from 'koa-joi-router';
 import anonymus from 'anonymus';
 import merge from 'lodash.merge';
 import { getLogger } from '../log.js';
+import { getOrcidPerson } from '../utils/orcid.js';
 
 const log = getLogger('backend:controllers:auth');
 
 const ANON_TRIES_LIMIT = 5;
 
-export default function controller(users, personas, config, thisUser) {
+export default function controller(
+  users,
+  personas,
+  contacts,
+  config,
+  thisUser,
+) {
   const authRouter = router();
 
   passport.serializeUser((user, done) => {
@@ -49,8 +56,8 @@ export default function controller(users, personas, config, thisUser) {
       orcid: params.orcid,
       name: params.name,
       token: {
-        access_token: params.access_token || accessToken,
-        token_type: params.token_type,
+        accessToken: params.access_token || accessToken,
+        tokenType: params.token_type,
         expires_in: params.expires_in,
       },
     };
@@ -63,6 +70,7 @@ export default function controller(users, personas, config, thisUser) {
       // if a user already exists
       user = await users.findOne({ orcid: params.orcid }, [
         'personas',
+        'communities',
         'groups',
       ]);
       log.trace('verifyCallback() user:', user);
@@ -131,8 +139,38 @@ export default function controller(users, personas, config, thisUser) {
         }
 
         try {
+          const fullProfile = await getOrcidPerson(
+            profile.orcid,
+            profile.token,
+          );
+
+          if (
+            Array.isArray(fullProfile.emails.email) &&
+            fullProfile.emails.email.length > 0
+          ) {
+            for (const e of fullProfile.emails.email) {
+              let emailAddr;
+              emailAddr = contacts.create({
+                schema: 'mailto',
+                value: e.email,
+                identity: newUser,
+                isVerified: !!e.isVerified,
+                sendNotifications: false,
+              });
+              contacts.persist(emailAddr);
+            }
+          }
+        } catch (err) {
+          log.error(
+            `Failed resolving user ${profile.orcid}'s emails from ORCID's 
+            public API: ${err}.`,
+          );
+        }
+
+        try {
           await users.em.flush();
           await personas.em.flush();
+          await contacts.em.flush();
         } catch (err) {
           log.debug('Error saving user and personas to database.', err);
         }

@@ -117,7 +117,7 @@ export default function controller(commentModel, fullReviewModel, thisUser) {
         handleInvalid(ctx);
         return;
       }
-      getHandler(ctx);
+      await getHandler(ctx);
     },
     meta: {
       swagger: {
@@ -135,7 +135,7 @@ export default function controller(commentModel, fullReviewModel, thisUser) {
     validate: {
       query: querySchema,
     },
-    handler: async ctx => getHandler(ctx),
+    handler: async ctx => await getHandler(ctx),
     meta: {
       swagger: {
         operationId: 'GetFullReviewComments',

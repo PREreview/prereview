@@ -12,5 +12,6 @@ export * from './Preprint';
 export * from './RapidReview';
 export * from './Request';
 export * from './Tag';
+export * from './Template';
 export * from './User';
 export * from './Work';

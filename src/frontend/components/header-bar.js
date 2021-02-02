@@ -170,7 +170,7 @@ export default function HeaderBar({ onClickMenuButton, closeGap, thisUser }) {
             </UserBadge>
           ) : (
             <XLink to="/login" href="/login">
-              Login
+              Log In / Sign Up
             </XLink>
           )}
         </span>

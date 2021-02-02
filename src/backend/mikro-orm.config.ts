@@ -14,6 +14,7 @@ import {
   RapidReview,
   Request,
   Tag,
+  Template,
   User,
   Work,
 } from './models/entities';
@@ -43,6 +44,7 @@ const options: Options = {
     RapidReview,
     Request,
     Tag,
+    Template,
     User,
     Work,
   ],

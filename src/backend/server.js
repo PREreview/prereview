@@ -33,6 +33,7 @@ import {
   badgeModelWrapper,
   commentModelWrapper,
   communityModelWrapper,
+  contactModelWrapper,
   eventModelWrapper,
   fullReviewModelWrapper,
   fullReviewDraftModelWrapper,
@@ -43,7 +44,6 @@ import {
   requestModelWrapper,
   tagModelWrapper,
   userModelWrapper,
-  contactModelWrapper,
 } from './models/index.ts';
 
 // Our controllers
@@ -60,6 +60,7 @@ import PreprintController from './controllers/preprint.js';
 import RapidController from './controllers/rapidReview.js';
 import RequestController from './controllers/request.js';
 import TagController from './controllers/tag.js';
+import TemplateController from './controllers/template.js';
 import DocsController from './controllers/docs.js';
 import SearchesController from './controllers/searches.js';
 
@@ -103,15 +104,21 @@ export default async function configServer(config) {
   const userModel = userModelWrapper(db);
   const groupModel = groupModelWrapper(db);
   const personaModel = personaModelWrapper(db);
+  const contactModel = contactModelWrapper(db);
   const authz = authWrapper(groupModel); // authorization, not authentication
 
   // setup API handlers
-  const auth = AuthController(userModel, personaModel, config, authz);
+  const auth = AuthController(
+    userModel,
+    personaModel,
+    contactModel,
+    config,
+    authz,
+  );
   const badgeModel = badgeModelWrapper(db);
   const badges = BadgeController(badgeModel, authz);
   const commentModel = commentModelWrapper(db);
   const communityModel = communityModelWrapper(db);
-  const contactModel = contactModelWrapper(db);
   const eventModel = eventModelWrapper(db);
   const fullReviewModel = fullReviewModelWrapper(db);
   const draftModel = fullReviewDraftModelWrapper(db);
@@ -134,6 +141,9 @@ export default async function configServer(config) {
   );
   const tagModel = tagModelWrapper(db);
   const tags = TagController(tagModel, authz);
+  const templateModel = templateModelWrapper(db);
+  const templates = TemplateController(templateModel, communityModel, authz);
+  const users = UserController(userModel, authz);
   const users = UserController(userModel, contactModel, authz);
   const searches = SearchesController(preprintModel, draftModel, authz);
   const communities = CommunityController(
@@ -162,6 +172,7 @@ export default async function configServer(config) {
     requests.middleware(),
     searches.middleware(),
     tags.middleware(),
+    templates.middleware(),
     users.middleware(),
   ]);
 
