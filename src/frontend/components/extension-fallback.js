@@ -67,7 +67,7 @@ export default function ExtensionFallback() {
   const canonicalUrl = getCanonicalUrl(preprint ? preprint : null);
 
   useEffect(() => {
-    if (preprint) {
+    if (preprint && preprint.authors) {
       const string = preprint.authors.replace(/[|&;$%@"<>()\[\]+]/g, "");
       setAuthors(string);
     }
