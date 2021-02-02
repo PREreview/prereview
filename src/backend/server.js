@@ -33,6 +33,7 @@ import {
   badgeModelWrapper,
   commentModelWrapper,
   communityModelWrapper,
+  contactModelWrapper,
   fullReviewModelWrapper,
   fullReviewDraftModelWrapper,
   groupModelWrapper,
@@ -104,10 +105,17 @@ export default async function configServer(config) {
   const userModel = userModelWrapper(db);
   const groupModel = groupModelWrapper(db);
   const personaModel = personaModelWrapper(db);
+  const contactModel = contactModelWrapper(db);
   const authz = authWrapper(groupModel); // authorization, not authentication
 
   // setup API handlers
-  const auth = AuthController(userModel, personaModel, config, authz);
+  const auth = AuthController(
+    userModel,
+    personaModel,
+    contactModel,
+    config,
+    authz,
+  );
   const badgeModel = badgeModelWrapper(db);
   const badges = BadgeController(badgeModel, authz);
   const commentModel = commentModelWrapper(db);
