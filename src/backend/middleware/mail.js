@@ -22,7 +22,6 @@ export const mailWrapper = config => {
     }),
   );
 
-
   const mailer = new Email({
     message: {
       from: config.emailAddress,
