@@ -43,6 +43,7 @@ import {
   rapidReviewModelWrapper,
   requestModelWrapper,
   tagModelWrapper,
+  templateModelWrapper,
   userModelWrapper,
 } from './models/index.ts';
 
@@ -143,7 +144,6 @@ export default async function configServer(config) {
   const tags = TagController(tagModel, authz);
   const templateModel = templateModelWrapper(db);
   const templates = TemplateController(templateModel, communityModel, authz);
-  const users = UserController(userModel, authz);
   const users = UserController(userModel, contactModel, authz);
   const searches = SearchesController(preprintModel, draftModel, authz);
   const communities = CommunityController(
