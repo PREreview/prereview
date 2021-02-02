@@ -276,7 +276,7 @@ export default function controller(
       let community, user;
 
       try {
-        community = await communityModel.findOne({ name: ctx.params.id });
+        community = await communityModel.findOne({ uuid: ctx.params.id });
         user = await userModel.findOneByUuidOrOrcid(ctx.params.uid);
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
@@ -339,7 +339,9 @@ export default function controller(
     pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next),
     handler: async ctx => {
       log.debug(
-        `Removing user ${ctx.params.uid} from community ${ctx.params.id}.`,
+        `Removing user ${ctx.request.body.uid} from community ${
+          ctx.params.id
+        }.`,
       );
       let community, user;
 
@@ -347,7 +349,7 @@ export default function controller(
         community = await communityModel.findOne({ uuid: ctx.params.id }, [
           'members',
         ]);
-        user = await userModel.findOne({ orcid: ctx.request.body.uid });
+        user = await userModel.findOne({ uuid: ctx.request.body.uid });
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse query: ${err}`);

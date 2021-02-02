@@ -1,0 +1,229 @@
+// base imports
+import React, { useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
+
+// material ui imports
+import { makeStyles, withStyles } from '@material-ui/core/styles';
+import {
+  MuiPickersUtilsProvider,
+  KeyboardDatePicker,
+} from '@material-ui/pickers';
+import Checkbox from '@material-ui/core/Checkbox';
+import CheckBoxOutlineBlankIcon from '@material-ui/icons/CheckBoxOutlineBlank';
+import CheckBoxIcon from '@material-ui/icons/CheckBox';
+import DateFnsUtils from '@date-io/date-fns';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Grid from '@material-ui/core/Grid';
+import Modal from '@material-ui/core/Modal';
+import MuiButton from '@material-ui/core/Button';
+import TextField from '@material-ui/core/TextField';
+import Typography from '@material-ui/core/Typography';
+
+// hooks
+import {usePutCommunityEvent } from '../hooks/api-hooks.tsx';
+
+// components
+import Search from './search';
+
+// icons
+import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
+
+const Button = withStyles({
+  root: {
+    textTransform: 'none',
+  },
+})(MuiButton);
+
+const useStyles = makeStyles(theme => ({
+  buttonText: {
+    paddingLeft: 6,
+  },
+  checkedField: {
+    display: 'block',
+    marginBottom: '1rem',
+  },
+  dateField: {
+    display: 'block',
+    marginBottom: '1rem',
+  },
+  paper: {
+    top: `50%`,
+    left: `50%`,
+    transform: `translate(-50%, -50%)`,
+    position: 'absolute',
+    backgroundColor: theme.palette.background.paper,
+    boxShadow: theme.shadows[5],
+    padding: theme.spacing(2, 4, 3),
+  },
+  spinning: {
+    color: '#ff3333',
+    display: 'block',
+    marginLeft: 'auto',
+    marginRight: 'auto',
+  },
+  textField: {
+    marginBottom: '1rem',
+    width: '100%',
+  },
+}));
+
+const AddEvent = ({ community }) => {
+  const classes = useStyles();
+
+  const [inputs, setInputs] = useState({});
+
+  /* API calls */
+  const { mutate: addCommunityEvent, loading, error } = usePutCommunityEvent({
+    id: community,
+    uid: '',
+  });
+
+  /* update inputs with new values */
+  const handleInputChange = event => {
+    event.persist();
+    setInputs(inputs => ({
+      ...inputs,
+      [event.target.name]: event.target.value,
+    }));
+  };
+
+  // special case for checkbox
+  const handleCheckedChange = event => {
+    event.persist();
+    setInputs(inputs => ({
+      ...inputs,
+      [event.target.name]: event.target.checked,
+    }));
+  };
+
+  /* Date picker */
+  const [selectedDate, setSelectedDate] = React.useState(new Date());
+
+  const handleDateChange = date => {
+    setSelectedDate(date);
+    setInputs(inputs => ({
+      ...inputs,
+      start: date,
+    }));
+  };
+
+  /* validation */
+  const canSubmit = () => {
+    if (inputs.title && inputs.description && inputs.start) {
+      return true;
+    } else {
+      alert('All fields are required.');
+      return false;
+    }
+  };
+
+  const handleAddEvent = () => {
+    console.log(inputs);
+    if (canSubmit()) {
+      addCommunityEvent(inputs)
+        .then(response => {
+          console.log(response);
+          handleClose();
+          alert(`Event added successfully.`);
+          return;
+        })
+        .catch(err => alert(`An error occurred: ${err.message}`));
+    }
+  };
+
+  // getModalStyle is not a pure function, we roll the style only on the first render
+  const [open, setOpen] = useState(false);
+
+  const handleOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  return (
+    <div>
+      <Button type="button" onClick={handleOpen}>
+        <AddCircleOutlineIcon />
+        <span className={classes.buttonText}>Add new event</span>
+      </Button>
+      <Modal
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="simple-modal-title"
+        aria-describedby="simple-modal-description"
+      >
+        <div className={classes.paper}>
+          <form>
+            <Typography variant="h4" component="h2" gutterBottom={true}>
+              Add an event
+            </Typography>
+            <TextField
+              required
+              id="title"
+              name="title"
+              label="Title"
+              variant="outlined"
+              className={classes.textField}
+              onChange={handleInputChange}
+            />
+            <TextField
+              required
+              id="description"
+              name="description"
+              label="Description"
+              variant="outlined"
+              multiline
+              rows={4}
+              className={classes.textField}
+              onChange={handleInputChange}
+            />
+            <MuiPickersUtilsProvider utils={DateFnsUtils}>
+              <KeyboardDatePicker
+                required
+                margin="normal"
+                id="start"
+                name="start"
+                label="Date"
+                format="MM/dd/yyyy"
+                value={selectedDate}
+                className={classes.dateField}
+                onChange={handleDateChange}
+                KeyboardButtonProps={{
+                  'aria-label': 'change date',
+                }}
+              />
+            </MuiPickersUtilsProvider>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  color="primary"
+                  checked={inputs.isPrivate}
+                  onChange={handleCheckedChange}
+                  name="isPrivate"
+                />
+              }
+              label="Check the box if this is a private event."
+              className={classes.checkedField}
+            />
+            <Button
+              variant="contained"
+              color="primary"
+              type="button"
+              onClick={handleAddEvent}
+            >
+              Submit
+            </Button>
+          </form>
+        </div>
+      </Modal>
+    </div>
+  );
+};
+
+AddEvent.propTypes = {
+  community: PropTypes.string,
+};
+
+export default AddEvent;
