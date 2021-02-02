@@ -2,16 +2,10 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useLocation, useHistory } from 'react-router-dom';
-import { MdInfoOutline, MdWarning, MdCheck } from 'react-icons/md';
-import { unprefix } from '../utils/jsonld';
-import { usePutUser, usePutUserContacts, usePostUserContacts } from '../hooks/api-hooks.tsx';
-import ToggleSwitch from './toggle-switch';
-import TextInput from './text-input';
+import { usePutUserContacts, usePostUserContacts } from '../hooks/api-hooks.tsx';
 
 // components
 import Controls from './controls';
-import Button from './button';
-import IconButton from './icon-button';
 import Modal from './modal';
 import TextInput from './text-input';
 import ToggleSwitch from './toggle-switch';

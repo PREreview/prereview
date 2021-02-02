@@ -140,7 +140,7 @@ const Listbox = styled('ul')`
   }
 `;
 
-const Search = ({ handleClose, isMentor, reviewId, users, authors, mentors }) => {
+const Search = ({ handleClose, community, isMentor, reviewId, users, authors, mentors }) => {
   const {
     getRootProps,
     getInputLabelProps,

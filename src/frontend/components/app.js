@@ -121,6 +121,12 @@ export default function App({ user }) {
               </Route>
               <Route
                 exact={true}
+                path="/communities/:id"
+                >
+                  <Community />
+                </Route>
+              <Route
+                exact={true}
                 path="/preprints/:id/reviews/:cid?"
               >
                 <ExtensionFallback />
