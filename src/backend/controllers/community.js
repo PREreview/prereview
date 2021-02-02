@@ -6,7 +6,7 @@ const log = getLogger('backend:controller:community');
 const Joi = router.Joi;
 
 const communitySchema = Joi.object({
-  name: Joi.string().required(),
+  name: Joi.string(),
   description: Joi.string(),
   logo: Joi.string().uri(),
 });
@@ -587,7 +587,7 @@ export default function controller(
     pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next),
     handler: async ctx => {
       log.debug(
-        `Removing tag ${ctx.params.tid} from community ${ctx.params.id}.`,
+        `Removing tag ${ctx.request.body.tid} from community ${ctx.params.id}.`,
       );
       let community, tag;
 

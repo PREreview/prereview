@@ -12,10 +12,7 @@ import CloseIcon from '@material-ui/icons/Close';
 import styled from 'styled-components';
 
 // hooks
-import {
-  usePutCommunityMember,
-  usePutFullReview,
-} from '../hooks/api-hooks.tsx';
+import { usePutFullReview } from '../hooks/api-hooks.tsx';
 
 const Button = styled(MuiButton)`
   margin-top: 1rem;
@@ -277,7 +274,7 @@ Search.propTypes = {
   community: PropTypes.string,
   isMentor: PropTypes.bool,
   reviewId: PropTypes.number,
-  users: PropTypes.array.isRequired,
+  users: PropTypes.array,
 };
 
 export default Search;

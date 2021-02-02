@@ -10,11 +10,14 @@ import UserProvider from '../contexts/user-context';
 // hooks
 import {
   useDeleteCommunityMember,
+  useDeleteCommunityTag,
   useGetCommunity,
+  usePutCommunity,
 } from '../hooks/api-hooks.tsx';
 
 // components
 import AddEvent from './add-event';
+import AddTag from './add-tag';
 import AddUser from './add-user';
 import HeaderBar from './header-bar';
 import Loading from './loading';
@@ -26,6 +29,7 @@ import Avatar from '@material-ui/core/Avatar';
 import AvatarGroup from '@material-ui/lab/AvatarGroup';
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
+import Chip from '@material-ui/core/Chip';
 import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
 import IconButton from '@material-ui/core/IconButton';
@@ -61,6 +65,7 @@ const useStyles = makeStyles(theme => ({
     textTransform: 'none',
   },
   textField: {
+    marginBottom: '3rem',
     width: '100%',
   },
 }));
@@ -84,8 +89,19 @@ const CommunityPanel = () => {
     errorCommunity,
   } = useGetCommunity({ id: id });
 
+  // update community info
+  // delete member from community
+  const { mutate: updateCommunity } = usePutCommunity({
+    id: id,
+  });
+
   // delete member from community
   const { mutate: deleteCommunityMember } = useDeleteCommunityMember({
+    id: id,
+  });
+
+  // delete tagfrom community
+  const { mutate: deleteCommunityTag } = useDeleteCommunityTag({
     id: id,
   });
 
@@ -116,6 +132,13 @@ const CommunityPanel = () => {
     }));
   };
 
+  // save banner and description to API
+  const handleSubmit = () => {
+    updateCommunity(inputs)
+      .then(() => alert(`Community updated successfully.`))
+      .catch(err => alert(`An error occurred: ${err.message}`));
+  };
+
   // handle banner change differently because it is more complex
   const handleBannerChange = event => {
     readFileDataAsBase64(event)
@@ -141,6 +164,21 @@ const CommunityPanel = () => {
     ) {
       deleteCommunityMember({ uid: member.uuid })
         .then(() => alert(`Member has been removed from the community.`))
+        .catch(err => alert(`An error occurred: ${err.message}`));
+    }
+  };
+
+  // delete tag from community
+  const handleRemoveTag = tag => {
+    if (
+      confirm(
+        `Are you sure you want to remove the tag "${
+          tag.name
+        }" from this community?`,
+      )
+    ) {
+      deleteCommunityTag({ tid: tag.uuid })
+        .then(() => alert(`Tag has been removed from the community.`))
         .catch(err => alert(`An error occurred: ${err.message}`));
     }
   };
@@ -201,7 +239,7 @@ const CommunityPanel = () => {
                 />
                 <Button
                   color="primary"
-                  variant="contained"
+                  variant="outlined"
                   component="label"
                   className={classes.button}
                   defaultValue={community.banner || ''}
@@ -211,7 +249,7 @@ const CommunityPanel = () => {
                   <input type="file" hidden />
                 </Button>
               </Box>
-              <Box mb={4}>
+              <Box mb={4} pb={4} borderBottom="1px solid #ccc">
                 <Typography variant="h4" component="h2" gutterBottom={true}>
                   Description
                 </Typography>
@@ -226,6 +264,15 @@ const CommunityPanel = () => {
                   className={classes.textField}
                   onChange={handleInputChange}
                 />
+                <Button
+                  color="primary"
+                  variant="contained"
+                  component="label"
+                  className={classes.button}
+                  onClick={handleSubmit}
+                >
+                  Save
+                </Button>
               </Box>
               <Box mb={4}>
                 <Typography variant="h4" component="h2" gutterBottom={true}>
@@ -303,6 +350,21 @@ const CommunityPanel = () => {
                 <Typography variant="h4" component="h2" gutterBottom={true}>
                   Tags
                 </Typography>
+                <AddTag community={community.uuid} />
+                {community.tags.length ? (
+                  <Box mt={2}>
+                    <Grid container>
+                      {community.tags.map(tag => (
+                        <Grid item key={tag.uuid}>
+                          <Chip
+                            label={tag.name}
+                            onDelete={() => handleRemoveTag(tag)}
+                          />
+                        </Grid>
+                      ))}
+                    </Grid>
+                  </Box>
+                ) : null}
               </Box>
             </form>
           </Container>

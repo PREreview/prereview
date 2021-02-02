@@ -9,15 +9,18 @@ import {
   KeyboardDatePicker,
 } from '@material-ui/pickers';
 import Checkbox from '@material-ui/core/Checkbox';
+import CheckBoxOutlineBlankIcon from '@material-ui/icons/CheckBoxOutlineBlank';
+import CheckBoxIcon from '@material-ui/icons/CheckBox';
 import DateFnsUtils from '@date-io/date-fns';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Grid from '@material-ui/core/Grid';
 import Modal from '@material-ui/core/Modal';
 import MuiButton from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 
 // hooks
-import {usePutCommunityEvent } from '../hooks/api-hooks.tsx';
+import {usePutCommunityTag } from '../hooks/api-hooks.tsx';
 
 // icons
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
@@ -67,9 +70,9 @@ const AddEvent = ({ community }) => {
   const [inputs, setInputs] = useState({});
 
   /* API calls */
-  const { mutate: addCommunityEvent, loading, error } = usePutCommunityEvent({
+  const { mutate: addCommunityTag, loading, error } = usePutCommunityTag({
     id: community,
-    eid: 'none',
+    tid: 'none',
   });
 
   /* update inputs with new values */
@@ -81,47 +84,15 @@ const AddEvent = ({ community }) => {
     }));
   };
 
-  // special case for checkbox
-  const handleCheckedChange = event => {
-    event.persist();
-    setInputs(inputs => ({
-      ...inputs,
-      [event.target.name]: event.target.checked,
-    }));
-  };
-
-  /* Date picker */
-  const [selectedDate, setSelectedDate] = React.useState(new Date());
-
-  const handleDateChange = date => {
-    setSelectedDate(date);
-    setInputs(inputs => ({
-      ...inputs,
-      start: date,
-    }));
-  };
-
-  /* validation */
-  const canSubmit = () => {
-    if (inputs.title && inputs.description && inputs.start) {
-      return true;
-    } else {
-      alert('All fields are required.');
-      return false;
-    }
-  };
-
-  const handleAddEvent = () => {
-    if (canSubmit()) {
-      addCommunityEvent(inputs)
-        .then(response => {
-          console.log(response);
-          handleClose();
-          alert(`Event added successfully.`);
-          return;
-        })
-        .catch(err => alert(`An error occurred: ${err.message}`));
-    }
+  const handleAddTag = () => {
+    addCommunityTag(inputs)
+      .then(response => {
+        console.log(response);
+        handleClose();
+        alert(`Tag added successfully.`);
+        return;
+      })
+      .catch(err => alert(`An error occurred: ${err.message}`));
   };
 
   // getModalStyle is not a pure function, we roll the style only on the first render
@@ -135,80 +106,44 @@ const AddEvent = ({ community }) => {
     setOpen(false);
   };
 
+  const [disabledSubmit, setDisabledSubmit] = useState(true);
+
+  useEffect(() => {
+    inputs.name && inputs.name.length ? setDisabledSubmit(false) : setDisabledSubmit(true);
+  }, [inputs]);
+
   return (
     <div>
       <Button type="button" onClick={handleOpen}>
         <AddCircleOutlineIcon />
-        <span className={classes.buttonText}>Add new event</span>
+        <span className={classes.buttonText}>Add new tag</span>
       </Button>
-      <Modal
-        open={open}
-        onClose={handleClose}
-        aria-labelledby="add-event-title"
-      >
+      <Modal open={open} onClose={handleClose} aria-labelledby="add-tag-title">
         <div className={classes.paper}>
           <form>
             <Typography
               variant="h4"
               component="h2"
               gutterBottom={true}
-              id="add-event-title"
+              id="add-tag-title"
             >
-              Add an event
+              Add a tag
             </Typography>
             <TextField
               required
-              id="title"
-              name="title"
-              label="Title"
+              id="name"
+              name="name"
+              label="Name"
               variant="outlined"
               className={classes.textField}
               onChange={handleInputChange}
-            />
-            <TextField
-              required
-              id="description"
-              name="description"
-              label="Description"
-              variant="outlined"
-              multiline
-              rows={4}
-              className={classes.textField}
-              onChange={handleInputChange}
-            />
-            <MuiPickersUtilsProvider utils={DateFnsUtils}>
-              <KeyboardDatePicker
-                required
-                margin="normal"
-                id="start"
-                name="start"
-                label="Date"
-                format="MM/dd/yyyy"
-                value={selectedDate}
-                className={classes.dateField}
-                onChange={handleDateChange}
-                KeyboardButtonProps={{
-                  'aria-label': 'change date',
-                }}
-              />
-            </MuiPickersUtilsProvider>
-            <FormControlLabel
-              control={
-                <Checkbox
-                  color="primary"
-                  checked={inputs.isPrivate}
-                  onChange={handleCheckedChange}
-                  name="isPrivate"
-                />
-              }
-              label="Check the box if this is a private event."
-              className={classes.checkedField}
             />
             <Button
+              disabled={disabledSubmit}
               variant="contained"
               color="primary"
               type="button"
-              onClick={handleAddEvent}
+              onClick={handleAddTag}
             >
               Submit
             </Button>
