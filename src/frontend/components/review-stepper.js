@@ -1,6 +1,8 @@
 // base imports
 import React, { useState, useEffect } from 'react';
+import { useHistory, useLocation, useParams } from 'react-router-dom';
 import PropTypes from 'prop-types';
+import ReactHtmlParser, { convertNodeToElement } from 'react-html-parser';
 import clsx from 'clsx';
 
 // material ui
@@ -13,9 +15,16 @@ import {
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
 import Check from '@material-ui/icons/Check';
+import Grid from '@material-ui/core/Grid';
 import Input from '@material-ui/core/Input';
 import InputLabel from '@material-ui/core/InputLabel';
 import Link from '@material-ui/core/Link';
+import MenuItem from '@material-ui/core/MenuItem';
+import Modal from '@material-ui/core/Modal';
+import MuiAlert from '@material-ui/lab/Alert';
+import Paper from '@material-ui/core/Paper';
+import Select from '@material-ui/core/Select';
+import Snackbar from '@material-ui/core/Snackbar';
 import Stepper from '@material-ui/core/Stepper';
 import Step from '@material-ui/core/Step';
 import StepConnector from '@material-ui/core/StepConnector';
@@ -24,11 +33,14 @@ import Typography from '@material-ui/core/Typography';
 
 // utils
 import {
+  useGetTemplates,
   usePostFullReviews,
   usePostRapidReviews,
+  usePutFullReview,
 } from '../hooks/api-hooks.tsx';
 
 // components
+import AddAuthors from './add-authors';
 import RapidFormFragment from './rapid-form-fragment';
 import LongFormFragment from './long-form-fragment';
 
@@ -89,11 +101,29 @@ const useStyles = makeStyles(theme => ({
   label: {
     textAlign: 'center',
   },
+  modal: {
+    backgroundColor: theme.palette.background.paper,
+    boxShadow: theme.shadows[5],
+    left: `50%`,
+    minWidth: 300,
+    padding: theme.spacing(2, 4, 3),
+    position: 'absolute',
+    top: `50%`,
+    transform: `translate(-50%, -50%)`,
+  },
+  paper: {
+    padding: '1rem',
+  },
   red: {
     backgroundColor: '#FAB7B7',
     margin: '0 15px',
     padding: 10,
   },
+  select: {
+    marginTop: '1rem',
+    width: '100%',
+  },
+  template: {},
   yellow: {
     backgroundColor: '#FFFAEE',
     fontSize: '0.9rem',
@@ -206,6 +236,10 @@ QontoStepIcon.propTypes = {
   completed: PropTypes.bool,
 };
 
+function Alert(props) {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
+
 export default function ReviewStepper({
   preprint,
   onClose,
@@ -213,20 +247,83 @@ export default function ReviewStepper({
   hasLongReviewed,
   content,
   onContentChange,
+  onReviewChange,
+  review,
 }) {
+  const history = useHistory();
+  const location = useLocation();
   const classes = useStyles();
-  const [activeStep, setActiveStep] = React.useState(0);
+  const { cid } = useParams();
+  const [activeStep, setActiveStep] = useState(0);
   const [answerMap, setAnswerMap] = useState({});
-  const [completed, setCompleted] = React.useState(new Set());
-  const [expandFeedback, setExpandFeedback] = React.useState(false);
-  const [disabledSubmit, setDisabledSubmit] = React.useState(false);
-  const [skipped, setSkipped] = React.useState(new Set());
+  const [completed, setCompleted] = useState(new Set());
+  const [expandFeedback, setExpandFeedback] = useState(false);
+  const [disabledSubmit, setDisabledSubmit] = useState(false);
+  const [reviewId, setReviewId] = useState(review ? review.parent : null);
+  const [skipped, setSkipped] = useState(new Set());
   const steps = getSteps();
-
+  console.log(review);
+  // API queries
+  const { data: templates } = useGetTemplates();
   const { mutate: postRapidReview } = usePostRapidReviews();
-
   const { mutate: postLongReview } = usePostFullReviews();
+  const { mutate: putLongReview } = usePutFullReview({ id: cid });
 
+  // handle open/close templates
+  const [open, setOpen] = useState(false);
+
+  const handleOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  // handle open/close copy success
+  const [openCopied, setOpenCopied] = React.useState(false);
+
+  const handleCopied = () => {
+    setOpenCopied(true);
+  };
+
+  const handleCloseCopied = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setOpenCopied(false);
+  };
+
+  const [template, setTemplate] = useState('');
+
+  const handleTemplateChange = contents => {
+    setTemplate(contents);
+  };
+
+  // react html parser functionality
+  const transform = node => {
+    if (node.attribs) {
+      if (node.attribs.class === 'ql-editor') {
+        node.attribs.class = '';
+        node.attribs.contenteditable = false;
+      } else if (
+        node.attribs.class === 'ql-clipboard' ||
+        node.attribs.class === 'ql-tooltip ql-hidden'
+      ) {
+        return null;
+      }
+    }
+    return convertNodeToElement(node);
+  };
+
+  // react html parser options
+  const options = {
+    decodeEntities: true,
+    transform,
+  };
+
+  // handle submit functions
   const canSubmitRapid = answerMap => {
     return QUESTIONS.filter(q => q.type == 'YesNoQuestion').every(
       question => question.identifier in answerMap,
@@ -262,12 +359,25 @@ export default function ReviewStepper({
   const handleSaveLong = event => {
     event.preventDefault();
     if (canSubmitLong(content)) {
-      postLongReview({
-        preprint: preprint.uuid,
-        contents: content,
-      })
-        .then(() => alert('Draft updated successfully.'))
-        .catch(err => alert(`An error occurred: ${err.message}`));
+      if (cid) {
+        putLongReview({
+          contents: content,
+        })
+          .then(() => alert('Draft updated successfully.'))
+          .catch(err => alert(`An error occurred: ${err.message}`));
+      } else {
+        postLongReview({
+          preprint: preprint.uuid,
+          contents: content,
+        })
+          .then(response => {
+            alert('Draft updated successfully.');
+            setReviewId(response.body.uuid);
+            onReviewChange(response.body);
+            return history.push(`${location.pathname}/reviews/${response.body.uuid}`);
+          })
+          .catch(err => alert(`An error occurred: ${err.message}`));
+      }
     } else {
       alert('Review cannot be blank.');
     }
@@ -383,6 +493,7 @@ export default function ReviewStepper({
   }
 
   useEffect(() => {
+    console.log(hasRapidReviewed);
     if (hasRapidReviewed) {
       handleComplete();
     }
@@ -391,7 +502,7 @@ export default function ReviewStepper({
       setActiveStep(2);
       handleComplete(4);
     }
-  }, [hasRapidReviewed, hasLongReviewed]);
+  }, [hasRapidReviewed, hasLongReviewed, reviewId, templates, template]);
 
   function getStepContent(step) {
     switch (step) {
@@ -462,7 +573,8 @@ export default function ReviewStepper({
                 Instructions
               </Typography>
               <Typography variant="body2" gutterBottom>
-                Use the space below to compose your long-form review.
+                Use the space below to compose your long-form review. For
+                guidance, you can load one of our templates.
               </Typography>
               <Typography variant="body2" gutterBottom>
                 Please remember to be constructive and to abide by the{' '}
@@ -470,16 +582,122 @@ export default function ReviewStepper({
               </Typography>
             </Box>
             <Box mt={2} mb={2}>
+              <Grid
+                container
+                justify="space-between"
+                alignItems="flex-end"
+                spacing={2}
+              >
+                <Grid item xs={12} sm={6}>
+                  <AddAuthors reviewId={cid} />
+                  <AddAuthors
+                    isMentor={true}
+                    reviewId={cid}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <Box textAlign="right" mr={2}>
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      type="button"
+                      onClick={handleOpen}
+                    >
+                      Load templates
+                    </Button>
+                    <Modal
+                      open={open}
+                      onClose={handleClose}
+                      aria-labelledby="simple-modal-title"
+                      aria-describedby="simple-modal-description"
+                    >
+                      <div className={classes.modal}>
+                        <InputLabel id="templates-select-label">
+                          Choose a template to paste into the editor
+                        </InputLabel>
+                        <Select
+                          className={classes.select}
+                          labelId="templates-select-label"
+                          id="templates-select"
+                          value={template}
+                          onChange={event =>
+                            handleTemplateChange(event.target.value)
+                          }
+                        >
+                          {templates
+                            ? templates.data.map(template => (
+                                <MenuItem
+                                  key={template.uuid}
+                                  value={template.contents}
+                                  className={classes.template}
+                                >
+                                  {template.title}
+                                </MenuItem>
+                              ))
+                            : null}
+                        </Select>
+                        {template ? (
+                          <Box my={2}>
+                            <Paper elevation={3} className={classes.paper}>
+                              {ReactHtmlParser(template, options)}
+                            </Paper>
+                          </Box>
+                        ) : null}
+                        <Box mt={2}>
+                          <Grid container spacing={2} justify="flex-end">
+                            <Grid item>
+                              <Button
+                                variant="outlined"
+                                color="primary"
+                                type="button"
+                                onClick={handleClose}
+                              >
+                                Close
+                              </Button>
+                            </Grid>
+                            <Grid item>
+                              <Button
+                                variant="contained"
+                                color="primary"
+                                type="button"
+                                onClick={() => {
+                                  navigator.clipboard.writeText(template);
+                                  handleCopied();
+                                }}
+                              >
+                                Copy
+                              </Button>
+                              <Snackbar
+                                open={openCopied}
+                                autoHideDuration={6000}
+                                onClose={handleCloseCopied}
+                              >
+                                <Alert
+                                  onClose={handleCloseCopied}
+                                  severity="success"
+                                >
+                                  Template copied
+                                </Alert>
+                              </Snackbar>
+                            </Grid>
+                          </Grid>
+                        </Box>
+                      </div>
+                    </Modal>
+                  </Box>
+                </Grid>
+              </Grid>
               <form>
                 <Box m={2}>
                   <LongFormFragment
                     onContentChange={onContentChange}
                     content={content}
+                    template={template}
                   />
                 </Box>
                 <Box mt={2}>
                   <InputLabel
-                    for="competing-interest"
+                    htmlFor="competing-interest"
                     className={classes.inputLabel}
                   >
                     Please use the space below to declare any existing{' '}
@@ -611,7 +829,9 @@ ReviewStepper.propTypes = {
   preprint: PropTypes.object.isRequired,
   onClose: PropTypes.func.isRequired,
   onContentChange: PropTypes.func.isRequired,
+  onReviewChange: PropTypes.func.isRequired,
   hasLongReviewed: PropTypes.bool.isRequired,
   hasRapidReviewed: PropTypes.bool.isRequired,
   content: PropTypes.string,
+  review: PropTypes.object,
 };

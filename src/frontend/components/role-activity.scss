@@ -25,6 +25,10 @@
     }
   }
 
+  & .role-activity__summary  {
+    margin-bottom: 0.75rem;
+  }
+
 }
 .role-activity__pagination {
   margin-top: var(--sgrd);

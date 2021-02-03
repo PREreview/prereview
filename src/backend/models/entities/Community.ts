@@ -10,7 +10,10 @@ import {
 import { Fixture } from 'class-fixtures-factory';
 import { CommunityModel } from '../communities';
 import { BaseEntity } from './BaseEntity';
+import { Event } from './Event';
+import { Persona } from './Persona';
 import { Preprint } from './Preprint';
+import { Tag } from './Tag';
 import { Template } from './Template';
 import { User } from './User';
 
@@ -24,6 +27,11 @@ export class Community extends BaseEntity {
   @Unique()
   name!: string;
 
+  @Fixture(faker => `${faker.commerce.color()}-${faker.random.word()}`)
+  @Property()
+  @Unique()
+  slug!: string;
+
   //@Fixture({ get: faker => faker.lorem.paragraph(), optional: true })
   @Fixture(faker => faker.lorem.sentences())
   @Property({ columnType: 'text', nullable: true })
@@ -32,13 +40,26 @@ export class Community extends BaseEntity {
   //@Fixture({ get: faker => faker.image.abstract(), optional: true })
   @Fixture(faker => faker.image.abstract())
   @Property({ nullable: true })
+  banner?: Buffer;
+
+  @Fixture(faker => faker.image.abstract())
+  @Property({ nullable: true })
   logo?: Buffer;
 
-  @ManyToMany({ entity: () => User, inversedBy: 'communities' })
-  members: Collection<User> = new Collection<User>(this);
+  @ManyToMany({ entity: () => Persona, inversedBy: 'communities' })
+  members: Collection<Persona> = new Collection<Persona>(this);
+
+  @ManyToMany({ entity: () => User, inversedBy: 'owned' })
+  owners: Collection<User> = new Collection<User>(this);
 
   @ManyToMany({ entity: () => Preprint, inversedBy: 'communities' })
   preprints: Collection<Preprint> = new Collection<Preprint>(this);
+
+  @OneToMany({ entity: () => Event, mappedBy: 'community' })
+  events: Collection<Event> = new Collection<Event>(this);
+
+  @ManyToMany({ entity: () => Tag, inversedBy: 'communities' })
+  tags: Collection<Tag> = new Collection<Tag>(this);
 
   @OneToMany({ entity: () => Template, mappedBy: 'community' })
   templates: Collection<Template> = new Collection<Template>(this);

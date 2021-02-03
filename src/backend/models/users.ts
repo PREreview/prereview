@@ -11,6 +11,8 @@ export class UserModel extends EntityRepository<User> {
       if (orcidUtils.isValid(value)) {
         return this.findOne({ orcid: value }, params);
       }
+      console.log('**************************here????');
+
       return this.findOne({ uuid: value }, params);
     } catch (err) {
       throw new ChainError('Failed to parse ORCID for user.', err);

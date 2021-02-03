@@ -5,11 +5,11 @@ const log = getLogger('backend:controllers:rapidReview');
 // const Joi = router.Joi;
 
 // eslint-disable-next-line no-unused-vars
-export default function controller(rapidReviews, thisUser) {
+export default function controller(rapidReviews, preprints, thisUser) {
   const rapidRouter = router();
 
   const getHandler = async ctx => {
-    let all, pid; // fid = fullReview ID
+    let all, pid, preprint; // fid = fullReview ID
 
     if (ctx.params.pid) {
       pid = ctx.params.pid;
@@ -22,7 +22,8 @@ export default function controller(rapidReviews, thisUser) {
 
     try {
       if (pid) {
-        all = await rapidReviews.find({ preprint: pid });
+        preprint = await preprints.findOneByUuidOrHandle(pid);
+        all = await rapidReviews.find({ preprint: preprint });
       } else {
         all = await rapidReviews.findAll();
       }
@@ -47,7 +48,7 @@ export default function controller(rapidReviews, thisUser) {
     // validate: {},
     handler: async ctx => {
       log.debug('Posting a rapid review.');
-      let rapidReview, authorPersona;
+      let rapidReview, authorPersona, preprint;
 
       try {
         authorPersona = ctx.state.user.defaultPersona;
@@ -58,9 +59,13 @@ export default function controller(rapidReviews, thisUser) {
 
       try {
         log.debug('authorPersona', authorPersona);
+        preprint = await preprints.findOneByUuidOrHandle(
+          ctx.request.body.preprint,
+        );
         rapidReview = rapidReviews.create({
           ...ctx.request.body,
           author: authorPersona,
+          preprint: preprint,
         });
         await rapidReviews.persistAndFlush(rapidReview);
       } catch (err) {

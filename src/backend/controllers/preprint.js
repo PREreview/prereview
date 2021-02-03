@@ -18,6 +18,8 @@ const querySchema = Joi.object({
     .greater(-1),
   asc: Joi.boolean(),
   search: Joi.string().allow(''),
+  communities: Joi.string().allow(''),
+  tags: Joi.string().allow(''),
   sort: Joi.string().allow(
     'datePosted',
     'recentRequests',
@@ -152,6 +154,7 @@ export default function controller(preprints, thisUser) {
           'rapidReviews',
           'rapidReviews.author',
           'requests',
+          'communities',
           'tags',
         ];
         let foundPreprints, count;
@@ -172,28 +175,59 @@ export default function controller(preprints, thisUser) {
           default:
             orderBy = { datePosted: order };
         }
+        const queries = [];
         if (ctx.query.search && ctx.query.search !== '') {
           const connection = preprints.em.getConnection();
-          let query;
           if (connection instanceof PostgreSqlConnection) {
-            query = {
+            queries.push({
               $or: [
                 { title: { $ilike: `%${ctx.query.search}%` } },
                 { handle: { $ilike: `%${ctx.query.search}%` } },
                 { abstract_text: { $ilike: `%${ctx.query.search}%` } },
                 { authors: { $ilike: `%${ctx.query.search}%` } },
               ],
-            };
+            });
           } else {
-            query = {
+            queries.push({
               $or: [
                 { title: { $like: `%${ctx.query.search}%` } },
                 { handle: { $like: `%${ctx.query.search}%` } },
                 { abstract_text: { $like: `%${ctx.query.search}%` } },
                 { authors: { $like: `%${ctx.query.search}%` } },
               ],
-            };
+            });
           }
+        }
+
+        if (ctx.query.tags) {
+          const tags = ctx.query.tags.split(',');
+          console.log('tags', tags);
+          queries.push({
+            $or: [
+              { tags: { uuid: { $in: tags } } },
+              { tags: { name: { $in: tags } } },
+            ],
+          });
+        }
+
+        if (ctx.query.communities) {
+          const communities = ctx.query.communities.split(',');
+          queries.push({
+            $or: [
+              { communities: { uuid: { $in: communities } } },
+              { communities: { slug: { $in: communities } } },
+            ],
+          });
+        }
+
+        if (queries.length > 0) {
+          let query;
+          if (queries.length > 1) {
+            query = { $and: queries };
+          } else {
+            query = queries[0];
+          }
+          log.debug('Querying preprints:', query);
           [foundPreprints, count] = await preprints.findAndCount(
             query,
             populate,
