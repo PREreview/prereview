@@ -12,6 +12,12 @@ const communitySchema = Joi.object({
 });
 
 const querySchema = Joi.object({
+  limit: Joi.number()
+    .integer()
+    .greater(-1),
+  offset: Joi.number()
+    .integer()
+    .greater(-1),
   start: Joi.number()
     .integer()
     .greater(-1),
@@ -22,6 +28,8 @@ const querySchema = Joi.object({
   sort_by: Joi.string(),
   from: Joi.string(),
   to: Joi.string(),
+  tags: Joi.string().allow(''),
+  search: Joi.string().allow(''),
 });
 
 const handleInvalid = ctx => {

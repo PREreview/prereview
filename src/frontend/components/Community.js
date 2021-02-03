@@ -46,6 +46,9 @@ import Typography from '@material-ui/core/Typography';
 // icons
 import SettingsIcon from '@material-ui/icons/Settings';
 
+// constants
+import { ORG } from '../constants';
+
 const useStyles = makeStyles(theme => ({
   avatar: {
     width: theme.spacing(10),
@@ -208,7 +211,9 @@ export default function Community() {
     return (
       <div className="community">
         <Helmet>
-          <title>{community.name}</title>
+          <title>
+            {community.name} • {ORG}
+          </title>
         </Helmet>
 
         <HeaderBar thisUser={user} />

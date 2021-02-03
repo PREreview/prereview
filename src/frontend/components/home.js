@@ -95,12 +95,12 @@ export default function Home() {
   if (loadingPreprints) {
     return <Loading />;
   } else if (error) {
-    return <div>An error occurred: {error}</div>;
+    return <div>An error occurred: {error.message}</div>;
   } else {
     return (
       <div className="home">
         <Helmet>
-          <title>{ORG} • Home</title>
+          <title>Home • {ORG}</title>
         </Helmet>
 
         {!!((isNewVisitor || params.get('welcome')) && isWelcomeModalOpen) && (
