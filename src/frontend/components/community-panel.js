@@ -207,7 +207,7 @@ const CommunityPanel = () => {
         <HeaderBar thisUser={user} />
         <section>
           <Container
-            maxWidth="lg"
+            maxWidth="false"
             style={
               community.banner
                 ? {
@@ -218,11 +218,13 @@ const CommunityPanel = () => {
                 : null
             }
           >
-            <Box className={classes.banner}>
-              <Typography variant="h3" component="h1" gutterBottom={true}>
-                {community.name}
-              </Typography>
-            </Box>
+            <Container maxWidth="lg">
+              <Box className={classes.banner}>
+                <Typography variant="h3" component="h1" gutterBottom={true}>
+                  {community.name}
+                </Typography>
+              </Box>
+            </Container>
           </Container>
         </section>
         <section>

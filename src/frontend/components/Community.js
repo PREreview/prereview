@@ -1,5 +1,5 @@
 // base imports
-import React, { Suspense, useContext, useState } from 'react';
+import React, { useContext, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useHistory, useLocation, useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
@@ -221,58 +221,62 @@ export default function Community() {
             members={community.members}
             membersLimit={5}
           />
-          <Box pt={4} px={4} bgcolor="rgba(229, 229, 229, 0.35)">
-            {user.isAdmin ? (
-              <IconButton
-                href={`/community-settings/${community.uuid}`}
-                className={classes.settings}
-              >
-                <SettingsIcon
-                  className={classes.settingsIcon}
-                  style={{ fontSize: 40 }}
-                />
-                <Hidden xsUp>
-                  <span>Settings</span>
-                </Hidden>
-              </IconButton>
-            ) : null}
-            <Grid container spacing={4}>
-              <Grid item xs={12} md={8}>
-                <CommunityContent
-                  thisUser={user}
-                  community={community}
-                  params={params}
-                />
-              </Grid>
-              <Grid item xs={12} md={4}>
-                {community.members &&
-                  Array.isArray(community.members) &&
-                  community.members.length > 0 && (
-                    <CommunityPersonas
-                      title="Members"
-                      personas={community.members}
-                      isSearchable="true"
+          <Box bgcolor="rgba(229, 229, 229, 0.35)">
+            <Container maxWidth="lg">
+              <Box p={4}>
+                {user.isAdmin ? (
+                  <IconButton
+                    href={`/community-settings/${community.uuid}`}
+                    className={classes.settings}
+                  >
+                    <SettingsIcon
+                      className={classes.settingsIcon}
+                      style={{ fontSize: 40 }}
                     />
-                  )}
-                {community.events &&
-                  Array.isArray(community.events) &&
-                  community.events.length > 0 && (
-                    <CommunityEvents
+                    <Hidden xsUp>
+                      <span>Settings</span>
+                    </Hidden>
+                  </IconButton>
+                ) : null}
+                <Grid container spacing={4}>
+                  <Grid item xs={12} md={8}>
+                    <CommunityContent
+                      thisUser={user}
                       community={community}
-                      events={community.events}
+                      params={params}
                     />
-                  )}
-                {community.owners &&
-                  Array.isArray(community.owners) &&
-                  community.owners.length > 0 && (
-                    <CommunityPersonas
-                      title="Moderators"
-                      personas={community.owners}
-                      isSearchable="false"
-                    />
-                  )}
-              </Grid>
-            </Grid>
+                  </Grid>
+                  <Grid item xs={12} md={4}>
+                    {community.members &&
+                      Array.isArray(community.members) &&
+                      community.members.length > 0 && (
+                        <CommunityPersonas
+                          title="Members"
+                          personas={community.members}
+                          isSearchable="true"
+                        />
+                      )}
+                    {community.events &&
+                      Array.isArray(community.events) &&
+                      community.events.length > 0 && (
+                        <CommunityEvents
+                          community={community}
+                          events={community.events}
+                        />
+                      )}
+                    {community.owners &&
+                      Array.isArray(community.owners) &&
+                      community.owners.length > 0 && (
+                        <CommunityPersonas
+                          title="Moderators"
+                          personas={community.owners}
+                          isSearchable="false"
+                        />
+                      )}
+                  </Grid>
+                </Grid>
+              </Box>
+            </Container>
           </Box>
         </React.Fragment>
       </div>
@@ -292,7 +296,7 @@ function CommunityHeader({
   return (
     <section>
       <Container
-        maxWidth="lg"
+        maxWidth="false"
         style={
           banner
             ? {
@@ -303,36 +307,38 @@ function CommunityHeader({
             : null
         }
       >
-        <Grid container>
-          <Grid item xs={12} lg={6}>
-            <Box className={classes.banner}>
-              <Typography variant="h3" component="h2" gutterBottom={true}>
-                {name}
-              </Typography>
-              <Grid container spacing={2} alignItems="center">
-                <Grid item>
-                  <AvatarGroup max={membersLimit}>
-                    {members.map(member => (
-                      <Avatar
-                        key={member.uuid}
-                        alt={member.name}
-                        src={member.avatar}
-                      />
-                    ))}
-                  </AvatarGroup>
+        <Container maxWidth="lg">
+          <Grid container>
+            <Grid item xs={12} lg={6}>
+              <Box className={classes.banner}>
+                <Typography variant="h3" component="h2" gutterBottom={true}>
+                  {name}
+                </Typography>
+                <Grid container spacing={2} alignItems="center">
+                  <Grid item>
+                    <AvatarGroup max={membersLimit}>
+                      {members.map(member => (
+                        <Avatar
+                          key={member.uuid}
+                          alt={member.name}
+                          src={member.avatar}
+                        />
+                      ))}
+                    </AvatarGroup>
+                  </Grid>
+                  <Grid item>
+                    <Typography variant="h6" component="p" gutterBottom={true}>
+                      {members.length} Members
+                    </Typography>
+                  </Grid>
                 </Grid>
-                <Grid item>
-                  <Typography variant="h6" component="p" gutterBottom={true}>
-                    {members.length} Members
-                  </Typography>
-                </Grid>
-              </Grid>
-              <Typography variant="h5" color="textSecondary" paragraph>
-                {description}
-              </Typography>
-            </Box>
+                <Typography variant="h5" color="textSecondary" paragraph>
+                  {description}
+                </Typography>
+              </Box>
+            </Grid>
           </Grid>
-        </Grid>
+        </Container>
       </Container>
     </section>
   );
