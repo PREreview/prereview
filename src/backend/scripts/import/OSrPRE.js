@@ -2,11 +2,14 @@ import fs from 'fs';
 import _ from 'lodash';
 import ndjson from 'ndjson';
 import {
+  badgeModelWrapper,
+  communityModelWrapper,
   fullReviewModelWrapper,
   personaModelWrapper,
   preprintModelWrapper,
   rapidReviewModelWrapper,
   requestModelWrapper,
+  tagModelWrapper,
   userModelWrapper,
 } from '../../models/index.ts';
 import anonymus from 'anonymus';
@@ -82,6 +85,8 @@ async function OSrPREImportReview(
   preprintModel,
   rapidReviewModel,
   personasMap,
+  osrpreCommunity,
+  osrpreTag,
 ) {
   return async record => {
     try {
@@ -89,7 +94,12 @@ async function OSrPREImportReview(
       if (!persona) {
         throw new Error('No persona');
       }
-      const preprint = await OSrPREImportPreprint(record.object, preprintModel);
+      const preprint = await OSrPREImportPreprint(
+        record.object,
+        preprintModel,
+        osrpreCommunity,
+        osrpreTag,
+      );
       if (!preprint) {
         throw new Error('No preprint');
       }
@@ -125,14 +135,27 @@ async function OSrPREImportReview(
   };
 }
 
-async function OSrPREImportRequest(requestModel, preprintModel, personasMap) {
+async function OSrPREImportRequest(
+  requestModel,
+  preprintModel,
+  personasMap,
+  osrpreCommunity,
+  osrpreTag,
+) {
   return async record => {
     try {
+      console.log(`OSrPRE: Fetching requester ${record.agent}`);
       const persona = personasMap.get(record.agent);
       if (!persona) {
         throw new Error('No persona');
       }
-      const preprint = await OSrPREImportPreprint(record.object, preprintModel);
+      console.log('OSrPRE: Fetching requested preprint', record.object);
+      const preprint = await OSrPREImportPreprint(
+        record.object,
+        preprintModel,
+        osrpreCommunity,
+        osrpreTag,
+      );
       if (!preprint) {
         throw new Error('No preprint');
       }
@@ -144,7 +167,12 @@ async function OSrPREImportRequest(requestModel, preprintModel, personasMap) {
   };
 }
 
-async function OSrPREImportPreprint(record, preprintModel) {
+async function OSrPREImportPreprint(
+  record,
+  preprintModel,
+  osrpreCommunity,
+  osrpreTag,
+) {
   try {
     record.createdAt = new Date(record.createdAt);
     record.datePosted = new Date(record.datePosted);
@@ -180,6 +208,8 @@ async function OSrPREImportPreprint(record, preprintModel) {
         source.contentEncoding,
         source.contentUrl,
       );
+      preprint.communities.add(osrpreCommunity);
+      preprint.tags.add(osrpreTag);
       await preprintModel.persistAndFlush(preprint);
       console.log(`OSrPRE: Inserted Preprint ${preprint.handle}`);
     } else {
@@ -200,6 +230,8 @@ async function OSrPREImportUser(
   usersMap,
   personasMap,
   isAnon,
+  osrpreCommunity,
+  osrpreBadge,
 ) {
   return async record => {
     if ((await userModel.findOne({ orcid: record.orcid })) !== null) {
@@ -224,6 +256,7 @@ async function OSrPREImportUser(
       let userObject, personaObject, anonPersonaObject;
       if (person) {
         userObject = userModel.create({ orcid: record.orcid });
+        userObject.communities.add(osrpreCommunity);
         //userObject.createdAt = new Date(record.createdAt);
         let name;
         if (person.name) {
@@ -263,10 +296,14 @@ async function OSrPREImportUser(
                   personaObject.bio = person.biography['content'];
                 }
                 if (!person.is_private) {
+                  personaObject.badges.add(osrpreBadge);
                   userObject.isPrivate = false;
                   userObject.defaultPersona = personaObject;
                 }
                 userObject.personas.add(personaObject);
+                console.log(
+                  `***inserting ${id}:${personaObject} into personasMap`,
+                );
                 personasMap.set(id, personaObject);
               } else if (isAnon.get(id) === true) {
                 let anonName = anonymus.create()[0];
@@ -281,10 +318,14 @@ async function OSrPREImportUser(
                   isAnonymous: true,
                 });
                 if (person.is_private) {
+                  anonPersonaObject.badges.add(osrpreBadge);
                   userObject.isPrivate = true;
                   userObject.defaultPersona = anonPersonaObject;
                 }
                 userObject.personas.add(anonPersonaObject);
+                console.log(
+                  `***inserting anon ${id}:${personaObject} into personasMap`,
+                );
                 personasMap.set(id, anonPersonaObject);
               } else {
                 console.warn(`No such role ${id} mapped`);
@@ -426,12 +467,26 @@ export default async function run(db) {
   const userMap = new Map();
   const personaMap = new Map();
   const anonMap = new Map();
+  const badgeModel = badgeModelWrapper(db);
+  const communityModel = communityModelWrapper(db);
   const fullReviewModel = fullReviewModelWrapper(db);
   const personaModel = personaModelWrapper(db);
   const preprintModel = preprintModelWrapper(db);
   const rapidReviewModel = rapidReviewModelWrapper(db);
   const requestModel = requestModelWrapper(db);
+  const tagModel = tagModelWrapper(db);
   const userModel = userModelWrapper(db);
+
+  const osrpreCommunity = communityModel.create({
+    name: 'Outbreak Science',
+    slug: 'outbreaksci',
+    description: 'A community for outbreak-related preprints.',
+  });
+  const osrpreBadge = badgeModel.create({ name: 'Outbreak Science' });
+  const osrpreTag = tagModel.create({ name: 'Imported from OSrPRE' });
+  communityModel.persistAndFlush(osrpreCommunity);
+  badgeModel.persistAndFlush(osrpreBadge);
+  tagModel.persistAndFlush(osrpreTag);
   await processPersonas(
     `${process.env.IMPORT_COUCH_OUTDIR}/rapid-prereview-docs.jsonl`,
     anonMap,
@@ -444,16 +499,26 @@ export default async function run(db) {
       userMap,
       personaMap,
       anonMap,
+      osrpreCommunity,
+      osrpreBadge,
     ),
   );
   await processActions(
     `${process.env.IMPORT_COUCH_OUTDIR}/rapid-prereview-docs.jsonl`,
-    await OSrPREImportRequest(requestModel, preprintModel, personaMap),
+    await OSrPREImportRequest(
+      requestModel,
+      preprintModel,
+      personaMap,
+      osrpreCommunity,
+      osrpreTag,
+    ),
     await OSrPREImportReview(
       fullReviewModel,
       preprintModel,
       rapidReviewModel,
       personaMap,
+      osrpreCommunity,
+      osrpreTag,
     ),
   );
   await queue.onIdle();

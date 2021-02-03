@@ -1,9 +1,11 @@
 import _ from 'lodash';
 import {
+  badgeModelWrapper,
   fullReviewModelWrapper,
   personaModelWrapper,
   preprintModelWrapper,
   requestModelWrapper,
+  tagModelWrapper,
   userModelWrapper,
 } from '../../models/index.ts';
 import { Client } from 'pg';
@@ -21,7 +23,13 @@ import {
   Work,
 } from '../../models/entities/index.ts';
 
-async function importPreprints(site, preprints, preprintModel, preprintsMap) {
+async function importPreprints(
+  site,
+  preprints,
+  preprintModel,
+  preprintsMap,
+  preTag,
+) {
   try {
     for (let r of preprints.rows) {
       r.createdAt = new Date(r.createdAt);
@@ -69,6 +77,7 @@ async function importPreprints(site, preprints, preprintModel, preprintsMap) {
           source.contentEncoding,
           source.contentUrl,
         );
+        preprint.tags.add(preTag);
         await preprintModel.persistAndFlush(preprint);
         console.log(`${site}: Inserted Preprint ${preprint.handle}`);
       } else {
@@ -84,7 +93,7 @@ async function importPreprints(site, preprints, preprintModel, preprintsMap) {
   }
 }
 
-async function prereviewOrgImportPreprints(db, client, preprintsMap) {
+async function prereviewOrgImportPreprints(db, client, preprintsMap, preTag) {
   const preprintModel = preprintModelWrapper(db);
   let oldPreprints;
   try {
@@ -101,6 +110,7 @@ async function prereviewOrgImportPreprints(db, client, preprintsMap) {
         oldPreprints,
         preprintModel,
         preprintsMap,
+        preTag,
       );
     } catch (err) {
       console.error('PREreview.org: Failed to import preprints:', err);
@@ -110,7 +120,7 @@ async function prereviewOrgImportPreprints(db, client, preprintsMap) {
   }
 }
 
-async function prereviewOrgImportUsers(db, client, usersMap) {
+async function prereviewOrgImportUsers(db, client, usersMap, preBadge) {
   const userModel = userModelWrapper(db);
   const personaModel = personaModelWrapper(db);
   try {
@@ -137,6 +147,7 @@ async function prereviewOrgImportUsers(db, client, usersMap) {
       let userObject;
       if (person) {
         userObject = new User(r.orcid);
+        userObject.badges.add(preBadge);
         //userObject.createdAt = new Date(r.createdAt);
         let name;
         if (person.name) {
@@ -394,10 +405,16 @@ export default async function run(db) {
       : 'prereview',
     ssl: true,
   });
+  const badgeModel = badgeModelWrapper(db);
+  const tagModel = tagModelWrapper(db);
 
+  const preBadge = badgeModel.create({ name: 'PREreview V1' });
+  const preTag = tagModel.create({ name: 'Imported from PREreview V1' });
+  badgeModel.persistAndFlush(preBadge);
+  tagModel.persistAndFlush(preTag);
   await client.connect();
-  await prereviewOrgImportPreprints(db, client, preprintsMap);
-  await prereviewOrgImportUsers(db, client, usersMap);
+  await prereviewOrgImportPreprints(db, client, preprintsMap, preTag);
+  await prereviewOrgImportUsers(db, client, usersMap, preBadge);
   await prereviewOrgImportReviews(db, client, usersMap, preprintsMap);
   await prereviewOrgImportRequests(db, client, usersMap, preprintsMap);
   await client.end();
