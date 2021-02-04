@@ -498,12 +498,8 @@ function CommunityEvents({ community, events }) {
                       gutterBottom={true}
                     >
                       {new Intl.DateTimeFormat(intl.locale, {
-                        weekday: 'long',
-                        day: 'numeric',
                         month: 'short',
-                        year: 'numeric',
-                        hour: 'numeric',
-                        minute: 'numeric',
+                        day: 'numeric',
                       }).format(Date.parse(event.start))}
                     </Typography>
                   </Grid>
@@ -553,12 +549,8 @@ function CommunityEvents({ community, events }) {
                           gutterBottom={true}
                         >
                           {new Intl.DateTimeFormat(intl.locale, {
-                            weekday: 'long',
-                            day: 'numeric',
                             month: 'short',
-                            year: 'numeric',
-                            hour: 'numeric',
-                            minute: 'numeric',
+                            day: 'numeric',
                           }).format(Date.parse(event.start))}
                         </Typography>
                       </Grid>
