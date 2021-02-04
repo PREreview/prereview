@@ -1,19 +1,28 @@
+// base imports
 import React, { useState, useEffect, useCallback, useContext } from 'react';
 import { Helmet } from 'react-helmet-async';
 import socketIoClient from 'socket.io-client';
-import { UserContext } from '../contexts/user-context';
+
+// contexts
+import UserProvider from '../contexts/user-context';
+
+// utils
 import { getId } from '../utils/jsonld';
-import HeaderBar from './header-bar';
-import { ORG } from '../constants';
+
+// components
 import Button from './button';
+import HeaderBar from './header-bar';
 import ModerationCard from './moderation-card';
+
+// constants
+import { ORG } from '../constants';
 
 const socket = socketIoClient(window.location.origin, {
   autoConnect: false,
 });
 
 export default function Moderate() {
-  const user = useContext(UserContext);
+  const [user] = useContext(UserProvider.context);
   const [bookmark, setBookmark] = useState(null);
   const [excluded, setExcluded] = useState(new Set());
   const [lockersByReviewActionId, setLockersByReviewActionId] = useState({});
@@ -54,6 +63,8 @@ export default function Moderate() {
   //   window.scrollTo(0, 0);
   // }, []);
 
+  useEffect(() => {}, [user]);
+
   useEffect(() => {
     socket.connect();
     return () => {
@@ -80,9 +91,9 @@ export default function Moderate() {
   return (
     <div className="moderate">
       <Helmet>
-        <title>{ORG} • Moderate Reviews</title>
+        <title>Moderate Reviews • {ORG}</title>
       </Helmet>
-      <HeaderBar closeGap />
+      <HeaderBar thisUser={user} closeGap />
 
       <section>
         <header className="moderate__header">
@@ -173,27 +184,6 @@ export default function Moderate() {
             </div>
           )
         ) : null}
-
-        <div>
-          {/* Cloudant returns the same bookmark when it hits the end of the list */}
-          {results
-            ? !!(
-                results.rows.length < results.total_rows &&
-                results.bookmark !== bookmark
-              ) && (
-                <div className="moderate__more">
-                  <Button
-                    onClick={e => {
-                      e.preventDefault();
-                      setBookmark(results.bookmark);
-                    }}
-                  >
-                    More
-                  </Button>
-                </div>
-              )
-            : null}
-        </div>
       </section>
     </div>
   );

@@ -155,7 +155,7 @@ export default function HeaderBar({ onClickMenuButton, closeGap, thisUser }) {
                 </XLink>
               )}
 
-              {roles.includes('moderators') && !thisUser.isModerated && (
+              {thisUser.isAdmin && ( // #FIXME should this be isModerator ?
                 <XLink
                   to={process.env.IS_EXTENSION ? undefined : '/moderate'}
                   href={`/moderate`}
@@ -164,6 +164,7 @@ export default function HeaderBar({ onClickMenuButton, closeGap, thisUser }) {
                   Moderate Reviews
                 </XLink>
               )}
+
               <XLink to="/logout" href={`/logout`}>
                 Logout
               </XLink>

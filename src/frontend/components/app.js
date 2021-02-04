@@ -1,5 +1,5 @@
 // base imports
-import React, { Suspense, lazy, useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import mobile from 'is-mobile';
 import { HTML5Backend } from 'react-dnd-html5-backend';
@@ -27,29 +27,22 @@ import ExtensionSplash from './extension-splash';
 import Home from './home';
 import Login from './login';
 import Logout from './logout';
+import Moderate from './moderate';
 import ModeratorRoute from './moderator-route';
 import NotFound from './not-found';
 import PrivateRoute, { AdminRoute } from './private-route';
 import Profile from './profile';
 import Settings from './settings';
-import SuspenseLoading from './suspense-loading';
 import ToCPage from './toc-page';
 import PersonaSearch from './PersonaSearch';
 
 // constants
 import API from './api';
 
-// icons
-import PreReviewLogo from './pre-review-logo';
-
-const Moderate = React.lazy(() => import('./moderate'));
-
 // kick off the polyfill!
 //smoothscroll.polyfill();
 
 export default function App({ user }) {
-  const [loading, setLoading] = useState(true);
-
   return (
     <HelmetProvider>
       <IntlProvider>
@@ -81,63 +74,63 @@ export default function App({ user }) {
                   </ToCPage>
                 </Route>
 
-              <Route exact={true} path="/api">
-                <ToCPage>
-                  <API />
-                </ToCPage>
-              </Route>
+                <Route exact={true} path="/api">
+                  <ToCPage>
+                    <API />
+                  </ToCPage>
+                </Route>
 
-               <Route exact={true} path="/personas">
-                <PersonaSearch />
-              </Route> 
-              <Route exact={true} path="/about/:id">
-                <Profile />
-              </Route>
-              <Route exact={true} path="/extension">
-                <ExtensionSplash />
-              </Route>
-              <PrivateRoute exact={true} path="/settings">
-                <Settings />
-              </PrivateRoute>
-              <AdminRoute exact={true} path="/admin">
-                <AdminPanel />
-              </AdminRoute>
-              <AdminRoute exact={true} path="/block">
-                <BlockPanel />
-              </AdminRoute>
-              <AdminRoute exact={true} path="/community-settings/:id">
-                <CommunityPanel />
-              </AdminRoute>
-              <ModeratorRoute exact={true} path="/moderate">
-                <Suspense fallback={<SuspenseLoading>Loading</SuspenseLoading>}>
+                <Route exact={true} path="/personas">
+                  <PersonaSearch />
+                </Route>
+
+                <Route exact={true} path="/about/:id">
+                  <Profile />
+                </Route>
+
+                <Route exact={true} path="/extension">
+                  <ExtensionSplash />
+                </Route>
+
+                <PrivateRoute exact={true} path="/settings">
+                  <Settings />
+                </PrivateRoute>
+
+                <AdminRoute exact={true} path="/admin">
+                  <AdminPanel />
+                </AdminRoute>
+
+                <AdminRoute exact={true} path="/block">
+                  <BlockPanel />
+                </AdminRoute>
+
+                <AdminRoute exact={true} path="/community-settings/:id">
+                  <CommunityPanel />
+                </AdminRoute>
+
+                <ModeratorRoute exact={true} path="/moderate">
                   <Moderate />
-                </Suspense>
-              </ModeratorRoute>
-              <Route
-                exact={true}
-                path="/preprints/:id"
-              >
-                <ExtensionFallback />
-              </Route>
-              <Route
-                exact={true}
-                path="/communities/:id"
-                >
+                </ModeratorRoute>
+
+                <Route exact={true} path="/preprints/:id">
+                  <ExtensionFallback />
+                </Route>
+
+                <Route exact={true} path="/communities/:id">
                   <Community />
                 </Route>
-              <Route
-                exact={true}
-                path="/preprints/:id/reviews/:cid?"
-              >
-                <ExtensionFallback />
-              </Route>
-              <Route>
-                <NotFound />
-              </Route>
-            </Switch>
-          </UserProvider>
-        </StoresProvider>
-      </DndProvider>
+
+                <Route exact={true} path="/preprints/:id/reviews/:cid?">
+                  <ExtensionFallback />
+                </Route>
+
+                <Route>
+                  <NotFound />
+                </Route>
+              </Switch>
+            </UserProvider>
+          </StoresProvider>
+        </DndProvider>
       </IntlProvider>
     </HelmetProvider>
   );
