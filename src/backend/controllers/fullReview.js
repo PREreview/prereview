@@ -104,14 +104,16 @@ export default function controller(
       ctx.throw(400, `Failed to parse full review schema: ${err}`);
     }
 
-    let reviewData; 
+    let reviewData;
 
     if (review.isPublished) {
       reviewData = {
         title: review.title || `Review of ${preprint.title}`,
         content: draft.contents,
         // ensuring anonymous reviewers stay anonymous
-        authorName: authorPersona.isAnonymous ? `PREreview community member` : authorPersona.name,
+        authorName: authorPersona.isAnonymous
+          ? `PREreview community member`
+          : authorPersona.name,
         orcid: authorPersona.isAnonymous ? '' : authorPersona.identity.orcid,
       };
       try {
@@ -130,7 +132,7 @@ export default function controller(
       ctx.throw(400, `Failed to persist review.`);
     }
 
-    log.debug("REVIEW**********", review)
+    log.debug('REVIEW**********', review);
 
     ctx.body = {
       status: 201,
