@@ -7,16 +7,8 @@ const Joi = router.Joi;
 
 // eslint-disable-next-line no-unused-vars
 const querySchema = Joi.object({
-  start: Joi.number()
-    .integer()
-    .greater(-1),
-  end: Joi.number()
-    .integer()
-    .positive(),
-  asc: Joi.boolean(),
-  sort_by: Joi.string(),
-  from: Joi.string(),
-  to: Joi.string(),
+  is_published: Joi.boolean(),
+  can_edit: Joi.string(),
 });
 
 export default function controller(
@@ -31,7 +23,7 @@ export default function controller(
 
   // handler for GET multiple reviews methods
   const getHandler = async ctx => {
-    let allReviews, pid, preprint; // fid = fullReview ID
+    let allReviews, pid; // fid = fullReview ID
 
     if (ctx.params.pid) {
       pid = ctx.params.pid;
@@ -43,18 +35,45 @@ export default function controller(
     }
 
     try {
+      const queries = [];
+      if (ctx.query.is_published !== undefined && ctx.query.is_published !== null) {
+        queries.push({ isPublished: { $eq: ctx.query.is_published } });
+      }
+
+      if (ctx.query.can_edit) {
+        const editors = ctx.query.can_edit.split(',');
+        queries.push({
+          $or: [
+            { authors: { uuid: { $in: editors } } },
+            { mentors: { uuid: { $in: editors } } },
+          ],
+        });
+      }
+
       if (pid) {
-        preprint = await preprintModel.findOneByUuidOrHandle(pid);
-        allReviews = await reviewModel.findAll({ preprint: preprint }, [
+        queries.push({ preprint: { uuid: { $eq: pid } } });
+      }
+
+      if (queries.length > 0) {
+        let query;
+        if (queries.length > 1) {
+          query = { $and: queries };
+        } else {
+          query = queries[0];
+        }
+        log.debug('Querying preprints:', query);
+        allReviews = await reviewModel.find(query, [
           'authors',
           'comments',
           'drafts',
+          'preprint',
         ]);
       } else {
         allReviews = await reviewModel.findAll([
           'authors',
           'comments',
           'drafts',
+          'preprint',
         ]);
       }
     } catch (err) {
@@ -145,6 +164,9 @@ export default function controller(
   reviewsRouter.route({
     method: 'GET',
     path: '/fullReviews',
+    validate: {
+      query: querySchema,
+    },
     handler: async ctx => getHandler(ctx),
     meta: {
       swagger: {
@@ -226,8 +248,7 @@ export default function controller(
     pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
     handler: async ctx => {
       log.debug(
-        `Adding persona ${ctx.request.body.pid} to review ${
-          ctx.params.id
+        `Adding persona ${ctx.request.body.pid} to review ${ctx.params.id
         } with role ${ctx.params.role}.`,
       );
       let review, persona;
@@ -250,6 +271,7 @@ export default function controller(
         ctx.throw(400, `Failed to parse query: ${err}`);
       }
 
+      console.log('***review***:', review);
       console.log('***persona***:', persona);
       if (!review || !persona) {
         log.error('HTTP 400: Invalid review or Persona');
@@ -259,8 +281,7 @@ export default function controller(
       if (ctx.params.role === 'authors') {
         try {
           log.debug(
-            `Full review ${review.id} found. Inviting persona ${
-              persona.id
+            `Full review ${review.id} found. Inviting persona ${persona.id
             } to review.`,
           );
           review.authorInvites.add(persona);
@@ -282,8 +303,7 @@ export default function controller(
                 },
               });
               log.info(
-                `Sent author invitation email to ${contact.value} for review ${
-                  review.uuid
+                `Sent author invitation email to ${contact.value} for review ${review.uuid
                 }`,
               );
             }
@@ -298,8 +318,7 @@ export default function controller(
       } else if (ctx.params.role === 'mentors') {
         try {
           log.debug(
-            `Full review ${review.id} found. Inviting persona ${
-              persona.id
+            `Full review ${review.id} found. Inviting persona ${persona.id
             } to review.`,
           );
           review.mentorInvites.add(persona);
@@ -321,8 +340,7 @@ export default function controller(
                 },
               });
               log.info(
-                `Sent mentor invitation email to ${contact.value} for review ${
-                  review.uuid
+                `Sent mentor invitation email to ${contact.value} for review ${review.uuid
                 }`,
               );
             }
@@ -351,7 +369,7 @@ export default function controller(
 
   reviewsRouter.route({
     method: 'DELETE',
-    path: '/fullReviews/:id/:role/:pid',
+    path: '/fullReviews/:id/:role',
     validate: {
       params: {
         id: Joi.string()
@@ -360,10 +378,13 @@ export default function controller(
         role: Joi.string()
           .description('Role')
           .required(),
+      },
+      body: {
         pid: Joi.string()
           .description('Persona id')
           .required(),
       },
+      type: 'json',
     },
     pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
     handler: async ctx => {
@@ -382,7 +403,7 @@ export default function controller(
             'mentorInvites',
           ]);
         }
-        persona = await personaModel.findOne({ uuid: ctx.params.pid });
+        persona = await personaModel.findOne({ uuid: ctx.request.body.pid });
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse query: ${err}`);
@@ -399,8 +420,7 @@ export default function controller(
       ) {
         try {
           log.debug(
-            `Full review ${review.id} found. Inviting persona ${
-              persona.id
+            `Full review ${review.id} found. Inviting persona ${persona.id
             } to review.`,
           );
           review.authorInvites.remove(persona);
@@ -418,8 +438,7 @@ export default function controller(
       ) {
         try {
           log.debug(
-            `Full review ${review.id} found. Inviting persona ${
-              persona.id
+            `Full review ${review.id} found. Inviting persona ${persona.id
             } to review.`,
           );
           review.mentorInvites.remove(persona);
@@ -464,7 +483,7 @@ export default function controller(
     },
     pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
     handler: async ctx => {
-      log.debug(`Adding persona ${ctx.params.pid} to review ${ctx.params.id}.`);
+      log.debug(`Adding persona ${ctx.params.pid} to review ${ctx.params.id} as a(n) ${ctx.params.role}.`);
       let review, persona;
 
       try {
@@ -484,6 +503,8 @@ export default function controller(
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse query: ${err}`);
       }
+      console.log('***review***:', review);
+      console.log('***persona***:', persona);
 
       if (!review || !persona) {
         log.error('HTTP 404: Review or Persona not found');
@@ -496,8 +517,7 @@ export default function controller(
       ) {
         try {
           log.debug(
-            `Full review ${review.id} found. Inviting persona ${
-              persona.id
+            `Full review ${review.id} found. Inviting persona ${persona.id
             } to review.`,
           );
           review.authorInvites.remove(persona);
@@ -516,8 +536,7 @@ export default function controller(
       ) {
         try {
           log.debug(
-            `Full review ${review.id} found. Inviting persona ${
-              persona.id
+            `Full review ${review.id} found. Inviting persona ${persona.id
             } to review.`,
           );
           review.mentorInvites.remove(persona);

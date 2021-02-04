@@ -480,7 +480,7 @@ export default async function run(db) {
   const osrpreCommunity = communityModel.create({
     name: 'Outbreak Science',
     slug: 'outbreaksci',
-    description: 'A community for outbreak-related preprints.',
+    description: 'A community for reviews of outbreak-related preprints.',
   });
   const osrpreBadge = badgeModel.create({ name: 'Outbreak Science' });
   const osrpreTag = tagModel.create({ name: 'Imported from OSrPRE' });

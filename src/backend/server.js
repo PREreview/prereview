@@ -64,6 +64,7 @@ import TagController from './controllers/tag.js';
 import TemplateController from './controllers/template.js';
 import DocsController from './controllers/docs.js';
 import SearchesController from './controllers/searches.js';
+import NotificationController from './controllers/notification.js';
 
 const __dirname = path.resolve();
 const STATIC_DIR = path.resolve(__dirname, 'dist', 'frontend');
@@ -146,6 +147,7 @@ export default async function configServer(config) {
   const templates = TemplateController(templateModel, communityModel, authz);
   const users = UserController(userModel, contactModel, authz);
   const searches = SearchesController(preprintModel, draftModel, authz);
+  const notifications = NotificationController(userModel, authz);
   const communities = CommunityController(
     communityModel,
     userModel,
@@ -168,6 +170,7 @@ export default async function configServer(config) {
     groups.middleware(),
     personas.middleware(),
     preprints.middleware(),
+    notifications.middleware(),
     rapidReviews.middleware(),
     requests.middleware(),
     searches.middleware(),
