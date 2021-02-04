@@ -23,6 +23,7 @@ import CodeOfConduct from './code-of-conduct';
 import Community from './Community';
 import Communities from './Communities';
 import CommunityPanel from './community-panel';
+import Event from './Event';
 import ExtensionFallback from './extension-fallback';
 import ExtensionSplash from './extension-splash';
 import Home from './home';
@@ -132,6 +133,14 @@ export default function App({ user }) {
                 >
                 <Community />
               </Route>
+
+              <Route
+                exact={true}
+                path="/events/:id"
+                >
+                <Event />
+              </Route>
+
               <Route
                 exact={true}
                 path="/preprints/:id/reviews/:cid?"

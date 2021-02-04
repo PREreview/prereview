@@ -486,7 +486,7 @@ function CommunityEvents({ community, events }) {
             return (
               <Link
                 key={event.uuid}
-                href={'/communities' + community.uuid + '/events/' + event.uuid}
+                href={`/events/${event.uuid}`}
                 className={classes.link}
               >
                 <Grid container spacing={2}>
@@ -498,8 +498,12 @@ function CommunityEvents({ community, events }) {
                       gutterBottom={true}
                     >
                       {new Intl.DateTimeFormat(intl.locale, {
-                        month: 'short',
+                        weekday: 'long',
                         day: 'numeric',
+                        month: 'short',
+                        year: 'numeric',
+                        hour: 'numeric',
+                        minute: 'numeric',
                       }).format(Date.parse(event.start))}
                     </Typography>
                   </Grid>
@@ -537,9 +541,7 @@ function CommunityEvents({ community, events }) {
                 return (
                   <Link
                     key={event.uuid}
-                    href={
-                      '/communities' + community.uuid + '/events/' + event.uuid
-                    }
+                    href={`/events/${event.uuid}`}
                     className={classes.link}
                   >
                     <Grid container spacing={2}>
@@ -551,8 +553,12 @@ function CommunityEvents({ community, events }) {
                           gutterBottom={true}
                         >
                           {new Intl.DateTimeFormat(intl.locale, {
-                            month: 'short',
+                            weekday: 'long',
                             day: 'numeric',
+                            month: 'short',
+                            year: 'numeric',
+                            hour: 'numeric',
+                            minute: 'numeric',
                           }).format(Date.parse(event.start))}
                         </Typography>
                       </Grid>
