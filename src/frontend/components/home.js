@@ -117,30 +117,32 @@ export default function Home() {
           }}
         />
 
-        <SearchBar
-          defaultValue={search}
-          isFetching={loadingPreprints}
-          onChange={value => {
-            params.delete('page');
-            setSearch(value);
-          }}
-          onCancelSearch={() => {
-            params.delete('search');
-            setSearch('');
-            history.push({
-              pathname: location.pathame,
-              search: params.toString(),
-            });
-          }}
-          onRequestSearch={() => {
-            params.set('search', search);
-            params.delete('page');
-            history.push({
-              pathname: location.pathame,
-              search: params.toString(),
-            });
-          }}
-        />
+        <div className="fixed__search-bar">
+          <SearchBar
+            defaultValue={search}
+            isFetching={loadingPreprints}
+            onChange={value => {
+              params.delete('page');
+              setSearch(value);
+            }}
+            onCancelSearch={() => {
+              params.delete('search');
+              setSearch('');
+              history.push({
+                pathname: location.pathame,
+                search: params.toString(),
+              });
+            }}
+            onRequestSearch={() => {
+              params.set('search', search);
+              params.delete('page');
+              history.push({
+                pathname: location.pathame,
+                search: params.toString(),
+              });
+            }}
+          />
+        </div>
 
         <div className="home__main">
           <div className="home__content">

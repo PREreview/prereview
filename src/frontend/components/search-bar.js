@@ -11,7 +11,6 @@ export default function SearchBar({
 }) {
   return (
     <div className="search-bar">
-      <div className="search-bar__left-spacer" />
       <div className="search-bar__search-box">
         <MuiSearchBar
           value={defaultValue}
@@ -23,7 +22,6 @@ export default function SearchBar({
           disabled={isFetching}
         />
       </div>
-      <div className="search-bar__right-spacer" />
     </div>
   );
 }

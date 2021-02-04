@@ -58,7 +58,7 @@ const useStyles = makeStyles(theme => ({
     marginBottom: theme.spacing(2),
   },
   banner: {
-    background: 'rgba(255, 255, 255, 0.75)',
+    background: 'rgba(255, 255, 255, 0.85)',
     maxWidth: theme.breakpoints.values['md'],
     marginLeft: 'auto',
     marginRight: 'auto',
@@ -227,7 +227,7 @@ export default function Community() {
             membersLimit={5}
           />
           <Box bgcolor="rgba(229, 229, 229, 0.35)">
-            <Container maxWidth="lg">
+            <Container>
               <Box p={4}>
                 {user.isAdmin ? (
                   <IconButton
@@ -312,37 +312,33 @@ function CommunityHeader({
             : null
         }
       >
-        <Container maxWidth="lg">
-          <Grid container>
-            <Grid item xs={12} lg={6}>
-              <Box className={classes.banner}>
-                <Typography variant="h3" component="h2" gutterBottom={true}>
-                  {name}
+        <Container>
+          <Box className={classes.banner}>
+            <Typography variant="h3" component="h2" gutterBottom={true}>
+              {name}
+            </Typography>
+            <Grid container spacing={2} alignItems="center">
+              <Grid item>
+                <AvatarGroup max={membersLimit}>
+                  {members.map(member => (
+                    <Avatar
+                      key={member.uuid}
+                      alt={member.name}
+                      src={member.avatar}
+                    />
+                  ))}
+                </AvatarGroup>
+              </Grid>
+              <Grid item>
+                <Typography variant="h6" component="p" gutterBottom={true}>
+                  {members.length} Members
                 </Typography>
-                <Grid container spacing={2} alignItems="center">
-                  <Grid item>
-                    <AvatarGroup max={membersLimit}>
-                      {members.map(member => (
-                        <Avatar
-                          key={member.uuid}
-                          alt={member.name}
-                          src={member.avatar}
-                        />
-                      ))}
-                    </AvatarGroup>
-                  </Grid>
-                  <Grid item>
-                    <Typography variant="h6" component="p" gutterBottom={true}>
-                      {members.length} Members
-                    </Typography>
-                  </Grid>
-                </Grid>
-                <Typography variant="h5" color="textSecondary" paragraph>
-                  {description}
-                </Typography>
-              </Box>
+              </Grid>
             </Grid>
-          </Grid>
+            <Typography variant="h5" color="textSecondary" paragraph>
+              {description}
+            </Typography>
+          </Box>
         </Container>
       </Container>
     </section>
