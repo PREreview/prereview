@@ -18,15 +18,17 @@ export default function WelcomeModal(props) {
         <header className="welcome-modal__banner">
           <PreReviewLogo />
         </header>
-        <div className="welcome-modal__body">
-          <p>
-            Welcome to the new PREreview.org, a site for the crowdsource of preprint reviews.
-            This is the marriage between two preprint review platforms: PREreview.org and outbreaksci.prereview.org. 
-            If you are a user of either of these platforms, your information has been migrated to this new site. 
-            If you are a new user, welcome to the family!
-          </p>
+        <div className="welcome-modal__body" align='center'>
+            <div><b>Welcome to the new PREreview.org, a site for crowdsourcing preprint reviews.</b></div>
+            <br/>
           <div>
-            Here you can:
+            This is the marriage between two preprint review platforms: <em>PREreview.org</em> and <em>outbreaksci.prereview.org</em>. 
+            If you were a user of either of these platforms, your information has been migrated to this new site. 
+            If you are a new user, welcome to the family!
+          </div>
+          <br/>
+          <div>
+            On this platform, you can:
             <ol>
               <li>Read rapid and long-form reviews of existing preprints.</li>
               <li>
