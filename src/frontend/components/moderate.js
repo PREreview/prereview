@@ -9,6 +9,9 @@ import UserProvider from '../contexts/user-context';
 // utils
 import { getId } from '../utils/jsonld';
 
+// hooks
+import { useGetFullReviews } from '../hooks/api-hooks.tsx';
+
 // components
 import Button from './button';
 import HeaderBar from './header-bar';
@@ -23,9 +26,12 @@ const socket = socketIoClient(window.location.origin, {
 
 export default function Moderate() {
   const [user] = useContext(UserProvider.context);
-  const [bookmark, setBookmark] = useState(null);
   const [excluded, setExcluded] = useState(new Set());
   const [lockersByReviewActionId, setLockersByReviewActionId] = useState({});
+
+  const { data: reviews, loading, error } = useGetFullReviews();
+
+  const [flaggedReviews, setFlaggedReviews] = useState(null);
 
   // #FIXME refactor to remove callback
   const handleLocked = useCallback(
@@ -63,7 +69,14 @@ export default function Moderate() {
   //   window.scrollTo(0, 0);
   // }, []);
 
-  useEffect(() => {}, [user]);
+  useEffect(() => {
+    if (!loading) {
+      if (reviews && reviews.data.length) {
+        const allFlagged = reviews.data.filter(review => review.isFlagged);
+        setFlaggedReviews(allFlagged);
+      }
+    }
+  }, [loading, reviews]);
 
   useEffect(() => {
     socket.connect();
@@ -98,7 +111,12 @@ export default function Moderate() {
       <section>
         <header className="moderate__header">
           <span>Moderate Content</span>
-          <span>{results ? results.total_rows : 'No'} Flagged Reviews</span>
+          <span>
+            {flaggedReviews && flaggedReviews.length
+              ? flaggedReviews.length
+              : 'No'}{' '}
+            Reviews
+          </span>
         </header>
 
         {results ? (
