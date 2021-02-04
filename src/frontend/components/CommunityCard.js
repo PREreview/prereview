@@ -32,7 +32,7 @@ const useStyles = makeStyles(theme => ({
     transition: 'transform 500ms',
     '&:active, &:focus, &:hover': {
       textDecoration: 'none !important',
-      transform: 'scale(1.1)',
+      transform: 'scale(1.05)',
       transition: 'transform 500ms',
     },
   },
@@ -41,7 +41,7 @@ const useStyles = makeStyles(theme => ({
 const CommunityCard = ({ community }) => {
   const classes = useStyles();
 
-  const membersLimit = 10;
+  const membersLimit = 5;
 
   return (
     <Link
