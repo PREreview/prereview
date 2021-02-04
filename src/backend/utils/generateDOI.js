@@ -42,6 +42,8 @@ export default async function generateDOI(prereviewData) {
     },
   };
 
+  log.debug(`data*************`, data)
+
   // Create a deposition
   const depositionUrl = zenodoBaseUrl();
   const depositionPayload = zenodoPayload(JSON.stringify(data));
@@ -96,5 +98,6 @@ export default async function generateDOI(prereviewData) {
     > Record: ${BASE_URL}/record/${publishData.doi.split('zenodo.')[1]}
   `);
 
+  log.debug(`DOI************`, publishData)
   return publishData.doi;
 }

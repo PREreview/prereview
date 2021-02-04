@@ -104,14 +104,15 @@ export default function controller(
       ctx.throw(400, `Failed to parse full review schema: ${err}`);
     }
 
-    let reviewData;
+    let reviewData; 
 
     if (review.isPublished) {
       reviewData = {
         title: review.title || `Review of ${preprint.title}`,
         content: draft.contents,
-        authorName: authorPersona.name,
-        orcid: authorPersona.isPrivate ? '' : authorPersona.identity.orcid,
+        // ensuring anonymous reviewers stay anonymous
+        authorName: authorPersona.isAnonymous ? `PREreview community member` : authorPersona.name,
+        orcid: authorPersona.isAnonymous ? '' : authorPersona.identity.orcid,
       };
       try {
         // yay, the review gets a DOI!
@@ -128,6 +129,8 @@ export default function controller(
       log.error(`HTTP 400 error: ${err}`);
       ctx.throw(400, `Failed to persist review.`);
     }
+
+    log.debug("REVIEW**********", review)
 
     ctx.body = {
       status: 201,

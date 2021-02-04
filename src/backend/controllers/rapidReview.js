@@ -44,7 +44,7 @@ export default function controller(rapidReviews, preprints, thisUser) {
     },
     method: 'post',
     path: '/rapidReviews',
-    // pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
+    pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
     // validate: {},
     handler: async ctx => {
       log.debug('Posting a rapid review.');
@@ -201,7 +201,7 @@ export default function controller(rapidReviews, preprints, thisUser) {
     },
     method: 'delete',
     path: '/rapidReviews/:id',
-    // pre: thisUser.can('access private pages'),
+    pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next),
     // validate: {},
     handler: async ctx => {
       log.debug(`Updating rapid review ${ctx.params.id}`);
