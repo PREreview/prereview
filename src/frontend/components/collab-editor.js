@@ -13,6 +13,7 @@ import { useQuill } from 'react-quilljs';
 import 'quill/dist/quill.snow.css'; // Add css for snow theme
 // or import 'quill/dist/quill.bubble.css'; // Add css for bubble theme
 
+// FIXME too collaborative!
 const ydoc = new Y.Doc();
 const provider = new WebrtcProvider('prereview-collab', ydoc);
 

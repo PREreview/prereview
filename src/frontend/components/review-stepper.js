@@ -262,7 +262,6 @@ export default function ReviewStepper({
   const [reviewId, setReviewId] = useState(review ? review.parent : null);
   const [skipped, setSkipped] = useState(new Set());
   const steps = getSteps();
-  console.log(review);
   // API queries
   const { data: templates } = useGetTemplates();
   const { mutate: postRapidReview } = usePostRapidReviews();
@@ -493,7 +492,6 @@ export default function ReviewStepper({
   }
 
   useEffect(() => {
-    console.log(hasRapidReviewed);
     if (hasRapidReviewed) {
       handleComplete();
     }
