@@ -31,7 +31,7 @@ export class Contact extends BaseEntity {
 
   @Fixture(() => false)
   @Property()
-  sendNotifications: boolean;
+  isNotified: boolean;
 
   @Fixture(faker => faker.random.alphaNumeric(16))
   @Property({ nullable: true })
@@ -42,13 +42,13 @@ export class Contact extends BaseEntity {
     value: string,
     identity: User,
     isVerified = false,
-    sendNotifications = false,
+    isNotified = false,
   ) {
     super();
     this.schema = schema;
     this.value = value;
     this.identity = identity;
     this.isVerified = isVerified;
-    this.sendNotifications = sendNotifications;
+    this.isNotified = isNotified;
   }
 }

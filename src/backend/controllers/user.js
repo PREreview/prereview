@@ -38,7 +38,7 @@ export default function controller(users, contacts, thisUser) {
       let allUsers;
 
       try {
-        allUsers = await users.findAll();
+        allUsers = await users.findAll(['defaultPersona']);
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse query: ${err}`);
@@ -94,16 +94,14 @@ export default function controller(users, contacts, thisUser) {
       let isAdmin,
         isModerator = false;
       if (user) {
-        if (thisUser) {
-          if (await thisUser.isMemberOf('admins', user.orcid)) {
-            log.debug(`User ${user.orcid} is an administrator!`);
-            isAdmin = true;
-          }
+        if (await thisUser.isMemberOf('admins', user.orcid)) {
+          log.debug(`User ${user.orcid} is an administrator!`);
+          isAdmin = true;
+        }
 
-          if (await thisUser.isMemberOf('moderators', user.orcid)) {
-            log.debug(`User ${user.orcid} is a moderator!`);
-            isModerator = true;
-          }
+        if (await thisUser.isMemberOf('moderators', user.orcid)) {
+          log.debug(`User ${user.orcid} is a moderator!`);
+          isModerator = true;
         }
 
         let avatar;
@@ -196,8 +194,9 @@ export default function controller(users, contacts, thisUser) {
       let conflict, schema, value;
       try {
         log.debug(`Create a new contact entry.`);
-        let { schema, value } = ctx.request.body;
-        conflict = await contacts.findOne({ schema, value, uuid: userId });
+        // FIXME contacts.fineOne  is not a valid method
+        // let { schema, value } = ctx.request.body;
+        // conflict = await contacts.findOne({ schema, value, uuid: userId });
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse contact schema: ${err}`);
@@ -214,13 +213,22 @@ export default function controller(users, contacts, thisUser) {
       }
 
       try {
-        newContact = contacts.create({
-          ...ctx.request.body,
+        // FIXME this is test data
+        newContact = {
+          value: 'foo@bar.com',
+          schema: 'mailto',
           identity: userId,
           isVerified: false,
           token: uuidv4(),
-        });
-        await contacts.persistAndFlush(newContact);
+        };
+        // FIXME this function does not exist
+        // newContact = contacts.create({
+        //   ...ctx.request.body,
+        //   identity: userId,
+        //   isVerified: false,
+        //   token: uuidv4(),
+        // });
+        // await contacts.persistAndFlush(newContact);
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse contact schema: ${err}`);
@@ -253,7 +261,10 @@ export default function controller(users, contacts, thisUser) {
       log.debug(`Updating contact for user ${userId}`);
 
       try {
-        const exists = await contacts.findOne({ uuid: contactId });
+        const exists = await contacts.findOne({
+          uuid: contactId,
+          identity: userId,
+        });
         if (exists) {
           log.debug('Contact already exists, updating.');
           contacts.assign(exists, ctx.request.body);

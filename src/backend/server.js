@@ -33,6 +33,8 @@ import {
   badgeModelWrapper,
   commentModelWrapper,
   communityModelWrapper,
+  contactModelWrapper,
+  eventModelWrapper,
   fullReviewModelWrapper,
   fullReviewDraftModelWrapper,
   groupModelWrapper,
@@ -43,7 +45,6 @@ import {
   tagModelWrapper,
   templateModelWrapper,
   userModelWrapper,
-  // contactModelWrapper, // #FIXME uncomment when in use; removing for linting
 } from './models/index.ts';
 
 // Our controllers
@@ -104,16 +105,22 @@ export default async function configServer(config) {
   const userModel = userModelWrapper(db);
   const groupModel = groupModelWrapper(db);
   const personaModel = personaModelWrapper(db);
+  const contactModel = contactModelWrapper(db);
   const authz = authWrapper(groupModel); // authorization, not authentication
 
   // setup API handlers
-  const auth = AuthController(userModel, personaModel, config, authz);
+  const auth = AuthController(
+    userModel,
+    personaModel,
+    contactModel,
+    config,
+    authz,
+  );
   const badgeModel = badgeModelWrapper(db);
   const badges = BadgeController(badgeModel, authz);
   const commentModel = commentModelWrapper(db);
   const communityModel = communityModelWrapper(db);
-  const communities = CommunityController(communityModel, authz);
-  // const contactModel = contactModelWrapper(db); // #FIXME uncomment when in use; removing for linting
+  const eventModel = eventModelWrapper(db);
   const fullReviewModel = fullReviewModelWrapper(db);
   const draftModel = fullReviewDraftModelWrapper(db);
   const fullReviewDrafts = DraftController(draftModel, authz);
@@ -123,7 +130,7 @@ export default async function configServer(config) {
   const preprintModel = preprintModelWrapper(db);
   const preprints = PreprintController(preprintModel, authz);
   const rapidReviewModel = rapidReviewModelWrapper(db);
-  const rapidReviews = RapidController(rapidReviewModel, authz);
+  const rapidReviews = RapidController(rapidReviewModel, preprintModel, authz);
   const requestModel = requestModelWrapper(db);
   const requests = RequestController(requestModel, authz);
   const fullReviews = FullReviewController(
@@ -137,8 +144,15 @@ export default async function configServer(config) {
   const tags = TagController(tagModel, authz);
   const templateModel = templateModelWrapper(db);
   const templates = TemplateController(templateModel, communityModel, authz);
-  const users = UserController(userModel, authz);
+  const users = UserController(userModel, contactModel, authz);
   const searches = SearchesController(preprintModel, draftModel, authz);
+  const communities = CommunityController(
+    communityModel,
+    userModel,
+    eventModel,
+    tagModel,
+    authz,
+  );
 
   server.use(authz.middleware());
 

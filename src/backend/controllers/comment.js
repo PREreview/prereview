@@ -75,7 +75,7 @@ export default function controller(commentModel, fullReviewModel, thisUser) {
 
     try {
       if (fid) {
-        fullReview = await fullReviewModel.findOne(fid);
+        fullReview = await fullReviewModel.findOne({ uuid: fid });
       }
 
       log.debug('author', authorPersona);

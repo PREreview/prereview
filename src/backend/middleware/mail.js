@@ -26,8 +26,14 @@ export const mailWrapper = config => {
     message: {
       from: config.emailAddress,
     },
+    send: true,
     transport: transport,
     getPath: (type, template) => path.join(TEMPLATE_DIR, template, type),
+    views: {
+      options: {
+        extension: 'hbs',
+      },
+    },
   });
 
   return async (ctx, next) => {

@@ -11,10 +11,11 @@ import UserProvider from '../contexts/user-context';
 import { useGetPersona } from '../hooks/api-hooks.tsx';
 
 // Material UI components
+import Avatar from '@material-ui/core/Avatar';
 import Chip from '@material-ui/core/Chip';
 
 // components
-import Avatar from './avatar';
+//import Avatar from './avatar';
 import HeaderBar from './header-bar';
 import LabelStyle from './label-style';
 import Loading from './loading.js';
@@ -67,9 +68,7 @@ export default function Profile() {
 
         <section className="profile__content">
           <header className="profile__header">
-            {persona && persona.avatar ? (
-              <Avatar avatar={persona.avatar} className="profile__avatar-img" />
-            ) : null}
+            <Avatar src={persona.avatar} className="profile__avatar-img" />
 
             <section className="profile__identity-info">
               <header className="profile__indentity-info-header">
@@ -111,15 +110,16 @@ export default function Profile() {
                 {persona && persona.badges.length > 0 && (
                   <Fragment>
                     <dt>
-                      <LabelStyle>Tags</LabelStyle>
+                      <LabelStyle>Badges</LabelStyle>
                     </dt>
-                    <dd>
+                    <dd className="profile__chips">
                       {persona.badges.map(badge => (
                         <Chip
                           key={badge.uuid}
                           label={badge.name}
                           color="primary"
                           size="small"
+                          className="profile__chip"
                         />
                       ))}
                     </dd>

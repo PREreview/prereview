@@ -12,6 +12,7 @@ import { Fixture } from 'class-fixtures-factory';
 import { PersonaModel } from '../personas';
 import { BaseEntity } from './BaseEntity';
 import { Badge } from './Badge';
+import { Community } from './Community';
 import { FullReview } from './FullReview';
 import { RapidReview } from './RapidReview';
 import { Request } from './Request';
@@ -56,11 +57,23 @@ export class Persona extends BaseEntity {
   @Property({ nullable: true })
   avatar_encoding?: string;
 
+  @ManyToMany({ entity: () => Community, mappedBy: 'members' })
+  communities: Collection<Community> = new Collection<Community>(this);
+
   @OneToMany({ entity: () => RapidReview, mappedBy: 'author' })
   rapidReviews: Collection<RapidReview> = new Collection<RapidReview>(this);
 
   @ManyToMany({ entity: () => FullReview, mappedBy: 'authors' })
   fullReviews: Collection<FullReview> = new Collection<FullReview>(this);
+
+  @ManyToMany({ entity: () => FullReview, mappedBy: 'authorInvites' })
+  invitedToAuthor: Collection<FullReview> = new Collection<FullReview>(this);
+
+  @ManyToMany({ entity: () => FullReview, mappedBy: 'mentors' })
+  mentoring: Collection<FullReview> = new Collection<FullReview>(this);
+
+  @ManyToMany({ entity: () => FullReview, mappedBy: 'mentorInvites' })
+  invitedToMentor: Collection<FullReview> = new Collection<FullReview>(this);
 
   @OneToMany({ entity: () => Request, mappedBy: 'author' })
   requests: Collection<Request> = new Collection<Request>(this);

@@ -5,7 +5,7 @@ import { DndProvider } from 'react-dnd';
 import { BrowserRouter as Router } from 'react-router-dom';
 import Shell from './shell';
 import ShellContent from './shell-content';
-import { UserProvider } from '../contexts/user-context';
+import UserProvider from '../contexts/user-context';
 import { StoresProvider } from '../contexts/store-context';
 import { TOGGLE_SHELL_TAB, SESSION_COOKIE_CHANGED } from '../constants';
 

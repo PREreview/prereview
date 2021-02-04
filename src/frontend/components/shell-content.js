@@ -9,7 +9,7 @@ import { Helmet } from 'react-helmet-async';
 import { makeStyles } from '@material-ui/core/styles';
 import Box from '@material-ui/core/Box';
 
-// utils
+// hooks
 import { usePostRequests } from '../hooks/api-hooks.tsx';
 
 // components
@@ -36,8 +36,11 @@ export default function ShellContent({
   user,
   defaultTab = 'read',
   onRequireScreen,
+  cid,
 }) {
   const location = useLocation();
+
+  // initial height of the header
   const [height, setHeight] = useState(0);
 
   const {
@@ -50,6 +53,7 @@ export default function ShellContent({
   const [hasLongReviewed, setHasLongReviewed] = useState(false);
   const [hasRequested, setHasRequested] = useState(false);
   const [newRequest, setNewRequest] = useState(false);
+  const [review, setReview] = useState(null);
 
   const [tab, setTab] = useState(defaultTab);
 
@@ -86,16 +90,20 @@ export default function ShellContent({
     setTab('read');
   };
 
+  const onReviewChange = review => {
+    setReview(review);
+  };
+
   useEffect(() => {
     const newHeight = document.getElementsByClassName(
       'shell-content__preview',
     )[0].clientHeight;
     setHeight(newHeight + 20);
-  }, []);
+  }, [review]);
 
   useEffect(() => {
     if (user) {
-      if (preprint.fullReviews.length) {
+      if (!hasLongReviewed && preprint.fullReviews.length) {
         // gets an array of the active user's persona IDs
         let personaIDs = user.personas.map(persona => persona.id);
 
@@ -111,21 +119,51 @@ export default function ShellContent({
           });
         });
 
-        // get a user's drafts
-        let ownDrafts = ownReviews.length
-          ? ownReviews
-              .filter(review => !review.isPublished)
-              .map(review => review.drafts)
-          : [];
+        // get a user's drafts of the correct review if cid is present, or latest if not
+        let ownDrafts,
+          latestDraft = [];
+        if (cid) {
+          ownDrafts = ownReviews.length
+            ? ownReviews.find(
+                review => review.uuid === cid && !review.isPublished,
+              )
+            : [];
 
-        const latestDraft = ownDrafts.length
-          ? ownDrafts.sort((a, b) => b.id - a.id)[0]
-          : [];
+          latestDraft =
+            ownDrafts && ownDrafts.drafts && ownDrafts.drafts.length
+              ? ownDrafts.drafts.length > 1
+                ? ownDrafts.drafts.sort((a, b) => a.id - b.id)[
+                    ownDrafts.drafts.length - 1
+                  ]
+                : ownDrafts.drafts[0]
+              : null;
 
-        // get the latest draft content & seed to the text editor
-        latestDraft.length
-          ? setInitialContent(latestDraft[0].contents)
-          : setInitialContent('');
+          // get the latest draft content & seed to the text editor
+          if (latestDraft) {
+            setInitialContent(latestDraft.contents);
+            setReview(latestDraft);
+          }
+        } else {
+          ownDrafts = ownReviews.length
+            ? ownReviews
+                .filter(review => !review.isPublished)
+                .map(review => review.drafts)
+            : [];
+
+          latestDraft = ownDrafts.length
+            ? ownDrafts.sort((a, b) => a[0].id - b[0].id)[ownDrafts.length - 1]
+            : [];
+
+          latestDraft = latestDraft.length
+            ? latestDraft[latestDraft.length - 1]
+            : null;
+
+          // get the latest draft content & seed to the text editor
+          if (latestDraft) {
+            setInitialContent(latestDraft.contents);
+            setReview(latestDraft);
+          }
+        }
 
         // gets all published reviews of the preprint
         let published = preprint.fullReviews.filter(
@@ -143,7 +181,7 @@ export default function ShellContent({
         });
       }
 
-      if (preprint.rapidReviews.length) {
+      if (!hasRapidReviewed && preprint.rapidReviews.length) {
         let authorID;
         preprint.rapidReviews.map(review => {
           review.author.id
@@ -155,7 +193,7 @@ export default function ShellContent({
         });
       }
 
-      if (preprint.requests.length) {
+      if (!hasRequested && preprint.requests.length) {
         let authorID;
         preprint.requests.map(request => {
           request.author.id
@@ -290,10 +328,13 @@ export default function ShellContent({
           />
         ) : tab === 'reviews' ? (
           <ShellContentReviews
+            cid={cid}
+            review={review}
             user={user}
             preprint={preprint}
             onClose={onCloseReviews}
             onContentChange={onContentChange}
+            onReviewChange={onReviewChange}
             hasRapidReviewed={hasRapidReviewed}
             hasLongReviewed={hasLongReviewed}
             initialContent={initialContent}
@@ -309,6 +350,7 @@ ShellContent.propTypes = {
   preprint: PropTypes.object.isRequired,
   user: PropTypes.object,
   defaultTab: PropTypes.oneOf(['read', 'review', 'request']),
+  cid: PropTypes.string,
 };
 
 function ShellContentRead({
@@ -373,8 +415,29 @@ function ShellContentReviews({
   hasRapidReviewed,
   hasLongReviewed,
   initialContent,
+  cid,
+  review,
+  onReviewChange,
 }) {
-  return (
+  return cid ? (
+    review ? (
+      <div className="shell-content-review">
+        <ReviewStepper
+          preprint={preprint}
+          disabled={disabled}
+          onClose={onClose}
+          onContentChange={onContentChange}
+          hasRapidReviewed={hasRapidReviewed}
+          hasLongReviewed={hasLongReviewed}
+          content={initialContent}
+          review={review}
+          onReviewChange={onReviewChange}
+        />
+      </div>
+    ) : (
+      <div>Sorry, you are not authorized to contribute to this review.</div>
+    )
+  ) : (
     <div className="shell-content-review">
       <ReviewStepper
         preprint={preprint}
@@ -384,6 +447,8 @@ function ShellContentReviews({
         hasRapidReviewed={hasRapidReviewed}
         hasLongReviewed={hasLongReviewed}
         content={initialContent}
+        review={review}
+        onReviewChange={onReviewChange}
       />
     </div>
   );
@@ -392,10 +457,13 @@ ShellContentReviews.propTypes = {
   preprint: PropTypes.object.isRequired,
   onClose: PropTypes.func.isRequired,
   onContentChange: PropTypes.func.isRequired,
+  onReviewChange: PropTypes.func.isRequired,
   disabled: PropTypes.bool,
   hasLongReviewed: PropTypes.bool.isRequired,
   hasRapidReviewed: PropTypes.bool.isRequired,
   initialContent: PropTypes.string,
+  cid: PropTypes.string,
+  review: PropTypes.object,
 };
 
 function ShellContentRequest({

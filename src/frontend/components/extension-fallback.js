@@ -41,7 +41,7 @@ export default function ExtensionFallback() {
   const [preprint, setPreprint] = useState(null);
   const [authors, setAuthors] = useState(null);
 
-  const { id } = useParams();
+  const { id, cid } = useParams();
 
   const { data: preprintData, loadingPreprint, errorPreprint } = useGetPreprint({id: id});
 
@@ -67,7 +67,7 @@ export default function ExtensionFallback() {
   const canonicalUrl = getCanonicalUrl(preprint ? preprint : null);
 
   useEffect(() => {
-    if (preprint) {
+    if (preprint && preprint.authors) {
       const string = preprint.authors.replace(/[|&;$%@"<>()\[\]+]/g, "");
       setAuthors(string);
     }
@@ -93,52 +93,43 @@ export default function ExtensionFallback() {
           </title>
         </Helmet>
 
-        {isMobile || isChromeOnMac ? (
-            /* for mobile devices we always use the fallback */
-            <Suspense fallback={<SuspenseLoading>Loading PDF</SuspenseLoading>}>
-              <PdfViewer
-                docId={id}
-                loading={<SuspenseLoading>Loading PDF</SuspenseLoading>}
-              />
-            </Suspense>
-          ) : (
-            <object
-              key={pdfUrl}
-              data={pdfUrl}
-              // type="application/pdf" commented out as it seems to break pdf loading in safari
-              // typemustmatch="true" commented out as it doesn't seem to be currently supported by react
-            >
-              {/* fallback text in case we can't load the PDF */}
-              <div className="extension-fallback__no-pdf-message">
-                <div className="extension-fallback__no-pdf-message-inner">
-                  <h2>{preprint.title}</h2>
-                  <div className="extension-fallback__no-pdf-message-inner-authors">{authors}</div>
-                  <h3>Abstract</h3>
-                  <div  className="extension-fallback__no-pdf-message-inner-content" dangerouslySetInnerHTML={{ __html: preprint.abstractText }} />
-                  {!!canonicalUrl && (
-                    <div  className="extension-fallback__no-pdf-message-inner-link">
-                      You can access the{' '}
-                      {
-                        <a
-                          href={canonicalUrl}
-                          target="_blank"
-                          rel="noreferrer noopener"
-                        >
-                          full text of this preprint
-                        </a>
-                      }{' '}
-                      at the preprint server's website.
-                    </div>
-                  )}
+        <object
+          key={pdfUrl}
+          data={pdfUrl}
+          // type="application/pdf" commented out as it seems to break pdf loading in safari
+          // typemustmatch="true" commented out as it doesn't seem to be currently supported by react
+        >
+          {/* fallback text in case we can't load the PDF */}
+          <div className="extension-fallback__no-pdf-message">
+            <div className="extension-fallback__no-pdf-message-inner">
+              <h2>{preprint.title}</h2>
+              <div className="extension-fallback__no-pdf-message-inner-authors">{authors}</div>
+              <h3>Abstract</h3>
+              <div  className="extension-fallback__no-pdf-message-inner-content" dangerouslySetInnerHTML={{ __html: preprint.abstractText }} />
+              {!!canonicalUrl && (
+                <div  className="extension-fallback__no-pdf-message-inner-link">
+                  You can access the{' '}
+                  {
+                    <a
+                      href={canonicalUrl}
+                      target="_blank"
+                      rel="noreferrer noopener"
+                    >
+                      full text of this preprint
+                    </a>
+                  }{' '}
+                  at the preprint server's website.
                 </div>
-              </div>
-            </object>
-          )}
+              )}
+            </div>
+          </div>
+        </object>
 
         <Shell>
           {onRequireScreen =>
             !!preprint && (
               <ShellContent
+                cid={cid}
                 onRequireScreen={onRequireScreen}
                 preprint={preprint}
                 user={user}

@@ -16,18 +16,23 @@ export default function RoleEditor({ persona, onCancel, onSaved }) {
   const [scale, setScale] = useState(1);
   const [rotate, setRotate] = useState(0);
   const { mutate: updatePersona, loading, error } = usePutPersona({
-    id: persona.name,
+    id: persona.uuid,
   });
 
   const dataUrlToFile = async dataURL => {
     const blob = await (await fetch(dataURL)).blob();
-    const file = new File([blob], 'fileName.jpg', {type:"image/jpeg", lastModified:new Date()});
+    const file = new File([blob], 'fileName.jpg', {
+      type: 'image/jpeg',
+      lastModified: new Date(),
+    });
     return file;
   };
 
   useEffect(() => {
     if (persona && persona.avatar) {
-      dataUrlToFile(persona.avatar).then(file => setImage(file));
+      dataUrlToFile(persona.avatar)
+        .then(file => setImage(file))
+        .catch(err => alert(`An error occurred: ${err.message}`));
     }
   }, [persona]);
 
@@ -162,10 +167,7 @@ export default function RoleEditor({ persona, onCancel, onSaved }) {
           )}
         </div>
       </div>
-      <Controls
-        error={error} // #FIXME
-        className="role-editor__controls"
-      >
+      <Controls error={error} className="role-editor__controls">
         <Button
           disabled={loading}
           onClick={() => {

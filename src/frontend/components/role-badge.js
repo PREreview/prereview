@@ -5,16 +5,24 @@ import classNames from 'classnames';
 import Tooltip from '@reach/tooltip';
 
 // material UI
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles, withStyles } from '@material-ui/core/styles';
+import MuiAvatar from '@material-ui/core/Avatar';
 import Popover from '@material-ui/core/Popover';
 
 // components
-import Avatar from './avatar';
+//import Avatar from './avatar';
 import NoticeBadge from './notice-badge';
 import XLink from './xlink';
 
 // icons
 import { MdPerson } from 'react-icons/md';
+
+const Avatar = withStyles({
+  root: {
+    height: 28,
+    width: 28,
+  }
+})(MuiAvatar);
 
 const useStyles = makeStyles(theme => ({
   popover: {
@@ -79,7 +87,6 @@ const RoleBadgeUI = React.forwardRef(function RoleBadgeUI(
 
   const open = Boolean(anchorEl);
   const id = open ? 'user-menu' : undefined;
-  console.log('user:', user);
 
   return (
     <>
@@ -97,27 +104,7 @@ const RoleBadgeUI = React.forwardRef(function RoleBadgeUI(
             Open
           </span>
           <Tooltipify tooltip={tooltip} user={user}>
-            <div ref={ref}>
-              <div
-                className={classNames(
-                  'role-badge-menu__generic-icon-container',
-                )}
-              >
-                <MdPerson className="role-badge-menu__generic-icon" />
-              </div>
-
-              <div
-                className={classNames('role-badge-menu__avatar', {
-                  'role-badge-menu__avatar--loaded': user && user.avatar,
-                })}
-              >
-                {user && user.avatar ? (
-                  <Avatar avatar={user.avatar} />
-                ) : (
-                  undefined
-                )}
-              </div>
-            </div>
+            <Avatar src={user.avatar} ref={ref} />
           </Tooltipify>
         </button>
       </div>
@@ -169,7 +156,7 @@ RoleBadgeUI.propTypes = {
     identity: PropTypes.oneOfType([PropTypes.object, PropTypes.number]),
     orcid: PropTypes.string,
     name: PropTypes.string,
-    avatar: PropTypes.object,
+    avatar: PropTypes.oneOfType([PropTypes.object, PropTypes.string]),
   }),
   children: PropTypes.any,
   className: PropTypes.string,

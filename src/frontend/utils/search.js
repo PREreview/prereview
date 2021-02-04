@@ -1,6 +1,42 @@
 import doiRegex from 'doi-regex';
 import identifiersArxiv from 'identifiers-arxiv';
 
+export const processParams = search => {
+  const unprocessed = new URLSearchParams(search);
+  const processed = new URLSearchParams();
+  let page = 1;
+  let limit = 10;
+  for (const [key, value] of unprocessed) {
+    if (key.toLowerCase() === 'search') {
+      processed.append('search', value);
+    } else if (key.toLowerCase() === 'page') {
+      page = value;
+    } else if (key.toLowerCase() === 'limit') {
+      limit = value;
+    } else if (key.toLowerCase() === 'sort') {
+      processed.append('sort', value);
+    } else if (key.toLowerCase() === 'desc') {
+      processed.append('desc', value === 'true');
+    }
+  }
+
+  processed.append('page', page);
+  processed.append('limit', limit);
+  processed.append('offset', limit * (page - 1));
+
+  return processed;
+};
+
+export const searchParamsToObject = params => {
+  const obj = {};
+  for (const [key, value] of params.entries()) {
+    if (key !== 'page') {
+      obj[key] = value;
+    }
+  }
+  return obj;
+};
+
 export function createPreprintQs(
   {
     // full text search

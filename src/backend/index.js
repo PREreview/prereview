@@ -40,6 +40,6 @@ ${bigName}
   })
   .catch(err => {
     setImmediate(() => {
-      console.error('Encountered error while running the app: ', err);
+      console.error(`Encountered error while running the app: ${err}`);
     });
   });
