@@ -15,7 +15,9 @@ import { useGetFullReviews } from '../hooks/api-hooks.tsx';
 // components
 import Button from './button';
 import HeaderBar from './header-bar';
+import Loading from './loading';
 import ModerationCard from './moderation-card';
+import NotFound from './not-found';
 
 // constants
 import { ORG } from '../constants';
@@ -50,20 +52,18 @@ export default function Moderate() {
 
   let results;
 
-  // const [isOpenedMap, setIsOpenedMap] = useState(
-  //   results.rows.reduce((map, row) => {
-  //     map[getId(row.doc)] = false;
-  //     return map;
-  //   }, {}),
-  // );
-  // useEffect(() => {
-  //   setIsOpenedMap(
-  //     results.rows.reduce((map, row) => {
-  //       map[getId(row.doc)] = false;
-  //       return map;
-  //     }, {}),
-  //   );
-  // }, [results]);
+  const [isOpenedMap, setIsOpenedMap] = useState(false);
+
+  useEffect(() => {
+    if (flaggedReviews) {
+      setIsOpenedMap(
+        flaggedReviews.reduce((map, row) => {
+          map[review.uuid] = false;
+          return map;
+        }, {}),
+      );
+    }
+  }, [flaggedReviews]);
 
   // useEffect(() => {
   //   window.scrollTo(0, 0);
@@ -101,108 +101,106 @@ export default function Moderate() {
     };
   }, [handleLocked]);
 
-  return (
-    <div className="moderate">
-      <Helmet>
-        <title>Moderate Reviews • {ORG}</title>
-      </Helmet>
-      <HeaderBar thisUser={user} closeGap />
+  if (loading) {
+    return <Loading />;
+  } else if (error) {
+    return <NotFound />;
+  } else {
+    return (
+      <div className="moderate">
+        <Helmet>
+          <title>Moderate Reviews • {ORG}</title>
+        </Helmet>
+        <HeaderBar thisUser={user} closeGap />
 
-      <section>
-        <header className="moderate__header">
-          <span>Moderate Content</span>
-          <span>
-            {flaggedReviews && flaggedReviews.length
-              ? flaggedReviews.length
-              : 'No'}{' '}
-            Reviews
-          </span>
-        </header>
+        <section>
+          <header className="moderate__header">
+            <span>Moderate Content</span>
+            <span>
+              {flaggedReviews && flaggedReviews.length
+                ? flaggedReviews.length
+                : 'No'}{' '}
+              Reviews
+            </span>
+          </header>
 
-        {results ? (
-          results.total_rows === 0 && !results.loading ? (
-            <div>No reported reviews.</div>
+          {flaggedReviews && flaggedReviews.length ? (
+            <ul className="moderate__card-list">
+              {flaggedReviews.map(review => (
+                <li key={review.uuid}>
+                  <ModerationCard
+                    reviewer={user}
+                    review={review}
+                    isOpened={isOpenedMap[review.uuid] || false}
+                    isLockedBy={lockersByReviewActionId[review.uuid]}
+                    onOpen={() => {
+                      socket.emit(
+                        'lock',
+                        {
+                          reviewActionId: review.uuid,
+                          roleId: user.uuid,
+                        },
+                        isLocked => {
+                          if (!isLocked) {
+                            setIsOpenedMap(
+                              flaggedReviews.reduce((map, row) => {
+                                map[row.review.uuid] =
+                                  row.review.uuid === review.uuid;
+                                return map;
+                              }, {}),
+                            );
+                          }
+                        },
+                      );
+                    }}
+                    onClose={() => {
+                      socket.emit('unlock', {
+                        reviewActionId: review.uuid,
+                        roleId: user.defaultRole,
+                      });
+
+                      setIsOpenedMap(
+                        results.rows.reduce((map, row) => {
+                          map[review.uuid] = false;
+                          return map;
+                        }, {}),
+                      );
+                    }}
+                    onSuccess={(
+                      moderationActionType,
+                      reviewActionId,
+                    ) => {
+                      if (
+                        moderationActionType ===
+                          'ModerateRapidPREreviewAction' ||
+                        moderationActionType ===
+                          'IgnoreReportRapidPREreviewAction'
+                      ) {
+                        socket.emit('unlock', {
+                          reviewActionId: review.uuid,
+                          roleId: user.defaultRole,
+                        });
+                        socket.emit('exclude', {
+                          reviewActionId: review.uuid,
+                          roleId: user.defaultRole,
+                        });
+
+                        setExcluded(
+                          new Set(
+                            Array.from(excluded).concat(reviewActionId),
+                          ),
+                        );
+                      }
+                    }}
+                  />
+                </li>
+              ))}
+            </ul>
           ) : (
-            <div>
-              <ul className="moderate__card-list">
-                {results
-                  ? results.rows
-                      .filter(row => !excluded.has(getId(row.doc)))
-                      .map(({ doc }) => (
-                        <li key={getId(doc)}>
-                          <ModerationCard
-                            user={user}
-                            reviewAction={doc}
-                            isOpened={isOpenedMap[getId(doc)] || false}
-                            isLockedBy={lockersByReviewActionId[getId(doc)]}
-                            onOpen={() => {
-                              socket.emit(
-                                'lock',
-                                {
-                                  reviewActionId: getId(doc),
-                                  roleId: user.defaultRole,
-                                },
-                                isLocked => {
-                                  if (!isLocked) {
-                                    setIsOpenedMap(
-                                      results.rows.reduce((map, row) => {
-                                        map[getId(row.doc)] =
-                                          getId(row.doc) === getId(doc);
-                                        return map;
-                                      }, {}),
-                                    );
-                                  }
-                                },
-                              );
-                            }}
-                            onClose={() => {
-                              socket.emit('unlock', {
-                                reviewActionId: getId(doc),
-                                roleId: user.defaultRole,
-                              });
-
-                              setIsOpenedMap(
-                                results.rows.reduce((map, row) => {
-                                  map[getId(row.doc)] = false;
-                                  return map;
-                                }, {}),
-                              );
-                            }}
-                            onSuccess={(
-                              moderationActionType,
-                              reviewActionId,
-                            ) => {
-                              if (
-                                moderationActionType ===
-                                  'ModerateRapidPREreviewAction' ||
-                                moderationActionType ===
-                                  'IgnoreReportRapidPREreviewAction'
-                              ) {
-                                socket.emit('unlock', {
-                                  reviewActionId: getId(doc),
-                                  roleId: user.defaultRole,
-                                });
-                                socket.emit('exclude', {
-                                  reviewActionId: getId(doc),
-                                  roleId: user.defaultRole,
-                                });
-
-                                setExcluded(
-                                  new Set(
-                                    Array.from(excluded).concat(reviewActionId),
-                                  ),
-                                );
-                              }
-                            }}
-                          />
-                        </li>
-                      ))
-                  : null}
-              </ul>
-            </div>
-          )
-        ) : null}
-      </section>
-    </div>
-  );
+            <div>No reported reviews.</div>
+          )}
+        </section>
+      </div>
+    );
+  }
 }
