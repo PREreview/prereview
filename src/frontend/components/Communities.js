@@ -126,7 +126,7 @@ const Communities = () => {
                   <div className="home__pagination">
                     <Pagination
                       count={Math.ceil(
-                        communities.data.length / params.get('limit'),
+                        communities.totalCount / params.get('limit'),
                       )}
                       page={parseInt('' + params.get('page'))}
                       onChange={(ev, page) => {

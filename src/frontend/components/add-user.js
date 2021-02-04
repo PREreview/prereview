@@ -44,14 +44,14 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const AddUsers = ({ community }) => {
+const AddUsers = ({ community, isModerator }) => {
   const classes = useStyles();
 
   const [users, setUsers] = useState(null);
 
   /* API calls */
   // fetch users from API
-  const { data: usersData, loading, error } = useGetUsers();
+  const { data: usersData, loading } = useGetUsers();
 
   // getModalStyle is not a pure function, we roll the style only on the first render
   const [open, setOpen] = useState(false);
@@ -79,7 +79,9 @@ const AddUsers = ({ community }) => {
       <div>
         <Button type="button" onClick={handleOpen}>
           <AddCircleOutlineIcon />
-          <span className={classes.buttonText}>Add new community members</span>
+          <span className={classes.buttonText}>
+            {isModerator ? `Add moderator` : `Add new community members`}
+          </span>
         </Button>
         <Modal
           open={open}
@@ -89,9 +91,10 @@ const AddUsers = ({ community }) => {
         >
           <div className={classes.paper}>
             <Search
-              community={community}
+              community={community.uuid}
               handleClose={handleClose}
-              users={users}
+              users={isModerator ? community.members : users}
+              isModerator={isModerator}
             />
           </div>
         </Modal>
@@ -101,7 +104,8 @@ const AddUsers = ({ community }) => {
 };
 
 AddUsers.propTypes = {
-  community: PropTypes.string,
+  community: PropTypes.object,
+  isModerator: PropTypes.bool,
 };
 
 export default AddUsers;

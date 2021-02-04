@@ -95,12 +95,17 @@ const CommunityPanel = () => {
     id: id,
   });
 
+  // remove user from being owner/moderator
+  const { mutate: deleteCommunityModerator } = useDeleteCommunityMember({
+    id: id,
+  }); // #FIXME fix route when moderator is added
+
   // delete member from community
   const { mutate: deleteCommunityMember } = useDeleteCommunityMember({
     id: id,
   });
 
-  // delete tagfrom community
+  // delete tag from community
   const { mutate: deleteCommunityTag } = useDeleteCommunityTag({
     id: id,
   });
@@ -153,6 +158,19 @@ const CommunityPanel = () => {
         console.error('error:', error);
         throw Error(error.statusText);
       });
+  };
+
+  // remove user from community moderator
+  const handleRemoveModerator = owner => {
+    if (
+      confirm(
+        `Are you sure you want to remove ${owner.name} as a moderator of this community?`,
+      )
+    ) {
+      deleteCommunityModerator({ uid: owner.uuid })
+        .then(() => alert(`User is no longer a moderator of this community.`))
+        .catch(err => alert(`An error occurred: ${err.message}`));
+    }
   };
 
   // delete user from community
@@ -278,9 +296,46 @@ const CommunityPanel = () => {
               </Box>
               <Box mb={4}>
                 <Typography variant="h4" component="h2" gutterBottom={true}>
+                  Moderators
+                </Typography>
+                <AddUser community={community} isModerator={true} />
+                {community.owners.map(owner => {
+                  return (
+                    <Box key={owner.uuid} mt={2}>
+                      <Grid container alignItems="center" spacing={2}>
+                        <Grid item>
+                          <Avatar
+                            alt={owner.name}
+                            src={owner.avatar}
+                            className={classes.avatar}
+                          />
+                        </Grid>
+                        <Grid item>
+                          <Typography
+                            variant="h6"
+                            component="h4"
+                            gutterBottom={true}
+                          >
+                            {owner.name}
+                          </Typography>
+                        </Grid>
+                        <Grid item>
+                          <IconButton
+                            onClick={() => handleRemoveModerator(owner)}
+                          >
+                            <ClearIcon />
+                          </IconButton>
+                        </Grid>
+                      </Grid>
+                    </Box>
+                  );
+                })}
+              </Box>
+              <Box mb={4}>
+                <Typography variant="h4" component="h2" gutterBottom={true}>
                   Users
                 </Typography>
-                <AddUser community={community.uuid} />
+                <AddUser community={community} />
                 {community.members.map(member => {
                   return (
                     <Box key={member.uuid} mt={2}>

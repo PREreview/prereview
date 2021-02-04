@@ -132,7 +132,6 @@ export default function controller(
                 { description: { $ilike: `%${ctx.query.search}%` } },
                 { members: { $ilike: `%${ctx.query.search}%` } },
                 { owners: { $ilike: `%${ctx.query.search}%` } },
-                // { moderators: { $ilike: `%${ctx.query.search}%` } }, // #FIXME uncomment when included in db fields
                 { events: { $ilike: `%${ctx.query.search}%` } },
                 { preprints: { $ilike: `%${ctx.query.search}%` } },
               ],
@@ -144,7 +143,6 @@ export default function controller(
                 { description: { $like: `%${ctx.query.search}%` } },
                 { members: { $like: `%${ctx.query.search}%` } },
                 { owners: { $like: `%${ctx.query.search}%` } },
-                // { moderators: { $like: `%${ctx.query.search}%` } }, // #FIXME uncomment when included in db fields
                 { events: { $like: `%${ctx.query.search}%` } },
                 { preprints: { $like: `%${ctx.query.search}%` } },
               ],
