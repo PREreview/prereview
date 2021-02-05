@@ -6,9 +6,6 @@ import { useLocation } from 'react-router-dom';
 // contexts
 import UserProvider from '../contexts/user-context';
 
-// hooks
-import { useHasAgreedCoC } from '../hooks/ui-hooks';
-
 // components
 import Button from './button';
 import Checkbox from './checkbox';
@@ -28,13 +25,11 @@ export default function Login() {
     window.scrollTo(0, 0);
   }, []);
 
-  const [hasAgreed, setHasAgreed] = useHasAgreedCoC();
-
   const location = useLocation();
 
   const [thisUser] = useContext(UserProvider.context);
   const [loginModalOpen, setLoginModalOpen] = useState(false)
-  const [joinModalOpen, setJoinModalOpen] = useState(false)
+  const [joinModalOpen, setJoinModalOpen] = useState(true)
 
   const handleJoinModalClose = () => {
     setLoginModalOpen(true)
@@ -51,51 +46,8 @@ export default function Login() {
         <title>{ORG} • Login</title>
       </Helmet>
       <HeaderBar thisUser={thisUser} />
-      <div className="login__content">
-        {/* <div className="login__logo-container">
-          <AnimatedLogo />
-        </div> */}
-
-        <h2 className="login__header">
-          To log in to <Org /> you will need an ORCID ID.
-        </h2>
-
-        <p className="login__text">
-          Click below to sign in with your ORCID account, or create one if you
-          don’t have one.
-        </p>
-
-        <div className="login__coc">
-          <span className="login__checkbox">
-            <Checkbox
-              checked={hasAgreed}
-              onChange={() => setHasAgreed(!hasAgreed)}
-              label={
-                <span>
-                  I have read and agree to the <Org />{' '}
-                  <XLink href="/code-of-conduct" to="/code-of-conduct">
-                    Code of Conduct
-                  </XLink>
-                  .
-                </span>
-              }
-            />
-          </span>
-        </div>
-
-        <Button
-          disabled={!hasAgreed}
-          element={hasAgreed ? 'a' : 'button'}
-          onClick={() => setJoinModalOpen(true)}
-          primary={true}
-          className="login__login-button"
-        >
-          Sign in with ORCID
-        </Button>
-
         { joinModalOpen ? <JoinModal open={joinModalOpen} handleClose={handleJoinModalClose}/> : null }
         { loginModalOpen ? <LoginModal open={loginModalOpen} handleClose={(handleLoginModalClose)} /> : null }
-      </div>
     </div>
   );
 }
