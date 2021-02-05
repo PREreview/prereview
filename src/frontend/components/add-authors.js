@@ -72,12 +72,7 @@ const AddAuthors = ({ isMentor, reviewId }) => {
             {isMentor ? 'Add mentor' : 'Add co-reviewer(s)'}
           </span>
         </Button>
-        <Modal
-          open={open}
-          onClose={handleClose}
-          aria-labelledby="simple-modal-title"
-          aria-describedby="simple-modal-description"
-        >
+        <Modal open={open} onClose={handleClose} aria-label="add authors modal">
           <div className={classes.paper}>
             <Search
               handleClose={handleClose}

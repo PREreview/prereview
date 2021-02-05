@@ -83,12 +83,7 @@ const AddUsers = ({ community, isModerator }) => {
             {isModerator ? `Add moderator` : `Add new community members`}
           </span>
         </Button>
-        <Modal
-          open={open}
-          onClose={handleClose}
-          aria-labelledby="simple-modal-title"
-          aria-describedby="simple-modal-description"
-        >
+        <Modal open={open} onClose={handleClose} aria-label="Add user modal">
           <div className={classes.paper}>
             <Search
               community={community.uuid}

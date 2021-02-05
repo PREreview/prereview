@@ -1,5 +1,5 @@
 // base imports
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import PropTypes from 'prop-types';
 
@@ -20,23 +20,33 @@ import Loading from './loading';
 import NotFound from './not-found';
 
 // Material UI components
+import { makeStyles, withStyles } from '@material-ui/core/styles';
+import Box from '@material-ui/core/Box';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import CardHeader from '@material-ui/core/CardHeader';
 import Grid from '@material-ui/core/Grid';
 import IconButton from '@material-ui/core/IconButton';
+import Link from '@material-ui/core/Link';
+import Modal from '@material-ui/core/Modal';
+import MuiButton from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
+
+// icons
 import Delete from '@material-ui/icons/Delete';
 import LockRounded from '@material-ui/icons/LockRounded';
-import { makeStyles } from '@material-ui/core/styles';
+import LockOpenIcon from '@material-ui/icons/LockOpen';
 
 // constants
 import { ORG } from '../constants';
 
+const Button = withStyles({
+  root: {
+    textTransform: 'none',
+  },
+})(MuiButton);
+
 const useStyles = makeStyles(theme => ({
-  card: {},
-  header: {},
-  content: {},
   avatar: {
     width: theme.spacing(10),
     height: theme.spacing(10),
@@ -44,11 +54,23 @@ const useStyles = makeStyles(theme => ({
     marginRight: 'auto',
     marginBottom: theme.spacing(2),
   },
+  modal: {
+    backgroundColor: theme.palette.background.paper,
+    border: '2px solid #000',
+    boxShadow: theme.shadows[5],
+    left: '50%',
+    minWidth: 300,
+    padding: theme.spacing(2, 4, 3),
+    position: 'absolute',
+    top: '50%',
+    transform: 'translate(-50%, -50%)',
+  },
 }));
 
 export default function Moderate() {
   const [user] = useContext(UserProvider.context);
 
+  // get reports from API
   const { data: reports, loading, error } = useGetReports({
     resolve: reports => reports.data,
   });
@@ -66,30 +88,33 @@ export default function Moderate() {
         <HeaderBar thisUser={user} closeGap />
 
         <section>
-          <header className="moderate__header">
-            <span>Moderate Content</span>
-            <span>
-              {reports && reports.length ? reports.length : 'No'} Reports
-            </span>
+          <header>
+            <Box borderBottom="1px solid #ccc" pb={4} mb={4}>
+              <Grid container justify="space-between" alignItems="center">
+                <Grid item>
+                  <Typography variant="h3" component="h1">
+                    Moderate Content
+                  </Typography>
+                </Grid>
+                <Grid item>
+                  <Typography variant="h5" component="h2">
+                    {reports && reports.length ? reports.length : 'No'} Reports
+                  </Typography>
+                </Grid>
+              </Grid>
+            </Box>
           </header>
 
           {reports && reports.length ? (
             <ul className="moderate__card-list">
               {reports.map(report => (
                 <li key={report.uuid}>
-                  <ModerateCard
-                    id={report.uuid}
-                    subject={report.subject}
-                    type={report.subjectType}
-                    reason={report.reason}
-                    onRemove={() => console.log('onRemove')}
-                    onLock={() => console.log('onLock')}
-                  />
+                  <ModerateCard report={report} />
                 </li>
               ))}
             </ul>
           ) : (
-            <div>No reported reviews.</div>
+            <div>No content on the site has been reported.</div>
           )}
         </section>
       </div>
@@ -97,29 +122,105 @@ export default function Moderate() {
   }
 }
 
-function ModerateCard({ id, subject, type, reason, onRemove, onLock }) {
+function ModerateCard({ report }) {
   const classes = useStyles();
+  const [isLocked, setIsLocked] = useState(false);
+
+  const { data: reportedContent, loading, error } = useGetReported({
+    id: report.subject,
+    resolve: report => report.data,
+  });
+
+  const { mutate: lock } = usePutReport({
+    id: report.uuid,
+    isLocked: isLocked,
+  });
+
+  const { mutate: remove } = useDeleteReport({
+    id: report.uuid,
+  });
+
+  useEffect(() => {
+    if (!loading && reportedContent) {
+      setIsLocked(reportedContent.isLocked);
+    }
+  }, [loading, reportedContent]);
+
+  // unlock or lock a review to signed in moderator
+  const onLock = () => {
+    if (isLocked) {
+      lock({ isLocked: false })
+        .then(() => setIsLocked(false))
+        .catch(err => alert(`Error locking report: ${err}`));
+    } else {
+      lock({ isLocked: true })
+        .then(() => setIsLocked(true))
+        .catch(err => alert(`Error locking report: ${err}`));
+    }
+  };
+
+  // delete a review
+  const onRemove = () => {
+    remove()
+      .then(() => {
+        alert('Successfully removed report.');
+        return;
+      })
+      .catch(err => {
+        alert(`Error removing report: ${err}`);
+      });
+  };
+
+  const [open, setOpen] = useState(false);
+
+  const handleOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  useEffect(() => {}, [isLocked]);
 
   return (
     <Card className={classes.card}>
-      <Grid container>
-        <CardHeader className={classes.header} title={`${type}/${subject}`} />
+      <Grid container justify="space-between">
+        <CardHeader
+          className={classes.header}
+          title={
+            report.title
+              ? report.title
+              : `${report.subjectType}/${report.subject}`
+          }
+        />
         <CardContent className={classes.content}>
-          <Grid container>
+          <Grid container alignItems="center" spacing={1}>
             <Grid item>
-              <dt>
-                <Typography>Reason</Typography>
-              </dt>
-              <dd>{reason}</dd>
+              <Button onClick={handleOpen} color="primary" variant="outlined">
+                Review
+              </Button>
+              <Modal open={open} onClose={handleClose}>
+                <ModerateModal
+                  report={report}
+                  reportedContent={reportedContent}
+                  onLock={onLock}
+                  onRemove={onRemove}
+                />
+              </Modal>
             </Grid>
             <Grid item>
               <IconButton arial-label="lock" onClick={onLock}>
-                <LockRounded />
+                {isLocked ? (
+                  <LockRounded color="primary" />
+                ) : (
+                  <LockOpenIcon color="primary" />
+                )}
               </IconButton>
             </Grid>
             <Grid item>
               <IconButton arial-label="remove" onClick={onRemove}>
-                <Delete />
+                <Delete color="primary" />
               </IconButton>
             </Grid>
           </Grid>
@@ -130,101 +231,71 @@ function ModerateCard({ id, subject, type, reason, onRemove, onLock }) {
 }
 
 ModerateCard.propTypes = {
-  id: PropTypes.string,
-  type: PropTypes.string,
-  reason: PropTypes.string,
-  onRemove: PropTypes.func,
-  onLock: PropTypes.func,
-  author: PropTypes.shape({
-    name: PropTypes.string,
-    uuid: PropTypes.string,
-  }),
+  report: PropTypes.object.isRequired,
 };
 
-function ModerateModal({ id, subject, type, reason, onRemove, onLock }) {
+function ModerateModal({ report, reportedContent, onRemove, onLock }) {
   const classes = useStyles();
 
-  const { data: report, loading, error } = useGetReported({
-    id: subject,
-    resolve: report => report.data,
-  });
+  return (
+    <Card className={classes.modal}>
+      <Grid container>
+        <CardHeader
+          className={classes.header}
+          title={
+            report.title
+              ? report.title
+              : `${report.subjectType}/${report.subject}`
+          }
+        />
+        <CardContent className={classes.content}>
+          <Box mb={4}>
+            <Typography variant="h6" component="h2">
+              Reason
+            </Typography>
+            <Typography variant="body1" component="div">
+              {report.reason ? report.reason : 'No reason reported.'}
+            </Typography>
+          </Box>
+          {/* FIXME include either a link to reported content or display it somehow */}
+          {/*<Box mb={4}>
+            <Link
+              href={`/${report.subjectType}/${report.subject}`}
+              color="primary"
+            >
+              <Typography variant="body1" component="span">
+                View Reported Content
+              </Typography>
+            </Link>
+            <Typography variant="body1" component="h3">
+              {reportedContent.title
+                ? reportedContent.title
+                : reportedContent.name}
+            </Typography>
+          </Box>*/}
 
-  const { mutate: lock } = usePutReport({
-    id: id,
-    isLocked: true,
-  });
-
-  const { mutate: remove } = useDeleteReport({
-    id: id,
-  });
-
-  const handleLock = () => {
-    lock()
-      .then(() => {
-        alert(`Successfully locked ${type}`);
-        onLock(id);
-        return;
-      })
-      .catch(() => {
-        alert(`Error locking ${type}`);
-      });
-  };
-
-  const handleRemove = () => {
-    remove()
-      .then(() => {
-        alert('Successfully removed report');
-        onLock(id);
-        return;
-      })
-      .catch(() => {
-        alert('Error removing report');
-      });
-  };
-
-  if (loading) {
-    return <Loading />;
-  } else if (error) {
-    return <NotFound />;
-  } else {
-    return (
-      <Card className={classes.card}>
-        <Grid container>
-          <CardHeader className={classes.header} title={`${type}/${subject}`} />
-          <CardContent className={classes.content}>
-            <Grid container>
-              <Grid item>
-                <dt>
-                  <Typography>Reason</Typography>
-                </dt>
-                <dd>{reason}</dd>
-              </Grid>
-              <Grid item>
-                <IconButton arial-label="lock" onClick={handleLock}>
-                  <LockRounded />
-                </IconButton>
-              </Grid>
-              <Grid item>
-                <IconButton arial-label="remove" onClick={handleRemove}>
-                  <Delete />
-                </IconButton>
-              </Grid>
+          {/* FIXME what controls should go here?*/}
+          {/*<Grid container spacing={1}>
+            <Grid item>
+              <IconButton arial-label="lock" onClick={onLock}>
+                <LockRounded />
+              </IconButton>
             </Grid>
-          </CardContent>
-        </Grid>
-      </Card>
-    );
-  }
+            <Grid item>
+              <IconButton arial-label="remove" onClick={onRemove}>
+                <Delete />
+              </IconButton>
+            </Grid>
+          </Grid>*/}
+        </CardContent>
+      </Grid>
+    </Card>
+  );
 }
 
 ModerateModal.propTypes = {
-  id: PropTypes.string,
-  type: PropTypes.string,
-  reason: PropTypes.string,
+  report: PropTypes.object.isRequired,
+  reportedContent: PropTypes.object.isRequired,
   onRemove: PropTypes.func,
   onLock: PropTypes.func,
-  author: PropTypes.shape({
-    name: PropTypes.string,
-    uuid: PropTypes.string,
-  }),
 };

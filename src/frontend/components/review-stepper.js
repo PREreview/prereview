@@ -604,8 +604,7 @@ export default function ReviewStepper({
                     <Modal
                       open={open}
                       onClose={handleClose}
-                      aria-labelledby="simple-modal-title"
-                      aria-describedby="simple-modal-description"
+                      aria-label="template picker modal"
                     >
                       <div className={classes.modal}>
                         <InputLabel id="templates-select-label">

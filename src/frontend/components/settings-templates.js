@@ -187,8 +187,7 @@ export default function SettingsTemplates() {
         <Modal
           open={openAdd}
           onClose={handleCloseAdd}
-          aria-labelledby="simple-modal-title"
-          aria-describedby="simple-modal-description"
+          aria-label="add template modal"
         >
           <div className={classes.paper}>
             <Typography variant="h5" component="h2" gutterBottom>
