@@ -89,7 +89,7 @@ export default function ExtensionFallback() {
       <div className="extension-fallback">
         <Helmet>
           <title>
-            {ORG} • {id}
+            {id} • {ORG}
           </title>
         </Helmet>
 

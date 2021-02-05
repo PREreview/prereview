@@ -7,6 +7,7 @@ import { makeStyles, withStyles } from '@material-ui/core/styles';
 import {
   MuiPickersUtilsProvider,
   KeyboardDatePicker,
+  KeyboardTimePicker,
 } from '@material-ui/pickers';
 import Checkbox from '@material-ui/core/Checkbox';
 import DateFnsUtils from '@date-io/date-fns';
@@ -189,6 +190,17 @@ const AddEvent = ({ community }) => {
                 onChange={handleDateChange}
                 KeyboardButtonProps={{
                   'aria-label': 'change date',
+                }}
+              />
+              <KeyboardTimePicker
+                required
+                margin="normal"
+                id="time-picker"
+                label="Time"
+                value={selectedDate}
+                onChange={handleDateChange}
+                KeyboardButtonProps={{
+                  'aria-label': 'change time',
                 }}
               />
             </MuiPickersUtilsProvider>

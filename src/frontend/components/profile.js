@@ -62,7 +62,7 @@ export default function Profile() {
 
         <Helmet>
           <title>
-            {ORG} • Profile {persona.name}
+            {persona.name} • {ORG}
           </title>
         </Helmet>
 

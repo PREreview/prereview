@@ -140,7 +140,14 @@ const Listbox = styled('ul')`
   }
 `;
 
-const Search = ({ handleClose, community, isMentor, reviewId, users, authors, mentors }) => {
+const Search = ({
+  handleClose,
+  community,
+  isMentor,
+  isModerator,
+  reviewId,
+  users,
+}) => {
   const {
     getRootProps,
     getInputLabelProps,
@@ -167,9 +174,33 @@ const Search = ({ handleClose, community, isMentor, reviewId, users, authors, me
   const [invitees, setInvitees] = useState(null);
 
   const { mutate: postInvite } = usePostFullReviewInvite({
-      id: reviewId,
-      role: isMentor ? 'mentors' : 'authors',
-    });
+    id: reviewId,
+    role: isMentor ? 'mentors' : 'authors',
+  });
+
+  // add users to a community if a community is present and isModerator is true
+  const handleAddModerators = () => {
+    console.log(community);
+    if (value.length) {
+      value.map(user => {
+        fetch(`/api/v2/communities/${community}/owners/${user.uuid}`, {
+          method: 'PUT',
+        })
+          .then(response => {
+            if (response.status === 201) {
+              return response.json();
+            }
+            throw new Error(response.message);
+          })
+          .then(() => {
+            handleClose();
+            alert('Moderator(s) successfully added to community.');
+            return;
+          })
+          .catch(err => alert(`An error occurred: ${err.message}`));
+      });
+    }
+  };
 
   // add users to a community if a community is present
   const handleAddUsers = () => {
@@ -265,9 +296,19 @@ const Search = ({ handleClose, community, isMentor, reviewId, users, authors, me
           variant="contained"
           color="primary"
           type="button"
-          onClick={community ? handleAddUsers : handleInvite}
+          onClick={
+            community
+              ? isModerator
+                ? handleAddModerators
+                : handleAddUsers
+              : handleInvite
+          }
         >
-          {community ? `Add users` : `Send invitations`}
+          {community
+            ? isModerator
+              ? `Add moderator(s)`
+              : `Add user(s)`
+            : `Send invitations`}
         </Button>
       </div>
     </NoSsr>
@@ -278,6 +319,7 @@ Search.propTypes = {
   handleClose: PropTypes.func.isRequired,
   community: PropTypes.string,
   isMentor: PropTypes.bool,
+  isModerator: PropTypes.bool,
   reviewId: PropTypes.string,
   users: PropTypes.array.isRequired,
 };

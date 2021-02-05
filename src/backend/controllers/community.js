@@ -1,4 +1,6 @@
 import router from 'koa-joi-router';
+import { QueryOrder } from '@mikro-orm/core';
+import { PostgreSqlConnection } from '@mikro-orm/postgresql';
 import { getLogger } from '../log.js';
 import { getErrorMessages } from '../utils/errors';
 
@@ -12,6 +14,12 @@ const communitySchema = Joi.object({
 });
 
 const querySchema = Joi.object({
+  limit: Joi.number()
+    .integer()
+    .greater(-1),
+  offset: Joi.number()
+    .integer()
+    .greater(-1),
   start: Joi.number()
     .integer()
     .greater(-1),
@@ -22,6 +30,8 @@ const querySchema = Joi.object({
   sort_by: Joi.string(),
   from: Joi.string(),
   to: Joi.string(),
+  tags: Joi.string().allow(''),
+  search: Joi.string().allow(''),
 });
 
 const handleInvalid = ctx => {
@@ -98,27 +108,102 @@ export default function controller(
       }
 
       log.debug(`Retrieving communities.`);
-      let allCommunities;
 
       try {
-        allCommunities = await communityModel.findAll([
+        const populate = [
           'members',
           'preprints',
           'owners.defaultPersona',
           'tags',
           'events',
-        ]);
+        ];
+        let foundCommunities, count;
+        const order = ctx.query.asc
+          ? QueryOrder.ASC_NULLS_LAST
+          : QueryOrder.DESC_NULLS_LAST;
+        const orderBy = { name: order };
+        const queries = [];
+        if (ctx.query.search && ctx.query.search !== '') {
+          const connection = communityModel.em.getConnection();
+          if (connection instanceof PostgreSqlConnection) {
+            queries.push({
+              $or: [
+                { name: { $ilike: `%${ctx.query.search}%` } },
+                { description: { $ilike: `%${ctx.query.search}%` } },
+                { members: { $ilike: `%${ctx.query.search}%` } },
+                { owners: { $ilike: `%${ctx.query.search}%` } },
+                { events: { $ilike: `%${ctx.query.search}%` } },
+                { preprints: { $ilike: `%${ctx.query.search}%` } },
+              ],
+            });
+          } else {
+            queries.push({
+              $or: [
+                { name: { $like: `%${ctx.query.search}%` } },
+                { description: { $like: `%${ctx.query.search}%` } },
+                { members: { $like: `%${ctx.query.search}%` } },
+                { owners: { $like: `%${ctx.query.search}%` } },
+                { events: { $like: `%${ctx.query.search}%` } },
+                { preprints: { $like: `%${ctx.query.search}%` } },
+              ],
+            });
+          }
+        }
+
+        if (ctx.query.tags) {
+          const tags = ctx.query.tags.split(',');
+          queries.push({
+            $or: [
+              { tags: { uuid: { $in: tags } } },
+              { tags: { name: { $in: tags } } },
+            ],
+          });
+        }
+
+        if (queries.length > 0) {
+          let query;
+          if (queries.length > 1) {
+            query = { $and: queries };
+          } else {
+            query = queries[0];
+          }
+          log.debug('Querying communities:', query);
+          [foundCommunities, count] = await communityModel.findAndCount(
+            query,
+            populate,
+            orderBy,
+            ctx.query.limit,
+            ctx.query.offset,
+          );
+        } else {
+          foundCommunities = await communityModel.findAll(
+            populate,
+            orderBy,
+            ctx.query.limit,
+            ctx.query.offset,
+          );
+          count = await communityModel.count();
+        }
+
+        foundCommunities.map(community => {
+          if (community.banner && Buffer.isBuffer(community.banner)) {
+            community.banner = community.banner.toString();
+          }
+        });
+
+        if (foundCommunities) {
+          ctx.body = {
+            statusCode: 200,
+            status: 'ok',
+            totalCount: count,
+            data: foundCommunities,
+          };
+          ctx.status = 200;
+        }
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse community schema: ${err}`);
       }
-
-      ctx.body = {
-        status: 200,
-        message: 'ok',
-        data: allCommunities,
-      };
-      ctx.status = 200;
     },
     meta: {
       swagger: {
