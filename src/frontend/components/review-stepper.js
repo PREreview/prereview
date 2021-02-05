@@ -556,8 +556,6 @@ export default function ReviewStepper({
                 disableUnderline
               />
               <Box mt={2} mb={2} className={classes.yellow}>
-                Thank you for your contribution!
-                <br />
                 Please review the{' '}
                 <Link href="#">PREreview Code of Conduct</Link> before
                 submitting your review.
