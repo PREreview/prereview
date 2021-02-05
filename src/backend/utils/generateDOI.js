@@ -2,21 +2,14 @@ import fetch from 'node-fetch';
 import { getLogger } from '../log.js';
 // eslint-disable-next-line node/no-extraneous-import
 import FormData from 'form-data';
+import config from '../config.ts'
 
 const log = getLogger('backend:utils:generateDOI');
-const ENV = process.env.NODE_ENV;
-const ACCESS_TOKEN = {
-  development: 'r3DMu7WwEf4O8BHpdz8IBEELHBJAngsYWZOsU830i4ingaQ79ZtPYAVV3ssN',
-  production: 'FIXME FIXME FIXME',
-}[ENV];
 
-const BASE_URL = {
-  development: 'https://sandbox.zenodo.org',
-  production: 'https://zenodo.org',
-}[ENV];
+const BASE_URL = config.zenodoSandbox ? 'https://sandbox.zenodo.org' :  'https://zenodo.org'
 
 const zenodoBaseUrl = (action = '') =>
-  `${BASE_URL}/api/deposit/depositions${action}?access_token=${ACCESS_TOKEN}`;
+  `${BASE_URL}/api/deposit/depositions${action}?access_token=${config.zenodoToken}`;
 
 const zenodoPayload = (body = {}, headers = {}) => ({
   method: 'POST',
@@ -41,8 +34,6 @@ export default async function generateDOI(prereviewData) {
       ],
     },
   };
-
-  log.debug(`data*************`, data);
 
   // Create a deposition
   const depositionUrl = zenodoBaseUrl();
