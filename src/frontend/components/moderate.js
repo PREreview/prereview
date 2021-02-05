@@ -58,7 +58,7 @@ export default function Moderate() {
     if (flaggedReviews) {
       setIsOpenedMap(
         flaggedReviews.reduce((map, row) => {
-          map[review.uuid] = false;
+          map[row.uuid] = false;
           return map;
         }, {}),
       );
@@ -131,7 +131,8 @@ export default function Moderate() {
                   <ModerationCard
                     reviewer={user}
                     review={review}
-                    isOpened={isOpenedMap[review.uuid] || false}
+                    isOpened={true} // FIXME
+                    // isOpened={isOpenedMap[review.uuid] || false}
                     isLockedBy={lockersByReviewActionId[review.uuid]}
                     onOpen={() => {
                       socket.emit(

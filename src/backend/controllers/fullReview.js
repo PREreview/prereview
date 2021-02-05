@@ -55,6 +55,7 @@ export default function controller(
           'authors',
           'comments',
           'drafts',
+          'preprint',
         ]);
       }
     } catch (err) {

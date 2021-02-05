@@ -1,23 +1,34 @@
+// base imports
 import React, { Fragment, useEffect, useState, useRef } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { MdExpandLess, MdExpandMore, MdLock } from 'react-icons/md';
 import { format } from 'date-fns';
+
+// utils
 import { getId, unprefix } from '../utils/jsonld';
-import Collapse from './collapse';
-import IconButton from './icon-button';
-import Value from './value';
-import Controls from './controls';
-import Button from './button';
-import PreprintPreview from './preprint-preview';
 import { getTextAnswers, getActiveReports } from '../utils/stats';
-import RoleBadge from './role-badge';
-import Modal from './modal';
+
+// hooks
 import {
   useDeleteRapidReview,
   useDeleteFullReview,
-  useGetUser,
 } from '../hooks/api-hooks.tsx';
+
+// components
+import Button from './button';
+import Collapse from './collapse';
+import Controls from './controls';
+import IconButton from './icon-button';
+import Modal from './modal';
+import PreprintPreview from './preprint-preview';
+import RoleBadge from './role-badge';
+import Value from './value';
+
+// materialUI components
+import CircularProgress from '@material-ui/core/CircularProgress';
+
+// icons
+import { MdExpandLess, MdExpandMore, MdLock } from 'react-icons/md';
 
 export default function ModerationCard({
   reviewer,
@@ -58,13 +69,13 @@ export default function ModerationCard({
         <div className="moderation-card__header__left">
           {review.authors.length ? (
             <>
-              {review.authors.map(author => (
+              {/*review.authors.map(author => (
                 <RoleBadge
                   key={author.uuid}
                   roleId={author}
                   className="moderation-card__header-badge"
                 />
-              ))}
+              ))*/}
             </>
           ) : null}
           <span className="moderation-card__header-name">
@@ -194,7 +205,7 @@ export default function ModerationCard({
             </span>
 
             <span className="moderation-card__lock-overlay__agent">
-              <RoleBadge roleId={locker} />
+              {/*<RoleBadge roleId={locker} />*/}
               <span className="moderation-card__lock-overlay__agent-name">
                 {locker ? locker.name || unprefix(getId(locker)) : null}
               </span>
