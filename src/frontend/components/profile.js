@@ -73,11 +73,12 @@ export default function Profile() {
                 <h2 className="profile__username">
                   {persona && persona.name ? persona.name : 'Name goes here'}
                 </h2>
+                { persona.identity.uuid === thisUser.uuid ? 
                 <XLink
                     to={`/settings`}
                     href={`/settings`}
                   >Edit user settings
-                </XLink>
+                </XLink> : null }
                 {persona ? (
                   <span className="profile__persona-status">
                     {persona && !persona.isAnonymous ? (
