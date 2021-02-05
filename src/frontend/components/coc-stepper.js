@@ -15,6 +15,7 @@ import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
+import ReactHtmlParser from 'react-html-parser';
 import Stepper from '@material-ui/core/Stepper';
 import Step from '@material-ui/core/Step';
 import StepLabel from '@material-ui/core/StepLabel';
@@ -107,11 +108,7 @@ export default function CoCStepper({ openNext }) {
                   primary={`In the interest of fostering an open and welcoming environment we, as PREreview's leaders, contributors, and maintainers, pledge to make participation in our project and our  community a harassment-free experience for everyone, regardless of background, family status, gender, gender identity or expression, marital status, sex, sexual orientation, native language, age, ability, race/ethnicity, caste, national origin, socioeconomic status, religion, geographic location, and any other dimension of diversity. `}
                 />
               </ListItem>
-              <ListItem>
-                <ListItemText
-                  primary={`You, as a member of our community, are expected to abide by PREreview Code of Conduct. In short, you are expected to: `}
-                />
-              </ListItem>
+                  You, as a member of our community, are expected to abide by <a href='https://content.prereview.org/coc'target="_blank" rel="noopener noreferrer">PREreview Code of Conduct</a>. In short, you are expected to:
               <ListItem>
                 <ListItemIcon>
                   <ArrowRightAltIcon />
@@ -153,31 +150,31 @@ export default function CoCStepper({ openNext }) {
         );
       case 2:
         return (
-          <List>
-            <ListItem>
-              <ListItemText primary="PREreview operates as a non-for-profit organization via the fiscal sponsorship of Code for Science and Society." />
-            </ListItem>
-            <ListItem>
-              <ListItemText primary="This platform is funded by public grants and private donations." />
-            </ListItem>
-            <ListItem>
-              <ListItemText primary="The code that runs this platform is open-source and can be found on our GitHub repository under the MIT licence." />
-            </ListItem>
-          </List>
+          <ul>
+            <li>
+              PREreview operates as a non-for-profit organization via the fiscal sponsorship of <a href='https://codeforscience.org/' target="_blank" rel="noopener noreferrer"> Code for Science and Society</a>.
+            </li>
+            <li>
+              This platform is funded by public grants and private donations.
+            </li>
+            <li>
+              The code that runs this platform is open source and can be found <a href='https://github.com/PREreview/prereview/' target="_blank" rel="noopener noreferrer">on our GitHub repository</a> under the MIT licence.
+            </li>
+          </ul>
         );
       case 3:
         return (
-          <List>
-            <ListItem>
-              <ListItemText primary="Our login is via the ORCID public API. If you do not already have an account with ORCID, to sign up on PREreview you will need to make one. Register here." />
-            </ListItem>
-            <ListItem>
-              <ListItemText primary="The reviews published on this platform will be licensed CC-BY 4.0 and be openly available to everyone. However, you will be able to set your account to anonymous or public." />
-            </ListItem>
-            <ListItem>
-              <ListItemText primary="We DO NOT share your data with advertisers, social media companies, or analytics partners. However, the reviews, comments, and endorsements via Plaudit.pub can be downloaded openly for meta-analysis purposes, stripped of any personal information. Learn more." />
-            </ListItem>
-          </List>
+            <ul>              
+              <li>
+                Our login is via <a href='https://info.orcid.org/documentation/features/public-api/' target="_blank" rel="noopener noreferrer">ORCID's public API</a>. If you do not already have an account with ORCID, to sign up on PREreview you will need to make one.  <a href='https://orcid.org/register' target="_blank" rel="noopener noreferrer">Register here</a>.
+              </li>
+            <li>
+              The reviews published on this platform will be licensed <a href='https://creativecommons.org/licenses/by/4.0/' target="_blank" rel="noopener noreferrer">CC-BY 4.0</a> and be openly available to everyone. However, you will be able to set your account to anonymous or public.
+            </li>
+            <li>
+              We DO NOT share your data with advertisers, social media companies, or analytics partners.
+            </li>
+          </ul>
         );
       default:
         return 'Unknown step';
