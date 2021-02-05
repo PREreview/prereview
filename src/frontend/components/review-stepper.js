@@ -262,7 +262,6 @@ export default function ReviewStepper({
   const [reviewId, setReviewId] = useState(review ? review.parent : null);
   const [skipped, setSkipped] = useState(new Set());
   const steps = getSteps();
-  console.log(review);
   // API queries
   const { data: templates } = useGetTemplates();
   const { mutate: postRapidReview } = usePostRapidReviews();
@@ -493,7 +492,6 @@ export default function ReviewStepper({
   }
 
   useEffect(() => {
-    console.log(hasRapidReviewed);
     if (hasRapidReviewed) {
       handleComplete();
     }
@@ -590,10 +588,7 @@ export default function ReviewStepper({
               >
                 <Grid item xs={12} sm={6}>
                   <AddAuthors reviewId={cid} />
-                  <AddAuthors
-                    isMentor={true}
-                    reviewId={cid}
-                  />
+                  <AddAuthors isMentor={true} reviewId={cid} />
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <Box textAlign="right" mr={2}>
@@ -693,6 +688,7 @@ export default function ReviewStepper({
                     onContentChange={onContentChange}
                     content={content}
                     template={template}
+                    reviewId={cid}
                   />
                 </Box>
                 <Box mt={2}>
