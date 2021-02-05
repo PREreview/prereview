@@ -600,10 +600,7 @@ export default function ReviewStepper({
               >
                 <Grid item xs={12} sm={6}>
                   <AddAuthors reviewId={cid} />
-                  <AddAuthors
-                    isMentor={true}
-                    reviewId={cid}
-                  />
+                  <AddAuthors isMentor={true} reviewId={cid} />
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <Box textAlign="right" mr={2}>
@@ -703,6 +700,7 @@ export default function ReviewStepper({
                     onContentChange={onContentChange}
                     content={content}
                     template={template}
+                    reviewId={cid}
                   />
                 </Box>
                 <Box mt={2}>
