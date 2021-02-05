@@ -68,9 +68,9 @@ export default function controller(
 
     try {
       // if a user already exists
-      user = await users.findOne({ orcid: params.orcid }, [
+      user = await users.findOneByUuidOrOrcid(params.orcid, [
         'personas',
-        'communities',
+        'owned', //communities
         'groups',
       ]);
       log.trace('verifyCallback() user:', user);
@@ -102,7 +102,7 @@ export default function controller(
       if (newUser) {
         log.debug('Authenticated & created user:', newUser);
         let anonPersona;
-        let defaultPersona;
+        let publicPersona;
 
         let anonName = anonymus
           .create()[0]
@@ -125,14 +125,14 @@ export default function controller(
             identity: newUser,
             isAnonymous: true,
           });
-          defaultPersona = personas.create({
+          publicPersona = personas.create({
             name: usersName,
             identity: newUser,
             isAnonymous: false,
           });
 
-          newUser.defaultPersona = defaultPersona;
-          personas.persist([anonPersona, defaultPersona]);
+          newUser.defaultPersona = anonPersona;
+          personas.persist([anonPersona, publicPersona]);
           users.persist(newUser);
         } catch (err) {
           log.debug('Error creating personas.', err);
