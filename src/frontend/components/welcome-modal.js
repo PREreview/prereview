@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Link } from 'react-router-dom';
 import Modal from './modal';
 import Button from './button';
-import Org from './org';
+import PreReviewLogo from './pre-review-logo';
+
 
 export default function WelcomeModal(props) {
   return (
@@ -15,28 +15,29 @@ export default function WelcomeModal(props) {
     >
       <div className="welcome-modal__content">
         <header className="welcome-modal__banner">
-          <div className="welcome-modal__banner__background" />
+          <PreReviewLogo />
         </header>
-        <div className="welcome-modal__body">
-          <h2 className="welcome-modal__title">
-            Welcome to <Org />
-          </h2>
-
-          <p>
-            This platform was designed to facilitate rapid and long-form, open
-            review of preprints.
-          </p>
+        <div className="welcome-modal__body" align='center'>
+            <div><b>Welcome to the new PREreview.org, a site for crowdsourcing preprint reviews.</b></div>
+            <br/>
           <div>
-            Here you can:
+            This is the marriage between two preprint review platforms: <em>PREreview.org</em> and <em>outbreaksci.prereview.org</em>. 
+            If you were a user of either of these platforms, your information has been migrated to this new site. 
+            If you are a new user, welcome to the family!
+          </div>
+          <br/>
+          <div>
+            On this platform, you can:
             <ol>
-              <li>Find rapid and long-form reviews of existing preprints.</li>
+              <li>Read rapid and long-form reviews of existing preprints.</li>
               <li>
-                Request reviews of preprints (your own, or preprints you are
-                interested in).
+                Request reviews of preprints (your own, or preprints in which you are interested in seeing community feedback).
               </li>
               <li>
-                Review preprints (as an individual, with a mentor, or in
-                collaboration with co-reviewers).
+                Review preprints (as an individual, with a mentor, or in collaboration with co-reviewers).
+              </li>
+              <li>
+                Find and join communities that are reviewing and discussing research relevant to you or start your own community.
               </li>
             </ol>
           </div>
@@ -45,13 +46,8 @@ export default function WelcomeModal(props) {
             <Button pill={true} primary={true} onClick={props.onClose}>
               Get Started
             </Button>
-            {/*<Link className="welcome-modal__get-app" to="/extension">
-              Get Extension
-            </Link>*/}
+
           </div>
-        </div>
-        <div className="welcome-modal__logo-row">
-          {/* <PrereviewLogo /> <OutbreakSciLogo /> */}
         </div>
       </div>
     </Modal>

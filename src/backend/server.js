@@ -67,6 +67,7 @@ import TagController from './controllers/tag.js';
 import TemplateController from './controllers/template.js';
 import DocsController from './controllers/docs.js';
 import SearchesController from './controllers/searches.js';
+import EventController from './controllers/event.js';
 
 const __dirname = path.resolve();
 const STATIC_DIR = path.resolve(__dirname, 'dist', 'frontend');
@@ -160,6 +161,7 @@ export default async function configServer(config) {
     tagModel,
     authz,
   );
+  const events = EventController(eventModel, authz);
 
   server.use(authz.middleware());
 
@@ -170,6 +172,7 @@ export default async function configServer(config) {
     badges.middleware(),
     comments.middleware(),
     communities.middleware(),
+    events.middleware(),
     fullReviews.middleware(),
     fullReviewDrafts.middleware(),
     groups.middleware(),

@@ -95,12 +95,12 @@ export default function Home() {
   if (loadingPreprints) {
     return <Loading />;
   } else if (error) {
-    return <div>An error occurred: {error}</div>;
+    return <div>An error occurred: {error.message}</div>;
   } else {
     return (
       <div className="home">
         <Helmet>
-          <title>{ORG} • Home</title>
+          <title>Home • {ORG}</title>
         </Helmet>
 
         {!!((isNewVisitor || params.get('welcome')) && isWelcomeModalOpen) && (
@@ -117,30 +117,32 @@ export default function Home() {
           }}
         />
 
-        <SearchBar
-          defaultValue={search}
-          isFetching={loadingPreprints}
-          onChange={value => {
-            params.delete('page');
-            setSearch(value);
-          }}
-          onCancelSearch={() => {
-            params.delete('search');
-            setSearch('');
-            history.push({
-              pathname: location.pathame,
-              search: params.toString(),
-            });
-          }}
-          onRequestSearch={() => {
-            params.set('search', search);
-            params.delete('page');
-            history.push({
-              pathname: location.pathame,
-              search: params.toString(),
-            });
-          }}
-        />
+        <div className="fixed__search-bar">
+          <SearchBar
+            defaultValue={search}
+            isFetching={loadingPreprints}
+            onChange={value => {
+              params.delete('page');
+              setSearch(value);
+            }}
+            onCancelSearch={() => {
+              params.delete('search');
+              setSearch('');
+              history.push({
+                pathname: location.pathame,
+                search: params.toString(),
+              });
+            }}
+            onRequestSearch={() => {
+              params.set('search', search);
+              params.delete('page');
+              history.push({
+                pathname: location.pathame,
+                search: params.toString(),
+              });
+            }}
+          />
+        </div>
 
         <div className="home__main">
           <div className="home__content">

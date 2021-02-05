@@ -7,7 +7,12 @@ import PropTypes from 'prop-types';
 import UserProvider from '../contexts/user-context';
 
 // hooks
-import { useGetReports, useGetReported, usePutReport, useDeleteReport } from '../hooks/api-hooks.tsx';
+import {
+  useGetReports,
+  useGetReported,
+  usePutReport,
+  useDeleteReport,
+} from '../hooks/api-hooks.tsx';
 
 // components
 import HeaderBar from './header-bar';
@@ -64,10 +69,7 @@ export default function Moderate() {
           <header className="moderate__header">
             <span>Moderate Content</span>
             <span>
-              {reports && reports.length
-                ? reports.length
-                : 'No'}{' '}
-              Reports
+              {reports && reports.length ? reports.length : 'No'} Reports
             </span>
           </header>
 
@@ -87,8 +89,8 @@ export default function Moderate() {
               ))}
             </ul>
           ) : (
-              <div>No reported reviews.</div>
-            )}
+            <div>No reported reviews.</div>
+          )}
         </section>
       </div>
     );
@@ -101,10 +103,7 @@ function ModerateCard({ id, subject, type, reason, onRemove, onLock }) {
   return (
     <Card className={classes.card}>
       <Grid container>
-        <CardHeader
-          className={classes.header}
-          title={`${type}/${subject}`}
-        />
+        <CardHeader className={classes.header} title={`${type}/${subject}`} />
         <CardContent className={classes.content}>
           <Grid container>
             <Grid item>
@@ -191,10 +190,7 @@ function ModerateModal({ id, subject, type, reason, onRemove, onLock }) {
     return (
       <Card className={classes.card}>
         <Grid container>
-          <CardHeader
-            className={classes.header}
-            title={`${type}/${subject}`}
-          />
+          <CardHeader className={classes.header} title={`${type}/${subject}`} />
           <CardContent className={classes.content}>
             <Grid container>
               <Grid item>

@@ -19,7 +19,7 @@ export default function Settings() {
   return (
     <div className="settings">
       <Helmet>
-        <title>{ORG} • Settings</title>
+        <title>Settings • {ORG}</title>
       </Helmet>
 
       <HeaderBar thisUser={user} closeGap />
