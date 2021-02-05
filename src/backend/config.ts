@@ -69,6 +69,7 @@ const defaults = {
   log_level: 'error',
   no_proxy: 'false',
   orcid_sandbox: String(defaultEnv !== 'production'),
+  zenodo_sandbox: String(defaultEnv !== 'production'),
   port: defaultPort,
 };
 
@@ -418,4 +419,16 @@ export default program
     'Use the OrcID sandbox environment',
     validateBool,
     getEnvOrDefault('orcid_sandbox').asBool(),
+  )
+  .option(
+    '--zenodo-token <url>',
+    'Zenodo API token',
+    validateToken,
+    getEnvOrDefault('zenodo_token').asString(),
+  )
+  .option(
+    '--zenodo-sandbox',
+    'Use the Zenodo sandbox environment',
+    validateBool,
+    getEnvOrDefault('zenodo_sandbox').asBool(),
   );
