@@ -15,6 +15,7 @@ import {
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
 import Check from '@material-ui/icons/Check';
+import CircularProgress from '@material-ui/core/CircularProgress';
 import Grid from '@material-ui/core/Grid';
 import Input from '@material-ui/core/Input';
 import InputLabel from '@material-ui/core/InputLabel';
@@ -100,6 +101,12 @@ const useStyles = makeStyles(theme => ({
   },
   label: {
     textAlign: 'center',
+  },
+  loading: {
+    left: '50%',
+    position: 'absolute',
+    top: '50%',
+    transform: 'translate(-50%, -50%)',
   },
   modal: {
     backgroundColor: theme.palette.background.paper,
@@ -262,11 +269,10 @@ export default function ReviewStepper({
   const [reviewId, setReviewId] = useState(review ? review.parent : null);
   const [skipped, setSkipped] = useState(new Set());
   const steps = getSteps();
-  console.log(review);
   // API queries
   const { data: templates } = useGetTemplates();
   const { mutate: postRapidReview } = usePostRapidReviews();
-  const { mutate: postLongReview } = usePostFullReviews();
+  const { mutate: postLongReview, loading } = usePostFullReviews();
   const { mutate: putLongReview } = usePutFullReview({ id: cid });
 
   // handle open/close templates
@@ -493,7 +499,6 @@ export default function ReviewStepper({
   }
 
   useEffect(() => {
-    console.log(hasRapidReviewed);
     if (hasRapidReviewed) {
       handleComplete();
     }
@@ -502,7 +507,14 @@ export default function ReviewStepper({
       setActiveStep(2);
       handleComplete(4);
     }
-  }, [hasRapidReviewed, hasLongReviewed, reviewId, templates, template]);
+  }, [
+    hasRapidReviewed,
+    hasLongReviewed,
+    loading,
+    reviewId,
+    templates,
+    template,
+  ]);
 
   function getStepContent(step) {
     switch (step) {
@@ -556,8 +568,6 @@ export default function ReviewStepper({
                 disableUnderline
               />
               <Box mt={2} mb={2} className={classes.yellow}>
-                Thank you for your contribution!
-                <br />
                 Please review the{' '}
                 <Link href="#">PREreview Code of Conduct</Link> before
                 submitting your review.
@@ -590,10 +600,7 @@ export default function ReviewStepper({
               >
                 <Grid item xs={12} sm={6}>
                   <AddAuthors reviewId={cid} />
-                  <AddAuthors
-                    isMentor={true}
-                    reviewId={cid}
-                  />
+                  <AddAuthors isMentor={true} reviewId={cid} />
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <Box textAlign="right" mr={2}>
@@ -693,6 +700,7 @@ export default function ReviewStepper({
                     onContentChange={onContentChange}
                     content={content}
                     template={template}
+                    reviewId={cid}
                   />
                 </Box>
                 <Box mt={2}>
@@ -732,6 +740,11 @@ export default function ReviewStepper({
               >
                 Submit
               </Button>
+              <Modal open={loading}>
+                <div className={classes.loading}>
+                  <CircularProgress />
+                </div>
+              </Modal>
             </Box>
           </Box>
         );

@@ -1,6 +1,7 @@
 import router from 'koa-joi-router';
 import { getLogger } from '../log.js';
 import getActivePersona from '../utils/persona.js';
+import generateDOI from '../utils/generateDOI.js';
 
 const log = getLogger('backend:controllers:fullReviews');
 const Joi = router.Joi;
@@ -91,14 +92,9 @@ export default function controller(
 
   const postHandler = async ctx => {
     log.debug('Adding full review.');
-    let review, draft, authorPersona, preprint;
+    let review, draft, personaId, authorPersona, preprint;
 
-    try {
-      authorPersona = getActivePersona(ctx.state.user);
-    } catch (err) {
-      log.error('Failed to load user personas.');
-      ctx.throw(400, err);
-    }
+    personaId = getActivePersona(ctx.state.user); // FIXME: when there's multiple authors
 
     try {
       preprint = await preprintModel.findOneByUuidOrHandle(
@@ -108,6 +104,8 @@ export default function controller(
         ...ctx.request.body,
         preprint: preprint,
       });
+
+      authorPersona = await personaModel.findOne(personaId);
 
       review.authors.add(authorPersona);
 
@@ -120,11 +118,40 @@ export default function controller(
         });
         review.drafts.add(draft);
       }
-      await reviewModel.persistAndFlush(review);
     } catch (err) {
       log.error('HTTP 400 Error: ', err);
       ctx.throw(400, `Failed to parse full review schema: ${err}`);
     }
+
+    let reviewData;
+
+    if (review.isPublished) {
+      reviewData = {
+        title: review.title || `Review of ${preprint.title}`,
+        content: draft.contents,
+        // ensuring anonymous reviewers stay anonymous
+        authorName: authorPersona.isAnonymous
+          ? `PREreview community member`
+          : authorPersona.name,
+        orcid: authorPersona.isAnonymous ? '' : authorPersona.identity.orcid,
+      };
+      try {
+        // yay, the review gets a DOI!
+        review.doi = await generateDOI(reviewData);
+      } catch (err) {
+        log.error(`Error generating DOI from Zenodo. ${err}`);
+        ctx.throw(400, `Failed to generate DOI.`);
+      }
+    }
+
+    try {
+      await reviewModel.persistAndFlush(review);
+    } catch (err) {
+      log.error(`HTTP 400 error: ${err}`);
+      ctx.throw(400, `Failed to persist review.`);
+    }
+
+    log.debug('REVIEW**********', review);
 
     ctx.body = {
       status: 201,

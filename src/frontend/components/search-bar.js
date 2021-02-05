@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import MuiSearchBar from 'material-ui-search-bar';
-import { useIsMobile } from '../hooks/ui-hooks';
 
 export default function SearchBar({
   isFetching,
@@ -10,11 +9,8 @@ export default function SearchBar({
   onCancelSearch,
   onRequestSearch,
 }) {
-  const isMobile = useIsMobile();
-
   return (
     <div className="search-bar">
-      <div className="search-bar__left-spacer" />
       <div className="search-bar__search-box">
         <MuiSearchBar
           value={defaultValue}
@@ -22,15 +18,10 @@ export default function SearchBar({
           onCancelSearch={onCancelSearch}
           onRequestSearch={onRequestSearch}
           className="search-bar__search-box__input"
-          placeholder={
-            isMobile
-              ? 'Search by DOI, arXiv ID, title, author, or abstract'
-              : 'Search preprints with reviews or requests for reviews by DOI, arXiv ID, title, author, or abstract'
-          }
+          placeholder="Enter search terms here"
           disabled={isFetching}
         />
       </div>
-      <div className="search-bar__right-spacer" />
     </div>
   );
 }

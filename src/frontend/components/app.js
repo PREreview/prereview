@@ -21,7 +21,9 @@ import AdminPanel from './admin-panel';
 import BlockPanel from './block-panel';
 import CodeOfConduct from './code-of-conduct';
 import Community from './Community';
+import Communities from './Communities';
 import CommunityPanel from './community-panel';
+import Event from './Event';
 import ExtensionFallback from './extension-fallback';
 import ExtensionSplash from './extension-splash';
 import Home from './home';
@@ -89,7 +91,7 @@ export default function App({ user }) {
 
                <Route exact={true} path="/personas">
                 <PersonaSearch />
-              </Route> 
+              </Route>
               <Route exact={true} path="/about/:id">
                 <Profile />
               </Route>
@@ -121,10 +123,24 @@ export default function App({ user }) {
               </Route>
               <Route
                 exact={true}
+                path="/communities/"
+                >
+                <Communities />
+              </Route>
+              <Route
+                exact={true}
                 path="/communities/:id"
                 >
-                  <Community />
-                </Route>
+                <Community />
+              </Route>
+
+              <Route
+                exact={true}
+                path="/events/:id"
+                >
+                <Event />
+              </Route>
+
               <Route
                 exact={true}
                 path="/preprints/:id/reviews/:cid?"
