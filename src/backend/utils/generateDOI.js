@@ -2,14 +2,18 @@ import fetch from 'node-fetch';
 import { getLogger } from '../log.js';
 // eslint-disable-next-line node/no-extraneous-import
 import FormData from 'form-data';
-import config from '../config.ts'
+import config from '../config.ts';
 
 const log = getLogger('backend:utils:generateDOI');
 
-const BASE_URL = config.zenodoSandbox ? 'https://sandbox.zenodo.org' :  'https://zenodo.org'
+const BASE_URL = config.zenodoSandbox
+  ? 'https://sandbox.zenodo.org'
+  : 'https://zenodo.org';
 
 const zenodoBaseUrl = (action = '') =>
-  `${BASE_URL}/api/deposit/depositions${action}?access_token=${config.zenodoToken}`;
+  `${BASE_URL}/api/deposit/depositions${action}?access_token=${
+    config.zenodoToken
+  }`;
 
 const zenodoPayload = (body = {}, headers = {}) => ({
   method: 'POST',
