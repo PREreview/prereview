@@ -107,12 +107,111 @@ function LoginModal({ open, handleClose }) {
     setModalContent('continue');
   };
 
-  const handleBack = () => {
-    console.log('this is what happens when you cancel');
+  const handleCancel = () => {
+    setModalContent('cancel')
   };
 
   const classes = useStyles();
   const next = new URLSearchParams(location.search).get('next');
+
+  const getModalContent = content => {
+    switch (content) {
+      case 'coc':
+        return <CoCStepper openNext={openNext} />;
+      case 'continue':
+        return <Fragment>
+                <DialogContent>
+                  <Typography variant="h6" gutterBottom>
+                    Continue if:
+                  </Typography>
+                  <List>
+                    <ListItem>
+                      <ListItemIcon>
+                        <CheckIcon />
+                      </ListItemIcon>
+                      <ListItemText
+                        primary={`You are okay with us connecting your ORCID public information to your PREreview account and storing it in our database`}
+                      />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemIcon>
+                        <CheckIcon />
+                      </ListItemIcon>
+                      <ListItemText
+                        primary={`You are willing to share an email address with our team for the purposes of accessing notifications options and receiving occasional emails on platform updates.`}
+                      />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemIcon>
+                        <CheckIcon />
+                      </ListItemIcon>
+                      <ListItemText
+                        primary={`You commit to abiding by our Code of Conduct. `}
+                      />
+                    </ListItem>
+                  </List>
+                </DialogContent>
+                <DialogContent>
+                  <Typography variant="h6" gutterBottom>
+                    Do not continue if:
+                  </Typography>
+                  <List>
+                    <ListItem>
+                      <ListItemIcon>
+                        <ClearIcon />
+                      </ListItemIcon>
+                      <ListItemText
+                        primary={`You DO NOT want to have your ORCID proflie’s public information imported to PREreview.`}
+                      />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemIcon>
+                        <ClearIcon />
+                      </ListItemIcon>
+                      <ListItemText
+                        primary={`You are NOT willing to abide by our Code of Conduct.`}
+                      />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemIcon>
+                        <ClearIcon />
+                      </ListItemIcon>
+                      <ListItemText
+                        primary={`You DO NOT wish  your reviews and comments to be shared under a CC-BY 4.0 license.`}
+                      />
+                    </ListItem>
+                  </List>
+                </DialogContent>
+                <DialogContent className={classes.root}>
+                  <Button onClick={handleCancel} className={classes.button}>
+                    Cancel
+                  </Button>
+                  <Button
+                    href={`/api/v2/orcid/login${
+                      next ? `?next=${encodeURIComponent(next)}` : ''
+                    }`}
+                    className={classes.button}
+                  >
+                    Continue to ORCID sign-in
+                  </Button>
+                </DialogContent>
+              </Fragment>;
+       case 'cancel':
+         return   <Fragment>
+                    <DialogContent>
+                      <List>
+                        <ListItemText>We are sorry you can't join our community at this moment. We hope you come back soon!</ListItemText>
+
+                        <ListItemText>If you have any questions or concerns, 
+                      please don't hesitate to contact us at <a href='mailto:contact:prereview.org'>contact@prereview.org</a>. 
+                      You can also give us anonymous feedback via <a href='https://docs.google.com/forms/d/e/1FAIpQLSdjlXuPgmA0p3xcQ316_qJAXvisEN_jywzAJ5jQREmj1c-uCA/viewform' target="_blank" rel="noopener noreferrer">his feedback form</a>.</ListItemText>
+
+                      <ListItemText>Thank you!</ListItemText>
+                      </List>
+                    </DialogContent>
+                  </Fragment>     
+    }
+  }
 
   return (
     <ThemeProvider theme={prereviewTheme}>
@@ -125,87 +224,7 @@ function LoginModal({ open, handleClose }) {
           <DialogTitle id="login-modal-title" onClose={handleClose}>
             <PreReviewLogo />
           </DialogTitle>
-          {modalContent === 'coc' ? (
-            <CoCStepper openNext={openNext} />
-          ) : (
-            <Fragment>
-              <DialogContent>
-                <Typography variant="h6" gutterBottom>
-                  Continue if:
-                </Typography>
-                <List>
-                  <ListItem>
-                    <ListItemIcon>
-                      <CheckIcon />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={`You are okay with us connecting your ORCID public information to your PREreview account and storing it in our database`}
-                    />
-                  </ListItem>
-                  <ListItem>
-                    <ListItemIcon>
-                      <CheckIcon />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={`You are willing to share an email address with our team for the purposes of accessing notifications options and receiving occasional emails on platform updates.`}
-                    />
-                  </ListItem>
-                  <ListItem>
-                    <ListItemIcon>
-                      <CheckIcon />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={`You commit to abiding by our Code of Conduct. `}
-                    />
-                  </ListItem>
-                </List>
-              </DialogContent>
-              <DialogContent>
-                <Typography variant="h6" gutterBottom>
-                  Do not continue if:
-                </Typography>
-                <List>
-                  <ListItem>
-                    <ListItemIcon>
-                      <ClearIcon />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={`You DO NOT want to have your ORCID proflie’s public information imported to PREreview.`}
-                    />
-                  </ListItem>
-                  <ListItem>
-                    <ListItemIcon>
-                      <ClearIcon />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={`You are NOT willing to abide by our Code of Conduct.`}
-                    />
-                  </ListItem>
-                  <ListItem>
-                    <ListItemIcon>
-                      <ClearIcon />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={`You DO NOT wish  your reviews and comments to be shared under a CC-BY 4.0 licence.`}
-                    />
-                  </ListItem>
-                </List>
-              </DialogContent>
-              <DialogContent className={classes.root}>
-                <Button onClick={handleBack} className={classes.button}>
-                  Cancel
-                </Button>
-                <Button
-                  href={`/api/v2/orcid/login${
-                    next ? `?next=${encodeURIComponent(next)}` : ''
-                  }`}
-                  className={classes.button}
-                >
-                  Continue to ORCID sign-in
-                </Button>
-              </DialogContent>
-            </Fragment>
-          )}
+          { getModalContent(modalContent) }
         </Box>
       </Dialog>
     </ThemeProvider>
