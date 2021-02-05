@@ -136,7 +136,14 @@ export default async function configServer(config) {
   const rapidReviewModel = rapidReviewModelWrapper(db);
   const rapidReviews = RapidController(rapidReviewModel, preprintModel, authz);
   const reportModel = reportModelWrapper(db);
-  const reports = ReportController(reportModel, commentModel, fullReviewModel, personaModel, rapidReviewModel, authz);
+  const reports = ReportController(
+    reportModel,
+    commentModel,
+    fullReviewModel,
+    personaModel,
+    rapidReviewModel,
+    authz,
+  );
   const requestModel = requestModelWrapper(db);
   const requests = RequestController(requestModel, authz);
   const statementModel = statementModelWrapper(db);

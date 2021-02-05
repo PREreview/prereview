@@ -108,7 +108,11 @@ export default function controller(
 
       if (ctx.request.body.coi) {
         log.debug('Adding conflict of interest statement.');
-        coi = statementModel.create({ parent: fullReview, author: ctx.state.user, contents: ctx.request.body.coi });
+        coi = statementModel.create({
+          parent: review,
+          author: ctx.state.user,
+          contents: ctx.request.body.coi,
+        });
         review.statements.add(coi);
       }
       await reviewModel.persistAndFlush(review);
@@ -198,11 +202,18 @@ export default function controller(
 
         if (ctx.request.body.coi) {
           log.debug(`Looking up conflict of interest statement.`);
-          coi = statementModel.findOne({ parent: fullReview, author: ctx.state.user });
+          coi = statementModel.findOne({
+            parent: fullReview,
+            author: ctx.state.user,
+          });
           if (coi) {
             coi.contents = coi;
           } else {
-            coi = statementModel.create({ parent: fullReview, author: ctx.state.user, contents: ctx.request.body.coi });
+            coi = statementModel.create({
+              parent: fullReview,
+              author: ctx.state.user,
+              contents: ctx.request.body.coi,
+            });
             fullReview.statements.add(coi);
           }
           await statementModel.persistAndFlush(coi);

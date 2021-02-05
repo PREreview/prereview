@@ -17,6 +17,7 @@ const querySchema = Joi.object({
   types: Joi.string().allow(''),
 });
 
+// eslint-disable-next-line no-unused-vars
 const reportSchema = Joi.object({
   reason: Joi.string(),
   isLocked: Joi.boolean(),
@@ -35,7 +36,14 @@ const handleInvalid = ctx => {
 };
 
 // eslint-disable-next-line no-unused-vars
-export default function controller(reportModel, commentModel, fullReviewModel, personaModel, rapidReviewModel, thisUser) {
+export default function controller(
+  reportModel,
+  commentModel,
+  fullReviewModel,
+  personaModel,
+  rapidReviewModel,
+  thisUser,
+) {
   const reportsRouter = router();
 
   const findReport = async (uuid, type) => {
@@ -174,7 +182,7 @@ export default function controller(reportModel, commentModel, fullReviewModel, p
             ctx.throw(404, `A report with ID ${ctx.params.id} doesn't exist`);
           }
 
-          found = await findReport(report.subject, report.subjecType);
+          found = await findReport(report.subject, report.subjectType);
 
           if (!found) {
             ctx.throw(404, `Subject of report ${ctx.params.id} doesn't exist`);
@@ -314,7 +322,12 @@ export default function controller(reportModel, commentModel, fullReviewModel, p
       }
 
       console.log('***found.type***:', found.type);
-      const report = reportModel.create({ author: ctx.state.user, subject: ctx.params.id, reason: ctx.request.body.reason, subjectType: found.type });
+      const report = reportModel.create({
+        author: ctx.state.user,
+        subject: ctx.params.id,
+        reason: ctx.request.body.reason,
+        subjectType: found.type,
+      });
       console.log('***report***:', report);
       await reportModel.persistAndFlush(report);
 
