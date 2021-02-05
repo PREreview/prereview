@@ -38,6 +38,13 @@ const authWrapper = groups => {
     return ctx.isAuthenticated();
   });
 
+  roles.use('access moderator pages', async ctx => {
+    log.debug('Checking if user can access moderator pages.');
+    if (!ctx.isAuthenticated()) return false;
+
+    return (await roles.isMemberOf('moderators', ctx.state.user.orcid) || await roles.isMemberOf('admins', ctx.state.user.orcid));
+  });
+
   roles.use('access admin pages', async ctx => {
     log.debug('Checking if user can access admin pages.');
     if (!ctx.isAuthenticated()) return false;

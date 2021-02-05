@@ -1,105 +1,52 @@
 // base imports
-import React, { useState, useEffect, useCallback, useContext } from 'react';
+import React, { useContext } from 'react';
 import { Helmet } from 'react-helmet-async';
-import socketIoClient from 'socket.io-client';
+import PropTypes from 'prop-types';
 
 // contexts
 import UserProvider from '../contexts/user-context';
 
-// utils
-import { getId } from '../utils/jsonld';
-
 // hooks
-import { useGetFullReviews } from '../hooks/api-hooks.tsx';
+import { useGetReports, useGetReported, usePutReport, useDeleteReport } from '../hooks/api-hooks.tsx';
 
 // components
-import Button from './button';
 import HeaderBar from './header-bar';
 import Loading from './loading';
-import ModerationCard from './moderation-card';
 import NotFound from './not-found';
+
+// Material UI components
+import Card from '@material-ui/core/Card';
+import CardContent from '@material-ui/core/CardContent';
+import CardHeader from '@material-ui/core/CardHeader';
+import Grid from '@material-ui/core/Grid';
+import IconButton from '@material-ui/core/IconButton';
+import Typography from '@material-ui/core/Typography';
+import Delete from '@material-ui/icons/Delete';
+import LockRounded from '@material-ui/icons/LockRounded';
+import { makeStyles } from '@material-ui/core/styles';
 
 // constants
 import { ORG } from '../constants';
 
-const socket = socketIoClient(window.location.origin, {
-  autoConnect: false,
-});
+const useStyles = makeStyles(theme => ({
+  card: {},
+  header: {},
+  content: {},
+  avatar: {
+    width: theme.spacing(10),
+    height: theme.spacing(10),
+    marginLeft: 'auto',
+    marginRight: 'auto',
+    marginBottom: theme.spacing(2),
+  },
+}));
 
 export default function Moderate() {
   const [user] = useContext(UserProvider.context);
-  const [excluded, setExcluded] = useState(new Set());
-  const [lockersByReviewActionId, setLockersByReviewActionId] = useState({});
 
-  const { data: reviews, loading, error } = useGetFullReviews();
-
-  const [flaggedReviews, setFlaggedReviews] = useState(null);
-
-  // #FIXME refactor to remove callback
-  const handleLocked = useCallback(
-    data => {
-      const nextLockersByReviewActionId = data.reduce((map, item) => {
-        if (!user.hasRole.some(roleId => roleId === item.roleId)) {
-          map[item.reviewActionId] = item.roleId;
-        }
-        return map;
-      }, {});
-
-      setLockersByReviewActionId(nextLockersByReviewActionId);
-    },
-    [user],
-  );
-
-  let results;
-
-  const [isOpenedMap, setIsOpenedMap] = useState(false);
-
-  useEffect(() => {
-    if (flaggedReviews) {
-      setIsOpenedMap(
-        flaggedReviews.reduce((map, row) => {
-          map[row.uuid] = false;
-          return map;
-        }, {}),
-      );
-    }
-  }, [flaggedReviews]);
-
-  // useEffect(() => {
-  //   window.scrollTo(0, 0);
-  // }, []);
-
-  useEffect(() => {
-    if (!loading) {
-      if (reviews && reviews.data.length) {
-        const allFlagged = reviews.data.filter(review => review.isFlagged);
-        setFlaggedReviews(allFlagged);
-      }
-    }
-  }, [loading, reviews]);
-
-  useEffect(() => {
-    socket.connect();
-    return () => {
-      socket.disconnect();
-    };
-  }, []);
-
-  useEffect(() => {
-    const handleExcluded = reviewActionId => {
-      setExcluded(prevSet => {
-        return new Set(Array.from(prevSet).concat(reviewActionId));
-      });
-    };
-
-    socket.on('locked', handleLocked);
-    socket.on('excluded', handleExcluded);
-
-    return () => {
-      socket.off('locked', handleLocked);
-      socket.off('excluded', handleExcluded);
-    };
-  }, [handleLocked]);
+  const { data: reports, loading, error } = useGetReports({
+    resolve: reports => reports.data,
+  });
 
   if (loading) {
     return <Loading />;
@@ -117,91 +64,171 @@ export default function Moderate() {
           <header className="moderate__header">
             <span>Moderate Content</span>
             <span>
-              {flaggedReviews && flaggedReviews.length
-                ? flaggedReviews.length
+              {reports && reports.length
+                ? reports.length
                 : 'No'}{' '}
-              Reviews
+              Reports
             </span>
           </header>
 
-          {flaggedReviews && flaggedReviews.length ? (
+          {reports && reports.length ? (
             <ul className="moderate__card-list">
-              {flaggedReviews.map(review => (
-                <li key={review.uuid}>
-                  <ModerationCard
-                    reviewer={user}
-                    review={review}
-                    isOpened={true} // FIXME
-                    // isOpened={isOpenedMap[review.uuid] || false}
-                    isLockedBy={lockersByReviewActionId[review.uuid]}
-                    onOpen={() => {
-                      socket.emit(
-                        'lock',
-                        {
-                          reviewActionId: review.uuid,
-                          roleId: user.uuid,
-                        },
-                        isLocked => {
-                          if (!isLocked) {
-                            setIsOpenedMap(
-                              flaggedReviews.reduce((map, row) => {
-                                map[row.review.uuid] =
-                                  row.review.uuid === review.uuid;
-                                return map;
-                              }, {}),
-                            );
-                          }
-                        },
-                      );
-                    }}
-                    onClose={() => {
-                      socket.emit('unlock', {
-                        reviewActionId: review.uuid,
-                        roleId: user.defaultRole,
-                      });
-
-                      setIsOpenedMap(
-                        results.rows.reduce((map, row) => {
-                          map[review.uuid] = false;
-                          return map;
-                        }, {}),
-                      );
-                    }}
-                    onSuccess={(
-                      moderationActionType,
-                      reviewActionId,
-                    ) => {
-                      if (
-                        moderationActionType ===
-                          'ModerateRapidPREreviewAction' ||
-                        moderationActionType ===
-                          'IgnoreReportRapidPREreviewAction'
-                      ) {
-                        socket.emit('unlock', {
-                          reviewActionId: review.uuid,
-                          roleId: user.defaultRole,
-                        });
-                        socket.emit('exclude', {
-                          reviewActionId: review.uuid,
-                          roleId: user.defaultRole,
-                        });
-
-                        setExcluded(
-                          new Set(
-                            Array.from(excluded).concat(reviewActionId),
-                          ),
-                        );
-                      }
-                    }}
+              {reports.map(report => (
+                <li key={report.uuid}>
+                  <ModerateCard
+                    id={report.uuid}
+                    subject={report.subject}
+                    type={report.subjectType}
+                    reason={report.reason}
+                    onRemove={() => console.log('onRemove')}
+                    onLock={() => console.log('onLock')}
                   />
                 </li>
               ))}
             </ul>
           ) : (
-            <div>No reported reviews.</div>
-          )}
+              <div>No reported reviews.</div>
+            )}
         </section>
       </div>
     );
   }
 }
+
+function ModerateCard({ id, subject, type, reason, onRemove, onLock }) {
+  const classes = useStyles();
+
+  return (
+    <Card className={classes.card}>
+      <Grid container>
+        <CardHeader
+          className={classes.header}
+          title={`${type}/${subject}`}
+        />
+        <CardContent className={classes.content}>
+          <Grid container>
+            <Grid item>
+              <dt>
+                <Typography>Reason</Typography>
+              </dt>
+              <dd>{reason}</dd>
+            </Grid>
+            <Grid item>
+              <IconButton arial-label="lock" onClick={onLock}>
+                <LockRounded />
+              </IconButton>
+            </Grid>
+            <Grid item>
+              <IconButton arial-label="remove" onClick={onRemove}>
+                <Delete />
+              </IconButton>
+            </Grid>
+          </Grid>
+        </CardContent>
+      </Grid>
+    </Card>
+  );
+}
+
+ModerateCard.propTypes = {
+  id: PropTypes.string,
+  type: PropTypes.string,
+  reason: PropTypes.string,
+  onRemove: PropTypes.func,
+  onLock: PropTypes.func,
+  author: PropTypes.shape({
+    name: PropTypes.string,
+    uuid: PropTypes.string,
+  }),
+};
+
+function ModerateModal({ id, subject, type, reason, onRemove, onLock }) {
+  const classes = useStyles();
+
+  const { data: report, loading, error } = useGetReported({
+    id: subject,
+    resolve: report => report.data,
+  });
+
+  const { mutate: lock } = usePutReport({
+    id: id,
+    isLocked: true,
+  });
+
+  const { mutate: remove } = useDeleteReport({
+    id: id,
+  });
+
+  const handleLock = () => {
+    lock()
+      .then(() => {
+        alert(`Successfully locked ${type}`);
+        onLock(id);
+        return;
+      })
+      .catch(() => {
+        alert(`Error locking ${type}`);
+      });
+  };
+
+  const handleRemove = () => {
+    remove()
+      .then(() => {
+        alert('Successfully removed report');
+        onLock(id);
+        return;
+      })
+      .catch(() => {
+        alert('Error removing report');
+      });
+  };
+
+  if (loading) {
+    return <Loading />;
+  } else if (error) {
+    return <NotFound />;
+  } else {
+    return (
+      <Card className={classes.card}>
+        <Grid container>
+          <CardHeader
+            className={classes.header}
+            title={`${type}/${subject}`}
+          />
+          <CardContent className={classes.content}>
+            <Grid container>
+              <Grid item>
+                <dt>
+                  <Typography>Reason</Typography>
+                </dt>
+                <dd>{reason}</dd>
+              </Grid>
+              <Grid item>
+                <IconButton arial-label="lock" onClick={handleLock}>
+                  <LockRounded />
+                </IconButton>
+              </Grid>
+              <Grid item>
+                <IconButton arial-label="remove" onClick={handleRemove}>
+                  <Delete />
+                </IconButton>
+              </Grid>
+            </Grid>
+          </CardContent>
+        </Grid>
+      </Card>
+    );
+  }
+}
+
+ModerateModal.propTypes = {
+  id: PropTypes.string,
+  type: PropTypes.string,
+  reason: PropTypes.string,
+  onRemove: PropTypes.func,
+  onLock: PropTypes.func,
+  author: PropTypes.shape({
+    name: PropTypes.string,
+    uuid: PropTypes.string,
+  }),
+};

@@ -46,17 +46,6 @@ export default function ModerationCard({
   const reports = review.isFlagged;
   const [content, setContent] = useState(null);
 
-  useEffect(() => {
-    const latestDraft = review && review.drafts && review.drafts.length
-        ? review.drafts.length > 1
-          ? review.drafts.sort((a, b) => a.id - b.id)[review.drafts.length - 1]
-          : review.drafts[0]
-        : null;
-
-    if (latestDraft) {
-      setContent(latestDraft.contents);
-    }
-  });
 
   return (
     <div

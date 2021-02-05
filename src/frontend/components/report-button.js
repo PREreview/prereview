@@ -3,7 +3,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 // hooks
-import { usePutFullReview } from '../hooks/api-hooks.tsx';
+import { usePutReported } from '../hooks/api-hooks.tsx';
 
 // Material UI imports
 import { withStyles } from '@material-ui/core/styles';
@@ -17,18 +17,21 @@ const Button = withStyles({
 })(MuiButton);
 
 const ReportButton = props => {
-  const { reviewId } = props;
+  const { uuid, type, title } = props;
 
-  const { mutate: updateReview } = usePutFullReview({
-    id: reviewId,
+  const { mutate: updateReview } = usePutReported({
+    id: uuid,
   });
 
   const handleReport = () => {
-    if (confirm('Are you sure you want to report this review?')) {
-      updateReview({ isFlagged: true })
+    if (confirm(`Are you sure you want to report this ${type}?`)) {
+      updateReview({
+        type: type,
+        title: title,
+      })
         .then(() =>
           alert(
-            'This review has been reported to the moderators. They will review it promptly.',
+            `This ${type} has been reported to the moderators. They will review it promptly.`,
           ),
         )
         .catch(err => alert(`An error occurred: ${err.message}`));
@@ -44,7 +47,9 @@ const ReportButton = props => {
 };
 
 ReportButton.propTypes = {
-  reviewId: PropTypes.string.isRequired,
+  uuid: PropTypes.string.isRequired,
+  type: PropTypes.string,
+  title: PropTypes.string,
 };
 
 export default ReportButton;

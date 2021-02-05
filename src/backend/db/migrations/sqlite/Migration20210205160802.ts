@@ -1,6 +1,6 @@
 import { Migration } from '@mikro-orm/migrations';
 
-export class Migration20210202204603 extends Migration {
+export class Migration20210205160802 extends Migration {
 
   async up(): Promise<void> {
     this.addSql('create table `tag` (`id` integer not null primary key autoincrement, `uuid` varchar not null, `created_at` datetime not null, `updated_at` datetime not null, `name` varchar not null, `color` varchar not null);');
@@ -22,6 +22,9 @@ export class Migration20210202204603 extends Migration {
     this.addSql('create table `rapid_review` (`id` integer not null primary key autoincrement, `uuid` varchar not null, `created_at` datetime not null, `updated_at` datetime not null, `is_published` integer not null, `is_flagged` integer not null, `yn_novel` text check (`yn_novel` in (\'yes\', \'no\', \'N/A\', \'unsure\')) not null, `yn_future` text check (`yn_future` in (\'yes\', \'no\', \'N/A\', \'unsure\')) not null, `yn_reproducibility` text check (`yn_reproducibility` in (\'yes\', \'no\', \'N/A\', \'unsure\')) not null, `yn_methods` text check (`yn_methods` in (\'yes\', \'no\', \'N/A\', \'unsure\')) not null, `yn_coherent` text check (`yn_coherent` in (\'yes\', \'no\', \'N/A\', \'unsure\')) not null, `yn_limitations` text check (`yn_limitations` in (\'yes\', \'no\', \'N/A\', \'unsure\')) not null, `yn_ethics` text check (`yn_ethics` in (\'yes\', \'no\', \'N/A\', \'unsure\')) not null, `yn_new_data` text check (`yn_new_data` in (\'yes\', \'no\', \'N/A\', \'unsure\')) not null, `yn_recommend` text check (`yn_recommend` in (\'yes\', \'no\', \'N/A\', \'unsure\')) not null, `yn_peer_review` text check (`yn_peer_review` in (\'yes\', \'no\', \'N/A\', \'unsure\')) not null, `yn_available_code` text check (`yn_available_code` in (\'yes\', \'no\', \'N/A\', \'unsure\')) not null, `yn_available_data` text check (`yn_available_data` in (\'yes\', \'no\', \'N/A\', \'unsure\')) not null, `link_to_data` text null, `coi` text null);');
     this.addSql('create unique index `rapid_review_uuid_unique` on `rapid_review` (`uuid`);');
 
+    this.addSql('create table `report` (`id` integer not null primary key autoincrement, `uuid` varchar not null, `created_at` datetime not null, `updated_at` datetime not null, `reason` text null, `title` text null, `subject` varchar not null, `subject_type` varchar not null);');
+    this.addSql('create unique index `report_uuid_unique` on `report` (`uuid`);');
+
     this.addSql('create table `request` (`id` integer not null primary key autoincrement, `uuid` varchar not null, `created_at` datetime not null, `updated_at` datetime not null);');
     this.addSql('create unique index `request_uuid_unique` on `request` (`uuid`);');
 
@@ -39,12 +42,15 @@ export class Migration20210202204603 extends Migration {
     this.addSql('create index `group_members_group_id_index` on `group_members` (`group_id`);');
     this.addSql('create index `group_members_user_id_index` on `group_members` (`user_id`);');
 
-    this.addSql('create table `full_review` (`id` integer not null primary key autoincrement, `uuid` varchar not null, `created_at` datetime not null, `updated_at` datetime not null, `is_published` integer not null, `is_flagged` integer not null, `doi` varchar null, `coi` text null);');
+    this.addSql('create table `full_review` (`id` integer not null primary key autoincrement, `uuid` varchar not null, `created_at` datetime not null, `updated_at` datetime not null, `is_published` integer not null, `is_flagged` integer not null, `doi` varchar null);');
     this.addSql('create unique index `full_review_uuid_unique` on `full_review` (`uuid`);');
     this.addSql('create unique index `full_review_doi_unique` on `full_review` (`doi`);');
 
     this.addSql('create table `full_review_draft` (`id` integer not null primary key autoincrement, `uuid` varchar not null, `created_at` datetime not null, `updated_at` datetime not null, `contents` text not null);');
     this.addSql('create unique index `full_review_draft_uuid_unique` on `full_review_draft` (`uuid`);');
+
+    this.addSql('create table `statement` (`id` integer not null primary key autoincrement, `uuid` varchar not null, `created_at` datetime not null, `updated_at` datetime not null, `contents` text not null, `is_flagged` integer not null);');
+    this.addSql('create unique index `statement_uuid_unique` on `statement` (`uuid`);');
 
     this.addSql('create table `full_review_mentor_invites` (`full_review_id` integer not null, `persona_id` integer not null, primary key (`full_review_id`, `persona_id`));');
     this.addSql('create index `full_review_mentor_invites_full_review_id_index` on `full_review_mentor_invites` (`full_review_id`);');
@@ -112,6 +118,9 @@ export class Migration20210202204603 extends Migration {
     this.addSql('create index `rapid_review_author_id_index` on `rapid_review` (`author_id`);');
     this.addSql('create index `rapid_review_preprint_id_index` on `rapid_review` (`preprint_id`);');
 
+    this.addSql('alter table `report` add column `author_id` integer null;');
+    this.addSql('create index `report_author_id_index` on `report` (`author_id`);');
+
     this.addSql('alter table `request` add column `author_id` integer null;');
     this.addSql('alter table `request` add column `preprint_id` integer null;');
     this.addSql('create index `request_author_id_index` on `request` (`author_id`);');
@@ -129,6 +138,11 @@ export class Migration20210202204603 extends Migration {
 
     this.addSql('alter table `full_review_draft` add column `parent_id` integer null;');
     this.addSql('create index `full_review_draft_parent_id_index` on `full_review_draft` (`parent_id`);');
+
+    this.addSql('alter table `statement` add column `author_id` integer null;');
+    this.addSql('alter table `statement` add column `parent_id` integer null;');
+    this.addSql('create index `statement_author_id_index` on `statement` (`author_id`);');
+    this.addSql('create index `statement_parent_id_index` on `statement` (`parent_id`);');
 
     this.addSql('alter table `contact` add column `identity_id` integer null;');
     this.addSql('create index `contact_identity_id_index` on `contact` (`identity_id`);');

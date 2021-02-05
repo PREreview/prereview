@@ -18,7 +18,13 @@ const querySchema = Joi.object({
 });
 
 const reportSchema = Joi.object({
-  reason: Joi.string().required(),
+  reason: Joi.string(),
+  isLocked: Joi.boolean(),
+});
+
+const reportedSchema = Joi.object({
+  title: Joi.string().allow(''),
+  type: Joi.string().allow(''),
 });
 
 const handleInvalid = ctx => {
@@ -35,30 +41,34 @@ export default function controller(reportModel, commentModel, fullReviewModel, p
   const findReport = async (uuid, type) => {
     let report;
 
-    if (!type || String.toLowerCase(type) === 'comment') {
+    if (!type || type.toLowerCase() === 'comment') {
       report = await commentModel.findOne({ uuid: uuid });
       if (report) {
+        report.type = 'comment';
         return report;
       }
     }
 
-    if (!type || String.toLowerCase(type) === 'fullreview') {
+    if (!type || type.toLowerCase() === 'fullreview') {
       report = await fullReviewModel.findOne({ uuid: uuid });
       if (report) {
+        report.type = 'fullReview';
         return report;
       }
     }
 
-    if (!type || String.toLowerCase(type) === 'persona') {
+    if (!type || type.toLowerCase() === 'persona') {
       report = await personaModel.findOne({ uuid: uuid });
       if (report) {
+        report.type = 'persona';
         return report;
       }
     }
 
-    if (!type || String.toLowerCase(type) === 'rapidreview') {
+    if (!type || type.toLowerCase() === 'rapidreview') {
       report = await rapidReviewModel.findOne({ uuid: uuid });
       if (report) {
+        report.type = 'rapidReview';
         return report;
       }
     }
@@ -82,7 +92,7 @@ export default function controller(reportModel, commentModel, fullReviewModel, p
           ? QueryOrder.ASC_NULLS_LAST
           : QueryOrder.DESC_NULLS_LAST;
         reports = await reportModel.findAll(
-          [],
+          ['author'],
           { createdAt: order },
           ctx.query.limit,
           ctx.query.offset,
@@ -104,7 +114,7 @@ export default function controller(reportModel, commentModel, fullReviewModel, p
   reportsRouter.route({
     method: 'GET',
     path: '/reports',
-    pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
+    pre: (ctx, next) => thisUser.can('access moderator pages')(ctx, next),
     validate: {
       query: querySchema,
       continueOnError: true,
@@ -127,7 +137,7 @@ export default function controller(reportModel, commentModel, fullReviewModel, p
   reportsRouter.route({
     method: 'GET',
     path: '/reports/:id',
-    pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
+    pre: (ctx, next) => thisUser.can('access moderator pages')(ctx, next),
     validate: {
       query: querySchema,
       continueOnError: true,
@@ -148,9 +158,52 @@ export default function controller(reportModel, commentModel, fullReviewModel, p
   });
 
   reportsRouter.route({
+    method: 'PUT',
+    path: '/reports/:id',
+    pre: (ctx, next) => thisUser.can('access moderator pages')(ctx, next),
+    // validate: {},
+    handler: async ctx => {
+      log.debug(`Updating report with ID ${ctx.params.id}`);
+      let found, report;
+
+      if (typeof ctx.request.body.isLocked === 'boolean') {
+        try {
+          report = await reportModel.findOne({ uuid: ctx.params.id });
+
+          if (!report) {
+            ctx.throw(404, `A report with ID ${ctx.params.id} doesn't exist`);
+          }
+
+          found = await findReport(report.subject, report.subjecType);
+
+          if (!found) {
+            ctx.throw(404, `Subject of report ${ctx.params.id} doesn't exist`);
+          }
+
+          found.isLocked = ctx.request.body.isLocked;
+          await reportModel.em.persistAndFlush(found);
+        } catch (err) {
+          log.error('HTTP 400 Error: ', err);
+          ctx.throw(400, `Failed to parse report schema: ${err}`);
+        }
+      }
+
+      // if deleted
+      ctx.status = 204;
+    },
+    meta: {
+      swagger: {
+        operationId: 'PutReport',
+        summary: 'Endpoint to PUT a report.',
+        required: true,
+      },
+    },
+  });
+
+  reportsRouter.route({
     method: 'DELETE',
     path: '/reports/:id',
-    pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next),
+    pre: (ctx, next) => thisUser.can('access moderator pages')(ctx, next),
     // validate: {},
     handler: async ctx => {
       log.debug(`Removing report with ID ${ctx.params.id}`);
@@ -184,7 +237,7 @@ export default function controller(reportModel, commentModel, fullReviewModel, p
   reportsRouter.route({
     method: 'GET',
     path: '/reported/:id',
-    pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
+    pre: (ctx, next) => thisUser.can('access moderator pages')(ctx, next),
     validate: {
       query: querySchema,
     },
@@ -201,11 +254,12 @@ export default function controller(reportModel, commentModel, fullReviewModel, p
 
       try {
         if (types) {
-          types.forEach(type => {
-            found = findReport(ctx.params.id, type);
-          });
+          for (let type in types) {
+            found = await findReport(ctx.params.id, type);
+            if (found) break;
+          }
         } else {
-          found = findReport(ctx.params.id);
+          found = await findReport(ctx.params.id);
         }
       } catch (err) {
         log.error(`HTTP 400 error: ${err}`);
@@ -219,7 +273,7 @@ export default function controller(reportModel, commentModel, fullReviewModel, p
       ctx.response.body = {
         status: 200,
         message: 'ok',
-        data: [found],
+        data: found,
       };
       ctx.status = 200;
     },
@@ -237,26 +291,18 @@ export default function controller(reportModel, commentModel, fullReviewModel, p
     path: '/reported/:id',
     pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
     validate: {
-      query: querySchema,
+      body: reportedSchema,
+      type: 'json',
     },
     handler: async ctx => {
-      log.debug(`Retrieving report ${ctx.params.id}.`);
-      let found, types;
-
-      if (ctx.query.types) {
-        const queries = ctx.query.split(',');
-        if (queries.length > 0) {
-          types = queries;
-        }
-      }
+      log.debug(`Retrieving item ${ctx.params.id}.`);
+      let found;
 
       try {
-        if (types) {
-          types.forEach(type => {
-            found = findReport(ctx.params.id, type);
-          });
+        if (ctx.request.body.type) {
+          found = await findReport(ctx.params.id, ctx.request.body.type);
         } else {
-          found = findReport(ctx.params.id);
+          found = await findReport(ctx.params.id);
         }
       } catch (err) {
         log.error(`HTTP 400 error: ${err}`);
@@ -267,7 +313,9 @@ export default function controller(reportModel, commentModel, fullReviewModel, p
         ctx.throw(404, `report with ID ${ctx.params.id} doesn't exist`);
       }
 
-      const report = reportModel.create({ author: ctx.state.user, subject: ctx.params.id, reason: ctx.request.body.reason });
+      console.log('***found.type***:', found.type);
+      const report = reportModel.create({ author: ctx.state.user, subject: ctx.params.id, reason: ctx.request.body.reason, subjectType: found.type });
+      console.log('***report***:', report);
       await reportModel.persistAndFlush(report);
 
       ctx.status = 204;

@@ -176,6 +176,7 @@ export default async function configServer(config) {
     personas.middleware(),
     preprints.middleware(),
     rapidReviews.middleware(),
+    reports.middleware(),
     requests.middleware(),
     searches.middleware(),
     tags.middleware(),

@@ -414,7 +414,7 @@ const ReviewReader = React.memo(function ReviewReader({
                                       />
                                     </Grid>
                                     <Grid item>
-                                      <ReportButton reviewId={review.uuid} />
+                                      <ReportButton uuid={review.uuid} type="fullReview" />
                                     </Grid>
                                   </Grid>
                                 </Box>

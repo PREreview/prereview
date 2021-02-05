@@ -19,16 +19,33 @@ export class Report extends BaseEntity {
   @Property({ columnType: 'text', nullable: true })
   reason?: string;
 
+  @Fixture(faker => `${faker.commerce.color()} ${faker.random.word()}`)
+  @Property({ columnType: 'text', nullable: true })
+  title?: string;
+
   @ManyToOne({ entity: () => Persona })
   author!: Persona;
 
   @Fixture(() => uuidv4())
+  @Property()
   subject!: string;
 
-  constructor(reason: string, author: Persona, subject: string) {
+  @Fixture(() => 'comment')
+  @Property()
+  subjectType!: string;
+
+  constructor(
+    author: Persona,
+    subject: string,
+    subjectType: string,
+    reason?: string,
+    title?: string,
+  ) {
     super();
-    this.reason = reason;
     this.author = author;
     this.subject = subject;
+    this.subjectType = subjectType;
+    this.reason = reason;
+    this.title = title;
   }
 }
