@@ -24,6 +24,7 @@ export default function controller(
   draftModel,
   personaModel,
   preprintModel,
+  statementModel,
   // eslint-disable-next-line no-unused-vars
   thisUser,
 ) {
@@ -49,12 +50,14 @@ export default function controller(
           'authors',
           'comments',
           'drafts',
+          'statements',
         ]);
       } else {
         allReviews = await reviewModel.findAll([
           'authors',
           'comments',
           'drafts',
+          'statements',
         ]);
       }
     } catch (err) {
@@ -72,7 +75,7 @@ export default function controller(
 
   const postHandler = async ctx => {
     log.debug('Adding full review.');
-    let review, draft, authorPersona, preprint;
+    let review, draft, authorPersona, preprint, coi;
 
     try {
       authorPersona = getActivePersona(ctx.state.user);
@@ -93,13 +96,19 @@ export default function controller(
       review.authors.add(authorPersona);
 
       if (ctx.request.body.contents) {
-        log.debug(`Adding full review draft.`);
+        log.debug('Adding full review draft.');
         draft = draftModel.create({
           title: 'Review of a preprint', //TODO: remove when we make title optional
           contents: ctx.request.body.contents,
           parent: review,
         });
         review.drafts.add(draft);
+      }
+
+      if (ctx.request.body.coi) {
+        log.debug('Adding conflict of interest statement.');
+        coi = statementModel.create({ parent: fullReview, author: ctx.state.user, contents: ctx.request.body.coi });
+        review.statements.add(coi);
       }
       await reviewModel.persistAndFlush(review);
     } catch (err) {
@@ -160,7 +169,7 @@ export default function controller(
     path: '/fullReviews/:id',
     handler: async ctx => {
       log.debug(`Updating review ${ctx.params.id}.`);
-      let fullReview, draft;
+      let fullReview, draft, coi;
 
       try {
         fullReview = await reviewModel.findOne({ uuid: ctx.params.id });
@@ -184,6 +193,18 @@ export default function controller(
           });
           await draftModel.persistAndFlush(draft);
           fullReview.drafts.add(draft);
+        }
+
+        if (ctx.request.body.coi) {
+          log.debug(`Looking up conflict of interest statement.`);
+          coi = statementModel.findOne({ parent: fullReview, author: ctx.state.user });
+          if (coi) {
+            coi.contents = coi;
+          } else {
+            coi = statementModel.create({ parent: fullReview, author: ctx.state.user, contents: ctx.request.body.coi });
+            fullReview.statements.add(coi);
+          }
+          await statementModel.persistAndFlush(coi);
         }
         // reviewModel.assign(fullReview, ctx.request.body);
         await reviewModel.persistAndFlush(fullReview);
