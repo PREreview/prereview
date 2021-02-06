@@ -41,7 +41,7 @@ export default function controller(draftModel, thisUser) {
   draftsRouter.route({
     method: 'post',
     path: '/fullReviewDrafts/',
-    // pre:thisUserthisUser.can('access admin pages'),
+    pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
     // validate: {
     //   body: {
     //     authors: Joi.array(),
@@ -152,7 +152,7 @@ export default function controller(draftModel, thisUser) {
   draftsRouter.route({
     method: 'delete',
     path: '/fullReviewDrafts/:id',
-    // pre:thisUserthisUser.can('access admin pages'),
+    pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next),
     handler: async ctx => {
       log.debug(`Deleting review draft ${ctx.params.id}.`);
       let draft;

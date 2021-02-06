@@ -17,7 +17,7 @@ export default function controller(eventModel, thisUser) {
     },
     method: 'post',
     path: '/events',
-    // pre:thisUserthisUser.can('access admin pages'),
+    pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next),
     // validate: {},
     handler: async ctx => {
       log.debug(`Adding a new event.`);
@@ -116,7 +116,7 @@ export default function controller(eventModel, thisUser) {
     },
     method: 'put',
     path: '/events/:id',
-    // pre: thisUser.can(''),
+    pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next),
     // validate: {},
     handler: async ctx => {
       log.debug(`Updating event with id ${ctx.params.id}.`);
@@ -149,7 +149,7 @@ export default function controller(eventModel, thisUser) {
     },
     method: 'delete',
     path: '/events/:id',
-    // pre: thisUser.can(''),
+    pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next),
     // validate: {},
     handler: async ctx => {
       log.debug(`Retrieving event with id ${ctx.params.id}.`);

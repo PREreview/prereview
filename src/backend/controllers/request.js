@@ -39,13 +39,8 @@ export default function controller(reqModel, thisUser) {
 
     ctx.params.pid ? (pid = ctx.params.pid) : null;
 
-    try {
-      authorPersona = await getActivePersona(ctx.state.user);
-    } catch (err) {
-      log.error('Failed to load user personas.');
-      ctx.throw(400, err);
-    }
-
+    authoerPersona = getActivePersona(ctx.state.user)
+    
     log.debug(`Adding a request.`);
 
     try {
@@ -79,22 +74,11 @@ export default function controller(reqModel, thisUser) {
     },
     method: 'POST',
     path: '/preprints/:pid/requests',
-    pre: thisUser.can('access private pages'),
+    pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next),
     // validate: {},
     handler: postHandler,
   });
 
-  // requestRouter.route({
-  //   meta: {
-  //     swagger: {
-  //       operationId: 'PostRequests',
-  //     },
-  //   },
-  //   method: 'POST',
-  //   path: '/requests',
-  //   // pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
-  //   handler: postHandler,
-  // });
 
   requestRouter.route({
     meta: {
@@ -172,7 +156,7 @@ export default function controller(reqModel, thisUser) {
     },
     method: 'delete',
     path: '/requests/:id',
-    // pre: thisUser.can(''),
+    pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next),
     // validate: {},
     handler: async ctx => {
       log.debug(`Deleting request ${ctx.params.id}`);

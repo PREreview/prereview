@@ -411,10 +411,7 @@ export default function controller(preprints, thisUser) {
           .required(),
       },
     },
-    pre: async (ctx, next) => {
-      await thisUser.can('access admin pages');
-      return next();
-    },
+    pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next),
     handler: async ctx => {
       log.debug(`Deleting preprint ${ctx.params.id}.`);
       let preprint;

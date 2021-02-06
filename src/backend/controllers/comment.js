@@ -78,12 +78,7 @@ export default function controller(commentModel, fullReviewModel, thisUser) {
         fullReview = await fullReviewModel.findOne({ uuid: fid });
       }
 
-      log.debug('author', authorPersona);
-      log.debug('fullReview', fullReview);
-      log.debug('ctx.request.body', ctx.request.body);
-
       if (fullReview && authorPersona) {
-        log.debug('creating a comment');
         comment = commentModel.create({
           ...ctx.request.body,
           parent: fullReview,

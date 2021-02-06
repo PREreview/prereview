@@ -17,7 +17,7 @@ export default function controller(badgeModel, thisUser) {
     },
     method: 'post',
     path: '/badges',
-    pre: thisUser.can('access admin pages'),
+    pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next),
     // validate: {},
     handler: async ctx => {
       log.debug(`Adding a new badge.`);
@@ -116,7 +116,7 @@ export default function controller(badgeModel, thisUser) {
     },
     method: 'put',
     path: '/badges/:id',
-    // pre: thisUser.can(''),
+    pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next),
     // validate: {},
     handler: async ctx => {
       log.debug(`Updating badge with id ${ctx.params.id}.`);
@@ -149,7 +149,7 @@ export default function controller(badgeModel, thisUser) {
     },
     method: 'delete',
     path: '/badges/:id',
-    pre: thisUser.can('access admin pages'),
+    pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next),
     // validate: {},
     handler: async ctx => {
       log.debug(`Retrieving badge with id ${ctx.params.id}.`);
