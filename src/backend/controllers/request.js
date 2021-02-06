@@ -39,8 +39,8 @@ export default function controller(reqModel, thisUser) {
 
     ctx.params.pid ? (pid = ctx.params.pid) : null;
 
-    authoerPersona = getActivePersona(ctx.state.user)
-    
+    authorPersona = getActivePersona(ctx.state.user);
+
     log.debug(`Adding a request.`);
 
     try {
@@ -78,7 +78,6 @@ export default function controller(reqModel, thisUser) {
     // validate: {},
     handler: postHandler,
   });
-
 
   requestRouter.route({
     meta: {

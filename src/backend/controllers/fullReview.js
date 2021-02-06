@@ -131,7 +131,7 @@ export default function controller(
       log.error(`HTTP 400 error: ${err}`);
       ctx.throw(400, `Failed to persist review.`);
     }
-    
+
     ctx.body = {
       status: 201,
       message: 'created',
