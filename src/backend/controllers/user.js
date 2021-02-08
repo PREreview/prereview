@@ -210,10 +210,10 @@ export default function controller(users, contacts, thisUser) {
         ctx.throw(404, `That user with ID ${ctx.params.id} does not exist.`);
       }
 
-      let conflict;
+      let conflict, schema, value;
       try {
         log.debug(`Create a new contact entry.`);
-        let { schema, value } = ctx.request.body;
+        ({ schema, value } = ctx.request.body);
         conflict = await contacts.findOne({ schema, value, identity: user });
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
@@ -222,7 +222,9 @@ export default function controller(users, contacts, thisUser) {
 
       if (conflict) {
         log.error(
-          `HTTP 409 Error: Contact ${schema}:${value} already exists for user ${ctx.params.id}`,
+          `HTTP 409 Error: Contact ${schema}:${value} already exists for user ${
+            ctx.params.id
+          }`,
         );
         ctx.throw(
           409,
@@ -363,7 +365,7 @@ export default function controller(users, contacts, thisUser) {
     },
     handler: async ctx => {
       const contactId = ctx.query.cid;
-      let newContact, user;
+      let user;
       log.debug(`Deleting contact for user ${ctx.params.id}`);
       try {
         user = await users.findOneByUuidOrOrcid(ctx.params.id);
@@ -390,7 +392,12 @@ export default function controller(users, contacts, thisUser) {
           };
         } else {
           log.error('Contact does not exist.');
-          ctx.throw(404, `That contact ${ctx.query.cid} for user with ID ${ctx.params.id} does not exist.`);
+          ctx.throw(
+            404,
+            `That contact ${ctx.query.cid} for user with ID ${
+              ctx.params.id
+            } does not exist.`,
+          );
         }
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
@@ -467,7 +474,8 @@ export default function controller(users, contacts, thisUser) {
         });
         if (!contact) {
           log.error(
-            `HTTP 404 Error: Contact with token ${ctx.params.token
+            `HTTP 404 Error: Contact with token ${
+              ctx.params.token
             } doesn't exist`,
           );
           ctx.throw(
@@ -477,7 +485,8 @@ export default function controller(users, contacts, thisUser) {
         }
         if (contact.isVerified) {
           log.error(
-            `HTTP 409 Error: Contact with token ${ctx.params.token
+            `HTTP 409 Error: Contact with token ${
+              ctx.params.token
             } is already verified`,
           );
           ctx.throw(

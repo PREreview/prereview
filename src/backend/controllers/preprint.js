@@ -309,7 +309,8 @@ export default function controller(preprints, thisUser) {
         ctx.response.status = 200;
       } else {
         log.error(
-          `HTTP 404 Error: That preprint with ID ${ctx.params.id
+          `HTTP 404 Error: That preprint with ID ${
+            ctx.params.id
           } does not exist.`,
         );
 
@@ -376,7 +377,8 @@ export default function controller(preprints, thisUser) {
         ctx.response.status = 200;
       } else {
         log.error(
-          `HTTP 404 Error: That preprint with ID ${ctx.params.id
+          `HTTP 404 Error: That preprint with ID ${
+            ctx.params.id
           } does not exist.`,
         );
         ctx.throw(
@@ -429,7 +431,8 @@ export default function controller(preprints, thisUser) {
         ctx.response.status = 200;
       } else {
         log.error(
-          `HTTP 404 Error: That preprint with ID ${ctx.params.id
+          `HTTP 404 Error: That preprint with ID ${
+            ctx.params.id
           } does not exist.`,
         );
         ctx.throw(

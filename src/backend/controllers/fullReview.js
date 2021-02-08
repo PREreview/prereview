@@ -1,6 +1,5 @@
 import router from 'koa-joi-router';
 import { getLogger } from '../log.js';
-import getActivePersona from '../utils/persona.js';
 import generateDOI from '../utils/generateDOI.js';
 
 const log = getLogger('backend:controllers:fullReviews');
