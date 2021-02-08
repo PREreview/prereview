@@ -234,8 +234,8 @@ function QontoStepIcon(props) {
       {completed ? (
         <Check className={classes.completed} />
       ) : (
-        <div className={classes.circle} />
-      )}
+          <div className={classes.circle} />
+        )}
     </div>
   );
 }
@@ -370,6 +370,7 @@ export default function ReviewStepper({
       if (cid) {
         putLongReview({
           contents: content,
+          authors: review ? review.authors.map(author => ({ uuid: author.uuid })) : null,
         })
           .then(() => alert('Draft updated successfully.'))
           .catch(err => alert(`An error occurred: ${err.message}`));
@@ -377,12 +378,15 @@ export default function ReviewStepper({
         postLongReview({
           preprint: preprint.uuid,
           contents: content,
+          authors: review ? review.authors.map(author => ({ uuid: author.uuid })) : null,
         })
           .then(response => {
             alert('Draft updated successfully.');
             setReviewId(response.body.uuid);
             onReviewChange(response.body);
-            return history.push(`${location.pathname}/reviews/${response.body.uuid}`);
+            return history.push(
+              `${location.pathname}/reviews/${response.body.uuid}`,
+            );
           })
           .catch(err => alert(`An error occurred: ${err.message}`));
       }
@@ -402,6 +406,7 @@ export default function ReviewStepper({
           preprint: preprint.uuid,
           contents: content,
           isPublished: true,
+          authors: review ? review.authors.map(author => ({ uuid: author.uuid })) : null,
         })
           .then(() => {
             setActiveStep(prevActiveStep => prevActiveStep + 2);
@@ -542,42 +547,42 @@ export default function ReviewStepper({
             </Box>
           </>
         ) : (
-          <Box>
-            <header className="shell-content-reviews__title">
-              Rapid Review
+            <Box>
+              <header className="shell-content-reviews__title">
+                Rapid Review
             </header>
-            <form>
-              <RapidFormFragment
-                answerMap={answerMap}
-                onChange={(key, value) => {
-                  setAnswerMap(answerMap => ({
-                    ...answerMap,
-                    [key]: value,
-                  }));
-                }}
-              />
-              <InputLabel
-                htmlFor="competing-interest"
-                className={classes.inputLabel}
-              >
-                Please use the space below to declare any existing{' '}
-                <Link href="#">Competing Interest</Link>.
+              <form>
+                <RapidFormFragment
+                  answerMap={answerMap}
+                  onChange={(key, value) => {
+                    setAnswerMap(answerMap => ({
+                      ...answerMap,
+                      [key]: value,
+                    }));
+                  }}
+                />
+                <InputLabel
+                  htmlFor="competing-interest"
+                  className={classes.inputLabel}
+                >
+                  Please use the space below to declare any existing{' '}
+                  <Link href="#">Competing Interest</Link>.
               </InputLabel>
-              <Input
-                className={classes.input}
-                id="competing-interest"
-                multiline
-                rows={2}
-                disableUnderline
-              />
-              <Box mt={2} mb={2} className={classes.yellow}>
-                Please review the{' '}
-                <Link href="#">PREreview Code of Conduct</Link> before
+                <Input
+                  className={classes.input}
+                  id="competing-interest"
+                  multiline
+                  rows={2}
+                  disableUnderline
+                />
+                <Box mt={2} mb={2} className={classes.yellow}>
+                  Please review the{' '}
+                  <Link href="#">PREreview Code of Conduct</Link> before
                 submitting your review.
               </Box>
-            </form>
-          </Box>
-        );
+              </form>
+            </Box>
+          );
       case 1:
         return (
           <Box mt={2}>
@@ -602,8 +607,8 @@ export default function ReviewStepper({
                 spacing={2}
               >
                 <Grid item xs={12} sm={6}>
-                  <AddAuthors reviewId={cid} />
-                  <AddAuthors isMentor={true} reviewId={cid} />
+                  <AddAuthors reviewId={cid} authors={review ? review.authors : null} />
+                  <AddAuthors isMentor={true} reviewId={cid} authors={review ? review.mentors : null} />
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <Box textAlign="right" mr={2}>
@@ -636,14 +641,14 @@ export default function ReviewStepper({
                         >
                           {templates
                             ? templates.data.map(template => (
-                                <MenuItem
-                                  key={template.uuid}
-                                  value={template.contents}
-                                  className={classes.template}
-                                >
-                                  {template.title}
-                                </MenuItem>
-                              ))
+                              <MenuItem
+                                key={template.uuid}
+                                value={template.contents}
+                                className={classes.template}
+                              >
+                                {template.title}
+                              </MenuItem>
+                            ))
                             : null}
                         </Select>
                         {template ? (
@@ -802,39 +807,39 @@ export default function ReviewStepper({
               Congratulations! You have successfully submitted your PREreview.
             </Box>
           ) : (
-            <div>
-              {getStepContent(activeStep)}
-              <Box textAlign="right">
-                {activeStep === 0 ? (
-                  <>
-                    {hasRapidReviewed && (
-                      <Button
-                        variant="outlined"
-                        color="primary"
-                        onClick={() => handleComplete(2)}
-                        className={classes.button}
-                      >
-                        No
-                      </Button>
-                    )}
+              <div>
+                {getStepContent(activeStep)}
+                <Box textAlign="right">
+                  {activeStep === 0 ? (
+                    <>
+                      {hasRapidReviewed && (
+                        <Button
+                          variant="outlined"
+                          color="primary"
+                          onClick={() => handleComplete(2)}
+                          className={classes.button}
+                        >
+                          No
+                        </Button>
+                      )}
 
-                    {!hasLongReviewed ? (
-                      <Button
-                        variant="contained"
-                        color="primary"
-                        onClick={handleNext}
-                        className={classes.button}
-                      >
-                        {!hasRapidReviewed && activeStep === 0
-                          ? 'Submit'
-                          : 'Yes'}
-                      </Button>
-                    ) : null}
-                  </>
-                ) : null}
-              </Box>
-            </div>
-          )}
+                      {!hasLongReviewed ? (
+                        <Button
+                          variant="contained"
+                          color="primary"
+                          onClick={handleNext}
+                          className={classes.button}
+                        >
+                          {!hasRapidReviewed && activeStep === 0
+                            ? 'Submit'
+                            : 'Yes'}
+                        </Button>
+                      ) : null}
+                    </>
+                  ) : null}
+                </Box>
+              </div>
+            )}
         </div>
       </div>
     </ThemeProvider>

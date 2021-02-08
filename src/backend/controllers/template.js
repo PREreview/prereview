@@ -281,19 +281,33 @@ export default function controller(templateModel, communityModel, thisUser) {
   });
 
   templatesRouter.route({
+    meta: {
+      swagger: {
+        operationId: 'DeleteTemplate',
+        summary: 'Endpoint to DELETE a template.',
+      },
+    },
     method: 'DELETE',
-    path: '/templates/:id',
+    path: '/templates',
     pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next),
-    // validate: {},
+    validate: {
+      query: {
+        id: Joi.string()
+          .description('Template id')
+          .required(),
+      },
+      type: 'json',
+      continueOnError: true,
+    },
     handler: async ctx => {
-      log.debug(`Removing template with ID ${ctx.params.id}`);
+      log.debug(`Removing template with ID ${ctx.query.id}`);
       let template;
 
       try {
-        template = await templateModel.findOne({ uuid: ctx.params.id });
+        template = await templateModel.findOne({ uuid: ctx.query.id });
 
         if (!template) {
-          ctx.throw(404, `A template with ID ${ctx.params.id} doesn't exist`);
+          ctx.throw(404, `A template with ID ${ctx.query.id} doesn't exist`);
         }
 
         await templateModel.removeAndFlush(template);
@@ -304,13 +318,6 @@ export default function controller(templateModel, communityModel, thisUser) {
 
       // if deleted
       ctx.status = 204;
-    },
-    meta: {
-      swagger: {
-        operationId: 'DeleteTemplate',
-        summary: 'Endpoint to DELETE a template.',
-        required: true,
-      },
     },
   });
 

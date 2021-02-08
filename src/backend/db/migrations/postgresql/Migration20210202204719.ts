@@ -24,7 +24,7 @@ export class Migration20210202204719 extends Migration {
     this.addSql('create table "request" ("id" serial primary key, "uuid" varchar(255) not null, "created_at" timestamptz(0) not null, "updated_at" timestamptz(0) not null, "author_id" int4 not null, "preprint_id" int4 not null);');
     this.addSql('alter table "request" add constraint "request_uuid_unique" unique ("uuid");');
 
-    this.addSql('create table "user" ("id" serial primary key, "uuid" varchar(255) not null, "created_at" timestamptz(0) not null, "updated_at" timestamptz(0) not null, "orcid" varchar(255) not null, "default_persona_id" int4 null, "is_private" bool not null);');
+    this.addSql('create table "user" ("id" serial primary key, "uuid" varchar(255) not null, "created_at" timestamptz(0) not null, "updated_at" timestamptz(0) not null, "orcid" varchar(255) not null unique, "default_persona_id" int4 null, "is_private" bool not null);');
     this.addSql('alter table "user" add constraint "user_uuid_unique" unique ("uuid");');
     this.addSql('alter table "user" add constraint "user_default_persona_id_unique" unique ("default_persona_id");');
 

@@ -22,6 +22,7 @@ import {
   useDeleteTemplate,
   useGetTemplates,
   usePostTemplates,
+  usePutTemplates,
 } from '../hooks/api-hooks.tsx';
 
 // components
@@ -84,9 +85,6 @@ export default function SettingsTemplates() {
   // post new template via the API
   const { mutate: postTemplate } = usePostTemplates();
 
-  // delete template from the database
-  const { mutate: deleteTemplate } = useDeleteTemplate();
-
   // template content
   const [title, setTitle] = useState('');
   const [errorTitle, setErrorTitle] = useState(false);
@@ -130,14 +128,6 @@ export default function SettingsTemplates() {
         .catch(err => alert(`An error occurred: ${err.message}`));
     }
   };
-
-  const handleDelete = id => {
-    if (confirm('Are you sure you want to delete this template?')) {
-      deleteTemplate({ id: id })
-        .then(() => alert('Template deleted successfully.'))
-        .catch(err => alert(`An error occurred: ${err.message}`));
-    }
-  }
 
   const resetContent = () => {
     setTitle('');
@@ -205,11 +195,24 @@ export default function SettingsTemplates() {
               helperText={error ? 'This field is required' : null}
               required
             />
+            <TextField
+              id="template-content"
+              variant="outlined"
+              placeholder="Add contents for this template"
+              multiline
+              rows={4}
+              className={classes.input}
+              error={error}
+              onChange={event => onContentChange(event.target.value)}
+              required
+            />
+            {/*
             <TemplateEditor
               id={'add'}
               initialContent={content}
               handleContentChange={onContentChange}
             />
+            */}
             <Button
               onClick={handleSubmit}
               type="button"
@@ -234,32 +237,13 @@ export default function SettingsTemplates() {
               <TableBody>
                 {templates &&
                   templates.map(template => (
-                    <StyledTableRow
-                      key={template.uuid ? template.uuid : template.title}
-                    >
-                      <TableCell component="th" scope="row">
-                        {template.title}
-                      </TableCell>
-                      <TableCell align="right">
-                        <EditTemplate
-                          title={title}
-                          content={content}
-                          template={template}
-                          handleTitleChange={onTitleChange}
-                          handleContentChange={onContentChange}
-                          resetContent={resetContent}
-                        />
-                      </TableCell>
-                      <TableCell align="right">
-                        <IconButton
-                          onClick={() => handleDelete(template.uuid)}
-                          type="button"
-                        >
-                          <div className="vh">{`Delete ${template.title}`}</div>
-                          <DeleteIcon />
-                        </IconButton>
-                      </TableCell>
-                    </StyledTableRow>
+                    <SettingsRow
+                      key={template.uuid}
+                      template={template}
+                      onDelete={() => {
+                        setTemplates(templates.filter(t => t.uuid !== template.uuid));
+                      }}
+                    />
                   ))}
               </TableBody>
             </Table>
@@ -268,4 +252,55 @@ export default function SettingsTemplates() {
       </section>
     );
   }
+}
+
+function SettingsRow({ template, onDelete }) {
+  // template content
+  const [title, setTitle] = useState(template.title);
+  const [content, setContent] = useState(template.content);
+
+  // delete template from the database
+  const { mutate: deleteTemplate } = useDeleteTemplate({
+    queryParams: {
+      id: template.uuid
+    }
+  });
+
+  return (
+    <StyledTableRow
+      key={template.uuid}
+    >
+      <TableCell component="th" scope="row">
+        {template.title}
+      </TableCell>
+      <TableCell align="right">
+        <EditTemplate
+          title={title}
+          content={content}
+          template={template}
+          handleTitleChange={newTitle => setTitle(newTitle)}
+          handleContentChange={newContent => setContent(newContent)}
+        />
+      </TableCell>
+      <TableCell align="right">
+        <IconButton
+          onClick={() => {
+            if (confirm('Are you sure you want to delete this template?')) {
+              deleteTemplate()
+                .then(() => {
+                  onDelete();
+                  alert('Template deleted successfully.');
+                  return;
+                })
+                .catch(err => alert(`An error occurred: ${err.message}`));
+            }
+          }}
+          type="button"
+        >
+          <div className="vh">{`Delete ${title}`}</div>
+          <DeleteIcon />
+        </IconButton>
+      </TableCell>
+    </StyledTableRow>
+  );
 }
