@@ -32,6 +32,8 @@ import StepConnector from '@material-ui/core/StepConnector';
 import StepLabel from '@material-ui/core/StepLabel';
 import Typography from '@material-ui/core/Typography';
 
+import { v4 as uuidv4 } from 'uuid';
+
 // utils
 import {
   useGetTemplates,
@@ -266,7 +268,7 @@ export default function ReviewStepper({
   const [completed, setCompleted] = useState(new Set());
   const [expandFeedback, setExpandFeedback] = useState(false);
   const [disabledSubmit, setDisabledSubmit] = useState(false);
-  const [reviewId, setReviewId] = useState(review ? review.parent : null);
+  const [reviewId, setReviewId] = useState(review ? review.parent : uuidv4());
   const [skipped, setSkipped] = useState(new Set());
   const steps = getSteps();
   // API queries
@@ -507,6 +509,7 @@ export default function ReviewStepper({
       setActiveStep(2);
       handleComplete(4);
     }
+    console.log("REVIEW ID IN USE EFFECT REVIEWSTEPPER", reviewId)
   }, [
     hasRapidReviewed,
     hasLongReviewed,
@@ -700,7 +703,7 @@ export default function ReviewStepper({
                     onContentChange={onContentChange}
                     content={content}
                     template={template}
-                    reviewId={cid}
+                    reviewId={cid ? cid : reviewId}
                   />
                 </Box>
                 <Box mt={2}>

@@ -16,12 +16,14 @@ import 'quill/dist/quill.snow.css'; // Add css for snow theme
 const ydoc = new Y.Doc();
 
 const CollabEditor = ({ initialContent, handleContentChange, reviewId }) => {
+  console.log("reviewId,", reviewId)
   /* collaboration needs */
   const [provider, setProvider] = useState(null);
 
   useEffect(() => {
+    console.log("use effect changing, setProvider should be firing?")
     setProvider(new WebrtcProvider(`prereview-${reviewId}`, ydoc));
-  }, []);
+  }, [reviewId]);
 
   // quill options
   const placeholder = 'Start typing...';
