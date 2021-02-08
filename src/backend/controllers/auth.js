@@ -178,7 +178,7 @@ export default function controller(
 
       if (newUser) {
         log.debug('Authenticated & created user.', newUser);
-        const completeUser = merge(profile, {...newUser, isNew: true});
+        const completeUser = merge(profile, { ...newUser, isNew: true });
         log.trace('verifyCallback() new completeUser:', completeUser);
         return done(null, completeUser);
       } else {
@@ -248,7 +248,7 @@ export default function controller(
             ctx.login(user);
 
             if (user.isNew) {
-              ctx.redirect('/settings')
+              ctx.redirect('/settings');
               return;
             }
 
