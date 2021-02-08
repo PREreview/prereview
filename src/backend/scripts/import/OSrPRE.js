@@ -19,7 +19,7 @@ import {
   Contact,
   FullReview,
   FullReviewDraft,
-  Preprint,
+  //Preprint,
   RapidReview,
   Request,
   Work,
@@ -220,8 +220,8 @@ async function OSrPREImportPreprint(
         contentEncoding: source.contentEncoding,
         contentUrl: source.contentUrl,
       });
-      //preprint.communities.add(osrpreCommunity);
-      //preprint.tags.add(osrpreTag);
+      preprint.communities.add(osrpreCommunity);
+      preprint.tags.add(osrpreTag);
       await preprintModel.persistAndFlush(preprint);
       console.log(`OSrPRE: Inserted Preprint ${preprint.handle}`);
     } else {
