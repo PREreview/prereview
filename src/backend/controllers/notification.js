@@ -30,8 +30,8 @@ export default function controller(
     let user;
     try {
       user = await userModel.findOneByUuidOrOrcid(ctx.params.uid, [
-        'personas.invitedToAuthor',
-        'personas.invitedToMentor',
+        'personas.invitedToAuthor.preprint',
+        'personas.invitedToMentor.preprint',
       ]);
     } catch (err) {
       log.error('HTTP 400 Error: ', err);
@@ -42,7 +42,7 @@ export default function controller(
       persona.invitedToAuthor.forEach(invite => {
         invites.push({
           preprint: invite.uuid,
-          title: invite.title,
+          title: invite.preprint.title,
           persona: persona.uuid,
           role: 'authors',
         });
@@ -50,7 +50,7 @@ export default function controller(
       persona.invitedToMentor.forEach(invite => {
         invites.push({
           preprint: invite.uuid,
-          title: invite.title,
+          title: invite.preprint.title,
           persona: persona.uuid,
           role: 'mentors',
         });

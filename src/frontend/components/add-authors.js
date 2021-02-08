@@ -4,6 +4,8 @@ import PropTypes from 'prop-types';
 
 // material ui imports
 import { makeStyles, withStyles } from '@material-ui/core/styles';
+import Avatar from '@material-ui/core/Avatar';
+import AvatarGroup from '@material-ui/lab/AvatarGroup';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Modal from '@material-ui/core/Modal';
 import MuiButton from '@material-ui/core/Button';
@@ -44,7 +46,7 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const AddAuthors = ({ isMentor, reviewId }) => {
+const AddAuthors = ({ isMentor, reviewId, members, membersLimit = 5 }) => {
   const classes = useStyles();
 
   // fetch users from API
@@ -61,6 +63,7 @@ const AddAuthors = ({ isMentor, reviewId }) => {
     setOpen(false);
   };
 
+  console.log('members:', members);
   if (loading) {
     return <CircularProgress className={classes.spinning} />;
   } else {
@@ -72,6 +75,17 @@ const AddAuthors = ({ isMentor, reviewId }) => {
             {isMentor ? 'Add mentor' : 'Add co-reviewer(s)'}
           </span>
         </Button>
+        {!!members && (
+          <AvatarGroup max={membersLimit}>
+            {members.map(member => (
+              <Avatar
+                key={member.uuid}
+                alt={member.name}
+                src={member.avatar}
+              />
+            ))}
+          </AvatarGroup>
+        )}
         <Modal
           open={open}
           onClose={handleClose}

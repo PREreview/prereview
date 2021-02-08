@@ -70,7 +70,6 @@ export default function controller(
       // if a user already exists
       user = await users.findOne({ orcid: params.orcid }, [
         'personas',
-        'communities',
         'groups',
       ]);
       log.trace('verifyCallback() user:', user);

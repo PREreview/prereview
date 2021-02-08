@@ -73,6 +73,7 @@ function InviteRow({ invite, onRemove }) {
     pid: invite.persona,
   });
 
+  console.log('***invite***:', invite);
   const handleAcceptInvite = () => {
     acceptInvite()
       .then(() => {
@@ -192,8 +193,8 @@ export default function SettingsInvites({ user }) {
             </TableContainer>
           </Box>
         ) : (
-          <div>No invites yet.</div>
-        )}
+            <div>No invites yet.</div>
+          )}
         <h4 className="settings__subtitle">Drafts</h4>
         {reviews && reviews.length ? (
           <Box my={4}>
@@ -228,8 +229,8 @@ export default function SettingsInvites({ user }) {
             </TableContainer>
           </Box>
         ) : (
-          <div>No accepted invites to display.</div>
-        )}
+            <div>No accepted invites to display.</div>
+          )}
       </section>
     );
   }

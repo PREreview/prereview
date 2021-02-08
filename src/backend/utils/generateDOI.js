@@ -11,8 +11,7 @@ const BASE_URL = config.zenodoSandbox
   : 'https://zenodo.org';
 
 const zenodoBaseUrl = (action = '') =>
-  `${BASE_URL}/api/deposit/depositions${action}?access_token=${
-    config.zenodoToken
+  `${BASE_URL}/api/deposit/depositions${action}?access_token=${config.zenodoToken
   }`;
 
 const zenodoPayload = (body = {}, headers = {}) => ({
@@ -30,12 +29,7 @@ export default async function generateDOI(prereviewData) {
       publication_type: 'article',
       title: prereviewData.title,
       description: prereviewData.content || 'No content.',
-      creators: [
-        {
-          name: prereviewData.authorName,
-          orcid: prereviewData.authorOrcid,
-        },
-      ],
+      creators: prereviewData.creators,
     },
   };
 

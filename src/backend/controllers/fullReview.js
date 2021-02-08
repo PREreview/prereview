@@ -37,7 +37,10 @@ export default function controller(
 
     try {
       const queries = [];
-      if (ctx.query.is_published !== undefined && ctx.query.is_published !== null) {
+      if (
+        ctx.query.is_published !== undefined &&
+        ctx.query.is_published !== null
+      ) {
         queries.push({ isPublished: { $eq: ctx.query.is_published } });
       }
 
@@ -92,9 +95,8 @@ export default function controller(
 
   const postHandler = async ctx => {
     log.debug('Adding full review.');
-    let review, draft, personaId, authorPersona, preprint;
-
-    personaId = getActivePersona(ctx.state.user); // FIXME: when there's multiple authors
+    let review, draft, authorPersona, preprint;
+    const creators = [];
 
     try {
       preprint = await preprintModel.findOneByUuidOrHandle(
@@ -105,9 +107,16 @@ export default function controller(
         preprint: preprint,
       });
 
-      authorPersona = await personaModel.findOne(personaId);
-
-      review.authors.add(authorPersona);
+      for (let p of ctx.request.body.authors) {
+        authorPersona = await personaModel.findOne({ uuid: p.uuid });
+        creators.push({
+          name: authorPersona.isAnonymous
+            ? `PREreview community member`
+            : authorPersona.name,
+          orcid: authorPersona.isAnonymous ? '' : authorPersona.identity.orcid,
+        });
+        review.authors.add(authorPersona);
+      }
 
       if (ctx.request.body.contents) {
         log.debug(`Adding full review draft.`);
@@ -130,10 +139,7 @@ export default function controller(
         title: review.title || `Review of ${preprint.title}`,
         content: draft.contents,
         // ensuring anonymous reviewers stay anonymous
-        authorName: authorPersona.isAnonymous
-          ? `PREreview community member`
-          : authorPersona.name,
-        orcid: authorPersona.isAnonymous ? '' : authorPersona.identity.orcid,
+        creators: creators,
       };
       try {
         // yay, the review gets a DOI!
@@ -275,7 +281,8 @@ export default function controller(
     pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
     handler: async ctx => {
       log.debug(
-        `Adding persona ${ctx.request.body.pid} to review ${ctx.params.id
+        `Adding persona ${ctx.request.body.pid} to review ${
+          ctx.params.id
         } with role ${ctx.params.role}.`,
       );
       let review, persona;
@@ -283,10 +290,12 @@ export default function controller(
       try {
         if (ctx.params.role === 'authors') {
           review = await reviewModel.findOne({ uuid: ctx.params.id }, [
+            'preprint',
             'authorInvites',
           ]);
         } else if (ctx.params.role === 'mentors') {
           review = await reviewModel.findOne({ uuid: ctx.params.id }, [
+            'preprint',
             'mentorInvites',
           ]);
         }
@@ -308,7 +317,8 @@ export default function controller(
       if (ctx.params.role === 'authors') {
         try {
           log.debug(
-            `Full review ${review.id} found. Inviting persona ${persona.id
+            `Full review ${review.id} found. Inviting persona ${
+              persona.id
             } to review.`,
           );
           review.authorInvites.add(persona);
@@ -325,12 +335,12 @@ export default function controller(
                   to: contact.value,
                 },
                 locals: {
-                  pid: persona.uuid,
-                  rid: review.uuid,
+                  title: review.preprint.title,
                 },
               });
               log.info(
-                `Sent author invitation email to ${contact.value} for review ${review.uuid
+                `Sent author invitation email to ${contact.value} for review ${
+                  review.uuid
                 }`,
               );
             }
@@ -345,7 +355,8 @@ export default function controller(
       } else if (ctx.params.role === 'mentors') {
         try {
           log.debug(
-            `Full review ${review.id} found. Inviting persona ${persona.id
+            `Full review ${review.id} found. Inviting persona ${
+              persona.id
             } to review.`,
           );
           review.mentorInvites.add(persona);
@@ -362,12 +373,12 @@ export default function controller(
                   to: contact.value,
                 },
                 locals: {
-                  pid: persona.uuid,
-                  rid: review.uuid,
+                  title: review.preprint.title,
                 },
               });
               log.info(
-                `Sent mentor invitation email to ${contact.value} for review ${review.uuid
+                `Sent mentor invitation email to ${contact.value} for review ${
+                  review.uuid
                 }`,
               );
             }
@@ -447,7 +458,8 @@ export default function controller(
       ) {
         try {
           log.debug(
-            `Full review ${review.id} found. Inviting persona ${persona.id
+            `Full review ${review.id} found. Inviting persona ${
+              persona.id
             } to review.`,
           );
           review.authorInvites.remove(persona);
@@ -465,7 +477,8 @@ export default function controller(
       ) {
         try {
           log.debug(
-            `Full review ${review.id} found. Inviting persona ${persona.id
+            `Full review ${review.id} found. Inviting persona ${
+              persona.id
             } to review.`,
           );
           review.mentorInvites.remove(persona);
@@ -510,7 +523,11 @@ export default function controller(
     },
     pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
     handler: async ctx => {
-      log.debug(`Adding persona ${ctx.params.pid} to review ${ctx.params.id} as a(n) ${ctx.params.role}.`);
+      log.debug(
+        `Adding persona ${ctx.params.pid} to review ${ctx.params.id} as a(n) ${
+          ctx.params.role
+        }.`,
+      );
       let review, persona;
 
       try {
@@ -544,7 +561,8 @@ export default function controller(
       ) {
         try {
           log.debug(
-            `Full review ${review.id} found. Inviting persona ${persona.id
+            `Full review ${review.id} found. Inviting persona ${
+              persona.id
             } to review.`,
           );
           review.authorInvites.remove(persona);
@@ -563,7 +581,8 @@ export default function controller(
       ) {
         try {
           log.debug(
-            `Full review ${review.id} found. Inviting persona ${persona.id
+            `Full review ${review.id} found. Inviting persona ${
+              persona.id
             } to review.`,
           );
           review.mentorInvites.remove(persona);

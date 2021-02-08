@@ -37,6 +37,7 @@ import Settings from './settings';
 import SuspenseLoading from './suspense-loading';
 import ToCPage from './toc-page';
 import PersonaSearch from './PersonaSearch';
+import Validate from './Validate';
 
 // constants
 import API from './api';
@@ -147,6 +148,13 @@ export default function App({ user }) {
               >
                 <ExtensionFallback />
               </Route>
+              <Route
+                exact={true}
+                path="/validate/:token"
+                >
+                <Validate />
+              </Route>
+
               <Route>
                 <NotFound />
               </Route>

@@ -86,6 +86,9 @@ export default function HeaderBar({ onClickMenuButton, closeGap, thisUser }) {
         >
           Programs
         </a>
+        <a className="header-bar__nav-item" href="/communities">
+          Communities
+        </a>
         <a
           className="header-bar__nav-item"
           href="https://content.prereview.org/resources"
