@@ -218,8 +218,15 @@ export default async function configServer(config) {
     .use(mailWrapper(config))
     .use(mount('/api/v2', apiV2Router))
     .use(mount('/api', apiDocs.middleware()))
+    .use(koa404Handler)
     .use(serveStatic(STATIC_DIR))
-    .use(koa404Handler);
+    .use(
+      async (ctx, next) =>
+        await serveStatic(STATIC_DIR)(
+          Object.assign(ctx, { path: 'index.html' }),
+          next,
+        ),
+    );
 
   return server.callback();
 }
