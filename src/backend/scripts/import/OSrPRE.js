@@ -19,7 +19,7 @@ import {
   Contact,
   FullReview,
   FullReviewDraft,
-  Preprint,
+  //Preprint,
   RapidReview,
   Request,
   Work,
@@ -195,19 +195,31 @@ async function OSrPREImportPreprint(
         console.warn(`OSrPRE: Failed to lookup preprint, using data as-is`);
         source = record;
       }
-      preprint = new Preprint(
-        handle,
-        source.title,
-        true,
-        source.abstractText,
-        source.preprintServer,
-        source.datePosted,
-        source.license,
-        source.publication,
-        source.url,
-        source.contentEncoding,
-        source.contentUrl,
-      );
+      //preprint = new Preprint(
+      //  handle,
+      //  source.title,
+      //  true,
+      //  source.abstractText,
+      //  source.preprintServer,
+      //  source.datePosted,
+      //  source.license,
+      //  source.publication,
+      //  source.url,
+      //  source.contentEncoding,
+      //  source.contentUrl,
+      //);
+      preprint = preprintModel.create({
+        handle: handle,
+        title: source.title,
+        isPublished: true,
+        abstractText: source.abstractText,
+        preprintServer: source.preprintServer,
+        license: source.license,
+        publication: source.publication,
+        url: source.url,
+        contentEncoding: source.contentEncoding,
+        contentUrl: source.contentUrl,
+      });
       preprint.communities.add(osrpreCommunity);
       preprint.tags.add(osrpreTag);
       await preprintModel.persistAndFlush(preprint);
@@ -256,7 +268,6 @@ async function OSrPREImportUser(
       let userObject, personaObject, anonPersonaObject;
       if (person) {
         userObject = userModel.create({ orcid: record.orcid });
-        userObject.communities.add(osrpreCommunity);
         //userObject.createdAt = new Date(record.createdAt);
         let name;
         if (person.name) {
@@ -296,6 +307,7 @@ async function OSrPREImportUser(
                   personaObject.bio = person.biography['content'];
                 }
                 if (!person.is_private) {
+                  personaObject.communities.add(osrpreCommunity);
                   personaObject.badges.add(osrpreBadge);
                   userObject.isPrivate = false;
                   userObject.defaultPersona = personaObject;
@@ -318,6 +330,7 @@ async function OSrPREImportUser(
                   isAnonymous: true,
                 });
                 if (person.is_private) {
+                  anonPersonaObject.communities.add(osrpreCommunity);
                   anonPersonaObject.badges.add(osrpreBadge);
                   userObject.isPrivate = true;
                   userObject.defaultPersona = anonPersonaObject;
