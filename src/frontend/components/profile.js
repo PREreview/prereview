@@ -95,6 +95,11 @@ export default function Profile() {
                 <h2 className="profile__username">
                   {persona && persona.name ? persona.name : 'Name goes here'}
                 </h2>
+                <XLink
+                    to={`/settings`}
+                    href={`/settings`}
+                  >Edit user settings
+                </XLink>
                 {persona ? (
                   <span className="profile__persona-status">
                     {persona && !persona.isAnonymous ? (

@@ -181,7 +181,7 @@ export default function HeaderBar({ onClickMenuButton, closeGap, thisUser }) {
       {/* TODO link to feedback form */}
       <div className="header-bar__give-feedback">
         <a
-          href="https://docs.google.com/forms/d/1ao2f12U96lKlbVJifrWHEhPmCAB3ZHD16s-I7WmJyU4/viewform?edit_requested=true"
+          href="https://forms.gle/BjHvfBWXYVchUwvs9"
           target="_blank"
           rel="noopener noreferrer"
         >

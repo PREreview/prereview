@@ -1,6 +1,7 @@
 import router from 'koa-joi-router';
 import { getLogger } from '../log.js';
 import generateDOI from '../utils/generateDOI.js';
+import getActivePersona from '../utils/persona.js';
 
 const log = getLogger('backend:controllers:fullReviews');
 const Joi = router.Joi;
@@ -44,7 +45,7 @@ export default function controller(
       }
 
       if (ctx.query.can_edit) {
-        const editors = ctx.query.can_edit.split(',');
+        const editors = decodeURIComponent(ctx.query.can_edit).split(',');
         queries.push({
           $or: [
             { authors: { uuid: { $in: editors } } },
@@ -106,13 +107,28 @@ export default function controller(
         preprint: preprint,
       });
 
-      for (let p of ctx.request.body.authors) {
-        authorPersona = await personaModel.findOne({ uuid: p.uuid });
+      if (ctx.request.body.authors) {
+        for (let p of ctx.request.body.authors) {
+          authorPersona = await personaModel.findOne({ uuid: p.uuid });
+          if (authorPersona) {
+            creators.push({
+              name: authorPersona.isAnonymous
+                ? `PREreview community member`
+                : authorPersona.name,
+              orcid: authorPersona.isAnonymous
+                ? ''
+                : authorPersona.identity.orcid,
+            });
+            review.authors.add(authorPersona);
+          }
+        }
+      } else {
+        authorPersona = await personaModel.findOne(ctx.state.user.defaultPersona);
         creators.push({
           name: authorPersona.isAnonymous
             ? `PREreview community member`
             : authorPersona.name,
-          orcid: authorPersona.isAnonymous ? '' : authorPersona.identity.orcid,
+          orcid: authorPersona.isAnonymous ? '' : ctx.state.user.orcid,
         });
         review.authors.add(authorPersona);
       }
@@ -150,13 +166,12 @@ export default function controller(
     }
 
     try {
+      console.log('***review***:', review);
       await reviewModel.persistAndFlush(review);
     } catch (err) {
       log.error(`HTTP 400 error: ${err}`);
       ctx.throw(400, `Failed to persist review.`);
     }
-
-    log.debug('REVIEW**********', review);
 
     ctx.body = {
       status: 201,
@@ -280,8 +295,7 @@ export default function controller(
     pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
     handler: async ctx => {
       log.debug(
-        `Adding persona ${ctx.request.body.pid} to review ${
-          ctx.params.id
+        `Adding persona ${ctx.request.body.pid} to review ${ctx.params.id
         } with role ${ctx.params.role}.`,
       );
       let review, persona;
@@ -316,8 +330,7 @@ export default function controller(
       if (ctx.params.role === 'authors') {
         try {
           log.debug(
-            `Full review ${review.id} found. Inviting persona ${
-              persona.id
+            `Full review ${review.id} found. Inviting persona ${persona.id
             } to review.`,
           );
           review.authorInvites.add(persona);
@@ -338,8 +351,7 @@ export default function controller(
                 },
               });
               log.info(
-                `Sent author invitation email to ${contact.value} for review ${
-                  review.uuid
+                `Sent author invitation email to ${contact.value} for review ${review.uuid
                 }`,
               );
             }
@@ -354,8 +366,7 @@ export default function controller(
       } else if (ctx.params.role === 'mentors') {
         try {
           log.debug(
-            `Full review ${review.id} found. Inviting persona ${
-              persona.id
+            `Full review ${review.id} found. Inviting persona ${persona.id
             } to review.`,
           );
           review.mentorInvites.add(persona);
@@ -376,8 +387,7 @@ export default function controller(
                 },
               });
               log.info(
-                `Sent mentor invitation email to ${contact.value} for review ${
-                  review.uuid
+                `Sent mentor invitation email to ${contact.value} for review ${review.uuid
                 }`,
               );
             }
@@ -457,8 +467,7 @@ export default function controller(
       ) {
         try {
           log.debug(
-            `Full review ${review.id} found. Inviting persona ${
-              persona.id
+            `Full review ${review.id} found. Inviting persona ${persona.id
             } to review.`,
           );
           review.authorInvites.remove(persona);
@@ -476,8 +485,7 @@ export default function controller(
       ) {
         try {
           log.debug(
-            `Full review ${review.id} found. Inviting persona ${
-              persona.id
+            `Full review ${review.id} found. Inviting persona ${persona.id
             } to review.`,
           );
           review.mentorInvites.remove(persona);
@@ -523,8 +531,7 @@ export default function controller(
     pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
     handler: async ctx => {
       log.debug(
-        `Adding persona ${ctx.params.pid} to review ${ctx.params.id} as a(n) ${
-          ctx.params.role
+        `Adding persona ${ctx.params.pid} to review ${ctx.params.id} as a(n) ${ctx.params.role
         }.`,
       );
       let review, persona;
@@ -560,8 +567,7 @@ export default function controller(
       ) {
         try {
           log.debug(
-            `Full review ${review.id} found. Inviting persona ${
-              persona.id
+            `Full review ${review.id} found. Inviting persona ${persona.id
             } to review.`,
           );
           review.authorInvites.remove(persona);
@@ -580,8 +586,7 @@ export default function controller(
       ) {
         try {
           log.debug(
-            `Full review ${review.id} found. Inviting persona ${
-              persona.id
+            `Full review ${review.id} found. Inviting persona ${persona.id
             } to review.`,
           );
           review.mentorInvites.remove(persona);
