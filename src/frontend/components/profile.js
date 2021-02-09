@@ -11,8 +11,11 @@ import UserProvider from '../contexts/user-context';
 import { useGetPersona } from '../hooks/api-hooks.tsx';
 
 // Material UI components
+import { makeStyles } from '@material-ui/core/styles';
 import Avatar from '@material-ui/core/Avatar';
 import Chip from '@material-ui/core/Chip';
+import IconButton from '@material-ui/core/IconButton';
+import Modal from '@material-ui/core/Modal';
 
 // components
 //import Avatar from './avatar';
@@ -22,6 +25,7 @@ import Loading from './loading.js';
 import NotFound from './not-found';
 import RoleActivity from './role-activity';
 import XLink from './xlink';
+//import RoleEditor from './role-editor';
 
 // icons
 import { MdPublic } from 'react-icons/md';
@@ -33,25 +37,14 @@ import { ORG } from '../constants';
 export default function Profile() {
   const location = useLocation();
   const [thisUser] = useContext(UserProvider.context);
-  const [loading, setLoading] = useState(true);
-  const [persona, setPersona] = useState(null);
+  //const [editAvatar, setEditAvatar] = useState(false);
 
-  const { data: personaData, loading: loadingPersona, error } = useGetPersona({
+  const { data: persona, loading, error } = useGetPersona({
     id: location.pathname.slice(7),
+    resolve: persona => persona.data[0],
   });
 
-  useEffect(() => {
-    if (!loadingPersona) {
-      if (personaData) {
-        setPersona(personaData.data[0]);
-        setLoading(false);
-      }
-    }
-  }, [loadingPersona, personaData]);
-
-  console.log(persona);
-
-  if (loading || !personaData) {
+  if (loading || !persona) {
     return <Loading />;
   } else if (error) {
     return <NotFound />;
@@ -68,13 +61,46 @@ export default function Profile() {
 
         <section className="profile__content">
           <header className="profile__header">
-            <Avatar src={persona.avatar} className="profile__avatar-img" />
+            {thisUser.uuid === persona.identity.uuid ? (
+              <IconButton href="/settings">
+                <Avatar src={persona.avatar} className="profile__avatar-img" />
+              </IconButton>
+            ) : (
+              <Avatar src={persona.avatar} className="profile__avatar-img" />
+            )}
+
+            {/*
+            <Modal
+              className="settings-role-editor-modal"
+              title="Edit Persona Settings"
+              open={editAvatar}
+              onClose={() => {
+                setEditAvatar(false);
+              }}
+            >
+              <RoleEditor
+                persona={persona}
+                onCancel={() => {
+                  setEditAvatar(false);
+                }}
+                onSaved={() => {
+                  setEditAvatar(false);
+                }}
+              />
+            </Modal>
+            */}
 
             <section className="profile__identity-info">
               <header className="profile__indentity-info-header">
                 <h2 className="profile__username">
                   {persona && persona.name ? persona.name : 'Name goes here'}
                 </h2>
+                { persona.identity.uuid === thisUser.uuid ? 
+                <XLink
+                    to={`/settings`}
+                    href={`/settings`}
+                  >Edit user settings
+                </XLink> : null }
                 {persona ? (
                   <span className="profile__persona-status">
                     {persona && !persona.isAnonymous ? (

@@ -1,5 +1,5 @@
 // base imports
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 
 // yjs imports
@@ -15,11 +15,14 @@ import 'quill/dist/quill.snow.css'; // Add css for snow theme
 
 // FIXME too collaborative!
 const ydoc = new Y.Doc();
-const provider = new WebrtcProvider('prereview-collab', ydoc);
 
-const CollabEditor = ({ initialContent, handleContentChange }) => {
+const CollabEditor = ({ initialContent, handleContentChange, reviewId }) => {
   /* collaboration needs */
-  // provider.connect();
+  const [provider, setProvider] = useState(null);
+
+  useEffect(() => {
+    setProvider(new WebrtcProvider(`prereview-${reviewId}`, ydoc));
+  }, []);
 
   // quill options
   const placeholder = 'Start typing...';
@@ -68,10 +71,6 @@ const CollabEditor = ({ initialContent, handleContentChange }) => {
     Quill.register('modules/cursors', QuillCursors);
   }
 
-  if (quill) {
-    // provider.connect();
-  }
-
   useEffect(() => {
     if (quill) {
       let delta;
@@ -105,6 +104,7 @@ const CollabEditor = ({ initialContent, handleContentChange }) => {
 CollabEditor.propTypes = {
   initialContent: PropTypes.string,
   handleContentChange: PropTypes.func.isRequired,
+  reviewId: PropTypes.string,
 };
 
 export default CollabEditor;

@@ -4,6 +4,8 @@ import PropTypes from 'prop-types';
 
 // material ui imports
 import { makeStyles, withStyles } from '@material-ui/core/styles';
+import Avatar from '@material-ui/core/Avatar';
+import AvatarGroup from '@material-ui/lab/AvatarGroup';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Modal from '@material-ui/core/Modal';
 import MuiButton from '@material-ui/core/Button';
@@ -13,9 +15,12 @@ import { useGetUsers } from '../hooks/api-hooks.tsx';
 
 // components
 import Search from './search';
+import Collapse from './collapse';
+import Value from './value';
 
 // icons
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
+import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
 
 const Button = withStyles({
   root: {
@@ -44,7 +49,7 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const AddAuthors = ({ isMentor, reviewId }) => {
+const AddAuthors = ({ isMentor, reviewId, members, membersLimit = 5 }) => {
   const classes = useStyles();
 
   // fetch users from API
@@ -61,6 +66,9 @@ const AddAuthors = ({ isMentor, reviewId }) => {
     setOpen(false);
   };
 
+  const [mentorHelpTextOpen, setMentorHelpTextOpen] = useState(false)
+  const [coReviewerHelpTextOpen, setCoReviewerHelpTextOpen] = useState(false)
+
   if (loading) {
     return <CircularProgress className={classes.spinning} />;
   } else {
@@ -72,7 +80,45 @@ const AddAuthors = ({ isMentor, reviewId }) => {
             {isMentor ? 'Add mentor' : 'Add co-reviewer(s)'}
           </span>
         </Button>
-        <Modal open={open} onClose={handleClose} aria-label="add authors modal">
+        <Button
+          type='button'
+          className={classes.button}
+          onClick={e => {
+            e.preventDefault();
+            isMentor ? setMentorHelpTextOpen(!mentorHelpTextOpen) : setCoReviewerHelpTextOpen(!coReviewerHelpTextOpen)}}
+        >
+          <HelpOutlineIcon />
+        </Button>
+        <Collapse isOpened={mentorHelpTextOpen || coReviewerHelpTextOpen}>
+          <Value
+            tagName="p"
+            className="rapid-form-fragment__help-text"
+          >
+            { isMentor ? `A mentor is a person you wish to invite to give you feedback
+            and/or edit your review. They will not be authors of the review, but 
+            they will be recognized as having helped you write it. A mentor can be 
+            a PREreview user or a prospective PREreview user. In order to 
+            invite a mentor, you first need to SAVE the draft of your review.` : `A co-reviewer is a person you wish to invite to write this review with you. They can be a PREreview user or a prospective PREreview user. 
+            In order to invite one or more co-reviewer(s), you first need to SAVE the draft of your review.`}
+          </Value>
+        </Collapse>
+        {!!members && (
+          <AvatarGroup max={membersLimit}>
+            {members.map(member => (
+              <Avatar
+                key={member.uuid}
+                alt={member.name}
+                src={member.avatar}
+              />
+            ))}
+          </AvatarGroup>
+        )}
+        <Modal
+          open={open}
+          onClose={handleClose}
+          aria-labelledby="add-authors-modal"
+          aria-describedby="add-authors-modal"
+        >
           <div className={classes.paper}>
             <Search
               handleClose={handleClose}

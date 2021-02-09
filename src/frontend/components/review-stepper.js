@@ -15,6 +15,7 @@ import {
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
 import Check from '@material-ui/icons/Check';
+import CircularProgress from '@material-ui/core/CircularProgress';
 import Grid from '@material-ui/core/Grid';
 import Input from '@material-ui/core/Input';
 import InputLabel from '@material-ui/core/InputLabel';
@@ -100,6 +101,12 @@ const useStyles = makeStyles(theme => ({
   },
   label: {
     textAlign: 'center',
+  },
+  loading: {
+    left: '50%',
+    position: 'absolute',
+    top: '50%',
+    transform: 'translate(-50%, -50%)',
   },
   modal: {
     backgroundColor: theme.palette.background.paper,
@@ -225,8 +232,8 @@ function QontoStepIcon(props) {
       {completed ? (
         <Check className={classes.completed} />
       ) : (
-        <div className={classes.circle} />
-      )}
+          <div className={classes.circle} />
+        )}
     </div>
   );
 }
@@ -265,7 +272,7 @@ export default function ReviewStepper({
   // API queries
   const { data: templates } = useGetTemplates();
   const { mutate: postRapidReview } = usePostRapidReviews();
-  const { mutate: postLongReview } = usePostFullReviews();
+  const { mutate: postLongReview, loading } = usePostFullReviews();
   const { mutate: putLongReview } = usePutFullReview({ id: cid });
 
   // handle open/close templates
@@ -361,6 +368,7 @@ export default function ReviewStepper({
       if (cid) {
         putLongReview({
           contents: content,
+          authors: review ? review.authors.map(author => ({ uuid: author.uuid })) : null,
         })
           .then(() => alert('Draft updated successfully.'))
           .catch(err => alert(`An error occurred: ${err.message}`));
@@ -368,12 +376,15 @@ export default function ReviewStepper({
         postLongReview({
           preprint: preprint.uuid,
           contents: content,
+          authors: review ? review.authors.map(author => ({ uuid: author.uuid })) : null,
         })
           .then(response => {
             alert('Draft updated successfully.');
             setReviewId(response.body.uuid);
             onReviewChange(response.body);
-            return history.push(`${location.pathname}/reviews/${response.body.uuid}`);
+            return history.push(
+              `${location.pathname}/reviews/${response.body.uuid}`,
+            );
           })
           .catch(err => alert(`An error occurred: ${err.message}`));
       }
@@ -393,6 +404,7 @@ export default function ReviewStepper({
           preprint: preprint.uuid,
           contents: content,
           isPublished: true,
+          authors: review ? review.authors.map(author => ({ uuid: author.uuid })) : null,
         })
           .then(() => {
             setActiveStep(prevActiveStep => prevActiveStep + 2);
@@ -500,7 +512,14 @@ export default function ReviewStepper({
       setActiveStep(2);
       handleComplete(4);
     }
-  }, [hasRapidReviewed, hasLongReviewed, reviewId, templates, template]);
+  }, [
+    hasRapidReviewed,
+    hasLongReviewed,
+    loading,
+    reviewId,
+    templates,
+    template,
+  ]);
 
   function getStepContent(step) {
     switch (step) {
@@ -525,42 +544,42 @@ export default function ReviewStepper({
             </Box>
           </>
         ) : (
-          <Box>
-            <header className="shell-content-reviews__title">
-              Rapid Review
+            <Box>
+              <header className="shell-content-reviews__title">
+                Rapid Review
             </header>
-            <form>
-              <RapidFormFragment
-                answerMap={answerMap}
-                onChange={(key, value) => {
-                  setAnswerMap(answerMap => ({
-                    ...answerMap,
-                    [key]: value,
-                  }));
-                }}
-              />
-              <InputLabel
-                htmlFor="competing-interest"
-                className={classes.inputLabel}
-              >
-                Please use the space below to declare any existing{' '}
-                <Link href="#">Competing Interest</Link>.
+              <form>
+                <RapidFormFragment
+                  answerMap={answerMap}
+                  onChange={(key, value) => {
+                    setAnswerMap(answerMap => ({
+                      ...answerMap,
+                      [key]: value,
+                    }));
+                  }}
+                />
+                <InputLabel
+                  htmlFor="competing-interest"
+                  className={classes.inputLabel}
+                >
+                  Please use the space below to declare any existing{' '}
+                  <Link href="#">Competing Interest</Link>.
               </InputLabel>
-              <Input
-                className={classes.input}
-                id="competing-interest"
-                multiline
-                rows={2}
-                disableUnderline
-              />
-              <Box mt={2} mb={2} className={classes.yellow}>
-                Please review the{' '}
-                <Link href="#">PREreview Code of Conduct</Link> before
+                <Input
+                  className={classes.input}
+                  id="competing-interest"
+                  multiline
+                  rows={2}
+                  disableUnderline
+                />
+                <Box mt={2} mb={2} className={classes.yellow}>
+                  Please review the{' '}
+                  <Link href="#">PREreview Code of Conduct</Link> before
                 submitting your review.
               </Box>
-            </form>
-          </Box>
-        );
+              </form>
+            </Box>
+          );
       case 1:
         return (
           <Box mt={2}>
@@ -585,11 +604,8 @@ export default function ReviewStepper({
                 spacing={2}
               >
                 <Grid item xs={12} sm={6}>
-                  <AddAuthors reviewId={cid} />
-                  <AddAuthors
-                    isMentor={true}
-                    reviewId={cid}
-                  />
+                  <AddAuthors reviewId={cid} authors={review ? review.authors : null} />
+                  <AddAuthors isMentor={true} reviewId={cid} authors={review ? review.mentors : null} />
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <Box textAlign="right" mr={2}>
@@ -621,14 +637,14 @@ export default function ReviewStepper({
                         >
                           {templates
                             ? templates.data.map(template => (
-                                <MenuItem
-                                  key={template.uuid}
-                                  value={template.contents}
-                                  className={classes.template}
-                                >
-                                  {template.title}
-                                </MenuItem>
-                              ))
+                              <MenuItem
+                                key={template.uuid}
+                                value={template.contents}
+                                className={classes.template}
+                              >
+                                {template.title}
+                              </MenuItem>
+                            ))
                             : null}
                         </Select>
                         {template ? (
@@ -688,6 +704,7 @@ export default function ReviewStepper({
                     onContentChange={onContentChange}
                     content={content}
                     template={template}
+                    reviewId={cid}
                   />
                 </Box>
                 <Box mt={2}>
@@ -727,6 +744,11 @@ export default function ReviewStepper({
               >
                 Submit
               </Button>
+              <Modal open={loading}>
+                <div className={classes.loading}>
+                  <CircularProgress />
+                </div>
+              </Modal>
             </Box>
           </Box>
         );
@@ -781,39 +803,39 @@ export default function ReviewStepper({
               Congratulations! You have successfully submitted your PREreview.
             </Box>
           ) : (
-            <div>
-              {getStepContent(activeStep)}
-              <Box textAlign="right">
-                {activeStep === 0 ? (
-                  <>
-                    {hasRapidReviewed && (
-                      <Button
-                        variant="outlined"
-                        color="primary"
-                        onClick={() => handleComplete(2)}
-                        className={classes.button}
-                      >
-                        No
-                      </Button>
-                    )}
+              <div>
+                {getStepContent(activeStep)}
+                <Box textAlign="right">
+                  {activeStep === 0 ? (
+                    <>
+                      {hasRapidReviewed && (
+                        <Button
+                          variant="outlined"
+                          color="primary"
+                          onClick={() => handleComplete(2)}
+                          className={classes.button}
+                        >
+                          No
+                        </Button>
+                      )}
 
-                    {!hasLongReviewed ? (
-                      <Button
-                        variant="contained"
-                        color="primary"
-                        onClick={handleNext}
-                        className={classes.button}
-                      >
-                        {!hasRapidReviewed && activeStep === 0
-                          ? 'Submit'
-                          : 'Yes'}
-                      </Button>
-                    ) : null}
-                  </>
-                ) : null}
-              </Box>
-            </div>
-          )}
+                      {!hasLongReviewed ? (
+                        <Button
+                          variant="contained"
+                          color="primary"
+                          onClick={handleNext}
+                          className={classes.button}
+                        >
+                          {!hasRapidReviewed && activeStep === 0
+                            ? 'Submit'
+                            : 'Yes'}
+                        </Button>
+                      ) : null}
+                    </>
+                  ) : null}
+                </Box>
+              </div>
+            )}
         </div>
       </div>
     </ThemeProvider>

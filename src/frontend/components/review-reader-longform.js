@@ -231,6 +231,12 @@ const LongformReviewReader = props => {
                 <Grid item xs={12} sm={3} className={classes.date}>
                   {reviewDate.toLocaleDateString('en-US')}
                 </Grid>
+               { review.doi ? 
+                <Grid item xs={12} sm={2}> 
+                  <a href={`https://doi.org/${review.doi}`}>
+                  <img src={`https://sandbox.zenodo.org/badge/DOI/${review.doi}.svg`}/></a> 
+                </Grid> 
+                : null }
               </Grid>
               <Box border="1px solid #E5E5E5" mt={4} px={3} pb={2}>
                 <Box>{ReactHtmlParser(reviewContent.contents, options)}</Box>

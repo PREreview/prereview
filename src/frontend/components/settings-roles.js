@@ -37,7 +37,7 @@ const useStyles = makeStyles({
   },
 });
 
-export default function SettingsRoles({ user }) {
+export default function SettingsRoles({ user, updateUser }) {
   const classes = useStyles();
   const isFirstTimeOnSettings = useIsFirstTimeOnSettings();
   const [personaToEdit, setPersonaToEdit] = useState(null);
@@ -47,6 +47,7 @@ export default function SettingsRoles({ user }) {
 
   const handleActivePersonaClose = persona => {
     setActivePersona(persona);
+    updateUser({...user, defaultPersona: persona})
   };
 
   return (

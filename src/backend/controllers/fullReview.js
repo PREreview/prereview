@@ -1,22 +1,14 @@
 import router from 'koa-joi-router';
 import { getLogger } from '../log.js';
-import getActivePersona from '../utils/persona.js';
+import generateDOI from '../utils/generateDOI.js';
 
 const log = getLogger('backend:controllers:fullReviews');
 const Joi = router.Joi;
 
 // eslint-disable-next-line no-unused-vars
 const querySchema = Joi.object({
-  start: Joi.number()
-    .integer()
-    .greater(-1),
-  end: Joi.number()
-    .integer()
-    .positive(),
-  asc: Joi.boolean(),
-  sort_by: Joi.string(),
-  from: Joi.string(),
-  to: Joi.string(),
+  is_published: Joi.boolean(),
+  can_edit: Joi.string(),
 });
 
 export default function controller(
@@ -32,7 +24,7 @@ export default function controller(
 
   // handler for GET multiple reviews methods
   const getHandler = async ctx => {
-    let allReviews, pid, preprint; // fid = fullReview ID
+    let allReviews, pid; // fid = fullReview ID
 
     if (ctx.params.pid) {
       pid = ctx.params.pid;
@@ -44,9 +36,37 @@ export default function controller(
     }
 
     try {
+      const queries = [];
+      if (
+        ctx.query.is_published !== undefined &&
+        ctx.query.is_published !== null
+      ) {
+        queries.push({ isPublished: { $eq: ctx.query.is_published } });
+      }
+
+      if (ctx.query.can_edit) {
+        const editors = decodeURIComponent(ctx.query.can_edit).split(',');
+        queries.push({
+          $or: [
+            { authors: { uuid: { $in: editors } } },
+            { mentors: { uuid: { $in: editors } } },
+          ],
+        });
+      }
+
       if (pid) {
-        preprint = await preprintModel.findOneByUuidOrHandle(pid);
-        allReviews = await reviewModel.findAll({ preprint: preprint }, [
+        queries.push({ preprint: { uuid: { $eq: pid } } });
+      }
+
+      if (queries.length > 0) {
+        let query;
+        if (queries.length > 1) {
+          query = { $and: queries };
+        } else {
+          query = queries[0];
+        }
+        log.debug('Querying preprints:', query);
+        allReviews = await reviewModel.find(query, [
           'authors',
           'comments',
           'drafts',
@@ -77,13 +97,7 @@ export default function controller(
   const postHandler = async ctx => {
     log.debug('Adding full review.');
     let review, draft, authorPersona, preprint, coi;
-
-    try {
-      authorPersona = getActivePersona(ctx.state.user);
-    } catch (err) {
-      log.error('Failed to load user personas.');
-      ctx.throw(400, err);
-    }
+    const creators = [];
 
     try {
       preprint = await preprintModel.findOneByUuidOrHandle(
@@ -94,7 +108,33 @@ export default function controller(
         preprint: preprint,
       });
 
-      review.authors.add(authorPersona);
+      if (ctx.request.body.authors) {
+        for (let p of ctx.request.body.authors) {
+          authorPersona = await personaModel.findOne({ uuid: p.uuid });
+          if (authorPersona) {
+            creators.push({
+              name: authorPersona.isAnonymous
+                ? `PREreview community member`
+                : authorPersona.name,
+              orcid: authorPersona.isAnonymous
+                ? ''
+                : authorPersona.identity.orcid,
+            });
+            review.authors.add(authorPersona);
+          }
+        }
+      } else {
+        authorPersona = await personaModel.findOne(
+          ctx.state.user.defaultPersona,
+        );
+        creators.push({
+          name: authorPersona.isAnonymous
+            ? `PREreview community member`
+            : authorPersona.name,
+          orcid: authorPersona.isAnonymous ? '' : ctx.state.user.orcid,
+        });
+        review.authors.add(authorPersona);
+      }
 
       if (ctx.request.body.contents) {
         log.debug('Adding full review draft.');
@@ -119,6 +159,32 @@ export default function controller(
     } catch (err) {
       log.error('HTTP 400 Error: ', err);
       ctx.throw(400, `Failed to parse full review schema: ${err}`);
+    }
+
+    let reviewData;
+
+    if (review.isPublished) {
+      reviewData = {
+        title: review.title || `Review of ${preprint.title}`,
+        content: draft.contents,
+        // ensuring anonymous reviewers stay anonymous
+        creators: creators,
+      };
+      try {
+        // yay, the review gets a DOI!
+        review.doi = await generateDOI(reviewData);
+      } catch (err) {
+        log.error(`Error generating DOI from Zenodo. ${err}`);
+        ctx.throw(400, `Failed to generate DOI.`);
+      }
+    }
+
+    try {
+      console.log('***review***:', review);
+      await reviewModel.persistAndFlush(review);
+    } catch (err) {
+      log.error(`HTTP 400 error: ${err}`);
+      ctx.throw(400, `Failed to persist review.`);
     }
 
     ctx.body = {
@@ -159,6 +225,9 @@ export default function controller(
   reviewsRouter.route({
     method: 'GET',
     path: '/fullReviews',
+    validate: {
+      query: querySchema,
+    },
     handler: async ctx => getHandler(ctx),
     meta: {
       swagger: {
@@ -268,10 +337,12 @@ export default function controller(
       try {
         if (ctx.params.role === 'authors') {
           review = await reviewModel.findOne({ uuid: ctx.params.id }, [
+            'preprint',
             'authorInvites',
           ]);
         } else if (ctx.params.role === 'mentors') {
           review = await reviewModel.findOne({ uuid: ctx.params.id }, [
+            'preprint',
             'mentorInvites',
           ]);
         }
@@ -283,6 +354,7 @@ export default function controller(
         ctx.throw(400, `Failed to parse query: ${err}`);
       }
 
+      console.log('***review***:', review);
       console.log('***persona***:', persona);
       if (!review || !persona) {
         log.error('HTTP 400: Invalid review or Persona');
@@ -310,8 +382,7 @@ export default function controller(
                   to: contact.value,
                 },
                 locals: {
-                  pid: persona.uuid,
-                  rid: review.uuid,
+                  title: review.preprint.title,
                 },
               });
               log.info(
@@ -349,8 +420,7 @@ export default function controller(
                   to: contact.value,
                 },
                 locals: {
-                  pid: persona.uuid,
-                  rid: review.uuid,
+                  title: review.preprint.title,
                 },
               });
               log.info(
@@ -384,7 +454,7 @@ export default function controller(
 
   reviewsRouter.route({
     method: 'DELETE',
-    path: '/fullReviews/:id/:role/:pid',
+    path: '/fullReviews/:id/:role',
     validate: {
       params: {
         id: Joi.string()
@@ -393,10 +463,13 @@ export default function controller(
         role: Joi.string()
           .description('Role')
           .required(),
+      },
+      body: {
         pid: Joi.string()
           .description('Persona id')
           .required(),
       },
+      type: 'json',
     },
     pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
     handler: async ctx => {
@@ -415,7 +488,7 @@ export default function controller(
             'mentorInvites',
           ]);
         }
-        persona = await personaModel.findOne({ uuid: ctx.params.pid });
+        persona = await personaModel.findOne({ uuid: ctx.request.body.pid });
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse query: ${err}`);
@@ -497,7 +570,11 @@ export default function controller(
     },
     pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
     handler: async ctx => {
-      log.debug(`Adding persona ${ctx.params.pid} to review ${ctx.params.id}.`);
+      log.debug(
+        `Adding persona ${ctx.params.pid} to review ${ctx.params.id} as a(n) ${
+          ctx.params.role
+        }.`,
+      );
       let review, persona;
 
       try {
@@ -517,6 +594,8 @@ export default function controller(
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse query: ${err}`);
       }
+      console.log('***review***:', review);
+      console.log('***persona***:', persona);
 
       if (!review || !persona) {
         log.error('HTTP 404: Review or Persona not found');

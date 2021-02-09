@@ -10,7 +10,8 @@ import HeaderBar from './header-bar';
 import { ORG } from '../constants';
 
 export default function Settings() {
-  const [user] = useContext(UserProvider.context);
+  const [user, setUser] = useContext(UserProvider.context);
+
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -34,7 +35,7 @@ export default function Settings() {
           </dl>
         </section>
 
-        <SettingsRoles user={user} />
+        <SettingsRoles user={user} updateUser={setUser} />
         <SettingsNotifications user={user} />
         <SettingsInvites user={user} />
         {/*<SettingsApi user={user} />*/}

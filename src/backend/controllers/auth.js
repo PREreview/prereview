@@ -68,9 +68,9 @@ export default function controller(
 
     try {
       // if a user already exists
-      user = await users.findOne({ orcid: params.orcid }, [
+      user = await users.findOneByUuidOrOrcid(params.orcid, [
         'personas',
-        'communities',
+        'owned', //communities
         'groups',
       ]);
       log.trace('verifyCallback() user:', user);
@@ -102,7 +102,7 @@ export default function controller(
       if (newUser) {
         log.debug('Authenticated & created user:', newUser);
         let anonPersona;
-        let defaultPersona;
+        let publicPersona;
 
         let anonName = anonymus
           .create()[0]
@@ -125,14 +125,14 @@ export default function controller(
             identity: newUser,
             isAnonymous: true,
           });
-          defaultPersona = personas.create({
+          publicPersona = personas.create({
             name: usersName,
             identity: newUser,
             isAnonymous: false,
           });
 
-          newUser.defaultPersona = defaultPersona;
-          personas.persist([anonPersona, defaultPersona]);
+          newUser.defaultPersona = anonPersona;
+          personas.persist([anonPersona, publicPersona]);
           users.persist(newUser);
         } catch (err) {
           log.debug('Error creating personas.', err);
@@ -178,7 +178,7 @@ export default function controller(
 
       if (newUser) {
         log.debug('Authenticated & created user.', newUser);
-        const completeUser = merge(profile, newUser);
+        const completeUser = merge(profile, { ...newUser, isNew: true });
         log.trace('verifyCallback() new completeUser:', completeUser);
         return done(null, completeUser);
       } else {
@@ -247,7 +247,12 @@ export default function controller(
           try {
             ctx.login(user);
 
-            if (ctx.session.next) {
+            if (user.isNew) {
+              ctx.redirect('/settings');
+              return;
+            }
+
+            if (ctx.session.next && !user.isNew) {
               ctx.redirect(ctx.session.next);
               delete ctx.session.next;
               return;
