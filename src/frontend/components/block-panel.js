@@ -1,21 +1,29 @@
+// base imports
 import React, { Fragment, useContext, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Helmet } from 'react-helmet-async';
-import { MdClose } from 'react-icons/md';
-import UserProvider from '../contexts/user-context';
-// import { getId, unprefix } from '../utils/jsonld';
-import HeaderBar from './header-bar';
-import { ORG } from '../constants';
-// import { createLockedRolesQs } from '../utils/search';
-// import { useRolesSearchResults, usePostAction } from '../hooks/api-hooks.tsx';
+
+// hooks
 import { useGetPersonas, usePutPersona } from '../hooks/api-hooks.tsx';
+
+// contexts
+import UserProvider from '../contexts/user-context';
+
+// components
 import Button from './button';
+import Controls from './controls';
+import HeaderBar from './header-bar';
 import IconButton from './icon-button';
-import { RoleBadgeUI } from './role-badge';
 import LabelStyle from './label-style';
 import Modal from './modal';
+import { RoleBadgeUI } from './role-badge';
 import TextInput from './text-input';
-import Controls from './controls';
+
+// icons
+import { MdClose } from 'react-icons/md';
+
+// constants
+import { ORG } from '../constants';
 
 export default function BlockPanel() {
   const [user] = useContext(UserProvider.context);
@@ -41,7 +49,7 @@ export default function BlockPanel() {
   return (
     <div className="block-panel">
       <Helmet>
-        <title>{ORG} • Moderate Users</title>
+        <title>Moderate Users • {ORG}</title>
       </Helmet>
       <HeaderBar thisUser={user} closeGap />
 

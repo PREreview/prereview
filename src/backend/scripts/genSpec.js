@@ -11,6 +11,7 @@ import eventRoutes from '../controllers/event.js';
 import groupRoutes from '../controllers/group.js';
 import personaRoutes from '../controllers/persona.js';
 import rapidReviewRoutes from '../controllers/rapidReview.js';
+import reportRoutes from '../controllers/report.js';
 import requestRoutes from '../controllers/request.js';
 import searchesRoutes from '../controllers/searches.js';
 import tagRoutes from '../controllers/tag.js';
@@ -33,6 +34,7 @@ function docs() {
   generator.addJoiRouter(communityRoutes({}, authz));
   generator.addJoiRouter(personaRoutes({}, authz));
   generator.addJoiRouter(rapidReviewRoutes({}, authz));
+  generator.addJoiRouter(reportRoutes({}, authz));
   generator.addJoiRouter(requestRoutes({}, authz));
   generator.addJoiRouter(searchesRoutes({}, authz));
   generator.addJoiRouter(tagRoutes({}, authz));

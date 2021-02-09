@@ -11,7 +11,6 @@ export class PreprintModel extends EntityRepository<Preprint> {
   async findOneByUuidOrHandle(value: string, params: string[]): Promise<any> {
     try {
       const { id, scheme } = decodePreprintId(value);
-      console.log(`***id: ${id} scheme: ${scheme}***`);
       return this.findOne({ handle: `${scheme}:${id}` }, params);
     } catch (err) {
       log.warn('Failed to extract handle, trying as a uuid');

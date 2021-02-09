@@ -5,18 +5,6 @@ import PropTypes from 'prop-types';
 // components
 import Loading from '../components/loading';
 
-// export const UserContext = React.createContext();
-//
-// export function UserProvider({ user = null, children }) {
-//   const [user, setUser] = useState(null);
-//   return <UserContext.Provider value={user}>{children}</UserContext.Provider>;
-// }
-//
-// UserProvider.propTypes = {
-//   user: PropTypes.object,
-//   children: PropTypes.any,
-// };
-
 const context = createContext(null);
 
 export default function UserProvider({ children }) {

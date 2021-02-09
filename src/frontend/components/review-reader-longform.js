@@ -249,7 +249,7 @@ const LongformReviewReader = props => {
                   <Grid item><PlauditScript /></Grid>
                   {/*#FIXME plaudits*/}
                   <Grid item>
-                    <ReportButton reviewId={review.uuid} />
+                    <ReportButton uuid={review.uuid} type='fullReview' />
                   </Grid>
                 </Grid>
               </Box>

@@ -15,6 +15,7 @@ import { Comment } from './Comment';
 import { FullReviewDraft } from './FullReviewDraft';
 import { Persona } from './Persona';
 import { Preprint } from './Preprint';
+import { Statement } from './Statement';
 import { createRandomDoi } from '../../../common/utils/ids';
 
 @Entity()
@@ -57,9 +58,8 @@ export class FullReview extends BaseEntity {
   @OneToMany({ entity: () => Comment, mappedBy: 'parent' })
   comments: Collection<Comment> = new Collection<Comment>(this);
 
-  @Fixture(faker => faker.lorem.sentence())
-  @Property({ columnType: 'text', nullable: true })
-  coi?: string;
+  @OneToMany({ entity: () => Comment, mappedBy: 'parent' })
+  statements: Collection<Statement> = new Collection<Statement>(this);
 
   constructor(preprint: Preprint, isPublished = false, doi?: string) {
     super();

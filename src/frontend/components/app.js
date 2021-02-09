@@ -84,11 +84,11 @@ export default function App({ user }) {
                   </ToCPage>
                 </Route>
 
-              <Route exact={true} path="/api">
-                <ToCPage>
-                  <API />
-                </ToCPage>
-              </Route>
+                <Route exact={true} path="/api">
+                  <ToCPage>
+                    <API />
+                  </ToCPage>
+                </Route>
 
                <Route exact={true} path="/personas">
                 <PersonaSearch />

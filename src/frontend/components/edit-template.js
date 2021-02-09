@@ -128,8 +128,7 @@ const EditTemplate = ({
       <Modal
         open={openEdit}
         onClose={handleCloseEdit}
-        aria-labelledby="simple-modal-title"
-        aria-describedby="simple-modal-description"
+        aria-label="edit template modal"
       >
         <div className={classes.paper}>
           <Typography variant="h5" component="h2" gutterBottom>
