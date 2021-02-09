@@ -39,13 +39,8 @@ export default function controller(reqModel, thisUser) {
 
     ctx.params.pid ? (pid = ctx.params.pid) : null;
 
-    try {
-      authorPersona = await getActivePersona(ctx.state.user);
-    } catch (err) {
-      log.error('Failed to load user personas.');
-      ctx.throw(400, err);
-    }
-
+    authorPersona =  getActivePersona(ctx.state.user);
+    
     log.debug(`Adding a request.`);
 
     try {
