@@ -15,6 +15,7 @@ import requestRoutes from '../controllers/request.js';
 import searchesRoutes from '../controllers/searches.js';
 import tagRoutes from '../controllers/tag.js';
 import templateRoutes from '../controllers/template.js';
+import notificationRoutes from '../controllers/notification.js';
 
 const __dirname = path.resolve();
 const OUT_FILE = path.resolve(__dirname, 'dist', 'openapi.json');
@@ -36,6 +37,7 @@ function docs() {
   generator.addJoiRouter(searchesRoutes({}, authz));
   generator.addJoiRouter(tagRoutes({}, authz));
   generator.addJoiRouter(templateRoutes({}, authz));
+  generator.addJoiRouter(notificationRoutes({}, authz));
 
   const spec = generator.generateSpec(
     {

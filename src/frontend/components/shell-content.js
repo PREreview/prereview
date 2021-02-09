@@ -125,29 +125,30 @@ export default function ShellContent({
         if (cid) {
           ownDrafts = ownReviews.length
             ? ownReviews.find(
-                review => review.uuid === cid && !review.isPublished,
-              )
+              review => review.uuid === cid && !review.isPublished,
+            )
             : [];
 
           latestDraft =
             ownDrafts && ownDrafts.drafts && ownDrafts.drafts.length
               ? ownDrafts.drafts.length > 1
                 ? ownDrafts.drafts.sort((a, b) => a.id - b.id)[
-                    ownDrafts.drafts.length - 1
-                  ]
+                ownDrafts.drafts.length - 1
+                ]
                 : ownDrafts.drafts[0]
               : null;
 
           // get the latest draft content & seed to the text editor
           if (latestDraft) {
+            latestDraft.authors = ownDrafts.authors;
             setInitialContent(latestDraft.contents);
             setReview(latestDraft);
           }
         } else {
           ownDrafts = ownReviews.length
             ? ownReviews
-                .filter(review => !review.isPublished)
-                .map(review => review.drafts)
+              .filter(review => !review.isPublished)
+              .map(review => review.drafts)
             : [];
 
           latestDraft = ownDrafts.length
@@ -160,6 +161,7 @@ export default function ShellContent({
 
           // get the latest draft content & seed to the text editor
           if (latestDraft) {
+            latestDraft.authors = ownDrafts.authors;
             setInitialContent(latestDraft.contents);
             setReview(latestDraft);
           }
@@ -435,23 +437,23 @@ function ShellContentReviews({
         />
       </div>
     ) : (
-      <div>Sorry, you are not authorized to contribute to this review.</div>
-    )
+        <div>Sorry, you are not authorized to contribute to this review.</div>
+      )
   ) : (
-    <div className="shell-content-review">
-      <ReviewStepper
-        preprint={preprint}
-        disabled={disabled}
-        onClose={onClose}
-        onContentChange={onContentChange}
-        hasRapidReviewed={hasRapidReviewed}
-        hasLongReviewed={hasLongReviewed}
-        content={initialContent}
-        review={review}
-        onReviewChange={onReviewChange}
-      />
-    </div>
-  );
+      <div className="shell-content-review">
+        <ReviewStepper
+          preprint={preprint}
+          disabled={disabled}
+          onClose={onClose}
+          onContentChange={onContentChange}
+          hasRapidReviewed={hasRapidReviewed}
+          hasLongReviewed={hasLongReviewed}
+          content={initialContent}
+          review={review}
+          onReviewChange={onReviewChange}
+        />
+      </div>
+    );
 }
 ShellContentReviews.propTypes = {
   preprint: PropTypes.object.isRequired,
@@ -485,24 +487,24 @@ function ShellContentRequest({
           </Box>
         </div>
       ) : (
-        <div className="shell-content-request">
-          <header className="shell-content-request__title">
-            Add a request for review
+          <div className="shell-content-request">
+            <header className="shell-content-request__title">
+              Add a request for review
           </header>
 
-          <Controls error={error}>
-            <Button
-              primary={true}
-              isWaiting={isPosting}
-              onClick={() => {
-                onSubmit(preprint);
-              }}
-            >
-              Submit
+            <Controls error={error}>
+              <Button
+                primary={true}
+                isWaiting={isPosting}
+                onClick={() => {
+                  onSubmit(preprint);
+                }}
+              >
+                Submit
             </Button>
-          </Controls>
-        </div>
-      )}
+            </Controls>
+          </div>
+        )}
     </div>
   );
 }
