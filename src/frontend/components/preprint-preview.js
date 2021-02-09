@@ -1,7 +1,8 @@
+// base imports
 import React from 'react';
 import PropTypes from 'prop-types';
-import { MdChevronRight } from 'react-icons/md';
-import Value from './value';
+
+// utils
 import { getFormattedDatePosted } from '../utils/preprints';
 import {
   createPreprintId,
@@ -9,7 +10,13 @@ import {
   getCanonicalDoiUrl,
   getCanonicalArxivUrl,
 } from '../../common/utils/ids.js';
+
+// components
+import Value from './value';
 import XLink from './xlink';
+
+// icons
+import { MdChevronRight } from 'react-icons/md';
 import ShellIcon from '../svgs/shell_icon.svg';
 
 export default function PreprintPreview({ preprint }) {

@@ -69,12 +69,16 @@ const EditTemplate = ({
   // handle open and close of edit template modal
   const [openEdit, setOpenEdit] = useState(false);
 
+  const [contents, setContents] = useState(template.contents);
+
   const handleOpenEdit = () => {
     setOpenEdit(true);
   };
 
   const handleCloseEdit = () => {
-    resetContent();
+    if (resetContent) {
+      resetContent();
+    }
     setOpenEdit(false);
   };
 
@@ -124,8 +128,7 @@ const EditTemplate = ({
       <Modal
         open={openEdit}
         onClose={handleCloseEdit}
-        aria-labelledby="simple-modal-title"
-        aria-describedby="simple-modal-description"
+        aria-label="edit template modal"
       >
         <div className={classes.paper}>
           <Typography variant="h5" component="h2" gutterBottom>
@@ -142,11 +145,28 @@ const EditTemplate = ({
             onChange={event => handleTitleChange(event.target.value)}
             required
           />
+          <TextField
+            id="template-content"
+            variant="outlined"
+            placeholder="Add contents for this template"
+            multiline
+            rows={4}
+            className={classes.input}
+            error={error}
+            defaultValue={contents}
+            onChange={event => {
+              setContents(event.target.value);
+              handleContentChange(event.target.value);
+            }}
+            required
+          />
+          {/*
           <TemplateEditor
             id={template.uuid}
             initialContent={template.contents}
             handleContentChange={handleContentChange}
           />
+          */}
           <Button
             onClick={() => handleSubmit(template.id)}
             type="button"
@@ -168,7 +188,7 @@ EditTemplate.propTypes = {
   content: PropTypes.string.isRequired,
   handleContentChange: PropTypes.func.isRequired,
   handleTitleChange: PropTypes.func.isRequired,
-  resetContent: PropTypes.func.isRequired,
+  resetContent: PropTypes.func,
 };
 
 export default EditTemplate;

@@ -4,6 +4,8 @@ import PropTypes from 'prop-types';
 
 // material ui imports
 import { makeStyles, withStyles } from '@material-ui/core/styles';
+import Avatar from '@material-ui/core/Avatar';
+import AvatarGroup from '@material-ui/lab/AvatarGroup';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Modal from '@material-ui/core/Modal';
 import MuiButton from '@material-ui/core/Button';
@@ -47,7 +49,7 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const AddAuthors = ({ isMentor, reviewId }) => {
+const AddAuthors = ({ isMentor, reviewId, members, membersLimit = 5 }) => {
   const classes = useStyles();
 
   // fetch users from API
@@ -100,11 +102,22 @@ const AddAuthors = ({ isMentor, reviewId }) => {
             In order to invite one or more co-reviewer(s), you first need to SAVE the draft of your review.`}
           </Value>
         </Collapse>
+        {!!members && (
+          <AvatarGroup max={membersLimit}>
+            {members.map(member => (
+              <Avatar
+                key={member.uuid}
+                alt={member.name}
+                src={member.avatar}
+              />
+            ))}
+          </AvatarGroup>
+        )}
         <Modal
           open={open}
           onClose={handleClose}
-          aria-labelledby="simple-modal-title"
-          aria-describedby="simple-modal-description"
+          aria-labelledby="add-authors-modal"
+          aria-describedby="add-authors-modal"
         >
           <div className={classes.paper}>
             <Search

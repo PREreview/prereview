@@ -41,7 +41,9 @@ import {
   personaModelWrapper,
   preprintModelWrapper,
   rapidReviewModelWrapper,
+  reportModelWrapper,
   requestModelWrapper,
+  statementModelWrapper,
   tagModelWrapper,
   templateModelWrapper,
   userModelWrapper,
@@ -59,12 +61,14 @@ import UserController from './controllers/user.js';
 import PersonaController from './controllers/persona.js';
 import PreprintController from './controllers/preprint.js';
 import RapidController from './controllers/rapidReview.js';
+import ReportController from './controllers/report.js';
 import RequestController from './controllers/request.js';
 import TagController from './controllers/tag.js';
 import TemplateController from './controllers/template.js';
 import DocsController from './controllers/docs.js';
 import SearchesController from './controllers/searches.js';
 import EventController from './controllers/event.js';
+import NotificationController from './controllers/notification.js';
 
 const __dirname = path.resolve();
 const STATIC_DIR = path.resolve(__dirname, 'dist', 'frontend');
@@ -132,13 +136,24 @@ export default async function configServer(config) {
   const preprints = PreprintController(preprintModel, authz);
   const rapidReviewModel = rapidReviewModelWrapper(db);
   const rapidReviews = RapidController(rapidReviewModel, preprintModel, authz);
+  const reportModel = reportModelWrapper(db);
+  const reports = ReportController(
+    reportModel,
+    commentModel,
+    fullReviewModel,
+    personaModel,
+    rapidReviewModel,
+    authz,
+  );
   const requestModel = requestModelWrapper(db);
   const requests = RequestController(requestModel, authz);
+  const statementModel = statementModelWrapper(db);
   const fullReviews = FullReviewController(
     fullReviewModel,
     draftModel,
     personaModel,
     preprintModel,
+    statementModel,
     authz,
   );
   const tagModel = tagModelWrapper(db);
@@ -147,6 +162,7 @@ export default async function configServer(config) {
   const templates = TemplateController(templateModel, communityModel, authz);
   const users = UserController(userModel, contactModel, authz);
   const searches = SearchesController(preprintModel, draftModel, authz);
+  const notifications = NotificationController(userModel, authz);
   const communities = CommunityController(
     communityModel,
     userModel,
@@ -171,7 +187,9 @@ export default async function configServer(config) {
     groups.middleware(),
     personas.middleware(),
     preprints.middleware(),
+    notifications.middleware(),
     rapidReviews.middleware(),
+    reports.middleware(),
     requests.middleware(),
     searches.middleware(),
     tags.middleware(),
@@ -218,8 +236,15 @@ export default async function configServer(config) {
     .use(mailWrapper(config))
     .use(mount('/api/v2', apiV2Router))
     .use(mount('/api', apiDocs.middleware()))
+    .use(koa404Handler)
     .use(serveStatic(STATIC_DIR))
-    .use(koa404Handler);
+    .use(
+      async (ctx, next) =>
+        await serveStatic(STATIC_DIR)(
+          Object.assign(ctx, { path: 'index.html' }),
+          next,
+        ),
+    );
 
   return server.callback();
 }

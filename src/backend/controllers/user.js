@@ -182,21 +182,39 @@ export default function controller(users, contacts, thisUser) {
         summary: 'Endpoint to POST new contacts for a single user.',
       },
     },
-    method: 'post',
+    method: 'POST',
     path: '/users/:id/contacts',
-    // validate: {    },
+    validate: {
+      params: {
+        id: Joi.string()
+          .description('User id')
+          .required(),
+      },
+      body: Joi.object({
+        schema: Joi.string(),
+        value: Joi.string(),
+      }),
+      type: 'json',
+    },
     // pre: {},
     handler: async ctx => {
-      const userId = ctx.params.id;
-      let newContact;
-      log.debug(`Adding a new contact to user ${userId}`);
+      log.debug(`Adding a new contact to user ${ctx.params.id}`);
+      let newContact, user;
+      try {
+        user = await users.findOneByUuidOrOrcid(ctx.params.id);
+      } catch (err) {
+        log.error('HTTP 400 Error: ', err);
+        ctx.throw(400, `Failed to parse contact schema: ${err}`);
+      }
+      if (!user) {
+        ctx.throw(404, `That user with ID ${ctx.params.id} does not exist.`);
+      }
 
       let conflict, schema, value;
       try {
         log.debug(`Create a new contact entry.`);
-        // FIXME contacts.fineOne  is not a valid method
-        // let { schema, value } = ctx.request.body;
-        // conflict = await contacts.findOne({ schema, value, uuid: userId });
+        ({ schema, value } = ctx.request.body);
+        conflict = await contacts.findOne({ schema, value, identity: user });
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse contact schema: ${err}`);
@@ -204,31 +222,33 @@ export default function controller(users, contacts, thisUser) {
 
       if (conflict) {
         log.error(
-          `HTTP 409 Error: Contact ${schema}:${value} already exists for user ${userId}`,
+          `HTTP 409 Error: Contact ${schema}:${value} already exists for user ${
+            ctx.params.id
+          }`,
         );
         ctx.throw(
           409,
-          `Contact ${schema}:${value} already exists for user ${userId}`,
+          `Contact ${schema}:${value} already exists for user ${ctx.params.id}`,
         );
       }
 
       try {
-        // FIXME this is test data
-        newContact = {
-          value: 'foo@bar.com',
-          schema: 'mailto',
-          identity: userId,
+        newContact = contacts.create({
+          ...ctx.request.body,
+          identity: user,
           isVerified: false,
           token: uuidv4(),
-        };
-        // FIXME this function does not exist
-        // newContact = contacts.create({
-        //   ...ctx.request.body,
-        //   identity: userId,
-        //   isVerified: false,
-        //   token: uuidv4(),
-        // });
-        // await contacts.persistAndFlush(newContact);
+        });
+        await contacts.persistAndFlush(newContact);
+        await ctx.mail.send({
+          template: 'verifyEmail',
+          message: {
+            to: newContact.value,
+          },
+          locals: {
+            token: newContact.token,
+          },
+        });
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse contact schema: ${err}`);
@@ -252,18 +272,41 @@ export default function controller(users, contacts, thisUser) {
     },
     method: 'put',
     path: '/users/:id/contacts/:cid',
+    validate: {
+      params: {
+        id: Joi.string()
+          .description('User id')
+          .required(),
+        cid: Joi.string()
+          .description('Contacts id')
+          .required(),
+      },
+      body: Joi.object({
+        schema: Joi.string().required(),
+        value: Joi.string().required(),
+        isNotified: Joi.boolean().required(),
+      }),
+      type: 'json',
+    },
     // validate: {    },
     // pre: {},
     handler: async ctx => {
-      const userId = ctx.params.id;
       const contactId = ctx.params.cid;
-      let newContact;
-      log.debug(`Updating contact for user ${userId}`);
-
+      let newContact, user;
+      log.debug(`Updating contact for user ${ctx.params.id}`);
+      try {
+        user = await users.findOneByUuidOrOrcid(ctx.params.id);
+      } catch (err) {
+        log.error('HTTP 400 Error: ', err);
+        ctx.throw(400, `Failed to parse contact schema: ${err}`);
+      }
+      if (!user) {
+        ctx.throw(404, `That user with ID ${ctx.params.id} does not exist.`);
+      }
       try {
         const exists = await contacts.findOne({
           uuid: contactId,
-          identity: userId,
+          identity: user,
         });
         if (exists) {
           log.debug('Contact already exists, updating.');
@@ -279,7 +322,7 @@ export default function controller(users, contacts, thisUser) {
           log.debug('Contact does not yet exist, creating.');
           newContact = contacts.create({
             ...ctx.request.body,
-            identity: userId,
+            identity: user,
             token: uuidv4(),
           });
           await contacts.persistAndFlush(newContact);
@@ -290,8 +333,72 @@ export default function controller(users, contacts, thisUser) {
             data: newContact,
           };
         }
-        newContact = contacts.create({ ...ctx.request.body, identity: userId });
-        await contacts.persistAndFlush(newContact);
+      } catch (err) {
+        log.error('HTTP 400 Error: ', err);
+        ctx.throw(400, `Failed to parse contact schema: ${err}`);
+      }
+    },
+  });
+
+  userRouter.route({
+    meta: {
+      swagger: {
+        operationId: 'DeleteUserContacts',
+        summary: 'Endpoint to PUT contacts for a single user.',
+      },
+    },
+    method: 'DELETE',
+    path: '/users/:id/contacts',
+    validate: {
+      params: {
+        id: Joi.string()
+          .description('User id')
+          .required(),
+      },
+      query: {
+        cid: Joi.string()
+          .description('Contacts id')
+          .required(),
+      },
+      type: 'json',
+      continueOnError: true,
+    },
+    handler: async ctx => {
+      const contactId = ctx.query.cid;
+      let user;
+      log.debug(`Deleting contact for user ${ctx.params.id}`);
+      try {
+        user = await users.findOneByUuidOrOrcid(ctx.params.id);
+      } catch (err) {
+        log.error('HTTP 400 Error: ', err);
+        ctx.throw(400, `Failed to parse contact schema: ${err}`);
+      }
+      if (!user) {
+        ctx.throw(404, `That user with ID ${ctx.params.id} does not exist.`);
+      }
+      try {
+        const exists = await contacts.findOne({
+          uuid: contactId,
+          identity: user,
+        });
+        if (exists) {
+          log.debug('Deleting contact.');
+          await contacts.removeAndFlush(exists);
+          ctx.status = 200;
+          ctx.body = {
+            status: 200,
+            message: 'ok',
+            data: exists,
+          };
+        } else {
+          log.error('Contact does not exist.');
+          ctx.throw(
+            404,
+            `That contact ${ctx.query.cid} for user with ID ${
+              ctx.params.id
+            } does not exist.`,
+          );
+        }
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse contact schema: ${err}`);
@@ -334,6 +441,72 @@ export default function controller(users, contacts, thisUser) {
       }
       // if deleted
       ctx.status = 204;
+    },
+  });
+
+  userRouter.route({
+    meta: {
+      swagger: {
+        operationId: 'GetValidateContact',
+        summary: 'Endpoint to validate an email.',
+        required: true,
+      },
+    },
+    method: 'GET',
+    path: '/valid-contacts/:token',
+    validate: {
+      params: {
+        token: Joi.string()
+          .description('Email validation token')
+          .required(),
+      },
+    },
+    pre: (ctx, next) => thisUser.can('access private pages')(ctx, next), // TODO: can users delete their own account?
+    handler: async ctx => {
+      log.debug(`Validating contact w/ token ${ctx.params.token}.`);
+
+      let contact;
+
+      try {
+        contact = await contacts.findOne({
+          token: ctx.params.token,
+          identity: ctx.state.user,
+        });
+        if (!contact) {
+          log.error(
+            `HTTP 404 Error: Contact with token ${
+              ctx.params.token
+            } doesn't exist`,
+          );
+          ctx.throw(
+            404,
+            `Contact with token ${ctx.params.token} doesn't exist`,
+          );
+        }
+        if (contact.isVerified) {
+          log.error(
+            `HTTP 409 Error: Contact with token ${
+              ctx.params.token
+            } is already verified`,
+          );
+          ctx.throw(
+            409,
+            `Contact with token ${ctx.params.token} is already verified`,
+          );
+        }
+        contact.isVerified = true;
+        await contacts.persistAndFlush(contact);
+      } catch (err) {
+        log.error('HTTP 400 Error: ', err);
+        ctx.throw(400, `Failed to retrieve contact: ${err}`);
+      }
+      // if verified
+      ctx.status = 200;
+      ctx.body = {
+        status: 200,
+        message: 'ok',
+        data: { schema: contact.schema, value: contact.value },
+      };
     },
   });
 

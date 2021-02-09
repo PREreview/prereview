@@ -6,6 +6,7 @@ import {
   OneToMany,
   OneToOne,
   Property,
+  Unique,
 } from '@mikro-orm/core';
 import { Fixture } from 'class-fixtures-factory';
 import { UserModel } from '../users';
@@ -23,6 +24,7 @@ export class User extends BaseEntity {
   [EntityRepositoryType]?: UserModel;
 
   @Fixture(() => createRandomOrcid())
+  @Unique()
   @Property()
   orcid!: string;
 

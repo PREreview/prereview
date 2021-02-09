@@ -1,27 +1,38 @@
-import React, { Fragment, useState, useRef } from 'react';
+// base imports
+import React, { Fragment, useEffect, useState, useRef } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { MdExpandLess, MdExpandMore, MdLock } from 'react-icons/md';
 import { format } from 'date-fns';
+
+// utils
 import { getId, unprefix } from '../utils/jsonld';
-import Collapse from './collapse';
-import IconButton from './icon-button';
-import Value from './value';
-import Controls from './controls';
-import Button from './button';
-import PreprintPreview from './preprint-preview';
 import { getTextAnswers, getActiveReports } from '../utils/stats';
-import RoleBadge from './role-badge';
-import Modal from './modal';
+
+// hooks
 import {
   useDeleteRapidReview,
   useDeleteFullReview,
-  useGetUser,
 } from '../hooks/api-hooks.tsx';
 
+// components
+import Button from './button';
+import Collapse from './collapse';
+import Controls from './controls';
+import IconButton from './icon-button';
+import Modal from './modal';
+import PreprintPreview from './preprint-preview';
+import RoleBadge from './role-badge';
+import Value from './value';
+
+// materialUI components
+import CircularProgress from '@material-ui/core/CircularProgress';
+
+// icons
+import { MdExpandLess, MdExpandMore, MdLock } from 'react-icons/md';
+
 export default function ModerationCard({
-  user,
-  reviewAction,
+  reviewer,
+  review,
   isOpened,
   isLockedBy,
   onOpen,
@@ -29,11 +40,12 @@ export default function ModerationCard({
   onSuccess,
 }) {
   const [modalFrame, setModalFrame] = useState(null);
-  const reviewer = useGetUser(reviewAction.agent);
-  const locker = useGetUser(isLockedBy);
+  // const locker = useGetUser(isLockedBy);
+  const locker = reviewer; // FIXME
 
-  const reports = getActiveReports(reviewAction);
-  const textAnswers = getTextAnswers(reviewAction);
+  const reports = review.isFlagged;
+  const [content, setContent] = useState(null);
+
 
   return (
     <div
@@ -44,36 +56,37 @@ export default function ModerationCard({
       {/* The card body */}
       <div className="moderation-card__header">
         <div className="moderation-card__header__left">
-          <RoleBadge
-            roleId={getId(reviewAction.agent)}
-            className="moderation-card__header-badge"
-          />
+          {review.authors.length ? (
+            <>
+              {/*review.authors.map(author => (
+                <RoleBadge
+                  key={author.uuid}
+                  roleId={author}
+                  className="moderation-card__header-badge"
+                />
+              ))*/}
+            </>
+          ) : null}
           <span className="moderation-card__header-name">
-            {reviewer && (reviewer.name || unprefix(getId(reviewer)))}
+            {reviewer && (reviewer.name || reviewer.orcid)}
           </span>
         </div>
         <div className="moderation-card__header__right">
           Reviewed on{' '}
-          <span>
-            {format(new Date(reviewAction.startTime), 'MMM. d, yyyy')}
-          </span>
+          <span>{format(new Date(review.updatedAt), 'MMM. d, yyyy')}</span>
         </div>
       </div>
 
       <div className="moderation-card__text-answers">
         <dl className="moderation-card__text-answers-list">
-          {textAnswers
-            .filter(data => data.answers.length)
-            .map(({ questionId, question, answers: [{ text: answer }] }) => (
-              <div key={questionId} className="moderation-card__text-answer">
-                <dt className="moderation-card__text-answer-question">
-                  <Value>{question}</Value>
-                </dt>
-                <dd className="moderation-card__text-answer-response">
-                  <Value>{answer}</Value>
-                </dd>
-              </div>
-            ))}
+          <div className="moderation-card__text-answer">
+            <dt className="moderation-card__text-answer-question">
+              <Value>Content</Value>
+            </dt>
+            <dd className="moderation-card__text-answer-response">
+              <Value>{content}</Value>
+            </dd>
+          </div>
         </dl>
       </div>
 
@@ -88,7 +101,7 @@ export default function ModerationCard({
             tagName="span"
             className="moderation-card__expansion-preview-title"
           >
-            {reviewAction.object.name}
+            {review.title}
           </Value>
         </div>
 
@@ -109,15 +122,12 @@ export default function ModerationCard({
       <Collapse isOpened={isOpened}>
         <div className="moderation-card__expansion-content">
           {/* The moderation reason of each reporter */}
-          <PreprintPreview
-            preprint={reviewAction.object}
-            hyperlinkTitle={true}
-          />
+          <PreprintPreview preprint={review.preprint} hyperlinkTitle={true} />
 
           <h3 className="moderation-card__sub-title">User Reports</h3>
 
           <ul className="moderation-card__flag-reasons-list">
-            {reports.map(report => (
+            {/*reports.map(report => (
               <li
                 key={`${getId(report.agent)}-${report.startTime}`}
                 className="moderation-card__flag-reasons-list-item"
@@ -127,11 +137,12 @@ export default function ModerationCard({
                   {report.moderationReason || 'No reason specified'}
                 </Value>
               </li>
-            ))}
+            ))*/}
           </ul>
 
           <Controls className="moderation-card__expansion-controls">
-            {user.isAdmin && reviewer && !reviewer.isModerated && (
+            {reviewer && !reviewer.isAdmin && (
+              // FIXME should be reviewer.isModerated ?
               <Button
                 primary={true}
                 onClick={() => {
@@ -161,8 +172,8 @@ export default function ModerationCard({
             {modalFrame && (
               <ModerationCardModal
                 defaultFrame={modalFrame}
-                user={user}
-                reviewAction={reviewAction}
+                user={reviewer}
+                reviewAction={review}
                 onClose={() => {
                   setModalFrame(null);
                 }}
@@ -183,7 +194,7 @@ export default function ModerationCard({
             </span>
 
             <span className="moderation-card__lock-overlay__agent">
-              <RoleBadge roleId={getId(locker)} />
+              {/*<RoleBadge roleId={locker} />*/}
               <span className="moderation-card__lock-overlay__agent-name">
                 {locker ? locker.name || unprefix(getId(locker)) : null}
               </span>
@@ -196,29 +207,8 @@ export default function ModerationCard({
 }
 
 ModerationCard.propTypes = {
-  user: PropTypes.object.isRequired,
-  reviewAction: PropTypes.shape({
-    '@type': PropTypes.oneOf(['RapidPREreviewAction']).isRequired,
-    agent: PropTypes.string.isRequired,
-    startTime: PropTypes.string.isRequired,
-    object: PropTypes.shape({
-      name: PropTypes.oneOfType([PropTypes.string, PropTypes.object])
-        .isRequired,
-    }).isRequired,
-    moderationAction: PropTypes.arrayOf(
-      PropTypes.shape({
-        '@type': PropTypes.oneOf([
-          'ReportRapidPREreviewAction',
-          'IgnoreReportRapidPREreviewAction',
-          'ModerateRapidPREreviewAction',
-        ]).isRequired,
-        moderationReason: PropTypes.oneOfType([
-          PropTypes.string,
-          PropTypes.object,
-        ]),
-      }),
-    ).isRequired,
-  }).isRequired,
+  reviewer: PropTypes.object.isRequired,
+  review: PropTypes.object.isRequired,
   isLockedBy: PropTypes.string, // the roleId of a moderator currently viewing the card
   isOpened: PropTypes.bool.isRequired,
   onOpen: PropTypes.func.isRequired,

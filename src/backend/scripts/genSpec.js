@@ -11,10 +11,12 @@ import eventRoutes from '../controllers/event.js';
 import groupRoutes from '../controllers/group.js';
 import personaRoutes from '../controllers/persona.js';
 import rapidReviewRoutes from '../controllers/rapidReview.js';
+import reportRoutes from '../controllers/report.js';
 import requestRoutes from '../controllers/request.js';
 import searchesRoutes from '../controllers/searches.js';
 import tagRoutes from '../controllers/tag.js';
 import templateRoutes from '../controllers/template.js';
+import notificationRoutes from '../controllers/notification.js';
 
 const __dirname = path.resolve();
 const OUT_FILE = path.resolve(__dirname, 'dist', 'openapi.json');
@@ -32,10 +34,12 @@ function docs() {
   generator.addJoiRouter(communityRoutes({}, authz));
   generator.addJoiRouter(personaRoutes({}, authz));
   generator.addJoiRouter(rapidReviewRoutes({}, authz));
+  generator.addJoiRouter(reportRoutes({}, authz));
   generator.addJoiRouter(requestRoutes({}, authz));
   generator.addJoiRouter(searchesRoutes({}, authz));
   generator.addJoiRouter(tagRoutes({}, authz));
   generator.addJoiRouter(templateRoutes({}, authz));
+  generator.addJoiRouter(notificationRoutes({}, authz));
 
   const spec = generator.generateSpec(
     {
