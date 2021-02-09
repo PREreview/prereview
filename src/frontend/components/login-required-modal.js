@@ -24,7 +24,7 @@ export default function LoginRequiredModal({ onClose, next }) {
 
       <p>
         <XLink to={url} href={url}>
-          Log in with your ORCID
+          Log in or sign up for an account 
         </XLink>
       </p>
     </Modal>
