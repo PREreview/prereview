@@ -243,12 +243,14 @@ export default function controller(preprints, thisUser) {
           );
           count = await preprints.count();
         }
-      
-        if (foundPreprints) {
 
-          // only send back preprints with requests for reviews or actual reviews -- does not check for full-length reviews 
+        if (foundPreprints) {
+          // only send back preprints with requests for reviews or actual reviews -- does not check for full-length reviews
           // because full length reviews require a rapid review
-          let results = foundPreprints.filter(preprint => preprint.requests.length > 0 || preprint.rapidReviews.length > 0)
+          let results = foundPreprints.filter(
+            preprint =>
+              preprint.requests.length > 0 || preprint.rapidReviews.length > 0,
+          );
 
           ctx.body = {
             statusCode: 200,
