@@ -563,7 +563,7 @@ export default function ReviewStepper({
                   className={classes.inputLabel}
                 >
                   Please use the space below to declare any existing{' '}
-                  <Link href="#">Competing Interest</Link>.
+                  <Link href="https://content.prereview.org/coc/#toc-anchor_5" target="_blank" rel="noopener noreferrer">Competing Interest</Link>.
               </InputLabel>
                 <Input
                   className={classes.input}
@@ -574,7 +574,7 @@ export default function ReviewStepper({
                 />
                 <Box mt={2} mb={2} className={classes.yellow}>
                   Please review the{' '}
-                  <Link href="#">PREreview Code of Conduct</Link> before
+                  <Link href="https://content.prereview.org/coc/" target="_blank" rel="noopener noreferrer">PREreview Code of Conduct</Link> before
                 submitting your review.
               </Box>
               </form>
@@ -593,7 +593,7 @@ export default function ReviewStepper({
               </Typography>
               <Typography variant="body2" gutterBottom>
                 Please remember to be constructive and to abide by the{' '}
-                <Link href="#">PREreview Code of Conduct</Link>.
+                <Link href="https://content.prereview.org/coc/" target="_blank" rel="noopener noreferrer">PREreview Code of Conduct</Link>.
               </Typography>
             </Box>
             <Box mt={2} mb={2}>
