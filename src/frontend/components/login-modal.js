@@ -204,16 +204,16 @@ function LoginModal({ open, handleClose }) {
             <DialogContent>
               <List>
                 <ListItemText>
-                  We are sorry you can&apos;t join our community at this moment.
+                  We are sorry you cannot join our community at this moment.
                   We hope you come back soon!
                 </ListItemText>
 
                 <ListItemText>
-                  If you have any questions or concerns, please don&apos;t
+                  If you have any questions or concerns, please do not
                   hesitate to contact us at{' '}
                   <a href="mailto:contact:prereview.org">
                     contact@prereview.org
-                  </a>
+                  </a>. {' '}
                   You can also give us anonymous feedback via{' '}
                   <a
                     href="https://docs.google.com/forms/d/e/1FAIpQLSdjlXuPgmA0p3xcQ316_qJAXvisEN_jywzAJ5jQREmj1c-uCA/viewform"
@@ -237,6 +237,7 @@ function LoginModal({ open, handleClose }) {
       <Dialog
         open={open}
         aria-labelledby="login-modal-title"
+        disableBackdropClick={true}
         onClose={handleClose}
       >
         <Box className={classes.dialog} p={4}>
