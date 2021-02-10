@@ -16,10 +16,8 @@ import {
   Contact,
   FullReview,
   FullReviewDraft,
-  Persona,
   Preprint,
   Request,
-  User,
   Work,
 } from '../../models/entities/index.ts';
 
@@ -31,6 +29,7 @@ async function importPreprints(
   preTag,
 ) {
   try {
+    const preprintCache = new Set();
     for (let r of preprints.rows) {
       r.createdAt = new Date(r.createdAt);
       r.datePosted = new Date(r.datePosted);
@@ -56,7 +55,7 @@ async function importPreprints(
         console.log('ERROR');
       }
       let preprint = await preprintModel.findOne({ handle: handle });
-      if (!preprint) {
+      if (!preprint && !preprintCache.has(handle)) {
         let source;
         if (lookup) {
           source = lookup;
@@ -78,15 +77,16 @@ async function importPreprints(
           source.contentUrl,
         );
         preprint.tags.add(preTag);
-        await preprintModel.persistAndFlush(preprint);
+        preprintModel.persist(preprint);
         console.log(`${site}: Inserted Preprint ${preprint.handle}`);
       } else {
         console.log(`${site}: Duplicate preprint ${handle}, skipping`);
       }
+      preprintCache.add(handle);
       preprintsMap.set(r.handle, preprint);
     }
     console.log(`${site}: Flushing preprints to disk.`);
-    //await preprintModel.flush();
+    await preprintModel.flush();
     console.log(`${site}: Done flushing preprints to disk.`);
   } catch (err) {
     console.error('Failed to import:', err);
@@ -123,6 +123,8 @@ async function prereviewOrgImportPreprints(db, client, preprintsMap, preTag) {
 async function prereviewOrgImportUsers(db, client, usersMap, preBadge) {
   const userModel = userModelWrapper(db);
   const personaModel = personaModelWrapper(db);
+  const userCache = new Set();
+  const personaCache = new Set();
   try {
     const oldUsers = await client.query(
       'SELECT user_id,orcid,name,created_at AS "createdAt",profile FROM users',
@@ -146,8 +148,8 @@ async function prereviewOrgImportUsers(db, client, usersMap, preBadge) {
       // Process the deep JSON structure for a given ORCID user
       let userObject;
       if (person) {
-        userObject = new User(r.orcid);
-        userObject.badges.add(preBadge);
+        userObject = userModel.create({ orcid: r.orcid });
+        userCache.add(r.orcid);
         //userObject.createdAt = new Date(r.createdAt);
         let name;
         if (person.name) {
@@ -169,28 +171,52 @@ async function prereviewOrgImportUsers(db, client, usersMap, preBadge) {
           name = r.name;
         }
         let personaObject = await personaModel.findOne({ name: name });
-        if (!personaObject) {
-          personaObject = new Persona(name, userObject);
+        if (!personaObject && !personaCache.has(name)) {
+          personaObject = personaModel.create({
+            name: name,
+            identity: userObject,
+          });
         } else {
           console.log(
             `PREreview.org: Persona with name ${name} already exists`,
           );
         }
-        let anonName = anonymus.create()[0];
-        while ((await personaModel.findOne({ name: anonName })) !== null) {
+        let anonName = anonymus
+          .create()[0]
+          .replace(/(^|\s)\S/g, l => l.toUpperCase());
+        while (
+          (await personaModel.findOne({ name: anonName })) !== null ||
+          personaCache.has(anonName)
+        ) {
           console.log('PREreview.org: Anonymous name generation collision');
           anonName = anonymus.create()[0];
         }
-        const anonPersonaObject = new Persona(anonName, userObject, true);
+        const anonPersonaObject = personaModel.create({
+          name: anonName,
+          identity: userObject,
+          isAnonymous: true,
+        });
         if (person.biography && person.biography['content']) {
           personaObject.bio = person.biography['content'];
         }
+        console.log(
+          `PREreview.org: Imported persona '${name}' for ${userObject.orcid}`,
+        );
+        console.log(
+          `PREreview.org: Imported anonymous persona '${anonName}' for ${
+            userObject.orcid
+          }`,
+        );
+        personaCache.add(personaObject.name);
+        personaCache.add(anonPersonaObject.name);
         userObject.personas.add(personaObject);
         userObject.personas.add(anonPersonaObject);
         if (person.is_private) {
+          anonPersonaObject.badges.add(preBadge);
           userObject.isPrivate = true;
           userObject.defaultPersona = anonPersonaObject;
         } else {
+          personaObject.badges.add(preBadge);
           userObject.isPrivate = false;
           userObject.defaultPersona = personaObject;
         }
@@ -308,10 +334,12 @@ async function prereviewOrgImportUsers(db, client, usersMap, preBadge) {
           }
         }
       }
-      await userModel.persistAndFlush(userObject);
+      userModel.persist(userObject);
       usersMap.set(r.user_id, userObject);
     }
-    //await userModel.flush();
+    console.log('PREreview.org: Flushing users to disk.');
+    await userModel.flush();
+    console.log('PREreview.org: Finished flushing users to disk.');
   } catch (err) {
     console.error('PREreview.org: Failed to import:', err);
   }
@@ -336,23 +364,26 @@ async function prereviewOrgImportReviews(db, client, usersMap, preprintsMap) {
       if (r.doi) {
         r.doi = `doi:${r.doi}`;
       }
-      const review = new FullReview(preprint, true, r.doi);
-      const draft = new FullReviewDraft(review, r.content);
-      review.drafts.add(draft);
-      review.createdAt = new Date(r.date_created);
-      review.isPublished = !r.is_hidden;
-      if (author && author.defaultPersona) {
-        review.authors.add(author.defaultPersona);
-      } else {
-        console.log(
-          `PREreview.org: No default persona found for user:`,
-          author,
-        );
+      if (preprint && r.content) {
+        const review = new FullReview(preprint, true, r.doi);
+        const draft = new FullReviewDraft(review, r.content);
+        review.drafts.add(draft);
+        review.createdAt = new Date(r.date_created);
+        review.isPublished = !r.is_hidden;
+        if (author && author.defaultPersona) {
+          review.authors.add(author.defaultPersona);
+        } else {
+          console.log(
+            `PREreview.org: No default persona found for user:`,
+            r.author_id,
+          );
+        }
+        fullReviewModel.persist(review);
       }
-      await fullReviewModel.persistAndFlush(review);
-      //fullReviewDraftModel.persist(draft);
     }
-    //fullReviewModel.flush();
+    console.log('PREreview.org: Flushing reviews to disk.');
+    await fullReviewModel.flush();
+    console.log('PREreview.org: Finished flushing reviews to disk.');
   } catch (err) {
     console.error('PREreview.org: Failed to import:', err);
   }
@@ -374,17 +405,20 @@ async function prereviewOrgImportRequests(db, client, usersMap, preprintsMap) {
         `PREreview.org: Fetching author ID ${r.author_id} for request`,
       );
       const author = usersMap.get(r.author_id);
-      if (author && author.defaultPersona) {
+      if (author && author.defaultPersona && preprint) {
         const request = new Request(author.defaultPersona, preprint);
         request.createdAt = new Date(r.date_created);
-        await requestModel.persistAndFlush(request);
+        requestModel.persist(request);
       } else {
         console.log(
           `PREreview.org: No default persona found for user:`,
-          author,
+          r.author_id,
         );
       }
     }
+    console.log('PREreview.org: Flushing requests to disk.');
+    await requestModel.flush();
+    console.log('PREreview.org: Finished flushing requests to disk.');
   } catch (err) {
     console.error('PREreview.org: Failed to import:', err);
   }
