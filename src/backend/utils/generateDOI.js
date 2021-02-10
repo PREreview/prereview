@@ -30,12 +30,7 @@ export default async function generateDOI(prereviewData) {
       publication_type: 'article',
       title: prereviewData.title,
       description: prereviewData.content || 'No content.',
-      creators: [
-        {
-          name: prereviewData.authorName,
-          orcid: prereviewData.authorOrcid,
-        },
-      ],
+      creators: prereviewData.creators,
     },
   };
 

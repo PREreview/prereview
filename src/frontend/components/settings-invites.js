@@ -1,17 +1,16 @@
 // base imports
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { useLocation, useHistory } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 
 // hooks
-import { useGetInvites } from '../hooks/api-hooks.tsx';
+import { useGetUserNotifications, useGetFullReviews, usePostFullReviewInviteAccept, useDeleteFullReviewInvite } from '../hooks/api-hooks.tsx';
 
 // MaterialUI components
 import { makeStyles, withStyles } from '@material-ui/core/styles';
 import Box from '@material-ui/core/Box';
+import Link from '@material-ui/core/Link';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import IconButton from '@material-ui/core/IconButton';
-import Modal from '@material-ui/core/Modal';
 import MuiButton from '@material-ui/core/Button';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -19,11 +18,6 @@ import TableCell from '@material-ui/core/TableCell';
 import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
-import TextField from '@material-ui/core/TextField';
-import Typography from '@material-ui/core/Typography';
-
-// icons
-import { MdInfoOutline } from 'react-icons/md';
 
 const Button = withStyles({
   root: {
@@ -67,37 +61,108 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
+function InviteRow({ invite, onRemove }) {
+  const { mutate: acceptInvite } = usePostFullReviewInviteAccept({
+    id: invite.preprint,
+    role: invite.role,
+    pid: invite.persona,
+  });
+  const { mutate: declineInvite } = useDeleteFullReviewInvite({
+    id: invite.preprint,
+    role: invite.role,
+    pid: invite.persona,
+  });
+
+  console.log('***invite***:', invite);
+  const handleAcceptInvite = () => {
+    acceptInvite()
+      .then(() => {
+        alert('Invite has been accepted.');
+        onRemove(invite);
+        return;
+      })
+      .catch(() => alert('Failed to accept the invitation.'));
+  };
+
+  const handleDeclineInvite = () => {
+    declineInvite()
+      .then(() => {
+        alert('Invite has been declined.');
+        onRemove(invite);
+        return;
+      })
+      .catch(() => alert('Failed to decline the invitation.'));
+  };
+
+  return (
+    <>
+      <StyledTableRow>
+        <TableCell component="th" scope="row">
+          {invite.title}
+        </TableCell>
+        <TableCell align="right">
+          <Button
+            color="primary"
+            variant="contained"
+            onClick={handleAcceptInvite}
+          >
+            Accept
+          </Button>
+        </TableCell>
+        <TableCell align="right">
+          <Button
+            color="primary"
+            variant="contained"
+            onClick={handleDeclineInvite}
+          >
+            Delete
+          </Button>
+        </TableCell>
+      </StyledTableRow>
+    </>
+  );
+}
+
 export default function SettingsInvites({ user }) {
   const classes = useStyles();
 
   // fetch all invites from the API
   const [invites, setInvites] = useState(null);
-  // FIXME this needs correct API hook
-  // const { data: invitesData, loading: loading, error } = useGetInvites();
-
-  // FIXME this is placeholder
-  const loading = false;
-  const invitesData = { data: [{ name: 'Test invite' }] };
-
-  const handleAcceptInvite = invite => {
-    console.log(invite);
-    // FIXME build function
-  };
-
-  const handleDeleteInvite = invite => {
-    alert("Invite has been accepted.")
-    // FIXME build function
-  };
+  const [reviews, setReviews] = useState(null);
+  const { data: invitesData, loading: invitesLoading } = useGetUserNotifications({
+    uid: user.orcid,
+    resolve: invites => invites.data,
+  });
+  const { data: reviewsData, loading: reviewsLoading } = useGetFullReviews({
+    queryParams: {
+      can_edit: user.personas.map(persona => persona.uuid).toString(),
+      is_published: false,
+    },
+    resolve: reviews => reviews.data,
+  });
 
   useEffect(() => {
-    if (!loading) {
+    if (!invitesLoading) {
       if (invitesData) {
-        setInvites(invitesData.data);
+        setInvites(invitesData);
       }
     }
-  }, [loading]);
+  }, [invitesLoading]);
 
-  if (loading) {
+  useEffect(() => {
+    if (!reviewsLoading) {
+      if (reviewsData) {
+        setReviews(reviewsData);
+      }
+    }
+  }, [invitesLoading]);
+
+  const onRemove = remove => {
+    const filtered = invites.filter(invite => invite.preprint !== remove.preprint && invite.persona !== remove.persona);
+    setInvites(filtered);
+  };
+
+  if (invitesLoading) {
     return <CircularProgress className={classes.spinning} />;
   } else {
     return (
@@ -117,42 +182,55 @@ export default function SettingsInvites({ user }) {
                 </TableHead>
                 <TableBody>
                   {invites.map(invite => (
-                    <StyledTableRow
-                      key={invite.uuid ? invite.uuid : invite.title}
-                    >
-                      <TableCell component="th" scope="row">
-                        {invite.name}
-                      </TableCell>
-                      <TableCell align="right">
-                        <Button
-                          color="primary"
-                          variant="contained"
-                          onClick={() => handleAcceptInvite(invite)}
-                        >
-                          Accept
-                        </Button>
-                      </TableCell>
-                      <TableCell align="right">
-                        <Button
-                          color="primary"
-                          variant="contained"
-                          onClick={() => handleDeleteInvite(invite)}
-                        >
-                          Delete
-                        </Button>
-                      </TableCell>
-                    </StyledTableRow>
+                    <InviteRow
+                      key={invite.uuid}
+                      invite={invite}
+                      onRemove={onRemove}
+                    />
                   ))}
                 </TableBody>
               </Table>
             </TableContainer>
           </Box>
         ) : (
-          <div>No invites yet.</div>
-        )}
-        <h4 className="settings__subtitle">Accepted</h4>
-        {/* FIXME build this section*/}
-        <div>No accepted invites to display.</div>
+            <div>No invites yet.</div>
+          )}
+        <h4 className="settings__subtitle">Drafts</h4>
+        {reviews && reviews.length ? (
+          <Box my={4}>
+            <TableContainer>
+              <Table className={classes.table} aria-label="customized table">
+                <TableHead>
+                  <TableRow>
+                    <TableCell className="vh">Title</TableCell>
+                    <TableCell className="vh">Handle</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {reviews.map(review => (
+                    <Link
+                      href={`/preprints/${review.preprint.uuid}/reviews/${review.uuid}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      key={review.uuid}
+                    >
+                      <StyledTableRow>
+                        <TableCell component="th" scope="row">
+                          {review.preprint.title}
+                        </TableCell>
+                        <TableCell align="right">
+                          {review.preprint.handle}
+                        </TableCell>
+                      </StyledTableRow>
+                    </Link>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Box>
+        ) : (
+            <div>No accepted invites to display.</div>
+          )}
       </section>
     );
   }

@@ -26,6 +26,7 @@ import {
 } from '../../models/entities/index.ts';
 import PQueue from 'p-queue';
 
+const BATCH_SIZE = 9999;
 const queue = new PQueue({ concurrency: 1 });
 
 const processJsonDump = (path, cb) => {
@@ -38,12 +39,24 @@ const processJsonDump = (path, cb) => {
   });
 };
 
-const processUsers = (path, userHandler) => {
+const processUsers = (path, userHandler, em) => {
   const processJsonArray = obj => {
+    let count = 0;
     obj.map(async item => {
       if (item['@type'] === 'Person') {
         console.log(`inserting person ${item['@id']}`);
         queue.add(async () => await userHandler(item));
+        count = count + 1;
+      }
+      if (count >= BATCH_SIZE) {
+        queue.add(async () => {
+          console.log(`OSrPRE: Flushing batch of ${BATCH_SIZE} users to disk`);
+          await em.flush();
+          console.log(
+            `OSrPRE: Done flushing batch of ${BATCH_SIZE} users to disk`,
+          );
+        });
+        count = 0;
       }
     });
   };
@@ -65,15 +78,28 @@ const processPersonas = (path, anonMap) => {
   return processJsonDump(path, processJsonArray);
 };
 
-const processActions = (path, requestHandler, reviewHandler) => {
+const processActions = (path, requestHandler, reviewHandler, em) => {
   const processJsonArray = obj => {
+    let count = 0;
     obj.map(async item => {
       if (item['@type'] === 'RequestForRapidPREreviewAction') {
         console.log(`inserting request ${item['@id']}`);
         queue.add(async () => await requestHandler(item));
+        count = count + 1;
       } else if (item['@type'] === 'RapidPREreviewAction') {
         console.log(`inserting review ${item['@id']}`);
         queue.add(async () => await reviewHandler(item));
+        count = count + 1;
+      }
+      if (count >= BATCH_SIZE) {
+        queue.add(async () => {
+          console.log(`OSrPRE: Flushing batch of ${BATCH_SIZE} users to disk`);
+          await em.flush();
+          console.log(
+            `OSrPRE: Done flushing batch of ${BATCH_SIZE} users to disk`,
+          );
+        });
+        count = 0;
       }
     });
   };
@@ -119,14 +145,14 @@ async function OSrPREImportReview(
           full = full.concat(`${key}:\n ${answer.text}`);
         }
       });
-      await rapidReviewModel.persistAndFlush(rapid);
+      rapidReviewModel.persist(rapid);
       if (full) {
         const review = new FullReview(preprint, true);
         const draft = new FullReviewDraft(review, full);
         review.drafts.add(draft);
         review.createdAt = new Date(record.startTime);
         review.authors.add(persona);
-        await fullReviewModel.persistAndFlush(review);
+        fullReviewModel.persist(review);
       }
       return;
     } catch (err) {
@@ -160,7 +186,7 @@ async function OSrPREImportRequest(
         throw new Error('No preprint');
       }
       const request = new Request(persona, preprint);
-      await requestModel.persistAndFlush(request);
+      requestModel.persist(request);
     } catch (err) {
       console.error('Failed to import request:', err);
     }
@@ -222,7 +248,7 @@ async function OSrPREImportPreprint(
       });
       preprint.communities.add(osrpreCommunity);
       preprint.tags.add(osrpreTag);
-      await preprintModel.persistAndFlush(preprint);
+      preprintModel.persist(preprint);
       console.log(`OSrPRE: Inserted Preprint ${preprint.handle}`);
     } else {
       console.log(`OSrPRE: Duplicate preprint ${handle}, skipping`);
@@ -244,9 +270,14 @@ async function OSrPREImportUser(
   isAnon,
   osrpreCommunity,
   osrpreBadge,
+  userCache,
+  personaCache,
 ) {
   return async record => {
-    if ((await userModel.findOne({ orcid: record.orcid })) !== null) {
+    if (
+      (await userModel.findOne({ orcid: record.orcid })) !== null ||
+      userCache.has(record.orcid)
+    ) {
       console.log(`OSrPRE: Duplicate user ${record.orcid}, skipping`);
       return;
     }
@@ -293,7 +324,16 @@ async function OSrPREImportUser(
           await Promise.all(
             record.hasRole.map(async id => {
               if (isAnon.get(id) === false) {
-                if ((await personaModel.findOne({ name: name })) !== null) {
+                if (name === '' || name === null || name === undefined) {
+                  console.log(
+                    `OSrPRE: Can't import existing persona with blank name, skipping.`,
+                  );
+                  return;
+                }
+                const hasCache = personaCache.has(name);
+                const inModel =
+                  (await personaModel.findOne({ name: name })) !== null;
+                if (hasCache || inModel) {
                   console.log(
                     `OSrPRE: Duplicate persona name ${name}, skipping.`,
                   );
@@ -313,17 +353,40 @@ async function OSrPREImportUser(
                   userObject.defaultPersona = personaObject;
                 }
                 userObject.personas.add(personaObject);
+                //console.log(
+                //  `***inserting into personasMap ${id}:`,
+                //  personaObject,
+                //);
                 console.log(
-                  `***inserting ${id}:${personaObject} into personasMap`,
+                  `OSrPRE: Imported persona '${name}' for ${record.orcid}`,
                 );
+                personaModel.persist(personaObject);
+                personaCache.add(name);
                 personasMap.set(id, personaObject);
               } else if (isAnon.get(id) === true) {
-                let anonName = anonymus.create()[0];
+                if (name === '' || name === null || name === undefined) {
+                  console.log(
+                    `OSrPRE: Can't import existing persona with blank name, skipping.`,
+                  );
+                  return;
+                }
+                const ANON_TRIES_LIMIT = 5;
+                let anonName = anonymus
+                  .create()[0]
+                  .replace(/(^|\s)\S/g, l => l.toUpperCase());
+                let tries = 0;
                 while (
-                  (await personaModel.findOne({ name: anonName })) !== null
+                  (await personaModel.findOne({ name: anonName })) !== null ||
+                  personaCache.has(anonName)
                 ) {
                   console.log('OSrPRE: Anonymous name generation collision');
-                  anonName = anonymus.create()[0];
+                  anonName = anonymus
+                    .create()[0]
+                    .replace(/(^|\s)\S/g, l => l.toUpperCase());
+                  tries = tries + 1;
+                  if (tries >= ANON_TRIES_LIMIT) {
+                    anonName = anonName + ` ${tries - ANON_TRIES_LIMIT}`;
+                  }
                 }
                 anonPersonaObject = personaModel.create({
                   name: anonName,
@@ -336,9 +399,17 @@ async function OSrPREImportUser(
                   userObject.defaultPersona = anonPersonaObject;
                 }
                 userObject.personas.add(anonPersonaObject);
+                //console.log(
+                //  `***inserting anon into personasMap ${id}:`,
+                //  anonPersonaObject,
+                //);
                 console.log(
-                  `***inserting anon ${id}:${personaObject} into personasMap`,
+                  `OSrPRE: Imported anonymous persona '${anonName}' for ${
+                    record.orcid
+                  }`,
                 );
+                personaModel.persist(anonPersonaObject);
+                personaCache.add(anonName);
                 personasMap.set(id, anonPersonaObject);
               } else {
                 console.warn(`No such role ${id} mapped`);
@@ -371,7 +442,7 @@ async function OSrPREImportUser(
           }
         }
         if (emails.length > 0) {
-          emails = _.uniq(emails);
+          emails = _.uniqBy(emails, 'value');
           for (let e of emails) {
             const contact = new Contact(
               'mailto',
@@ -467,7 +538,10 @@ async function OSrPREImportUser(
       });
 
       //personaModel.persist([anonPersonaObject, personaObject]);
-      await userModel.persistAndFlush(userObject);
+      //console.log('userCache:', userCache);
+      //console.log('personaCache:', personaCache);
+      userModel.persist(userObject);
+      userCache.add(record.orcid);
       usersMap.set(record['@id'], userObject);
       return;
     } catch (err) {
@@ -493,17 +567,21 @@ export default async function run(db) {
   const osrpreCommunity = communityModel.create({
     name: 'Outbreak Science',
     slug: 'outbreaksci',
-    description: 'A community for outbreak-related preprints.',
+    description: 'A community for reviews of outbreak-related preprints.',
   });
   const osrpreBadge = badgeModel.create({ name: 'Outbreak Science' });
   const osrpreTag = tagModel.create({ name: 'Imported from OSrPRE' });
   communityModel.persistAndFlush(osrpreCommunity);
   badgeModel.persistAndFlush(osrpreBadge);
   tagModel.persistAndFlush(osrpreTag);
+
+  const userCache = new Set();
+  const personaCache = new Set();
   await processPersonas(
     `${process.env.IMPORT_COUCH_OUTDIR}/rapid-prereview-docs.jsonl`,
     anonMap,
   );
+  queue.add(async () => await communityModel.em.flush());
   await processUsers(
     `${process.env.IMPORT_COUCH_OUTDIR}/rapid-prereview-users.jsonl`,
     await OSrPREImportUser(
@@ -514,8 +592,12 @@ export default async function run(db) {
       anonMap,
       osrpreCommunity,
       osrpreBadge,
+      userCache,
+      personaCache,
     ),
+    communityModel.em,
   );
+  queue.add(async () => await communityModel.em.flush());
   await processActions(
     `${process.env.IMPORT_COUCH_OUTDIR}/rapid-prereview-docs.jsonl`,
     await OSrPREImportRequest(
@@ -534,6 +616,7 @@ export default async function run(db) {
       osrpreTag,
     ),
   );
+  queue.add(async () => await communityModel.em.flush());
   await queue.onIdle();
   return;
 }

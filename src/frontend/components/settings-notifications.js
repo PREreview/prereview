@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useLocation, useHistory } from 'react-router-dom';
-import { usePutUserContacts, usePostUserContacts } from '../hooks/api-hooks.tsx';
+import { usePutUserContacts, usePostUserContacts, useDeleteUserContacts } from '../hooks/api-hooks.tsx';
 
 // components
 import Controls from './controls';
@@ -13,6 +13,8 @@ import ToggleSwitch from './toggle-switch';
 // MaterialUI components
 import { makeStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
+import IconButton from '@material-ui/core/IconButton';
+import Delete from '@material-ui/icons/Delete';
 
 // icons
 import { MdInfoOutline } from 'react-icons/md';
@@ -48,7 +50,7 @@ export default function SettingsNotifications({ user }) {
     setModalType(null);
   }
 
-  useEffect(() => {}, [userContacts]);
+  useEffect(() => { }, [userContacts]);
 
   return (
     <section className="settings-notifications settings__section">
@@ -66,12 +68,16 @@ export default function SettingsNotifications({ user }) {
 
       {userContacts.length
         ? userContacts.map(contact => (
-            <EmailToggle
-              key={contact.uuid}
-              userId={user.uuid}
-              contact={contact}
-            />
-          ))
+          <EmailToggle
+            key={contact.uuid}
+            userId={user.uuid}
+            contact={contact}
+            onDelete={() => {
+              setUserContacts(userContacts.filter(c => c.uuid !== contact.uuid));
+              return;
+            }}
+          />
+        ))
         : null}
 
       <div className="settings-notifications__email">
@@ -86,24 +92,6 @@ export default function SettingsNotifications({ user }) {
             setIsEmailValid(isValid);
           }}
         />
-
-        {/* <IconButton
-          onClick={() => {
-            setModalType(
-              userContacts
-                ? 'checked'
-                : userContacts
-                ? 'verifying'
-                : 'empty',
-            );
-          }}
-        >
-          {userContacts ? (
-            <MdCheck className="settings-notifications__email-icon" />
-          ) : (
-            <MdWarning className="settings-notifications__email-icon" />
-          )}
-        </IconButton> */}
       </div>
 
       <Controls>
@@ -138,8 +126,8 @@ export default function SettingsNotifications({ user }) {
             {modalType === 'checked'
               ? 'The email address was successfully verified.'
               : modalType === 'verifying'
-              ? 'An email with a verification link has been sent. Please check your inbox and follow the instructions.'
-              : 'An email must be set to be able to receive notifications.'}
+                ? 'An email with a verification link has been sent. Please check your inbox and follow the instructions.'
+                : 'An email must be set to be able to receive notifications.'}
           </p>
 
           <Controls>
@@ -155,28 +143,52 @@ SettingsNotifications.propTypes = {
   user: PropTypes.object.isRequired,
 };
 
-function EmailToggle({ userId, contact }) {
-  const { mutate: updateUser, loading } = usePutUserContacts({
+function EmailToggle({ userId, contact, onDelete }) {
+  const [toggle, setToggle] = useState(contact.isNotified)
+  const { mutate: updateContact, loading } = usePutUserContacts({
     id: userId,
     cid: contact.uuid,
   });
 
+  const { mutate: deleteContact } = useDeleteUserContacts({
+    id: userId,
+    queryParams: {
+      cid: contact.uuid
+    }
+  });
   return (
     <div className="settings-notifications__toggle">
       <span>{`${contact.value}`}</span>
       <ToggleSwitch
         id="notification-switch"
         disabled={loading}
-        checked={contact.isNotified}
+        checked={toggle}
         onChange={() => {
-          updateUser(
+          updateContact(
             {
-              isNotified: !contact.isNotified,
+              isNotified: !toggle,
+              schema: contact.schema,
+              value: contact.value,
             })
-            .then(() => alert('Contact info updated successfully.'))
+            .then(() => {
+              setToggle(!toggle);
+            })
             .catch(err => alert(`An error occurred: ${err.message}`));
         }}
       />
+      <IconButton onClick={() => {
+        if (confirm('Are you sure you want to delete this email address?')) {
+          deleteContact()
+              .then(() => {
+                onDelete();
+                alert('Contact info deleted successfully.');
+              })
+              .catch(err => alert(`An error occurred: ${err.message}`));
+        }
+      }}
+      >
+        <Delete />
+      </IconButton>
     </div>
   );
 }

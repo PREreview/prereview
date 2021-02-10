@@ -201,7 +201,6 @@ export default function controller(preprints, thisUser) {
 
         if (ctx.query.tags) {
           const tags = ctx.query.tags.split(',');
-          console.log('tags', tags);
           queries.push({
             $or: [
               { tags: { uuid: { $in: tags } } },
