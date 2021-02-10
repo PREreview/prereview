@@ -1,7 +1,7 @@
 .fixed__search-bar {
   left: 0;
   position: fixed;
-  top: calc(var(--announcement-bar-height) + var(--header-bar-height));
+  top:  var(--header-bar-height);
   z-index: 999;
 
   & .search-bar {
@@ -24,7 +24,7 @@
 
   @media (--short-screen) {
     height: auto;
-    margin-top: calc(var(--announcement-bar-height) + calc(var(--header-bar-height)));
+    margin-top: calc(var(--header-bar-height));
     padding: var(--mgrd) 0;
     position: relative;
     top: 0;
@@ -32,7 +32,7 @@
   }
 
   @media (max-width: $mobile-bp) {
-    margin-top: calc(var(--announcement-bar-height--mobile) + var(--header-bar-height));
+    padding-top: var(--header-bar-height);
   }
 
   & .search-bar__search-box {
