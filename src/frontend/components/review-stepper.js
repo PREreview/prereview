@@ -514,7 +514,6 @@ export default function ReviewStepper({
       setActiveStep(2);
       handleComplete(4);
     }
-    console.log("REVIEW ID IN USE EFFECT REVIEWSTEPPER", reviewId)
   }, [
     hasRapidReviewed,
     hasLongReviewed,
@@ -547,42 +546,42 @@ export default function ReviewStepper({
             </Box>
           </>
         ) : (
-            <Box>
-              <header className="shell-content-reviews__title">
-                Rapid Review
+          <Box>
+            <header className="shell-content-reviews__title">
+              Rapid Review
             </header>
-              <form>
-                <RapidFormFragment
-                  answerMap={answerMap}
-                  onChange={(key, value) => {
-                    setAnswerMap(answerMap => ({
-                      ...answerMap,
-                      [key]: value,
-                    }));
-                  }}
-                />
-                <InputLabel
-                  htmlFor="competing-interest"
-                  className={classes.inputLabel}
-                >
-                  Please use the space below to declare any existing{' '}
-                  <Link href="#">Competing Interest</Link>.
+            <form>
+              <RapidFormFragment
+                answerMap={answerMap}
+                onChange={(key, value) => {
+                  setAnswerMap(answerMap => ({
+                    ...answerMap,
+                    [key]: value,
+                  }));
+                }}
+              />
+              <InputLabel
+                htmlFor="competing-interest"
+                className={classes.inputLabel}
+              >
+                Please use the space below to declare any existing{' '}
+                <Link href="#">Competing Interest</Link>.
               </InputLabel>
-                <Input
-                  className={classes.input}
-                  id="competing-interest"
-                  multiline
-                  rows={2}
-                  disableUnderline
-                />
-                <Box mt={2} mb={2} className={classes.yellow}>
-                  Please review the{' '}
-                  <Link href="#">PREreview Code of Conduct</Link> before
+              <Input
+                className={classes.input}
+                id="competing-interest"
+                multiline
+                rows={2}
+                disableUnderline
+              />
+              <Box mt={2} mb={2} className={classes.yellow}>
+                Please review the{' '}
+                <Link href="#">PREreview Code of Conduct</Link> before
                 submitting your review.
               </Box>
-              </form>
-            </Box>
-          );
+            </form>
+          </Box>
+        );
       case 1:
         return (
           <Box mt={2}>
