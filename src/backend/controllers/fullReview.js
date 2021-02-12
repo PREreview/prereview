@@ -180,7 +180,6 @@ export default function controller(
     }
 
     try {
-      console.log('***review***:', review);
       await reviewModel.persistAndFlush(review);
     } catch (err) {
       log.error(`HTTP 400 error: ${err}`);

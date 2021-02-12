@@ -370,9 +370,7 @@ export default function ReviewStepper({
       if (cid) {
         putLongReview({
           contents: content,
-          authors: review
-            ? review.authors.map(author => ({ uuid: author.uuid }))
-            : null,
+          authors: review && review.authors ? review.authors.map(author => ({ uuid: author.uuid })) : null,
         })
           .then(() => alert('Draft updated successfully.'))
           .catch(err => alert(`An error occurred: ${err.message}`));
@@ -380,9 +378,7 @@ export default function ReviewStepper({
         postLongReview({
           preprint: preprint.uuid,
           contents: content,
-          authors: review
-            ? review.authors.map(author => ({ uuid: author.uuid }))
-            : null,
+          authors: review && review.authors ? review.authors.map(author => ({ uuid: author.uuid })) : null,
         })
           .then(response => {
             alert('Draft updated successfully.');
@@ -410,9 +406,7 @@ export default function ReviewStepper({
           preprint: preprint.uuid,
           contents: content,
           isPublished: true,
-          authors: review
-            ? review.authors.map(author => ({ uuid: author.uuid }))
-            : null,
+          authors: review && review.authors ? review.authors.map(author => ({ uuid: author.uuid })) : null,
         })
           .then(() => {
             setActiveStep(prevActiveStep => prevActiveStep + 2);
