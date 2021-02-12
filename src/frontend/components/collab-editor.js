@@ -22,7 +22,7 @@ const CollabEditor = ({ initialContent, handleContentChange, reviewId }) => {
 
   useEffect(() => {
     setProvider(new WebrtcProvider(`prereview-${reviewId}`, ydoc));
-  }, []);
+  }, [reviewId]);
 
   // quill options
   const placeholder = 'Start typing...';
