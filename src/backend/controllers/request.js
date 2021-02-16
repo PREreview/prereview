@@ -1,5 +1,4 @@
 import router from 'koa-joi-router';
-import { wrap } from '@mikro-orm/core';
 import { getLogger } from '../log.js';
 import getActivePersona from '../utils/persona.js';
 

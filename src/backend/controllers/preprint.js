@@ -250,7 +250,6 @@ export default function controller(preprints, thisUser) {
         if (!foundPreprints || count <= 0) {
           log.error('HTTP 404 Error: No preprints found');
           ctx.throw(404, 'No preprints found');
-
         }
 
         ctx.body = {

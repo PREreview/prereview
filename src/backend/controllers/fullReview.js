@@ -98,18 +98,19 @@ export default function controller(
     log.debug('Adding full review.');
     let review, draft, authorPersona, preprint, coi;
     const creators = [];
+    const { authors, ...body } = ctx.request.body;
 
     try {
       preprint = await preprintModel.findOneByUuidOrHandle(
         ctx.request.body.preprint,
       );
       review = reviewModel.create({
-        ...ctx.request.body,
+        ...body,
         preprint: preprint,
       });
 
-      if (ctx.request.body.authors) {
-        for (let p of ctx.request.body.authors) {
+      if (authors) {
+        for (let p of authors) {
           authorPersona = await personaModel.findOne({ uuid: p.uuid });
           if (authorPersona) {
             creators.push({
@@ -359,8 +360,6 @@ export default function controller(
         ctx.throw(400, `Failed to parse query: ${err}`);
       }
 
-      console.log('***review***:', review);
-      console.log('***persona***:', persona);
       if (!review || !persona) {
         log.error('HTTP 400: Invalid review or Persona');
         ctx.throw(400, 'Invalid Review or Persona');
@@ -599,8 +598,6 @@ export default function controller(
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse query: ${err}`);
       }
-      console.log('***review***:', review);
-      console.log('***persona***:', persona);
 
       if (!review || !persona) {
         log.error('HTTP 404: Review or Persona not found');
