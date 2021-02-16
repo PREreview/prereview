@@ -5,7 +5,7 @@ import getActivePersona from '../utils/persona.js';
 const log = getLogger('backend:controllers:requests');
 
 // eslint-disable-next-line no-unused-vars
-export default function controller(reqModel, thisUser) {
+export default function controller(reqModel, preprintModel, thisUser) {
   const requestRouter = router();
 
   const getHandler = async ctx => {
@@ -35,28 +35,23 @@ export default function controller(reqModel, thisUser) {
   };
 
   const postHandler = async ctx => {
-    let request, pid, authorPersona; // pid = preprint ID
+    let request, preprint, authorPersona; // pid = preprint ID
 
-    ctx.params.pid ? (pid = ctx.params.pid) : null;
-
-    try {
-      authorPersona = await getActivePersona(ctx.state.user);
-    } catch (err) {
-      log.error('Failed to load user personas.');
-      ctx.throw(400, err);
+    if (ctx.params.pid) {
+      preprint = await preprintModel.findOne({ uuid: ctx.params.pid });
     }
+
+    if (!preprint) {
+      log.error('HTTP 404 Error: Preprint not found');
+      ctx.throw(400, 'Preprint not found');
+    }
+    authorPersona = getActivePersona(ctx.state.user);
 
     log.debug(`Adding a request.`);
 
     try {
-      if (pid) {
-        request = reqModel.create({ preprint: pid, author: authorPersona });
-      } else {
-        request = reqModel.create({
-          preprint: ctx.request.body.preprint.id, // TODO: figure out ensuring preprint id gets passed this way
-          author: authorPersona,
-        });
-      }
+      preprint.isPublished = true;
+      request = reqModel.create({ preprint: preprint, author: authorPersona });
       await reqModel.persistAndFlush(request);
     } catch (err) {
       log.error('HTTP 400 Error: ', err);

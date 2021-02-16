@@ -64,7 +64,7 @@ export default function HeaderBar({ onClickMenuButton, closeGap, thisUser }) {
             />
           </IconButton>
         )}
-        <PreReviewLogo />
+        <XLink to="/" href="/"><PreReviewLogo /></XLink>
       </div>
 
       <div className="header-bar__right">

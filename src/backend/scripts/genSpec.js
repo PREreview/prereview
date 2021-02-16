@@ -26,19 +26,19 @@ function docs() {
   const authz = authWrapper({}); // authorization, not authentication
 
   generator.addJoiRouter(preprintRoutes({}, authz));
-  generator.addJoiRouter(userRoutes({}, authz));
-  generator.addJoiRouter(fullReviewRoutes({}, authz));
+  generator.addJoiRouter(userRoutes({}, {}, authz));
+  generator.addJoiRouter(fullReviewRoutes({}, {}, {}, {}, {}, authz));
   generator.addJoiRouter(eventRoutes({}, authz));
-  generator.addJoiRouter(groupRoutes({}, authz));
-  generator.addJoiRouter(commentRoutes({}, authz));
-  generator.addJoiRouter(communityRoutes({}, authz));
-  generator.addJoiRouter(personaRoutes({}, authz));
-  generator.addJoiRouter(rapidReviewRoutes({}, authz));
-  generator.addJoiRouter(reportRoutes({}, authz));
-  generator.addJoiRouter(requestRoutes({}, authz));
+  generator.addJoiRouter(groupRoutes({}, {}, authz));
+  generator.addJoiRouter(commentRoutes({}, {}, authz));
+  generator.addJoiRouter(communityRoutes({}, {}, {}, {}, authz));
+  generator.addJoiRouter(personaRoutes({}, {}, authz));
+  generator.addJoiRouter(rapidReviewRoutes({}, {}, authz));
+  generator.addJoiRouter(reportRoutes({}, {}, {}, {}, {}, authz));
+  generator.addJoiRouter(requestRoutes({}, {}, authz));
   generator.addJoiRouter(searchesRoutes({}, authz));
   generator.addJoiRouter(tagRoutes({}, authz));
-  generator.addJoiRouter(templateRoutes({}, authz));
+  generator.addJoiRouter(templateRoutes({}, {}, authz));
   generator.addJoiRouter(notificationRoutes({}, authz));
 
   const spec = generator.generateSpec(

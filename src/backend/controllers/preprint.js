@@ -176,6 +176,9 @@ export default function controller(preprints, thisUser) {
             orderBy = { datePosted: order };
         }
         const queries = [];
+        queries.push({
+          isPublished: { $eq: true },
+        });
         if (ctx.query.search && ctx.query.search !== '') {
           const connection = preprints.em.getConnection();
           if (connection instanceof PostgreSqlConnection) {
@@ -243,14 +246,18 @@ export default function controller(preprints, thisUser) {
           );
           count = await preprints.count();
         }
-        if (foundPreprints) {
-          ctx.body = {
-            statusCode: 200,
-            status: 'ok',
-            totalCount: count,
-            data: foundPreprints,
-          };
+
+        if (!foundPreprints || count <= 0) {
+          log.error('HTTP 404 Error: No preprints found');
+          ctx.throw(404, 'No preprints found');
         }
+
+        ctx.body = {
+          statusCode: 200,
+          status: 'ok',
+          totalCount: count,
+          data: foundPreprints,
+        };
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse query: ${err}`);

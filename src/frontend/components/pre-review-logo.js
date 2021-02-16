@@ -13,19 +13,20 @@ export default function PreReviewLogo({ short = false, responsive = true }) {
         'rapid-pre-review-logo--responsive': responsive,
       })}
     >
-      <XLink to="/" href="/" className="rapid-pre-review-logo__svg-container">
+      <div className="rapid-pre-review-logo__svg-container">
         <img
           src={preReviewLogo}
           className="rapid-pre-review-logo__icon-svg"
           aria-hidden="true"
           alt=""
+          outline='0'
         />
         <div className="rapid-pre-review-logo__type">
           <div className="rapid-pre-review-logo__outbreak-science">
             <span className="rapid-pre-review-logo__beta">beta</span>
           </div>
         </div>
-      </XLink>
+      </div>
     </div>
   );
 }

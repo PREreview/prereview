@@ -9,7 +9,7 @@ export default function AddButton({ ...buttonProps }) {
         <img src={icon} aria-hidden="true" alt="" />
       </div>
       <div className="add-button__left">Add Review</div>
-      <div className="add-button__right">Request Review</div>
+      <div className="add-button__right">Add Request</div>
     </Button>
   );
 }

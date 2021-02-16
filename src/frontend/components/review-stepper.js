@@ -370,6 +370,9 @@ export default function ReviewStepper({
       if (cid) {
         putLongReview({
           contents: content,
+          authors: review
+            ? review.authors.map(author => ({ uuid: author.uuid }))
+            : null,
         })
           .then(() => alert('Draft updated successfully.'))
           .catch(err => alert(`An error occurred: ${err.message}`));
@@ -377,6 +380,9 @@ export default function ReviewStepper({
         postLongReview({
           preprint: preprint.uuid,
           contents: content,
+          authors: review
+            ? review.authors.map(author => ({ uuid: author.uuid }))
+            : null,
         })
           .then(response => {
             alert('Draft updated successfully.');
@@ -404,6 +410,9 @@ export default function ReviewStepper({
           preprint: preprint.uuid,
           contents: content,
           isPublished: true,
+          authors: review
+            ? review.authors.map(author => ({ uuid: author.uuid }))
+            : null,
         })
           .then(() => {
             setActiveStep(prevActiveStep => prevActiveStep + 2);
@@ -562,7 +571,14 @@ export default function ReviewStepper({
                 className={classes.inputLabel}
               >
                 Please use the space below to declare any existing{' '}
-                <Link href="#">Competing Interest</Link>.
+                <Link
+                  href="https://content.prereview.org/coc/#toc-anchor_5"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Competing Interest
+                </Link>
+                .
               </InputLabel>
               <Input
                 className={classes.input}
@@ -573,8 +589,14 @@ export default function ReviewStepper({
               />
               <Box mt={2} mb={2} className={classes.yellow}>
                 Please review the{' '}
-                <Link href="#">PREreview Code of Conduct</Link> before
-                submitting your review.
+                <Link
+                  href="https://content.prereview.org/coc/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  PREreview Code of Conduct
+                </Link>{' '}
+                before submitting your review.
               </Box>
             </form>
           </Box>
@@ -592,7 +614,14 @@ export default function ReviewStepper({
               </Typography>
               <Typography variant="body2" gutterBottom>
                 Please remember to be constructive and to abide by the{' '}
-                <Link href="#">PREreview Code of Conduct</Link>.
+                <Link
+                  href="https://content.prereview.org/coc/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  PREreview Code of Conduct
+                </Link>
+                .
               </Typography>
             </Box>
             <Box mt={2} mb={2}>
@@ -710,7 +739,7 @@ export default function ReviewStepper({
                     onContentChange={onContentChange}
                     content={content}
                     template={template}
-                    reviewId={cid ? cid : reviewId}
+                    reviewId={cid}
                   />
                 </Box>
                 <Box mt={2}>
