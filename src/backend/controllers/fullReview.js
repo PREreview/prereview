@@ -127,6 +127,7 @@ export default function controller(
         authorPersona = await personaModel.findOne(
           ctx.state.user.defaultPersona,
         );
+        // ensuring anonymous reviewers stay anonymous
         creators.push({
           name: authorPersona.isAnonymous
             ? `PREreview community member`
@@ -162,12 +163,17 @@ export default function controller(
     }
 
     let reviewData;
+    let anonReviewer = [];
 
-    if (review.isPublished) {
+    for (let cr of creators) {
+      cr.name === 'PREreview community member' ? anonReviewer.push(cr) : null;
+    }
+
+    // shape data for ZENODO if none of the authors are anonymous
+    if (review.isPublished && !anonReviewer.length) {
       reviewData = {
         title: review.title || `Review of ${preprint.title}`,
         content: draft.contents,
-        // ensuring anonymous reviewers stay anonymous
         creators: creators,
       };
       try {
@@ -180,7 +186,6 @@ export default function controller(
     }
 
     try {
-      console.log('***review***:', review);
       await reviewModel.persistAndFlush(review);
     } catch (err) {
       log.error(`HTTP 400 error: ${err}`);
