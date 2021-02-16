@@ -246,7 +246,6 @@ export default function controller(preprints, thisUser) {
           );
           count = await preprints.count();
         }
-
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse query: ${err}`);
