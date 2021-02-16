@@ -244,7 +244,7 @@ export default function Home() {
                 ))}
               </ul>
             )}
-            {preprints && preprints.totalCount === 0 && !loadingPreprints ? (
+            {!preprints || (preprints && preprints.totalCount <= 0) && !loadingPreprints ? (
               <div>
                 No preprints about this topic have been added to Rapid
                 PREreview.{' '}

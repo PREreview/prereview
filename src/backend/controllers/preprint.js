@@ -147,6 +147,7 @@ export default function controller(preprints, thisUser) {
 
       log.debug(`Retrieving preprints.`);
 
+      let foundPreprints, count;
       try {
         const populate = [
           'fullReviews',
@@ -157,7 +158,6 @@ export default function controller(preprints, thisUser) {
           'communities',
           'tags',
         ];
-        let foundPreprints, count;
         const order = ctx.query.asc
           ? QueryOrder.ASC_NULLS_LAST
           : QueryOrder.DESC_NULLS_LAST;
@@ -247,21 +247,21 @@ export default function controller(preprints, thisUser) {
           count = await preprints.count();
         }
 
-        if (!foundPreprints || count <= 0) {
-          log.error('HTTP 404 Error: No preprints found');
-          ctx.throw(404, 'No preprints found');
-        }
-
-        ctx.body = {
-          statusCode: 200,
-          status: 'ok',
-          totalCount: count,
-          data: foundPreprints,
-        };
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse query: ${err}`);
       }
+
+      if (!foundPreprints || count <= 0) {
+        ctx.status = 204;
+      }
+
+      ctx.body = {
+        statusCode: 200,
+        status: 'ok',
+        totalCount: count,
+        data: foundPreprints,
+      };
     },
   });
 
