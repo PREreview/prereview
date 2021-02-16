@@ -62,6 +62,7 @@ export default function controller(rapidReviews, preprints, thisUser) {
         preprint = await preprints.findOneByUuidOrHandle(
           ctx.request.body.preprint,
         );
+        preprint.isPublished = true;
         rapidReview = rapidReviews.create({
           ...ctx.request.body,
           author: authorPersona,
