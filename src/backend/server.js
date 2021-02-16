@@ -146,7 +146,7 @@ export default async function configServer(config) {
     authz,
   );
   const requestModel = requestModelWrapper(db);
-  const requests = RequestController(requestModel, authz);
+  const requests = RequestController(requestModel, preprintModel, authz);
   const statementModel = statementModelWrapper(db);
   const fullReviews = FullReviewController(
     fullReviewModel,

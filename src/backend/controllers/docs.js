@@ -11,10 +11,12 @@ import eventRoutes from './event.js';
 import groupRoutes from './group.js';
 import personaRoutes from './persona.js';
 import rapidReviewRoutes from './rapidReview.js';
+import reportRoutes from '../controllers/report.js';
 import requestRoutes from './request.js';
 import searchesRoutes from './searches.js';
 import tagRoutes from './tag.js';
 import templateRoutes from './template.js';
+import notificationRoutes from '../controllers/notification.js';
 
 const log = getLogger('apiDocs:::');
 
@@ -23,18 +25,20 @@ export default function docs(authz) {
   const generator = new SwaggerAPI();
 
   generator.addJoiRouter(preprintRoutes({}, authz));
-  generator.addJoiRouter(userRoutes({}, authz));
-  generator.addJoiRouter(fullReviewRoutes({}, authz));
+  generator.addJoiRouter(userRoutes({}, {}, authz));
+  generator.addJoiRouter(fullReviewRoutes({}, {}, {}, {}, {}, authz));
   generator.addJoiRouter(eventRoutes({}, authz));
-  generator.addJoiRouter(groupRoutes({}, authz));
-  generator.addJoiRouter(commentRoutes({}, authz));
-  generator.addJoiRouter(communityRoutes({}, authz));
-  generator.addJoiRouter(personaRoutes({}, authz));
-  generator.addJoiRouter(rapidReviewRoutes({}, authz));
-  generator.addJoiRouter(requestRoutes({}, authz));
+  generator.addJoiRouter(groupRoutes({}, {}, authz));
+  generator.addJoiRouter(commentRoutes({}, {}, authz));
+  generator.addJoiRouter(communityRoutes({}, {}, {}, {}, authz));
+  generator.addJoiRouter(personaRoutes({}, {}, authz));
+  generator.addJoiRouter(rapidReviewRoutes({}, {}, authz));
+  generator.addJoiRouter(reportRoutes({}, {}, {}, {}, {}, authz));
+  generator.addJoiRouter(requestRoutes({}, {}, authz));
   generator.addJoiRouter(searchesRoutes({}, authz));
   generator.addJoiRouter(tagRoutes({}, authz));
-  generator.addJoiRouter(templateRoutes({}, authz));
+  generator.addJoiRouter(templateRoutes({}, {}, authz));
+  generator.addJoiRouter(notificationRoutes({}, authz));
 
   const spec = generator.generateSpec(
     {
