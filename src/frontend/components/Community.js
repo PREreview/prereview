@@ -176,13 +176,13 @@ const searchParamsToObject = params => {
   return obj;
 };
 
-export default function Community() {
+export default function Community(props) {
   const classes = useStyles();
   const location = useLocation();
   const params = processParams(location.search);
   const [user] = useContext(UserProvider.context);
 
-  const { id } = useParams();
+  const { id } = props && props.id ? props : useParams();
   const { data: community, loading, error } = useGetCommunity({
     resolve: community => {
       if (
@@ -288,6 +288,10 @@ export default function Community() {
     );
   }
 }
+
+Community.propTypes = {
+  id: PropTypes.string,
+};
 
 function CommunityHeader({
   name,
