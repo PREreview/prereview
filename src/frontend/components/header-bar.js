@@ -9,7 +9,7 @@ import NoticeBadge from './notice-badge';
 import { useIsMobile } from '../hooks/ui-hooks';
 
 export default function HeaderBar({ onClickMenuButton, closeGap, thisUser }) {
-  const roles = thisUser && thisUser.groups ? thisUser.groups : []; //GetUser(1);
+  // const roles = thisUser && thisUser.groups ? thisUser.groups : []; //GetUser(1);
 
   //const showProfileNotice = checkIfRoleLacksMininmalData(role);
   const showProfileNotice = false;
@@ -20,34 +20,34 @@ export default function HeaderBar({ onClickMenuButton, closeGap, thisUser }) {
     null,
   );
 
-  closeGap = true;
-  useEffect(() => {
-    if (document) {
-      document.documentElement.style.setProperty(
-        '--announcement-bar-height',
-        closeGap ? '0px' : initialHeaderOffset,
-      );
+  // closeGap = true;
+  // useEffect(() => {
+  //   if (document) {
+  //     document.documentElement.style.setProperty(
+  //       '--announcement-bar-height',
+  //       closeGap ? '0px' : initialHeaderOffset,
+  //     );
+  //
+  //     document.documentElement.style.setProperty(
+  //       '--announcement-bar-height--mobile',
+  //       closeGap ? '0px' : initialHeaderOffsetMobile,
+  //     );
+  //     setHeaderOffset();
+  //   }
+  // }, []);
 
-      document.documentElement.style.setProperty(
-        '--announcement-bar-height--mobile',
-        closeGap ? '0px' : initialHeaderOffsetMobile,
-      );
-      setHeaderOffset();
-    }
-  }, []);
-
-  const setHeaderOffset = () => {
-    const headerBarOffset = window
-      .getComputedStyle(document.documentElement)
-      .getPropertyValue('--announcement-bar-height');
-
-    const headerBarOffsetMobile = window
-      .getComputedStyle(document.documentElement)
-      .getPropertyValue('--announcement-bar-height--mobile');
-
-    setinitialHeaderOffset(headerBarOffset);
-    setinitialHeaderOffsetMobile(headerBarOffsetMobile);
-  };
+  // const setHeaderOffset = () => {
+  //   const headerBarOffset = window
+  //     .getComputedStyle(document.documentElement)
+  //     .getPropertyValue('--announcement-bar-height');
+  //
+  //   const headerBarOffsetMobile = window
+  //     .getComputedStyle(document.documentElement)
+  //     .getPropertyValue('--announcement-bar-height--mobile');
+  //
+  //   setinitialHeaderOffset(headerBarOffset);
+  //   setinitialHeaderOffsetMobile(headerBarOffsetMobile);
+  // };
 
   return (
     <div className="header-bar">
