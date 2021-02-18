@@ -1,5 +1,5 @@
 // base imports
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useHistory, useLocation, useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
@@ -176,13 +176,13 @@ const searchParamsToObject = params => {
   return obj;
 };
 
-export default function Community() {
+export default function Community(props) {
   const classes = useStyles();
   const location = useLocation();
   const params = processParams(location.search);
   const [user] = useContext(UserProvider.context);
 
-  const { id } = useParams();
+  const { id } = props && props.id ? props : useParams();
   const { data: community, loading, error } = useGetCommunity({
     resolve: community => {
       if (
@@ -229,7 +229,7 @@ export default function Community() {
           <Box bgcolor="rgba(229, 229, 229, 0.35)">
             <Container>
               <Box p={4}>
-                {user.isAdmin ? (
+                {user && user.isAdmin ? (
                   <IconButton
                     href={`/community-settings/${community.uuid}`}
                     className={classes.settings}
@@ -288,6 +288,10 @@ export default function Community() {
     );
   }
 }
+
+Community.propTypes = {
+  id: PropTypes.string,
+};
 
 function CommunityHeader({
   name,

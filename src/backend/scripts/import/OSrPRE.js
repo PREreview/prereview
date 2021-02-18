@@ -93,10 +93,12 @@ const processActions = (path, requestHandler, reviewHandler, em) => {
       }
       if (count >= BATCH_SIZE) {
         queue.add(async () => {
-          console.log(`OSrPRE: Flushing batch of ${BATCH_SIZE} users to disk`);
+          console.log(
+            `OSrPRE: Flushing batch of ${BATCH_SIZE} reviews/requests to disk`,
+          );
           await em.flush();
           console.log(
-            `OSrPRE: Done flushing batch of ${BATCH_SIZE} users to disk`,
+            `OSrPRE: Done flushing batch of ${BATCH_SIZE} reviews/requests to disk`,
           );
         });
         count = 0;
@@ -109,20 +111,29 @@ const processActions = (path, requestHandler, reviewHandler, em) => {
 async function OSrPREImportReview(
   fullReviewModel,
   preprintModel,
+  preprintCache,
   rapidReviewModel,
+  personaModel,
   personasMap,
   osrpreCommunity,
   osrpreTag,
 ) {
   return async record => {
     try {
-      const persona = personasMap.get(record.agent);
+      console.log(`OSrPRE: Fetching reviewer ${record.agent}`);
+      let persona;
+      persona = personasMap.get(record.agent);
+      if (!persona && record.object && record.object.name) {
+        persona = await personaModel.findOne({ name: record.object.name });
+      }
       if (!persona) {
         throw new Error('No persona');
       }
+      console.log('OSrPRE: Fetching reviewed preprint', record.object);
       const preprint = await OSrPREImportPreprint(
         record.object,
         preprintModel,
+        preprintCache,
         osrpreCommunity,
         osrpreTag,
       );
@@ -164,6 +175,8 @@ async function OSrPREImportReview(
 async function OSrPREImportRequest(
   requestModel,
   preprintModel,
+  preprintCache,
+  personaModel,
   personasMap,
   osrpreCommunity,
   osrpreTag,
@@ -171,7 +184,11 @@ async function OSrPREImportRequest(
   return async record => {
     try {
       console.log(`OSrPRE: Fetching requester ${record.agent}`);
-      const persona = personasMap.get(record.agent);
+      let persona;
+      persona = personasMap.get(record.agent);
+      if (!persona && record.object && record.object.name) {
+        persona = await personaModel.findOne({ name: record.object.name });
+      }
       if (!persona) {
         throw new Error('No persona');
       }
@@ -179,6 +196,7 @@ async function OSrPREImportRequest(
       const preprint = await OSrPREImportPreprint(
         record.object,
         preprintModel,
+        preprintCache,
         osrpreCommunity,
         osrpreTag,
       );
@@ -196,6 +214,7 @@ async function OSrPREImportRequest(
 async function OSrPREImportPreprint(
   record,
   preprintModel,
+  preprintCache,
   osrpreCommunity,
   osrpreTag,
 ) {
@@ -212,7 +231,11 @@ async function OSrPREImportPreprint(
     } else {
       console.log('ERROR');
     }
-    let preprint = await preprintModel.findOne({ handle: handle });
+    let preprint;
+    preprint = await preprintModel.findOne({ handle: handle });
+    if (!preprint) {
+      preprint = preprintCache.get(handle);
+    }
     if (!preprint) {
       let source;
       if (lookup) {
@@ -221,23 +244,15 @@ async function OSrPREImportPreprint(
         console.warn(`OSrPRE: Failed to lookup preprint, using data as-is`);
         source = record;
       }
-      //preprint = new Preprint(
-      //  handle,
-      //  source.title,
-      //  true,
-      //  source.abstractText,
-      //  source.preprintServer,
-      //  source.datePosted,
-      //  source.license,
-      //  source.publication,
-      //  source.url,
-      //  source.contentEncoding,
-      //  source.contentUrl,
-      //);
+      if (!source.title) {
+        console.error('OSrPRE: Blank title, skipping');
+        return;
+      }
       preprint = preprintModel.create({
         handle: handle,
         title: source.title,
         isPublished: true,
+        datePosted: source.datePosted,
         abstractText: source.abstractText,
         preprintServer: source.preprintServer,
         license: source.license,
@@ -249,6 +264,7 @@ async function OSrPREImportPreprint(
       preprint.communities.add(osrpreCommunity);
       preprint.tags.add(osrpreTag);
       preprintModel.persist(preprint);
+      preprintCache.set(handle, preprint);
       console.log(`OSrPRE: Inserted Preprint ${preprint.handle}`);
     } else {
       console.log(`OSrPRE: Duplicate preprint ${handle}, skipping`);
@@ -331,18 +347,19 @@ async function OSrPREImportUser(
                   return;
                 }
                 const hasCache = personaCache.has(name);
-                const inModel =
-                  (await personaModel.findOne({ name: name })) !== null;
-                if (hasCache || inModel) {
+                if (hasCache) {
                   console.log(
                     `OSrPRE: Duplicate persona name ${name}, skipping.`,
                   );
                   return;
                 }
-                personaObject = personaModel.create({
-                  name: name,
-                  isAnonymous: false,
-                });
+                personaObject = await personaModel.findOne({ name: name });
+                if (!personaObject) {
+                  personaObject = personaModel.create({
+                    name: name,
+                    isAnonymous: false,
+                  });
+                }
                 if (person.biography && person.biography['content']) {
                   personaObject.bio = person.biography['content'];
                 }
@@ -352,11 +369,9 @@ async function OSrPREImportUser(
                   userObject.isPrivate = false;
                   userObject.defaultPersona = personaObject;
                 }
-                userObject.personas.add(personaObject);
-                //console.log(
-                //  `***inserting into personasMap ${id}:`,
-                //  personaObject,
-                //);
+                if (!userObject.personas.contains(personaObject)) {
+                  userObject.personas.add(personaObject);
+                }
                 console.log(
                   `OSrPRE: Imported persona '${name}' for ${record.orcid}`,
                 );
@@ -577,11 +592,17 @@ export default async function run(db) {
 
   const userCache = new Set();
   const personaCache = new Set();
+  const preprintCache = new Map();
   await processPersonas(
     `${process.env.IMPORT_COUCH_OUTDIR}/rapid-prereview-docs.jsonl`,
     anonMap,
   );
-  queue.add(async () => await communityModel.em.flush());
+  queue.add(async () => {
+    console.log('OSrPRE: Flushing personas to disk.');
+    await communityModel.em.flush();
+    console.log('OSrPRE: Finished flushing personas to disk.');
+    return;
+  });
   await processUsers(
     `${process.env.IMPORT_COUCH_OUTDIR}/rapid-prereview-users.jsonl`,
     await OSrPREImportUser(
@@ -597,12 +618,19 @@ export default async function run(db) {
     ),
     communityModel.em,
   );
-  queue.add(async () => await communityModel.em.flush());
+  queue.add(async () => {
+    console.log('OSrPRE: Flushing users to disk.');
+    await communityModel.em.flush();
+    console.log('OSrPRE: Finished flushing users to disk.');
+    return;
+  });
   await processActions(
     `${process.env.IMPORT_COUCH_OUTDIR}/rapid-prereview-docs.jsonl`,
     await OSrPREImportRequest(
       requestModel,
       preprintModel,
+      preprintCache,
+      personaModel,
       personaMap,
       osrpreCommunity,
       osrpreTag,
@@ -610,13 +638,20 @@ export default async function run(db) {
     await OSrPREImportReview(
       fullReviewModel,
       preprintModel,
+      preprintCache,
       rapidReviewModel,
+      personaModel,
       personaMap,
       osrpreCommunity,
       osrpreTag,
     ),
   );
-  queue.add(async () => await communityModel.em.flush());
+  queue.add(async () => {
+    console.log('OSrPRE: Flushing requests & reviews to disk.');
+    await communityModel.em.flush();
+    console.log('OSrPRE: Finished flushing requests & reviews to disk.');
+    return;
+  });
   await queue.onIdle();
   return;
 }

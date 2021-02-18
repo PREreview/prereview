@@ -176,7 +176,7 @@ export default function controller(personasModel, badgesModel, thisUser) {
     method: 'GET',
     path: '/personas/:id',
     // validate: {}
-    pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
+    //pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
     handler: async ctx => {
       log.debug(`Retrieving persona ${ctx.params.id}.`);
       let persona;

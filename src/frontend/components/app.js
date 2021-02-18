@@ -5,7 +5,7 @@ import mobile from 'is-mobile';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { TouchBackend } from 'react-dnd-touch-backend';
 import { DndProvider } from 'react-dnd';
-import { Switch, Route } from 'react-router-dom';
+import { Switch, Route, useLocation } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 //import smoothscroll from 'smoothscroll-polyfill';
 import 'url-search-params-polyfill'; /* pollyfill for IE / Edge */
@@ -53,6 +53,19 @@ const Moderate = React.lazy(() => import('./moderate'));
 
 export default function App({ user }) {
   const [loading, setLoading] = useState(true);
+  const [subdomain, setSubdomain] = useState(null);
+
+  useEffect(() => {
+    const host = window.location.host;
+    const labels = host.split('.');
+
+    if (labels.length === 3 || (labels.length === 2 && labels[1].includes('localhost'))) {
+      if (labels[0] === 'outbreaksci') {
+        setSubdomain(labels[0]);
+        console.debug('Subdomain found');
+      }
+    }
+  }, []);
 
   return (
     <HelmetProvider>
@@ -64,7 +77,11 @@ export default function App({ user }) {
             <UserProvider user={user}>
               <Switch>
                 <Route path="/:new(new)?" exact={true}>
-                  <Home />
+                  {subdomain && subdomain === 'outbreaksci' ? (
+                    <Community id="outbreaksci" />
+                  ) : (
+                    <Home />
+                  )}
                 </Route>
                 <Route exact={true} path="/login">
                   <Login />

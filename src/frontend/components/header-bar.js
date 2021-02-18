@@ -4,9 +4,12 @@ import { MdMenu } from 'react-icons/md';
 import PreReviewLogo from './pre-review-logo';
 import IconButton from './icon-button';
 import UserBadge from './user-badge';
-import XLink from './xlink';
 import NoticeBadge from './notice-badge';
 import { useIsMobile } from '../hooks/ui-hooks';
+
+// material-ui
+import Link from '@material-ui/core/Link';
+
 
 export default function HeaderBar({ onClickMenuButton, closeGap, thisUser }) {
   const roles = thisUser && thisUser.groups ? thisUser.groups : []; //GetUser(1);
@@ -19,6 +22,21 @@ export default function HeaderBar({ onClickMenuButton, closeGap, thisUser }) {
   const [initialHeaderOffsetMobile, setinitialHeaderOffsetMobile] = useState(
     null,
   );
+  const [loginLink, setLoginLink] = useState('/login');
+  const [homeLink, setHomeLink] = useState('/');
+
+  useEffect(() => {
+    const host = window.location.host;
+    const labels = host.split('.');
+
+    if (labels.length === 3 || (labels.length === 2 && labels[1].includes('localhost'))) {
+      if (labels[0] === 'outbreaksci') {
+        setLoginLink('https://prereview.org/login');
+        setHomeLink('https://prereview.org');
+        console.debug('Subdomain found');
+      }
+    }
+  }, []);
 
   // closeGap = true
   // useEffect(() => {
@@ -64,7 +82,7 @@ export default function HeaderBar({ onClickMenuButton, closeGap, thisUser }) {
             />
           </IconButton>
         )}
-        <XLink to="/" href="/"><PreReviewLogo /></XLink>
+        <Link to="/" href={homeLink}><PreReviewLogo /></Link>
       </div>
 
       <div className="header-bar__right">
@@ -118,7 +136,7 @@ export default function HeaderBar({ onClickMenuButton, closeGap, thisUser }) {
           {thisUser ? (
             <UserBadge user={thisUser} showNotice={showProfileNotice}>
               {showProfileNotice && (
-                <XLink
+                <Link
                   to={process.env.IS_EXTENSION ? undefined : '/settings'}
                   href={`/settings`}
                   target={process.env.IS_EXTENSION ? '_blank' : undefined}
@@ -127,55 +145,55 @@ export default function HeaderBar({ onClickMenuButton, closeGap, thisUser }) {
                   <div className="menu__link-item__icon">
                     <NoticeBadge />
                   </div>
-                </XLink>
+                </Link>
               )}
 
-              <XLink
+              <Link
                 to={process.env.IS_EXTENSION ? undefined : '/settings'}
                 href={`/settings`}
                 target={process.env.IS_EXTENSION ? '_blank' : undefined}
               >
                 User Settings
-              </XLink>
+              </Link>
 
               {thisUser.isAdmin && (
-                <XLink
+                <Link
                   to={process.env.IS_EXTENSION ? undefined : '/admin'}
                   href={`/admin`}
                   target={process.env.IS_EXTENSION ? '_blank' : undefined}
                 >
                   Admin Settings
-                </XLink>
+                </Link>
               )}
 
               {thisUser.isAdmin && (
-                <XLink
+                <Link
                   to={process.env.IS_EXTENSION ? undefined : '/block'}
                   href={`/block`}
                   target={process.env.IS_EXTENSION ? '_blank' : undefined}
                 >
                   Moderate Users
-                </XLink>
+                </Link>
               )}
 
               {thisUser.isAdmin && ( // #FIXME should this be isModerator ?
-                <XLink
+                <Link
                   to={process.env.IS_EXTENSION ? undefined : '/moderate'}
                   href={`/moderate`}
                   target={process.env.IS_EXTENSION ? '_blank' : undefined}
                 >
                   Moderate Reviews
-                </XLink>
+                </Link>
               )}
 
-              <XLink to="/logout" href={`/logout`}>
+              <Link to="/logout" href={`/logout`}>
                 Logout
-              </XLink>
+              </Link>
             </UserBadge>
           ) : (
-            <XLink to="/login" href="/login">
+            <Link to="/login" href={loginLink}>
               Log In / Sign Up
-            </XLink>
+            </Link>
           )}
         </span>
       </div>
