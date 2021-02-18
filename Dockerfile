@@ -6,6 +6,7 @@ RUN apk add --no-cache \
     python \
     g++ \
     git \
+    openssh \
     cairo-dev \
     jpeg-dev \
     pango-dev \
