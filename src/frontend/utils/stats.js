@@ -94,6 +94,35 @@ export function getTags(preprint) {
   return { hasReviews, hasRequests, hasData, hasCode, subjects };
 }
 
+export function getUsersRank(actions = []) {
+
+  /**
+   * TODO need to clarify in comments what actions are getting passed here */
+
+  const countedActions = actions.filter(
+    action =>
+      action['@type'] === 'RapidPREreviewAction' ||
+      action['@type'] === 'RequestForRapidPREreviewAction'
+  );
+
+  const reviewerCount = {};
+
+  countedActions.forEach(action => {
+      if (typeof action.agent === 'string') {
+        if (action.agent in reviewerCount) {
+          reviewerCount[action.agent] += 1;
+        } else {
+          reviewerCount[action.agent] = 1;
+        }
+      }
+  });
+
+  const sortedUsers = Object.entries(reviewerCount).sort((a, b) => b[1] - a[1]);
+  
+  return sortedUsers;
+}
+
+
 export function getYesNoStats(reviews = []) {
   return QUESTIONS.filter(({ type }) => type === 'YesNoQuestion').map(
     ({ identifier, question }) => {
