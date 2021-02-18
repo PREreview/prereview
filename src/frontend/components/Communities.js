@@ -71,7 +71,7 @@ const Communities = () => {
     return <div>An error occurred: {error.message}</div>;
   } else {
     return (
-      <div className={classes.communities}>
+      <div className={`${classes.communities} communities`}>
         <Helmet>
           <title>Communities • {ORG}</title>
         </Helmet>

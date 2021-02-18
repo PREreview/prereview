@@ -7,6 +7,7 @@ import { useHistory } from 'react-router-dom';
 import UserProvider from '../contexts/user-context';
 
 // components
+import Banner from './banner'
 import HeaderBar from './header-bar';
 import JoinModal from './join-modal';
 import LoginModal from './login-modal';
@@ -41,6 +42,7 @@ export default function Login() {
       <Helmet>
         <title>{ORG} • Login</title>
       </Helmet>
+      <Banner />
       <HeaderBar thisUser={thisUser} />
         { joinModalOpen ? <JoinModal open={joinModalOpen} handleClose={handleJoinModalClose}/> : null }
         { loginModalOpen ? <LoginModal open={loginModalOpen} handleClose={handleLoginModalClose} /> : null }

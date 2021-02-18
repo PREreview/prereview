@@ -1,6 +1,7 @@
 import { QUESTIONS } from '../constants';
 import { arrayify } from './jsonld';
 import { checkIfIsModerated } from './actions';
+import { useGetPersonas } from '../hooks/api-hooks.tsx';
 
 function isYes(textOrAnswer) {
   const text =
@@ -93,6 +94,34 @@ export function getTags(preprint) {
 
   return { hasReviews, hasRequests, hasData, hasCode, subjects };
 }
+
+export function getUsersRank(activities) {
+  /**
+   * 
+   * TODO need to clarify in comments what actions are getting passed here */
+  const reviewerCount = {};
+
+  activities.map(activity => {
+    let author = activity.author
+
+      if (author) {
+        `${author.uuid}, ${author.name}` in reviewerCount ? 
+          reviewerCount[`${author.uuid}, ${author.name}`] += 1 
+          : reviewerCount[`${author.uuid}, ${author.name}`] = 1
+      }
+
+      if (activity.authors) {
+        activity.authors.map( author => (
+          `${author.uuid}, ${author.name}` in reviewerCount ? 
+          reviewerCount[`${author.uuid}, ${author.name}`] += 1 
+          : reviewerCount[`${author.uuid}, ${author.name}`] = 1
+        ))
+      }
+  });
+
+  return Object.entries(reviewerCount).sort((a, b) => b[1] - a[1]); // rank them
+}
+
 
 export function getYesNoStats(reviews = []) {
   return QUESTIONS.filter(({ type }) => type === 'YesNoQuestion').map(

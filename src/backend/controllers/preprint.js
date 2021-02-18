@@ -155,6 +155,7 @@ export default function controller(preprints, thisUser) {
           'rapidReviews',
           'rapidReviews.author',
           'requests',
+          'requests.author',
           'communities',
           'tags',
         ];

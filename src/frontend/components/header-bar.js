@@ -38,34 +38,34 @@ export default function HeaderBar({ onClickMenuButton, closeGap, thisUser }) {
     }
   }, []);
 
-  closeGap = true;
-  useEffect(() => {
-    if (document) {
-      document.documentElement.style.setProperty(
-        '--announcement-bar-height',
-        closeGap ? '0px' : initialHeaderOffset,
-      );
+  // closeGap = true
+  // useEffect(() => {
+  //   if (document) {
+  //     document.documentElement.style.setProperty(
+  //       '--announcement-bar-height',
+  //       closeGap ? '0px' : initialHeaderOffset,
+  //     );
 
-      document.documentElement.style.setProperty(
-        '--announcement-bar-height--mobile',
-        closeGap ? '0px' : initialHeaderOffsetMobile,
-      );
-      setHeaderOffset();
-    }
-  }, []);
+  //     document.documentElement.style.setProperty(
+  //       '--announcement-bar-height--mobile',
+  //       closeGap ? '0px' : initialHeaderOffsetMobile,
+  //     );
+  //     setHeaderOffset();
+  //   }
+  // }, []);
 
-  const setHeaderOffset = () => {
-    const headerBarOffset = window
-      .getComputedStyle(document.documentElement)
-      .getPropertyValue('--announcement-bar-height');
+  // const setHeaderOffset = () => {
+  //   const headerBarOffset = window
+  //     .getComputedStyle(document.documentElement)
+  //     .getPropertyValue('--announcement-bar-height');
 
-    const headerBarOffsetMobile = window
-      .getComputedStyle(document.documentElement)
-      .getPropertyValue('--announcement-bar-height--mobile');
+  //   const headerBarOffsetMobile = window
+  //     .getComputedStyle(document.documentElement)
+  //     .getPropertyValue('--announcement-bar-height--mobile');
 
-    setinitialHeaderOffset(headerBarOffset);
-    setinitialHeaderOffsetMobile(headerBarOffsetMobile);
-  };
+  //   setinitialHeaderOffset(headerBarOffset);
+  //   setinitialHeaderOffsetMobile(headerBarOffsetMobile);
+  // };
 
   return (
     <div className="header-bar">

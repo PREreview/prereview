@@ -23,6 +23,7 @@ import CodeOfConduct from './code-of-conduct';
 import Community from './Community';
 import Communities from './Communities';
 import CommunityPanel from './community-panel';
+import Dashboard from './dashboard'
 import Event from './Event';
 import ExtensionFallback from './extension-fallback';
 import ExtensionSplash from './extension-splash';
@@ -93,6 +94,10 @@ export default function App({ user }) {
                   <ToCPage>
                     <About />
                   </ToCPage>
+                </Route>
+
+                <Route exact={true} path="/dashboard/:new(new)?">
+                  <Dashboard />
                 </Route>
 
                 <Route exact={true} path="/code-of-conduct">

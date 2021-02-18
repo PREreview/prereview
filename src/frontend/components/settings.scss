@@ -215,9 +215,19 @@
       display: none;
     }
   }
+
+  & .header-bar {
+    top: 0;
+  }
 }
 
 .settings-role-editor-modal {
   width: 100vw;
   max-width: 470px;
+}
+
+.communities, .community {
+  & .header-bar {
+    top: 0;
+  }
 }

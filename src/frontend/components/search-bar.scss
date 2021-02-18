@@ -1,7 +1,7 @@
 .fixed__search-bar {
   left: 0;
   position: fixed;
-  top:  var(--header-bar-height);
+  top: calc(var(--header-bar-height) + var(--announcement-bar-height));
   z-index: 999;
 
   & .search-bar {
@@ -22,7 +22,7 @@
     top: unset;
   }
 
-  @media (--short-screen) {
+  @media (max-width: $short-bp) {
     height: auto;
     margin-top: calc(var(--header-bar-height));
     padding: var(--mgrd) 0;

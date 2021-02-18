@@ -25,6 +25,7 @@ import { processParams, searchParamsToObject } from '../utils/search';
 
 // components
 import AddButton from './add-button';
+import Banner from './banner';
 import HeaderBar from './header-bar';
 import Loading from './loading';
 import LoginRequiredModal from './login-required-modal';
@@ -102,6 +103,7 @@ export default function Home() {
         <Helmet>
           <title>Home • {ORG}</title>
         </Helmet>
+        <Banner />
 
         {!!((isNewVisitor || params.get('welcome')) && isWelcomeModalOpen) && (
           <WelcomeModal
@@ -244,7 +246,8 @@ export default function Home() {
                 ))}
               </ul>
             )}
-            {!preprints || (preprints && preprints.totalCount <= 0) && !loadingPreprints ? (
+            {!preprints ||
+            (preprints && preprints.totalCount <= 0 && !loadingPreprints) ? (
               <div>
                 No preprints about this topic have been added to Rapid
                 PREreview.{' '}
