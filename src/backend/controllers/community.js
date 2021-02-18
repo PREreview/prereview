@@ -10,7 +10,7 @@ const Joi = router.Joi;
 const communitySchema = Joi.object({
   name: Joi.string(),
   description: Joi.string(),
-  logo: Joi.string().uri(),
+  banner: Joi.string(),
 });
 
 const querySchema = Joi.object({
