@@ -56,7 +56,7 @@
 
       &.profile__chips {
         margin-left: -0.5rem;
-        
+
         & .profile__chip {
           margin-left: 0.5rem;
         }
@@ -118,5 +118,9 @@
 
   & .profile__section-title {
     font: var(--ui-header-font);
+  }
+
+  & .header-bar {
+    top: 0;
   }
 }
