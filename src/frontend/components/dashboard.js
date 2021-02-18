@@ -1,5 +1,5 @@
 // base imports
-import React, { useEffect, useContext, useState, useCallback, useMemo } from 'react';
+import React, { useContext, useState, useCallback } from 'react';
 import { Helmet } from 'react-helmet-async';
 import omit from 'lodash/omit';
 import { subDays } from 'date-fns'
@@ -16,9 +16,8 @@ import { useGetPreprints } from '../hooks/api-hooks.tsx';
 import { useNewPreprints } from '../hooks/ui-hooks';
 
 // utils
-import { getUsersRank, isYes } from '../utils/stats';
+import { getUsersRank } from '../utils/stats';
 import { processParams, searchParamsToObject } from '../utils/search';
-import { getId } from '../utils/jsonld';
 
 // contexts
 import UserProvider from '../contexts/user-context';
@@ -28,7 +27,6 @@ import AddButton from './add-button';
 import Banner from "./banner.js";
 import Button from './button';
 import LoginRequiredModal from './login-required-modal';
-import Checkbox from './checkbox';
 import SortOptions from './sort-options';
 import HeaderBar from './header-bar';
 import PreprintCard from './preprint-card';
@@ -51,7 +49,6 @@ export default function Dashboard() {
   // search
   const params = processParams(location.search);
   const [search, setSearch] = useState(params.get('search') || '');
-  const covidTerms = ['COVID-19', 'Coronavirus', 'SARS-CoV-2'];
 
   const { data: preprints, loading: loadingPreprints, error } = useGetPreprints(
     {
@@ -59,52 +56,55 @@ export default function Dashboard() {
     },
   );
 
+  preprints ? preprints.data.forEach(preprint => console.log("PREPRINT!", preprint)) : null
+
   const [hoveredSortOption, setHoveredSortOption] = useState(null);
 
   /**
-   * builds an array where each item of the array is an object with an 'actions' key,
-   * the value to which are all of actions from each preprint
+   * this code is a bit clunky and probably expensive
    * */
-  // let allActions = []
-  // !loadingPreprints && preprints ? allActions = preprints.data.map(preprint => {
-  //   return {
-  //     preprint: preprint.doc, // details of each preprint
-  //     actions: preprint.doc.potentialAction
-  //   }
-  // })
-  //   : allActions = []
-
-  /**
-   * adding the preprint info to each action,
-   * and pushing each individual action to a new array
-   */
-  // let justActions = [];
-  // allActions.forEach(setOfActions => setOfActions.actions.forEach(action => {
-  //   action["preprint"] = setOfActions.preprint
-  //   justActions.push(action)
-  // }))
-
-  // const safeActions = useMemo(() => {
-  //   return justActions.filter(
-  //     action =>
-  //       !checkIfIsModerated(action) &&
-  //       (action['@type'] === 'RequestForRapidPREreviewAction' ||
-  //         action['@type'] === 'RapidPREreviewAction')
-  //   );
-  // }, [justActions]);
+  let activities = []
+  !loadingPreprints && preprints ? preprints.data.map(preprint => {
+    preprint.requests.forEach(request => activities.push(
+      { ...request, type: 'request', preprintTitle: preprint.title, handle: preprint.handle }
+    ))
+    preprint.rapidReviews.length ? 
+      preprint.rapidReviews.forEach(rapid => activities.push({
+        ...rapid,
+        type: 'rapid',
+        preprintTitle: preprint.title,
+        handle: preprint.handle
+      })) 
+      : null 
+    preprint.fullReviews.length ? 
+      preprint.fullReviews.filter(review => review.isPublished).forEach(review => activities.push({
+        ...review,
+        type: 'long',
+        preprintTitle: preprint.title,
+        handle: preprint.handle
+      })) 
+      : null
+  })
+    : activities = []
 
   // filtering actions for ones that happened within the last week
-  // const recentActions = safeActions ? safeActions.filter(action => new Date(action.startTime) >= subDays(new Date(), 7)) : []
+  const recentActivities = activities ? activities.filter(activity => new Date(activity.createdAt) >= subDays(new Date(), 7)) : []
 
   // sort recent actions to populate a "Recent activity" section,
   // but sorts all actions if none occurred in the last week
-  // const sortedActions = recentActions.length ? recentActions.slice(0, 15).sort((a, b) => new Date(b.startTime) - new Date(a.startTime)) : safeActions ? safeActions.slice(0, 15).sort((a, b) => new Date(b.startTime) - new Date(a.startTime)) : null
+  const sortedActivities = recentActivities.length 
+    ? 
+      recentActivities.slice(0, 15).sort((a, b) => 
+      new Date(b.createdAt) - new Date(a.createdAt)) 
+      : 
+        activities ? 
+          activities.slice(0, 15).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+        : null
 
   // gets active users, ranked by number of requests+reviews
-  // const rankedUsers = getUsersRank(safeActions ? safeActions : [])
+  const rankedUsers = getUsersRank(activities ? activities : [])
 
   // gets 10 of the top users, just their user ids
-  // const justUsers = rankedUsers.slice(0, 10).map(user => user[0])
 
   // next three functions copied from home.js
   const handleNewRequest = useCallback(
@@ -229,30 +229,32 @@ export default function Dashboard() {
         <div className="toc-page__body">
           <section className="dashboard home__main">
           <h1 id="Dashboard">COVID-19 Dashboard</h1>
+          <div className="fixed__search-bar">
             <SearchBar
-            defaultValue={search}
-            isFetching={loadingPreprints}
-            onChange={value => {
-              params.delete('page');
-              setSearch(value);
-            }}
-            onCancelSearch={() => {
-              params.delete('search');
-              setSearch('');
-              history.push({
-                pathname: location.pathame,
-                search: params.toString(),
-              });
-            }}
-            onRequestSearch={() => {
-              params.set('search', search);
-              params.delete('page');
-              history.push({
-                pathname: location.pathame,
-                search: params.toString(),
-              });
-            }}
-          />
+              defaultValue={search}
+              isFetching={loadingPreprints}
+              onChange={value => {
+                params.delete('page');
+                setSearch(value);
+              }}
+              onCancelSearch={() => {
+                params.delete('search');
+                setSearch('');
+                history.push({
+                  pathname: location.pathame,
+                  search: params.toString(),
+                });
+              }}
+              onRequestSearch={() => {
+                params.set('search', search);
+                params.delete('page');
+                history.push({
+                  pathname: location.pathame,
+                  search: params.toString(),
+                });
+              }}
+            />
+          </div>
             <div className="dashboard__flex">
               <div className="dashboard__flex_item">
 
@@ -274,7 +276,7 @@ export default function Dashboard() {
                   });
                 }}
               />
-              
+
                 {preprints && preprints.totalCount === 0 && !loadingPreprints ? (
                   <div>
                     No preprints about this topic have been added to Rapid PREreview.{' '}
@@ -295,7 +297,7 @@ export default function Dashboard() {
                     )}
                   </div>
                 ) : 
-                  <ul className="dashboard__preprint-list">
+                  <ul className="home__preprint-list">
                     {preprints &&
                       preprints.data.map(row => (
                         <li key={row.id} className="home__preprint-list__item">
@@ -346,12 +348,12 @@ export default function Dashboard() {
                 <div className="dashboard__activity">
                   <div  className="dashboard__activity_item">
                     <h2 className="dashboard__h2">Recent Activity</h2>
-                    {/* {sortedActions.map( action =>
+                    {sortedActivities.map(activity =>
                       <RecentActivity
-                        key={action['@id']}
-                        action={action}
+                        key={activity.id}
+                        activity={activity}
                       />
-                    )} */}
+                    )}
                   </div>
                   <div  className="dashboard__activity_item">
                     <h2 className="dashboard__h2">Active Reviewers</h2>

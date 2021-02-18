@@ -1,6 +1,7 @@
 import { QUESTIONS } from '../constants';
 import { arrayify } from './jsonld';
 import { checkIfIsModerated } from './actions';
+import { useGetPersonas } from '../hooks/api-hooks.tsx';
 
 function isYes(textOrAnswer) {
   const text =
@@ -94,32 +95,43 @@ export function getTags(preprint) {
   return { hasReviews, hasRequests, hasData, hasCode, subjects };
 }
 
-export function getUsersRank(actions = []) {
-
+export function getUsersRank(activities) {
   /**
+   * 
    * TODO need to clarify in comments what actions are getting passed here */
 
-  const countedActions = actions.filter(
-    action =>
-      action['@type'] === 'RapidPREreviewAction' ||
-      action['@type'] === 'RequestForRapidPREreviewAction'
-  );
+  const { data: personas, loading: loadingPersonas, error: personaError } = useGetPersonas()
 
   const reviewerCount = {};
 
-  countedActions.forEach(action => {
-      if (typeof action.agent === 'string') {
-        if (action.agent in reviewerCount) {
-          reviewerCount[action.agent] += 1;
-        } else {
-          reviewerCount[action.agent] = 1;
-        }
+  activities.map(activity => {
+      let authorPersona;
+      if (activity.author && typeof activity.author === 'number') {
+        personas ? authorPersona = personas.data.find(persona => persona.id === activity.author) : null
       }
+
+      if (activity.author) {
+        activity.author.uuid in reviewerCount ? 
+          reviewerCount[activity.author.uuid] += 1 
+          : reviewerCount[activity.author.uuid] = 1
+      }
+
+      if (authorPersona) {
+        authorPersona.uuid in reviewerCount ?
+          reviewerCount[activity.author.uuid] += 1 
+          : reviewerCount[activity.author.uuid] = 1
+      }
+
+      // if (activity.authors) {
+      //   activity.authors.map( author => (
+      //     author.uuid in reviewerCount ? 
+      //     reviewerCount[author.uuid] += 1 
+      //     : reviewerCount[author.uuid] = 1
+      //   ))
+      // }
   });
 
-  const sortedUsers = Object.entries(reviewerCount).sort((a, b) => b[1] - a[1]);
-  
-  return sortedUsers;
+  return Object.entries(reviewerCount).sort((a, b) => b - a); // rank them
 }
 
 

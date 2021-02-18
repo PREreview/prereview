@@ -1,74 +1,80 @@
 // base imports
-import React, { Fragment, useState, useMemo } from 'react';
+import React, { Fragment, useContext, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import omit from 'lodash/omit';
 
-
+//utils
 import { formatDistanceStrict } from 'date-fns';
+import { createPreprintId } from '../../common/utils/ids.js';
+//material ui
+import Link from '@material-ui/core/Link';
 
 
-// hooks
-import { useRole } from '../hooks/api-hooks';
+export default function RecentActivity({activity}) {
+  let author;
+  let authors;
 
-// utils
-import { unprefix } from '../utils/jsonld';
+  activity.author ? author = activity.author : authors = activity.authors;
 
-// components
-import XLink from './xlink';
+  const multiAuthors = () => {
+    return authors.map( author => (
+      <Link href={`/about/${author.uuid}`}>
+      {author.name}{' '}
+      </Link> 
+    ))
+  }
 
-export default function RecentActivity({action}) {
-  const user = action.agent
-  const [role, fetchRoleProgress] = useRole(user);
+  const title = activity.preprintTitle
+  const preprintId = createPreprintId(activity.handle);
 
-  const { name, doi, arXivId } = action.preprint;
+  const getContent = type => {
+    switch (type) {
+      case 'request':
+        return (
+          <Fragment>
+            <div className="dashboard__activity_item_text">
+              <Link href={`/about/${author.uuid}`}>
+                {author.name}
+              </Link>{' '}
+              requested reviews for {' '}
+              <Link href={`/preprints/${preprintId}`}>
+                {title}
+              </Link>{' '}
+              {formatDistanceStrict(new Date(activity.createdAt), new Date()) + ` ago.`}
+            </div>
+          </Fragment>
+        )
+      case 'rapid':
+        return (
+          <Fragment>
+            <div className="dashboard__activity_item_text">
+              <Link href={`/about/${author.uuid}`}>
+                {author.name}
+              </Link>{' '}
+              rapid reviewed {' '}
+              <Link href={`/preprints/${preprintId}`}>
+                {title}
+              </Link>{' '}
+              {formatDistanceStrict(new Date(activity.createdAt), new Date()) + ` ago.`}
+            </div>
+          </Fragment>
+        )
+      case 'long':
+        return (
+          <Fragment>
+            <div className="dashboard__activity_item_text">
+              { multiAuthors() }{' '} reviewed {' '}
+              <Link href={`/preprints/${preprintId}`}>
+                {title}
+              </Link>{' '}
+              {formatDistanceStrict(new Date(activity.createdAt), new Date()) + ` ago.`}
+            </div>
+          </Fragment>
+        )
+      default:
+        return ''
+    }
+  }
 
-  return action['@type'] === 'RequestForRapidPREreviewAction' ? (
-    <Fragment>
-      <div className="dashboard__activity_item_text">
-        {role && role['@type'] !== 'AnonymousReviewerRole'
-          ? <XLink to={`/about/${unprefix(user)}`}
-            href={`/about/${unprefix(user)}`} >{role.name}</XLink>
-          : <XLink to={`/about/${unprefix(user)}`}
-            href={`/about/${unprefix(user)}`} >{`Community reviewer ${user.slice(user.length - 4, user.length)}`}</XLink>}{' '}
-        {` requested a review for `}
-        <XLink
-          href={`/${doi || arXivId}`}
-          to={{
-            pathname: `/${doi || arXivId}`,
-            state: {
-              preprint: omit(action.preprint, ['potentialAction']),
-              tab: 'read'
-            }
-          }}
-        >
-          {name}
-        </XLink>{' '}
-        {formatDistanceStrict(new Date(action.startTime), new Date()) + ` ago.`}
-      </div>
-    </Fragment>
-  ) : (
-    <Fragment>
-      <div className="dashboard__activity_item_text">
-        {role && role['@type'] !== 'AnonymousReviewerRole'
-            ? <XLink to={`/about/${unprefix(user)}`}
-              href={`/about/${unprefix(user)}`} >{role.name}</XLink>
-            : <XLink to={`/about/${unprefix(user)}`}
-              href={`/about/${unprefix(user)}`} >{`Community reviewer ${user.slice(user.length - 4, user.length)}`}</XLink>}{' '}
-        {` reviewed `}
-        <XLink
-          href={`/${doi || arXivId}`}
-          to={{
-            pathname: `/${doi || arXivId}`,
-            state: {
-              preprint: omit(action.preprint, ['potentialAction']),
-              tab: 'read'
-            }
-          }}
-        >
-          {name}
-        </XLink>{' '}
-        {formatDistanceStrict(new Date(action.startTime), new Date()) + ` ago.`}
-      </div>
-    </Fragment>
-  );  
+  return getContent(activity.type)
 }
