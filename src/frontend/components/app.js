@@ -52,17 +52,19 @@ const Moderate = React.lazy(() => import('./moderate'));
 
 export default function App({ user }) {
   const [loading, setLoading] = useState(true);
-  const location = useLocation();
+  const [subdomain, setSubdomain] = useState(null);
 
-  console.log('location:', window.location);
-  const host = window.location.host;
-  const labels = host.split('.');
+  useEffect(() => {
+    const host = window.location.host;
+    const labels = host.split('.');
 
-  let subdomain;
-  if (labels.length === 3 || (labels.length === 2 && labels[1].includes('localhost'))) {
-    subdomain = labels[0];
-    console.debug('Subdomain found:', subdomain);
-  }
+    if (labels.length === 3 || (labels.length === 2 && labels[1].includes('localhost'))) {
+      if (labels[0] === 'outbreaksci') {
+        setSubdomain(labels[0]);
+        console.debug('Subdomain found');
+      }
+    }
+  }, [])
 
   return (
     <HelmetProvider>

@@ -6,7 +6,6 @@ import {
   ManyToOne,
   OneToMany,
   Property,
-  Unique,
 } from '@mikro-orm/core';
 import { Fixture } from 'class-fixtures-factory';
 import { PersonaModel } from '../personas';
@@ -25,7 +24,6 @@ export class Persona extends BaseEntity {
 
   @Fixture(faker => faker.name.findName())
   @Property()
-  @Unique()
   name!: string;
 
   @ManyToOne({ entity: () => User, nullable: true })

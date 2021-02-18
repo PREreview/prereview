@@ -217,7 +217,7 @@ export default function controller(
   communities.route({
     method: 'GET',
     path: '/communities/:id',
-    pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
+    //pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
     validate: {
       query: querySchema,
       continueOnError: true,
