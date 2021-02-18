@@ -302,10 +302,10 @@ export default function Dashboard() {
                     )}
                   </div>
                 ) : 
-                  <ul className="home__preprint-list">
+                  <ul className="dashboard__preprint-list">
                     {preprints &&
                       preprints.data.map(row => (
-                        <li key={row.id} className="home__preprint-list__item">
+                        <li key={row.id} className="dashboard__preprint-list__item">
                           <PreprintCard
                             isNew={false}
                             user={user}
