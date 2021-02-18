@@ -102,9 +102,14 @@ export default function Dashboard() {
         : null
 
   // gets active users, ranked by number of requests+reviews
+  // rankedUsers returns an array of objects where 
+  // the key is the uuid of a user's persona and the 
+  // value is their number of 'activity'
   const rankedUsers = getUsersRank(activities ? activities : [])
 
   // gets 10 of the top users, just their user ids
+  const activeUsers = rankedUsers.slice(0, 10).map(user => user[0])
+  console.log("justUsers", activeUsers)
 
   // next three functions copied from home.js
   const handleNewRequest = useCallback(
@@ -357,16 +362,16 @@ export default function Dashboard() {
                   </div>
                   <div  className="dashboard__activity_item">
                     <h2 className="dashboard__h2">Active Reviewers</h2>
-                    {/* <ol className="dashboard__activity_item_list">
-                      {justUsers.map(user =>
+                    <ol className="dashboard__activity_item_list">
+                      {activeUsers.map(user =>
                         <li>
                           <ActiveUser
-                            key={user['@id']}
+                            key={user.split(', ')[0]}
                             user={user}
                           />
                         </li>
                       )}
-                    </ol> */}
+                    </ol>
                   </div> 
                 </div>
               </div>

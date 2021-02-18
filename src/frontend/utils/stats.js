@@ -99,39 +99,27 @@ export function getUsersRank(activities) {
   /**
    * 
    * TODO need to clarify in comments what actions are getting passed here */
-
-  const { data: personas, loading: loadingPersonas, error: personaError } = useGetPersonas()
-
   const reviewerCount = {};
 
   activities.map(activity => {
-      let authorPersona;
-      if (activity.author && typeof activity.author === 'number') {
-        personas ? authorPersona = personas.data.find(persona => persona.id === activity.author) : null
+    let author = activity.author
+
+      if (author) {
+        `${author.uuid}, ${author.name}` in reviewerCount ? 
+          reviewerCount[`${author.uuid}, ${author.name}`] += 1 
+          : reviewerCount[`${author.uuid}, ${author.name}`] = 1
       }
 
-      if (activity.author) {
-        activity.author.uuid in reviewerCount ? 
-          reviewerCount[activity.author.uuid] += 1 
-          : reviewerCount[activity.author.uuid] = 1
+      if (activity.authors) {
+        activity.authors.map( author => (
+          `${author.uuid}, ${author.name}` in reviewerCount ? 
+          reviewerCount[`${author.uuid}, ${author.name}`] += 1 
+          : reviewerCount[`${author.uuid}, ${author.name}`] = 1
+        ))
       }
-
-      if (authorPersona) {
-        authorPersona.uuid in reviewerCount ?
-          reviewerCount[activity.author.uuid] += 1 
-          : reviewerCount[activity.author.uuid] = 1
-      }
-
-      // if (activity.authors) {
-      //   activity.authors.map( author => (
-      //     author.uuid in reviewerCount ? 
-      //     reviewerCount[author.uuid] += 1 
-      //     : reviewerCount[author.uuid] = 1
-      //   ))
-      // }
   });
 
-  return Object.entries(reviewerCount).sort((a, b) => b - a); // rank them
+  return Object.entries(reviewerCount).sort((a, b) => b[1] - a[1]); // rank them
 }
 
 
