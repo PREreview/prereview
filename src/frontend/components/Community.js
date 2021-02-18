@@ -1,5 +1,5 @@
 // base imports
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useHistory, useLocation, useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
@@ -229,7 +229,7 @@ export default function Community(props) {
           <Box bgcolor="rgba(229, 229, 229, 0.35)">
             <Container>
               <Box p={4}>
-                {user.isAdmin ? (
+                {user && user.isAdmin ? (
                   <IconButton
                     href={`/community-settings/${community.uuid}`}
                     className={classes.settings}
