@@ -64,7 +64,7 @@ export default function App({ user }) {
         console.debug('Subdomain found');
       }
     }
-  }, [])
+  }, []);
 
   return (
     <HelmetProvider>
