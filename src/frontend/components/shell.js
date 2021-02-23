@@ -57,7 +57,10 @@ export default function Shell({ children, defaultStatus = 'default' }) {
     const host = window.location.host;
     const labels = host.split('.');
 
-    if (labels.length === 3 || (labels.length === 2 && labels[1].includes('localhost'))) {
+    if (
+      labels.length === 3 ||
+      (labels.length === 2 && labels[1].includes('localhost'))
+    ) {
       if (labels[0] === 'outbreaksci') {
         setLoginLink('https://prereview.org/login');
         setHomeLink('https://prereview.org');
@@ -266,7 +269,9 @@ export default function Shell({ children, defaultStatus = 'default' }) {
         <div className="shell__control-bar">
           <div className="shell__controls">
             <div className="shell__controls__left">
-              <Link to="/" href={homeLink}><PreReviewLogo short={true} /></Link>
+              <Link to="/" href={homeLink}>
+                <PreReviewLogo short={true} />
+              </Link>
             </div>
             <div className="shell__controls__center">
               <IconButton
