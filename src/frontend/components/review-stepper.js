@@ -372,7 +372,12 @@ export default function ReviewStepper({
           contents: content,
           authors:
             review && review.authors
-              ? review.authors.map(author => ({ uuid: author.uuid }))
+              ? review.authors.reduce((authors, author) => {
+                  if (author.uuid) {
+                    authors.push({ uuid: author.uuid });
+                  }
+                  return authors;
+                }, [])
               : null,
         })
           .then(() => alert('Draft updated successfully.'))
@@ -383,7 +388,12 @@ export default function ReviewStepper({
           contents: content,
           authors:
             review && review.authors
-              ? review.authors.map(author => ({ uuid: author.uuid }))
+              ? review.authors.reduce((authors, author) => {
+                  if (author.uuid) {
+                    authors.push({ uuid: author.uuid });
+                  }
+                  return authors;
+                }, [])
               : null,
         })
           .then(response => {
@@ -412,9 +422,15 @@ export default function ReviewStepper({
           preprint: preprint.uuid,
           contents: content,
           isPublished: true,
-          authors: review
-            ? review.authors.map(author => ({ uuid: author.uuid }))
-            : null,
+          authors:
+            review && review.authors
+              ? review.authors.reduce((authors, author) => {
+                  if (author.uuid) {
+                    authors.push({ uuid: author.uuid });
+                  }
+                  return authors;
+                }, [])
+              : null,
         })
           .then(() => {
             setActiveStep(prevActiveStep => prevActiveStep + 2);
