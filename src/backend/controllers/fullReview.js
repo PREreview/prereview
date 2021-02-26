@@ -112,29 +112,31 @@ export default function controller(
       if (authors) {
         for (let p of authors) {
           authorPersona = await personaModel.findOne({ uuid: p.uuid });
-          if (authorPersona) {
+          if (authorPersona.isAnonymous) {
             creators.push({
-              name: authorPersona.isAnonymous
-                ? `PREreview community member`
-                : authorPersona.name,
-              orcid: authorPersona.isAnonymous
-                ? ''
-                : authorPersona.identity.orcid,
+              name: `PREreview.org community member`,
             });
-            review.authors.add(authorPersona);
+          } else {
+            creators.push({
+              name: authorPersona.name,
+              orcid: authorPersona.identity.orcid,
+            });
           }
+          review.authors.add(authorPersona);
         }
       } else {
         authorPersona = await personaModel.findOne(
           ctx.state.user.defaultPersona,
         );
         // ensuring anonymous reviewers stay anonymous
-        creators.push({
-          name: authorPersona.isAnonymous
-            ? `PREreview community member`
-            : authorPersona.name,
-          orcid: authorPersona.isAnonymous ? '' : ctx.state.user.orcid,
-        });
+        authorPersona.isAnonymous
+          ? creators.push({
+              name: `PREreview.org community member`,
+            })
+          : creators.push({
+              name: authorPersona.name,
+              orcid: ctx.state.user.orcid,
+            });
         review.authors.add(authorPersona);
       }
 
@@ -164,14 +166,9 @@ export default function controller(
     }
 
     let reviewData;
-    let anonReviewer = [];
-
-    for (let cr of creators) {
-      cr.name === 'PREreview community member' ? anonReviewer.push(cr) : null;
-    }
 
     // shape data for ZENODO if none of the authors are anonymous
-    if (review.isPublished && !anonReviewer.length) {
+    if (review.isPublished) {
       reviewData = {
         title: review.title || `Review of ${preprint.title}`,
         content: draft.contents,
@@ -209,8 +206,9 @@ export default function controller(
     meta: {
       swagger: {
         operationId: 'PostFullReviews',
-        summary:
-          'Endpoint to POST full-length drafts of reviews. The text contents of a review must be in the `contents` property of the request body. Returns a 201 if successful.',
+        summary: `Endpoint to POST full-length drafts of reviews. 
+          The text contents of a review must be in the 'contents' property of the request body. 
+          Returns a 201 if successful.`,
       },
     },
   });
