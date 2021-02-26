@@ -20,6 +20,9 @@ import NoticeBadge from './notice-badge';
 import UserBadge from './user-badge';
 import XLink from './xlink';
 
+// material-ui
+import Link from '@material-ui/core/Link';
+
 // icons
 import { MdDragHandle, MdUnfoldMore, MdUnfoldLess } from 'react-icons/md';
 import IconButton from './icon-button';
@@ -30,6 +33,8 @@ const SHELL_HEADER_HEIGHT = 40; // !! keep in sync with CSS
 export default function Shell({ children, defaultStatus = 'default' }) {
   const [user] = useContext(UserProvider.context);
   const [isDown, setIsDown] = useState(false);
+  const [homeLink, setHomeLink] = useState('/');
+
   const ref = useRef();
   const nextHeightRef = useRef(null);
   const needForRafRef = useRef(true);
@@ -47,6 +52,22 @@ export default function Shell({ children, defaultStatus = 'default' }) {
   // shell height is set in `%` units through the `max-height` CSS property
   const [height, setHeight] = useState(50);
   const [status, setStatus] = useState(defaultStatus);
+
+  useEffect(() => {
+    const host = window.location.host;
+    const labels = host.split('.');
+
+    if (
+      labels.length === 3 ||
+      (labels.length === 2 && labels[1].includes('localhost'))
+    ) {
+      if (labels[0] === 'outbreaksci') {
+        setLoginLink('https://prereview.org/login');
+        setHomeLink('https://prereview.org');
+        console.debug('Subdomain found');
+      }
+    }
+  }, []);
 
   // reposition shell when user "drag" the handle
   useEffect(() => {
@@ -248,7 +269,9 @@ export default function Shell({ children, defaultStatus = 'default' }) {
         <div className="shell__control-bar">
           <div className="shell__controls">
             <div className="shell__controls__left">
-              <PreReviewLogo short={true} />
+              <Link to="/" href={homeLink}>
+                <PreReviewLogo short={true} />
+              </Link>
             </div>
             <div className="shell__controls__center">
               <IconButton

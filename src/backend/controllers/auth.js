@@ -223,13 +223,13 @@ export default function controller(
     path: '/orcid/callback',
     handler: async ctx => {
       return passport.authenticate('orcid', (err, user) => {
-        log.debug('Finishing authenticating with ORCID.');
-        log.debug('Received user: ', user.uuid);
+        log.debug('Receiving ORCiD callback.');
         if (!user) {
           ctx.body = { success: false };
-          log.error('Authentication failed.');
+          log.error('Authentication failed: ', err);
           ctx.throw(401, 'Authentication failed.');
         } else {
+          log.debug('Received user: ', user.uuid);
           ctx.state.user = user;
 
           if (ctx.request.body.remember === 'true') {
