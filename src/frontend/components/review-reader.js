@@ -26,6 +26,7 @@ import LongformReviewReader from './review-reader-longform';
 import MuiButton from '@material-ui/core/Button';
 import { PotentialRoles } from './role-list';
 import ReportButton from './report-button';
+import ShareMenu from './share-menu';
 import TextAnswers from './text-answers';
 
 const Button = withStyles({
@@ -191,7 +192,7 @@ const ReviewReader = React.memo(function ReviewReader({
     }
   }, [defaultHighlightedRoleIds, highlightedRoleIds]);
 
-  useEffect(() => { }, [
+  useEffect(() => {}, [
     allReviews,
     allRapidReviews,
     publishedReviews,
@@ -248,6 +249,9 @@ const ReviewReader = React.memo(function ReviewReader({
                     stats={getYesNoStats(allRapidReviews)}
                     nReviews={allRapidReviews.length}
                   >
+                    <ShareMenu
+                      identifier={preprint.handle}
+                    />
                   </Barplot>
 
                   <TextAnswers
@@ -259,8 +263,8 @@ const ReviewReader = React.memo(function ReviewReader({
                   />
                 </div>
               ) : (
-                  <div>No rapid reviews yet.</div>
-                )}
+                <div>No rapid reviews yet.</div>
+              )}
             </AccordionDetails>
           </Accordion>
           <Accordion
@@ -334,21 +338,21 @@ const ReviewReader = React.memo(function ReviewReader({
                                             </span>
                                           ))
                                       ) : (
-                                          <span
-                                            key={review.authors[0].id}
-                                            className="review-reader__header-author"
-                                          >
-                                            {review.authors[0].defaultPersona
-                                              ? review.authors[0].defaultPersona
+                                        <span
+                                          key={review.authors[0].id}
+                                          className="review-reader__header-author"
+                                        >
+                                          {review.authors[0].defaultPersona
+                                            ? review.authors[0].defaultPersona
                                                 .name
-                                              : review.authors[0].name}
-                                          </span>
-                                        )}
+                                            : review.authors[0].name}
+                                        </span>
+                                      )}
                                       {review.authors.length > 2 ? '...' : null}
                                     </>
                                   ) : (
-                                      <span>Anonymous</span>
-                                    )}
+                                    <span>Anonymous</span>
+                                  )}
                                 </Typography>
                                 <Typography
                                   className={`${classes.h4} ${classes.date}`}
@@ -440,18 +444,18 @@ const ReviewReader = React.memo(function ReviewReader({
                   </div>
                 </div>
               ) : (
-                  <div>No longform reviews to display.</div>
-                )}
+                <div>No longform reviews to display.</div>
+              )}
             </AccordionDetails>
           </Accordion>
         </div>
       ) : (
-          <div className="text-answers">
-            <div className="text-answers__question long">
-              No reviews yet. Would you like to leave one?
+        <div className="text-answers">
+          <div className="text-answers__question long">
+            No reviews yet. Would you like to leave one?
           </div>
-          </div>
-        )}
+        </div>
+      )}
     </div>
   );
 });
