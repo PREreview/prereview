@@ -61,7 +61,7 @@ export default function Profile() {
 
         <section className="profile__content">
           <header className="profile__header">
-            {thisUser.uuid === persona.identity.uuid ? (
+            {thisUser && thisUser.uuid === persona.identity.uuid ? (
               <IconButton href="/settings">
                 <Avatar src={persona.avatar} className="profile__avatar-img" />
               </IconButton>
@@ -95,7 +95,7 @@ export default function Profile() {
                 <h2 className="profile__username">
                   {persona && persona.name ? persona.name : 'Name goes here'}
                 </h2>
-                { persona.identity.uuid === thisUser.uuid ? 
+                { thisUser && persona.identity.uuid === thisUser.uuid ? 
                 <XLink
                     to={`/settings`}
                     href={`/settings`}
