@@ -131,12 +131,12 @@ export default function controller(
         // ensuring anonymous reviewers stay anonymous
         authorPersona.isAnonymous
           ? creators.push({
-            name: `PREreview.org community member`,
-          })
+              name: `PREreview.org community member`,
+            })
           : creators.push({
-            name: authorPersona.name,
-            orcid: ctx.state.user.orcid,
-          });
+              name: authorPersona.name,
+              orcid: ctx.state.user.orcid,
+            });
         review.authors.add(authorPersona);
       }
 
@@ -201,7 +201,7 @@ export default function controller(
   reviewsRouter.route({
     method: 'POST',
     path: '/fullReviews',
-    // pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
+    pre: thisUser.can('access private pages'),
     handler: postHandler,
     meta: {
       swagger: {
@@ -245,6 +245,7 @@ export default function controller(
   reviewsRouter.route({
     method: 'PUT',
     path: '/fullReviews/:id',
+    pre: thisUser.can('access private pages'),
     handler: async ctx => {
       log.debug(`Updating review ${ctx.params.id}.`);
       let fullReview, draft, coi;
@@ -329,10 +330,11 @@ export default function controller(
       }),
       type: 'json',
     },
-    pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
+    pre: thisUser.can('access private pages'),
     handler: async ctx => {
       log.debug(
-        `Adding persona ${ctx.request.body.pid} to review ${ctx.params.id
+        `Adding persona ${ctx.request.body.pid} to review ${
+          ctx.params.id
         } with role ${ctx.params.role}.`,
       );
       let review, persona;
@@ -365,7 +367,8 @@ export default function controller(
       if (ctx.params.role === 'authors') {
         try {
           log.debug(
-            `Full review ${review.id} found. Inviting persona ${persona.id
+            `Full review ${review.id} found. Inviting persona ${
+              persona.id
             } to review.`,
           );
           review.authorInvites.add(persona);
@@ -386,7 +389,8 @@ export default function controller(
                 },
               });
               log.info(
-                `Sent author invitation email to ${contact.value} for review ${review.uuid
+                `Sent author invitation email to ${contact.value} for review ${
+                  review.uuid
                 }`,
               );
             }
@@ -401,7 +405,8 @@ export default function controller(
       } else if (ctx.params.role === 'mentors') {
         try {
           log.debug(
-            `Full review ${review.id} found. Inviting persona ${persona.id
+            `Full review ${review.id} found. Inviting persona ${
+              persona.id
             } to review.`,
           );
           review.mentorInvites.add(persona);
@@ -422,7 +427,8 @@ export default function controller(
                 },
               });
               log.info(
-                `Sent mentor invitation email to ${contact.value} for review ${review.uuid
+                `Sent mentor invitation email to ${contact.value} for review ${
+                  review.uuid
                 }`,
               );
             }
@@ -468,7 +474,7 @@ export default function controller(
       },
       type: 'json',
     },
-    pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
+    pre: thisUser.can('access private pages'),
     handler: async ctx => {
       log.debug(
         `Removing persona ${ctx.params.pid} from review ${ctx.params.id}.`,
@@ -502,7 +508,8 @@ export default function controller(
       ) {
         try {
           log.debug(
-            `Full review ${review.id} found. Inviting persona ${persona.id
+            `Full review ${review.id} found. Inviting persona ${
+              persona.id
             } to review.`,
           );
           review.authorInvites.remove(persona);
@@ -520,7 +527,8 @@ export default function controller(
       ) {
         try {
           log.debug(
-            `Full review ${review.id} found. Inviting persona ${persona.id
+            `Full review ${review.id} found. Inviting persona ${
+              persona.id
             } to review.`,
           );
           review.mentorInvites.remove(persona);
@@ -563,10 +571,11 @@ export default function controller(
           .required(),
       },
     },
-    pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
+    pre: thisUser.can('access private pages'),
     handler: async ctx => {
       log.debug(
-        `Adding persona ${ctx.params.pid} to review ${ctx.params.id} as a(n) ${ctx.params.role
+        `Adding persona ${ctx.params.pid} to review ${ctx.params.id} as a(n) ${
+          ctx.params.role
         }.`,
       );
       let review, persona;
@@ -600,7 +609,8 @@ export default function controller(
       ) {
         try {
           log.debug(
-            `Full review ${review.id} found. Inviting persona ${persona.id
+            `Full review ${review.id} found. Inviting persona ${
+              persona.id
             } to review.`,
           );
           review.authorInvites.remove(persona);
@@ -619,7 +629,8 @@ export default function controller(
       ) {
         try {
           log.debug(
-            `Full review ${review.id} found. Inviting persona ${persona.id
+            `Full review ${review.id} found. Inviting persona ${
+              persona.id
             } to review.`,
           );
           review.mentorInvites.remove(persona);
@@ -700,7 +711,7 @@ export default function controller(
   reviewsRouter.route({
     method: 'DELETE',
     path: '/fullReviews/:id',
-    pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next),
+    pre: thisUser.can('access admin pages'),
     handler: async ctx => {
       log.debug(`Deleting fullReview ${ctx.params.id}.`);
       let fullReview;

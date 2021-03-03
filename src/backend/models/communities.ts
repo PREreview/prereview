@@ -1,8 +1,61 @@
 import { EntityRepository, MikroORM, Repository } from '@mikro-orm/core';
-import { Community } from './entities';
+import orcidUtils from 'orcid-utils';
+import { validate as uuidValidate } from 'uuid';
+import { Community, User } from './entities';
+import { getLogger } from '../log.js';
+
+const log = getLogger('backend:models:communities');
 
 @Repository(Community)
-export class CommunityModel extends EntityRepository<Community> {}
+export class CommunityModel extends EntityRepository<Community> {
+  async isMemberOf(communityId: string, userId: string): Promise<boolean> {
+    let community: any;
+    if (uuidValidate(communityId)) {
+      community = await this.findOne({ uuid: communityId }, ['members']);
+    } else {
+      community = await this.findOne({ slug: communityId }, ['members']);
+    }
+
+    if (!community) {
+      log.warn(`No such community ${communityId}`);
+      return false;
+    }
+
+    let user: any;
+    if (orcidUtils.isValid(userId)) {
+      user = await this.em.findOne(User, { orcid: userId as string });
+    } else if (uuidValidate(userId)) {
+      user = await this.em.findOne(User, { uuid: userId as string });
+    }
+
+    if (!user) return false;
+    return community.members.contains(user);
+  }
+
+  async isOwnerOf(communityId: string, userId: string): Promise<boolean> {
+    let community: any;
+    if (uuidValidate(communityId)) {
+      community = await this.findOne({ uuid: communityId }, ['owners']);
+    } else {
+      community = await this.findOne({ slug: communityId }, ['owners']);
+    }
+
+    if (!community) {
+      log.warn(`No such community ${communityId}`);
+      return false;
+    }
+
+    let user: any;
+    if (orcidUtils.isValid(userId)) {
+      user = await this.em.findOne(User, { orcid: userId as string });
+    } else if (uuidValidate(userId)) {
+      user = await this.em.findOne(User, { uuid: userId as string });
+    }
+
+    if (!user) return false;
+    return community.owners.contains(user);
+  }
+}
 
 export function communityModelWrapper(db: MikroORM): CommunityModel {
   return db.em.getRepository(Community);

@@ -13,7 +13,6 @@ import personaRoutes from './persona.js';
 import rapidReviewRoutes from './rapidReview.js';
 import reportRoutes from '../controllers/report.js';
 import requestRoutes from './request.js';
-import searchesRoutes from './searches.js';
 import tagRoutes from './tag.js';
 import templateRoutes from './template.js';
 import notificationRoutes from '../controllers/notification.js';
@@ -35,7 +34,6 @@ export default function docs(authz) {
   generator.addJoiRouter(rapidReviewRoutes({}, {}, authz));
   generator.addJoiRouter(reportRoutes({}, {}, {}, {}, {}, authz));
   generator.addJoiRouter(requestRoutes({}, {}, authz));
-  generator.addJoiRouter(searchesRoutes({}, authz));
   generator.addJoiRouter(tagRoutes({}, authz));
   generator.addJoiRouter(templateRoutes({}, {}, authz));
   generator.addJoiRouter(notificationRoutes({}, authz));

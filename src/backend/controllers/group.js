@@ -58,7 +58,7 @@ export default function controller(groupModel, userModel, thisUser) {
     },
     method: 'POST',
     path: '/groups',
-    pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next),
+    pre: thisUser.can('access admin pages'),
     validate: validationSchema,
     handler: async ctx => {
       if (ctx.invalid) {
@@ -83,7 +83,7 @@ export default function controller(groupModel, userModel, thisUser) {
   groupsRouter.route({
     method: 'GET',
     path: '/groups',
-    pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
+    pre: thisUser.can('access private pages'),
     validate: {
       query: querySchema,
     },
@@ -120,8 +120,7 @@ export default function controller(groupModel, userModel, thisUser) {
   groupsRouter.route({
     method: 'GET',
     path: '/groups/:id',
-    // validate: validationSchema,
-    pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
+    pre: thisUser.can('access private pages'),
     handler: async ctx => {
       if (ctx.invalid) {
         handleInvalid(ctx);
@@ -167,7 +166,7 @@ export default function controller(groupModel, userModel, thisUser) {
     method: 'PUT',
     path: '/groups/:name',
     validate: validationSchema,
-    pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next),
+    pre: thisUser.can('access admin pages'),
     handler: async ctx => {
       if (ctx.invalid) {
         handleInvalid(ctx);
@@ -205,7 +204,7 @@ export default function controller(groupModel, userModel, thisUser) {
   groupsRouter.route({
     method: 'DELETE',
     path: '/groups/:id',
-    pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next),
+    pre: thisUser.can('access admin pages'),
     handler: async ctx => {
       log.debug(`Deleting group ${ctx.params.id}.`);
       let group;
@@ -248,7 +247,7 @@ export default function controller(groupModel, userModel, thisUser) {
       type: 'json',
       continueOnError: true,
     },
-    pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next),
+    pre: thisUser.can('access admin pages'),
     handler: async ctx => {
       log.debug(`Removing user ${ctx.params.uid} from group ${ctx.params.id}.`);
       let group, user;
@@ -308,7 +307,7 @@ export default function controller(groupModel, userModel, thisUser) {
           .required(),
       },
     },
-    pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next),
+    pre: thisUser.can('access admin pages'),
     handler: async ctx => {
       log.debug(`Adding user ${ctx.params.uid} to group ${ctx.params.id}.`);
       let group, user;

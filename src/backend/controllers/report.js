@@ -122,7 +122,7 @@ export default function controller(
   reportsRouter.route({
     method: 'GET',
     path: '/reports',
-    pre: (ctx, next) => thisUser.can('access moderator pages')(ctx, next),
+    pre: thisUser.can('access moderator pages'),
     validate: {
       query: querySchema,
       continueOnError: true,
@@ -145,7 +145,7 @@ export default function controller(
   reportsRouter.route({
     method: 'GET',
     path: '/reports/:id',
-    pre: (ctx, next) => thisUser.can('access moderator pages')(ctx, next),
+    pre: thisUser.can('access moderator pages'),
     validate: {
       query: querySchema,
       continueOnError: true,
@@ -168,7 +168,7 @@ export default function controller(
   reportsRouter.route({
     method: 'PUT',
     path: '/reports/:id',
-    pre: (ctx, next) => thisUser.can('access moderator pages')(ctx, next),
+    pre: thisUser.can('access moderator pages'),
     // validate: {},
     handler: async ctx => {
       log.debug(`Updating report with ID ${ctx.params.id}`);
@@ -211,7 +211,7 @@ export default function controller(
   reportsRouter.route({
     method: 'DELETE',
     path: '/reports/:id',
-    pre: (ctx, next) => thisUser.can('access moderator pages')(ctx, next),
+    pre: thisUser.can('access moderator pages'),
     // validate: {},
     handler: async ctx => {
       log.debug(`Removing report with ID ${ctx.params.id}`);
@@ -245,7 +245,7 @@ export default function controller(
   reportsRouter.route({
     method: 'GET',
     path: '/reported/:id',
-    pre: (ctx, next) => thisUser.can('access moderator pages')(ctx, next),
+    pre: thisUser.can('access moderator pages'),
     validate: {
       query: querySchema,
     },
@@ -297,7 +297,7 @@ export default function controller(
   reportsRouter.route({
     method: 'PUT',
     path: '/reported/:id',
-    pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
+    pre: thisUser.can('access private pages'),
     validate: {
       body: reportedSchema,
       type: 'json',
@@ -321,14 +321,12 @@ export default function controller(
         ctx.throw(404, `report with ID ${ctx.params.id} doesn't exist`);
       }
 
-      console.log('***found.type***:', found.type);
       const report = reportModel.create({
         author: ctx.state.user,
         subject: ctx.params.id,
         reason: ctx.request.body.reason,
         subjectType: found.type,
       });
-      console.log('***report***:', report);
       await reportModel.persistAndFlush(report);
 
       ctx.status = 204;

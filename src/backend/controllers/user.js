@@ -33,6 +33,7 @@ export default function controller(users, contacts, thisUser) {
     },
     method: 'get',
     path: '/users',
+    pre: thisUser.can('access admin pages'), // TODO: can users delete their own account?
     handler: async ctx => {
       log.debug(`Retrieving users.`);
       let allUsers;
@@ -72,6 +73,7 @@ export default function controller(users, contacts, thisUser) {
       continueOnError: false,
       failure: 400,
     },
+    pre: thisUser.can('edit this user'), // TODO: can users delete their own account?
     handler: async ctx => {
       log.debug(`Retrieving user ${ctx.params.id}`);
 
@@ -146,7 +148,7 @@ export default function controller(users, contacts, thisUser) {
       continueOnError: false,
       false: 400,
     },
-    // pre:thisUserthisUser.can('access private pages'), // TODO: can edit self only no?
+    pre: thisUser.can('edit this user'), // TODO: can users delete their own account?
     handler: async ctx => {
       log.debug(`Updating user ${ctx.params.id}.`);
 
@@ -196,7 +198,7 @@ export default function controller(users, contacts, thisUser) {
       }),
       type: 'json',
     },
-    // pre: {},
+    pre: thisUser.can('edit this user'), // TODO: can users delete their own account?
     handler: async ctx => {
       log.debug(`Adding a new contact to user ${ctx.params.id}`);
       let newContact, user;
@@ -289,7 +291,7 @@ export default function controller(users, contacts, thisUser) {
       type: 'json',
     },
     // validate: {    },
-    // pre: {},
+    pre: thisUser.can('edit this user'), // TODO: can users delete their own account?
     handler: async ctx => {
       const contactId = ctx.params.cid;
       let newContact, user;
@@ -363,6 +365,7 @@ export default function controller(users, contacts, thisUser) {
       type: 'json',
       continueOnError: true,
     },
+    pre: thisUser.can('edit this user'), // TODO: can users delete their own account?
     handler: async ctx => {
       const contactId = ctx.query.cid;
       let user;
@@ -423,7 +426,7 @@ export default function controller(users, contacts, thisUser) {
           .required(),
       },
     },
-    pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next), // TODO: can users delete their own account?
+    pre: thisUser.can('access admin pages'), // TODO: can users delete their own account?
     handler: async ctx => {
       log.debug(`Deleting user ${ctx.params.id}.`);
 
@@ -461,7 +464,7 @@ export default function controller(users, contacts, thisUser) {
           .required(),
       },
     },
-    pre: (ctx, next) => thisUser.can('access private pages')(ctx, next), // TODO: can users delete their own account?
+    pre: thisUser.can('access private pages'),
     handler: async ctx => {
       log.debug(`Validating contact w/ token ${ctx.params.token}.`);
 

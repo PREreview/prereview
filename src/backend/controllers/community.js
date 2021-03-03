@@ -54,7 +54,7 @@ export default function controller(
   communities.route({
     method: 'POST',
     path: '/communities',
-    pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next),
+    pre: thisUser.can('access admin pages'),
     validate: {
       body: communitySchema,
       type: 'json',
@@ -96,7 +96,6 @@ export default function controller(
   communities.route({
     method: 'GET',
     path: '/communities',
-    // pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
     validate: {
       query: querySchema,
       continueOnError: true,
@@ -217,7 +216,6 @@ export default function controller(
   communities.route({
     method: 'GET',
     path: '/communities/:id',
-    //pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
     validate: {
       query: querySchema,
       continueOnError: true,
@@ -268,7 +266,7 @@ export default function controller(
   communities.route({
     method: 'PUT',
     path: '/communities/:id',
-    pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next),
+    pre: thisUser.can('edit this community'),
     validate: {
       body: communitySchema,
       type: 'json',
@@ -310,7 +308,7 @@ export default function controller(
   communities.route({
     method: 'DELETE',
     path: '/communities/:id',
-    pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next),
+    pre: thisUser.can('access admin pages'),
     handler: async ctx => {
       if (ctx.invalid) {
         handleInvalid(ctx);
@@ -355,7 +353,7 @@ export default function controller(
           .required(),
       },
     },
-    pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next),
+    pre: thisUser.can('edit this community'),
     handler: async ctx => {
       log.debug(`Adding user ${ctx.params.uid} to community ${ctx.params.id}.`);
       let community, user;
@@ -421,7 +419,7 @@ export default function controller(
       type: 'json',
       continueOnError: true,
     },
-    pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next),
+    pre: thisUser.can('edit this community'),
     handler: async ctx => {
       log.debug(
         `Removing user ${ctx.request.body.uid} from community ${
@@ -476,6 +474,7 @@ export default function controller(
     path: '/communities/:id/events/:eid',
     // validate: {    },
     // pre: {},
+    pre: thisUser.can('edit this community'),
     handler: async ctx => {
       const communityId = ctx.params.id;
       const eventId = ctx.params.eid;
@@ -528,7 +527,7 @@ export default function controller(
       swagger: {
         operationId: 'DeleteCommunityEvent',
         summary:
-          'Endpoint to DELETE one event from a community by ID from PREreview. Admin events only.',
+          'Endpoint to DELETE one event from a community by ID from PREreview.',
         required: true,
       },
     },
@@ -546,7 +545,7 @@ export default function controller(
       type: 'json',
       continueOnError: true,
     },
-    pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next),
+    pre: thisUser.can('edit this community'),
     handler: async ctx => {
       log.debug(
         `Removing event ${ctx.params.eid} from community ${ctx.params.id}.`,
@@ -597,6 +596,7 @@ export default function controller(
     },
     method: 'PUT',
     path: '/communities/:id/tags/:tid',
+    pre: thisUser.can('edit this community'),
     // validate: {    },
     // pre: {},
     handler: async ctx => {
@@ -669,7 +669,7 @@ export default function controller(
       type: 'json',
       continueOnError: true,
     },
-    pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next),
+    pre: thisUser.can('edit this community'),
     handler: async ctx => {
       log.debug(
         `Removing tag ${ctx.request.body.tid} from community ${ctx.params.id}.`,
