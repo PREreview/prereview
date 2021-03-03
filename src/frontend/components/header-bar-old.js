@@ -8,24 +8,20 @@ import NoticeBadge from './notice-badge';
 import { useIsMobile } from '../hooks/ui-hooks';
 
 // material-ui
-import { makeStyles } from '@material-ui/core/styles';
-import Box from '@material-ui/core/Box';
-import Container from '@material-ui/core/Container';
 import Link from '@material-ui/core/Link';
 
-// components
-import Banner from './banner';
 
-const useStyles = makeStyles(theme => ({
-  headerBar: {
-  },
-}));
+export default function HeaderBar({ onClickMenuButton, closeGap, thisUser }) {
+  const roles = thisUser && thisUser.groups ? thisUser.groups : []; //GetUser(1);
 
-export default function HeaderBar({ onClickMenuButton, thisUser }) {
-  const classes = useStyles();
-  const isMobile = useIsMobile();
+  //const showProfileNotice = checkIfRoleLacksMininmalData(role);
   const showProfileNotice = false;
+  const isMobile = useIsMobile();
 
+  const [initialHeaderOffset, setinitialHeaderOffset] = useState(null);
+  const [initialHeaderOffsetMobile, setinitialHeaderOffsetMobile] = useState(
+    null,
+  );
   const [loginLink, setLoginLink] = useState('/login');
   const [homeLink, setHomeLink] = useState('/');
 
@@ -33,10 +29,7 @@ export default function HeaderBar({ onClickMenuButton, thisUser }) {
     const host = window.location.host;
     const labels = host.split('.');
 
-    if (
-      labels.length === 3 ||
-      (labels.length === 2 && labels[1].includes('localhost'))
-    ) {
+    if (labels.length === 3 || (labels.length === 2 && labels[1].includes('localhost'))) {
       if (labels[0] === 'outbreaksci') {
         setLoginLink('https://prereview.org/login');
         setHomeLink('https://prereview.org');
@@ -45,11 +38,37 @@ export default function HeaderBar({ onClickMenuButton, thisUser }) {
     }
   }, []);
 
+  // closeGap = true
+  // useEffect(() => {
+  //   if (document) {
+  //     document.documentElement.style.setProperty(
+  //       '--announcement-bar-height',
+  //       closeGap ? '0px' : initialHeaderOffset,
+  //     );
+
+  //     document.documentElement.style.setProperty(
+  //       '--announcement-bar-height--mobile',
+  //       closeGap ? '0px' : initialHeaderOffsetMobile,
+  //     );
+  //     setHeaderOffset();
+  //   }
+  // }, []);
+
+  // const setHeaderOffset = () => {
+  //   const headerBarOffset = window
+  //     .getComputedStyle(document.documentElement)
+  //     .getPropertyValue('--announcement-bar-height');
+
+  //   const headerBarOffsetMobile = window
+  //     .getComputedStyle(document.documentElement)
+  //     .getPropertyValue('--announcement-bar-height--mobile');
+
+  //   setinitialHeaderOffset(headerBarOffset);
+  //   setinitialHeaderOffsetMobile(headerBarOffsetMobile);
+  // };
+
   return (
-    <Box className={classes.headerBar}>
-
-      <Banner />
-
+    <div className="header-bar">
       <div className="header-bar__left">
         {!!onClickMenuButton && (
           <IconButton
@@ -63,9 +82,7 @@ export default function HeaderBar({ onClickMenuButton, thisUser }) {
             />
           </IconButton>
         )}
-        <Link to="/" href={homeLink}>
-          <PreReviewLogo />
-        </Link>
+        <Link to="/" href={homeLink}><PreReviewLogo /></Link>
       </div>
 
       <div className="header-bar__right">
@@ -190,11 +207,12 @@ export default function HeaderBar({ onClickMenuButton, thisUser }) {
           Give Feedback
         </a>
       </div>
-    </Box>
+    </div>
   );
 }
 
 HeaderBar.propTypes = {
   onClickMenuButton: PropTypes.func,
+  closeGap: PropTypes.bool,
   thisUser: PropTypes.object,
 };
