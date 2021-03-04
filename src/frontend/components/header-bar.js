@@ -17,7 +17,19 @@ import Link from '@material-ui/core/Link';
 import Banner from './banner';
 
 const useStyles = makeStyles(theme => ({
+  content: {
+    alignItems: 'center',
+    display: 'flex',
+    justifyContent: 'space-between',
+    padding: '1rem',
+  },
   headerBar: {
+    boxShadow: '0 0 5px #000',
+  },
+  navItem: {
+    color: '#000 !important', // #FIXME remove after porting to MUI
+    fontSize: '1rem',
+    marginLeft: '1rem',
   },
 }));
 
@@ -47,149 +59,165 @@ export default function HeaderBar({ onClickMenuButton, thisUser }) {
 
   return (
     <Box className={classes.headerBar}>
-
       <Banner />
 
-      <div className="header-bar__left">
-        {!!onClickMenuButton && (
-          <IconButton
+      {!!onClickMenuButton && (
+        <IconButton
+          data-noclickoutside="true"
+          onClickCapture={onClickMenuButton}
+          className="header-bar__menu-button"
+        >
+          <MdMenu
+            className="header-bar__menu-button-icon"
             data-noclickoutside="true"
-            onClickCapture={onClickMenuButton}
-            className="header-bar__menu-button"
-          >
-            <MdMenu
-              className="header-bar__menu-button-icon"
-              data-noclickoutside="true"
-            />
-          </IconButton>
-        )}
-        <Link to="/" href={homeLink}>
-          <PreReviewLogo />
-        </Link>
-      </div>
+          />
+        </IconButton>
+      )}
 
-      <div className="header-bar__right">
-        <a
-          className="header-bar__nav-item"
-          href="https://content.prereview.org/about"
-        >
-          About
-        </a>
-        <a
-          className="header-bar__nav-item"
-          href="https://content.prereview.org/people"
-        >
-          People
-        </a>
-        <a
-          className="header-bar__nav-item"
-          href="https://content.prereview.org/programs"
-        >
-          Programs
-        </a>
-        <a className="header-bar__nav-item" href="/communities">
-          Communities
-        </a>
-        <a
-          className="header-bar__nav-item"
-          href="https://content.prereview.org/resources"
-        >
-          Resources
-        </a>
-        <a
-          className="header-bar__nav-item"
-          href="https://content.prereview.org/coc"
-        >
-          {isMobile ? (
-            <abbr title="Code of Conduct">CoC</abbr>
-          ) : (
-            <span>Code of Conduct</span>
-          )}
-        </a>
-        <a
-          className="header-bar__nav-item"
-          href="https://content.prereview.org"
-        >
-          Blog
-        </a>
-        <a className="header-bar__nav-item" href="/api/docs">
-          API
-        </a>
-        <span className="header-bar__nav-item header-bar__nav-item--user-badge">
-          {thisUser ? (
-            <UserBadge user={thisUser} showNotice={showProfileNotice}>
-              {showProfileNotice && (
+      <Box className={classes.content}>
+        <Box className={classes.logo}>
+          <Link to="/" href={homeLink}>
+            <PreReviewLogo />
+          </Link>
+        </Box>
+
+        <Box className={classes.nav}>
+          <Link
+            className={classes.navItem}
+            color="textPrimary"
+            href="https://content.prereview.org/about"
+          >
+            About
+          </Link>
+          <Link
+            className={classes.navItem}
+            color="textPrimary"
+            href="https://content.prereview.org/people"
+          >
+            People
+          </Link>
+          <Link
+            className={classes.navItem}
+            color="textPrimary"
+            href="https://content.prereview.org/programs"
+          >
+            Programs
+          </Link>
+          <Link
+            className={classes.navItem}
+            color="textPrimary"
+            href="/communities"
+          >
+            Communities
+          </Link>
+          <Link
+            className={classes.navItem}
+            color="textPrimary"
+            href="https://content.prereview.org/resources"
+          >
+            Resources
+          </Link>
+          <Link
+            className={classes.navItem}
+            color="textPrimary"
+            href="https://content.prereview.org/coc"
+          >
+            {isMobile ? (
+              <abbr title="Code of Conduct">CoC</abbr>
+            ) : (
+              <span>Code of Conduct</span>
+            )}
+          </Link>
+          <Link
+            className={classes.navItem}
+            color="textPrimary"
+            href="https://content.prereview.org"
+          >
+            Blog
+          </Link>
+          <Link
+            className={classes.navItem}
+            color="textPrimary"
+            href="/api/docs"
+          >
+            API
+          </Link>
+          <span className={`header-bar__nav-item--user-badge`}>
+            {thisUser ? (
+              <UserBadge user={thisUser} showNotice={showProfileNotice}>
+                {showProfileNotice && (
+                  <Link
+                    to={process.env.IS_EXTENSION ? undefined : '/settings'}
+                    href={`/settings`}
+                    target={process.env.IS_EXTENSION ? '_blank' : undefined}
+                  >
+                    Complete Profile
+                    <div className="menu__link-item__icon">
+                      <NoticeBadge />
+                    </div>
+                  </Link>
+                )}
+
                 <Link
                   to={process.env.IS_EXTENSION ? undefined : '/settings'}
                   href={`/settings`}
                   target={process.env.IS_EXTENSION ? '_blank' : undefined}
                 >
-                  Complete Profile
-                  <div className="menu__link-item__icon">
-                    <NoticeBadge />
-                  </div>
+                  User Settings
                 </Link>
-              )}
 
-              <Link
-                to={process.env.IS_EXTENSION ? undefined : '/settings'}
-                href={`/settings`}
-                target={process.env.IS_EXTENSION ? '_blank' : undefined}
-              >
-                User Settings
+                {thisUser.isAdmin && (
+                  <Link
+                    to={process.env.IS_EXTENSION ? undefined : '/admin'}
+                    href={`/admin`}
+                    target={process.env.IS_EXTENSION ? '_blank' : undefined}
+                  >
+                    Admin Settings
+                  </Link>
+                )}
+
+                {thisUser.isAdmin && (
+                  <Link
+                    to={process.env.IS_EXTENSION ? undefined : '/block'}
+                    href={`/block`}
+                    target={process.env.IS_EXTENSION ? '_blank' : undefined}
+                  >
+                    Moderate Users
+                  </Link>
+                )}
+
+                {thisUser.isAdmin && ( // #FIXME should this be isModerator ?
+                  <Link
+                    to={process.env.IS_EXTENSION ? undefined : '/moderate'}
+                    href={`/moderate`}
+                    target={process.env.IS_EXTENSION ? '_blank' : undefined}
+                  >
+                    Moderate Reviews
+                  </Link>
+                )}
+
+                <Link to="/logout" href={`/logout`}>
+                  Logout
+                </Link>
+              </UserBadge>
+            ) : (
+              <Link to="/login" href={loginLink} className={classes.navItem}>
+                Log In / Sign Up
               </Link>
-
-              {thisUser.isAdmin && (
-                <Link
-                  to={process.env.IS_EXTENSION ? undefined : '/admin'}
-                  href={`/admin`}
-                  target={process.env.IS_EXTENSION ? '_blank' : undefined}
-                >
-                  Admin Settings
-                </Link>
-              )}
-
-              {thisUser.isAdmin && (
-                <Link
-                  to={process.env.IS_EXTENSION ? undefined : '/block'}
-                  href={`/block`}
-                  target={process.env.IS_EXTENSION ? '_blank' : undefined}
-                >
-                  Moderate Users
-                </Link>
-              )}
-
-              {thisUser.isAdmin && ( // #FIXME should this be isModerator ?
-                <Link
-                  to={process.env.IS_EXTENSION ? undefined : '/moderate'}
-                  href={`/moderate`}
-                  target={process.env.IS_EXTENSION ? '_blank' : undefined}
-                >
-                  Moderate Reviews
-                </Link>
-              )}
-
-              <Link to="/logout" href={`/logout`}>
-                Logout
-              </Link>
-            </UserBadge>
-          ) : (
-            <Link to="/login" href={loginLink}>
-              Log In / Sign Up
-            </Link>
-          )}
-        </span>
-      </div>
-      {/* TODO link to feedback form */}
-      <div className="header-bar__give-feedback">
-        <a
-          href="https://forms.gle/BjHvfBWXYVchUwvs9"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Give Feedback
-        </a>
-      </div>
+            )}
+          </span>
+        </Box>
+        {/* TODO link to feedback form */}
+        <div className={classes.navItem}>
+          <a
+            href="https://forms.gle/BjHvfBWXYVchUwvs9"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Give Feedback
+          </a>
+        </div>
+      </Box>
     </Box>
   );
 }
