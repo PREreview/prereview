@@ -11,14 +11,14 @@ import UserProvider from '../contexts/user-context';
 import { useGetPersona } from '../hooks/api-hooks.tsx';
 
 // Material UI components
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles, withStyles } from '@material-ui/core/styles';
 import Avatar from '@material-ui/core/Avatar';
 import Chip from '@material-ui/core/Chip';
 import IconButton from '@material-ui/core/IconButton';
 import Modal from '@material-ui/core/Modal';
+import Switch from '@material-ui/core/Switch';
 
 // components
-//import Avatar from './avatar';
 import HeaderBar from './header-bar';
 import LabelStyle from './label-style';
 import Loading from './loading.js';
@@ -27,12 +27,61 @@ import RoleActivity from './role-activity';
 import XLink from './xlink';
 //import RoleEditor from './role-editor';
 
-// icons
-import { MdPublic } from 'react-icons/md';
-import IncognitoIcon from '../svgs/incognito_icon.svg';
-
 // constants
 import { ORG } from '../constants';
+
+const PersonaSwitch = withStyles(theme => ({
+  root: {
+    width: 70,
+    height: 30,
+    padding: 2,
+    margin: theme.spacing(1),
+  },
+  switchBase: {
+    padding: 1,
+    '&$checked': {
+      transform: 'translateX(44px)',
+      color: theme.palette.common.white,
+      '& + $track': {
+        backgroundColor: '#52d869',
+        opacity: 1,
+        border: 'none',
+      },
+    },
+    '&$focusVisible $thumb': {
+      color: '#52d869',
+      border: '6px solid #fff',
+    },
+  },
+  thumb: {
+    width: 27,
+    height: 27,
+  },
+  track: {
+    borderRadius: 30 / 2,
+    border: `1px solid ${theme.palette.grey[400]}`,
+    backgroundColor: theme.palette.grey[50],
+    opacity: 1,
+    transition: theme.transitions.create(['background-color', 'border']),
+  },
+  checked: {},
+  focusVisible: {},
+}))(({ classes, ...props }) => {
+  return (
+    <Switch
+      focusVisibleClassName={classes.focusVisible}
+      disableRipple
+      classes={{
+        root: classes.root,
+        switchBase: classes.switchBase,
+        thumb: classes.thumb,
+        track: classes.track,
+        checked: classes.checked,
+      }}
+      {...props}
+    />
+  );
+});
 
 export default function Profile() {
   const location = useLocation();
@@ -61,7 +110,7 @@ export default function Profile() {
 
         <section className="profile__content">
           <header className="profile__header">
-            {thisUser.uuid === persona.identity.uuid ? (
+            {thisUser && thisUser.uuid === persona.identity.uuid ? (
               <IconButton href="/settings">
                 <Avatar src={persona.avatar} className="profile__avatar-img" />
               </IconButton>
@@ -69,70 +118,17 @@ export default function Profile() {
               <Avatar src={persona.avatar} className="profile__avatar-img" />
             )}
 
-            {/*
-            <Modal
-              className="settings-role-editor-modal"
-              title="Edit Persona Settings"
-              open={editAvatar}
-              onClose={() => {
-                setEditAvatar(false);
-              }}
-            >
-              <RoleEditor
-                persona={persona}
-                onCancel={() => {
-                  setEditAvatar(false);
-                }}
-                onSaved={() => {
-                  setEditAvatar(false);
-                }}
-              />
-            </Modal>
-            */}
-
             <section className="profile__identity-info">
               <header className="profile__indentity-info-header">
-                <h2 className="profile__username">
-                  {persona && persona.name ? persona.name : 'Name goes here'}
-                </h2>
-                { persona.identity.uuid === thisUser.uuid ? 
-                <XLink
-                    to={`/settings`}
-                    href={`/settings`}
-                  >Edit user settings
-                </XLink> : null }
-                {persona ? (
-                  <span className="profile__persona-status">
-                    {persona && !persona.isAnonymous ? (
-                      <div className="profile__persona-status__icon-container">
-                        <MdPublic className="profile__persona-status__icon" />{' '}
-                        Public
-                      </div>
-                    ) : (
-                      <div className="profile__persona-status__icon-container">
-                        <img
-                          src={IncognitoIcon}
-                          className="profile__persona-status__icon"
-                        />{' '}
-                        Anonymous
-                      </div>
-                    )}
-                  </span>
+                <PersonaSwitch />
+                { thisUser && persona.identity.uuid === thisUser.uuid ? (
+                  <XLink to={`/settings`} href={`/settings`}>
+                    Edit user settings
+                  </XLink>
                 ) : null}
               </header>
 
               <dl>
-                <dt>
-                  <LabelStyle>PREreview Name</LabelStyle>
-                </dt>
-                <dd>
-                  <XLink
-                    to={`/about/${persona.uuid}`}
-                    href={`/about/${persona.uuid}`}
-                  >
-                    {persona.name}
-                  </XLink>
-                </dd>
                 {persona && persona.badges.length > 0 && (
                   <Fragment>
                     <dt>
@@ -148,16 +144,6 @@ export default function Profile() {
                           className="profile__chip"
                         />
                       ))}
-                    </dd>
-                  </Fragment>
-                )}
-                {persona && (
-                  <Fragment>
-                    <dt>
-                      <LabelStyle>Identity</LabelStyle>
-                    </dt>
-                    <dd>
-                      {persona && persona.isAnonymous ? 'Anonymous' : 'Public'}
                     </dd>
                   </Fragment>
                 )}
