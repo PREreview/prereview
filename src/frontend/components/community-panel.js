@@ -166,7 +166,9 @@ const CommunityPanel = () => {
   const handleRemoveModerator = owner => {
     if (
       confirm(
-        `Are you sure you want to remove ${owner.name} as a moderator of this community?`,
+        `Are you sure you want to remove ${
+          owner.name
+        } as a moderator of this community?`,
       )
     ) {
       deleteCommunityModerator({ uid: owner.uuid })
@@ -192,7 +194,8 @@ const CommunityPanel = () => {
   const handleRemoveTag = tag => {
     if (
       confirm(
-        `Are you sure you want to remove the tag "${tag.name
+        `Are you sure you want to remove the tag "${
+          tag.name
         }" from this community?`,
       )
     ) {
@@ -229,10 +232,10 @@ const CommunityPanel = () => {
             style={
               community.banner
                 ? {
-                  backgroundImage: `url(${community.banner})`,
-                  backgroundSize: 'cover',
-                  backgroundRepeat: 'no-repeat',
-                }
+                    backgroundImage: `url(${community.banner})`,
+                    backgroundSize: 'cover',
+                    backgroundRepeat: 'no-repeat',
+                  }
                 : null
             }
           >
@@ -301,7 +304,11 @@ const CommunityPanel = () => {
                 <AddUser community={community} isModerator={true} />
                 {community.owners.map(owner => {
                   return (
-                    <DeleteCommunityMember communityId={community.uuid} member={owner} isOwner={true} />
+                    <DeleteCommunityMember
+                      communityId={community.uuid}
+                      member={owner}
+                      isOwner={true}
+                    />
                   );
                 })}
               </Box>
@@ -312,7 +319,11 @@ const CommunityPanel = () => {
                 <AddUser community={community} />
                 {community.members.map(member => {
                   return (
-                    <DeleteCommunityMember communityId={community.uuid} member={member} isOwner={false} />
+                    <DeleteCommunityMember
+                      communityId={community.uuid}
+                      member={member}
+                      isOwner={false}
+                    />
                   );
                 })}
               </Box>
@@ -323,7 +334,10 @@ const CommunityPanel = () => {
                 <AddEvent community={community.uuid} />
                 {community.events.map(event => {
                   return (
-                    <DeleteCommunityEvent communityId={community.uuid} event={event} />
+                    <DeleteCommunityEvent
+                      communityId={community.uuid}
+                      event={event}
+                    />
                   );
                 })}
               </Box>
@@ -334,7 +348,10 @@ const CommunityPanel = () => {
                 <AddTag community={community.uuid} />
                 {community.tags.map(tag => {
                   return (
-                    <DeleteCommunityTag communityId={community.uuid} tag={tag} />
+                    <DeleteCommunityTag
+                      communityId={community.uuid}
+                      tag={tag}
+                    />
                   );
                 })}
               </Box>
