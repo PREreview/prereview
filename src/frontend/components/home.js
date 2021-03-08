@@ -26,6 +26,7 @@ import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
 import CardMedia from '@material-ui/core/CardMedia';
 import Container from '@material-ui/core/Container';
+import Grid from '@material-ui/core/Grid';
 import Link from '@material-ui/core/Link';
 import Typography from '@material-ui/core/Typography';
 
@@ -103,13 +104,37 @@ const useStyles = makeStyles(theme => ({
       justifyContent: 'space-between',
     },
   },
+  cardsBox: {
+    background: 'linear-gradient(to bottom, #54948E 50%, #fff 50%)',
+  },
   cardTitle: {
     color: '#000 !important',
     display: 'block',
-    fontSize: '1.25rem',
+    fontSize: '1.5rem',
     fontWeight: 'bold',
     marginBottom: '1.5rem',
     textAlign: 'center',
+  },
+  gridTitle: {
+    color: '#54948E',
+    fontSize: '2rem',
+  },
+  gridContent: {
+    fontSize: '1.5rem',
+  },
+  gridLink: {
+    backgroundColor: '#FCBD4C',
+    border: '4px solid #FCBD4C',
+    borderRadius: '20px',
+    color: '#000 !important',
+    display: 'inline-block',
+    fontSize: '1.5rem',
+    fontWeight: 'bold',
+    marginTop: '20px',
+    padding: '16px',
+    '&:hover': {
+      border: '4px solid #000',
+    },
   },
   hero: {
     [theme.breakpoints.up('md')]: {
@@ -126,6 +151,10 @@ const useStyles = makeStyles(theme => ({
     },
   },
   home: {},
+  standout: {
+    fontSize: '2.5rem',
+    fontWeight: 'bold',
+  },
 }));
 
 export default function Home() {
@@ -219,7 +248,7 @@ export default function Home() {
           </Box>
         </Container>
       </Box>
-      <Box py={4}>
+      <Box py={4} className={classes.cardsBox}>
         <Container className={classes.cards}>
           <Card className={classes.card}>
             {/* FIXME loop*/}
@@ -239,7 +268,7 @@ export default function Home() {
                     </Link>
                   </CardContent>
                   <CardMedia>
-                    <img className={classes.cardImage} src={Card1} />
+                    <img className={classes.cardImage} src={Card1} alt="" aria-hidden="true" />
                   </CardMedia>
                 </Box>
                 <Box p={3}>
@@ -279,7 +308,7 @@ export default function Home() {
                     </Link>
                   </CardContent>
                   <CardMedia>
-                    <img className={classes.cardImage} src={Card2} />
+                    <img className={classes.cardImage} src={Card2} alt="" aria-hidden="true" />
                   </CardMedia>
                 </Box>
                 <Box p={3}>
@@ -318,7 +347,7 @@ export default function Home() {
                     </Link>
                   </CardContent>
                   <CardMedia>
-                    <img className={classes.cardImage} src={Card3} />
+                    <img className={classes.cardImage} src={Card3} alt="" aria-hidden="true" />
                   </CardMedia>
                 </Box>
                 <Box p={3}>
@@ -339,6 +368,67 @@ export default function Home() {
               </ReactCardFlip>
             </CardActionArea>
           </Card>
+        </Container>
+      </Box>
+      <Box bgcolor="#54948E" color="#fff" p={4} textAlign="center">
+        <Container>
+          <Typography className={classes.standout}>
+            We believe in equatable access, connecting people, self reflection,
+            and measurable success.
+          </Typography>
+        </Container>
+      </Box>
+      <Box py={4} textAlign="center">
+        <Container>
+          <Grid container spacing={4} alignItems="center" justify="center">
+            <Grid item sm={12} md={6}>
+              <Typography
+                component="div"
+                variant="h6"
+                gutterBottom
+                className={classes.gridTitle}
+              >
+                Inviting everyone to the table
+              </Typography>
+              <Typography
+                component="div"
+                variant="body1"
+                className={classes.gridContent}
+                gutterBottom
+              >
+                On our preprint review platform, any researcher with an ORCID iD
+                can request or provide constructive feedback to preprints.
+              </Typography>
+              <Typography
+                component="div"
+                variant="body1"
+                className={classes.gridContent}
+              >
+                We are committed to providing a safe space for all voices to be
+                heard without fear of retribution by enforcing a Code of
+                Conduct.
+              </Typography>
+            </Grid>
+            <Grid item sm={12} md={6}>
+              <img
+                src="http://satyr.io/584x253/red"
+                alt=""
+                aria-hidden="true"
+              />
+              <Typography
+                component="div"
+                variant="body1"
+                className={classes.gridContent}
+                gutterBottom
+              >
+                Researchers can join or start their own community to bring
+                together peers with shared interests and values.
+              </Typography>
+              <Link href="/communities" className={classes.gridLink}>
+                Explore Communities
+              </Link>
+            </Grid>
+          </Grid>
         </Container>
       </Box>
     </Box>
