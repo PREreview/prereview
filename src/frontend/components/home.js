@@ -380,7 +380,7 @@ export default function Home() {
       </Box>
       <Box py={4} textAlign="center">
         <Container>
-          <Grid container spacing={4} alignItems="center" justify="center">
+          <Grid container spacing={10} alignItems="center" justify="center">
             <Grid item sm={12} md={6}>
               <Typography
                 component="div"
@@ -426,6 +426,71 @@ export default function Home() {
               </Typography>
               <Link href="/communities" className={classes.gridLink}>
                 Explore Communities
+              </Link>
+            </Grid>
+            <Grid item sm={12} md={6}>
+              <Typography
+                component="div"
+                variant="h6"
+                gutterBottom
+                className={classes.gridTitle}
+              >
+                Bringing researchers together
+              </Typography>
+              <Typography
+                component="div"
+                variant="body1"
+                className={classes.gridContent}
+                gutterBottom
+              >
+                Live-streamed preprint journal clubs allow for researchers to
+                engage globally and hold timely discussions around preprints.
+              </Typography>
+              <Typography
+                component="div"
+                variant="body1"
+                className={classes.gridContent}
+                gutterBottom
+              >
+                PREreview workshops and sprints facilitate conversations and
+                co-creation of content across research communities to improve
+                diversity and openness in peer review.
+              </Typography>
+              <Link href="#FIXME" className={classes.gridLink}>
+                Stay connected via our newsletter
+              </Link>
+            </Grid>
+            <Grid item sm={12} md={6}>
+              <Typography
+                component="div"
+                variant="h6"
+                gutterBottom
+                className={classes.gridTitle}
+              >
+                Training the next generation of reviewers
+              </Typography>
+              <Typography
+                component="div"
+                variant="body1"
+                className={classes.gridContent}
+                gutterBottom
+              >
+                PREreview Open Reviewers is a peer review program where
+                early-career researchers receive 1:1 mentorship and training on
+                constructive feedback, implicit bias in science, and nonviolent
+                communication.
+              </Typography>
+              <Typography
+                component="div"
+                variant="body1"
+                className={classes.gridContent}
+                gutterBottom
+              >
+                Our graduates join a list of diverse trained reviewers made
+                available to editors.
+              </Typography>
+              <Link href="#FIXME" className={classes.gridLink}>
+                Learn more and get involved
               </Link>
             </Grid>
           </Grid>
