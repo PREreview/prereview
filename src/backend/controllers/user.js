@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import router from 'koa-joi-router';
+import { isString } from '../../common/utils/index.ts';
 import { getLogger } from '../log.js';
 
 const log = getLogger('backend:controllers:user');
@@ -167,7 +168,30 @@ export default function controller(users, contacts, thisUser) {
         ctx.throw(404, `That user with ID ${ctx.params.id} does not exist.`);
       }
 
-      users.assign(user, ctx.request.body);
+      let updatedUser = ctx.request.body;
+      const defaultPersona = updatedUser.defaultPersona;
+      let newDefault;
+
+      if (defaultPersona && isString(defaultPersona)) {
+        const personas = user.personas.getItems();
+        newDefault = personas.find(persona => persona.uuid === defaultPersona);
+        if (!newDefault) {
+          log.debug(
+            `HTTP 400 Error: User with ID ${
+              ctx.params.id
+            } has no persona with ID ${defaultPersona}.`,
+          );
+          ctx.throw(
+            400,
+            `User with ID ${
+              ctx.params.id
+            } has no persona with ID ${defaultPersona}.`,
+          );
+        }
+        updatedUser.defaultPersona = newDefault;
+      }
+
+      users.assign(user, updatedUser);
       await users.persistAndFlush(user);
 
       ctx.status = 204;

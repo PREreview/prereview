@@ -18,7 +18,7 @@ import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 
 // hooks
-import {usePutCommunityEvent } from '../hooks/api-hooks.tsx';
+import { usePostCommunityEvent } from '../hooks/api-hooks.tsx';
 
 // icons
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
@@ -68,7 +68,7 @@ const AddEvent = ({ community }) => {
   const [inputs, setInputs] = useState({});
 
   /* API calls */
-  const { mutate: addCommunityEvent, loading, error } = usePutCommunityEvent({
+  const { mutate: addCommunityEvent, loading } = usePostCommunityEvent({
     id: community,
     eid: 'none',
   });

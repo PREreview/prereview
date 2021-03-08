@@ -40,7 +40,7 @@ export default function controller(draftModel, thisUser) {
 
   draftsRouter.route({
     method: 'post',
-    path: '/fullReviewDrafts/',
+    path: '/full-review-drafts/',
     pre: thisUser.can('access private pages'),
     // validate: {
     //   body: {
@@ -74,7 +74,7 @@ export default function controller(draftModel, thisUser) {
 
   draftsRouter.route({
     method: 'get',
-    path: '/fullReviewDrafts/',
+    path: '/full-review-drafts/',
     // pre: thisUser.can('access admin pages'),
     // validate: {},
     handler: async ctx => getHandler(ctx),
@@ -82,7 +82,7 @@ export default function controller(draftModel, thisUser) {
 
   draftsRouter.route({
     method: 'get',
-    path: '/fullReviews/:fid/fullReviewDrafts/',
+    path: '/full-reviews/:fid/full-review-drafts/',
     // pre: thisUser.can('access admin pages'),
     // validate: {},
     handler: async ctx => getHandler(ctx),
@@ -90,7 +90,7 @@ export default function controller(draftModel, thisUser) {
 
   draftsRouter.route({
     method: 'get',
-    path: '/fullReviewDrafts/:id',
+    path: '/full-review-drafts/:id',
     // pre: thisUser.can('access admin pages'),
     // validate: {},
     handler: async ctx => {
@@ -118,7 +118,7 @@ export default function controller(draftModel, thisUser) {
 
   draftsRouter.route({
     method: 'put',
-    path: '/fullReviewDrafts/:id',
+    path: '/full-review-drafts/:id',
     pre: thisUser.can('access private pages'),
     // validate: {
     //   body: {
@@ -151,7 +151,7 @@ export default function controller(draftModel, thisUser) {
 
   draftsRouter.route({
     method: 'delete',
-    path: '/fullReviewDrafts/:id',
+    path: '/full-review-drafts/:id',
     pre: thisUser.can('access private pages'),
     handler: async ctx => {
       log.debug(`Deleting review draft ${ctx.params.id}.`);

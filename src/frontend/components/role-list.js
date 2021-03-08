@@ -54,7 +54,8 @@ export function PotentialRoles({
     }
 
     const filteredAuthors = newAuthors.filter(
-      (author, i, authors) => i === authors.findIndex(a => a.id === author.id),
+      (author, i, authors) =>
+        i === authors.findIndex(a => a.uuid === author.uuid),
     );
 
     setAuthors(filteredAuthors);
@@ -98,19 +99,19 @@ export function PotentialRoles({
         {authors.length
           ? authors.map(author => {
               return (
-                <li key={author.id} className="role-list__list-item">
+                <li key={author.uuid} className="role-list__list-item">
                   <DraggableRoleBadge
                     type={POTENTIAL_ROLE_TYPE}
                     author={author}
                     onDropped={author => {
-                      onRemoved(author.identity);
+                      onRemoved(author.uuid);
                     }}
                   >
                     {user && user.isAdmin && (
                       <div
-                        disabled={isModerationInProgress || author.identity}
+                        disabled={isModerationInProgress || author.uuid}
                         onSelect={() => {
-                          onModerate(author.identity);
+                          onModerate(author.uuid);
                         }}
                       >
                         Report Review
@@ -141,7 +142,7 @@ PotentialRoles.propTypes = {
 };
 
 function DraggableRoleBadge({ author, onDropped, children, type }) {
-  const roleId = author.identity;
+  const roleId = author.uuid;
 
   const [{ isDragging }, dragRef] = useDrag({
     item: { roleId, type },
@@ -220,7 +221,9 @@ export function HighlightedRoles({
       <ul className="role-list__list">
         {roleIds.length
           ? roleIds.map(roleId => {
-              const reviewer = reviews.find(review => review.id === roleId);
+              const reviewer = reviews.find(
+                review => review.author.uuid === roleId,
+              );
 
               return (
                 <li key={roleId} className="role-list__list-item">

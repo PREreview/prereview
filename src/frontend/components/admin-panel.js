@@ -92,7 +92,7 @@ export default function AdminPanel() {
                   if (moderator.defaultPersona) {
                     return (
                       <li
-                        key={moderator.id}
+                        key={moderator.uuid}
                         className="admin-panel__card-list-item"
                       >
                         <div className="admin-panel__card-list-item__left">

@@ -51,6 +51,8 @@ export class CommunityModel extends EntityRepository<Community> {
     } else if (uuidValidate(userId)) {
       user = await this.em.findOne(User, { uuid: userId as string });
     }
+    console.log('community:', community);
+    console.log('user:', user);
 
     if (!user) return false;
     return community.owners.contains(user);

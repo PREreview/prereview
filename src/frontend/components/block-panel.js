@@ -73,7 +73,10 @@ export default function BlockPanel() {
             <div>
               <ul className="block-panel__card-list">
                 {lockedPersonas.map(persona => (
-                  <li key={persona.id} className="block-panel__card-list-item">
+                  <li
+                    key={persona.uuid}
+                    className="block-panel__card-list-item"
+                  >
                     <div className="block-panel__card-list-item__left">
                       <RoleBadgeUI user={persona} />
                       <span>{persona.name}</span>

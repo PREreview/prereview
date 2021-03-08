@@ -255,9 +255,6 @@ export default function controller(groupModel, userModel, thisUser) {
       try {
         group = await groupModel.findOne({ uuid: ctx.params.id }, ['members']);
         user = await userModel.findOne({ orcid: ctx.request.body.uid });
-        console.log('group:', group);
-        console.log('user:', user);
-        console.log('body:', ctx.request.body);
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse query: ${err}`);

@@ -305,7 +305,7 @@ export default function Dashboard() {
                   <ul className="dashboard__preprint-list">
                     {preprints &&
                       preprints.data.map(row => (
-                        <li key={row.id} className="dashboard__preprint-list__item">
+                        <li key={row.uuid} className="dashboard__preprint-list__item">
                           <PreprintCard
                             isNew={false}
                             user={user}
@@ -355,7 +355,7 @@ export default function Dashboard() {
                     <h2 className="dashboard__h2">Recent Activity</h2>
                     {sortedActivities.map(activity =>
                       <RecentActivity
-                        key={activity.id}
+                        key={activity.uuid}
                         activity={activity}
                       />
                     )}

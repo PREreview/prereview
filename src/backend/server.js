@@ -170,6 +170,7 @@ export default async function configServer(config) {
   const communities = CommunityController(
     communityModel,
     userModel,
+    personaModel,
     eventModel,
     tagModel,
     authz,

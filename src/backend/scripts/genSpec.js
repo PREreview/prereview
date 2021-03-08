@@ -30,7 +30,7 @@ function docs() {
   generator.addJoiRouter(eventRoutes({}, authz));
   generator.addJoiRouter(groupRoutes({}, {}, authz));
   generator.addJoiRouter(commentRoutes({}, {}, authz));
-  generator.addJoiRouter(communityRoutes({}, {}, {}, {}, authz));
+  generator.addJoiRouter(communityRoutes({}, {}, {}, {}, {}, authz));
   generator.addJoiRouter(personaRoutes({}, {}, authz));
   generator.addJoiRouter(rapidReviewRoutes({}, {}, authz));
   generator.addJoiRouter(reportRoutes({}, {}, {}, {}, {}, authz));

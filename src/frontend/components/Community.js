@@ -191,6 +191,7 @@ export default function Community(props) {
         Array.isArray(community.data) &&
         community.data.length > 0
       ) {
+        return { ...community.data[0] };
         const owners = community.data[0].owners.reduce((results, owner) => {
           if (owner.defaultPersona && owner.defaultPersona.uuid) {
             return results.concat(owner.defaultPersona);
@@ -229,7 +230,7 @@ export default function Community(props) {
           <Box bgcolor="rgba(229, 229, 229, 0.35)">
             <Container>
               <Box p={4}>
-                {user && user.isAdmin ? (
+                {community.owners.some(owner => user.personas.some(persona => persona.uuid === owner.uuid)) ? (
                   <IconButton
                     href={`/community-settings/${community.uuid}`}
                     className={classes.settings}

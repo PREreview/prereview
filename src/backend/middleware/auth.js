@@ -74,9 +74,11 @@ const authWrapper = (groups, communities, personas) => {
     log.debug('Checking if user can edit this community.');
     if (!ctx.isAuthenticated()) return false;
 
-    const isAdmin = await groups.isMemberOf('admins', ctx.state.user.orcid);
+    const isAdmin = await roles.isMemberOf('admins', ctx.state.user.orcid);
     if (isAdmin) return true;
 
+    console.log('ctx.state.community:', ctx.state.community);
+    console.log('ctx.state.user.orcid:', ctx.state.user.orcid);
     if (ctx.state.community) {
       return roles.isOwnerOfCommunity(
         ctx.state.community,
@@ -91,7 +93,7 @@ const authWrapper = (groups, communities, personas) => {
     log.debug('Checking if user can edit this persona.');
     if (!ctx.isAuthenticated()) return false;
 
-    const isAdmin = await groups.isMemberOf('admins', ctx.state.user.orcid);
+    const isAdmin = await roles.isMemberOf('admins', ctx.state.user.orcid);
     if (isAdmin) return true;
 
     if (ctx.state.persona) {
@@ -105,7 +107,7 @@ const authWrapper = (groups, communities, personas) => {
     log.debug('Checking if user can edit this user.');
     if (!ctx.isAuthenticated()) return false;
 
-    const isAdmin = await groups.isMemberOf('admins', ctx.state.user.orcid);
+    const isAdmin = await roles.isMemberOf('admins', ctx.state.user.orcid);
     if (isAdmin) return true;
 
     if (ctx.state.identity) {

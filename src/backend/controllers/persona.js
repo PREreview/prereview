@@ -119,7 +119,6 @@ export default function controller(personasModel, badgesModel, thisUser) {
 
         if (ctx.query.badges) {
           const badges = ctx.query.badges.split(',');
-          console.log('badges', badges);
           queries.push({ badges: { uuid: { $in: badges } } });
         }
 

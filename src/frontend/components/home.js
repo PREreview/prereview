@@ -269,7 +269,7 @@ export default function Home() {
               <ul className="home__preprint-list">
                 {preprints &&
                   preprints.data.map(row => (
-                    <li key={row.id} className="home__preprint-list__item">
+                    <li key={row.uuid} className="home__preprint-list__item">
                       <PreprintCard
                         isNew={false}
                         user={thisUser}
