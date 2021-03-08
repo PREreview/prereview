@@ -205,7 +205,6 @@ const CommunityPanel = () => {
   useEffect(() => {
     if (!loadingCommunity) {
       if (communityData) {
-        console.log(communityData.data[0]);
         setCommunity(communityData.data[0]);
         setLoading(false);
       }
