@@ -34,6 +34,12 @@ import HeaderBar from './header-bar';
 import SearchBar from './search-bar';
 import WelcomeModal from './welcome-modal';
 
+// images
+import HeroImg from '../assets/images/home/hero.svg';
+import Card1 from '../assets/images/home/card-1.svg';
+import Card2 from '../assets/images/home/card-2.svg';
+import Card3 from '../assets/images/home/card-3.svg';
+
 // constants
 import { ORG } from '../constants';
 
@@ -64,6 +70,38 @@ const useStyles = makeStyles(theme => ({
   },
   card: {
     marginBottom: '1rem',
+    [theme.breakpoints.up('md')]: {
+      width: '30%',
+    },
+  },
+  cardAction: {
+    height: '100%',
+  },
+  cardContent: {
+    display: 'flex',
+    height: '100%',
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+  },
+  cardFront: {
+    display: 'flex',
+    flexDirection: 'column',
+    height: '100%',
+    justifyContent: 'space-between',
+  },
+  cardImage: {
+    display: 'block',
+    maxHeight: '300px',
+    maxWidth: '300px',
+    paddingBottom: '50px',
+    width: '100%',
+  },
+  cards: {
+    [theme.breakpoints.up('md')]: {
+      alignItems: 'stretch',
+      display: 'flex',
+      justifyContent: 'space-between',
+    },
   },
   cardTitle: {
     color: '#000 !important',
@@ -74,7 +112,18 @@ const useStyles = makeStyles(theme => ({
     textAlign: 'center',
   },
   hero: {
-    padding: '1rem',
+    [theme.breakpoints.up('md')]: {
+      backgroundImage: `url(${HeroImg})`,
+      backgroundPosition: 'right bottom',
+      backgroundRepeat: 'no-repeat',
+      backgroundSize: 'contain',
+      padding: '1rem',
+    },
+  },
+  heroContent: {
+    [theme.breakpoints.up('md')]: {
+      maxWidth: '70%',
+    },
   },
   home: {},
 }));
@@ -123,7 +172,7 @@ export default function Home() {
       />
 
       <Container className={classes.hero}>
-        <Box my={4}>
+        <Box my={4} className={classes.heroContent}>
           <Typography variant="h4" component="div" gutterBottom>
             Catalyzing change in peer review through equity, openness, and
             collaboration
@@ -171,18 +220,27 @@ export default function Home() {
         </Container>
       </Box>
       <Box py={4}>
-        <Container>
+        <Container className={classes.cards}>
           <Card className={classes.card}>
             {/* FIXME loop*/}
-            <CardActionArea onClick={() => handleFlip(0)}>
-              <ReactCardFlip isFlipped={isFlipped[0]}>
-                <Box p={3}>
+            <CardActionArea
+              className={classes.cardAction}
+              onClick={() => handleFlip(0)}
+            >
+              <ReactCardFlip
+                className={classes.cardContent}
+                isFlipped={isFlipped[0]}
+                containerStyle={{ height: '100%' }}
+              >
+                <Box p={3} className={classes.cardFront}>
                   <CardContent>
                     <Link href="#FIXME" className={classes.cardTitle}>
                       Preprint Review Platform
                     </Link>
                   </CardContent>
-                  <CardMedia /> {/* FIXME add asset */}
+                  <CardMedia>
+                    <img className={classes.cardImage} src={Card1} />
+                  </CardMedia>
                 </Box>
                 <Box p={3}>
                   <Typography className={classes.cardTitle} component="div">
@@ -205,15 +263,24 @@ export default function Home() {
             </CardActionArea>
           </Card>
           <Card className={classes.card}>
-            <CardActionArea onClick={() => handleFlip(1)}>
-              <ReactCardFlip isFlipped={isFlipped[1]}>
-                <Box p={3}>
+            <CardActionArea
+              className={classes.cardAction}
+              onClick={() => handleFlip(1)}
+            >
+              <ReactCardFlip
+                className={classes.cardContent}
+                isFlipped={isFlipped[1]}
+                containerStyle={{ height: '100%' }}
+              >
+                <Box p={3} className={classes.cardFront}>
                   <CardContent>
                     <Link href="#FIXME" className={classes.cardTitle}>
                       Resource Center
                     </Link>
                   </CardContent>
-                  <CardMedia /> {/* FIXME add asset */}
+                  <CardMedia>
+                    <img className={classes.cardImage} src={Card2} />
+                  </CardMedia>
                 </Box>
                 <Box p={3}>
                   <Typography className={classes.cardTitle} component="div">
@@ -235,15 +302,24 @@ export default function Home() {
             </CardActionArea>
           </Card>
           <Card className={classes.card}>
-            <CardActionArea onClick={() => handleFlip(2)}>
-              <ReactCardFlip isFlipped={isFlipped[2]}>
-                <Box p={3}>
+            <CardActionArea
+              className={classes.cardAction}
+              onClick={() => handleFlip(2)}
+            >
+              <ReactCardFlip
+                className={classes.cardContent}
+                isFlipped={isFlipped[2]}
+                containerStyle={{ height: '100%' }}
+              >
+                <Box p={3} className={classes.cardFront}>
                   <CardContent>
                     <Link href="#FIXME" className={classes.cardTitle}>
                       PREreview Communities
                     </Link>
                   </CardContent>
-                  <CardMedia /> {/* FIXME add asset */}
+                  <CardMedia>
+                    <img className={classes.cardImage} src={Card3} />
+                  </CardMedia>
                 </Box>
                 <Box p={3}>
                   <Typography className={classes.cardTitle} component="div">
