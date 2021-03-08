@@ -26,11 +26,11 @@ export default function controller(rapidReviews, preprints, thisUser) {
     try {
       if (pid) {
         preprint = await preprints.findOneByUuidOrHandle(pid);
-        data = await rapidReviews.find({ preprint: preprint });
+        data = await rapidReviews.find({ preprint: preprint }, ['preprint']);
       } else if (id) {
-        data = await rapidReviews.findOne({ uuid: id });
+        data = await rapidReviews.findOne({ uuid: id }, ['preprint']);
       } else {
-        data = await rapidReviews.findAll();
+        data = await rapidReviews.findAll(['preprint']);
       }
     } catch (error) {
       log.error('HTTP 400 Error: ', error);
