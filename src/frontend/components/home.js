@@ -3,6 +3,9 @@ import React, { useContext, useEffect, useState } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import ReactCardFlip from 'react-card-flip';
+import Slider from 'react-slick';
+import 'slick-carousel/slick/slick.css';
+import 'slick-carousel/slick/slick-theme.css';
 
 // hooks
 import {
@@ -165,6 +168,7 @@ export default function Home() {
 
   const [thisUser] = useContext(UserProvider.context);
 
+  /* React Card Flip vars and functions */
   const [isFlipped, setIsFlipped] = useState([false, false, false]);
   const isMobile = useIsMobile();
   const isNewVisitor = useIsNewVisitor();
@@ -176,6 +180,12 @@ export default function Home() {
     let updatedFlipped = [...isFlipped];
     updatedFlipped[index] = !isFlipped[index];
     setIsFlipped(updatedFlipped);
+  };
+
+  /* Slider settings */
+  const settings = {
+    autoplay: true,
+    dots: true,
   };
 
   useEffect(() => {}, [isFlipped]);
@@ -268,7 +278,12 @@ export default function Home() {
                     </Link>
                   </CardContent>
                   <CardMedia>
-                    <img className={classes.cardImage} src={Card1} alt="" aria-hidden="true" />
+                    <img
+                      className={classes.cardImage}
+                      src={Card1}
+                      alt=""
+                      aria-hidden="true"
+                    />
                   </CardMedia>
                 </Box>
                 <Box p={3}>
@@ -308,7 +323,12 @@ export default function Home() {
                     </Link>
                   </CardContent>
                   <CardMedia>
-                    <img className={classes.cardImage} src={Card2} alt="" aria-hidden="true" />
+                    <img
+                      className={classes.cardImage}
+                      src={Card2}
+                      alt=""
+                      aria-hidden="true"
+                    />
                   </CardMedia>
                 </Box>
                 <Box p={3}>
@@ -347,7 +367,12 @@ export default function Home() {
                     </Link>
                   </CardContent>
                   <CardMedia>
-                    <img className={classes.cardImage} src={Card3} alt="" aria-hidden="true" />
+                    <img
+                      className={classes.cardImage}
+                      src={Card3}
+                      alt=""
+                      aria-hidden="true"
+                    />
                   </CardMedia>
                 </Box>
                 <Box p={3}>
@@ -370,7 +395,7 @@ export default function Home() {
           </Card>
         </Container>
       </Box>
-      <Box bgcolor="#54948E" color="#fff" p={4} textAlign="center">
+      <Box bgcolor="#54948E" color="#fff" textAlign="center" py={4}>
         <Container>
           <Typography className={classes.standout}>
             We believe in equatable access, connecting people, self reflection,
@@ -494,6 +519,67 @@ export default function Home() {
               </Link>
             </Grid>
           </Grid>
+        </Container>
+      </Box>
+      <Box bgcolor="#54948E" color="#fff" textAlign="center" py={6}>
+        <Container>
+          <Slider {...settings}>
+            <Box>
+              <Typography
+                component="div"
+                variant="body1"
+                className={classes.gridContent}
+                gutterBottom
+              >
+                Contra legem facit qui id facit quod lex prohibet. Donec sed
+                odio operae, eu vulputate felis rhoncus. A communi observantia
+                non est recedendum.
+              </Typography>
+              <Typography
+                component="div"
+                variant="body1"
+                className={classes.gridContent}
+              >
+                - PREreview Open Reviewer 2021
+              </Typography>
+            </Box>
+            <Box>
+              <Typography
+                component="div"
+                variant="body1"
+                className={classes.gridContent}
+                gutterBottom
+              >
+                Quae vero auctorem tractata ab fiducia dicuntur. Quam temere in
+                vitiis, legem sancimus haerentia. Qui ipsorum lingua Celtae,
+                nostra Galli appellantur.
+              </Typography>
+              <Typography
+                component="div"
+                variant="body1"
+                className={classes.gridContent}
+              >
+                - Another PREreview Open Reviewer 2021
+              </Typography>
+            </Box>
+            <Box>
+              <Typography
+                component="div"
+                variant="body1"
+                className={classes.gridContent}
+                gutterBottom
+              >
+                Morbi odio eros, volutpat ut pharetra vitae, lobortis sed nibh.
+              </Typography>
+              <Typography
+                component="div"
+                variant="body1"
+                className={classes.gridContent}
+              >
+                - Yet Another PREreview Open Reviewer 2021
+              </Typography>
+            </Box>
+          </Slider>
         </Container>
       </Box>
     </Box>
