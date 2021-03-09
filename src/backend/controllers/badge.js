@@ -116,6 +116,7 @@ export default function controller(badgeModel, thisUser) {
     },
     method: 'put',
     path: '/badges/:id',
+    pre: thisUser.can('access admin pages'),
     // pre: thisUser.can(''),
     // validate: {},
     handler: async ctx => {

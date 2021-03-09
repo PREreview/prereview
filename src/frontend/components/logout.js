@@ -10,14 +10,11 @@ import Loading from './loading';
 
 // constants
 
-// TODO make clear that by logging in user accepts the code of conduct
-
 export default function Logout() {
   const history = useHistory();
   const [thisUser, setThisUser] = useContext(UserProvider.context);
 
   useEffect(() => {
-    console.log(thisUser);
     if (thisUser) {
       fetch('/api/v2/logout')
         .then(response => {

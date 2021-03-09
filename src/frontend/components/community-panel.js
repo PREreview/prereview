@@ -1,5 +1,6 @@
 // base imports
 import React, { useContext, useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
 import { useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { useIntl } from 'react-intl';
@@ -9,7 +10,9 @@ import UserProvider from '../contexts/user-context';
 
 // hooks
 import {
+  useDeleteCommunityEvent,
   useDeleteCommunityMember,
+  useDeleteCommunityOwner,
   useDeleteCommunityTag,
   useGetCommunity,
   usePutCommunity,
@@ -26,10 +29,8 @@ import NotFound from './not-found';
 // Material-ui components
 import { makeStyles } from '@material-ui/core/styles';
 import Avatar from '@material-ui/core/Avatar';
-import AvatarGroup from '@material-ui/lab/AvatarGroup';
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
-import Chip from '@material-ui/core/Chip';
 import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
 import IconButton from '@material-ui/core/IconButton';
@@ -72,7 +73,6 @@ const useStyles = makeStyles(theme => ({
 
 const CommunityPanel = () => {
   const classes = useStyles();
-  const intl = useIntl();
   const { id } = useParams();
   const [user] = useContext(UserProvider.context);
 
@@ -87,26 +87,11 @@ const CommunityPanel = () => {
     data: communityData,
     loadingCommunity,
     errorCommunity,
-  } = useGetCommunity({ id: id });
+  } = useGetCommunity({ id: id, resolve: community => community.data[0] });
 
   // update community info
   // delete member from community
   const { mutate: updateCommunity } = usePutCommunity({
-    id: id,
-  });
-
-  // remove user from being owner/moderator
-  const { mutate: deleteCommunityModerator } = useDeleteCommunityMember({
-    id: id,
-  }); // #FIXME fix route when moderator is added
-
-  // delete member from community
-  const { mutate: deleteCommunityMember } = useDeleteCommunityMember({
-    id: id,
-  });
-
-  // delete tag from community
-  const { mutate: deleteCommunityTag } = useDeleteCommunityTag({
     id: id,
   });
 
@@ -160,52 +145,38 @@ const CommunityPanel = () => {
       });
   };
 
-  // remove user from community moderator
-  const handleRemoveModerator = owner => {
-    if (
-      confirm(
-        `Are you sure you want to remove ${owner.name} as a moderator of this community?`,
-      )
-    ) {
-      deleteCommunityModerator({ uid: owner.uuid })
-        .then(() => alert(`User is no longer a moderator of this community.`))
-        .catch(err => alert(`An error occurred: ${err.message}`));
-    }
+  const handleDeleteOwner = owner => {
+    const { owners: personas } = community;
+
+    const owners = personas.filter(persona => persona.uuid !== owner.uuid);
+    setCommunity({ ...community, owners });
   };
 
-  // delete user from community
-  const handleRemoveUser = member => {
-    if (
-      confirm(
-        `Are you sure you want to remove ${member.name} from this community?`,
-      )
-    ) {
-      deleteCommunityMember({ uid: member.uuid })
-        .then(() => alert(`Member has been removed from the community.`))
-        .catch(err => alert(`An error occurred: ${err.message}`));
-    }
+  const handleDeleteMember = member => {
+    const { members: personas } = community;
+
+    const members = personas.filter(persona => persona.uuid !== member.uuid);
+    setCommunity({ ...community, members });
   };
 
-  // delete tag from community
-  const handleRemoveTag = tag => {
-    if (
-      confirm(
-        `Are you sure you want to remove the tag "${
-          tag.name
-        }" from this community?`,
-      )
-    ) {
-      deleteCommunityTag({ tid: tag.uuid })
-        .then(() => alert(`Tag has been removed from the community.`))
-        .catch(err => alert(`An error occurred: ${err.message}`));
-    }
+  const handleDeleteEvent = event => {
+    const { events: oldEvents } = community;
+
+    const events = oldEvents.filter(e => e.uuid !== event.uuid);
+    setCommunity({ ...community, events });
+  };
+
+  const handleDeleteTag = tag => {
+    const { tags: oldTags } = community;
+
+    const tags = oldTags.filter(t => t.uuid !== tag.uuid);
+    setCommunity({ ...community, tags });
   };
 
   useEffect(() => {
     if (!loadingCommunity) {
       if (communityData) {
-        console.log(communityData.data[0]);
-        setCommunity(communityData.data[0]);
+        setCommunity(communityData);
         setLoading(false);
       }
     }
@@ -301,33 +272,13 @@ const CommunityPanel = () => {
                 <AddUser community={community} isModerator={true} />
                 {community.owners.map(owner => {
                   return (
-                    <Box key={owner.uuid} mt={2}>
-                      <Grid container alignItems="center" spacing={2}>
-                        <Grid item>
-                          <Avatar
-                            alt={owner.name}
-                            src={owner.avatar}
-                            className={classes.avatar}
-                          />
-                        </Grid>
-                        <Grid item>
-                          <Typography
-                            variant="h6"
-                            component="h4"
-                            gutterBottom={true}
-                          >
-                            {owner.name}
-                          </Typography>
-                        </Grid>
-                        <Grid item>
-                          <IconButton
-                            onClick={() => handleRemoveModerator(owner)}
-                          >
-                            <ClearIcon />
-                          </IconButton>
-                        </Grid>
-                      </Grid>
-                    </Box>
+                    <DeleteCommunityMember
+                      key={owner.uuid}
+                      communityId={community.uuid}
+                      member={owner}
+                      deleteMember={handleDeleteOwner}
+                      isOwner={true}
+                    />
                   );
                 })}
               </Box>
@@ -338,31 +289,13 @@ const CommunityPanel = () => {
                 <AddUser community={community} />
                 {community.members.map(member => {
                   return (
-                    <Box key={member.uuid} mt={2}>
-                      <Grid container alignItems="center" spacing={2}>
-                        <Grid item>
-                          <Avatar
-                            alt={member.name}
-                            src={member.avatar}
-                            className={classes.avatar}
-                          />
-                        </Grid>
-                        <Grid item>
-                          <Typography
-                            variant="h6"
-                            component="h4"
-                            gutterBottom={true}
-                          >
-                            {member.name}
-                          </Typography>
-                        </Grid>
-                        <Grid item>
-                          <IconButton onClick={() => handleRemoveUser(member)}>
-                            <ClearIcon />
-                          </IconButton>
-                        </Grid>
-                      </Grid>
-                    </Box>
+                    <DeleteCommunityMember
+                      key={member.uuid}
+                      communityId={community.uuid}
+                      member={member}
+                      deleteMember={handleDeleteMember}
+                      isOwner={false}
+                    />
                   );
                 })}
               </Box>
@@ -373,33 +306,12 @@ const CommunityPanel = () => {
                 <AddEvent community={community.uuid} />
                 {community.events.map(event => {
                   return (
-                    <Box key={event.uuid} mt={2}>
-                      <Grid container spacing={2} justify="flex-start">
-                        <Grid item>
-                          <Typography
-                            color="primary"
-                            variant="h6"
-                            component="h4"
-                            gutterBottom={true}
-                          >
-                            {new Intl.DateTimeFormat(intl.locale, {
-                              month: 'short',
-                              day: 'numeric',
-                            }).format(Date.parse(event.start))}
-                          </Typography>
-                        </Grid>
-                        <Grid item>
-                          <Typography
-                            color="textPrimary"
-                            variant="h6"
-                            component="h4"
-                            gutterBottom={true}
-                          >
-                            {event.title}
-                          </Typography>
-                        </Grid>
-                      </Grid>
-                    </Box>
+                    <DeleteCommunityEvent
+                      key={event.uuid}
+                      communityId={community.uuid}
+                      deleteEvent={handleDeleteEvent}
+                      event={event}
+                    />
                   );
                 })}
               </Box>
@@ -408,20 +320,16 @@ const CommunityPanel = () => {
                   Tags
                 </Typography>
                 <AddTag community={community.uuid} />
-                {community.tags.length ? (
-                  <Box mt={2}>
-                    <Grid container>
-                      {community.tags.map(tag => (
-                        <Grid item key={tag.uuid}>
-                          <Chip
-                            label={tag.name}
-                            onDelete={() => handleRemoveTag(tag)}
-                          />
-                        </Grid>
-                      ))}
-                    </Grid>
-                  </Box>
-                ) : null}
+                {community.tags.map(tag => {
+                  return (
+                    <DeleteCommunityTag
+                      key={tag.uuid}
+                      communityId={community.uuid}
+                      deleteTag={handleDeleteTag}
+                      tag={tag}
+                    />
+                  );
+                })}
               </Box>
             </form>
           </Container>
@@ -429,6 +337,218 @@ const CommunityPanel = () => {
       </>
     );
   }
+};
+
+function DeleteCommunityMember({ communityId, member, deleteMember, isOwner }) {
+  const classes = useStyles();
+
+  // remove user from being owner/moderator
+  const { mutate: deleteCommunityOwner } = useDeleteCommunityOwner({
+    id: communityId,
+    queryParams: {
+      uid: member.uuid,
+    },
+  }); // #FIXME fix route when moderator is added
+
+  // delete member from community
+  const { mutate: deleteCommunityMember } = useDeleteCommunityMember({
+    id: communityId,
+    queryParams: {
+      uid: member.uuid,
+    },
+  });
+
+  // delete member from community
+  const handleDeleteMember = persona => {
+    if (isOwner) {
+      if (
+        confirm(
+          `Are you sure you want to remove ${
+            persona.name
+          } as a moderator of this community?`,
+        )
+      ) {
+        deleteCommunityOwner()
+          .then(() => deleteMember(persona))
+          .then(() => alert(`User is no longer a moderator of this community.`))
+          .catch(err => alert(`An error occurred: ${err.message}`));
+      }
+    } else {
+      if (
+        confirm(
+          `Are you sure you want to remove ${
+            persona.name
+          } from this community?`,
+        )
+      ) {
+        deleteCommunityMember()
+          .then(() => deleteMember(persona))
+          .then(() => alert(`Member has been removed from the community.`))
+          .catch(err => alert(`An error occurred: ${err.message}`));
+      }
+    }
+  };
+
+  return (
+    <>
+      <Box key={member.uuid} mt={2}>
+        <Grid container alignItems="center" spacing={2}>
+          <Grid item>
+            <Avatar
+              alt={member.name}
+              src={member.avatar}
+              className={classes.avatar}
+            />
+          </Grid>
+          <Grid item>
+            <Typography variant="h6" component="h4" gutterBottom={true}>
+              {member.name}
+            </Typography>
+          </Grid>
+          <Grid item>
+            <IconButton onClick={() => handleDeleteMember(member)}>
+              <ClearIcon />
+            </IconButton>
+          </Grid>
+        </Grid>
+      </Box>
+    </>
+  );
+}
+
+DeleteCommunityMember.propTypes = {
+  communityId: PropTypes.string,
+  member: PropTypes.shape({
+    name: PropTypes.string,
+    avatar: PropTypes.object,
+    uuid: PropTypes.string,
+  }),
+  deleteMember: PropTypes.function,
+  isOwner: PropTypes.bool,
+};
+
+function DeleteCommunityEvent({ communityId, event, deleteEvent }) {
+  const intl = useIntl();
+
+  const { mutate: deleteCommunityEvent } = useDeleteCommunityEvent({
+    id: communityId,
+    queryParams: {
+      eid: event.uuid,
+    },
+  });
+
+  const handleDeleteEvent = event => {
+    if (
+      confirm(
+        `Are you sure you want to remove event ${
+          event.title
+        } from this community?`,
+      )
+    ) {
+      deleteCommunityEvent()
+        .then(() => deleteEvent(event))
+        .then(() => alert(`Event has been removed from the community.`))
+        .catch(err => alert(`An error occurred: ${err.message}`));
+    }
+  };
+
+  return (
+    <>
+      <Box key={event.uuid} mt={2}>
+        <Grid container spacing={2} justify="flex-start">
+          <Grid item>
+            <Typography
+              color="primary"
+              variant="h6"
+              component="h4"
+              gutterBottom={true}
+            >
+              {new Intl.DateTimeFormat(intl.locale, {
+                month: 'short',
+                day: 'numeric',
+              }).format(Date.parse(event.start))}
+            </Typography>
+          </Grid>
+          <Grid item>
+            <Typography
+              color="textPrimary"
+              variant="h6"
+              component="h4"
+              gutterBottom={true}
+            >
+              {event.title}
+            </Typography>
+          </Grid>
+          <Grid item>
+            <IconButton onClick={() => handleDeleteEvent(event)}>
+              <ClearIcon />
+            </IconButton>
+          </Grid>
+        </Grid>
+      </Box>
+    </>
+  );
+}
+
+DeleteCommunityEvent.propTypes = {
+  communityId: PropTypes.string,
+  event: PropTypes.shape({
+    title: PropTypes.string,
+    start: PropTypes.date,
+    uuid: PropTypes.string,
+  }),
+  deleteEvent: PropTypes.function,
+};
+
+function DeleteCommunityTag({ communityId, tag, deleteTag }) {
+  const { mutate: deleteCommunityTag } = useDeleteCommunityTag({
+    id: communityId,
+    queryParams: {
+      tid: tag.uuid,
+    },
+  });
+
+  const handleDeleteTag = tag => {
+    if (
+      confirm(
+        `Are you sure you want to remove tag ${tag.name} from this community?`,
+      )
+    ) {
+      deleteCommunityTag()
+        .then(() => deleteTag(tag))
+        .then(() => alert(`Tag has been removed from the community.`))
+        .catch(err => alert(`An error occurred: ${err.message}`));
+    }
+  };
+
+  return (
+    <>
+      <Box key={tag.uuid} mt={2}>
+        <Grid container spacing={2}>
+          <Grid item>
+            <Typography variant="h6" component="h4" gutterBottom={true}>
+              {tag.name}
+            </Typography>
+          </Grid>
+          <Grid item>
+            <IconButton onClick={() => handleDeleteTag(tag)}>
+              <ClearIcon />
+            </IconButton>
+          </Grid>
+        </Grid>
+      </Box>
+    </>
+  );
+}
+
+DeleteCommunityTag.propTypes = {
+  communityId: PropTypes.string,
+  tag: PropTypes.shape({
+    name: PropTypes.string,
+    color: PropTypes.string,
+    uuid: PropTypes.string,
+  }),
+  deleteTag: PropTypes.function,
 };
 
 export default CommunityPanel;

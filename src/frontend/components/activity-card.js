@@ -38,7 +38,7 @@ export default function ActivityCard({ activity }) {
     return <div>Loading...</div>;
   } else {
     return (
-      <div key={preprint.id} className="activity-card">
+      <div key={preprint.uuid} className="activity-card">
         <LabelStyle>
           {format(new Date(preprint.createdAt), 'MMM. d, yyyy')}{' '}
           {preprint['@type'] === 'RequestForRapidPREreviewAction'

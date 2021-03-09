@@ -107,8 +107,8 @@ const LongformReviewReader = props => {
 
   const [buttonRefId, setButtonRefId] = useState(null);
 
-  const open = Boolean(anchorEl && review.id === buttonRefId);
-  const id = open ? review.id : undefined;
+  const open = Boolean(anchorEl && review.uuid === buttonRefId);
+  const id = open ? review.uuid : undefined;
   const reviewDate = new Date(review.updatedAt);
   const reviewContent = review.drafts[review.drafts.length - 1];
 
@@ -191,7 +191,7 @@ const LongformReviewReader = props => {
                     <Grid container item xs={12} sm={4}>
                       {review.authors.length
                         ? review.authors.map(author => (
-                            <div key={author.id} className={classes.badge}>
+                            <div key={author.uuid} className={classes.badge}>
                               <RoleBadge user={author} />
                             </div>
                           ))
@@ -201,7 +201,7 @@ const LongformReviewReader = props => {
                       Review by{' '}
                       {review.authors.length ? (
                         review.authors.map(author => (
-                          <span key={author.id} className={classes.author}>
+                          <span key={author.uuid} className={classes.author}>
                             {author.name}
                           </span>
                         ))
@@ -261,7 +261,7 @@ const LongformReviewReader = props => {
               {review.comments ? (
                 review.comments.map(comment => {
                   return (
-                    <Box key={comment.id} className={classes.comment}>
+                    <Box key={comment.uuid} className={classes.comment}>
                       {comment.title ? (
                         <div className="comments-title">{comment.title}</div>
                       ) : null}
@@ -312,7 +312,7 @@ const LongformReviewReader = props => {
                       justify="flex-start"
                       xs={12}
                       sm={6}
-                      key={`comment-${user.id}`}
+                      key={`comment-${user.uuid}`}
                     >
                       <Grid item>
                         <RoleBadge user={user} />
@@ -349,7 +349,7 @@ const LongformReviewReader = props => {
                       justify="flex-start"
                       xs={12}
                       sm={6}
-                      key={`comment-${user.id}`}
+                      key={`comment-${user.uuid}`}
                     >
                       <Grid item>
                         <RoleBadge user={user} />
@@ -385,7 +385,7 @@ const LongformReviewReader = props => {
                   <Box mt={2} className={classes.yellow}>
                     <form className="comments__add">
                       <CommentEditor
-                        reviewId={review.id}
+                        reviewId={review.uuid}
                         initialContent={content}
                         handleContentChange={onChange}
                       />
@@ -398,7 +398,7 @@ const LongformReviewReader = props => {
                             event.preventDefault();
                             if (canSubmit(content)) {
                               postComment({
-                                title: `User ${user.id} comment`,
+                                title: `User ${user.uuid} comment`,
                                 // #FIXME optional title needed
                                 contents: content,
                               })

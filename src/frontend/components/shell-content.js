@@ -105,14 +105,14 @@ export default function ShellContent({
     if (user) {
       if (!hasLongReviewed && preprint.fullReviews.length) {
         // gets an array of the active user's persona IDs
-        let personaIDs = user.personas.map(persona => persona.id);
+        let personaIDs = user.personas.map(persona => persona.uuid);
 
         // collects the user's reviews for the current preprint, whether published or not
         let ownReviews = [];
         preprint.fullReviews.map(review => {
           review.authors.map(author => {
             let authorID;
-            author.id ? (authorID = author.id) : (authorID = author);
+            author.uuid ? (authorID = author.uuid) : (authorID = author);
             if (personaIDs.some(id => id === authorID)) {
               ownReviews = ownReviews.concat([review]);
             }
@@ -132,9 +132,9 @@ export default function ShellContent({
           latestDraft =
             ownDrafts && ownDrafts.drafts && ownDrafts.drafts.length
               ? ownDrafts.drafts.length > 1
-                ? ownDrafts.drafts.sort((a, b) => a.id - b.id)[
-                    ownDrafts.drafts.length - 1
-                  ]
+                ? ownDrafts.drafts.sort(
+                    (a, b) => new Date(a.updatedAt) - new Date(b.updatedAt),
+                  )[ownDrafts.drafts.length - 1]
                 : ownDrafts.drafts[0]
               : null;
 
@@ -152,7 +152,9 @@ export default function ShellContent({
             : [];
 
           latestDraft = ownDrafts.length
-            ? ownDrafts.sort((a, b) => a[0].id - b[0].id)[ownDrafts.length - 1]
+            ? ownDrafts.sort(
+                (a, b) => new Date(a[0].updatedAt) - new Date(b[0].updatedAt),
+              )[ownDrafts.length - 1]
             : [];
 
           latestDraft = latestDraft.length
@@ -175,8 +177,8 @@ export default function ShellContent({
         published.map(review => {
           review.authors.map(author => {
             let authorID;
-            author.id ? (authorID = author.id) : (authorID = author);
-            if (user.personas.some(persona => persona.id === authorID)) {
+            author.uuid ? (authorID = author.uuid) : (authorID = author);
+            if (user.personas.some(persona => persona.uuid === authorID)) {
               setHasLongReviewed(true);
             }
           });
@@ -186,11 +188,11 @@ export default function ShellContent({
       if (!hasRapidReviewed && preprint.rapidReviews.length) {
         let authorID;
         preprint.rapidReviews.map(review => {
-          review.author.id
-            ? (authorID = review.author.id)
+          review.author.uuid
+            ? (authorID = review.author.uuid)
             : (authorID = review.author);
           setHasRapidReviewed(
-            user.personas.some(persona => persona.id === authorID),
+            user.personas.some(persona => persona.uuid === authorID),
           );
         });
       }
@@ -198,11 +200,11 @@ export default function ShellContent({
       if (!hasRequested && preprint.requests.length) {
         let authorID;
         preprint.requests.map(request => {
-          request.author.id
-            ? (authorID = request.author.id)
+          request.author.uuid
+            ? (authorID = request.author.uuid)
             : (authorID = request.author);
           setHasRequested(
-            user.personas.some(persona => persona.id === authorID),
+            user.personas.some(persona => persona.uuid === authorID),
           );
         });
       }

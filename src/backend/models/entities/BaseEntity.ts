@@ -3,7 +3,7 @@ import { PrimaryKey, Property, Unique } from '@mikro-orm/core';
 import { Fixture } from 'class-fixtures-factory';
 
 export abstract class BaseEntity {
-  @PrimaryKey()
+  @PrimaryKey({ hidden: true })
   id!: number;
 
   @Fixture(() => uuidv4())
