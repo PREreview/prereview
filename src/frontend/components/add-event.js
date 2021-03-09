@@ -62,13 +62,13 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const AddEvent = ({ community }) => {
+const AddEvent = ({ community, addEvent }) => {
   const classes = useStyles();
 
   const [inputs, setInputs] = useState({});
 
   /* API calls */
-  const { mutate: addCommunityEvent, loading } = usePostCommunityEvent({
+  const { mutate: addCommunityEvent } = usePostCommunityEvent({
     id: community,
     eid: 'none',
   });
@@ -115,6 +115,7 @@ const AddEvent = ({ community }) => {
   const handleAddEvent = () => {
     if (canSubmit()) {
       addCommunityEvent(inputs)
+        .then(addEvent(inputs))
         .then(response => {
           console.log(response);
           handleClose();
@@ -233,6 +234,7 @@ const AddEvent = ({ community }) => {
 
 AddEvent.propTypes = {
   community: PropTypes.string,
+  addEvent: PropTypes.function,
 };
 
 export default AddEvent;

@@ -230,7 +230,7 @@ export default function Community(props) {
           <Box bgcolor="rgba(229, 229, 229, 0.35)">
             <Container>
               <Box p={4}>
-                {(user && community.owners.some(owner => user.personas.some(persona => persona.uuid === owner.uuid))) || (user &&user.isAdmin) ? (
+                {(user && community.owners.some(owner => user.personas.some(persona => persona.uuid === owner.uuid))) || (user && user.isAdmin) ? (
                   <IconButton
                     href={`/community-settings/${community.uuid}`}
                     className={classes.settings}

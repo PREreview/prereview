@@ -31,7 +31,6 @@ import { makeStyles } from '@material-ui/core/styles';
 import Avatar from '@material-ui/core/Avatar';
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
-import Chip from '@material-ui/core/Chip';
 import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
 import IconButton from '@material-ui/core/IconButton';
@@ -74,7 +73,6 @@ const useStyles = makeStyles(theme => ({
 
 const CommunityPanel = () => {
   const classes = useStyles();
-  const intl = useIntl();
   const { id } = useParams();
   const [user] = useContext(UserProvider.context);
 
@@ -89,26 +87,11 @@ const CommunityPanel = () => {
     data: communityData,
     loadingCommunity,
     errorCommunity,
-  } = useGetCommunity({ id: id });
+  } = useGetCommunity({ id: id, resolve: community => community.data[0] });
 
   // update community info
   // delete member from community
   const { mutate: updateCommunity } = usePutCommunity({
-    id: id,
-  });
-
-  // remove user from being owner/moderator
-  const { mutate: deleteCommunityModerator } = useDeleteCommunityMember({
-    id: id,
-  }); // #FIXME fix route when moderator is added
-
-  // delete member from community
-  const { mutate: deleteCommunityMember } = useDeleteCommunityMember({
-    id: id,
-  });
-
-  // delete tag from community
-  const { mutate: deleteCommunityTag } = useDeleteCommunityTag({
     id: id,
   });
 
@@ -162,53 +145,38 @@ const CommunityPanel = () => {
       });
   };
 
-  // remove user from community moderator
-  const handleRemoveModerator = owner => {
-    if (
-      confirm(
-        `Are you sure you want to remove ${
-          owner.name
-        } as a moderator of this community?`,
-      )
-    ) {
-      deleteCommunityModerator({ uid: owner.uuid })
-        .then(() => alert(`User is no longer a moderator of this community.`))
-        .catch(err => alert(`An error occurred: ${err.message}`));
-    }
+  const handleDeleteOwner = owner => {
+    const { owners: personas } = community;
+
+    const owners = personas.filter(persona => persona.uuid !== owner.uuid);
+    setCommunity({ ...community, owners });
   };
 
-  // delete user from community
-  const handleRemoveUser = member => {
-    if (
-      confirm(
-        `Are you sure you want to remove ${member.name} from this community?`,
-      )
-    ) {
-      deleteCommunityMember({ uid: member.uuid })
-        .then(() => alert(`Member has been removed from the community.`))
-        .catch(err => alert(`An error occurred: ${err.message}`));
-    }
+  const handleDeleteMember = member => {
+    const { members: personas } = community;
+
+    const members = personas.filter(persona => persona.uuid !== member.uuid);
+    setCommunity({ ...community, members });
   };
 
-  // delete tag from community
-  const handleRemoveTag = tag => {
-    if (
-      confirm(
-        `Are you sure you want to remove the tag "${
-          tag.name
-        }" from this community?`,
-      )
-    ) {
-      deleteCommunityTag({ tid: tag.uuid })
-        .then(() => alert(`Tag has been removed from the community.`))
-        .catch(err => alert(`An error occurred: ${err.message}`));
-    }
+  const handleDeleteEvent = event => {
+    const { events: oldEvents } = community;
+
+    const events = oldEvents.filter(e => e.uuid !== event.uuid);
+    setCommunity({ ...community, events });
+  };
+
+  const handleDeleteTag = tag => {
+    const { tags: oldTags } = community;
+
+    const tags = oldTags.filter(t => t.uuid !== tag.uuid);
+    setCommunity({ ...community, tags });
   };
 
   useEffect(() => {
     if (!loadingCommunity) {
       if (communityData) {
-        setCommunity(communityData.data[0]);
+        setCommunity(communityData);
         setLoading(false);
       }
     }
@@ -305,8 +273,10 @@ const CommunityPanel = () => {
                 {community.owners.map(owner => {
                   return (
                     <DeleteCommunityMember
+                      key={owner.uuid}
                       communityId={community.uuid}
                       member={owner}
+                      deleteMember={handleDeleteOwner}
                       isOwner={true}
                     />
                   );
@@ -320,8 +290,10 @@ const CommunityPanel = () => {
                 {community.members.map(member => {
                   return (
                     <DeleteCommunityMember
+                      key={member.uuid}
                       communityId={community.uuid}
                       member={member}
+                      deleteMember={handleDeleteMember}
                       isOwner={false}
                     />
                   );
@@ -335,7 +307,9 @@ const CommunityPanel = () => {
                 {community.events.map(event => {
                   return (
                     <DeleteCommunityEvent
+                      key={event.uuid}
                       communityId={community.uuid}
+                      deleteEvent={handleDeleteEvent}
                       event={event}
                     />
                   );
@@ -349,7 +323,9 @@ const CommunityPanel = () => {
                 {community.tags.map(tag => {
                   return (
                     <DeleteCommunityTag
+                      key={tag.uuid}
                       communityId={community.uuid}
+                      deleteTag={handleDeleteTag}
                       tag={tag}
                     />
                   );
@@ -363,7 +339,7 @@ const CommunityPanel = () => {
   }
 };
 
-function DeleteCommunityMember({ communityId, member, isOwner }) {
+function DeleteCommunityMember({ communityId, member, deleteMember, isOwner }) {
   const classes = useStyles();
 
   // remove user from being owner/moderator
@@ -393,6 +369,7 @@ function DeleteCommunityMember({ communityId, member, isOwner }) {
         )
       ) {
         deleteCommunityOwner()
+          .then(() => deleteMember(persona))
           .then(() => alert(`User is no longer a moderator of this community.`))
           .catch(err => alert(`An error occurred: ${err.message}`));
       }
@@ -405,6 +382,7 @@ function DeleteCommunityMember({ communityId, member, isOwner }) {
         )
       ) {
         deleteCommunityMember()
+          .then(() => deleteMember(persona))
           .then(() => alert(`Member has been removed from the community.`))
           .catch(err => alert(`An error occurred: ${err.message}`));
       }
@@ -442,13 +420,14 @@ DeleteCommunityMember.propTypes = {
   communityId: PropTypes.string,
   member: PropTypes.shape({
     name: PropTypes.string,
-    avatar: PropTypes.string,
+    avatar: PropTypes.object,
     uuid: PropTypes.string,
   }),
+  deleteMember: PropTypes.function,
   isOwner: PropTypes.bool,
 };
 
-function DeleteCommunityEvent({ communityId, event }) {
+function DeleteCommunityEvent({ communityId, event, deleteEvent }) {
   const intl = useIntl();
 
   const { mutate: deleteCommunityEvent } = useDeleteCommunityEvent({
@@ -461,10 +440,13 @@ function DeleteCommunityEvent({ communityId, event }) {
   const handleDeleteEvent = event => {
     if (
       confirm(
-        `Are you sure you want to remove ${event.title} from this community?`,
+        `Are you sure you want to remove event ${
+          event.title
+        } from this community?`,
       )
     ) {
       deleteCommunityEvent()
+        .then(() => deleteEvent(event))
         .then(() => alert(`Event has been removed from the community.`))
         .catch(err => alert(`An error occurred: ${err.message}`));
     }
@@ -515,9 +497,10 @@ DeleteCommunityEvent.propTypes = {
     start: PropTypes.date,
     uuid: PropTypes.string,
   }),
+  deleteEvent: PropTypes.function,
 };
 
-function DeleteCommunityTag({ communityId, tag }) {
+function DeleteCommunityTag({ communityId, tag, deleteTag }) {
   const { mutate: deleteCommunityTag } = useDeleteCommunityTag({
     id: communityId,
     queryParams: {
@@ -528,10 +511,11 @@ function DeleteCommunityTag({ communityId, tag }) {
   const handleDeleteTag = tag => {
     if (
       confirm(
-        `Are you sure you want to remove ${tag.title} from this community?`,
+        `Are you sure you want to remove tag ${tag.name} from this community?`,
       )
     ) {
       deleteCommunityTag()
+        .then(() => deleteTag(tag))
         .then(() => alert(`Tag has been removed from the community.`))
         .catch(err => alert(`An error occurred: ${err.message}`));
     }
@@ -564,6 +548,7 @@ DeleteCommunityTag.propTypes = {
     color: PropTypes.string,
     uuid: PropTypes.string,
   }),
+  deleteTag: PropTypes.function,
 };
 
 export default CommunityPanel;

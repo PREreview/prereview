@@ -1,5 +1,5 @@
 import router from 'koa-joi-router';
-import { QueryOrder } from '@mikro-orm/core';
+import { QueryOrder, wrap } from '@mikro-orm/core';
 import { PostgreSqlConnection } from '@mikro-orm/postgresql';
 import { getLogger } from '../log.js';
 import { getErrorMessages } from '../utils/errors';
@@ -196,20 +196,24 @@ export default function controller(
           count = await communityModel.count();
         }
 
-        foundCommunities = foundCommunities.map(community => {
-          if (community.banner && Buffer.isBuffer(community.banner)) {
-            community.banner = community.banner.toString();
-          }
-          community.owners = community.owners
-            .getItems()
-            .reduce((acc, owner) => {
-              if (owner.defaultPersona) {
-                acc.push(owner.defaultPersona);
-              }
-              return acc;
-            }, []);
-          return community;
-        });
+        foundCommunities = await Promise.all(
+          foundCommunities.map(async community => {
+            if (community.banner && Buffer.isBuffer(community.banner)) {
+              community.banner = community.banner.toString();
+            }
+            community.owners = await community.owners
+              .getItems()
+              .reduce(async (acc, owner) => {
+                acc = await acc;
+                if (owner.defaultPersona) {
+                  await wrap(owner.defaultPersona).init();
+                  acc.push(owner.defaultPersona);
+                }
+                return acc;
+              }, []);
+            return community;
+          }),
+        );
 
         if (foundCommunities) {
           ctx.body = {
@@ -271,12 +275,16 @@ export default function controller(
       if (community.banner && Buffer.isBuffer(community.banner)) {
         community.banner = community.banner.toString();
       }
-      community.owners = community.owners.getItems().reduce((acc, owner) => {
-        if (owner.defaultPersona) {
-          acc.push(owner.defaultPersona);
-        }
-        return acc;
-      }, []);
+      community.owners = await community.owners
+        .getItems()
+        .reduce(async (acc, owner) => {
+          acc = await acc;
+          if (owner.defaultPersona) {
+            await wrap(owner.defaultPersona).init();
+            acc.push(owner.defaultPersona);
+          }
+          return acc;
+        }, []);
 
       ctx.body = {
         status: 200,
