@@ -12,7 +12,7 @@ import Modal from '@material-ui/core/Modal';
 import MuiButton from '@material-ui/core/Button';
 
 // hooks
-import { useGetUsers } from '../hooks/api-hooks.tsx';
+import { useGetPersonas } from '../hooks/api-hooks.tsx';
 
 // components
 import Search from './search';
@@ -54,7 +54,7 @@ const AddAuthors = ({ isMentor, reviewId, members, membersLimit = 5 }) => {
   const classes = useStyles();
 
   // fetch users from API
-  const { data: users, loading: loading } = useGetUsers();
+  const { data: users, loading: loading } = useGetPersonas();
 
   // getModalStyle is not a pure function, we roll the style only on the first render
   const [open, setOpen] = useState(false);

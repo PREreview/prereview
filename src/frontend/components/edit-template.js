@@ -168,7 +168,7 @@ const EditTemplate = ({
           />
           */}
           <Button
-            onClick={() => handleSubmit(template.id)}
+            onClick={() => handleSubmit()}
             type="button"
             variant="contained"
             color="secondary"

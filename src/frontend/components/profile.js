@@ -1,5 +1,5 @@
 // base imports
-import React, { Fragment, useContext, useEffect, useState } from 'react';
+import React, { Fragment, useContext } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useLocation } from 'react-router-dom';
 import { format } from 'date-fns';
@@ -11,11 +11,9 @@ import UserProvider from '../contexts/user-context';
 import { useGetPersona } from '../hooks/api-hooks.tsx';
 
 // Material UI components
-import { makeStyles } from '@material-ui/core/styles';
 import Avatar from '@material-ui/core/Avatar';
 import Chip from '@material-ui/core/Chip';
 import IconButton from '@material-ui/core/IconButton';
-import Modal from '@material-ui/core/Modal';
 
 // components
 //import Avatar from './avatar';
@@ -61,7 +59,8 @@ export default function Profile() {
 
         <section className="profile__content">
           <header className="profile__header">
-            {thisUser.uuid === persona.identity.uuid ? (
+            {thisUser.personas &&
+            thisUser.personas.some(p => p.uuid === persona.uuid) ? (
               <IconButton href="/settings">
                 <Avatar src={persona.avatar} className="profile__avatar-img" />
               </IconButton>
@@ -95,12 +94,12 @@ export default function Profile() {
                 <h2 className="profile__username">
                   {persona && persona.name ? persona.name : 'Name goes here'}
                 </h2>
-                { persona.identity.uuid === thisUser.uuid ? 
-                <XLink
-                    to={`/settings`}
-                    href={`/settings`}
-                  >Edit user settings
-                </XLink> : null }
+                {thisUser.personas &&
+                thisUser.personas.some(p => p.uuid === persona.uuid) ? (
+                  <XLink to={`/settings`} href={`/settings`}>
+                    Edit user settings
+                  </XLink>
+                ) : null}
                 {persona ? (
                   <span className="profile__persona-status">
                     {persona && !persona.isAnonymous ? (
@@ -162,6 +161,7 @@ export default function Profile() {
                   </Fragment>
                 )}
 
+                {/*
                 {!persona.isAnonymous && (
                   <Fragment>
                     <dt>
@@ -174,6 +174,7 @@ export default function Profile() {
                     </dd>
                   </Fragment>
                 )}
+                  */}
 
                 {persona && (
                   <Fragment>

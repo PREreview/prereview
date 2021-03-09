@@ -253,7 +253,7 @@ export default function UserSearch() {
                   ) : (
                     personas &&
                     personas.data.map(persona => (
-                      <Grid item key={persona.id}>
+                      <Grid item key={persona.uuid}>
                         <PersonaCard persona={persona} />
                       </Grid>
                     ))

@@ -73,7 +73,6 @@ function InviteRow({ invite, onRemove }) {
     pid: invite.persona,
   });
 
-  console.log('***invite***:', invite);
   const handleAcceptInvite = () => {
     acceptInvite()
       .then(() => {

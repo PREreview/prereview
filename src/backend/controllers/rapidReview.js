@@ -9,13 +9,16 @@ export default function controller(rapidReviews, preprints, thisUser) {
   const rapidRouter = router();
 
   const getHandler = async ctx => {
-    let all, pid, preprint; // fid = fullReview ID
+    let data, id, pid, preprint; // fid = fullReview ID
 
     if (ctx.params.pid) {
       pid = ctx.params.pid;
       log.debug(
         `Retrieving rapid reviews associated with preprint ${ctx.params.pid}`,
       );
+    } else if (ctx.params.id) {
+      id = ctx.params.id;
+      log.debug(`Retrieving rapid review ${ctx.params.id}`);
     } else {
       log.debug(`Retrieving all rapid reviews.`);
     }
@@ -23,15 +26,23 @@ export default function controller(rapidReviews, preprints, thisUser) {
     try {
       if (pid) {
         preprint = await preprints.findOneByUuidOrHandle(pid);
-        all = await rapidReviews.find({ preprint: preprint });
+        data = await rapidReviews.find({ preprint: preprint }, ['preprint']);
+      } else if (id) {
+        data = await rapidReviews.findOne({ uuid: id }, ['preprint']);
       } else {
-        all = await rapidReviews.findAll();
+        data = await rapidReviews.findAll(['preprint']);
       }
     } catch (error) {
+      log.error('HTTP 400 Error: ', error);
       return ctx.throw(400, { message: error.message });
     }
 
-    ctx.body = { status: 200, message: 'ok', data: all };
+    if (id && !data) {
+      log.error(`HTTP 404 Error: No Rapid Review with id ${id}`);
+      return ctx.throw(404, `No Rapid Review with id ${id}.`);
+    }
+
+    ctx.body = { data };
     ctx.status = 200;
   };
 
@@ -43,8 +54,8 @@ export default function controller(rapidReviews, preprints, thisUser) {
       },
     },
     method: 'post',
-    path: '/rapidReviews',
-    pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
+    path: '/rapid-reviews',
+    pre: thisUser.can('access private pages'),
     // validate: {},
     handler: async ctx => {
       log.debug('Posting a rapid review.');
@@ -91,7 +102,7 @@ export default function controller(rapidReviews, preprints, thisUser) {
       },
     },
     method: 'get',
-    path: '/rapidReviews',
+    path: '/rapid-reviews',
     // validate: {},
     handler: getHandler,
   });
@@ -105,7 +116,7 @@ export default function controller(rapidReviews, preprints, thisUser) {
       },
     },
     method: 'get',
-    path: '/preprints/:pid/rapidReviews',
+    path: '/preprints/:pid/rapid-reviews',
     // validate: {},
     handler: getHandler,
   });
@@ -119,7 +130,7 @@ export default function controller(rapidReviews, preprints, thisUser) {
       },
     },
     method: 'get',
-    path: '/rapidReviews/:id',
+    path: '/rapid-reviews/:id',
     // pre: thisUser.can('access private pages'),
     // validate: {},
     handler: async ctx => {
@@ -162,8 +173,8 @@ export default function controller(rapidReviews, preprints, thisUser) {
       },
     },
     method: 'put',
-    path: '/rapidReviews/:id',
-    // pre: thisUser.can('access private pages'),
+    path: '/rapid-reviews/:id',
+    pre: thisUser.can('access admin pages'),
     // validate: {},
     handler: async ctx => {
       // if (ctx.invalid) {
@@ -201,8 +212,8 @@ export default function controller(rapidReviews, preprints, thisUser) {
       },
     },
     method: 'delete',
-    path: '/rapidReviews/:id',
-    pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next),
+    path: '/rapid-reviews/:id',
+    pre: thisUser.can('access admin pages'),
     // validate: {},
     handler: async ctx => {
       log.debug(`Updating rapid review ${ctx.params.id}`);
