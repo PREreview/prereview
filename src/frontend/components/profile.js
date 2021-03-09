@@ -1,7 +1,7 @@
 // base imports
 import React, { Fragment, useContext, useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 import { format } from 'date-fns';
 
 // contexts
@@ -87,6 +87,14 @@ export default function Profile() {
   const location = useLocation();
   const [thisUser] = useContext(UserProvider.context);
   //const [editAvatar, setEditAvatar] = useState(false);
+  const { id } = useParams();
+
+  // returns true if the profile page belongs to the logged in user 
+  const ownProfile = thisUser.personas.some(persona => persona.uuid === id); 
+
+  const [activePersona, setActivePersona] = useState(thisUser ? thisUser.defaultPersona : {})
+  console.log("activePersona", activePersona, activePersona.uuid)
+  console.log("params id", id)
 
   const { data: persona, loading, error } = useGetPersona({
     id: location.pathname.slice(7),
@@ -120,8 +128,8 @@ export default function Profile() {
 
             <section className="profile__identity-info">
               <header className="profile__indentity-info-header">
-                <PersonaSwitch />
-                { thisUser && persona.identity.uuid === thisUser.uuid ? (
+                { ownProfile ? <PersonaSwitch /> : null }
+                { ownProfile ? (
                   <XLink to={`/settings`} href={`/settings`}>
                     Edit user settings
                   </XLink>
