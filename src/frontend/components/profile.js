@@ -11,10 +11,13 @@ import UserProvider from '../contexts/user-context';
 import { useGetPersona } from '../hooks/api-hooks.tsx';
 
 // Material UI components
-import { withStyles } from '@material-ui/core/styles';
+import { makeStyles, withStyles } from '@material-ui/core/styles';
 import Avatar from '@material-ui/core/Avatar';
+import Box from '@material-ui/core/Box';
 import Chip from '@material-ui/core/Chip';
+import Container from '@material-ui/core/Container';
 import IconButton from '@material-ui/core/IconButton';
+import Link from '@material-ui/core/Link';
 import Modal from '@material-ui/core/Modal';
 import Switch from '@material-ui/core/Switch';
 import Grid from '@material-ui/core/Grid';
@@ -85,12 +88,20 @@ const PersonaSwitch = withStyles(theme => ({
   );
 });
 
+const useStyles = makeStyles(theme => ({
+  avatar: {
+    height: 220,
+    width: 220,
+  },
+}));
+
 export default function Profile() {
+  const classes = useStyles();
   const [thisUser, setUser] = useContext(UserProvider.context);
   // const [editAvatar, setEditAvatar] = useState(false);
   const { id } = useParams();
   const history = useHistory();
-  const ownProfile = !thisUser ? false : thisUser.personas.some(persona => persona.uuid === id); // returns true if the profile page belongs to the logged in user 
+  const ownProfile = !thisUser ? false : thisUser.personas.some(persona => persona.uuid === id); // returns true if the profile page belongs to the logged in user
   const anonPersona = !thisUser ? null : thisUser.personas.filter(persona => persona.isAnonymous)[0]
   const publicPersona = !thisUser ? null : thisUser.personas.filter(persona => !persona.isAnonymous)[0]
   const [persona, setPersona] = useState(thisUser ? thisUser.defaultPersona : {})
@@ -101,7 +112,7 @@ export default function Profile() {
   });
 
   const [checked, setChecked] = useState(persona && persona.isAnonymous ? true : false)
-    
+
   const handleSwitch = () => {
     setChecked(!checked)
     setPersona(checked ? anonPersona : publicPersona);
@@ -130,83 +141,132 @@ export default function Profile() {
         </Helmet>
 
         <section className="profile__content">
-          <header className="profile__header">
-            {ownProfile ? (
-              <IconButton href="/settings">
-                <Avatar src={persona.avatar} className="profile__avatar-img" />
-              </IconButton>
-            ) : (
-              <Avatar src={persona.avatar} className="profile__avatar-img" />
-            )}
-
-            <section className="profile__identity-info">
-              <header className="profile__indentity-info-header">
-                {ownProfile ? (
-                  <Typography component="div">
-                    <Grid
-                      component="label"
-                      container
-                      alignItems="center"
-                      spacing={1}
-                    >
-                      <Grid item>Public</Grid>
-                      <Grid item>
-                        <PersonaSwitch checked={checked} onChange={handleSwitch} />
-                      </Grid>
-                      <Grid item>Anonymous</Grid>
+          {ownProfile ? (
+            <Box textAlign="center">
+              <Container>
+                <Grid
+                  component="label"
+                  container
+                  alignItems="center"
+                  justify="space-between"
+                  spacing={8}
+                >
+                  <Grid
+                    container
+                    item
+                    xs={12}
+                    md={6}
+                    alignItems="center"
+                    justify="flex-start"
+                  >
+                    <Grid item xs={4}>
+                      <Typography component="div" variant="body1">
+                        Public
+                      </Typography>
                     </Grid>
-                  </Typography>
-                ) : null}
-                {ownProfile ? (
-                  <XLink to={`/settings`} href={`/settings`}>
-                    Edit user settings
-                  </XLink>
-                ) : null}
-              </header>
+                    <Grid item xs={4}>
+                      <PersonaSwitch
+                        checked={checked}
+                        onChange={handleSwitch}
+                      />
+                    </Grid>
+                    <Grid item xs={4}>
+                      <Typography component="div" variant="body1">
+                        Anonymous
+                      </Typography>
+                    </Grid>
+                  </Grid>
+                  <Grid item xs={12} md={6}>
+                    <XLink to={`/settings`} href={`/settings`}>
+                      Edit user settings
+                    </XLink>
+                  </Grid>
+                </Grid>
+              </Container>
+            </Box>
+          ) : null}
 
-              <dl>
-                {persona.badges && persona.badges.length > 0 && (
-                  <Fragment>
-                    <dt>
-                      <LabelStyle>Badges</LabelStyle>
-                    </dt>
-                    <dd className="profile__chips">
+          <Box my={8}>
+            <Container>
+              <Grid container justify="space-between" alignItems="flex-start">
+                <Grid item>
+                  {!persona.isAnonymous && (
+                    <Box>
+                      <Typography component="div" variant="h6" gutterBottom>
+                        {persona.name}
+                      </Typography>
+                      <Typography component="div" variant="body1" gutterBottom>
+                        <Link
+                          href={`https://orcid.org/${persona.identity.orcid}`}
+                        >
+                          ORCHID {persona.identity.orcid}
+                        </Link>
+                      </Typography>
+                      <Typography component="div" variant="body1" gutterBottom>
+                        <b>Email address: </b>
+                        {persona.email ? persona.email : `None provided`}
+                      </Typography>
+                      <Typography component="div" variant="body1" gutterBottom>
+                        <b>Badges: </b>
+                        {persona.badges &&
+                          persona.badges.length > 0 &&
+                          persona.badges.map(badge => (
+                            <Chip
+                              key={badge.uuid}
+                              label={badge.name}
+                              color="primary"
+                              size="small"
+                            />
+                          ))}
+                      </Typography>
+                      <Typography component="div" variant="body1" gutterBottom>
+                        <b>Area(s) of expertise: </b>
+                      </Typography>
+                      <Typography component="div" variant="body1" gutterBottom>
+                        Community member since{' '}
+                        {format(new Date(persona.createdAt), 'MMM. d, yyyy')}
+                      </Typography>
+                    </Box>
+                  )}
+                </Grid>
+                <Grid item>
+                  {ownProfile ? (
+                    <IconButton href="/settings">
+                      <Avatar src={persona.avatar} className={classes.avatar} />
+                    </IconButton>
+                  ) : (
+                    <Avatar src={persona.avatar} className={classes.avatar} />
+                  )}
+                  {persona.badges && persona.badges.length > 0 && (
+                    <Box>
+                      <Typography component="div" variant="button">
+                        Badges
+                      </Typography>
                       {persona.badges.map(badge => (
                         <Chip
                           key={badge.uuid}
                           label={badge.name}
                           color="primary"
                           size="small"
-                          className="profile__chip"
                         />
                       ))}
-                    </dd>
-                  </Fragment>
-                )}
+                    </Box>
+                  )}
+                </Grid>
+              </Grid>
+              <Typography component="div" variant="body1" gutterBottom>
+                <b>About</b>
+                <br />
+                {persona.bio}
+              </Typography>
+            </Container>
+          </Box>
 
-                {!persona.isAnonymous && (
-                  <Fragment>
-                    <dt>
-                      <LabelStyle>ORCID</LabelStyle>
-                    </dt>
-                    <dd>
-                      <a href={`https://orcid.org/${persona.identity.orcid}`}>
-                        {persona.identity.orcid}
-                      </a>
-                    </dd>
-                  </Fragment>
-                )}
+          <header className="profile__header">
 
-                {persona && (
-                  <Fragment>
-                    <dt>
-                      <LabelStyle>Member since</LabelStyle>
-                    </dt>
-                    <dd>
-                      {format(new Date(persona.createdAt), 'MMM. d, yyyy')}
-                    </dd>
-                  </Fragment>
-                )}
+
+            <section className="profile__identity-info">
+              <dl>
               </dl>
             </section>
           </header>
