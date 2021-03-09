@@ -1,11 +1,14 @@
 // base imports
-import React, { Fragment, useContext, useState } from 'react';
+import React, { Fragment, useContext, useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { useParams } from 'react-router-dom';
+import { useHistory, useParams } from 'react-router-dom';
 import { format } from 'date-fns';
 
 // contexts
 import UserProvider from '../contexts/user-context';
+
+// hooks
+import { useGetPersona } from '../hooks/api-hooks.tsx';
 
 // Material UI components
 import { withStyles } from '@material-ui/core/styles';
@@ -83,14 +86,37 @@ const PersonaSwitch = withStyles(theme => ({
 });
 
 export default function Profile() {
-  const [thisUser] = useContext(UserProvider.context);
-  //const [editAvatar, setEditAvatar] = useState(false);
+  const [thisUser, setUser] = useContext(UserProvider.context);
+  // const [editAvatar, setEditAvatar] = useState(false);
   const { id } = useParams();
+  const history = useHistory();
   const ownProfile = !thisUser ? false : thisUser.personas.some(persona => persona.uuid === id); // returns true if the profile page belongs to the logged in user 
+  const anonPersona = !thisUser ? null : thisUser.personas.filter(persona => persona.isAnonymous)[0]
+  const publicPersona = !thisUser ? null : thisUser.personas.filter(persona => !persona.isAnonymous)[0]
   const [persona, setPersona] = useState(thisUser ? thisUser.defaultPersona : {})
 
+  const { data: personaData, loading, error } = useGetPersona({
+    id: id,
+    resolve: personaData => personaData.data[0],
+  });
 
-  if (!persona) {
+  const [checked, setChecked] = useState(persona && persona.isAnonymous ? true : false)
+    
+  const handleSwitch = () => {
+    setChecked(!checked)
+    setPersona(checked ? anonPersona : publicPersona);
+    setUser({...thisUser, defaultPersona: checked ? anonPersona : publicPersona})
+  }
+
+  useEffect(() => {
+    console.log("useEffect is happening", persona)
+    history.push(`/about/${persona.uuid}`);
+   if (!loading) {
+     setPersona(personaData)
+   }
+  }, [persona, checked])
+
+  if (!persona || loading || !personaData) {
     return <Loading />;
   } else {
     return (
@@ -105,7 +131,7 @@ export default function Profile() {
 
         <section className="profile__content">
           <header className="profile__header">
-            {thisUser && thisUser.uuid === persona.identity.uuid ? (
+            {ownProfile ? (
               <IconButton href="/settings">
                 <Avatar src={persona.avatar} className="profile__avatar-img" />
               </IconButton>
@@ -125,7 +151,7 @@ export default function Profile() {
                     >
                       <Grid item>Public</Grid>
                       <Grid item>
-                        <PersonaSwitch />
+                        <PersonaSwitch checked={checked} onChange={handleSwitch} />
                       </Grid>
                       <Grid item>Anonymous</Grid>
                     </Grid>
@@ -139,7 +165,7 @@ export default function Profile() {
               </header>
 
               <dl>
-                {persona && persona.badges.length > 0 && (
+                {persona.badges && persona.badges.length > 0 && (
                   <Fragment>
                     <dt>
                       <LabelStyle>Badges</LabelStyle>
@@ -187,7 +213,7 @@ export default function Profile() {
           <section className="profile__activity-section">
             <h2 className="profile__section-title">Activity</h2>
 
-            <RoleActivity persona={persona} />
+            <RoleActivity persona={personaData} />
           </section>
         </section>
       </div>
