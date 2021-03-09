@@ -1,31 +1,30 @@
 // base imports
-import React, { Fragment, useContext, useEffect, useState } from 'react';
+import React, { Fragment, useContext, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { useLocation, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { format } from 'date-fns';
 
 // contexts
 import UserProvider from '../contexts/user-context';
 
-// hooks
-import { useGetPersona } from '../hooks/api-hooks.tsx';
-
 // Material UI components
-import { makeStyles, withStyles } from '@material-ui/core/styles';
+import { withStyles } from '@material-ui/core/styles';
 import Avatar from '@material-ui/core/Avatar';
 import Chip from '@material-ui/core/Chip';
 import IconButton from '@material-ui/core/IconButton';
 import Modal from '@material-ui/core/Modal';
 import Switch from '@material-ui/core/Switch';
+import Grid from '@material-ui/core/Grid';
+import Typography from '@material-ui/core/Typography';
 
 // components
 import HeaderBar from './header-bar';
 import LabelStyle from './label-style';
 import Loading from './loading.js';
-import NotFound from './not-found';
+//import NotFound from './not-found';
 import RoleActivity from './role-activity';
-import XLink from './xlink';
 //import RoleEditor from './role-editor';
+import XLink from './xlink';
 
 // constants
 import { ORG } from '../constants';
@@ -84,27 +83,15 @@ const PersonaSwitch = withStyles(theme => ({
 });
 
 export default function Profile() {
-  const location = useLocation();
   const [thisUser] = useContext(UserProvider.context);
   //const [editAvatar, setEditAvatar] = useState(false);
   const { id } = useParams();
+  const ownProfile = !thisUser ? false : thisUser.personas.some(persona => persona.uuid === id); // returns true if the profile page belongs to the logged in user 
+  const [persona, setPersona] = useState(thisUser ? thisUser.defaultPersona : {})
 
-  // returns true if the profile page belongs to the logged in user 
-  const ownProfile = thisUser.personas.some(persona => persona.uuid === id); 
 
-  const [activePersona, setActivePersona] = useState(thisUser ? thisUser.defaultPersona : {})
-  console.log("activePersona", activePersona, activePersona.uuid)
-  console.log("params id", id)
-
-  const { data: persona, loading, error } = useGetPersona({
-    id: location.pathname.slice(7),
-    resolve: persona => persona.data[0],
-  });
-
-  if (loading || !persona) {
+  if (!persona) {
     return <Loading />;
-  } else if (error) {
-    return <NotFound />;
   } else {
     return (
       <div className="profile">
@@ -128,8 +115,23 @@ export default function Profile() {
 
             <section className="profile__identity-info">
               <header className="profile__indentity-info-header">
-                { ownProfile ? <PersonaSwitch /> : null }
-                { ownProfile ? (
+                {ownProfile ? (
+                  <Typography component="div">
+                    <Grid
+                      component="label"
+                      container
+                      alignItems="center"
+                      spacing={1}
+                    >
+                      <Grid item>Public</Grid>
+                      <Grid item>
+                        <PersonaSwitch />
+                      </Grid>
+                      <Grid item>Anonymous</Grid>
+                    </Grid>
+                  </Typography>
+                ) : null}
+                {ownProfile ? (
                   <XLink to={`/settings`} href={`/settings`}>
                     Edit user settings
                   </XLink>
