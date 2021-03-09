@@ -167,6 +167,7 @@ export default function controller(reqModel, preprintModel, thisUser) {
     },
     method: 'delete',
     path: '/requests/:id',
+    pre: thisUser.can('access admin pages'),
     // pre: thisUser.can(''),
     // validate: {},
     handler: async ctx => {

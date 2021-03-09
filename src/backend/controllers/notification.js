@@ -69,6 +69,7 @@ export default function controller(
   notificationsRouter.route({
     method: 'GET',
     path: '/notifications/:uid',
+    pre: thisUser.can('access private pages'),
     handler: async ctx => getHandler(ctx),
     meta: {
       swagger: {

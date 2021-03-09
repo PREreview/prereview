@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import router from 'koa-joi-router';
+import { isString } from '../../common/utils/index.ts';
 import { getLogger } from '../log.js';
 
 const log = getLogger('backend:controllers:user');
@@ -33,6 +34,7 @@ export default function controller(users, contacts, thisUser) {
     },
     method: 'get',
     path: '/users',
+    pre: thisUser.can('access admin pages'), // TODO: can users delete their own account?
     handler: async ctx => {
       log.debug(`Retrieving users.`);
       let allUsers;
@@ -72,6 +74,7 @@ export default function controller(users, contacts, thisUser) {
       continueOnError: false,
       failure: 400,
     },
+    pre: thisUser.can('edit this user'), // TODO: can users delete their own account?
     handler: async ctx => {
       log.debug(`Retrieving user ${ctx.params.id}`);
 
@@ -146,7 +149,7 @@ export default function controller(users, contacts, thisUser) {
       continueOnError: false,
       false: 400,
     },
-    // pre:thisUserthisUser.can('access private pages'), // TODO: can edit self only no?
+    pre: thisUser.can('edit this user'), // TODO: can users delete their own account?
     handler: async ctx => {
       log.debug(`Updating user ${ctx.params.id}.`);
 
@@ -165,7 +168,30 @@ export default function controller(users, contacts, thisUser) {
         ctx.throw(404, `That user with ID ${ctx.params.id} does not exist.`);
       }
 
-      users.assign(user, ctx.request.body);
+      let updatedUser = ctx.request.body;
+      const defaultPersona = updatedUser.defaultPersona;
+      let newDefault;
+
+      if (defaultPersona && isString(defaultPersona)) {
+        const personas = user.personas.getItems();
+        newDefault = personas.find(persona => persona.uuid === defaultPersona);
+        if (!newDefault) {
+          log.debug(
+            `HTTP 400 Error: User with ID ${
+              ctx.params.id
+            } has no persona with ID ${defaultPersona}.`,
+          );
+          ctx.throw(
+            400,
+            `User with ID ${
+              ctx.params.id
+            } has no persona with ID ${defaultPersona}.`,
+          );
+        }
+        updatedUser.defaultPersona = newDefault;
+      }
+
+      users.assign(user, updatedUser);
       await users.persistAndFlush(user);
 
       ctx.status = 204;
@@ -196,7 +222,7 @@ export default function controller(users, contacts, thisUser) {
       }),
       type: 'json',
     },
-    // pre: {},
+    pre: thisUser.can('edit this user'), // TODO: can users delete their own account?
     handler: async ctx => {
       log.debug(`Adding a new contact to user ${ctx.params.id}`);
       let newContact, user;
@@ -289,7 +315,7 @@ export default function controller(users, contacts, thisUser) {
       type: 'json',
     },
     // validate: {    },
-    // pre: {},
+    pre: thisUser.can('edit this user'), // TODO: can users delete their own account?
     handler: async ctx => {
       const contactId = ctx.params.cid;
       let newContact, user;
@@ -363,6 +389,7 @@ export default function controller(users, contacts, thisUser) {
       type: 'json',
       continueOnError: true,
     },
+    pre: thisUser.can('edit this user'), // TODO: can users delete their own account?
     handler: async ctx => {
       const contactId = ctx.query.cid;
       let user;
@@ -423,7 +450,7 @@ export default function controller(users, contacts, thisUser) {
           .required(),
       },
     },
-    pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next), // TODO: can users delete their own account?
+    pre: thisUser.can('access admin pages'), // TODO: can users delete their own account?
     handler: async ctx => {
       log.debug(`Deleting user ${ctx.params.id}.`);
 
@@ -461,7 +488,7 @@ export default function controller(users, contacts, thisUser) {
           .required(),
       },
     },
-    pre: (ctx, next) => thisUser.can('access private pages')(ctx, next), // TODO: can users delete their own account?
+    pre: thisUser.can('access private pages'),
     handler: async ctx => {
       log.debug(`Validating contact w/ token ${ctx.params.token}.`);
 

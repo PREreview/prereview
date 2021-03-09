@@ -4,23 +4,13 @@ import PropTypes from 'prop-types';
 
 // material ui imports
 import { makeStyles, withStyles } from '@material-ui/core/styles';
-import {
-  MuiPickersUtilsProvider,
-  KeyboardDatePicker,
-} from '@material-ui/pickers';
-import Checkbox from '@material-ui/core/Checkbox';
-import CheckBoxOutlineBlankIcon from '@material-ui/icons/CheckBoxOutlineBlank';
-import CheckBoxIcon from '@material-ui/icons/CheckBox';
-import DateFnsUtils from '@date-io/date-fns';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Grid from '@material-ui/core/Grid';
 import Modal from '@material-ui/core/Modal';
 import MuiButton from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 
 // hooks
-import {usePutCommunityTag } from '../hooks/api-hooks.tsx';
+import { usePostCommunityTag } from '../hooks/api-hooks.tsx';
 
 // icons
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
@@ -70,7 +60,7 @@ const AddEvent = ({ community }) => {
   const [inputs, setInputs] = useState({});
 
   /* API calls */
-  const { mutate: addCommunityTag, loading, error } = usePutCommunityTag({
+  const { mutate: addCommunityTag } = usePostCommunityTag({
     id: community,
     tid: 'none',
   });
@@ -109,7 +99,9 @@ const AddEvent = ({ community }) => {
   const [disabledSubmit, setDisabledSubmit] = useState(true);
 
   useEffect(() => {
-    inputs.name && inputs.name.length ? setDisabledSubmit(false) : setDisabledSubmit(true);
+    inputs.name && inputs.name.length
+      ? setDisabledSubmit(false)
+      : setDisabledSubmit(true);
   }, [inputs]);
 
   return (

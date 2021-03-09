@@ -200,8 +200,8 @@ export default function controller(
 
   reviewsRouter.route({
     method: 'POST',
-    path: '/fullReviews',
-    // pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
+    path: '/full-reviews',
+    pre: thisUser.can('access private pages'),
     handler: postHandler,
     meta: {
       swagger: {
@@ -215,7 +215,7 @@ export default function controller(
 
   reviewsRouter.route({
     method: 'GET',
-    path: '/preprints/:pid/fullReviews',
+    path: '/preprints/:pid/full-reviews',
     handler: async ctx => getHandler(ctx),
     meta: {
       swagger: {
@@ -228,7 +228,7 @@ export default function controller(
 
   reviewsRouter.route({
     method: 'GET',
-    path: '/fullReviews',
+    path: '/full-reviews',
     validate: {
       query: querySchema,
     },
@@ -244,7 +244,8 @@ export default function controller(
 
   reviewsRouter.route({
     method: 'PUT',
-    path: '/fullReviews/:id',
+    path: '/full-reviews/:id',
+    pre: thisUser.can('access private pages'),
     handler: async ctx => {
       log.debug(`Updating review ${ctx.params.id}.`);
       let fullReview, draft, coi;
@@ -312,7 +313,7 @@ export default function controller(
 
   reviewsRouter.route({
     method: 'POST',
-    path: '/fullReviews/:id/:role',
+    path: '/full-reviews/:id/:role',
     validate: {
       params: {
         id: Joi.string()
@@ -329,7 +330,7 @@ export default function controller(
       }),
       type: 'json',
     },
-    pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
+    pre: thisUser.can('access private pages'),
     handler: async ctx => {
       log.debug(
         `Adding persona ${ctx.request.body.pid} to review ${
@@ -456,7 +457,7 @@ export default function controller(
 
   reviewsRouter.route({
     method: 'DELETE',
-    path: '/fullReviews/:id/:role',
+    path: '/full-reviews/:id/:role',
     validate: {
       params: {
         id: Joi.string()
@@ -473,7 +474,7 @@ export default function controller(
       },
       type: 'json',
     },
-    pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
+    pre: thisUser.can('access private pages'),
     handler: async ctx => {
       log.debug(
         `Removing persona ${ctx.params.pid} from review ${ctx.params.id}.`,
@@ -556,7 +557,7 @@ export default function controller(
 
   reviewsRouter.route({
     method: 'POST',
-    path: '/fullReviews/:id/:role/:pid',
+    path: '/full-reviews/:id/:role/:pid',
     validate: {
       params: {
         id: Joi.string()
@@ -570,7 +571,7 @@ export default function controller(
           .required(),
       },
     },
-    pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
+    pre: thisUser.can('access private pages'),
     handler: async ctx => {
       log.debug(
         `Adding persona ${ctx.params.pid} to review ${ctx.params.id} as a(n) ${
@@ -659,7 +660,7 @@ export default function controller(
 
   reviewsRouter.route({
     method: 'GET',
-    path: '/fullReviews/:id',
+    path: '/full-reviews/:id',
     handler: async ctx => {
       log.debug(`Retrieving review ${ctx.params.id}.`);
       let fullReview, latestDraft;
@@ -709,8 +710,8 @@ export default function controller(
 
   reviewsRouter.route({
     method: 'DELETE',
-    path: '/fullReviews/:id',
-    pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next),
+    path: '/full-reviews/:id',
+    pre: thisUser.can('access admin pages'),
     handler: async ctx => {
       log.debug(`Deleting fullReview ${ctx.params.id}.`);
       let fullReview;

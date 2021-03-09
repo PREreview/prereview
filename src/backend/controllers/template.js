@@ -120,7 +120,7 @@ export default function controller(templateModel, communityModel, thisUser) {
   templatesRouter.route({
     method: 'GET',
     path: '/templates',
-    pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
+    pre: thisUser.can('access private pages'),
     validate: {
       query: querySchema,
       continueOnError: true,
@@ -143,7 +143,7 @@ export default function controller(templateModel, communityModel, thisUser) {
   templatesRouter.route({
     method: 'GET',
     path: '/communities/:cid/templates',
-    pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
+    pre: thisUser.can('access private pages'),
     validate: {
       query: querySchema,
     },
@@ -160,7 +160,7 @@ export default function controller(templateModel, communityModel, thisUser) {
   templatesRouter.route({
     method: 'POST',
     path: '/communities/:cid/templates',
-    pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
+    pre: thisUser.can('edit this community'),
     validate: {
       body: templateSchema,
       type: 'json',
@@ -179,7 +179,7 @@ export default function controller(templateModel, communityModel, thisUser) {
   templatesRouter.route({
     method: 'POST',
     path: '/templates',
-    pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
+    pre: thisUser.can('access private pages'),
     validate: {
       body: templateSchema,
       type: 'json',
@@ -198,7 +198,7 @@ export default function controller(templateModel, communityModel, thisUser) {
   templatesRouter.route({
     method: 'GET',
     path: '/templates/:id',
-    pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
+    pre: thisUser.can('access private pages'),
     validate: {},
     handler: async ctx => {
       log.debug(`Retrieving template ${ctx.params.id}.`);
@@ -234,7 +234,7 @@ export default function controller(templateModel, communityModel, thisUser) {
   templatesRouter.route({
     method: 'PUT',
     path: '/templates/:id',
-    // pre: {},
+    pre: thisUser.can('access private pages'),
     validate: {
       body: templateSchema,
       type: 'json',
@@ -289,7 +289,7 @@ export default function controller(templateModel, communityModel, thisUser) {
     },
     method: 'DELETE',
     path: '/templates',
-    pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next),
+    pre: thisUser.can('access private pages'),
     validate: {
       query: {
         id: Joi.string()

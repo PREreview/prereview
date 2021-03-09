@@ -1,5 +1,5 @@
 import router from 'koa-joi-router';
-import { QueryOrder } from '@mikro-orm/core';
+import { QueryOrder, wrap } from '@mikro-orm/core';
 import { PostgreSqlConnection } from '@mikro-orm/postgresql';
 import { getLogger } from '../log.js';
 import { getErrorMessages } from '../utils/errors';
@@ -11,6 +11,17 @@ const communitySchema = Joi.object({
   name: Joi.string(),
   description: Joi.string(),
   banner: Joi.string(),
+});
+
+const eventSchema = Joi.object({
+  title: Joi.string(),
+  description: Joi.string(),
+  start: Joi.string(),
+});
+
+const tagSchema = Joi.object({
+  name: Joi.string(),
+  color: Joi.string(),
 });
 
 const querySchema = Joi.object({
@@ -45,6 +56,7 @@ const handleInvalid = ctx => {
 export default function controller(
   communityModel,
   userModel,
+  personaModel,
   eventModel,
   tagModel,
   thisUser,
@@ -54,7 +66,7 @@ export default function controller(
   communities.route({
     method: 'POST',
     path: '/communities',
-    pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next),
+    pre: thisUser.can('access admin pages'),
     validate: {
       body: communitySchema,
       type: 'json',
@@ -96,7 +108,6 @@ export default function controller(
   communities.route({
     method: 'GET',
     path: '/communities',
-    // pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
     validate: {
       query: querySchema,
       continueOnError: true,
@@ -185,11 +196,24 @@ export default function controller(
           count = await communityModel.count();
         }
 
-        foundCommunities.map(community => {
-          if (community.banner && Buffer.isBuffer(community.banner)) {
-            community.banner = community.banner.toString();
-          }
-        });
+        foundCommunities = await Promise.all(
+          foundCommunities.map(async community => {
+            if (community.banner && Buffer.isBuffer(community.banner)) {
+              community.banner = community.banner.toString();
+            }
+            community.owners = await community.owners
+              .getItems()
+              .reduce(async (acc, owner) => {
+                acc = await acc;
+                if (owner.defaultPersona) {
+                  await wrap(owner.defaultPersona).init();
+                  acc.push(owner.defaultPersona);
+                }
+                return acc;
+              }, []);
+            return community;
+          }),
+        );
 
         if (foundCommunities) {
           ctx.body = {
@@ -217,7 +241,6 @@ export default function controller(
   communities.route({
     method: 'GET',
     path: '/communities/:id',
-    //pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
     validate: {
       query: querySchema,
       continueOnError: true,
@@ -249,6 +272,20 @@ export default function controller(
         ctx.throw(400, `Failed to parse community schema: ${err}`);
       }
 
+      if (community.banner && Buffer.isBuffer(community.banner)) {
+        community.banner = community.banner.toString();
+      }
+      community.owners = await community.owners
+        .getItems()
+        .reduce(async (acc, owner) => {
+          acc = await acc;
+          if (owner.defaultPersona) {
+            await wrap(owner.defaultPersona).init();
+            acc.push(owner.defaultPersona);
+          }
+          return acc;
+        }, []);
+
       ctx.body = {
         status: 200,
         message: 'ok',
@@ -268,7 +305,7 @@ export default function controller(
   communities.route({
     method: 'PUT',
     path: '/communities/:id',
-    pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next),
+    pre: thisUser.can('edit this community'),
     validate: {
       body: communitySchema,
       type: 'json',
@@ -310,7 +347,7 @@ export default function controller(
   communities.route({
     method: 'DELETE',
     path: '/communities/:id',
-    pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next),
+    pre: thisUser.can('access admin pages'),
     handler: async ctx => {
       if (ctx.invalid) {
         handleInvalid(ctx);
@@ -355,23 +392,28 @@ export default function controller(
           .required(),
       },
     },
-    pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next),
+    pre: thisUser.can('edit this community'),
     handler: async ctx => {
       log.debug(`Adding user ${ctx.params.uid} to community ${ctx.params.id}.`);
       let community, user;
 
       try {
         community = await communityModel.findOne({ uuid: ctx.params.id });
-        user = await userModel.findOneByUuidOrOrcid(ctx.params.uid);
+        user = await personaModel.findOne({ uuid: ctx.params.uid });
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse query: ${err}`);
       }
 
+      if (!community || !user) {
+        log.error('HTTP 404 Error: Community or user not found.');
+        ctx.throw(404, 'Community or user not found.');
+      }
+
       try {
         log.debug(
-          `Community ${community.id} found. Adding user ${
-            user.id
+          `Community ${community.uuid} found. Adding user ${
+            user.uuid
           } to community.`,
         );
         community.members.add(user);
@@ -410,8 +452,8 @@ export default function controller(
     method: 'DELETE',
     path: '/communities/:id/members',
     validate: {
-      body: Joi.object({
-        uid: Joi.string(),
+      query: Joi.object({
+        uid: Joi.string().required(),
       }),
       params: {
         id: Joi.string()
@@ -421,12 +463,10 @@ export default function controller(
       type: 'json',
       continueOnError: true,
     },
-    pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next),
+    pre: thisUser.can('edit this community'),
     handler: async ctx => {
       log.debug(
-        `Removing user ${ctx.request.body.uid} from community ${
-          ctx.params.id
-        }.`,
+        `Removing user ${ctx.query.uid} from community ${ctx.params.id}.`,
       );
       let community, user;
 
@@ -434,7 +474,7 @@ export default function controller(
         community = await communityModel.findOne({ uuid: ctx.params.id }, [
           'members',
         ]);
-        user = await userModel.findOne({ uuid: ctx.request.body.uid });
+        user = await personaModel.findOne({ uuid: ctx.query.uid });
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse query: ${err}`);
@@ -443,8 +483,8 @@ export default function controller(
       if (user && community && community.members.contains(user)) {
         try {
           log.debug(
-            `Community ${community.id} found. Removing user ${
-              user.orcid
+            `Community ${community.uuid} found. Removing user ${
+              user.uuid
             } from community.`,
           );
           community.members.remove(user);
@@ -466,6 +506,132 @@ export default function controller(
   });
 
   communities.route({
+    method: 'PUT',
+    path: '/communities/:id/owners/:uid',
+    validate: {
+      params: {
+        id: Joi.string()
+          .description('Community id')
+          .required(),
+        uid: Joi.string()
+          .description('User id')
+          .required(),
+      },
+    },
+    pre: thisUser.can('edit this community'),
+    handler: async ctx => {
+      log.debug(`Adding user ${ctx.params.uid} to community ${ctx.params.id}.`);
+      let community, user;
+
+      try {
+        community = await communityModel.findOne({ uuid: ctx.params.id });
+        user = await userModel.findOneByPersona(ctx.params.uid);
+      } catch (err) {
+        log.error('HTTP 400 Error: ', err);
+        ctx.throw(400, `Failed to parse query: ${err}`);
+      }
+
+      if (!community || !user) {
+        log.error('HTTP 404 Error: Community or user not found.');
+        ctx.throw(404, 'Community or user not found.');
+      }
+
+      try {
+        log.debug(
+          `Community ${community.uuid} found. Adding user ${
+            user.uuid
+          } to community.`,
+        );
+        community.owners.add(user);
+        await communityModel.persistAndFlush(community);
+      } catch (err) {
+        log.error('HTTP 400 Error: ', err);
+        ctx.throw(400, `Failed to add user to community: ${err}`);
+      }
+
+      ctx.body = {
+        status: 201,
+        message: 'User has been added to community',
+        data: community,
+      };
+      ctx.status = 201;
+    },
+    meta: {
+      swagger: {
+        operationId: 'PutCommunityOwner',
+        summary:
+          'Endpoint to PUT one owner to a community by ID from PREreview. Admin users only.',
+        required: true,
+      },
+    },
+  });
+
+  communities.route({
+    meta: {
+      swagger: {
+        operationId: 'DeleteCommunityOwner',
+        summary:
+          'Endpoint to DELETE one owner from a community by ID from PREreview. Admin users only.',
+        required: true,
+      },
+    },
+    method: 'DELETE',
+    path: '/communities/:id/owners',
+    validate: {
+      query: Joi.object({
+        uid: Joi.string().required(),
+      }),
+      params: {
+        id: Joi.string()
+          .description('Community id')
+          .required(),
+      },
+      type: 'json',
+      continueOnError: true,
+    },
+    pre: thisUser.can('edit this community'),
+    handler: async ctx => {
+      log.debug(
+        `Removing user ${ctx.query.uid} from community ${ctx.params.id}.`,
+      );
+      let community, user;
+
+      try {
+        community = await communityModel.findOne({ uuid: ctx.params.id }, [
+          'owners',
+        ]);
+        user = await userModel.findOneByPersona(ctx.query.uid);
+      } catch (err) {
+        log.error('HTTP 400 Error: ', err);
+        ctx.throw(400, `Failed to parse query: ${err}`);
+      }
+
+      if (user && community && community.owners.contains(user)) {
+        try {
+          log.debug(
+            `Community ${community.uuid} found. Removing user ${
+              user.uuid
+            } from community.`,
+          );
+          community.owners.remove(user);
+          await communityModel.persistAndFlush(community);
+        } catch (err) {
+          log.error('HTTP 400 Error: ', err);
+          ctx.throw(400, `Failed to remove owner from community: ${err}`);
+        }
+      } else {
+        log.error('HTTP 404 Error: user or community not found');
+        ctx.throw(
+          404,
+          'Failed to remove owner from community: user or community not found',
+        );
+      }
+      // if deleted
+      ctx.status = 204;
+    },
+  });
+
+  communities.route({
     meta: {
       swagger: {
         operationId: 'PutCommunityEvent',
@@ -475,7 +641,7 @@ export default function controller(
     method: 'PUT',
     path: '/communities/:id/events/:eid',
     // validate: {    },
-    // pre: {},
+    pre: thisUser.can('edit this community'),
     handler: async ctx => {
       const communityId = ctx.params.id;
       const eventId = ctx.params.eid;
@@ -526,16 +692,57 @@ export default function controller(
   communities.route({
     meta: {
       swagger: {
+        operationId: 'PostCommunityEvent',
+        summary: 'Endpoint to POST events for a single community.',
+      },
+    },
+    method: 'POST',
+    path: '/communities/:id/events',
+    validate: {
+      body: eventSchema,
+      type: 'json',
+    },
+    pre: thisUser.can('edit this community'),
+    handler: async ctx => {
+      const communityId = ctx.params.id;
+      let community, newEvent;
+      log.debug(`Add event for community ${communityId}`);
+
+      try {
+        community = await communityModel.findOne({ uuid: communityId }, [
+          'events',
+        ]);
+        newEvent = eventModel.create({
+          ...ctx.request.body,
+        });
+        community.events.add(newEvent);
+        await eventModel.em.flush();
+        ctx.status = 201;
+        ctx.body = {
+          status: 201,
+          message: 'created',
+          data: newEvent,
+        };
+      } catch (err) {
+        log.error('HTTP 400 Error: ', err);
+        ctx.throw(400, `Failed to parse event schema: ${err}`);
+      }
+    },
+  });
+
+  communities.route({
+    meta: {
+      swagger: {
         operationId: 'DeleteCommunityEvent',
         summary:
-          'Endpoint to DELETE one event from a community by ID from PREreview. Admin events only.',
+          'Endpoint to DELETE one event from a community by ID from PREreview.',
         required: true,
       },
     },
     method: 'DELETE',
     path: '/communities/:id/events',
     validate: {
-      body: Joi.object({
+      query: Joi.object({
         eid: Joi.string(),
       }),
       params: {
@@ -546,18 +753,18 @@ export default function controller(
       type: 'json',
       continueOnError: true,
     },
-    pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next),
+    pre: thisUser.can('edit this community'),
     handler: async ctx => {
       log.debug(
-        `Removing event ${ctx.params.eid} from community ${ctx.params.id}.`,
+        `Removing event ${ctx.query.eid} from community ${ctx.params.id}.`,
       );
       let community, event;
 
       try {
-        community = await communityModel.findOne({ id: ctx.params.id }, [
+        community = await communityModel.findOne({ uuid: ctx.params.id }, [
           'events',
         ]);
-        event = await eventModel.findOne({ uuid: ctx.request.body.eid });
+        event = await eventModel.findOne({ uuid: ctx.query.eid });
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse query: ${err}`);
@@ -566,8 +773,8 @@ export default function controller(
       if (event && community && community.events.contains(event)) {
         try {
           log.debug(
-            `Community ${community.id} found. Removing event ${
-              event.orcid
+            `Community ${community.uuid} found. Removing event ${
+              event.uuid
             } from community.`,
           );
           community.events.remove(event);
@@ -597,6 +804,7 @@ export default function controller(
     },
     method: 'PUT',
     path: '/communities/:id/tags/:tid',
+    pre: thisUser.can('edit this community'),
     // validate: {    },
     // pre: {},
     handler: async ctx => {
@@ -649,6 +857,47 @@ export default function controller(
   communities.route({
     meta: {
       swagger: {
+        operationId: 'PostCommunityTag',
+        summary: 'Endpoint to POST a tag for a single community.',
+      },
+    },
+    method: 'POST',
+    path: '/communities/:id/tags',
+    validate: {
+      body: tagSchema,
+      type: 'json',
+    },
+    pre: thisUser.can('edit this community'),
+    handler: async ctx => {
+      const communityId = ctx.params.id;
+      let community, newTag;
+      log.debug(`Add tag for community ${communityId}`);
+
+      try {
+        community = await communityModel.findOne({ uuid: communityId }, [
+          'tags',
+        ]);
+        newTag = tagModel.create({
+          ...ctx.request.body,
+        });
+        community.tags.add(newTag);
+        await tagModel.em.flush();
+        ctx.status = 201;
+        ctx.body = {
+          status: 201,
+          message: 'created',
+          data: newTag,
+        };
+      } catch (err) {
+        log.error('HTTP 400 Error: ', err);
+        ctx.throw(400, `Failed to parse event schema: ${err}`);
+      }
+    },
+  });
+
+  communities.route({
+    meta: {
+      swagger: {
         operationId: 'DeleteCommunityTag',
         summary:
           'Endpoint to DELETE one tag from a community by ID from PREreview. Admin tags only.',
@@ -658,7 +907,7 @@ export default function controller(
     method: 'DELETE',
     path: '/communities/:id/tags',
     validate: {
-      body: Joi.object({
+      query: Joi.object({
         tid: Joi.string(),
       }),
       params: {
@@ -669,18 +918,18 @@ export default function controller(
       type: 'json',
       continueOnError: true,
     },
-    pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next),
+    pre: thisUser.can('edit this community'),
     handler: async ctx => {
       log.debug(
-        `Removing tag ${ctx.request.body.tid} from community ${ctx.params.id}.`,
+        `Removing tag ${ctx.query.tid} from community ${ctx.params.id}.`,
       );
       let community, tag;
 
       try {
-        community = await communityModel.findOne({ id: ctx.params.id }, [
+        community = await communityModel.findOne({ uuid: ctx.params.id }, [
           'tags',
         ]);
-        tag = await tagModel.findOne({ uuid: ctx.request.body.tid });
+        tag = await tagModel.findOne({ uuid: ctx.query.tid });
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse query: ${err}`);
@@ -689,8 +938,8 @@ export default function controller(
       if (tag && community && community.tags.contains(tag)) {
         try {
           log.debug(
-            `Community ${community.id} found. Removing tag ${
-              tag.orcid
+            `Community ${community.uuid} found. Removing tag ${
+              tag.uuid
             } from community.`,
           );
           community.tags.remove(tag);
