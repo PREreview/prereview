@@ -46,7 +46,6 @@ export default function SettingsRoles({ user, updateUser }) {
   );
 
   const handleActivePersonaClose = persona => {
-    console.log("persona!", persona)
     setActivePersona(persona);
     updateUser({...user, defaultPersona: persona})
   };

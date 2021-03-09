@@ -451,12 +451,12 @@ const ReviewReader = React.memo(function ReviewReader({
           </Accordion>
         </div>
       ) : (
-        <div className="text-answers">
-          <div className="text-answers__question long">
-            No reviews yet. Would you like to leave one?
+          <div className="text-answers">
+            <div className="text-answers__question long">
+              There are no reviews on this preprint yet. To add your review, click on "Add Review(s)". To request reviews, click on "Add Request" in the menu above.          
+            </div>
           </div>
-        </div>
-      )}
+        )}
     </div>
   );
 });
