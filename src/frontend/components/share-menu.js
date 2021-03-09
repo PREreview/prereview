@@ -9,7 +9,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import Popover from '@material-ui/core/Popover';
 
 // utils
-import { createPreprintId } from '../utils/ids';
+import { createPreprintId } from '../../common/utils/ids';
 import { unprefix } from '../utils/jsonld';
 
 // components
@@ -80,29 +80,13 @@ export default function ShareMenu({ identifier, roleIds = [] }) {
             <XLink
               className="menu__list__link-item"
               download="rapid-prereview-data.jsonld"
-              href={`/api/v2/preprint/${unprefix(
-                createPreprintId(identifier),
-              )}`}
-              to={`/api/v2/preprint/${unprefix(createPreprintId(identifier))}`}
+              href={`/preprints/${createPreprintId(identifier)}`}
+              to={`/preprints/${createPreprintId(identifier)}`}
             >
               Permalink
             </XLink>
 
-            {!!(roleIds && roleIds.length) && (
-              <div
-                className="menu__list"
-                onSelect={() => {
-                  const qs = new URLSearchParams();
-                  qs.set('role', roleIds.map(unprefix));
-
-                  setPermalink(`${identifier}?${qs.toString()}`);
-                }}
-              >
-                Permalink (for selected user{roleIds.length > 1 ? 's' : ''})
-              </div>
-            )}
-
-            <XLink
+            {/* <XLink
               className="menu__list__link-item"
               download="rapid-prereview-data.jsonld"
               href={`/api/v2/preprint/${unprefix(
@@ -111,7 +95,7 @@ export default function ShareMenu({ identifier, roleIds = [] }) {
               to={`/api/v2/preprint/${unprefix(createPreprintId(identifier))}`}
             >
               Download data (JSON-LD)
-            </XLink>
+            </XLink> */}
           </div>
         </Popover>
       </div>
