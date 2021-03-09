@@ -30,6 +30,7 @@ import CardContent from '@material-ui/core/CardContent';
 import CardMedia from '@material-ui/core/CardMedia';
 import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
+import Hidden from '@material-ui/core/Hidden';
 import Link from '@material-ui/core/Link';
 import Typography from '@material-ui/core/Typography';
 
@@ -43,6 +44,13 @@ import HeroImg from '../assets/images/home/hero.svg';
 import Card1 from '../assets/images/home/card-1.svg';
 import Card2 from '../assets/images/home/card-2.svg';
 import Card3 from '../assets/images/home/card-3.svg';
+
+// sponsor logos
+import APSImg from '../assets/images/sponsors/aps-foundation.png';
+import ElifeImg from '../assets/images/sponsors/elife.jpg';
+import IOIImg from '../assets/images/sponsors/ioi.png';
+import MozillaImg from '../assets/images/sponsors/mozilla.png';
+import WellcomeImg from '../assets/images/sponsors/wellcome.jpg';
 
 // constants
 import { ORG } from '../constants';
@@ -144,7 +152,7 @@ const useStyles = makeStyles(theme => ({
       backgroundImage: `url(${HeroImg})`,
       backgroundPosition: 'right bottom',
       backgroundRepeat: 'no-repeat',
-      backgroundSize: 'contain',
+      backgroundSize: '50vh',
       padding: '1rem',
     },
   },
@@ -154,6 +162,19 @@ const useStyles = makeStyles(theme => ({
     },
   },
   home: {},
+  sliderImage: {
+    marginLeft: 'auto',
+    marginRight: 'auto',
+  },
+  sponsorImage: {
+    display: 'block',
+    marginLeft: 'auto',
+    marginRight: 'auto',
+    maxHeight: '140px',
+    maxWidth: '300px',
+    objectFit: 'contain',
+    width: '100%',
+  },
   standout: {
     fontSize: '2.5rem',
     fontWeight: 'bold',
@@ -210,26 +231,32 @@ export default function Home() {
         }}
       />
 
-      <Container className={classes.hero}>
-        <Box my={4} className={classes.heroContent}>
-          <Typography variant="h4" component="div" gutterBottom>
-            Catalyzing change in peer review through equity, openness, and
-            collaboration
-          </Typography>
-          <Typography variant="h5" component="div">
-            We envision a world in which feedback to scholarly outputs is done
-            openly, rapidly, constructively, and by a global community of peers.
-          </Typography>
-          <Box my={6}>
-            <Link href="/login" className={classes.buttonLink}>
-              Join us and start reviewing now
-            </Link>
-          </Box>
-        </Box>
-      </Container>
-      <Box bgcolor="#D2D1CE" py={4}>
+      <Box className={classes.hero}>
         <Container>
-          <Typography variant="h5" component="div">
+          <Box my={4} className={classes.heroContent}>
+            <Typography variant="h4" component="div" gutterBottom>
+              Catalyzing change in peer review through equity, openness, and
+              collaboration
+            </Typography>
+            <Typography variant="h5" component="div">
+              We envision a world in which feedback to scholarly outputs is done
+              openly, rapidly, constructively, and by a global community of
+              peers.
+            </Typography>
+            <Box my={6}>
+              <Link href="/login" className={classes.buttonLink}>
+                Join us and start reviewing now
+              </Link>
+            </Box>
+          </Box>
+        </Container>
+      </Box>
+      <Hidden xsUp>
+        <Typography component="h2">Search</Typography>
+      </Hidden>
+      <Box bgcolor="#D2D1CE" py={8}>
+        <Container>
+          <Typography variant="h4" component="div">
             Search and browse preprint reviews
           </Typography>
           <Box mt={3}>
@@ -258,7 +285,10 @@ export default function Home() {
           </Box>
         </Container>
       </Box>
-      <Box py={4} className={classes.cardsBox}>
+      <Hidden xsUp>
+        <Typography component="h2">About PREreview</Typography>
+      </Hidden>
+      <Box py={8} className={classes.cardsBox}>
         <Container className={classes.cards}>
           <Card className={classes.card}>
             {/* FIXME loop*/}
@@ -395,7 +425,7 @@ export default function Home() {
           </Card>
         </Container>
       </Box>
-      <Box bgcolor="#54948E" color="#fff" textAlign="center" py={4}>
+      <Box bgcolor="#54948E" color="#fff" textAlign="center" py={8}>
         <Container>
           <Typography className={classes.standout}>
             We believe in equatable access, connecting people, self reflection,
@@ -403,7 +433,7 @@ export default function Home() {
           </Typography>
         </Container>
       </Box>
-      <Box py={4} textAlign="center">
+      <Box py={8} textAlign="center">
         <Container>
           <Grid container spacing={10} alignItems="center" justify="center">
             <Grid item sm={12} md={6}>
@@ -521,7 +551,7 @@ export default function Home() {
           </Grid>
         </Container>
       </Box>
-      <Box bgcolor="#54948E" color="#fff" textAlign="center" py={6}>
+      <Box bgcolor="#54948E" color="#fff" textAlign="center" py={8}>
         <Container>
           <Slider {...settings}>
             <Box>
@@ -539,6 +569,7 @@ export default function Home() {
                 component="div"
                 variant="body1"
                 className={classes.gridContent}
+                gutterBottom
               >
                 - PREreview Open Reviewer 2021
               </Typography>
@@ -558,6 +589,7 @@ export default function Home() {
                 component="div"
                 variant="body1"
                 className={classes.gridContent}
+                gutterBottom
               >
                 - Another PREreview Open Reviewer 2021
               </Typography>
@@ -575,9 +607,96 @@ export default function Home() {
                 component="div"
                 variant="body1"
                 className={classes.gridContent}
+                gutterBottom
               >
                 - Yet Another PREreview Open Reviewer 2021
               </Typography>
+            </Box>
+          </Slider>
+        </Container>
+      </Box>
+      <Box py={8} textAlign="center">
+        <Container>
+          <Typography variant="h4" component="h2">
+            Our Funders
+          </Typography>
+          <Box mt={8}>
+            <Grid container alignItems="center" justify="center" spacing={8}>
+              <Grid item sm={12} md={4}>
+                <img
+                  className={classes.sponsorImage}
+                  src={APSImg}
+                  alt="Alfred P. Sloan Foundation"
+                />
+              </Grid>
+              <Grid item sm={12} md={4}>
+                <img
+                  className={classes.sponsorImage}
+                  src={WellcomeImg}
+                  alt="Wellcome"
+                />
+              </Grid>
+              <Grid item sm={12} md={4}>
+                <img
+                  className={classes.sponsorImage}
+                  src={ElifeImg}
+                  alt="eLife"
+                />
+              </Grid>
+              <Grid item sm={12} md={6}>
+                <img
+                  className={classes.sponsorImage}
+                  src={MozillaImg}
+                  alt="Mozilla"
+                />
+              </Grid>
+              <Grid item sm={12} md={6}>
+                <img className={classes.sponsorImage} src={IOIImg} alt="IOI" />
+              </Grid>
+            </Grid>
+          </Box>
+        </Container>
+      </Box>
+      <Hidden xsUp>
+        <Typography component="h2">Donate</Typography>
+      </Hidden>
+      <Box bgcolor="#54948E" color="#fff" textAlign="center" py={8}>
+        <Container>
+          <Typography className={classes.standout} gutterBottom>
+            PREreview is a fiscally sponsored project of Code for Science and
+            Society. Help us grow our impact!
+          </Typography>
+          <Link href="#FIXME" className={classes.gridLink}>
+            Donate
+          </Link>
+        </Container>
+      </Box>
+      <Box py={8} textAlign="center">
+        <Container>
+          <Typography variant="h4" component="h2" gutterBottom>
+            Press &amp; Awards
+          </Typography>
+          <Slider {...settings}>
+            <Box textAlign="center">
+              <img
+                src="http://satyr.io/988x588/red"
+                alt="FIXME"
+                className={classes.sliderImage}
+              />
+            </Box>
+            <Box textAlign="center">
+              <img
+                src="http://satyr.io/988x588/red"
+                alt="FIXME"
+                className={classes.sliderImage}
+              />
+            </Box>
+            <Box textAlign="center">
+              <img
+                src="http://satyr.io/988x588/red"
+                alt="FIXME"
+                className={classes.sliderImage}
+              />
             </Box>
           </Slider>
         </Container>
