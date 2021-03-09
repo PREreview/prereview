@@ -131,152 +131,155 @@ export default function Profile() {
     return <Loading />;
   } else {
     return (
-      <div className="profile">
-        <HeaderBar thisUser={thisUser} closeGap />
-
+      <>
         <Helmet>
           <title>
             {persona.name} • {ORG}
           </title>
         </Helmet>
 
-        <section className="profile__content">
-          {ownProfile ? (
-            <Box textAlign="center">
-              <Container>
-                <Grid
-                  component="label"
-                  container
-                  alignItems="center"
-                  justify="space-between"
-                  spacing={8}
-                >
+        <HeaderBar thisUser={thisUser} closeGap />
+
+        <Box my={10}>
+          <Container>
+            {ownProfile ? (
+              <Box textAlign="center">
+                <Container>
                   <Grid
+                    component="label"
                     container
-                    item
-                    xs={12}
-                    md={6}
                     alignItems="center"
-                    justify="flex-start"
+                    justify="space-between"
+                    spacing={8}
                   >
-                    <Grid item xs={4}>
-                      <Typography component="div" variant="body1">
-                        Public
-                      </Typography>
+                    <Grid
+                      container
+                      item
+                      xs={12}
+                      md={6}
+                      alignItems="center"
+                      justify="flex-start"
+                    >
+                      <Grid item xs={4}>
+                        <Typography component="div" variant="body1">
+                          Public
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={4}>
+                        <PersonaSwitch
+                          checked={checked}
+                          onChange={handleSwitch}
+                        />
+                      </Grid>
+                      <Grid item xs={4}>
+                        <Typography component="div" variant="body1">
+                          Anonymous
+                        </Typography>
+                      </Grid>
                     </Grid>
-                    <Grid item xs={4}>
-                      <PersonaSwitch
-                        checked={checked}
-                        onChange={handleSwitch}
-                      />
-                    </Grid>
-                    <Grid item xs={4}>
-                      <Typography component="div" variant="body1">
-                        Anonymous
-                      </Typography>
+                    <Grid item xs={12} md={6}>
+                      <XLink to={`/settings`} href={`/settings`}>
+                        Edit user settings
+                      </XLink>
                     </Grid>
                   </Grid>
-                  <Grid item xs={12} md={6}>
-                    <XLink to={`/settings`} href={`/settings`}>
-                      Edit user settings
-                    </XLink>
+                </Container>
+              </Box>
+            ) : null}
+
+            <Box my={8} borderBottom="1px solid #C1BFBF">
+              <Container>
+                <Grid container justify="space-between" alignItems="flex-start">
+                  <Grid item>
+                    {!persona.isAnonymous && (
+                      <Box>
+                        <Typography component="div" variant="h6" gutterBottom>
+                          {persona.name}
+                        </Typography>
+                        <Typography component="div" variant="body1" gutterBottom>
+                          <Link
+                            href={`https://orcid.org/${persona.identity.orcid}`}
+                          >
+                            ORCHID {persona.identity.orcid}
+                          </Link>
+                        </Typography>
+                        <Typography component="div" variant="body1" gutterBottom>
+                          <b>Email address: </b>
+                          {persona.email ? persona.email : `None provided`}
+                        </Typography>
+                        <Typography component="div" variant="body1" gutterBottom>
+                          <b>Badges: </b>
+                          {persona.badges &&
+                            persona.badges.length > 0 &&
+                            persona.badges.map(badge => (
+                              <Chip
+                                key={badge.uuid}
+                                label={badge.name}
+                                color="primary"
+                                size="small"
+                              />
+                            ))}
+                        </Typography>
+                        <Typography component="div" variant="body1" gutterBottom>
+                          <b>Area(s) of expertise: </b>
+                        </Typography>
+                        <Typography component="div" variant="body1" gutterBottom>
+                          Community member since{' '}
+                          {format(new Date(persona.createdAt), 'MMM. d, yyyy')}
+                        </Typography>
+                      </Box>
+                    )}
+                  </Grid>
+                  <Grid item>
+                    {ownProfile ? (
+                      <IconButton href="/settings">
+                        <Avatar src={persona.avatar} className={classes.avatar} />
+                      </IconButton>
+                    ) : (
+                      <Avatar src={persona.avatar} className={classes.avatar} />
+                    )}
+                    {persona.badges && persona.badges.length > 0 && (
+                      <Box>
+                        <Typography component="div" variant="button">
+                          Badges
+                        </Typography>
+                        {persona.badges.map(badge => (
+                          <Chip
+                            key={badge.uuid}
+                            label={badge.name}
+                            color="primary"
+                            size="small"
+                          />
+                        ))}
+                      </Box>
+                    )}
                   </Grid>
                 </Grid>
+                <Typography component="div" variant="body1" gutterBottom>
+                  <b>About</b>
+                  <br />
+                  {persona.bio}
+                </Typography>
               </Container>
             </Box>
-          ) : null}
 
-          <Box my={8}>
-            <Container>
-              <Grid container justify="space-between" alignItems="flex-start">
-                <Grid item>
-                  {!persona.isAnonymous && (
-                    <Box>
-                      <Typography component="div" variant="h6" gutterBottom>
-                        {persona.name}
-                      </Typography>
-                      <Typography component="div" variant="body1" gutterBottom>
-                        <Link
-                          href={`https://orcid.org/${persona.identity.orcid}`}
-                        >
-                          ORCHID {persona.identity.orcid}
-                        </Link>
-                      </Typography>
-                      <Typography component="div" variant="body1" gutterBottom>
-                        <b>Email address: </b>
-                        {persona.email ? persona.email : `None provided`}
-                      </Typography>
-                      <Typography component="div" variant="body1" gutterBottom>
-                        <b>Badges: </b>
-                        {persona.badges &&
-                          persona.badges.length > 0 &&
-                          persona.badges.map(badge => (
-                            <Chip
-                              key={badge.uuid}
-                              label={badge.name}
-                              color="primary"
-                              size="small"
-                            />
-                          ))}
-                      </Typography>
-                      <Typography component="div" variant="body1" gutterBottom>
-                        <b>Area(s) of expertise: </b>
-                      </Typography>
-                      <Typography component="div" variant="body1" gutterBottom>
-                        Community member since{' '}
-                        {format(new Date(persona.createdAt), 'MMM. d, yyyy')}
-                      </Typography>
-                    </Box>
-                  )}
-                </Grid>
-                <Grid item>
-                  {ownProfile ? (
-                    <IconButton href="/settings">
-                      <Avatar src={persona.avatar} className={classes.avatar} />
-                    </IconButton>
-                  ) : (
-                    <Avatar src={persona.avatar} className={classes.avatar} />
-                  )}
-                  {persona.badges && persona.badges.length > 0 && (
-                    <Box>
-                      <Typography component="div" variant="button">
-                        Badges
-                      </Typography>
-                      {persona.badges.map(badge => (
-                        <Chip
-                          key={badge.uuid}
-                          label={badge.name}
-                          color="primary"
-                          size="small"
-                        />
-                      ))}
-                    </Box>
-                  )}
-                </Grid>
-              </Grid>
-              <Typography component="div" variant="body1" gutterBottom>
-                <b>About</b>
-                <br />
-                {persona.bio}
-              </Typography>
-            </Container>
-          </Box>
-
-          <header className="profile__header">
-
-
-            <section className="profile__identity-info">
-              <dl>
-              </dl>
-            </section>
-          </header>
-          <section className="profile__activity-section">
-            <h2 className="profile__section-title">Activity</h2>
-
-            <RoleActivity persona={personaData} />
-          </section>
-        </section>
-      </div>
+            <Box>
+              <Container>
+                <Typography component="h2" variant="h6" gutterBottom>
+                  PREreview Communities
+                </Typography>
+                <Typography component="h2" variant="h6" gutterBottom>
+                  PREreview Contributions
+                </Typography>
+                <RoleActivity persona={personaData} />
+                <Typography component="h2" variant="h6" gutterBottom>
+                  List of Publications
+                </Typography>
+              </Container>
+            </Box>
+          </Container>
+        </Box>
+      </>
     );
   }
 }
