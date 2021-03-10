@@ -44,6 +44,7 @@ import HeroImg from '../assets/images/home/hero.svg';
 import Card1 from '../assets/images/home/card-1.svg';
 import Card2 from '../assets/images/home/card-2.svg';
 import Card3 from '../assets/images/home/card-3.svg';
+import CommunitiesImg from '../assets/images/home/communities.jpg';
 
 // sponsor logos
 import APSImg from '../assets/images/sponsors/aps-foundation.png';
@@ -162,6 +163,10 @@ const useStyles = makeStyles(theme => ({
     },
   },
   home: {},
+  img: {
+    display: 'block',
+    width: '100%',
+  },
   sliderImage: {
     marginLeft: 'auto',
     marginRight: 'auto',
@@ -466,9 +471,10 @@ export default function Home() {
             </Grid>
             <Grid item sm={12} md={6}>
               <img
-                src="http://satyr.io/584x253/red"
+                src={CommunitiesImg}
                 alt=""
                 aria-hidden="true"
+                className={classes.img}
               />
               <Typography
                 component="div"
@@ -666,7 +672,10 @@ export default function Home() {
             PREreview is a fiscally sponsored project of Code for Science and
             Society. Help us grow our impact!
           </Typography>
-          <Link href="#FIXME" className={classes.gridLink}>
+          <Link
+            href="https://codeforscience.org/donate/prereview/"
+            className={classes.gridLink}
+          >
             Donate
           </Link>
         </Container>
