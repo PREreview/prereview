@@ -56,8 +56,6 @@ export default function Dashboard() {
     },
   );
 
-  preprints ? preprints.data.forEach(preprint => console.log("PREPRINT!", preprint)) : null
-
   const [hoveredSortOption, setHoveredSortOption] = useState(null);
 
   /**
@@ -109,7 +107,6 @@ export default function Dashboard() {
 
   // gets 10 of the top users, just their user ids
   const activeUsers = rankedUsers.slice(0, 10).map(user => user[0])
-  console.log("justUsers", activeUsers)
 
   // next three functions copied from home.js
   const handleNewRequest = useCallback(
@@ -305,7 +302,7 @@ export default function Dashboard() {
                   <ul className="dashboard__preprint-list">
                     {preprints &&
                       preprints.data.map(row => (
-                        <li key={row.id} className="dashboard__preprint-list__item">
+                        <li key={row.uuid} className="dashboard__preprint-list__item">
                           <PreprintCard
                             isNew={false}
                             user={user}
@@ -355,7 +352,7 @@ export default function Dashboard() {
                     <h2 className="dashboard__h2">Recent Activity</h2>
                     {sortedActivities.map(activity =>
                       <RecentActivity
-                        key={activity.id}
+                        key={activity.uuid}
                         activity={activity}
                       />
                     )}

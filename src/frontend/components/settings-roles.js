@@ -46,7 +46,6 @@ export default function SettingsRoles({ user, updateUser }) {
   );
 
   const handleActivePersonaClose = persona => {
-    console.log("persona!", persona)
     setActivePersona(persona);
     updateUser({...user, defaultPersona: persona})
   };
@@ -273,7 +272,7 @@ function MakeActivePersonaModalButton({ user, persona, handleClose }) {
               isWaiting={loading}
               disabled={loading}
               onClick={() => {
-                updateUser({ defaultPersona: persona.id })
+                updateUser({ defaultPersona: persona.uuid })
                   .then(() => {
                     alert('User updated successfully.');
                     setIsOpen(false);

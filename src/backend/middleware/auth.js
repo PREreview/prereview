@@ -13,7 +13,7 @@ const log = getLogger('backend:middleware:auth');
  * @param {funtion} next - continue to next middleware
  */
 
-const authWrapper = groups => {
+const authWrapper = (groups, communities, personas) => {
   const roles = new Roles();
 
   roles.isMemberOf = async (group, id) => {
@@ -31,6 +31,21 @@ const authWrapper = groups => {
     } else {
       return groups.isMemberOf(group, id);
     }
+  };
+
+  roles.isMemberOfCommunity = async (community, id) => {
+    log.debug(`Checking if ${id} is a member of ${community}.`);
+    return communities.isMemberOf(community, id);
+  };
+
+  roles.isOwnerOfCommunity = async (community, id) => {
+    log.debug(`Checking if ${id} is an owner of ${community}.`);
+    return communities.isOwnerOf(community, id);
+  };
+
+  roles.isIdentityOf = async (persona, id) => {
+    log.debug(`Checking if ${id} is the identity of ${persona}.`);
+    return personas.isIdentityOf(persona, id);
   };
 
   roles.use('access private pages', ctx => {
@@ -53,6 +68,56 @@ const authWrapper = groups => {
     if (!ctx.isAuthenticated()) return false;
 
     return roles.isMemberOf('admins', ctx.state.user.orcid);
+  });
+
+  roles.use('edit this community', async ctx => {
+    log.debug('Checking if user can edit this community.');
+    if (!ctx.isAuthenticated()) return false;
+
+    const isAdmin = await roles.isMemberOf('admins', ctx.state.user.orcid);
+    if (isAdmin) return true;
+
+    console.log('ctx.state.community:', ctx.state.community);
+    console.log('ctx.state.user.orcid:', ctx.state.user.orcid);
+    if (ctx.state.community) {
+      return roles.isOwnerOfCommunity(
+        ctx.state.community,
+        ctx.state.user.orcid,
+      );
+    } else {
+      return false;
+    }
+  });
+
+  roles.use('edit this persona', async ctx => {
+    log.debug('Checking if user can edit this persona.');
+    if (!ctx.isAuthenticated()) return false;
+
+    const isAdmin = await roles.isMemberOf('admins', ctx.state.user.orcid);
+    if (isAdmin) return true;
+
+    if (ctx.state.persona) {
+      return roles.isIdentityOf(ctx.state.persona, ctx.state.user.orcid);
+    } else {
+      return false;
+    }
+  });
+
+  roles.use('edit this user', async ctx => {
+    log.debug('Checking if user can edit this user.');
+    if (!ctx.isAuthenticated()) return false;
+
+    const isAdmin = await roles.isMemberOf('admins', ctx.state.user.orcid);
+    if (isAdmin) return true;
+
+    if (ctx.state.identity) {
+      return (
+        ctx.state.user.uuid === ctx.state.identity ||
+        ctx.state.user.orcid === ctx.state.identity
+      );
+    } else {
+      return false;
+    }
   });
 
   return roles;

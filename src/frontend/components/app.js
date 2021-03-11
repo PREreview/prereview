@@ -134,9 +134,9 @@ export default function App({ user }) {
               <AdminRoute exact={true} path="/block">
                 <BlockPanel />
               </AdminRoute>
-              <AdminRoute exact={true} path="/community-settings/:id">
+              <Route exact={true} path="/community-settings/:id">
                 <CommunityPanel />
-              </AdminRoute>
+              </Route>
               <ModeratorRoute exact={true} path="/moderate">
                 <Suspense fallback={<SuspenseLoading>Loading</SuspenseLoading>}>
                   <Moderate />

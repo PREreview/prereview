@@ -1,15 +1,26 @@
 import router from 'koa-joi-router';
+import { QueryOrder } from '@mikro-orm/core';
 import { getLogger } from '../log.js';
 
 const log = getLogger('backend:controllers:rapidReview');
-// const Joi = router.Joi;
+const Joi = router.Joi;
 
-// eslint-disable-next-line no-unused-vars
+const querySchema = Joi.object({
+  limit: Joi.number()
+    .integer()
+    .greater(-1),
+  offset: Joi.number()
+    .integer()
+    .greater(-1),
+  asc: Joi.boolean(),
+  is_published: Joi.boolean(),
+});
+
 export default function controller(rapidReviews, preprints, thisUser) {
   const rapidRouter = router();
 
   const getHandler = async ctx => {
-    let all, pid, preprint; // fid = fullReview ID
+    let count, data, pid;
 
     if (ctx.params.pid) {
       pid = ctx.params.pid;
@@ -21,18 +32,61 @@ export default function controller(rapidReviews, preprints, thisUser) {
     }
 
     try {
-      if (pid) {
-        preprint = await preprints.findOneByUuidOrHandle(pid);
-        all = await rapidReviews.find({ preprint: preprint });
-      } else {
-        all = await rapidReviews.findAll();
+      const queries = [];
+      if (
+        ctx.query.is_published !== undefined &&
+        ctx.query.is_published !== null
+      ) {
+        queries.push({ isPublished: { $eq: ctx.query.is_published } });
       }
-    } catch (error) {
-      return ctx.throw(400, { message: error.message });
+
+      if (pid) {
+        queries.push({ preprint: { uuid: { $eq: pid } } });
+      }
+
+      const order = ctx.query.asc
+        ? QueryOrder.ASC_NULLS_LAST
+        : QueryOrder.DESC_NULLS_LAST;
+
+      if (queries.length > 0) {
+        let query;
+        if (queries.length > 1) {
+          query = { $and: queries };
+        } else {
+          query = queries[0];
+        }
+        log.debug('Querying rapid reviews:', query);
+        [data, count] = await rapidReviews.findAndCount(
+          query,
+          ['author', 'preprint'],
+          { createdAt: order },
+          ctx.query.limit,
+          ctx.query.offset,
+        );
+      } else {
+        data = await rapidReviews.findAll(
+          ['author', 'preprint'],
+          { createdAt: order },
+          ctx.query.limit,
+          ctx.query.offset,
+        );
+        count = await rapidReviews.count();
+      }
+    } catch (err) {
+      log.error('HTTP 400 Error: ', err);
+      ctx.throw(400, `Failed to parse query: ${err}`);
     }
 
-    ctx.body = { status: 200, message: 'ok', data: all };
-    ctx.status = 200;
+    if (!data || count <= 0) {
+      ctx.status = 204;
+    }
+
+    ctx.body = {
+      status: 200,
+      message: 'ok',
+      totalCount: count,
+      data: data,
+    };
   };
 
   rapidRouter.route({
@@ -43,8 +97,8 @@ export default function controller(rapidReviews, preprints, thisUser) {
       },
     },
     method: 'post',
-    path: '/rapidReviews',
-    pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
+    path: '/rapid-reviews',
+    pre: thisUser.can('access private pages'),
     // validate: {},
     handler: async ctx => {
       log.debug('Posting a rapid review.');
@@ -91,8 +145,10 @@ export default function controller(rapidReviews, preprints, thisUser) {
       },
     },
     method: 'get',
-    path: '/rapidReviews',
-    // validate: {},
+    path: '/rapid-reviews',
+    validate: {
+      query: querySchema,
+    },
     handler: getHandler,
   });
 
@@ -105,8 +161,10 @@ export default function controller(rapidReviews, preprints, thisUser) {
       },
     },
     method: 'get',
-    path: '/preprints/:pid/rapidReviews',
-    // validate: {},
+    path: '/preprints/:pid/rapid-reviews',
+    validate: {
+      query: querySchema,
+    },
     handler: getHandler,
   });
 
@@ -119,7 +177,7 @@ export default function controller(rapidReviews, preprints, thisUser) {
       },
     },
     method: 'get',
-    path: '/rapidReviews/:id',
+    path: '/rapid-reviews/:id',
     // pre: thisUser.can('access private pages'),
     // validate: {},
     handler: async ctx => {
@@ -162,8 +220,8 @@ export default function controller(rapidReviews, preprints, thisUser) {
       },
     },
     method: 'put',
-    path: '/rapidReviews/:id',
-    // pre: thisUser.can('access private pages'),
+    path: '/rapid-reviews/:id',
+    pre: thisUser.can('access admin pages'),
     // validate: {},
     handler: async ctx => {
       // if (ctx.invalid) {
@@ -201,8 +259,8 @@ export default function controller(rapidReviews, preprints, thisUser) {
       },
     },
     method: 'delete',
-    path: '/rapidReviews/:id',
-    pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next),
+    path: '/rapid-reviews/:id',
+    pre: thisUser.can('access admin pages'),
     // validate: {},
     handler: async ctx => {
       log.debug(`Updating rapid review ${ctx.params.id}`);

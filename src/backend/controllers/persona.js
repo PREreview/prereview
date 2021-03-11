@@ -119,7 +119,6 @@ export default function controller(personasModel, badgesModel, thisUser) {
 
         if (ctx.query.badges) {
           const badges = ctx.query.badges.split(',');
-          console.log('badges', badges);
           queries.push({ badges: { uuid: { $in: badges } } });
         }
 
@@ -176,7 +175,6 @@ export default function controller(personasModel, badgesModel, thisUser) {
     method: 'GET',
     path: '/personas/:id',
     // validate: {}
-    //pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
     handler: async ctx => {
       log.debug(`Retrieving persona ${ctx.params.id}.`);
       let persona;
@@ -232,7 +230,7 @@ export default function controller(personasModel, badgesModel, thisUser) {
       continueOnError: true,
       false: 400,
     },
-    // pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next), // TODO: can edit self only no?
+    pre: thisUser.can('edit this persona'),
     handler: async ctx => {
       if (ctx.invalid) {
         handleInvalid(ctx);
@@ -288,7 +286,7 @@ export default function controller(personasModel, badgesModel, thisUser) {
           .required(),
       },
     },
-    // pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next),
+    pre: thisUser.can('access admin pages'),
     handler: async ctx => {
       log.debug(`Adding badge ${ctx.params.uid} to persona ${ctx.params.id}.`);
       let persona, badge;
@@ -330,7 +328,7 @@ export default function controller(personasModel, badgesModel, thisUser) {
   personaRouter.route({
     method: 'DELETE',
     path: '/personas/:id/badges/:bid',
-    pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next),
+    pre: thisUser.can('access admin pages'),
     handler: async ctx => {
       log.debug(
         `Removing badge ${ctx.params.bid} from persona ${ctx.params.id}.`,

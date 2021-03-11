@@ -108,7 +108,6 @@ export default function controller(commentModel, fullReviewModel, thisUser) {
   commentsRouter.route({
     method: 'GET',
     path: '/comments',
-    pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
     validate: {
       query: querySchema,
     },
@@ -131,7 +130,6 @@ export default function controller(commentModel, fullReviewModel, thisUser) {
   commentsRouter.route({
     method: 'GET',
     path: '/fullReviews/:fid/comments',
-    pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
     validate: {
       query: querySchema,
     },
@@ -148,7 +146,7 @@ export default function controller(commentModel, fullReviewModel, thisUser) {
   commentsRouter.route({
     method: 'POST',
     path: '/fullReviews/:fid/comments',
-    pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
+    pre: thisUser.can('access private pages'),
     validate: {
       body: commentSchema,
       type: 'json',
@@ -167,7 +165,7 @@ export default function controller(commentModel, fullReviewModel, thisUser) {
   commentsRouter.route({
     method: 'GET',
     path: '/comments/:id',
-    pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
+    pre: thisUser.can('access private pages'),
     validate: {},
     handler: async ctx => {
       log.debug(`Retrieving comment ${ctx.params.id}.`);
@@ -203,7 +201,7 @@ export default function controller(commentModel, fullReviewModel, thisUser) {
   commentsRouter.route({
     method: 'PUT',
     path: '/comments/:id',
-    // pre: {},
+    pre: thisUser.can('access admin pages'),
     validate: {
       body: commentSchema,
       type: 'json',
@@ -247,7 +245,7 @@ export default function controller(commentModel, fullReviewModel, thisUser) {
   commentsRouter.route({
     method: 'DELETE',
     path: '/comments/:id',
-    pre: (ctx, next) => thisUser.can('access admin pages')(ctx, next),
+    pre: thisUser.can('access admin pages'),
     // validate: {},
     handler: async ctx => {
       log.debug(`Removing comment with ID ${ctx.params.id}`);

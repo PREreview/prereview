@@ -316,11 +316,11 @@ const ReviewReader = React.memo(function ReviewReader({
                         const reviewContent =
                           review.drafts[review.drafts.length - 1];
                         return (
-                          <div key={review.id}>
+                          <div key={review.uuid}>
                             <Accordion>
                               <AccordionSummary
-                                aria-controls={`review-content-${review.id}`}
-                                id={`review-header-${review.id}`}
+                                aria-controls={`review-content-${review.uuid}`}
+                                id={`review-header-${review.uuid}`}
                               >
                                 <Typography className={classes.h4}>
                                   {review.authors.length ? (
@@ -330,7 +330,7 @@ const ReviewReader = React.memo(function ReviewReader({
                                           .slice(0, 2)
                                           .map(author => (
                                             <span
-                                              key={author.id}
+                                              key={author.uuid}
                                               className="review-reader__header-author"
                                             >
                                               {author.defaultPersona
@@ -340,7 +340,7 @@ const ReviewReader = React.memo(function ReviewReader({
                                           ))
                                       ) : (
                                         <span
-                                          key={review.authors[0].id}
+                                          key={review.authors[0].uuid}
                                           className="review-reader__header-author"
                                         >
                                           {review.authors[0].defaultPersona
@@ -366,7 +366,7 @@ const ReviewReader = React.memo(function ReviewReader({
                                 <Box>
                                   <Typography
                                     component="div"
-                                    key={`content-${review.id}`}
+                                    key={`content-${review.uuid}`}
                                   >
                                     {ReactHtmlParser(
                                       reviewContent.contents
@@ -378,7 +378,7 @@ const ReviewReader = React.memo(function ReviewReader({
                                       component="button"
                                       className={classes.link}
                                       variant="body1"
-                                      aria-describedby={review.id}
+                                      aria-describedby={review.uuid}
                                       type="button"
                                       onClick={handleClick}
                                       color="secondary"
@@ -393,7 +393,7 @@ const ReviewReader = React.memo(function ReviewReader({
                                   >
                                     <Grid item>
                                       <Button
-                                        aria-describedby={review.id}
+                                        aria-describedby={review.uuid}
                                         type="button"
                                         onClick={handleClick}
                                         color="secondary"
@@ -433,7 +433,7 @@ const ReviewReader = React.memo(function ReviewReader({
                               {'New user review'}
                             </div>
                             <div className="">
-                              <span key={user.id}>by {user.name}</span>
+                              <span key={user.uuid}>by {user.name}</span>
                             </div>
                             <Typography component="div">
                               {ReactHtmlParser(review, options)}
@@ -451,12 +451,12 @@ const ReviewReader = React.memo(function ReviewReader({
           </Accordion>
         </div>
       ) : (
-        <div className="text-answers">
-          <div className="text-answers__question long">
-            No reviews yet. Would you like to leave one?
+          <div className="text-answers">
+            <div className="text-answers__question long">
+              There are no reviews on this preprint yet. To add your review, click on "Add Review(s)". To request reviews, click on "Add Request" in the menu above.          
+            </div>
           </div>
-        </div>
-      )}
+        )}
     </div>
   );
 });
