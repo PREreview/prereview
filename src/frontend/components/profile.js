@@ -72,6 +72,7 @@ const PersonaSwitch = withStyles(theme => ({
   checked: {},
   focusVisible: {},
 }))(({ classes, ...props }) => {
+  console.log("switch persona")
   return (
     <Switch
       focusVisibleClassName={classes.focusVisible}
@@ -106,12 +107,12 @@ export default function Profile() {
   const publicPersona = !thisUser ? null : thisUser.personas.filter(persona => !persona.isAnonymous)[0]
   const [persona, setPersona] = useState(thisUser ? thisUser.defaultPersona : {})
 
-  const { data: personaData, loading, error } = useGetPersona({
+  const { data: persona, loading, error } = useGetPersona({
     id: id,
-    resolve: personaData => personaData.data[0],
+    resolve: persona => persona.data[0],
   });
 
-  const [checked, setChecked] = useState(persona && persona.isAnonymous ? true : false)
+  const [checked, setChecked] = useState(true)
 
   const handleSwitch = () => {
     setChecked(!checked)
@@ -119,15 +120,7 @@ export default function Profile() {
     setUser({...thisUser, defaultPersona: checked ? anonPersona : publicPersona})
   }
 
-  useEffect(() => {
-    console.log("useEffect is happening", persona)
-    history.push(`/about/${persona.uuid}`);
-   if (!loading) {
-     setPersona(personaData)
-   }
-  }, [persona, checked])
-
-  if (!persona || loading || !personaData) {
+  if (!persona || loading) {
     return <Loading />;
   } else {
     return (
@@ -138,7 +131,7 @@ export default function Profile() {
           </title>
         </Helmet>
 
-        <HeaderBar thisUser={thisUser} closeGap />
+        {/* <HeaderBar thisUser={thisUser} closeGap /> */}
 
         <Box my={10}>
           <Container>
@@ -200,7 +193,7 @@ export default function Profile() {
                           <Link
                             href={`https://orcid.org/${persona.identity.orcid}`}
                           >
-                            ORCHID {persona.identity.orcid}
+                            ORCiD: {persona.identity.orcid}
                           </Link>
                         </Typography>
                         <Typography component="div" variant="body1" gutterBottom>
@@ -271,7 +264,7 @@ export default function Profile() {
                 <Typography component="h2" variant="h6" gutterBottom>
                   PREreview Contributions
                 </Typography>
-                <RoleActivity persona={personaData} />
+                {/* <RoleActivity persona={persona} /> */}
                 <Typography component="h2" variant="h6" gutterBottom>
                   List of Publications
                 </Typography>
