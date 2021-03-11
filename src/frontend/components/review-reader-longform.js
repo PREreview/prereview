@@ -147,7 +147,7 @@ const LongformReviewReader = props => {
 
   useEffect(() => {
     if (anchorEl) {
-      setButtonRefId(parseInt(anchorEl.getAttribute('aria-describedby')));
+      setButtonRefId(anchorEl.getAttribute('aria-describedby'));
     }
   }, [anchorEl, content, commentTitle, publishedComment]);
 
