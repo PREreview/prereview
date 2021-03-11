@@ -6,7 +6,6 @@ import ReactCardFlip from 'react-card-flip';
 import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
-import { TwitterTimelineEmbed } from 'react-twitter-embed';
 
 // hooks
 import {
@@ -36,6 +35,7 @@ import Link from '@material-ui/core/Link';
 import Typography from '@material-ui/core/Typography';
 
 // components
+import Footer from './footer';
 import HeaderBar from './header-bar';
 import SearchBar from './search-bar';
 import WelcomeModal from './welcome-modal';
@@ -53,9 +53,6 @@ import ElifeImg from '../assets/images/sponsors/elife.jpg';
 import IOIImg from '../assets/images/sponsors/ioi.png';
 import MozillaImg from '../assets/images/sponsors/mozilla.png';
 import WellcomeImg from '../assets/images/sponsors/wellcome.jpg';
-
-// site logo
-import PreReviewLogo from './pre-review-logo';
 
 // constants
 import { ORG } from '../constants';
@@ -130,15 +127,6 @@ const useStyles = makeStyles(theme => ({
     fontWeight: 'bold',
     marginBottom: '1.5rem',
     textAlign: 'center',
-  },
-  footerNav: {
-    height: 200,
-    marginBottom: '2rem',
-    marginTop: '2rem',
-  },
-  footerNavItem: {
-    color: '#000 !important', // #FIXME remove after porting to MUI
-    fontSize: '1.25rem',
   },
   gridTitle: {
     color: '#54948E',
@@ -287,7 +275,7 @@ export default function Home() {
                 params.delete('search');
                 setSearch('');
                 history.push({
-                  pathname: '/search', //#FIXME pagename?
+                  pathname: '/reviews',
                   search: params.toString(),
                 });
               }}
@@ -723,167 +711,7 @@ export default function Home() {
           </Slider>
         </Container>
       </Box>
-      <Box>
-        <Grid container>
-          <Grid item xs={12} md={4}>
-            <Box p={3} borderTop="1px solid #54948E">
-              <Link to="/" href={'https://prereview.org'}>
-                <PreReviewLogo />
-              </Link>
-              <Grid
-                container
-                direction="column"
-                spacing={2}
-                justify="space-between"
-                className={classes.footerNav}
-              >
-                <Grid item>
-                  <Link
-                    className={classes.footerNavItem}
-                    href="https://content.prereview.org/about/"
-                  >
-                    About
-                  </Link>
-                </Grid>
-                <Grid item>
-                  <Link className={classes.footerNavItem} href="#FIXME">
-                    Team
-                  </Link>
-                </Grid>
-                <Grid item>
-                  <Link
-                    className={classes.footerNavItem}
-                    color="textPrimary"
-                    href="https://content.prereview.org/blog"
-                  >
-                    Blog
-                  </Link>
-                </Grid>
-                <Grid item>
-                  <Link
-                    className={classes.footerNavItem}
-                    color="textPrimary"
-                    href="https://codeforscience.org/donate/prereview/"
-                  >
-                    Donate
-                  </Link>
-                </Grid>
-                <Grid item>
-                  <Link
-                    className={classes.footerNavItem}
-                    color="textPrimary"
-                    href="https://content.prereview.org/contact"
-                  >
-                    Contact
-                  </Link>
-                </Grid>
-                <Grid item>
-                  <Link
-                    className={classes.footerNavItem}
-                    color="textPrimary"
-                    href="https://content.prereview.org/coc"
-                  >
-                    Code of Conduct
-                  </Link>
-                </Grid>
-                <Grid item>
-                  <Link
-                    className={classes.footerNavItem}
-                    color="textPrimary"
-                    href="#FIXME"
-                  >
-                    Privacy Policy
-                  </Link>
-                </Grid>
-                <Grid item>
-                  <Link
-                    className={classes.footerNavItem}
-                    color="textPrimary"
-                    href="#FIXME"
-                  >
-                    Terms
-                  </Link>
-                </Grid>
-                <Grid item>
-                  <Link
-                    className={classes.footerNavItem}
-                    color="textPrimary"
-                    href="/api/docs"
-                  >
-                    API
-                  </Link>
-                </Grid>
-                <Grid item>
-                  <Link
-                    className={classes.footerNavItem}
-                    color="textPrimary"
-                    href="https://github.com/PREreview/"
-                  >
-                    GitHub
-                  </Link>
-                </Grid>
-              </Grid>
-              <Grid
-                container
-                direction="column"
-                spacing={2}
-                className={classes.footerNav}
-              >
-                <Grid item>
-                  <Link className={classes.footerNavItem} href="/reviews">
-                    Preprint Review Platform
-                  </Link>
-                </Grid>
-                <Grid item>
-                  <Link className={classes.footerNavItem} href="#FIXME">
-                    Programs
-                  </Link>
-                </Grid>
-                <Grid item>
-                  <Link
-                    className={classes.footerNavItem}
-                    href="https://content.prereview.org/resources"
-                  >
-                    Resources
-                  </Link>
-                </Grid>
-              </Grid>
-              <Box borderTop="1px solid #000" mt={2} pt={2}>
-                <Typography>
-                  <em>
-                    This content is available under a Creative Commons
-                    Attribution License.
-                  </em>
-                </Typography>
-              </Box>
-            </Box>
-          </Grid>
-          <Grid item xs={12} md={4}>
-            <TwitterTimelineEmbed
-              sourceType="profile"
-              screenName="PREreview_"
-              options={{ height: 600 }}
-            />
-          </Grid>
-          <Grid item xs={12} md={4}>
-            <Box bgcolor="#54948E" color="#fff" p={8} height="80%">
-              <Typography variant="h4" component="h2" gutterBottom>
-                Stay Connected.
-              </Typography>
-              {/* FIXME need sign up for embed*/}
-              <img src="http://satyr.io/400x60/white" className={classes.img} />
-              <Typography variant="h5" component="div">
-                <em>
-                  By providing your email address, you are opting in to receive
-                  communications about PREreview. All data is subject to the
-                  PREreview privacy policy. Please contact contact@prereview.org
-                  with any questions.
-                </em>
-              </Typography>
-            </Box>
-          </Grid>
-        </Grid>
-      </Box>
+      <Footer />
     </Box>
   );
 }
