@@ -1,8 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import PreReviewLogo from './pre-review-logo';
-import UserBadge from './user-badge';
-import NoticeBadge from './notice-badge';
 
 // material-ui
 import { makeStyles } from '@material-ui/core/styles';
@@ -16,9 +13,12 @@ import MenuItem from '@material-ui/core/MenuItem';
 
 // components
 import Banner from './banner';
+import NoticeBadge from './notice-badge';
+import UserBadge from './user-badge';
 
 // icons
 import MenuIcon from '@material-ui/icons/Menu';
+import PreReviewLogo from './pre-review-logo';
 
 const useStyles = makeStyles(theme => ({
   content: {
@@ -273,7 +273,7 @@ export default function HeaderBar({ thisUser }) {
             <Link
               className={classes.navItem}
               color="textPrimary"
-              href="https://content.prereview.org"
+              href="https://content.prereview.org/blog"
             >
               Blog
             </Link>

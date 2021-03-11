@@ -223,6 +223,7 @@
     "react-quilljs": "^1.2.12",
     "react-router-dom": "^5.1.2",
     "react-slick": "^0.28.1",
+    "react-twitter-embed": "^3.0.3",
     "reflect-metadata": "^0.1.13",
     "remirror": "^1.0.0-next.58",
     "request-promise-native": "^1.0.8",
