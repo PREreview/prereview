@@ -3,9 +3,13 @@ import React, { useContext, useState } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 
-// Material UI
+// Material UI imports
+import Box from '@material-ui/core/Box';
+import Container from '@material-ui/core/Container';
+import Grid from '@material-ui/core/Grid';
 import Link from '@material-ui/core/Link';
 import Pagination from '@material-ui/lab/Pagination';
+import Typography from '@material-ui/core/Typography';
 
 // contexts
 import UserProvider from '../contexts/user-context';
@@ -25,7 +29,7 @@ import { processParams, searchParamsToObject } from '../utils/search';
 
 // components
 import AddButton from './add-button';
-import Banner from './banner';
+import Footer from './footer';
 import HeaderBar from './header-bar';
 import Loading from './loading';
 import LoginRequiredModal from './login-required-modal';
@@ -40,7 +44,7 @@ import WelcomeModal from './welcome-modal';
 // constants
 import { ORG } from '../constants';
 
-export default function Home() {
+export default function Reviews() {
   const history = useHistory();
   const location = useLocation();
   const params = processParams(location.search);
@@ -101,9 +105,8 @@ export default function Home() {
     return (
       <div className="home">
         <Helmet>
-          <title>Home • {ORG}</title>
+          <title>Reviews • {ORG}</title>
         </Helmet>
-        <Banner />
 
         {!!((isNewVisitor || params.get('welcome')) && isWelcomeModalOpen) && (
           <WelcomeModal
@@ -119,92 +122,99 @@ export default function Home() {
           }}
         />
 
-        <div className="fixed__search-bar">
-          <SearchBar
-            defaultValue={search}
-            isFetching={loadingPreprints}
-            onChange={value => {
-              params.delete('page');
-              setSearch(value);
-            }}
-            onCancelSearch={() => {
-              params.delete('search');
-              setSearch('');
-              history.push({
-                pathname: location.pathame,
-                search: params.toString(),
-              });
-            }}
-            onRequestSearch={() => {
-              params.set('search', search);
-              params.delete('page');
-              history.push({
-                pathname: location.pathame,
-                search: params.toString(),
-              });
-            }}
-          />
-        </div>
-
-        <div className="home__main">
-          <div className="home__content">
-            <div className="home__content-header">
-              <h3 className="home__content-title">
-                Preprints with reviews or requests for reviews
-              </h3>
-              <AddButton
-                onClick={() => {
-                  if (thisUser) {
-                    history.push('/new');
-                  } else {
-                    setLoginModalOpenNext('/new');
-                  }
-                }}
-                disabled={location.pathname === '/new'}
-              />
-            </div>
-
-            <PrivateRoute path="/new" exact={true}>
-              <Modal
-                showCloseButton={true}
-                title="Add Entry"
-                onClose={() => {
-                  history.push('/');
-                }}
+        <Box py={8}>
+          <Container>
+            <SearchBar
+              defaultValue={search}
+              isFetching={loadingPreprints}
+              onChange={value => {
+                params.delete('page');
+                setSearch(value);
+              }}
+              onCancelSearch={() => {
+                params.delete('search');
+                setSearch('');
+                history.push({
+                  pathname: location.pathame,
+                  search: params.toString(),
+                });
+              }}
+              onRequestSearch={() => {
+                params.set('search', search);
+                params.delete('page');
+                history.push({
+                  pathname: location.pathame,
+                  search: params.toString(),
+                });
+              }}
+            />
+            <Box my={4}>
+              <Grid
+                container
+                alignItems="center"
+                justify="space-between"
+                spacing={2}
               >
-                <Helmet>
-                  <title>Rapid PREreview • Add entry</title>
-                </Helmet>
-                <NewPreprint
-                  user={thisUser}
-                  onCancel={() => {
-                    history.push('/');
-                  }}
-                  onSuccess={preprint => {
-                    history.push('/');
-                    setNewPreprints(newPreprints.concat(preprint));
-                  }}
-                  onViewInContext={({ preprint, tab }) => {
-                    history.push(
-                      `/preprints/${createPreprintId(preprint.handle)}`,
-                      {
-                        preprint: preprint,
-                        tab,
-                      },
-                    );
-                  }}
-                />
-              </Modal>
-            </PrivateRoute>
+                <Grid item>
+                  <Typography component="h2" variant="h5">
+                    Preprints with reviews or requests for reviews
+                  </Typography>
+                </Grid>
+                <Grid item>
+                  <AddButton
+                    onClick={() => {
+                      if (thisUser) {
+                        history.push('/new');
+                      } else {
+                        setLoginModalOpenNext('/new');
+                      }
+                    }}
+                    disabled={location.pathname === '/new'}
+                  />
+                  <PrivateRoute path="/new" exact={true}>
+                    <Modal
+                      showCloseButton={true}
+                      title="Add Entry"
+                      onClose={() => {
+                        history.push('/');
+                      }}
+                    >
+                      <Helmet>
+                        <title>Rapid PREreview • Add entry</title>
+                      </Helmet>
+                      <NewPreprint
+                        user={thisUser}
+                        onCancel={() => {
+                          history.push('/');
+                        }}
+                        onSuccess={preprint => {
+                          history.push('/');
+                          setNewPreprints(newPreprints.concat(preprint));
+                        }}
+                        onViewInContext={({ preprint, tab }) => {
+                          history.push(
+                            `/preprints/${createPreprintId(preprint.handle)}`,
+                            {
+                              preprint: preprint,
+                              tab,
+                            },
+                          );
+                        }}
+                      />
+                    </Modal>
+                  </PrivateRoute>
+                  {loginModalOpenNext && (
+                    <LoginRequiredModal
+                      next={loginModalOpenNext}
+                      onClose={() => {
+                        setLoginModalOpenNext(null);
+                      }}
+                    />
+                  )}
+                </Grid>
+              </Grid>
+            </Box>
 
-            {loginModalOpenNext && (
-              <LoginRequiredModal
-                next={loginModalOpenNext}
-                onClose={() => {
-                  setLoginModalOpenNext(null);
-                }}
-              />
-            )}
             {preprints && preprints.totalCount > 0 && !loadingPreprints && (
               <SortOptions
                 sort={params.get('sort') || ''}
@@ -246,6 +256,7 @@ export default function Home() {
                 ))}
               </ul>
             )}
+
             {!preprints ||
             (preprints && preprints.totalCount <= 0 && !loadingPreprints) ? (
               <div>
@@ -300,8 +311,9 @@ export default function Home() {
                 />
               </div>
             )}
-          </div>
-        </div>
+          </Container>
+        </Box>
+        <Footer />
       </div>
     );
   }

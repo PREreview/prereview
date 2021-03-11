@@ -215,7 +215,8 @@ export default function Home() {
     dots: true,
   };
 
-  useEffect(() => {}, [isFlipped]);
+
+  useEffect(() => {}, [isFlipped, search]);
 
   return (
     <Box className={classes.home}>
@@ -276,14 +277,14 @@ export default function Home() {
                 setSearch('');
                 history.push({
                   pathname: '/reviews',
-                  search: params.toString(),
+                  search: `${params.toString()}&search=${search}`,
                 });
               }}
               onRequestSearch={() => {
                 params.set('search', search);
                 params.delete('page');
                 history.push({
-                  pathname: '/search', //#FIXME pagename?
+                  pathname: '/reviews',
                   search: params.toString(),
                 });
               }}

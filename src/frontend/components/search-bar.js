@@ -7,10 +7,11 @@ import { makeStyles } from '@material-ui/core/styles';
 import Box from '@material-ui/core/Box';
 import MuiSearchBar from 'material-ui-search-bar';
 
-const useStyles = makeStyles(theme => ({
-  searchbar: {
+// material ui icons
+import SearchIcon from '@material-ui/icons/Search';
 
-  },
+const useStyles = makeStyles(theme => ({
+  searchbar: {},
   searchbarInner: {
     borderRadius: '50%',
   },
@@ -30,6 +31,7 @@ export default function SearchBar({
       <Box className={classes.searchbarInner}>
         <MuiSearchBar
           value={defaultValue}
+          closeIcon={<SearchIcon style={{ color: '#000' }} />}
           onChange={value => onChange(value)}
           onCancelSearch={onCancelSearch}
           onRequestSearch={onRequestSearch}
