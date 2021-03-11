@@ -1,49 +1,92 @@
 import router from 'koa-joi-router';
+import { QueryOrder } from '@mikro-orm/core';
 import { getLogger } from '../log.js';
 
 const log = getLogger('backend:controllers:rapidReview');
-// const Joi = router.Joi;
+const Joi = router.Joi;
 
-// eslint-disable-next-line no-unused-vars
+const querySchema = Joi.object({
+  limit: Joi.number()
+    .integer()
+    .greater(-1),
+  offset: Joi.number()
+    .integer()
+    .greater(-1),
+  asc: Joi.boolean(),
+  is_published: Joi.boolean(),
+});
+
 export default function controller(rapidReviews, preprints, thisUser) {
   const rapidRouter = router();
 
   const getHandler = async ctx => {
-    let data, id, pid, preprint; // fid = fullReview ID
+    let count, data, pid;
 
     if (ctx.params.pid) {
       pid = ctx.params.pid;
       log.debug(
         `Retrieving rapid reviews associated with preprint ${ctx.params.pid}`,
       );
-    } else if (ctx.params.id) {
-      id = ctx.params.id;
-      log.debug(`Retrieving rapid review ${ctx.params.id}`);
     } else {
       log.debug(`Retrieving all rapid reviews.`);
     }
 
     try {
-      if (pid) {
-        preprint = await preprints.findOneByUuidOrHandle(pid);
-        data = await rapidReviews.find({ preprint: preprint }, ['preprint']);
-      } else if (id) {
-        data = await rapidReviews.findOne({ uuid: id }, ['preprint']);
-      } else {
-        data = await rapidReviews.findAll(['preprint']);
+      const queries = [];
+      if (
+        ctx.query.is_published !== undefined &&
+        ctx.query.is_published !== null
+      ) {
+        queries.push({ isPublished: { $eq: ctx.query.is_published } });
       }
-    } catch (error) {
-      log.error('HTTP 400 Error: ', error);
-      return ctx.throw(400, { message: error.message });
+
+      if (pid) {
+        queries.push({ preprint: { uuid: { $eq: pid } } });
+      }
+
+      const order = ctx.query.asc
+        ? QueryOrder.ASC_NULLS_LAST
+        : QueryOrder.DESC_NULLS_LAST;
+
+      if (queries.length > 0) {
+        let query;
+        if (queries.length > 1) {
+          query = { $and: queries };
+        } else {
+          query = queries[0];
+        }
+        log.debug('Querying rapid reviews:', query);
+        [data, count] = await rapidReviews.findAndCount(
+          query,
+          ['author', 'preprint'],
+          { createdAt: order },
+          ctx.query.limit,
+          ctx.query.offset,
+        );
+      } else {
+        data = await rapidReviews.findAll(
+          ['author', 'preprint'],
+          { createdAt: order },
+          ctx.query.limit,
+          ctx.query.offset,
+        );
+        count = await rapidReviews.count();
+      }
+    } catch (err) {
+      log.error('HTTP 400 Error: ', err);
+      ctx.throw(400, `Failed to parse query: ${err}`);
     }
 
-    if (id && !data) {
-      log.error(`HTTP 404 Error: No Rapid Review with id ${id}`);
-      return ctx.throw(404, `No Rapid Review with id ${id}.`);
+    if (!data || count <= 0) {
+      ctx.status = 204;
     }
 
-    ctx.body = { data };
-    ctx.status = 200;
+    ctx.body = {
+      status: 200,
+      message: 'ok',
+      totalCount: count,
+      data: data,
+    };
   };
 
   rapidRouter.route({
@@ -103,7 +146,9 @@ export default function controller(rapidReviews, preprints, thisUser) {
     },
     method: 'get',
     path: '/rapid-reviews',
-    // validate: {},
+    validate: {
+      query: querySchema,
+    },
     handler: getHandler,
   });
 
@@ -117,7 +162,9 @@ export default function controller(rapidReviews, preprints, thisUser) {
     },
     method: 'get',
     path: '/preprints/:pid/rapid-reviews',
-    // validate: {},
+    validate: {
+      query: querySchema,
+    },
     handler: getHandler,
   });
 
