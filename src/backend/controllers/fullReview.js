@@ -1,12 +1,19 @@
 import router from 'koa-joi-router';
+import { QueryOrder } from '@mikro-orm/core';
 import { getLogger } from '../log.js';
 import generateDOI from '../utils/generateDOI.js';
 
 const log = getLogger('backend:controllers:fullReviews');
 const Joi = router.Joi;
 
-// eslint-disable-next-line no-unused-vars
 const querySchema = Joi.object({
+  limit: Joi.number()
+    .integer()
+    .greater(-1),
+  offset: Joi.number()
+    .integer()
+    .greater(-1),
+  asc: Joi.boolean(),
   is_published: Joi.boolean(),
   can_edit: Joi.string(),
 });
@@ -24,7 +31,7 @@ export default function controller(
 
   // handler for GET multiple reviews methods
   const getHandler = async ctx => {
-    let allReviews, pid; // fid = fullReview ID
+    let allReviews, count, pid; // fid = fullReview ID
 
     if (ctx.params.pid) {
       pid = ctx.params.pid;
@@ -58,6 +65,10 @@ export default function controller(
         queries.push({ preprint: { uuid: { $eq: pid } } });
       }
 
+      const order = ctx.query.asc
+        ? QueryOrder.ASC_NULLS_LAST
+        : QueryOrder.DESC_NULLS_LAST;
+
       if (queries.length > 0) {
         let query;
         if (queries.length > 1) {
@@ -66,32 +77,37 @@ export default function controller(
           query = queries[0];
         }
         log.debug('Querying preprints:', query);
-        allReviews = await reviewModel.find(query, [
-          'authors',
-          'comments',
-          'drafts',
-          'statements',
-        ]);
+        [allReviews, count] = await reviewModel.findAndCount(
+          query,
+          ['authors', 'comments', 'drafts', 'preprint', 'statements'],
+          { updatedAt: order },
+          ctx.query.limit,
+          ctx.query.offset,
+        );
       } else {
-        allReviews = await reviewModel.findAll([
-          'authors',
-          'comments',
-          'drafts',
-          'preprint',
-          'statements',
-        ]);
+        allReviews = await reviewModel.findAll(
+          ['authors', 'comments', 'drafts', 'preprint', 'statements'],
+          { updatedAt: order },
+          ctx.query.limit,
+          ctx.query.offset,
+        );
+        count = await reviewModel.count();
       }
     } catch (err) {
       log.error('HTTP 400 Error: ', err);
       ctx.throw(400, `Failed to parse query: ${err}`);
     }
 
+    if (!allReviews || count <= 0) {
+      ctx.status = 204;
+    }
+
     ctx.body = {
       status: 200,
       message: 'ok',
+      totalCount: count,
       data: allReviews,
     };
-    ctx.status = 200;
   };
 
   const postHandler = async ctx => {
@@ -216,6 +232,9 @@ export default function controller(
   reviewsRouter.route({
     method: 'GET',
     path: '/preprints/:pid/full-reviews',
+    validate: {
+      query: querySchema,
+    },
     handler: async ctx => getHandler(ctx),
     meta: {
       swagger: {
