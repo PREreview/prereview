@@ -112,78 +112,68 @@ export default function App({ user }) {
                   </ToCPage>
                 </Route>
 
-               <Route exact={true} path="/personas">
-                <PersonaSearch />
-              </Route>
-              <Route exact={true} path="/about/:id">
-                <Profile />
-              </Route>
-              <Route exact={true} path="/extension">
-                <ExtensionSplash />
-              </Route>
-              <PrivateRoute exact={true} path="/settings">
-                <Settings />
-              </PrivateRoute>
-              <AdminRoute exact={true} path="/admin">
-                <AdminPanel />
-              </AdminRoute>
-              <AdminRoute exact={true} path="/block">
-                <BlockPanel />
-              </AdminRoute>
-              <Route exact={true} path="/community-settings/:id">
-                <CommunityPanel />
-              </Route>
-              <ModeratorRoute exact={true} path="/moderate">
-                <Suspense fallback={<SuspenseLoading>Loading</SuspenseLoading>}>
-                  <Moderate />
-                </Suspense>
-              </ModeratorRoute>
-              <Route
-                exact={true}
-                path="/preprints/:id"
-              >
-                <ExtensionFallback />
-              </Route>
-              <Route
-                exact={true}
-                path="/communities/"
-                >
-                <Communities />
-              </Route>
-              <Route
-                exact={true}
-                path="/communities/:id"
-                >
-                <Community />
-              </Route>
+                <Route exact={true} path="/personas">
+                  <PersonaSearch />
+                </Route>
+                <Route exact={true} path="/about/:id">
+                  <Profile />
+                </Route>
+                <Route exact={true} path="/extension">
+                  <ExtensionSplash />
+                </Route>
+                <PrivateRoute exact={true} path="/settings">
+                  <Settings />
+                </PrivateRoute>
+                <AdminRoute exact={true} path="/admin">
+                  <AdminPanel />
+                </AdminRoute>
+                <AdminRoute exact={true} path="/block">
+                  <BlockPanel />
+                </AdminRoute>
+                <Route exact={true} path="/community-settings/:id">
+                  <CommunityPanel />
+                </Route>
+                <ModeratorRoute exact={true} path="/moderate">
+                  <Suspense
+                    fallback={<SuspenseLoading>Loading</SuspenseLoading>}
+                  >
+                    <Moderate />
+                  </Suspense>
+                </ModeratorRoute>
+                <Route exact={true} path="/preprints/:id">
+                  <ExtensionFallback />
+                </Route>
+                <Route exact={true} path="/communities/">
+                  <Communities />
+                </Route>
+                <Route exact={true} path="/communities/:id">
+                  <Community />
+                </Route>
 
-              <Route
-                exact={true}
-                path="/events/:id"
-                >
-                <Event />
-              </Route>
+                <Route exact={true} path="/events/:id">
+                  <Event />
+                </Route>
 
-              <Route
-                exact={true}
-                path="/preprints/:id/reviews/:cid?"
-              >
-                <ExtensionFallback />
-              </Route>
-              <Route
-                exact={true}
-                path="/validate/:token"
-                >
-                <Validate />
-              </Route>
+                <Route exact={true} path="/preprints/:id/drafts/:cid?">
+                  <ExtensionFallback />
+                </Route>
+                <Route exact={true} path="/preprints/:id/full-reviews/:cid">
+                  <ExtensionFallback />
+                </Route>
+                <Route exact={true} path="/preprints/:id/rapid-reviews/:cid">
+                  <ExtensionFallback />
+                </Route>
+                <Route exact={true} path="/validate/:token">
+                  <Validate />
+                </Route>
 
-              <Route>
-                <NotFound />
-              </Route>
-            </Switch>
-          </UserProvider>
-        </StoresProvider>
-      </DndProvider>
+                <Route>
+                  <NotFound />
+                </Route>
+              </Switch>
+            </UserProvider>
+          </StoresProvider>
+        </DndProvider>
       </IntlProvider>
     </HelmetProvider>
   );

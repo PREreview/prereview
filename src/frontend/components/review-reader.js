@@ -136,6 +136,7 @@ const ReviewReader = React.memo(function ReviewReader({
   // expand/collapse longform reviews
   const [anchorEl, setAnchorEl] = React.useState(null);
   const handleClick = event => {
+    console.log("event at handleClick of Read more", event)
     setAnchorEl(anchorEl ? null : event.currentTarget);
   };
 

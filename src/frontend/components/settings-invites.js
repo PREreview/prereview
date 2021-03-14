@@ -208,7 +208,7 @@ export default function SettingsInvites({ user }) {
                 <TableBody>
                   {reviews.map(review => (
                     <Link
-                      href={`/preprints/${review.preprint.uuid}/reviews/${review.uuid}`}
+                      href={`/preprints/${review.preprint.uuid}/drafts/${review.uuid}`}
                       target="_blank"
                       rel="noreferrer"
                       key={review.uuid}
