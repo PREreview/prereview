@@ -17,7 +17,7 @@ const HIGHLIGHTED_ROLE_TYPE = Symbol('dnd:highlighted-role-type');
  * Note: this is also a drop zone for the `HighlightedRoles`
  * so that dragged role can be dragged back
  */
-export function RapidReviewers({
+export function PotentialRoles({
   user,
   allReviews,
   onRemoved,
@@ -63,6 +63,28 @@ export function RapidReviewers({
 
   useEffect(() => {}), [authors];
 
+  // const filteredReviews = reviews.filter((review, index, reviews) => {
+  //   if (review.author) {
+  //     return (
+  //       index ===
+  //       reviews.findIndex(r => {
+  //         if (r.author) {
+  //           if (r.author.identity.defaultPersona) {
+  //             return r.author.identity.defaultPersona.id === review.author.id;
+  //           } else {
+  //             return r.author.identity.id === review.author.id;
+  //           }
+  //         }
+  //       })
+  //     );
+  //   } else if (review.authors) {
+  //     review.authors.filter((author, i, authors) => {
+  //       i === authors.findIndex(a => a.id === author.id);
+  //     });
+  //   }
+  //   return review;
+  // });
+
   return (
     <div
       className={classNames('role-list role-list--potential', {
@@ -105,7 +127,7 @@ export function RapidReviewers({
   );
 }
 
-RapidReviewers.propTypes = {
+PotentialRoles.propTypes = {
   user: PropTypes.object,
   allReviews: PropTypes.array.isRequired,
   onModerate: PropTypes.func,

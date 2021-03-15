@@ -24,7 +24,7 @@ import { getYesNoStats } from '../utils/stats';
 import Barplot from './barplot';
 import LongformReviewReader from './review-reader-longform';
 import MuiButton from '@material-ui/core/Button';
-import { PotentialRoles } from './role-list';
+import { RapidReviewers } from './role-list';
 import ReportButton from './report-button';
 import ShareMenu from './share-menu';
 import TextAnswers from './text-answers';
@@ -230,8 +230,7 @@ const ReviewReader = React.memo(function ReviewReader({
                     Reviewers
                   </Typography>
                   <div className="review-reader__persona-selector">
-                    <PotentialRoles
-                      role={role}
+                    <RapidReviewers
                       allReviews={allRapidReviews}
                       hasReviewed={rapidContent}
                       user={user}
@@ -290,7 +289,7 @@ const ReviewReader = React.memo(function ReviewReader({
                     Reviewers
                   </Typography>
                   <div className="review-reader__persona-selector">
-                    <PotentialRoles
+                    <RapidReviewers
                       role={role}
                       allReviews={publishedReviews}
                       hasReviewed={longContent && longContent.length}
@@ -415,7 +414,10 @@ const ReviewReader = React.memo(function ReviewReader({
                                       />
                                     </Grid>
                                     <Grid item>
-                                      <ReportButton uuid={review.uuid} type="fullReview" />
+                                      <ReportButton
+                                        uuid={review.uuid}
+                                        type="fullReview"
+                                      />
                                     </Grid>
                                   </Grid>
                                 </Box>
@@ -454,7 +456,7 @@ const ReviewReader = React.memo(function ReviewReader({
       ) : (
           <div className="text-answers">
             <div className="text-answers__question long">
-              There are no reviews on this preprint yet. To add your review, click on "Add Review(s)". To request reviews, click on "Add Request" in the menu above.          
+              There are no reviews on this preprint yet. To add your review, click on "Add Review(s)". To request reviews, click on "Add Request" in the menu above.
             </div>
           </div>
         )}
