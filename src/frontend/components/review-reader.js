@@ -24,7 +24,7 @@ import { getYesNoStats } from '../utils/stats';
 import Barplot from './barplot';
 import LongformReviewReader from './review-reader-longform';
 import MuiButton from '@material-ui/core/Button';
-import { RapidReviewers } from './role-list';
+import { Reviewers } from './role-list';
 import ReportButton from './report-button';
 import ShareMenu from './share-menu';
 import TextAnswers from './text-answers';
@@ -230,7 +230,7 @@ const ReviewReader = React.memo(function ReviewReader({
                     Reviewers
                   </Typography>
                   <div className="review-reader__persona-selector">
-                    <RapidReviewers
+                    <Reviewers
                       allReviews={allRapidReviews}
                       hasReviewed={rapidContent}
                       user={user}
@@ -289,7 +289,7 @@ const ReviewReader = React.memo(function ReviewReader({
                     Reviewers
                   </Typography>
                   <div className="review-reader__persona-selector">
-                    <RapidReviewers
+                    <Reviewers
                       role={role}
                       allReviews={publishedReviews}
                       hasReviewed={longContent && longContent.length}

@@ -14,14 +14,11 @@ import Popover from '@material-ui/core/Popover';
 import NoticeBadge from './notice-badge';
 import XLink from './xlink';
 
-// icons
-import { MdPerson } from 'react-icons/md';
-
 const Avatar = withStyles({
   root: {
     height: 28,
     width: 28,
-  }
+  },
 })(MuiAvatar);
 
 const useStyles = makeStyles(theme => ({
@@ -36,7 +33,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const RoleBadge = React.forwardRef(function RoleBadge(
-  { children, className, tooltip, showNotice, disabled, user },
+  { children, className, tooltip, showNotice, user },
   ref,
 ) {
   return (
@@ -46,7 +43,6 @@ const RoleBadge = React.forwardRef(function RoleBadge(
       user={user}
       className={className}
       showNotice={showNotice}
-      disabled={disabled}
     >
       {children}
     </RoleBadgeUI>
@@ -54,12 +50,11 @@ const RoleBadge = React.forwardRef(function RoleBadge(
 });
 
 RoleBadge.propTypes = {
-  tooltip: PropTypes.bool,
-  user: PropTypes.object.isRequired,
   children: PropTypes.any,
   className: PropTypes.string,
   showNotice: PropTypes.bool,
-  disabled: PropTypes.bool,
+  tooltip: PropTypes.bool,
+  user: PropTypes.object.isRequired,
 };
 
 export default RoleBadge;
@@ -68,11 +63,10 @@ export default RoleBadge;
  * Non hooked version (handy for story book and `UserBadge`)
  */
 const RoleBadgeUI = React.forwardRef(function RoleBadgeUI(
-  { user, className, children, tooltip, showNotice = false, disabled = false },
+  { user, className, children, tooltip, showNotice = false },
   ref,
 ) {
-
-// ****  USER IN THIS COMPONENT IS ACTUALLY A PERSONA OBJECT **** //
+  // ****  USER IN THIS COMPONENT IS ACTUALLY A PERSONA OBJECT **** //
 
   const classes = useStyles();
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -124,6 +118,22 @@ const RoleBadgeUI = React.forwardRef(function RoleBadgeUI(
         className={classes.popover}
       >
         <div className={classes.popoverInner}>
+          {user.reviewUuid ? (
+            <XLink
+              className="menu__list__link-item"
+              href={`/reviews/${user.reviewUuid}`}
+              target={process.env.IS_EXTENSION ? '_blank' : undefined}
+              to={
+                process.env.IS_EXTENSION
+                  ? undefined
+                  : `/reviews/${user.reviewUuid}`
+              }
+            >
+              {user && user.defaultPersona
+                ? `View ${user.defaultPersona.name}'s Rapid Review`
+                : `View ${user.name}'s Rapid Review`}
+            </XLink>
+          ) : null}
           <XLink
             className="menu__list__link-item"
             href={`/about/${user.uuid}`}
@@ -148,19 +158,19 @@ const RoleBadgeUI = React.forwardRef(function RoleBadgeUI(
 });
 
 RoleBadgeUI.propTypes = {
+  children: PropTypes.any,
+  className: PropTypes.string,
   showNotice: PropTypes.bool,
   tooltip: PropTypes.bool,
   user: PropTypes.shape({
     defaultPersona: PropTypes.object,
-    id: PropTypes.number,
+    uuid: PropTypes.string,
+    reviewUuid: PropTypes.string,
     identity: PropTypes.oneOfType([PropTypes.object, PropTypes.number]),
     orcid: PropTypes.string,
     name: PropTypes.string,
     avatar: PropTypes.oneOfType([PropTypes.object, PropTypes.string]),
   }),
-  children: PropTypes.any,
-  className: PropTypes.string,
-  disabled: PropTypes.bool,
 };
 
 export { RoleBadgeUI };
