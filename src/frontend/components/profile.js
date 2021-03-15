@@ -54,27 +54,42 @@ const useStyles = makeStyles(theme => ({
 export default function Profile() {
   const classes = useStyles();
   const [thisUser, setUser] = useContext(UserProvider.context);
-  // const [editAvatar, setEditAvatar] = useState(false);
   const { id } = useParams();
-  const history = useHistory();
   const ownProfile = thisUser
     ? thisUser.personas.some(persona => persona.uuid === id)
     : false; // returns true if the profile page belongs to the logged in user
 
-  const { data: persona, loading, error } = useGetPersona({
+  const { data: persona, loading } = useGetPersona({
     id: id,
     resolve: persona => persona.data[0],
   });
 
-  const { mutate: updateUser, loadingUser } = usePutUser({
+  const { mutate: updateUser } = usePutUser({
     id: thisUser.uuid,
   });
-
-  const personas = !thisUser ? [] : thisUser.personas;
 
   const [selectedPersona, setSelectedPersona] = useState(
     thisUser ? thisUser.defaultPersona : {},
   );
+
+  const [editMode, setEditMode] = useState(false);
+  const handleEdit = () => {
+    setEditMode(true);
+  };
+
+  const personas = !thisUser ? [] : thisUser.personas;
+  const displayedPersona = ownProfile
+    ? selectedPersona
+    : !loading
+    ? persona
+    : {};
+  const badges =
+    displayedPersona && displayedPersona.badges ? displayedPersona.badges : [];
+  const orcid = ownProfile
+    ? thisUser.orcid
+    : displayedPersona && displayedPersona.identity
+    ? displayedPersona.identity.orcid
+    : '';
 
   const handleChange = e => {
     updateUser({ defaultPersona: e.target.value.id })
@@ -96,7 +111,7 @@ export default function Profile() {
       <>
         <Helmet>
           <title>
-            {persona.name} • {ORG}
+            {displayedPersona.name} • {ORG}
           </title>
         </Helmet>
 
@@ -151,9 +166,7 @@ export default function Profile() {
                       </Grid>
                     </Grid>
                     <Grid item xs={12} md={6}>
-                      <XLink to={`/settings`} href={`/settings`}>
-                        Edit user settings
-                      </XLink>
+                      <Link onClick={handleEdit}>Edit profile</Link>
                     </Grid>
                   </Grid>
                 </Container>
@@ -166,20 +179,18 @@ export default function Profile() {
                   <Grid item>
                     <Box>
                       <Typography component="div" variant="h6" gutterBottom>
-                        {persona.name}
+                        {displayedPersona.name}
                       </Typography>
                     </Box>
-                    {!persona.isAnonymous && (
+                    {!displayedPersona.isAnonymous && (
                       <Box>
                         <Typography
                           component="div"
                           variant="body1"
                           gutterBottom
                         >
-                          <Link
-                            href={`https://orcid.org/${persona.identity.orcid}`}
-                          >
-                            ORCiD: {persona.identity.orcid}
+                          <Link href={`https://orcid.org/${orcid}`}>
+                            ORCiD: {orcid}
                           </Link>
                         </Typography>
                         <Typography
@@ -188,7 +199,9 @@ export default function Profile() {
                           gutterBottom
                         >
                           <b>Email address: </b>
-                          {persona.email ? persona.email : `None provided`}
+                          {displayedPersona.email
+                            ? displayedPersona.email
+                            : `None provided`}
                         </Typography>
                         <Typography
                           component="div"
@@ -196,9 +209,9 @@ export default function Profile() {
                           gutterBottom
                         >
                           <b>Badges: </b>
-                          {persona.badges &&
-                            persona.badges.length > 0 &&
-                            persona.badges.map(badge => (
+                          {badges &&
+                            badges.length > 0 &&
+                            badges.map(badge => (
                               <Chip
                                 key={badge.uuid}
                                 label={badge.name}
@@ -229,34 +242,22 @@ export default function Profile() {
                     {ownProfile ? (
                       <IconButton href="/settings">
                         <Avatar
-                          src={persona.avatar}
+                          src={displayedPersona.avatar}
                           className={classes.avatar}
                         />
                       </IconButton>
                     ) : (
-                      <Avatar src={persona.avatar} className={classes.avatar} />
-                    )}
-                    {persona.badges && persona.badges.length > 0 && (
-                      <Box>
-                        <Typography component="div" variant="button">
-                          Badges
-                        </Typography>
-                        {persona.badges.map(badge => (
-                          <Chip
-                            key={badge.uuid}
-                            label={badge.name}
-                            color="primary"
-                            size="small"
-                          />
-                        ))}
-                      </Box>
+                      <Avatar
+                        src={displayedPersona.avatar}
+                        className={classes.avatar}
+                      />
                     )}
                   </Grid>
                 </Grid>
                 <Typography component="div" variant="body1" gutterBottom>
                   <b>About</b>
                   <br />
-                  {persona.bio}
+                  {displayedPersona.bio}
                 </Typography>
               </Container>
             </Box>
