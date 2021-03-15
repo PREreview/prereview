@@ -86,20 +86,8 @@ export default function Profile() {
   };
 
   useEffect(() => {
-    console.log('useEffect firing');
     setUser({ ...thisUser, defaultPersona: selectedPersona });
   }, [selectedPersona]);
-
-  console.log(
-    'console logging to see whether the defaultPersona changes',
-    thisUser.defaultPersona.name,
-  );
-
-  persona
-    ? console.log('persona!!!!!!!', persona, persona.name)
-    : console.log('no persona');
-  console.log('selectedPersona,', selectedPersona, selectedPersona.name);
-  personas.map(persona => console.log('this persona!', persona.name));
 
   if (!persona || loading) {
     return <Loading />;
