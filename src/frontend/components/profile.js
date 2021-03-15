@@ -1,7 +1,7 @@
 // base imports
-import React, { Fragment, useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { useHistory, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { format } from 'date-fns';
 
 // contexts
@@ -24,6 +24,7 @@ import Modal from '@material-ui/core/Modal';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import Select from '@material-ui/core/Select';
+import TextField from '@material-ui/core/TextField';
 
 // components
 import HeaderBar from './header-bar';
@@ -31,8 +32,6 @@ import LabelStyle from './label-style';
 import Loading from './loading.js';
 //import NotFound from './not-found';
 import RoleActivity from './role-activity';
-//import RoleEditor from './role-editor';
-import XLink from './xlink';
 
 // constants
 import { ORG } from '../constants';
@@ -76,6 +75,9 @@ export default function Profile() {
   const handleEdit = () => {
     setEditMode(true);
   };
+  const cancelEdit = () => {
+    setEditMode(false);
+  };
 
   const personas = !thisUser ? [] : thisUser.personas;
   const displayedPersona = ownProfile
@@ -90,6 +92,10 @@ export default function Profile() {
     : displayedPersona && displayedPersona.identity
     ? displayedPersona.identity.orcid
     : '';
+
+  console.log('DISPLAYED PERSONA', displayedPersona);
+  console.log('thisUser!!!!', thisUser);
+  console.log('ownProfile!?', ownProfile);
 
   const handleChange = e => {
     updateUser({ defaultPersona: e.target.value.id })
@@ -166,7 +172,11 @@ export default function Profile() {
                       </Grid>
                     </Grid>
                     <Grid item xs={12} md={6}>
-                      <Link onClick={handleEdit}>Edit profile</Link>
+                      {editMode ? (
+                        <Link onClick={cancelEdit}>Cancel edits</Link>
+                      ) : (
+                        <Link onClick={handleEdit}>Edit profile</Link>
+                      )}
                     </Grid>
                   </Grid>
                 </Container>
@@ -178,11 +188,20 @@ export default function Profile() {
                 <Grid container justify="space-between" alignItems="flex-start">
                   <Grid item>
                     <Box>
-                      <Typography component="div" variant="h6" gutterBottom>
-                        {displayedPersona.name}
-                      </Typography>
+                      {editMode ? (
+                        <TextField
+                          required
+                          id="name"
+                          label="Name"
+                          defaultValue={displayedPersona.name}
+                        />
+                      ) : (
+                        <Typography component="div" variant="h6" gutterBottom>
+                          {displayedPersona.name}
+                        </Typography>
+                      )}
                     </Box>
-                    {!displayedPersona.isAnonymous && (
+                    {!displayedPersona.isAnonymous ? (
                       <Box>
                         <Typography
                           component="div"
@@ -199,44 +218,47 @@ export default function Profile() {
                           gutterBottom
                         >
                           <b>Email address: </b>
-                          {displayedPersona.email
-                            ? displayedPersona.email
-                            : `None provided`}
-                        </Typography>
-                        <Typography
-                          component="div"
-                          variant="body1"
-                          gutterBottom
-                        >
-                          <b>Badges: </b>
-                          {badges &&
-                            badges.length > 0 &&
-                            badges.map(badge => (
-                              <Chip
-                                key={badge.uuid}
-                                label={badge.name}
-                                color="primary"
-                                size="small"
-                              />
-                            ))}
-                        </Typography>
-                        <Typography
-                          component="div"
-                          variant="body1"
-                          gutterBottom
-                        >
-                          <b>Area(s) of expertise: </b>
-                        </Typography>
-                        <Typography
-                          component="div"
-                          variant="body1"
-                          gutterBottom
-                        >
-                          Community member since{' '}
-                          {format(new Date(persona.createdAt), 'MMM. d, yyyy')}
+                          {editMode ? (
+                            <TextField
+                              required
+                              id="email"
+                              label="email"
+                              defaultValue={
+                                displayedPersona.email
+                                  ? displayedPersona.email
+                                  : ''
+                              }
+                            />
+                          ) : displayedPersona.email ? (
+                            displayedPersona.email
+                          ) : (
+                            `None provided`
+                          )}
                         </Typography>
                       </Box>
-                    )}
+                    ) : null}
+                    <Box>
+                      <Typography component="div" variant="body1" gutterBottom>
+                        <b>Badges: </b>
+                        {badges &&
+                          badges.length > 0 &&
+                          badges.map(badge => (
+                            <Chip
+                              key={badge.uuid}
+                              label={badge.name}
+                              color="primary"
+                              size="small"
+                            />
+                          ))}
+                      </Typography>
+                      <Typography component="div" variant="body1" gutterBottom>
+                        <b>Area(s) of expertise: </b>
+                      </Typography>
+                      <Typography component="div" variant="body1" gutterBottom>
+                        Community member since{' '}
+                        {format(new Date(persona.createdAt), 'MMM. d, yyyy')}
+                      </Typography>
+                    </Box>
                   </Grid>
                   <Grid item>
                     {ownProfile ? (
@@ -270,7 +292,9 @@ export default function Profile() {
                 <Typography component="h2" variant="h6" gutterBottom>
                   PREreview Contributions
                 </Typography>
-                {/* <RoleActivity persona={persona} /> */}
+                {!ownProfile ? (
+                  <RoleActivity persona={displayedPersona} />
+                ) : null}
                 <Typography component="h2" variant="h6" gutterBottom>
                   List of Publications
                 </Typography>
