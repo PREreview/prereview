@@ -1,27 +1,28 @@
 // base imports
-import React, { useState } from 'react';
+import React from 'react';
 import { useHistory } from 'react-router-dom';
 import PropTypes from 'prop-types';
+import classNames from 'classnames';
 import Tooltip from '@reach/tooltip';
 
 // material UI
-import { makeStyles } from '@material-ui/core/styles';
-import Avatar from '@material-ui/core/Avatar';
+import { makeStyles, withStyles } from '@material-ui/core/styles';
+import MuiAvatar from '@material-ui/core/Avatar';
 import Popover from '@material-ui/core/Popover';
 
 // components
+//import Avatar from './avatar';
+import NoticeBadge from './notice-badge';
 import XLink from './xlink';
 
+const Avatar = withStyles({
+  root: {
+    height: 28,
+    width: 28,
+  },
+})(MuiAvatar);
+
 const useStyles = makeStyles(theme => ({
-  avatar: {
-    cursor: 'pointer',
-  },
-  container: {
-    border: '2px solid #fff',
-    borderRadius: '50%',
-    marginRight: '-10px',
-    position: 'relative',
-  },
   popover: {
     zIndex: '20000 !important',
   },
@@ -30,26 +31,48 @@ const useStyles = makeStyles(theme => ({
     flexDirection: 'column',
     padding: theme.spacing(2),
   },
-  tooltip: {
-    backgroundColor: '#fff',
-    border: '1px solid #ccc',
-    color: 'rgba(0, 0, 0, 0.8)',
-    left: '50%',
-    padding: 5,
-    position: 'absolute',
-    top: '90%',
-    transform: 'translateX(-50%)',
-    zIndex: '999',
-  },
 }));
 
-const RoleBadge = ({ user, children }) => {
-  // ****  USER IN THIS COMPONENT IS A PERSONA OBJECT **** //
+const RoleBadge = React.forwardRef(function RoleBadge(
+  { children, className, tooltip, showNotice, user },
+  ref,
+) {
+  return (
+    <RoleBadgeUI
+      ref={ref}
+      tooltip={tooltip}
+      user={user}
+      className={className}
+      showNotice={showNotice}
+    >
+      {children}
+    </RoleBadgeUI>
+  );
+});
+
+RoleBadge.propTypes = {
+  children: PropTypes.any,
+  className: PropTypes.string,
+  showNotice: PropTypes.bool,
+  tooltip: PropTypes.bool,
+  user: PropTypes.object.isRequired,
+};
+
+export default RoleBadge;
+
+/**
+ * Non hooked version (handy for story book and `UserBadge`)
+ */
+const RoleBadgeUI = React.forwardRef(function RoleBadgeUI(
+  { user, className, children, tooltip, showNotice = false },
+  ref,
+) {
+  // ****  USER IN THIS COMPONENT IS ACTUALLY A PERSONA OBJECT **** //
 
   const classes = useStyles();
   const history = useHistory();
-  const [anchorEl, setAnchorEl] = useState(null);
-  const [tooltipDisplay, setTooltipDisplay] = useState('none');
+  const [anchorEl, setAnchorEl] = React.useState(null);
+
   const handleClick = event => {
     setAnchorEl(event.currentTarget);
   };
@@ -61,23 +84,25 @@ const RoleBadge = ({ user, children }) => {
   const open = Boolean(anchorEl);
   const id = open ? 'user-menu' : undefined;
 
-  const toggleTooltip = () => {
-    setTooltipDisplay(tooltipDisplay =>
-      tooltipDisplay === 'none' ? 'block' : 'none',
-    );
-  };
-
   return (
-    <div className={classes.container}>
-      <Avatar
-        className={classes.avatar}
-        onClick={handleClick}
-        onMouseEnter={toggleTooltip}
-        onMouseLeave={toggleTooltip}
-        src={user.avatar}
-      />
-      <div className={classes.tooltip} style={{ display: tooltipDisplay }}>
-        {`${user.defaultPersona ? user.defaultPersona.name : user.name}`}
+    <>
+      <div className="role-badge-menu-container">
+        {showNotice && <NoticeBadge />}
+        <button
+          type="button"
+          aria-describedby={id}
+          variant="contained"
+          color="primary"
+          onClick={handleClick}
+          className={classNames('role-badge-menu', className)}
+        >
+          <span data-expands-text="Close" className="vh">
+            Open
+          </span>
+          <Tooltipify tooltip={tooltip} user={user}>
+            <Avatar src={user.avatar} ref={ref} />
+          </Tooltipify>
+        </button>
       </div>
       <Popover
         id={id}
@@ -134,11 +159,11 @@ const RoleBadge = ({ user, children }) => {
           {children}
         </div>
       </Popover>
-    </div>
+    </>
   );
-};
+});
 
-RoleBadge.propTypes = {
+RoleBadgeUI.propTypes = {
   children: PropTypes.any,
   className: PropTypes.string,
   showNotice: PropTypes.bool,
@@ -154,4 +179,26 @@ RoleBadge.propTypes = {
   }),
 };
 
-export default RoleBadge;
+export { RoleBadgeUI };
+
+function Tooltipify({ tooltip, user, children }) {
+  return tooltip ? (
+    <Tooltip
+      label={`${user.defaultPersona ? user.defaultPersona.name : user.name}`}
+    >
+      <div>{children}</div>
+    </Tooltip>
+  ) : (
+    children
+  );
+}
+
+Tooltipify.propTypes = {
+  tooltip: PropTypes.bool,
+  user: PropTypes.shape({
+    name: PropTypes.string,
+    defaultPersona: PropTypes.object,
+    identity: PropTypes.oneOfType([PropTypes.object, PropTypes.number]),
+  }),
+  children: PropTypes.any,
+};
