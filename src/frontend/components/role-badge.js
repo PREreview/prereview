@@ -126,8 +126,8 @@ const RoleBadge = ({ user, children }) => {
             }
           >
             {user && user.defaultPersona
-              ? `View Profile ${user.defaultPersona.name}`
-              : `View Profile ${user.name}`}
+              ? `View ${user.defaultPersona.name}'s Profile`
+              : `View ${user.name}'s Profile`}
           </XLink>
           {children}
         </div>

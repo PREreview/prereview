@@ -148,10 +148,6 @@ const LongformReviewReader = props => {
   };
 
   useEffect(() => {
-    console.log(review);
-  }, []);
-
-  useEffect(() => {
     if (anchorEl) {
       setButtonRefId(anchorEl.getAttribute('aria-describedby'));
       if (!history.location.pathname.includes('-reviews')) {
@@ -160,7 +156,7 @@ const LongformReviewReader = props => {
         );
       }
     } else {
-      history.push(`${history.location.pathname.split('/full-reviews')[0]}`);
+      // history.push(`${history.location.pathname.split('/full-reviews')[0]}`);
     }
   }, [anchorEl, content, commentTitle, publishedComment]);
 
