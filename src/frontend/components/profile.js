@@ -3,15 +3,27 @@ import React, { useContext, useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useParams } from 'react-router-dom';
 import { format } from 'date-fns';
+import AvatarEditor from 'react-avatar-editor';
 
 // contexts
 import UserProvider from '../contexts/user-context';
 
 // hooks
-import { useGetPersona, usePutUser } from '../hooks/api-hooks.tsx';
+import {
+  useGetPersona,
+  usePutPersona,
+  usePutUser,
+  usePostUserContacts,
+  usePutUserContacts,
+} from '../hooks/api-hooks.tsx';
 
 // Material UI components
-import { makeStyles, withStyles } from '@material-ui/core/styles';
+import {
+  ThemeProvider,
+  makeStyles,
+  withStyles,
+  createMuiTheme,
+} from '@material-ui/core/styles';
 import Avatar from '@material-ui/core/Avatar';
 import Box from '@material-ui/core/Box';
 import Chip from '@material-ui/core/Chip';
@@ -20,6 +32,7 @@ import FormHelperText from '@material-ui/core/FormHelperText';
 import IconButton from '@material-ui/core/IconButton';
 import Link from '@material-ui/core/Link';
 import MenuItem from '@material-ui/core/MenuItem';
+import MuiButton from '@material-ui/core/Button';
 import Modal from '@material-ui/core/Modal';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
@@ -36,10 +49,42 @@ import RoleActivity from './role-activity';
 // constants
 import { ORG } from '../constants';
 
+const Button = withStyles({
+  root: {
+    textTransform: 'none',
+  },
+})(MuiButton);
+
+const prereviewTheme = createMuiTheme({
+  palette: {
+    primary: {
+      main: '#F77463',
+      contrastText: '#fff',
+    },
+    secondary: {
+      main: '#eaeaf0',
+    },
+  },
+  typography: {
+    fontFamily: ['Open Sans', 'sans-serif'].join(','),
+  },
+});
+
 const useStyles = makeStyles(theme => ({
+  buttonText: {
+    paddingLeft: 6,
+  },
+  button: {
+    marginTop: theme.spacing(1),
+    marginRight: theme.spacing(1),
+  },
   avatar: {
     height: 220,
     width: 220,
+  },
+  small: {
+    height: 30,
+    width: 30,
   },
   formControl: {
     margin: theme.spacing(1),
@@ -79,12 +124,31 @@ export default function Profile() {
     setEditMode(false);
   };
 
+  const onSave = () => {
+    console.log('clicking on save');
+  };
+
+  const handleInputChange = e => {
+    console.log('typing all the time', e);
+  };
+
   const personas = !thisUser ? [] : thisUser.personas;
   const displayedPersona = ownProfile
     ? selectedPersona
     : !loading
     ? persona
     : {};
+  const [name, setName] = useState(
+    displayedPersona ? displayedPersona.name : '',
+  );
+  const [contacts, setContacts] = useState(
+    displayedPersona && !displayedPersona.isAnonymous
+      ? displayedPersona.identity.contacts
+      : [],
+  );
+  const [bio, setBio] = useState(
+    displayedPersona && displayedPersona.bio ? displayedPersona.bio : '',
+  );
   const badges =
     displayedPersona && displayedPersona.badges ? displayedPersona.badges : [];
   const orcid = ownProfile
@@ -94,8 +158,10 @@ export default function Profile() {
     : '';
 
   console.log('DISPLAYED PERSONA', displayedPersona);
+  console.log('avatar!!!!!!!!', displayedPersona.avatar);
   console.log('thisUser!!!!', thisUser);
   console.log('ownProfile!?', ownProfile);
+  console.log('contacts!!!!!!!', contacts);
 
   const handleChange = e => {
     updateUser({ defaultPersona: e.target.value.id })
@@ -114,7 +180,7 @@ export default function Profile() {
     return <Loading />;
   } else {
     return (
-      <>
+      <ThemeProvider theme={prereviewTheme}>
         <Helmet>
           <title>
             {displayedPersona.name} • {ORG}
@@ -173,7 +239,18 @@ export default function Profile() {
                     </Grid>
                     <Grid item xs={12} md={6}>
                       {editMode ? (
-                        <Link onClick={cancelEdit}>Cancel edits</Link>
+                        <>
+                          <Button type="button" onClick={cancelEdit}>
+                            <span className={classes.buttonText}>
+                              Cancel edits
+                            </span>
+                          </Button>
+                          <Button type="button" onClick={onSave}>
+                            <span className={classes.buttonText}>
+                              Save changes
+                            </span>
+                          </Button>
+                        </>
                       ) : (
                         <Link onClick={handleEdit}>Edit profile</Link>
                       )}
@@ -193,7 +270,10 @@ export default function Profile() {
                           required
                           id="name"
                           label="Name"
-                          defaultValue={displayedPersona.name}
+                          value={name}
+                          onChange={e => {
+                            setName(e.target.value);
+                          }}
                         />
                       ) : (
                         <Typography component="div" variant="h6" gutterBottom>
@@ -217,20 +297,34 @@ export default function Profile() {
                           variant="body1"
                           gutterBottom
                         >
-                          <b>Email address: </b>
+                          <b>Contact: </b>
+                          <br />
                           {editMode ? (
-                            <TextField
-                              required
-                              id="email"
-                              label="email"
-                              defaultValue={
-                                displayedPersona.email
-                                  ? displayedPersona.email
-                                  : ''
-                              }
-                            />
-                          ) : displayedPersona.email ? (
-                            displayedPersona.email
+                            contacts.length ? (
+                              contacts.map(contact => (
+                                <TextField
+                                  required
+                                  id="Email"
+                                  label="Email"
+                                  value={contact.value}
+                                  onChange={handleEmailChange}
+                                />
+                              ))
+                            ) : (
+                              <TextField
+                                required
+                                id="email"
+                                label="email"
+                                value={''}
+                                onChange={e => {
+                                  setContacts()
+                                }}
+                              />
+                            )
+                          ) : contacts.length ? (
+                            contacts.map(contact => contact.value)
+                          ) : ownProfile ? (
+                            ` Please add an email address`
                           ) : (
                             `None provided`
                           )}
@@ -240,20 +334,22 @@ export default function Profile() {
                     <Box>
                       <Typography component="div" variant="body1" gutterBottom>
                         <b>Badges: </b>
-                        {badges &&
-                          badges.length > 0 &&
-                          badges.map(badge => (
-                            <Chip
-                              key={badge.uuid}
-                              label={badge.name}
-                              color="primary"
-                              size="small"
-                            />
-                          ))}
+                        <br />
+                        {badges && badges.length > 0
+                          ? badges.map(badge => (
+                              <Chip
+                                key={badge.uuid}
+                                label={badge.name}
+                                color="primary"
+                                size="small"
+                              />
+                            ))
+                          : 'No badges yet'}
                       </Typography>
-                      <Typography component="div" variant="body1" gutterBottom>
+                      {/* <Typography component="div" variant="body1" gutterBottom>
                         <b>Area(s) of expertise: </b>
                       </Typography>
+                      <Select multiple /> */}
                       <Typography component="div" variant="body1" gutterBottom>
                         Community member since{' '}
                         {format(new Date(persona.createdAt), 'MMM. d, yyyy')}
@@ -278,31 +374,42 @@ export default function Profile() {
                 </Grid>
                 <Typography component="div" variant="body1" gutterBottom>
                   <b>About</b>
-                  <br />
-                  {displayedPersona.bio}
                 </Typography>
+                <br />
+                {editMode ? (
+                  <TextField
+                    id="bio"
+                    name="bio"
+                    value={bio}
+                    onChange={e => setBio(e.target.value)}
+                  />
+                ) : (
+                  displayedPersona.bio
+                )}
               </Container>
             </Box>
 
-            <Box>
-              <Container>
-                <Typography component="h2" variant="h6" gutterBottom>
-                  PREreview Communities
-                </Typography>
-                <Typography component="h2" variant="h6" gutterBottom>
-                  PREreview Contributions
-                </Typography>
-                {!ownProfile ? (
-                  <RoleActivity persona={displayedPersona} />
-                ) : null}
-                <Typography component="h2" variant="h6" gutterBottom>
-                  List of Publications
-                </Typography>
-              </Container>
-            </Box>
+            {editMode ? null : (
+              <Box>
+                <Container>
+                  <Typography component="h2" variant="h6" gutterBottom>
+                    PREreview Communities
+                  </Typography>
+                  <Typography component="h2" variant="h6" gutterBottom>
+                    PREreview Contributions
+                  </Typography>
+                  {!ownProfile ? (
+                    <RoleActivity persona={displayedPersona} />
+                  ) : null}
+                  <Typography component="h2" variant="h6" gutterBottom>
+                    List of Publications
+                  </Typography>
+                </Container>
+              </Box>
+            )}
           </Container>
         </Box>
-      </>
+      </ThemeProvider>
     );
   }
 }
