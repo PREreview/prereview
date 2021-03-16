@@ -136,17 +136,22 @@ export default function Profile() {
   };
 
   const onSave = () => {
+    if (name === displayedPersona.name && bio === displayedPersona.bio) {
+      alert(`No changes were made.`)
+      return;
+    }
     let data = {
       name: name,
       bio: bio,
     };
     updatePersona(data)
       .then(resp => {
-        console.log('resp', resp);
         let updated = resp.data;
         alert(`You've successfully updated your persona.`);
         setEditMode(false);
         setDisplayedPersona(updated);
+        setName(updated.name)
+        setBio(updated.bio)
       })
       .catch(err => alert(`ERROR!`, err.message));
   };
@@ -170,7 +175,7 @@ export default function Profile() {
   const badges =
     displayedPersona && displayedPersona.badges ? displayedPersona.badges : [];
   const [bio, setBio] = useState(
-    displayedPersona && displayedPersona.bio ? displayedPersona.bio : '',
+    displayedPersona && displayedPersona.bio ? displayedPersona.bio : null,
   );
 
   const handleChange = e => {
