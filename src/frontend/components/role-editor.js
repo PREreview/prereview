@@ -200,6 +200,8 @@ export default function RoleEditor({ persona, onCancel, onSaved }) {
               data.avatar = dataUrl;
             }
 
+            console.log("DATA", data)
+
             updatePersona(data)
               .then(resp => {
                 let updatedPersona = resp.data;

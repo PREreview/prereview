@@ -223,6 +223,7 @@ export default function controller(personasModel, badgesModel, thisUser) {
       body: Joi.object({
         name: Joi.string(),
         avatar: Joi.string(),
+        bio: Joi.string().allow(''),
         isLocked: Joi.boolean(),
       }),
       type: 'json',
@@ -257,6 +258,9 @@ export default function controller(personasModel, badgesModel, thisUser) {
         ctx.throw(400, `Failed to parse schema: ${err}`);
       }
 
+      if (persona.avatar && Buffer.isBuffer(persona.avatar)) {
+        persona.avatar = persona.avatar.toString();
+      }
       // if updated
       ctx.status = 200;
       ctx.body = {

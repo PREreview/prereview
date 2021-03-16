@@ -112,9 +112,19 @@ export default function Profile() {
     id: thisUser.uuid,
   });
 
+  const { mutate: updatePersona, loadingUpdate, error } = usePutPersona({
+    id: id,
+  });
+
   const [selectedPersona, setSelectedPersona] = useState(
     thisUser ? thisUser.defaultPersona : {},
   );
+
+  let [displayedPersona, setDisplayedPersona] = useState(ownProfile
+    ? selectedPersona
+    : !loading
+    ? persona
+    : {});
 
   const [editMode, setEditMode] = useState(false);
   const handleEdit = () => {
@@ -125,19 +135,23 @@ export default function Profile() {
   };
 
   const onSave = () => {
-    console.log('clicking on save');
-  };
-
-  const handleInputChange = e => {
-    console.log('typing all the time', e);
-  };
+    let data = {
+      name: name,
+      bio: bio
+    }
+    updatePersona(data)
+      .then(resp => {
+        console.log('resp', resp);
+        let updated = resp.data;
+        alert(`You've successfully updated your persona.`);
+        setEditMode(false);
+        setDisplayedPersona(updated); 
+      })
+      .catch(err => alert(`ERROR!`, err.message));
+  }
 
   const personas = !thisUser ? [] : thisUser.personas;
-  const displayedPersona = ownProfile
-    ? selectedPersona
-    : !loading
-    ? persona
-    : {};
+
   const [name, setName] = useState(
     displayedPersona ? displayedPersona.name : '',
   );
@@ -156,12 +170,6 @@ export default function Profile() {
     : displayedPersona && displayedPersona.identity
     ? displayedPersona.identity.orcid
     : '';
-
-  console.log('DISPLAYED PERSONA', displayedPersona);
-  console.log('avatar!!!!!!!!', displayedPersona.avatar);
-  console.log('thisUser!!!!', thisUser);
-  console.log('ownProfile!?', ownProfile);
-  console.log('contacts!!!!!!!', contacts);
 
   const handleChange = e => {
     updateUser({ defaultPersona: e.target.value.id })
@@ -317,16 +325,16 @@ export default function Profile() {
                                 label="email"
                                 value={''}
                                 onChange={e => {
-                                  setContacts()
+                                  console.log('email');
                                 }}
                               />
                             )
                           ) : contacts.length ? (
                             contacts.map(contact => contact.value)
                           ) : ownProfile ? (
-                            ` Please add an email address`
+                            ` Please click on 'Edit profile' and add an email address!`
                           ) : (
-                            `None provided`
+                            `None provided.`
                           )}
                         </Typography>
                       </Box>
