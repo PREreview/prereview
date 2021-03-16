@@ -161,10 +161,7 @@ const ReviewReader = React.memo(function ReviewReader({
   };
 
   useEffect(() => {
-    if (
-      history.location.pathname.includes('full-reviews') ||
-      history.location.pathname.includes('rapid-reviews')
-    ) {
+    if (history.location.pathname.includes('-reviews')) {
       const reviewNode = document.querySelector(
         `[aria-describedby='${
           history.location.pathname.split('-reviews/')[1]

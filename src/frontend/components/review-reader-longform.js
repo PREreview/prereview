@@ -154,9 +154,13 @@ const LongformReviewReader = props => {
   useEffect(() => {
     if (anchorEl) {
       setButtonRefId(anchorEl.getAttribute('aria-describedby'));
-      // history.push(`${history.location.pathname}/full-reviews/${review.uuid}`);
+      if (!history.location.pathname.includes('-reviews')) {
+        history.push(
+          `${history.location.pathname}/full-reviews/${review.uuid}`,
+        );
+      }
     } else {
-      // history.push(`${history.location.pathname.split('/full-reviews')[0]}`);
+      history.push(`${history.location.pathname.split('/full-reviews')[0]}`);
     }
   }, [anchorEl, content, commentTitle, publishedComment]);
 
