@@ -74,27 +74,44 @@ const prereviewTheme = createMuiTheme({
 });
 
 const useStyles = makeStyles(theme => ({
+  avatar: {
+    height: 220,
+    width: 220,
+  },
   buttonText: {
-    paddingLeft: 6,
+    fontSize: '1rem',
+    textTransform: 'uppercase',
   },
   button: {
     marginTop: theme.spacing(1),
     marginRight: theme.spacing(1),
   },
-  avatar: {
-    height: 220,
-    width: 220,
+  formControl: {
+    margin: theme.spacing(1),
+    minWidth: 120,
+  },
+  input: {
+    marginBottom: 20,
+    minWidth: 250,
+  },
+  label: {
+    lineHeight: 5,
+    marginRight: 10,
+  },
+  right: {
+    textAlign: 'right',
   },
   small: {
     height: 30,
     width: 30,
   },
-  formControl: {
-    margin: theme.spacing(1),
-    minWidth: 120,
-  },
-  selectEmpty: {
+  select: {
     marginTop: theme.spacing(2),
+    minWidth: 200,
+    width: '100%',
+  },
+  textField: {
+    width: '100%',
   },
 }));
 
@@ -115,7 +132,7 @@ export default function Profile() {
     id: thisUser.uuid,
   });
 
-  const { mutate: updatePersona, loadingUpdate, error } = usePutPersona({
+  const { mutate: updatePersona } = usePutPersona({
     id: id,
   });
 
@@ -182,7 +199,7 @@ export default function Profile() {
     updateUser({ defaultPersona: e.target.value.id })
       .then(() => {
         alert(`You've successfully updated your active persona.`);
-        setSelectedPersona(e.target.value);
+        return setSelectedPersona(e.target.value);
       })
       .catch(err => alert(`An error occurred: ${err.message}`));
   };
@@ -203,12 +220,12 @@ export default function Profile() {
           </title>
         </Helmet>
 
-        {/* <HeaderBar thisUser={thisUser} closeGap /> */}
+        <HeaderBar thisUser={thisUser} closeGap />
 
         <Box my={10}>
           <Container>
             {ownProfile ? (
-              <Box textAlign="center">
+              <Box my={4}>
                 <Container>
                   <Grid
                     component="label"
@@ -221,27 +238,38 @@ export default function Profile() {
                       container
                       item
                       xs={12}
-                      md={6}
+                      md={8}
                       alignItems="center"
                       justify="flex-start"
+                      spacing={2}
                     >
-                      <Grid item xs={4}>
+                      <Grid item>
                         <Typography component="div" variant="body1">
                           Active persona:
                         </Typography>
                       </Grid>
-                      <Grid item md={10}>
+                      <Grid item>
                         <Select
                           value={selectedPersona}
                           onChange={handleChange}
-                          className={classes.selectEmpty}
+                          className={classes.select}
                           renderValue={selected => (
-                            <><Avatar
-                              src={selected.avatar}
-                              className={classes.small}
-                            />
-                            <span>{selected.name}</span>
-                            </>
+                            <Grid
+                              container
+                              alignItems="center"
+                              justify="flex-start"
+                              spacing={2}
+                            >
+                              <Grid item>
+                                <Avatar
+                                  src={selected.avatar}
+                                  className={classes.small}
+                                />
+                              </Grid>
+                              <Grid item>
+                                <span>{selected.name}</span>
+                              </Grid>
+                            </Grid>
                           )}
                         >
                           {personas
@@ -260,22 +288,43 @@ export default function Profile() {
                         </FormHelperText>
                       </Grid>
                     </Grid>
-                    <Grid item xs={12} md={6}>
+                    <Grid item xs={12} md={4} className={classes.right}>
                       {editMode ? (
-                        <>
-                          <Button type="button" onClick={cancelEdit}>
-                            <span className={classes.buttonText}>
-                              Cancel edits
-                            </span>
-                          </Button>
-                          <Button type="button" onClick={onSave}>
-                            <span className={classes.buttonText}>
-                              Save changes
-                            </span>
-                          </Button>
-                        </>
+                        <Grid container spacing={2} justify="flex-end">
+                          <Grid item>
+                            <Button
+                              type="button"
+                              onClick={onSave}
+                              color="primary"
+                              variant="contained"
+                            >
+                              <span className={classes.buttonText}>
+                                Save changes
+                              </span>
+                            </Button>
+                          </Grid>
+                          <Grid item>
+                            <Button
+                              type="button"
+                              onClick={cancelEdit}
+                              color="primary"
+                              variant="outlined"
+                            >
+                              <span className={classes.buttonText}>
+                                Cancel edits
+                              </span>
+                            </Button>
+                          </Grid>
+                        </Grid>
                       ) : (
-                        <Link onClick={handleEdit}>Edit profile</Link>
+                        <Button
+                          onClick={handleEdit}
+                          className={classes.buttonText}
+                          color="primary"
+                          variant="contained"
+                        >
+                          Edit profile
+                        </Button>
                       )}
                     </Grid>
                   </Grid>
@@ -283,13 +332,14 @@ export default function Profile() {
               </Box>
             ) : null}
 
-            <Box my={8} borderBottom="1px solid #C1BFBF">
+            <Box my={8} pb={6} borderBottom="1px solid #C1BFBF">
               <Container>
                 <Grid container justify="space-between" alignItems="flex-start">
                   <Grid item>
                     <Box>
                       {editMode && !displayedPersona.isAnonymous ? (
                         <TextField
+                          className={classes.input}
                           required
                           id="name"
                           label="Name"
@@ -297,6 +347,7 @@ export default function Profile() {
                           onChange={e => {
                             setName(e.target.value);
                           }}
+                          variant="outlined"
                         />
                       ) : (
                         <Typography component="div" variant="h6" gutterBottom>
@@ -320,28 +371,33 @@ export default function Profile() {
                           variant="body1"
                           gutterBottom
                         >
-                          <b>Contact: </b>
-                          <br />
+                          <b className={editMode ? classes.label : ''}>
+                            Contact:{' '}
+                          </b>
                           {editMode ? (
                             contacts && contacts.length ? (
                               contacts.map(contact => (
                                 <TextField
+                                  className={classes.input}
+                                  key={contact.uuid}
                                   required
                                   id="Email"
                                   label="Email"
                                   value={contact.value}
                                   onChange={handleEmailChange}
+                                  variant="outlined"
                                 />
                               ))
                             ) : (
                               <TextField
+                                className={classes.input}
                                 required
                                 id="email"
                                 label="email"
                                 value={''}
                                 onChange={e => {
-                                  console.log('email');
                                 }}
+                                variant="outlined"
                               />
                             )
                           ) : contacts.length ? (
@@ -357,36 +413,37 @@ export default function Profile() {
                     <Box>
                       <Typography component="div" variant="body1" gutterBottom>
                         <b>Badges: </b>
+                        {badges && badges.length > 0
+                          ? badges.map(badge => (
+                              <Chip
+                                key={badge.uuid}
+                                label={badge.name}
+                                color="primary"
+                                size="small"
+                              />
+                            ))
+                          : 'No badges yet.'}
                       </Typography>
-                      {badges && badges.length > 0
-                        ? badges.map(badge => (
-                            <Chip
-                              key={badge.uuid}
-                              label={badge.name}
-                              color="primary"
-                              size="small"
-                            />
-                          ))
-                        : 'No badges yet.'}
                       <Typography component="div" variant="body1" gutterBottom>
                         <b>Area(s) of expertise: </b>
+                        {editMode ? (
+                          <Select
+                            className={classes.input}
+                            multiple
+                            value={expertise}
+                            onChange={handleChange}
+                            input={<Input />}
+                          >
+                            {EXAMPLE_EXPERTISE.map(exp => (
+                              <MenuItem key={exp} value={exp}>
+                                {exp}
+                              </MenuItem>
+                            ))}
+                          </Select>
+                        ) : (
+                          `No area of expertise selected yet.`
+                        )}
                       </Typography>
-                      {editMode ? (
-                        <Select
-                          multiple
-                          value={expertise}
-                          onChange={handleChange}
-                          input={<Input />}
-                        >
-                          {EXAMPLE_EXPERTISE.map(exp => (
-                            <MenuItem key={exp} value={exp}>
-                              {exp}
-                            </MenuItem>
-                          ))}
-                        </Select>
-                      ) : (
-                        `No area of expertise selected yet.`
-                      )}
                       <Typography component="div" variant="body1" gutterBottom>
                         Community member since{' '}
                         {format(new Date(persona.createdAt), 'MMM. d, yyyy')}
@@ -412,18 +469,21 @@ export default function Profile() {
                 <Typography component="div" variant="body1" gutterBottom>
                   <b>About</b>
                 </Typography>
-                <br />
                 {editMode && !displayedPersona.isAnonymous ? (
                   <TextField
+                    className={classes.textField}
                     multiline
                     rowsMax={24}
                     id="bio"
                     name="bio"
                     value={bio}
                     onChange={e => setBio(e.target.value)}
+                    variant="outlined"
                   />
                 ) : (
-                  displayedPersona.bio
+                  <Typography component="div" variant="body1">
+                    {displayedPersona.bio}
+                  </Typography>
                 )}
               </Container>
             </Box>
