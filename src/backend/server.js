@@ -24,7 +24,7 @@ import { createError } from '../common/errors.ts';
 import { dbWrapper } from './db.ts';
 
 // Our middlewares
-import cloudflareAccess from './middleware/cloudflare.js';
+//import cloudflareAccess from './middleware/cloudflare.js';
 import authWrapper from './middleware/auth.js'; // authorization/user roles
 import currentCommunity from './middleware/community.js';
 import currentPersona from './middleware/persona.js';
@@ -41,6 +41,7 @@ import {
   fullReviewModelWrapper,
   fullReviewDraftModelWrapper,
   groupModelWrapper,
+  keyModelWrapper,
   personaModelWrapper,
   preprintModelWrapper,
   rapidReviewModelWrapper,
@@ -165,7 +166,8 @@ export default async function configServer(config) {
   const tags = TagController(tagModel, authz);
   const templateModel = templateModelWrapper(db);
   const templates = TemplateController(templateModel, communityModel, authz);
-  const users = UserController(userModel, contactModel, authz);
+  const keyModel = keyModelWrapper(db);
+  const users = UserController(userModel, contactModel, keyModel, authz);
   const notifications = NotificationController(userModel, authz);
   const communities = CommunityController(
     communityModel,

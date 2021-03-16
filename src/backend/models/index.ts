@@ -6,6 +6,7 @@ export * from './events';
 export * from './fullReviews';
 export * from './fullReviewDrafts';
 export * from './groups';
+export * from './keys';
 export * from './personas';
 export * from './preprints';
 export * from './rapidReviews';
