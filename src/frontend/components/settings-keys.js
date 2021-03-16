@@ -1,7 +1,6 @@
 // base imports
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { useLocation, useHistory } from 'react-router-dom';
 import { usePostUserKey, useDeleteUserKeys } from '../hooks/api-hooks.tsx';
 
 // components
@@ -17,7 +16,7 @@ import Delete from '@material-ui/icons/Delete';
 // icons
 import { MdInfoOutline } from 'react-icons/md';
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles(() => ({
   button: {
     textTransform: 'none',
   },
@@ -25,7 +24,6 @@ const useStyles = makeStyles(theme => ({
 
 export default function SettingsKeys({ user }) {
   const classes = useStyles();
-  const location = useLocation();
   const [userKeys, setUserKeys] = useState(user ? user.keys : []);
   const [app, setApp] = useState('');
   const [isAppValid, setIsAppValid] = useState(true);
@@ -38,8 +36,8 @@ export default function SettingsKeys({ user }) {
     <section className="settings-keys settings__section">
       <h3 className="settings__title">API keys</h3>
 
-      <p className="settings-notifications__notice">
-        <MdInfoOutline className="settings-notifications__notice-icon" />
+      <p className="settings-keys__notice">
+        <MdInfoOutline className="settings-keys__notice-icon" />
         <span>
           API keys allow an application to access this site with the same identity and privileges as your user account. <em>Please be careful who you share these keys with, and delete any that are no longer used or may be compromised.</em>
         </span>
@@ -59,11 +57,11 @@ export default function SettingsKeys({ user }) {
         ))
         : null}
 
-      <div className="settings-notifications__email">
+      <div className="settings-keys__name">
         <TextInput
           label="Choose a name to distinguish a new API key"
           value={app}
-          className="settings-notifications__email-input"
+          className="settings-keys__name-input"
           onChange={e => {
             const isValid = !e.target.validity.typeMismatch;
             setApp(e.target.value);
@@ -112,8 +110,9 @@ function ApiKey({ userId, credentials, onDelete }) {
     },
   });
   return (
-    <div className="settings-notifications__toggle">
-      <span>{`${credentials.app}`} {`${credentials.secret}`}</span>
+    <div className="settings-keys__delete">
+      <span>{`${credentials.app}`}</span>
+      <span>{`${credentials.secret}`}</span>
       <IconButton onClick={() => {
         if (confirm('Are you sure you want to delete this API key?')) {
           deleteKey()
@@ -138,5 +137,5 @@ ApiKey.propTypes = {
     app: PropTypes.string.isRequired,
     secret: PropTypes.string.isRequired,
   }).isRequired,
-  onDelete: PropTypes.function.isRequired,
+  onDelete: PropTypes.func.isRequired,
 };
