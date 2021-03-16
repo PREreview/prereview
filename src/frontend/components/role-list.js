@@ -18,11 +18,15 @@ export function Reviewers({ user, allReviews, hasReviewed }) {
     reviews.map(review => {
       if (review.author) {
         const newAuthor = review.author;
-        newAuthor.reviewUuid = review.uuid;
+        newAuthor.reviewUuid = `/rapid-reviews/${review.uuid}`;
         newAuthors = [...newAuthors, newAuthor];
       } else if (review.authors) {
         if (review.isPublished) {
-          review.authors.map(author => (newAuthors = [...newAuthors, author]));
+          review.authors.map(author => {
+            const newAuthor = author;
+            newAuthor.reviewUuid = `/full-reviews/${review.uuid}`;
+            newAuthors = [...newAuthors, newAuthor];
+          });
         }
       }
       return newAuthors;

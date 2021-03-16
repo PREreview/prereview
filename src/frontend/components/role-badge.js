@@ -102,19 +102,15 @@ const RoleBadge = ({ user, children }) => {
               className="menu__list__link-item"
               onClick={event => {
                 event.preventDefault();
-                history.push(`/rapid-reviews/${user.reviewUuid}`);
+                history.push(`${user.reviewUuid}`);
               }}
-              href={`/rapid-reviews/${user.reviewUuid}`}
+              href={`${user.reviewUuid}`}
               target={process.env.IS_EXTENSION ? '_blank' : undefined}
-              to={
-                process.env.IS_EXTENSION
-                  ? undefined
-                  : `/rapid-reviews/${user.reviewUuid}`
-              }
+              to={process.env.IS_EXTENSION ? undefined : `${user.reviewUuid}`}
             >
               {user && user.defaultPersona
-                ? `View ${user.defaultPersona.name}'s Rapid Review`
-                : `View ${user.name}'s Rapid Review`}
+                ? `View ${user.defaultPersona.name}'s Review`
+                : `View ${user.name}'s Review`}
             </XLink>
           ) : null}
           <XLink
