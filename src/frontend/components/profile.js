@@ -30,6 +30,7 @@ import Chip from '@material-ui/core/Chip';
 import Container from '@material-ui/core/Container';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import IconButton from '@material-ui/core/IconButton';
+import Input from '@material-ui/core/Input';
 import Link from '@material-ui/core/Link';
 import MenuItem from '@material-ui/core/MenuItem';
 import MuiButton from '@material-ui/core/Button';
@@ -54,6 +55,8 @@ const Button = withStyles({
     textTransform: 'none',
   },
 })(MuiButton);
+
+const EXAMPLE_EXPERTISE = ['Biology', 'Microbiology', 'Physics', 'COVID-19'];
 
 const prereviewTheme = createMuiTheme({
   palette: {
@@ -120,11 +123,9 @@ export default function Profile() {
     thisUser ? thisUser.defaultPersona : {},
   );
 
-  let [displayedPersona, setDisplayedPersona] = useState(ownProfile
-    ? selectedPersona
-    : !loading
-    ? persona
-    : {});
+  let [displayedPersona, setDisplayedPersona] = useState(
+    ownProfile ? selectedPersona : !loading ? persona : {},
+  );
 
   const [editMode, setEditMode] = useState(false);
   const handleEdit = () => {
@@ -137,39 +138,40 @@ export default function Profile() {
   const onSave = () => {
     let data = {
       name: name,
-      bio: bio
-    }
+      bio: bio,
+    };
     updatePersona(data)
       .then(resp => {
         console.log('resp', resp);
         let updated = resp.data;
         alert(`You've successfully updated your persona.`);
         setEditMode(false);
-        setDisplayedPersona(updated); 
+        setDisplayedPersona(updated);
       })
       .catch(err => alert(`ERROR!`, err.message));
-  }
+  };
 
   const personas = !thisUser ? [] : thisUser.personas;
 
   const [name, setName] = useState(
     displayedPersona ? displayedPersona.name : '',
   );
-  const [contacts, setContacts] = useState(
-    displayedPersona && !displayedPersona.isAnonymous
-      ? displayedPersona.identity.contacts
-      : [],
-  );
-  const [bio, setBio] = useState(
-    displayedPersona && displayedPersona.bio ? displayedPersona.bio : '',
-  );
-  const badges =
-    displayedPersona && displayedPersona.badges ? displayedPersona.badges : [];
   const orcid = ownProfile
     ? thisUser.orcid
     : displayedPersona && displayedPersona.identity
     ? displayedPersona.identity.orcid
     : '';
+  const [contacts, setContacts] = useState(
+    displayedPersona && !displayedPersona.isAnonymous
+      ? displayedPersona.identity.contacts
+      : [],
+  );
+  const [expertise, setExpertise] = useState([]);
+  const badges =
+    displayedPersona && displayedPersona.badges ? displayedPersona.badges : [];
+  const [bio, setBio] = useState(
+    displayedPersona && displayedPersona.bio ? displayedPersona.bio : '',
+  );
 
   const handleChange = e => {
     updateUser({ defaultPersona: e.target.value.id })
@@ -182,6 +184,7 @@ export default function Profile() {
 
   useEffect(() => {
     setUser({ ...thisUser, defaultPersona: selectedPersona });
+    setDisplayedPersona(selectedPersona);
   }, [selectedPersona]);
 
   if (!persona || loading) {
@@ -227,7 +230,14 @@ export default function Profile() {
                           value={selectedPersona}
                           onChange={handleChange}
                           className={classes.selectEmpty}
-                          renderValue={selected => selected.name}
+                          renderValue={selected => (
+                            <><Avatar
+                              src={selected.avatar}
+                              className={classes.small}
+                            />
+                            <span>{selected.name}</span>
+                            </>
+                          )}
                         >
                           {personas
                             ? personas.map(p => {
@@ -273,7 +283,7 @@ export default function Profile() {
                 <Grid container justify="space-between" alignItems="flex-start">
                   <Grid item>
                     <Box>
-                      {editMode ? (
+                      {editMode && !displayedPersona.isAnonymous ? (
                         <TextField
                           required
                           id="name"
@@ -308,7 +318,7 @@ export default function Profile() {
                           <b>Contact: </b>
                           <br />
                           {editMode ? (
-                            contacts.length ? (
+                            contacts && contacts.length ? (
                               contacts.map(contact => (
                                 <TextField
                                   required
@@ -332,7 +342,7 @@ export default function Profile() {
                           ) : contacts.length ? (
                             contacts.map(contact => contact.value)
                           ) : ownProfile ? (
-                            ` Please click on 'Edit profile' and add an email address!`
+                            ` Please go to 'Edit profile' and add an email address!`
                           ) : (
                             `None provided.`
                           )}
@@ -342,22 +352,36 @@ export default function Profile() {
                     <Box>
                       <Typography component="div" variant="body1" gutterBottom>
                         <b>Badges: </b>
-                        <br />
-                        {badges && badges.length > 0
-                          ? badges.map(badge => (
-                              <Chip
-                                key={badge.uuid}
-                                label={badge.name}
-                                color="primary"
-                                size="small"
-                              />
-                            ))
-                          : 'No badges yet'}
                       </Typography>
-                      {/* <Typography component="div" variant="body1" gutterBottom>
+                      {badges && badges.length > 0
+                        ? badges.map(badge => (
+                            <Chip
+                              key={badge.uuid}
+                              label={badge.name}
+                              color="primary"
+                              size="small"
+                            />
+                          ))
+                        : 'No badges yet.'}
+                      <Typography component="div" variant="body1" gutterBottom>
                         <b>Area(s) of expertise: </b>
                       </Typography>
-                      <Select multiple /> */}
+                      {editMode ? (
+                        <Select
+                          multiple
+                          value={expertise}
+                          onChange={handleChange}
+                          input={<Input />}
+                        >
+                          {EXAMPLE_EXPERTISE.map(exp => (
+                            <MenuItem key={exp} value={exp}>
+                              {exp}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      ) : (
+                        `No area of expertise selected yet.`
+                      )}
                       <Typography component="div" variant="body1" gutterBottom>
                         Community member since{' '}
                         {format(new Date(persona.createdAt), 'MMM. d, yyyy')}
@@ -384,8 +408,10 @@ export default function Profile() {
                   <b>About</b>
                 </Typography>
                 <br />
-                {editMode ? (
+                {editMode && !displayedPersona.isAnonymous ? (
                   <TextField
+                    multiline
+                    rowsMax={24}
                     id="bio"
                     name="bio"
                     value={bio}
