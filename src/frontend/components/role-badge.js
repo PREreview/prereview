@@ -15,6 +15,8 @@ import XLink from './xlink';
 const useStyles = makeStyles(theme => ({
   avatar: {
     cursor: 'pointer',
+    height: 28,
+    width: 28,
   },
   container: {
     border: '2px solid #fff',
@@ -100,14 +102,14 @@ const RoleBadge = ({ user, children }) => {
               className="menu__list__link-item"
               onClick={event => {
                 event.preventDefault();
-                history.push(`/reviews/${user.reviewUuid}`);
+                history.push(`/rapid-reviews/${user.reviewUuid}`);
               }}
-              href={`/reviews/${user.reviewUuid}`}
+              href={`/rapid-reviews/${user.reviewUuid}`}
               target={process.env.IS_EXTENSION ? '_blank' : undefined}
               to={
                 process.env.IS_EXTENSION
                   ? undefined
-                  : `/reviews/${user.reviewUuid}`
+                  : `/rapid-reviews/${user.reviewUuid}`
               }
             >
               {user && user.defaultPersona

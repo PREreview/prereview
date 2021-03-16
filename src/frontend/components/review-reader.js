@@ -103,8 +103,8 @@ const ReviewReader = React.memo(function ReviewReader({
     preprint.fullReviews.filter(review => review.isPublished),
   );
   const [allReviews] = useState(publishedReviews.concat(allRapidReviews));
-  const [expandRapid, setExpandRapid] = React.useState(true);
-  const [expandLong, setExpandLong] = React.useState(true);
+  const [expandRapid, setExpandRapid] = useState(true);
+  const [expandLong, setExpandLong] = useState(true);
 
   // expand and collapse rapid and longform review sections
   const handleChangeRapid = panel => (event, newExpanded) => {
@@ -134,9 +134,8 @@ const ReviewReader = React.memo(function ReviewReader({
   );
 
   // expand/collapse longform reviews
-  const [anchorEl, setAnchorEl] = React.useState(null);
+  const [anchorEl, setAnchorEl] = useState(null);
   const handleClick = event => {
-    console.log("event at handleClick of Read more", event)
     setAnchorEl(anchorEl ? null : event.currentTarget);
   };
 
@@ -162,6 +161,17 @@ const ReviewReader = React.memo(function ReviewReader({
   };
 
   useEffect(() => {
+    if (
+      history.location.pathname.includes('full-reviews') ||
+      history.location.pathname.includes('rapid-reviews')
+    ) {
+      const reviewNode = document.querySelector(
+        `[aria-describedby='${
+          history.location.pathname.split('-reviews/')[1]
+        }']`,
+      );
+      setAnchorEl(reviewNode);
+    }
     if (
       rapidContent &&
       Object.keys(rapidContent).length !== 0 &&

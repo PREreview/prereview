@@ -1,5 +1,6 @@
 // base imports
 import React, { useEffect, useState } from 'react';
+import { useHistory } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import ReactHtmlParser, { convertNodeToElement } from 'react-html-parser';
 
@@ -104,6 +105,7 @@ const LongformReviewReader = props => {
   }));
 
   const classes = useStyles();
+  const history = useHistory();
 
   const [buttonRefId, setButtonRefId] = useState(null);
 
@@ -146,8 +148,15 @@ const LongformReviewReader = props => {
   };
 
   useEffect(() => {
+    console.log(review);
+  }, []);
+
+  useEffect(() => {
     if (anchorEl) {
       setButtonRefId(anchorEl.getAttribute('aria-describedby'));
+      // history.push(`${history.location.pathname}/full-reviews/${review.uuid}`);
+    } else {
+      // history.push(`${history.location.pathname.split('/full-reviews')[0]}`);
     }
   }, [anchorEl, content, commentTitle, publishedComment]);
 
@@ -231,11 +240,11 @@ const LongformReviewReader = props => {
                 <Grid item xs={12} sm={3} className={classes.date}>
                   {reviewDate.toLocaleDateString('en-US')}
                 </Grid>
-               { review.doi ? 
-                <Grid item xs={12} sm={2}> 
+               { review.doi ?
+                <Grid item xs={12} sm={2}>
                   <a href={`https://doi.org/${review.doi}`}>
-                  <img src={`https://sandbox.zenodo.org/badge/DOI/${review.doi}.svg`}/></a> 
-                </Grid> 
+                  <img src={`https://sandbox.zenodo.org/badge/DOI/${review.doi}.svg`}/></a>
+                </Grid>
                 : null }
               </Grid>
               <Box border="1px solid #E5E5E5" mt={4} px={3} pb={2}>
