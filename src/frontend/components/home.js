@@ -83,6 +83,7 @@ const useStyles = makeStyles(theme => ({
     },
   },
   card: {
+    borderRadius: 32,
     height: 300,
     marginBottom: '1rem',
     [theme.breakpoints.up('md')]: {
