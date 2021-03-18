@@ -174,27 +174,6 @@ export default function Profile() {
 
   const personas = !thisUser ? [] : thisUser.personas;
 
-  // personas
-  //   ? personas.map(p => console.log('avatar in the personas', p.name, p.avatar))
-  //   : null;
-  // selectedPersona
-  //   ? console.log(
-  //       'selectedPersona?',
-  //       selectedPersona.name,
-  //       selectedPersona.avatar,
-  //     )
-  //   : console.log('no selected persona yet');
-  // displayedPersona
-  //   ? console.log(
-  //       'displayedPersona',
-  //       displayedPersona.name,
-  //       displayedPersona.avatar,
-  //     )
-  //   : console.log('no displayed persona');
-  // persona && !loadingPer
-  //   ? console.log('persona', persona.name, '\n', persona.avatar)
-  //   : console.log('hi, no persona yet');
-
   const [name, setName] = useState(
     displayedPersona ? displayedPersona.name : '',
   );
@@ -212,7 +191,6 @@ export default function Profile() {
   );
 
   const handleChange = e => {
-    console.log("handling Change")
     history.push(`/about/${e.target.value.uuid}`);
     updateUser({ defaultPersona: e.target.value.id })
       .then(() => {
@@ -454,7 +432,7 @@ export default function Profile() {
                             ))
                           : 'No badges yet.'}
                       </Typography>
-                      {/* <Typography component="div" variant="body1" gutterBottom>
+                      <Typography component="div" variant="body1" gutterBottom>
                         <b>Area(s) of expertise: </b>
                         {editMode ? (
                           <Select
@@ -473,7 +451,7 @@ export default function Profile() {
                         ) : (
                           `No area of expertise selected yet.`
                         )}
-                      </Typography> */}
+                      </Typography>
                       <Typography component="div" variant="body1" gutterBottom>
                         Community member since{' '}
                         {format(new Date(persona.createdAt), 'MMM. d, yyyy')}
