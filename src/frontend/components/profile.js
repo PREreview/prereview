@@ -120,9 +120,10 @@ export default function Profile() {
   const [thisUser, setUser] = useContext(UserProvider.context);
   const history = useHistory();
   const { id } = useParams();
-  const ownProfile = thisUser
-    ? thisUser.personas.some(persona => persona.uuid === id)
-    : false; // returns true if the profile page belongs to the logged in user
+  const ownProfile =
+    thisUser && thisUser.personas
+      ? thisUser.personas.some(persona => persona.uuid === id)
+      : false; // returns true if the profile page belongs to the logged in user
 
   const { data: persona, loading: loadingPersona } = useGetPersona({
     id: id,
@@ -130,7 +131,7 @@ export default function Profile() {
   });
 
   const { mutate: updateUser } = usePutUser({
-    id: thisUser.uuid,
+    id: thisUser ? thisUser.uuid : null,
   });
 
   const { mutate: updatePersona } = usePutPersona({
@@ -138,6 +139,7 @@ export default function Profile() {
   });
 
   const [displayedPersona, setDisplayedPersona] = useState(null);
+  const [selectedPersona, setSelectedPersona] = useState(null);
 
   const [editMode, setEditMode] = useState(false);
   const handleEdit = () => {
@@ -172,14 +174,14 @@ export default function Profile() {
     console.log('changing email');
   };
 
-  const personas = !thisUser ? [] : thisUser.personas;
+  const personas = !thisUser || !thisUser.personas ? [] : thisUser.personas;
 
   const [name, setName] = useState(
     displayedPersona ? displayedPersona.name : '',
   );
   const orcid = ownProfile
     ? thisUser.orcid
-    : displayedPersona && displayedPersona.identity
+    : displayedPersona && !displayedPersona.isAnonymous
     ? displayedPersona.identity.orcid
     : '';
   const [contacts, setContacts] = useState(ownProfile ? thisUser.contacts : []);
@@ -191,11 +193,17 @@ export default function Profile() {
   );
 
   const handleChange = e => {
+    setSelectedPersona(e.target.value);
+    setDisplayedPersona(e.target.value);
     history.push(`/about/${e.target.value.uuid}`);
     updateUser({ defaultPersona: e.target.value.id })
       .then(() => {
-        alert(`You've successfully updated your active persona.`);
-        setDisplayedPersona(e.target.value);
+        alert(
+          `You've successfully updated your active persona to ${
+            e.target.value.name
+          }.`,
+        );
+        return;
       })
       .catch(err => alert(`An error occurred: ${err.message}`));
   };
@@ -205,8 +213,14 @@ export default function Profile() {
   }, [loadingPersona, persona]);
 
   useEffect(() => {
-    setUser({ ...thisUser, defaultPersona: displayedPersona });
-  }, [displayedPersona]);
+    if (
+      ownProfile &&
+      selectedPersona &&
+      selectedPersona.uuid !== thisUser.defaultPersona.uuid
+    ) {
+      setUser({ ...thisUser, defaultPersona: selectedPersona });
+    }
+  }, [selectedPersona]);
 
   if (!displayedPersona) {
     return <Loading />;
@@ -250,9 +264,11 @@ export default function Profile() {
                       <Grid item>
                         <Select
                           value={
-                            personas.filter(
-                              p => p.uuid === displayedPersona.uuid,
-                            )[0]
+                            thisUser
+                              ? personas.filter(
+                                  p => p.uuid === thisUser.defaultPersona.uuid,
+                                )[0]
+                              : ''
                           }
                           onChange={handleChange}
                           className={classes.select}
@@ -462,9 +478,7 @@ export default function Profile() {
                     {ownProfile ? (
                       <IconButton href="/settings">
                         <Avatar
-                          src={
-                            persona ? persona.avatar : displayedPersona.avatar
-                          }
+                          src={displayedPersona.avatar}
                           className={classes.avatar}
                         />
                       </IconButton>
