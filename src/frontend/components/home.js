@@ -102,6 +102,9 @@ const useStyles = makeStyles(theme => ({
     flexDirection: 'column',
     height: '100%',
     justifyContent: 'space-between',
+    '&:hover': {
+      backgroundColor: '#ccc',
+    },
   },
   cardImage: {
     display: 'block',
@@ -297,7 +300,7 @@ export default function Home() {
       </Hidden>
       <Box py={8} className={classes.cardsBox}>
         <Container className={classes.cards}>
-          <Card className={classes.card}>
+          <Card className={classes.card} elevation={3}>
             {/* FIXME loop*/}
             <CardActionArea
               className={classes.cardAction}
@@ -343,7 +346,7 @@ export default function Home() {
               </ReactCardFlip>
             </CardActionArea>
           </Card>
-          <Card className={classes.card}>
+          <Card className={classes.card} elevation={3}>
             <CardActionArea
               className={classes.cardAction}
               onClick={() => handleFlip(1)}
@@ -387,7 +390,7 @@ export default function Home() {
               </ReactCardFlip>
             </CardActionArea>
           </Card>
-          <Card className={classes.card}>
+          <Card className={classes.card} elevation={3}>
             <CardActionArea
               className={classes.cardAction}
               onClick={() => handleFlip(2)}
