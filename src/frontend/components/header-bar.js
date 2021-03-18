@@ -59,6 +59,9 @@ const useStyles = makeStyles(theme => ({
   nested: {
     paddingLeft: theme.spacing(4),
   },
+  userBadge: {
+    minWidth: 165,
+  },
 }));
 
 export default function HeaderBar({ thisUser }) {
@@ -319,7 +322,7 @@ export default function HeaderBar({ thisUser }) {
             </Link>
           </Grid>
         </Grid>
-        <span className={`header-bar__nav-item--user-badge`}>
+        <span className={classes.userBadge}>
           {thisUser ? (
             <UserBadge user={thisUser} showNotice={showProfileNotice}>
               {showProfileNotice && (
