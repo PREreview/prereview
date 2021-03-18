@@ -36,7 +36,7 @@ export default function Settings() {
         </section>
 
         <SettingsRoles user={user} updateUser={setUser} />
-        <SettingsNotifications user={user} />
+        {/* <SettingsNotifications user={user} /> */}
         <SettingsInvites user={user} />
         {/*<SettingsApi user={user} />*/}
 

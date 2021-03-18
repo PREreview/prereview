@@ -1,7 +1,7 @@
 // base imports
 import React, { useContext, useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { useParams } from 'react-router-dom';
+import { useParams, useHistory, useLocation } from 'react-router-dom';
 import { format } from 'date-fns';
 import AvatarEditor from 'react-avatar-editor';
 
@@ -42,10 +42,10 @@ import TextField from '@material-ui/core/TextField';
 
 // components
 import HeaderBar from './header-bar';
-import LabelStyle from './label-style';
+import Banner from './banner.js';
 import Loading from './loading.js';
-//import NotFound from './not-found';
 import RoleActivity from './role-activity';
+import SettingsNotifications from './settings-notifications';
 
 // constants
 import { ORG } from '../constants';
@@ -118,12 +118,13 @@ const useStyles = makeStyles(theme => ({
 export default function Profile() {
   const classes = useStyles();
   const [thisUser, setUser] = useContext(UserProvider.context);
+  const history = useHistory();
   const { id } = useParams();
   const ownProfile = thisUser
     ? thisUser.personas.some(persona => persona.uuid === id)
     : false; // returns true if the profile page belongs to the logged in user
 
-  const { data: persona, loading } = useGetPersona({
+  const { data: persona, loading: loadingPersona } = useGetPersona({
     id: id,
     resolve: persona => persona.data[0],
   });
@@ -136,13 +137,7 @@ export default function Profile() {
     id: id,
   });
 
-  const [selectedPersona, setSelectedPersona] = useState(
-    thisUser ? thisUser.defaultPersona : {},
-  );
-
-  let [displayedPersona, setDisplayedPersona] = useState(
-    ownProfile ? selectedPersona : !loading ? persona : {},
-  );
+  const [displayedPersona, setDisplayedPersona] = useState(null);
 
   const [editMode, setEditMode] = useState(false);
   const handleEdit = () => {
@@ -154,7 +149,7 @@ export default function Profile() {
 
   const onSave = () => {
     if (name === displayedPersona.name && bio === displayedPersona.bio) {
-      alert(`No changes were made.`)
+      alert(`No changes were made.`);
       return;
     }
     let data = {
@@ -167,13 +162,38 @@ export default function Profile() {
         alert(`You've successfully updated your persona.`);
         setEditMode(false);
         setDisplayedPersona(updated);
-        setName(updated.name)
-        setBio(updated.bio)
+        setName(updated.name);
+        setBio(updated.bio);
       })
       .catch(err => alert(`ERROR!`, err.message));
   };
 
+  const handleEmailChange = () => {
+    console.log('changing email');
+  };
+
   const personas = !thisUser ? [] : thisUser.personas;
+
+  // personas
+  //   ? personas.map(p => console.log('avatar in the personas', p.name, p.avatar))
+  //   : null;
+  // selectedPersona
+  //   ? console.log(
+  //       'selectedPersona?',
+  //       selectedPersona.name,
+  //       selectedPersona.avatar,
+  //     )
+  //   : console.log('no selected persona yet');
+  // displayedPersona
+  //   ? console.log(
+  //       'displayedPersona',
+  //       displayedPersona.name,
+  //       displayedPersona.avatar,
+  //     )
+  //   : console.log('no displayed persona');
+  // persona && !loadingPer
+  //   ? console.log('persona', persona.name, '\n', persona.avatar)
+  //   : console.log('hi, no persona yet');
 
   const [name, setName] = useState(
     displayedPersona ? displayedPersona.name : '',
@@ -183,33 +203,34 @@ export default function Profile() {
     : displayedPersona && displayedPersona.identity
     ? displayedPersona.identity.orcid
     : '';
-  const [contacts, setContacts] = useState(
-    displayedPersona && !displayedPersona.isAnonymous
-      ? displayedPersona.identity.contacts
-      : [],
-  );
+  const [contacts, setContacts] = useState(ownProfile ? thisUser.contacts : []);
   const [expertise, setExpertise] = useState([]);
   const badges =
     displayedPersona && displayedPersona.badges ? displayedPersona.badges : [];
   const [bio, setBio] = useState(
-    displayedPersona && displayedPersona.bio ? displayedPersona.bio : null,
+    displayedPersona && displayedPersona.bio ? displayedPersona.bio : '',
   );
 
   const handleChange = e => {
+    console.log("handling Change")
+    history.push(`/about/${e.target.value.uuid}`);
     updateUser({ defaultPersona: e.target.value.id })
       .then(() => {
         alert(`You've successfully updated your active persona.`);
-        return setSelectedPersona(e.target.value);
+        setDisplayedPersona(e.target.value);
       })
       .catch(err => alert(`An error occurred: ${err.message}`));
   };
 
   useEffect(() => {
-    setUser({ ...thisUser, defaultPersona: selectedPersona });
-    setDisplayedPersona(selectedPersona);
-  }, [selectedPersona]);
+    if (!loadingPersona && persona) setDisplayedPersona(persona);
+  }, [loadingPersona, persona]);
 
-  if (!persona || loading) {
+  useEffect(() => {
+    setUser({ ...thisUser, defaultPersona: displayedPersona });
+  }, [displayedPersona]);
+
+  if (!displayedPersona) {
     return <Loading />;
   } else {
     return (
@@ -219,11 +240,11 @@ export default function Profile() {
             {displayedPersona.name} • {ORG}
           </title>
         </Helmet>
-
-        <HeaderBar thisUser={thisUser} closeGap />
+        <Banner />
+        <HeaderBar thisUser={thisUser} />
 
         <Box my={10}>
-          <Container>
+          <Container className="profile">
             {ownProfile ? (
               <Box my={4}>
                 <Container>
@@ -250,7 +271,11 @@ export default function Profile() {
                       </Grid>
                       <Grid item>
                         <Select
-                          value={selectedPersona}
+                          value={
+                            personas.filter(
+                              p => p.uuid === displayedPersona.uuid,
+                            )[0]
+                          }
                           onChange={handleChange}
                           className={classes.select}
                           renderValue={selected => (
@@ -261,13 +286,16 @@ export default function Profile() {
                               spacing={2}
                             >
                               <Grid item>
-                                <Avatar
-                                  src={selected.avatar}
-                                  className={classes.small}
-                                />
+                                <Avatar className={classes.small}>
+                                  {selected.name.charAt(0)}
+                                </Avatar>
                               </Grid>
                               <Grid item>
-                                <span>{selected.name}</span>
+                                <span>
+                                  {selected.isAnonymous
+                                    ? `Anonymous persona`
+                                    : `Public persona`}
+                                </span>
                               </Grid>
                             </Grid>
                           )}
@@ -276,7 +304,9 @@ export default function Profile() {
                             ? personas.map(p => {
                                 return (
                                   <MenuItem key={p.uuid} value={p}>
-                                    {p.name}
+                                    {p.isAnonymous
+                                      ? `Anonymous persona: ${p.name}`
+                                      : `Public persona: ${p.name}`}
                                   </MenuItem>
                                 );
                               })
@@ -395,8 +425,7 @@ export default function Profile() {
                                 id="email"
                                 label="email"
                                 value={''}
-                                onChange={e => {
-                                }}
+                                onChange={e => {}}
                                 variant="outlined"
                               />
                             )
@@ -408,6 +437,7 @@ export default function Profile() {
                             `None provided.`
                           )}
                         </Typography>
+                        {/* <SettingsNotifications user={thisUser} /> */}
                       </Box>
                     ) : null}
                     <Box>
@@ -424,7 +454,7 @@ export default function Profile() {
                             ))
                           : 'No badges yet.'}
                       </Typography>
-                      <Typography component="div" variant="body1" gutterBottom>
+                      {/* <Typography component="div" variant="body1" gutterBottom>
                         <b>Area(s) of expertise: </b>
                         {editMode ? (
                           <Select
@@ -443,7 +473,7 @@ export default function Profile() {
                         ) : (
                           `No area of expertise selected yet.`
                         )}
-                      </Typography>
+                      </Typography> */}
                       <Typography component="div" variant="body1" gutterBottom>
                         Community member since{' '}
                         {format(new Date(persona.createdAt), 'MMM. d, yyyy')}
@@ -454,7 +484,9 @@ export default function Profile() {
                     {ownProfile ? (
                       <IconButton href="/settings">
                         <Avatar
-                          src={displayedPersona.avatar}
+                          src={
+                            persona ? persona.avatar : displayedPersona.avatar
+                          }
                           className={classes.avatar}
                         />
                       </IconButton>
