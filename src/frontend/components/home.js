@@ -83,12 +83,17 @@ const useStyles = makeStyles(theme => ({
     },
   },
   card: {
+    height: 300,
     marginBottom: '1rem',
     [theme.breakpoints.up('md')]: {
+      height: 500,
       width: '30%',
     },
   },
   cardAction: {
+    height: '100%',
+  },
+  cardBack: {
     height: '100%',
   },
   cardContent: {
@@ -326,8 +331,8 @@ export default function Home() {
                     />
                   </CardMedia>
                 </Box>
-                <Box p={3}>
-                  <Typography component="div">
+                <Box p={3} className={classes.cardBack}>
+                  <Typography component="div" gutterBottom>
                     <Link href="/reviews" className={classes.cardTitle}>
                       A platform for crowdsourcing of preprint reviews
                     </Link>
@@ -360,7 +365,10 @@ export default function Home() {
               >
                 <Box p={3} className={classes.cardFront}>
                   <CardContent>
-                    <Link href="https://content.prereview.org/resources/" className={classes.cardTitle}>
+                    <Link
+                      href="https://content.prereview.org/resources/"
+                      className={classes.cardTitle}
+                    >
                       Resource Center
                     </Link>
                   </CardContent>
@@ -373,8 +381,8 @@ export default function Home() {
                     />
                   </CardMedia>
                 </Box>
-                <Box p={3}>
-                  <Typography component="div">
+                <Box p={3} className={classes.cardBack}>
+                  <Typography component="div" gutterBottom>
                     <Link
                       href="https://content.prereview.org/resources/"
                       className={classes.cardTitle}
@@ -422,8 +430,8 @@ export default function Home() {
                     />
                   </CardMedia>
                 </Box>
-                <Box p={3}>
-                  <Typography component="div">
+                <Box p={3} className={classes.cardBack}>
+                  <Typography component="div" gutterBottom>
                     <Link href="/communities" className={classes.cardTitle}>
                       A hub for peer review communities
                     </Link>
