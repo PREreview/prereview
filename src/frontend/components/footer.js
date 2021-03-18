@@ -168,13 +168,6 @@ export default function Footer() {
           </Box>
         </Grid>
         <Grid item xs={12} md={4}>
-          <TwitterTimelineEmbed
-            sourceType="profile"
-            screenName="PREreview_"
-            options={{ height: 600 }}
-          />
-        </Grid>
-        <Grid item xs={12} md={4}>
           <Box bgcolor="#54948E" color="#fff" p={8} height="80%">
             <Typography variant="h4" component="h2" gutterBottom>
               Stay Connected.
@@ -190,6 +183,13 @@ export default function Footer() {
               </em>
             </Typography>
           </Box>
+        </Grid>
+        <Grid item xs={12} md={4}>
+          <TwitterTimelineEmbed
+            sourceType="profile"
+            screenName="PREreview_"
+            options={{ height: 600 }}
+          />
         </Grid>
       </Grid>
     </Box>
