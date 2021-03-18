@@ -154,7 +154,7 @@ const useStyles = makeStyles(theme => ({
       backgroundImage: `url(${HeroImg})`,
       backgroundPosition: 'right bottom',
       backgroundRepeat: 'no-repeat',
-      backgroundSize: '50vh',
+      backgroundSize: '60vh',
       padding: '1rem',
     },
   },
