@@ -313,7 +313,7 @@ export default function Home() {
               >
                 <Box p={3} className={classes.cardFront}>
                   <CardContent>
-                    <Link href="#FIXME" className={classes.cardTitle}>
+                    <Link href="/reviews" className={classes.cardTitle}>
                       Preprint Review Platform
                     </Link>
                   </CardContent>
@@ -327,8 +327,10 @@ export default function Home() {
                   </CardMedia>
                 </Box>
                 <Box p={3}>
-                  <Typography className={classes.cardTitle} component="div">
-                    A platform for crowdsourcing of preprint reviews
+                  <Typography component="div">
+                    <Link href="/reviews" className={classes.cardTitle}>
+                      A platform for crowdsourcing of preprint reviews
+                    </Link>
                   </Typography>
                   <Typography variant="body1" component="div" gutterBottom>
                     <b>Read, request, and write</b> rapid and long-form preprint
@@ -358,7 +360,7 @@ export default function Home() {
               >
                 <Box p={3} className={classes.cardFront}>
                   <CardContent>
-                    <Link href="#FIXME" className={classes.cardTitle}>
+                    <Link href="https://content.prereview.org/resources/" className={classes.cardTitle}>
                       Resource Center
                     </Link>
                   </CardContent>
@@ -372,9 +374,14 @@ export default function Home() {
                   </CardMedia>
                 </Box>
                 <Box p={3}>
-                  <Typography className={classes.cardTitle} component="div">
-                    A space to grow as a socially-conscious, constructive
-                    reviewer
+                  <Typography component="div">
+                    <Link
+                      href="https://content.prereview.org/resources/"
+                      className={classes.cardTitle}
+                    >
+                      A space to grow as a socially-conscious, constructive
+                      reviewer
+                    </Link>
                   </Typography>
                   <Typography variant="body1" component="div" gutterBottom>
                     <b>Learn</b> how to provide constructive feedback
@@ -402,7 +409,7 @@ export default function Home() {
               >
                 <Box p={3} className={classes.cardFront}>
                   <CardContent>
-                    <Link href="#FIXME" className={classes.cardTitle}>
+                    <Link href="/communities" className={classes.cardTitle}>
                       PREreview Communities
                     </Link>
                   </CardContent>
@@ -416,8 +423,10 @@ export default function Home() {
                   </CardMedia>
                 </Box>
                 <Box p={3}>
-                  <Typography className={classes.cardTitle} component="div">
-                    A hub for peer review communities
+                  <Typography component="div">
+                    <Link href="/communities" className={classes.cardTitle}>
+                      A hub for peer review communities
+                    </Link>
                   </Typography>
                   <Typography variant="body1" component="div" gutterBottom>
                     <b>Find</b> communities that are discussing research
