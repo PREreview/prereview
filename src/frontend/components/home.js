@@ -553,7 +553,10 @@ export default function Home() {
                 co-creation of content across research communities to improve
                 diversity and openness in peer review.
               </Typography>
-              <Link href="#FIXME" className={classes.gridLink}>
+              <Link
+                href="https://mailchi.mp/97886570610a/prereview-newsletter-signup"
+                className={classes.gridLink}
+              >
                 Stay connected via our newsletter
               </Link>
             </Grid>
@@ -586,7 +589,10 @@ export default function Home() {
                 Our graduates join a list of diverse trained reviewers made
                 available to editors.
               </Typography>
-              <Link href="#FIXME" className={classes.gridLink}>
+              <Link
+                href="https://content.prereview.org/openreviewers"
+                className={classes.gridLink}
+              >
                 Learn more and get involved
               </Link>
             </Grid>
