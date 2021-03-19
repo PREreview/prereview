@@ -5,12 +5,10 @@ import { useDropzone } from 'react-dropzone';
 import { MdPerson } from 'react-icons/md';
 import Button from './button';
 import Controls from './controls';
-import TextInput from './text-input';
 import { usePutPersona } from '../hooks/api-hooks.tsx';
 
 export default function RoleEditor({ persona, onCancel, onSaved }) {
   const editorRef = useRef();
-  const [name, setName] = useState(persona.name);
   const [image, setImage] = useState(null);
   const [file, setFile] = useState(null);
   const [scale, setScale] = useState(1);
@@ -70,14 +68,6 @@ export default function RoleEditor({ persona, onCancel, onSaved }) {
   return (
     <div className="role-editor">
       <div className="role-editor__content">
-        <TextInput
-          className="role-editor__name_input"
-          label="Display Name"
-          value={name}
-          onChange={e => {
-            setName(e.target.value);
-          }}
-        />
 
         <div className="role-editor__avatar-block">
           <h4 className="role-editor__avatar-block-title">Avatar Editor</h4>

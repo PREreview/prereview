@@ -34,7 +34,6 @@ import Input from '@material-ui/core/Input';
 import Link from '@material-ui/core/Link';
 import MenuItem from '@material-ui/core/MenuItem';
 import MuiButton from '@material-ui/core/Button';
-import Modal from '@material-ui/core/Modal';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import Select from '@material-ui/core/Select';
@@ -44,7 +43,9 @@ import TextField from '@material-ui/core/TextField';
 import HeaderBar from './header-bar';
 import Banner from './banner.js';
 import Loading from './loading.js';
+import Modal from './modal';
 import RoleActivity from './role-activity';
+import RoleEditor from './role-editor';
 import SettingsNotifications from './settings-notifications';
 
 // constants
@@ -169,6 +170,13 @@ export default function Profile() {
       })
       .catch(err => alert(`ERROR!`, err.message));
   };
+
+  const [avatarModalOpen, setAvatarModalOpen] = useState(false);
+  const handleAvatarClick = () => {
+    console.log('clicking avatar');
+    setAvatarModalOpen(true);
+  };
+  console.log('avatarMOdal state', avatarModalOpen);
 
   const handleEmailChange = () => {
     console.log('changing email');
@@ -476,7 +484,7 @@ export default function Profile() {
                   </Grid>
                   <Grid item>
                     {ownProfile ? (
-                      <IconButton href="/settings">
+                      <IconButton onClick={handleAvatarClick}>
                         <Avatar
                           src={displayedPersona.avatar}
                           className={classes.avatar}
@@ -490,6 +498,23 @@ export default function Profile() {
                     )}
                   </Grid>
                 </Grid>
+
+                {avatarModalOpen ? (
+                  <Modal
+                    className="settings-role-editor-modal"
+                    title="Edit avatar"
+                    onClose={() => {
+                      setAvatarModalOpen(false);
+                    }}
+                  >
+                    <RoleEditor
+                      persona={displayedPersona}
+                      onCancel={() => {
+                        setAvatarModalOpen(false);
+                      }}
+                    />
+                  </Modal>
+                ) : null}
                 <Typography component="div" variant="body1" gutterBottom>
                   <b>About</b>
                 </Typography>
