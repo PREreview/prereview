@@ -184,9 +184,7 @@ export default function Profile() {
 
   const personas = !thisUser || !thisUser.personas ? [] : thisUser.personas;
 
-  const [name, setName] = useState(
-    displayedPersona ? displayedPersona.name : '',
-  );
+  const [name, setName] = useState('');
   const orcid = ownProfile
     ? thisUser.orcid
     : displayedPersona && !displayedPersona.isAnonymous
@@ -200,9 +198,9 @@ export default function Profile() {
     displayedPersona && displayedPersona.bio ? displayedPersona.bio : '',
   );
 
+  console.log('name!', name);
+
   const handleChange = e => {
-    setSelectedPersona(e.target.value);
-    setDisplayedPersona(e.target.value);
     history.push(`/about/${e.target.value.uuid}`);
     updateUser({ defaultPersona: e.target.value.id })
       .then(() => {
@@ -211,10 +209,18 @@ export default function Profile() {
             e.target.value.name
           }.`,
         );
-        return;
+        setSelectedPersona(e.target.value);
+        setDisplayedPersona(e.target.value);
       })
       .catch(err => alert(`An error occurred: ${err.message}`));
   };
+
+  useEffect(() => {
+    if (displayedPersona && ownProfile) {
+      setName(displayedPersona.name);
+      setBio(displayedPersona.bio);
+    }
+  }, [displayedPersona]);
 
   useEffect(() => {
     if (!loadingPersona && persona) setDisplayedPersona(persona);
