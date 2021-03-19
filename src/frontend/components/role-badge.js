@@ -1,16 +1,13 @@
 // base imports
 import React, { useState } from 'react';
-import { useHistory } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import Tooltip from '@reach/tooltip';
 
 // material UI
 import { makeStyles } from '@material-ui/core/styles';
 import Avatar from '@material-ui/core/Avatar';
+import Link from '@material-ui/core/Link';
 import Popover from '@material-ui/core/Popover';
-
-// components
-import XLink from './xlink';
+import Typography from '@material-ui/core/Typography';
 
 const useStyles = makeStyles(theme => ({
   avatar: {
@@ -49,7 +46,6 @@ const RoleBadge = ({ user, children }) => {
   // ****  USER IN THIS COMPONENT IS A PERSONA OBJECT **** //
 
   const classes = useStyles();
-  const history = useHistory();
   const [anchorEl, setAnchorEl] = useState(null);
   const [tooltipDisplay, setTooltipDisplay] = useState('none');
   const handleClick = event => {
@@ -98,37 +94,25 @@ const RoleBadge = ({ user, children }) => {
       >
         <div className={classes.popoverInner}>
           {user.reviewUuid ? (
-            <XLink
-              className="menu__list__link-item"
-              onClick={event => {
-                event.preventDefault();
-                history.push(`${user.reviewUuid}`);
-              }}
-              href={`${user.reviewUuid}`}
-              target={process.env.IS_EXTENSION ? '_blank' : undefined}
-              to={process.env.IS_EXTENSION ? undefined : `${user.reviewUuid}`}
+            <Typography component="div">
+              <Link href={user.reviewUuid}>
+                {user && user.defaultPersona
+                  ? `View ${user.defaultPersona.name}'s Review`
+                  : `View ${user.name}'s Review`}
+              </Link>
+            </Typography>
+          ) : null}
+          <Typography component="div">
+            <Link
+              href={`/about/${
+                user.defaultPersona ? user.defaultPersona.uuid : user.uuid
+              }`}
             >
               {user && user.defaultPersona
-                ? `View ${user.defaultPersona.name}'s Review`
-                : `View ${user.name}'s Review`}
-            </XLink>
-          ) : null}
-          <XLink
-            className="menu__list__link-item"
-            href={`/about/${user.uuid}`}
-            target={process.env.IS_EXTENSION ? '_blank' : undefined}
-            to={
-              process.env.IS_EXTENSION
-                ? undefined
-                : `/about/${
-                    user.defaultPersona ? user.defaultPersona.uuid : user.uuid
-                  }`
-            }
-          >
-            {user && user.defaultPersona
-              ? `View ${user.defaultPersona.name}'s Profile`
-              : `View ${user.name}'s Profile`}
-          </XLink>
+                ? `View ${user.defaultPersona.name}'s Profile`
+                : `View ${user.name}'s Profile`}
+            </Link>
+          </Typography>
           {children}
         </div>
       </Popover>

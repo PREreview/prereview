@@ -43,9 +43,6 @@ export default function ExtensionFallback() {
 
   const { id, cid } = useParams();
 
-  console.log('id: ', id);
-  console.log('cid: ', cid);
-
   const { data: preprintData, loadingPreprint, errorPreprint } = useGetPreprint({id: id});
 
   useEffect(() => {

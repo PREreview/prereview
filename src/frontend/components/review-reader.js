@@ -238,6 +238,7 @@ const ReviewReader = React.memo(function ReviewReader({
                   </Typography>
                   <div className="review-reader__persona-selector">
                     <Reviewers
+                      preprintId={preprint.uuid}
                       allReviews={allRapidReviews}
                       hasReviewed={rapidContent}
                       user={user}
@@ -297,6 +298,7 @@ const ReviewReader = React.memo(function ReviewReader({
                   </Typography>
                   <div className="review-reader__persona-selector">
                     <Reviewers
+                      preprintId={preprint.uuid}
                       role={role}
                       allReviews={publishedReviews}
                       hasReviewed={longContent && longContent.length}
