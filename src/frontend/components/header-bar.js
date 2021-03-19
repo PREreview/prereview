@@ -195,7 +195,10 @@ export default function HeaderBar({ thisUser }) {
             </Link>
           </MenuItem>
           <MenuItem className={classes.nested}>
-            <Link className={classes.mobileNavItem} href="#FIXME">
+            <Link
+              className={classes.mobileNavItem}
+              href="https://content.prereview.org/coc"
+            >
               Code of Conduct
             </Link>
           </MenuItem>
