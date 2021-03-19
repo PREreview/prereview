@@ -144,6 +144,9 @@ const useStyles = makeStyles(theme => ({
   gridContent: {
     fontSize: '1.5rem',
   },
+  gridContentLink: {
+    color: `${theme.palette.primary.main} !important`,
+  },
   gridLink: {
     backgroundColor: '#FCBD4C',
     border: '4px solid #FCBD4C',
@@ -193,6 +196,10 @@ const useStyles = makeStyles(theme => ({
   standout: {
     fontSize: '2.5rem',
     fontWeight: 'bold',
+  },
+  standoutLink: {
+    color: '#fff !important',
+    textDecoration: 'underline',
   },
 }));
 
@@ -488,8 +495,14 @@ export default function Home() {
                 className={classes.gridContent}
               >
                 We are committed to providing a safe space for all voices to be
-                heard without fear of retribution by enforcing a Code of
-                Conduct.
+                heard without fear of retribution by enforcing a{' '}
+                <Link
+                  href="https://content.prereview.org/coc"
+                  className={classes.gridContentLink}
+                >
+                  Code of Conduct
+                </Link>
+                .
               </Typography>
             </Grid>
             <Grid item sm={12} md={6}>
@@ -692,8 +705,14 @@ export default function Home() {
       <Box bgcolor="#54948E" color="#fff" textAlign="center" py={8}>
         <Container>
           <Typography className={classes.standout} gutterBottom>
-            PREreview is a fiscally sponsored project of Code for Science and
-            Society. Help us grow our impact!
+            PREreview is a fiscally sponsored project of{' '}
+            <Link
+              href="https://codeforscience.org/"
+              className={classes.standoutLink}
+            >
+              Code for Science and Society
+            </Link>
+            . Help us grow our impact!
           </Typography>
           <Link
             href="https://codeforscience.org/donate/prereview/"

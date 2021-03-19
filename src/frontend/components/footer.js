@@ -160,8 +160,15 @@ export default function Footer() {
             <Box borderTop="1px solid #000" mt={2} pt={2}>
               <Typography>
                 <em>
-                  This content is available under a Creative Commons Attribution
-                  License.
+                  Except where otherwise noted, content on this site is licensed
+                  under a{' '}
+                  <Link href="https://creativecommons.org/licenses/by/4.0/">
+                    Creative Commons Attribution 4.0 International license
+                  </Link>
+                  . All project and service logos, images, videos, and brands
+                  are property of their respective owners and should not be
+                  reused without permission, except where otherwise noted. Icons
+                  by The Noun Project.
                 </em>
               </Typography>
             </Box>
