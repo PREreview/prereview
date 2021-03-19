@@ -30,7 +30,7 @@ export default function SettingsKeys({ user }) {
 
   const { mutate: postKey } = usePostUserKey({ id: user.uuid });
 
-  useEffect(() => { }, [userKeys]);
+  useEffect(() => {}, [userKeys]);
 
   return (
     <section className="settings-keys settings__section">
@@ -39,22 +39,27 @@ export default function SettingsKeys({ user }) {
       <p className="settings-keys__notice">
         <MdInfoOutline className="settings-keys__notice-icon" />
         <span>
-          API keys allow an application to access this site with the same identity and privileges as your user account. <em>Please be careful who you share these keys with, and delete any that are no longer used or may be compromised.</em>
+          API keys allow an application to access this site with the same
+          identity and privileges as your user account.{' '}
+          <em>
+            Please be careful who you share these keys with, and delete any that
+            are no longer used or may be compromised.
+          </em>
         </span>
       </p>
 
       {userKeys.length
         ? userKeys.map(credentials => (
-          <ApiKey
-            key={credentials.uuid}
-            userId={user.uuid}
-            credentials={credentials}
-            onDelete={() => {
-              setUserKeys(userKeys.filter(k => k.uuid !== credentials.uuid));
-              return;
-            }}
-          />
-        ))
+            <ApiKey
+              key={credentials.uuid}
+              userId={user.uuid}
+              credentials={credentials}
+              onDelete={() => {
+                setUserKeys(userKeys.filter(k => k.uuid !== credentials.uuid));
+                return;
+              }}
+            />
+          ))
         : null}
 
       <div className="settings-keys__name">
@@ -113,16 +118,17 @@ function ApiKey({ userId, credentials, onDelete }) {
     <div className="settings-keys__delete">
       <span>{`${credentials.app}`}</span>
       <span>{`${credentials.secret}`}</span>
-      <IconButton onClick={() => {
-        if (confirm('Are you sure you want to delete this API key?')) {
-          deleteKey()
+      <IconButton
+        onClick={() => {
+          if (confirm('Are you sure you want to delete this API key?')) {
+            deleteKey()
               .then(() => {
                 onDelete();
                 alert('API key deleted successfully.');
               })
               .catch(err => alert(`An error occurred: ${err.message}`));
-        }
-      }}
+          }
+        }}
       >
         <Delete />
       </IconButton>
