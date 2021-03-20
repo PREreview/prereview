@@ -35,17 +35,14 @@ export default function useScript(src) {
         const setAttributeFromEvent = event => {
           scriptTag.setAttribute(
             'data-status',
-
             event.type === 'load' ? 'ready' : 'error',
           );
         };
 
         scriptTag.addEventListener('load', setAttributeFromEvent);
-
         scriptTag.addEventListener('error', setAttributeFromEvent);
       } else {
         // Grab existing script status from attribute and set to state.
-
         setStatus(scriptTag.getAttribute('data-status'));
       }
 
@@ -71,35 +68,5 @@ export default function useScript(src) {
     [src], // Only re-run effect if script src changes
   );
 
-  return <div>Endorsements</div>
+  return <p>Endorsements</p>
 }
-
-
-
-// export default function PlauditScript() {
-//   const [isScriptLoaded, setIsScriptLoaded] = useState(false);
-
-//   const handleScriptLoad = () => {
-//     setIsScriptLoaded(true);
-//   };
-
-//   isScriptLoaded
-//     ? console.log('Plaudit.pub script loaded')
-//     : console.log('Plaudit nowhere to be found');
-
-//   const loadingElement = () => {
-//     return <div>Loading...</div>;
-//   };
-
-//   let AsyncScriptComponent;
-
-//   isScriptLoaded
-//     ? (AsyncScriptComponent = makeAsyncScriptLoader(PLAUDITURL, DATA_ATTR)(
-//         Plaudit,
-//       ))
-//     : (AsyncScriptComponent = makeAsyncScriptLoader(PLAUDITURL, DATA_ATTR)(
-//         loadingElement,
-//       ));
-
-//   return <AsyncScriptComponent asyncScriptOnLoad={handleScriptLoad} />;
-// }
