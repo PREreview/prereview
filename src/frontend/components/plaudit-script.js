@@ -24,7 +24,6 @@ export default function useScript(src) {
         // Create script
         script = document.createElement('script');
         script.src = src;
-        script.async = true;
         script.setAttribute('data-status', 'loading');
         script.setAttribute('data-embedder-id', 'prereview')
 
@@ -72,7 +71,7 @@ export default function useScript(src) {
     [src], // Only re-run effect if script src changes
   );
 
-  return status;
+  return <div>Endorsements</div>
 }
 
 
