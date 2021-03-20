@@ -241,7 +241,7 @@ const LongformReviewReader = props => {
                   <Grid item xs={12} sm={2}>
                     <a href={`https://doi.org/${review.doi}`}>
                       <img
-                        src={`https://sandbox.zenodo.org/badge/DOI/${
+                        src={`https://zenodo.org/badge/DOI/${
                           review.doi
                         }.svg`}
                       />
