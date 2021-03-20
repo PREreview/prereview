@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-// import makeAsyncScriptLoader from 'react-async-script'; 
 
+// with thanks to https://usehooks.com/useScript/  
 
 export default function useScript(src) {
   // Keep track of script status ("idle", "loading", "ready", "error")
