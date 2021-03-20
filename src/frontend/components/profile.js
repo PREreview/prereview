@@ -3,7 +3,6 @@ import React, { useContext, useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useParams, useHistory, useLocation } from 'react-router-dom';
 import { format } from 'date-fns';
-import AvatarEditor from 'react-avatar-editor';
 
 // contexts
 import UserProvider from '../contexts/user-context';
@@ -32,6 +31,8 @@ import FormHelperText from '@material-ui/core/FormHelperText';
 import IconButton from '@material-ui/core/IconButton';
 import Input from '@material-ui/core/Input';
 import Link from '@material-ui/core/Link';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
 import MenuItem from '@material-ui/core/MenuItem';
 import MuiButton from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
@@ -150,6 +151,10 @@ export default function Profile() {
     setEditMode(false);
   };
 
+  const handleChange = () => {
+    console.log('changing expertise');
+  };
+
   const onSave = () => {
     if (name === displayedPersona.name && bio === displayedPersona.bio) {
       alert(`No changes were made.`);
@@ -173,13 +178,7 @@ export default function Profile() {
 
   const [avatarModalOpen, setAvatarModalOpen] = useState(false);
   const handleAvatarClick = () => {
-    console.log('clicking avatar');
     setAvatarModalOpen(true);
-  };
-  console.log('avatarMOdal state', avatarModalOpen);
-
-  const handleEmailChange = () => {
-    console.log('changing email');
   };
 
   const personas = !thisUser || !thisUser.personas ? [] : thisUser.personas;
@@ -198,10 +197,7 @@ export default function Profile() {
     displayedPersona && displayedPersona.bio ? displayedPersona.bio : '',
   );
 
-  console.log('name!', name);
-
-  const handleChange = e => {
-    history.push(`/about/${e.target.value.uuid}`);
+  const handlePersonaChange = e => {
     updateUser({ defaultPersona: e.target.value.id })
       .then(() => {
         alert(
@@ -224,6 +220,8 @@ export default function Profile() {
 
   useEffect(() => {
     if (!loadingPersona && persona) setDisplayedPersona(persona);
+    if (!loadingPersona && !ownProfile && !persona.isAnonymous)
+      setContacts(persona.identity.contacts);
   }, [loadingPersona, persona]);
 
   useEffect(() => {
@@ -232,7 +230,11 @@ export default function Profile() {
       selectedPersona &&
       selectedPersona.uuid !== thisUser.defaultPersona.uuid
     ) {
-      setUser({ ...thisUser, defaultPersona: selectedPersona });
+      history.push(`/about/${selectedPersona.uuid}`);
+      setUser({
+        ...thisUser,
+        defaultPersona: selectedPersona,
+      });
     }
   }, [selectedPersona]);
 
@@ -246,7 +248,7 @@ export default function Profile() {
             {displayedPersona.name} • {ORG}
           </title>
         </Helmet>
-        <Banner />
+        {/* <Banner /> */}
         <HeaderBar thisUser={thisUser} />
 
         <Box my={10}>
@@ -284,7 +286,7 @@ export default function Profile() {
                                 )[0]
                               : ''
                           }
-                          onChange={handleChange}
+                          onChange={handlePersonaChange}
                           className={classes.select}
                           renderValue={selected => (
                             <Grid
@@ -393,60 +395,40 @@ export default function Profile() {
                         </Typography>
                       )}
                     </Box>
-                    {!displayedPersona.isAnonymous ? (
-                      <Box>
-                        <Typography
-                          component="div"
-                          variant="body1"
-                          gutterBottom
-                        >
-                          <Link href={`https://orcid.org/${orcid}`}>
-                            ORCiD: {orcid}
-                          </Link>
-                        </Typography>
-                        <Typography
-                          component="div"
-                          variant="body1"
-                          gutterBottom
-                        >
-                          <b className={editMode ? classes.label : ''}>
-                            Contact:{' '}
-                          </b>
-                          {editMode ? (
-                            contacts && contacts.length ? (
-                              contacts.map(contact => (
-                                <TextField
-                                  className={classes.input}
-                                  key={contact.uuid}
-                                  required
-                                  id="Email"
-                                  label="Email"
-                                  value={contact.value}
-                                  onChange={handleEmailChange}
-                                  variant="outlined"
-                                />
-                              ))
+                    {!displayedPersona.isAnonymous && !editMode ? (
+                      <>
+                        <Box>
+                          <Typography
+                            component="div"
+                            variant="body1"
+                            gutterBottom
+                          >
+                            <Link href={`https://orcid.org/${orcid}`}>
+                              ORCiD: {orcid}
+                            </Link>
+                          </Typography>
+                        </Box>
+                        <Box>
+                          <Typography
+                            component="div"
+                            variant="body1"
+                            gutterBottom
+                          >
+                            <b className={editMode ? classes.label : ''}>
+                              Contact information:{' '}
+                            </b>
+                            {contacts && contacts.length ? (
+                              <List>
+                                {contacts.map(contact => (
+                                  <ListItem>{contact.value}</ListItem>
+                                ))}
+                              </List>
                             ) : (
-                              <TextField
-                                className={classes.input}
-                                required
-                                id="email"
-                                label="email"
-                                value={''}
-                                onChange={e => {}}
-                                variant="outlined"
-                              />
-                            )
-                          ) : contacts.length ? (
-                            contacts.map(contact => contact.value)
-                          ) : ownProfile ? (
-                            ` Please go to 'Edit profile' and add an email address!`
-                          ) : (
-                            `None provided.`
-                          )}
-                        </Typography>
-                        {/* <SettingsNotifications user={thisUser} /> */}
-                      </Box>
+                              `None provided.`
+                            )}
+                          </Typography>
+                        </Box>
+                      </>
                     ) : null}
                     <Box>
                       <Typography component="div" variant="body1" gutterBottom>
@@ -521,9 +503,13 @@ export default function Profile() {
                     />
                   </Modal>
                 ) : null}
-                <Typography component="div" variant="body1" gutterBottom>
-                  <b>About</b>
-                </Typography>
+                {displayedPersona.isAnonymous ? (
+                  ''
+                ) : (
+                  <Typography component="div" variant="body1" gutterBottom>
+                    <b>About</b>
+                  </Typography>
+                )}
                 {editMode && !displayedPersona.isAnonymous ? (
                   <TextField
                     className={classes.textField}
@@ -540,6 +526,7 @@ export default function Profile() {
                     {displayedPersona.bio}
                   </Typography>
                 )}
+                { ownProfile && editMode ? <SettingsNotifications user={thisUser} /> : null}
               </Container>
             </Box>
 
