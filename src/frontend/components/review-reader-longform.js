@@ -20,7 +20,9 @@ import CommentEditor from './comment-editor';
 import Controls from './controls';
 import ReportButton from './report-button';
 import RoleBadge from './role-badge';
-import PlauditScript from './plaudit-script';
+import useScript from './plaudit-script';
+
+const PLAUDITURL = 'https://plaudit.pub/embed/endorsements.js';
 
 const Button = withStyles({
   root: {
@@ -134,6 +136,10 @@ const LongformReviewReader = props => {
     transform,
   };
 
+  const Plaudits = () => {
+    return useScript(PLAUDITURL)
+  }
+
   // comments
   const {
     mutate: postComment,
@@ -246,7 +252,7 @@ const LongformReviewReader = props => {
                   justify="space-between"
                   spacing={2}
                 >
-                  <Grid item><PlauditScript /></Grid>
+                  <Grid item><Plaudits /></Grid>
                   {/*#FIXME plaudits*/}
                   <Grid item>
                     <ReportButton uuid={review.uuid} type='fullReview' />
