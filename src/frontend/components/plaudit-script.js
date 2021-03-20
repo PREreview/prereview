@@ -18,35 +18,35 @@ export default function useScript(src) {
       }
 
       // Fetch existing script element by src
-      let script = document.querySelector(`script[src="${src}"]`);
+      let scriptTag = document.querySelector(`script[src="${src}"]`);
 
-      if (!script) {
-        // Create script
-        script = document.createElement('script');
-        script.src = src;
-        script.setAttribute('data-status', 'loading');
-        script.setAttribute('data-embedder-id', 'prereview')
+      if (!scriptTag) {
+        scriptTag = document.createElement('script');
+        scriptTag.src = src;
+        scriptTag.setAttribute('data-status', 'loading');
+        scriptTag.setAttribute('data-embedder-id', 'prereview');
 
-        // Add script to document body
-        document.body.appendChild(script);
+        let plauditDiv = document.getElementById('plaudits-div')
+
+        plauditDiv ? plauditDiv.appendChild(scriptTag) : document.body.appendChild(scriptTag)
 
         // Store status in attribute on script
         // This can be read by other instances of this hook
         const setAttributeFromEvent = event => {
-          script.setAttribute(
+          scriptTag.setAttribute(
             'data-status',
 
             event.type === 'load' ? 'ready' : 'error',
           );
         };
 
-        script.addEventListener('load', setAttributeFromEvent);
+        scriptTag.addEventListener('load', setAttributeFromEvent);
 
-        script.addEventListener('error', setAttributeFromEvent);
+        scriptTag.addEventListener('error', setAttributeFromEvent);
       } else {
         // Grab existing script status from attribute and set to state.
 
-        setStatus(script.getAttribute('data-status'));
+        setStatus(scriptTag.getAttribute('data-status'));
       }
 
       // Script event handler to update status in state
@@ -57,14 +57,14 @@ export default function useScript(src) {
       };
 
       // Add event listeners
-      script.addEventListener('load', setStateFromEvent);
-      script.addEventListener('error', setStateFromEvent);
+      scriptTag.addEventListener('load', setStateFromEvent);
+      scriptTag.addEventListener('error', setStateFromEvent);
 
       // Remove event listeners on cleanup
       return () => {
-        if (script) {
-          script.removeEventListener('load', setStateFromEvent);
-          script.removeEventListener('error', setStateFromEvent);
+        if (scriptTag) {
+          scriptTag.removeEventListener('load', setStateFromEvent);
+          scriptTag.removeEventListener('error', setStateFromEvent);
         }
       };
     },
