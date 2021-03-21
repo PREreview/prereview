@@ -233,7 +233,7 @@ const Search = ({
     console.log('value: ', value);
 
     postInvite({
-      pid: value[0].defaultPersona.uuid,
+      pid: value[0].uuid,
     })
       .then(() => {
         alert('Invites sent successfully.');

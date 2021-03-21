@@ -51,8 +51,6 @@ export default function AdminPanel() {
   useEffect(() => {
     if (!loadingGroup) {
       if (groupData && groupData.data[0]) {
-        console.log('groupData', groupData);
-        console.log('groupData.data', groupData.data);
         setGroup(groupData.data[0]);
         setModerators(groupData.data[0].members);
         setLoading(false);
@@ -92,7 +90,7 @@ export default function AdminPanel() {
                   if (moderator.defaultPersona) {
                     return (
                       <li
-                        key={moderator.id}
+                        key={moderator.uuid}
                         className="admin-panel__card-list-item"
                       >
                         <div className="admin-panel__card-list-item__left">

@@ -97,7 +97,7 @@ export default function controller(preprints, thisUser) {
     },
     method: 'POST',
     path: '/preprints',
-    pre: (ctx, next) => thisUser.can('access private pages')(ctx, next),
+    pre: thisUser.can('access admin pages'),
     handler: async ctx => {
       if (ctx.invalid) {
         handleInvalid(ctx);
@@ -359,10 +359,7 @@ export default function controller(preprints, thisUser) {
       failure: 400,
       continueOnError: true,
     },
-    pre: async (ctx, next) => {
-      await thisUser.can('access admin pages');
-      return next();
-    },
+    pre: thisUser.can('access admin pages'),
     handler: async ctx => {
       if (ctx.invalid) {
         handleInvalid(ctx);
@@ -408,19 +405,12 @@ export default function controller(preprints, thisUser) {
     path: '/preprints/:id',
     validate: {
       params: {
-        //id: Joi.alternatives()
-        //  .try(Joi.number().integer(), Joi.string())
-        //  .description('Preprint ID')
-        //  .required(),
         id: Joi.string()
           .description('Preprint ID')
           .required(),
       },
     },
-    pre: async (ctx, next) => {
-      await thisUser.can('access admin pages');
-      return next();
-    },
+    pre: thisUser.can('access admin pages'),
     handler: async ctx => {
       log.debug(`Deleting preprint ${ctx.params.id}.`);
       let preprint;

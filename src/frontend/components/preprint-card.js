@@ -79,22 +79,18 @@ export default function PreprintCard({
           request.author.uuid
             ? (author = request.author.uuid)
             : (author = request.author);
-          setHasRequested(user.personas.some(persona => persona.id === author));
+          setHasRequested(user.personas.some(persona => persona.uuid === author));
         });
       }
       if (preprint.fullReviews.length) {
         preprint.fullReviews.map(review => {
           review.authors.map(author => {
-            if (author.identity === user.id) {
-              setHasReviewed(true);
-            }
+            setHasReviewed(user.personas.some(persona => persona.uuid === author.uuid));
           });
         });
       } else if (preprint.rapidReviews.length) {
         preprint.rapidReviews.map(review => {
-          if (review.author.identity === user.id) {
-            setHasReviewed(true);
-          }
+          setHasReviewed(user.personas.some(persona => persona.uuid === review.author.uuid));
         });
       }
     }
@@ -170,7 +166,7 @@ export default function PreprintCard({
               <ul className="preprint-card__tag-list">
                 {subjects.map(subject => (
                   <li
-                    key={subject.id}
+                    key={subject.uuid}
                     className="preprint-card__tag-list__item"
                   >
                     <Tooltip

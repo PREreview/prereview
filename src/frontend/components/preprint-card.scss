@@ -22,6 +22,7 @@
 
   & .preprint-card__cta-button {
     background-color: transparent;
+    font-size: 1rem;
     outline: none;
     border: none;
     padding: 0;
@@ -216,6 +217,7 @@
 
   & .preprint-card__title-text {
     font: inherit;
+    font-size: 1.75rem;
     display: inline;
     margin: 0;
     margin-right: var(--xxsgrd);
@@ -238,6 +240,7 @@
     padding: 0 var(--sgrd) var(--mgrd) var(--sgrd);
     display: flex;
     flex-wrap: wrap;
+    font-size: 1rem;
     justify-content: space-between;
 
     @media (max-width: $mobile-bp) and (max-height: $mobile-portrait-bp) {
@@ -312,6 +315,7 @@
   & .preprint-card__expansion-header {
     box-sizing: border-box;
     font: var(--ui-basic-font--small);
+    font-size: 1rem;
     display: flex;
     align-items: center;
     border-top: 1px solid var(--ruling-color--light);

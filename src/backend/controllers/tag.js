@@ -17,7 +17,7 @@ export default function controller(tagModel, thisUser) {
     },
     method: 'post',
     path: '/tags',
-    // pre:thisUserthisUser.can('access admin pages'),
+    pre: thisUser.can('access admin pages'),
     // validate: {},
     handler: async ctx => {
       log.debug(`Adding a new tag.`);
@@ -116,7 +116,7 @@ export default function controller(tagModel, thisUser) {
     },
     method: 'put',
     path: '/tags/:id',
-    // pre: thisUser.can(''),
+    pre: thisUser.can('access admin pages'),
     // validate: {},
     handler: async ctx => {
       log.debug(`Updating tag with id ${ctx.params.id}.`);
@@ -149,7 +149,7 @@ export default function controller(tagModel, thisUser) {
     },
     method: 'delete',
     path: '/tags/:id',
-    // pre: thisUser.can(''),
+    pre: thisUser.can('access admin pages'),
     // validate: {},
     handler: async ctx => {
       log.debug(`Retrieving tag with id ${ctx.params.id}.`);

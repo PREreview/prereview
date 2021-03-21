@@ -26,6 +26,9 @@ import { dbWrapper } from './db.ts';
 // Our middlewares
 import cloudflareAccess from './middleware/cloudflare.js';
 import authWrapper from './middleware/auth.js'; // authorization/user roles
+import currentCommunity from './middleware/community.js';
+import currentPersona from './middleware/persona.js';
+import currentUser from './middleware/user.js';
 import { mailWrapper } from './middleware/mail.js';
 
 // Our models
@@ -66,7 +69,6 @@ import RequestController from './controllers/request.js';
 import TagController from './controllers/tag.js';
 import TemplateController from './controllers/template.js';
 import DocsController from './controllers/docs.js';
-import SearchesController from './controllers/searches.js';
 import EventController from './controllers/event.js';
 import NotificationController from './controllers/notification.js';
 
@@ -111,7 +113,11 @@ export default async function configServer(config) {
   const groupModel = groupModelWrapper(db);
   const personaModel = personaModelWrapper(db);
   const contactModel = contactModelWrapper(db);
-  const authz = authWrapper(groupModel); // authorization, not authentication
+  const communityModel = communityModelWrapper(db);
+  server.use(currentCommunity());
+  server.use(currentPersona());
+  server.use(currentUser());
+  const authz = authWrapper(groupModel, communityModel, personaModel); // authorization, not authentication
 
   // setup API handlers
   const auth = AuthController(
@@ -124,7 +130,6 @@ export default async function configServer(config) {
   const badgeModel = badgeModelWrapper(db);
   const badges = BadgeController(badgeModel, authz);
   const commentModel = commentModelWrapper(db);
-  const communityModel = communityModelWrapper(db);
   const eventModel = eventModelWrapper(db);
   const fullReviewModel = fullReviewModelWrapper(db);
   const draftModel = fullReviewDraftModelWrapper(db);
@@ -161,11 +166,11 @@ export default async function configServer(config) {
   const templateModel = templateModelWrapper(db);
   const templates = TemplateController(templateModel, communityModel, authz);
   const users = UserController(userModel, contactModel, authz);
-  const searches = SearchesController(preprintModel, draftModel, authz);
   const notifications = NotificationController(userModel, authz);
   const communities = CommunityController(
     communityModel,
     userModel,
+    personaModel,
     eventModel,
     tagModel,
     authz,
@@ -191,7 +196,6 @@ export default async function configServer(config) {
     rapidReviews.middleware(),
     reports.middleware(),
     requests.middleware(),
-    searches.middleware(),
     tags.middleware(),
     templates.middleware(),
     users.middleware(),

@@ -272,7 +272,7 @@ function MakeActivePersonaModalButton({ user, persona, handleClose }) {
               isWaiting={loading}
               disabled={loading}
               onClick={() => {
-                updateUser({ defaultPersona: persona.id })
+                updateUser({ defaultPersona: persona.uuid })
                   .then(() => {
                     alert('User updated successfully.');
                     setIsOpen(false);
