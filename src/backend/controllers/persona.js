@@ -188,6 +188,7 @@ export default function controller(personasModel, badgesModel, thisUser) {
           'rapidReviews.preprint',
           'badges',
           'identity',
+          'identity.contacts'
         ]);
         if (!persona) {
           ctx.throw(404, `Persona with ID ${ctx.params.id} doesn't exist`);

@@ -54,7 +54,7 @@ export default function SettingsNotifications({ user }) {
 
   return (
     <section className="settings-notifications settings__section">
-      <h3 className="settings__title">Enable notifications</h3>
+      <h3 className="settings__title">Email settings and enabling notifications</h3>
 
       <p className="settings-notifications__notice">
         <MdInfoOutline className="settings-notifications__notice-icon" />

@@ -151,6 +151,8 @@ export default function Profile() {
     setEditMode(false);
   };
 
+  console.log('ownProfile????', ownProfile);
+
   const handleChange = () => {
     console.log('changing expertise');
   };
@@ -189,7 +191,13 @@ export default function Profile() {
     : displayedPersona && !displayedPersona.isAnonymous
     ? displayedPersona.identity.orcid
     : '';
-  const [contacts, setContacts] = useState(ownProfile ? thisUser.contacts : []);
+  const [contacts, setContacts] = useState(
+    ownProfile
+      ? thisUser.contacts
+      : displayedPersona && !displayedPersona.isAnonymous
+      ? displayedPersona.identity.contacts
+      : [],
+  );
   const [expertise, setExpertise] = useState([]);
   const badges =
     displayedPersona && displayedPersona.badges ? displayedPersona.badges : [];
@@ -216,12 +224,14 @@ export default function Profile() {
       setName(displayedPersona.name);
       setBio(displayedPersona.bio);
     }
+    if (displayedPersona && !displayedPersona.isAnonymous) {
+      setContacts(displayedPersona.identity.contacts);
+    }
   }, [displayedPersona]);
 
   useEffect(() => {
+    console.log('this useEffect is happening');
     if (!loadingPersona && persona) setDisplayedPersona(persona);
-    if (!loadingPersona && !ownProfile && !persona.isAnonymous)
-      setContacts(persona.identity.contacts);
   }, [loadingPersona, persona]);
 
   useEffect(() => {
@@ -526,7 +536,9 @@ export default function Profile() {
                     {displayedPersona.bio}
                   </Typography>
                 )}
-                { ownProfile && editMode ? <SettingsNotifications user={thisUser} /> : null}
+                {ownProfile && editMode ? (
+                  <SettingsNotifications user={thisUser} />
+                ) : null}
               </Container>
             </Box>
 
