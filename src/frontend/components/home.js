@@ -136,6 +136,7 @@ const useStyles = makeStyles(theme => ({
   },
   gridContent: {
     fontSize: '1.5rem',
+    marginBottom: 30,
   },
   gridContentLink: {
     color: `${theme.palette.primary.main} !important`,
@@ -176,6 +177,10 @@ const useStyles = makeStyles(theme => ({
   sliderImage: {
     marginLeft: 'auto',
     marginRight: 'auto',
+  },
+  sliderItem: {
+    paddingLeft: 20,
+    paddingRight: 20,
   },
   sponsorImage: {
     display: 'block',
@@ -224,6 +229,8 @@ export default function Home() {
   /* Slider settings */
   const settings = {
     autoplay: true,
+    autoplaySpeed: 6000,
+    centerPadding: '80px',
     dots: true,
   };
 
@@ -604,9 +611,123 @@ export default function Home() {
                 className={classes.gridContent}
                 gutterBottom
               >
-                Contra legem facit qui id facit quod lex prohibet. Donec sed
-                odio operae, eu vulputate felis rhoncus. A communi observantia
-                non est recedendum.
+                Inexperience is the greatest barrier to gaining experience. Not
+                only do I not know where to start, I also do not know how to get
+                there. Furthermore, the only advice I have ever received on the
+                topic [of peer review] has been &quot;Don&apos;t do it. It’s a
+                waste of time that doesn&apos;t contribute to your career&quot;,
+                which epitomizes the core problems causing the rot we see in
+                peer review.
+              </Typography>
+              <Typography
+                component="div"
+                variant="body1"
+                className={classes.gridContent}
+                gutterBottom
+              >
+                - Juan Manuel Vazquez, PREreview Open Reviewer 2021
+              </Typography>
+            </Box>
+            <Box>
+              <Typography
+                component="div"
+                variant="body1"
+                className={classes.gridContent}
+                gutterBottom
+              >
+                Please continue to train and recruit young reviewers.
+              </Typography>
+              <Typography
+                component="div"
+                variant="body1"
+                className={classes.gridContent}
+                gutterBottom
+              >
+                - Kishore Wary, PREreview Open Reviewer Mentor 2021
+              </Typography>
+            </Box>
+            <Box>
+              <Typography
+                component="div"
+                variant="body1"
+                className={classes.gridContent}
+                gutterBottom
+              >
+                Science has a racism issue. Many discovered this issue recently
+                with the murder of George Floyd and Breonna Taylor. But we
+                (people of color and underrepresented in science) knew about
+                this a while ago. I believe to balance the inequalities in the
+                scientific enterprise, we should tackle different angles that
+                include but are not limited to scientific training, recruitment,
+                and support. Peer review is an important stage for scientific
+                progress so by diversifying the reviewer pool we can push the
+                needle forward and start to provide different voices to the
+                reviewing process.
+              </Typography>
+              <Typography
+                component="div"
+                variant="body1"
+                className={classes.gridContent}
+                gutterBottom
+              >
+                - Joel Encarnacion-Rosado, PREreview Open Reviewer 2021
+              </Typography>
+            </Box>
+            <Box>
+              <Typography
+                component="div"
+                variant="body1"
+                className={classes.gridContent}
+                gutterBottom
+              >
+                If we really want to diversify science we need to diversify the
+                people who are labeled as &quot;expert&quot; in a field and
+                [who] have the power to evaluate the quality of their
+                peers&apos; work.
+              </Typography>
+              <Typography
+                component="div"
+                variant="body1"
+                className={classes.gridContent}
+                gutterBottom
+              >
+                - Natalia Torres, PREreview Open Reviewer 2021
+              </Typography>
+            </Box>
+            <Box>
+              <Typography
+                component="div"
+                variant="body1"
+                className={classes.gridContent}
+                gutterBottom
+              >
+                My expectations were fully met and beyond. I felt that the
+                discussions on non-violent communication tied with the
+                anti-bias/systems of oppression discussions really highlighted
+                how valuable and important this program really is to our broader
+                scientific community. I am happy to have also become part of
+                this growing community.
+              </Typography>
+              <Typography
+                component="div"
+                variant="body1"
+                className={classes.gridContent}
+                gutterBottom
+              >
+                - Sergio Redondo, PREreview Open Reviewer 2021
+              </Typography>
+            </Box>
+            <Box>
+              <Typography
+                component="div"
+                variant="body1"
+                className={classes.gridContent}
+                gutterBottom
+              >
+                I found getting involved in the peer review process challenging.
+                When I was a graduate student, journal editors seemed reluctant
+                to include me as a peer reviewer. Most often, they did not want
+                to challenge the status quo in peer reviewing.
               </Typography>
               <Typography
                 component="div"
@@ -615,44 +736,6 @@ export default function Home() {
                 gutterBottom
               >
                 - PREreview Open Reviewer 2021
-              </Typography>
-            </Box>
-            <Box>
-              <Typography
-                component="div"
-                variant="body1"
-                className={classes.gridContent}
-                gutterBottom
-              >
-                Quae vero auctorem tractata ab fiducia dicuntur. Quam temere in
-                vitiis, legem sancimus haerentia. Qui ipsorum lingua Celtae,
-                nostra Galli appellantur.
-              </Typography>
-              <Typography
-                component="div"
-                variant="body1"
-                className={classes.gridContent}
-                gutterBottom
-              >
-                - Another PREreview Open Reviewer 2021
-              </Typography>
-            </Box>
-            <Box>
-              <Typography
-                component="div"
-                variant="body1"
-                className={classes.gridContent}
-                gutterBottom
-              >
-                Morbi odio eros, volutpat ut pharetra vitae, lobortis sed nibh.
-              </Typography>
-              <Typography
-                component="div"
-                variant="body1"
-                className={classes.gridContent}
-                gutterBottom
-              >
-                - Yet Another PREreview Open Reviewer 2021
               </Typography>
             </Box>
           </Slider>
