@@ -12,7 +12,6 @@ import { ORG } from '../constants';
 export default function Settings() {
   const [user, setUser] = useContext(UserProvider.context);
 
-
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [user]);
@@ -36,7 +35,7 @@ export default function Settings() {
         </section>
 
         <SettingsRoles user={user} updateUser={setUser} />
-        {/* <SettingsNotifications user={user} /> */}
+        <SettingsNotifications user={user} />
         <SettingsInvites user={user} />
         {/*<SettingsApi user={user} />*/}
 

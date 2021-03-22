@@ -151,8 +151,6 @@ export default function Profile() {
     setEditMode(false);
   };
 
-  console.log('ownProfile????', ownProfile);
-
   const handleChange = () => {
     console.log('changing expertise');
   };
@@ -188,13 +186,15 @@ export default function Profile() {
   const [name, setName] = useState('');
   const orcid = ownProfile
     ? thisUser.orcid
-    : displayedPersona && !displayedPersona.isAnonymous
+    : displayedPersona && !displayedPersona.isAnonymous && displayedPersona.identity 
     ? displayedPersona.identity.orcid
     : '';
   const [contacts, setContacts] = useState(
     ownProfile
       ? thisUser.contacts
-      : displayedPersona && !displayedPersona.isAnonymous
+      : displayedPersona &&
+        !displayedPersona.isAnonymous &&
+        displayedPersona.identity
       ? displayedPersona.identity.contacts
       : [],
   );
@@ -224,13 +224,12 @@ export default function Profile() {
       setName(displayedPersona.name);
       setBio(displayedPersona.bio);
     }
-    if (displayedPersona && !displayedPersona.isAnonymous) {
+    if (displayedPersona && !displayedPersona.isAnonymous && displayedPersona.identity) {
       setContacts(displayedPersona.identity.contacts);
     }
   }, [displayedPersona]);
 
   useEffect(() => {
-    console.log('this useEffect is happening');
     if (!loadingPersona && persona) setDisplayedPersona(persona);
   }, [loadingPersona, persona]);
 
