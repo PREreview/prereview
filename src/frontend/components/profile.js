@@ -206,7 +206,7 @@ export default function Profile() {
   );
 
   const handlePersonaChange = e => {
-    updateUser({ defaultPersona: e.target.value.id })
+    updateUser({ defaultPersona: e.target.value.uuid })
       .then(() => {
         alert(
           `You've successfully updated your active persona to ${
