@@ -8,14 +8,10 @@ import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 
 // hooks
-import {
-  useIsNewVisitor,
-  useIsMobile,
-  useNewPreprints,
-} from '../hooks/ui-hooks';
+import { useIsNewVisitor, useIsMobile } from '../hooks/ui-hooks';
 
 // utils
-import { processParams, searchParamsToObject } from '../utils/search';
+import { processParams } from '../utils/search';
 
 // contexts
 import UserProvider from '../contexts/user-context';
@@ -108,9 +104,6 @@ const useStyles = makeStyles(theme => ({
     flexDirection: 'column',
     height: '100%',
     justifyContent: 'space-between',
-    '&:hover': {
-      backgroundColor: '#ccc',
-    },
   },
   cardImage: {
     display: 'block',
@@ -231,7 +224,6 @@ export default function Home() {
     dots: true,
   };
 
-
   useEffect(() => {}, [isFlipped, search]);
 
   return (
@@ -317,7 +309,8 @@ export default function Home() {
             {/* FIXME loop*/}
             <CardActionArea
               className={classes.cardAction}
-              onClick={() => handleFlip(0)}
+              onMouseEnter={() => handleFlip(0)}
+              onMouseLeave={() => handleFlip(0)}
             >
               <ReactCardFlip
                 className={classes.cardContent}
@@ -326,9 +319,9 @@ export default function Home() {
               >
                 <Box p={3} className={classes.cardFront}>
                   <CardContent>
-                    <Link href="/reviews" className={classes.cardTitle}>
+                    <Typography className={classes.cardTitle}>
                       Preprint Review Platform
-                    </Link>
+                    </Typography>
                   </CardContent>
                   <CardMedia>
                     <img
@@ -364,7 +357,8 @@ export default function Home() {
           <Card className={classes.card} elevation={3}>
             <CardActionArea
               className={classes.cardAction}
-              onClick={() => handleFlip(1)}
+              onMouseEnter={() => handleFlip(1)}
+              onMouseLeave={() => handleFlip(1)}
             >
               <ReactCardFlip
                 className={classes.cardContent}
@@ -373,12 +367,9 @@ export default function Home() {
               >
                 <Box p={3} className={classes.cardFront}>
                   <CardContent>
-                    <Link
-                      href="https://content.prereview.org/resources/"
-                      className={classes.cardTitle}
-                    >
+                    <Typography className={classes.cardTitle}>
                       Resource Center
-                    </Link>
+                    </Typography>
                   </CardContent>
                   <CardMedia>
                     <img
@@ -416,7 +407,8 @@ export default function Home() {
           <Card className={classes.card} elevation={3}>
             <CardActionArea
               className={classes.cardAction}
-              onClick={() => handleFlip(2)}
+              onMouseEnter={() => handleFlip(2)}
+              onMouseLeave={() => handleFlip(2)}
             >
               <ReactCardFlip
                 className={classes.cardContent}
@@ -425,9 +417,9 @@ export default function Home() {
               >
                 <Box p={3} className={classes.cardFront}>
                   <CardContent>
-                    <Link href="/communities" className={classes.cardTitle}>
+                    <Typography className={classes.cardTitle}>
                       PREreview Communities
-                    </Link>
+                    </Typography>
                   </CardContent>
                   <CardMedia>
                     <img
