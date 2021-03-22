@@ -12,10 +12,12 @@ import Typography from '@material-ui/core/Typography';
 // site logo
 import PreReviewLogo from './pre-review-logo';
 
+// icons
+import ArrowForwardIosIcon from '@material-ui/icons/ArrowForwardIos';
+
 const useStyles = makeStyles(() => ({
   footerNav: {
-    height: 200,
-    marginBottom: '2rem',
+    height: 210,
     marginTop: '2rem',
   },
   footerNavItem: {
@@ -26,6 +28,20 @@ const useStyles = makeStyles(() => ({
     display: 'block',
     width: '100%',
   },
+  signUp: {
+    color: '#fff !important',
+    display: 'inline-block',
+    fontSize: '2rem',
+    marginBottom: 30,
+    marginTop: 30,
+    position: 'relative',
+  },
+  signUpIcon: {
+    position: 'absolute',
+    right: '-30px',
+    top: '55%',
+    transform: 'translateY(-50%)',
+  },
 }));
 
 export default function Footer() {
@@ -35,7 +51,7 @@ export default function Footer() {
     <Box>
       <Grid container>
         <Grid item xs={12} md={4}>
-          <Box p={3} borderTop="1px solid #54948E">
+          <Box pt={3} px={3} borderTop="1px solid #54948E">
             <Link to="/" href={'https://prereview.org'}>
               <PreReviewLogo />
             </Link>
@@ -49,23 +65,25 @@ export default function Footer() {
               <Grid item>
                 <Link
                   className={classes.footerNavItem}
-                  href="https://content.prereview.org/about/"
+                  href="https://content.prereview.org/mission"
                 >
-                  About
-                </Link>
-              </Grid>
-              <Grid item>
-                <Link className={classes.footerNavItem} href="#FIXME">
-                  Team
+                  Mission
                 </Link>
               </Grid>
               <Grid item>
                 <Link
                   className={classes.footerNavItem}
-                  color="textPrimary"
-                  href="https://content.prereview.org/blog"
+                  href="https://content.prereview.org/people"
                 >
-                  Blog
+                  People
+                </Link>
+              </Grid>
+              <Grid item>
+                <Link
+                  className={classes.footerNavItem}
+                  href="https://content.prereview.org/funding"
+                >
+                  Funding
                 </Link>
               </Grid>
               <Grid item>
@@ -81,9 +99,9 @@ export default function Footer() {
                 <Link
                   className={classes.footerNavItem}
                   color="textPrimary"
-                  href="https://content.prereview.org/contact"
+                  href="https://content.prereview.org/blog"
                 >
-                  Contact
+                  Blog
                 </Link>
               </Grid>
               <Grid item>
@@ -99,18 +117,9 @@ export default function Footer() {
                 <Link
                   className={classes.footerNavItem}
                   color="textPrimary"
-                  href="#FIXME"
+                  href="https://content.prereview.org/privacypolicy"
                 >
                   Privacy Policy
-                </Link>
-              </Grid>
-              <Grid item>
-                <Link
-                  className={classes.footerNavItem}
-                  color="textPrimary"
-                  href="#FIXME"
-                >
-                  Terms
                 </Link>
               </Grid>
               <Grid item>
@@ -126,9 +135,18 @@ export default function Footer() {
                 <Link
                   className={classes.footerNavItem}
                   color="textPrimary"
-                  href="https://github.com/PREreview/"
+                  href="https://github.com/PREreview/prereview"
                 >
                   GitHub
+                </Link>
+              </Grid>
+              <Grid item>
+                <Link
+                  className={classes.footerNavItem}
+                  color="textPrimary"
+                  href="https://content.prereview.org/contact"
+                >
+                  Contact
                 </Link>
               </Grid>
             </Grid>
@@ -144,8 +162,16 @@ export default function Footer() {
                 </Link>
               </Grid>
               <Grid item>
-                <Link className={classes.footerNavItem} href="#FIXME">
+                <Link
+                  className={classes.footerNavItem}
+                  href="https://content.prereview.org/programs"
+                >
                   Programs
+                </Link>
+              </Grid>
+              <Grid item>
+                <Link className={classes.footerNavItem} href="/communities">
+                  Communities
                 </Link>
               </Grid>
               <Grid item>
@@ -153,11 +179,11 @@ export default function Footer() {
                   className={classes.footerNavItem}
                   href="https://content.prereview.org/resources"
                 >
-                  Resources
+                  Resource Center
                 </Link>
               </Grid>
             </Grid>
-            <Box borderTop="1px solid #000" mt={2} pt={2}>
+            <Box borderTop="1px solid #000" mt={2} py={2}>
               <Typography>
                 <em>
                   Except where otherwise noted, content on this site is licensed
@@ -175,12 +201,19 @@ export default function Footer() {
           </Box>
         </Grid>
         <Grid item xs={12} md={4}>
-          <Box bgcolor="#54948E" color="#fff" p={8} height="80%">
+          <Box bgcolor="#54948E" color="#fff" p={8} height="85%">
             <Typography variant="h4" component="h2" gutterBottom>
               Stay Connected.
             </Typography>
-            {/* FIXME need sign up for embed*/}
-            <img src="http://satyr.io/400x60/white" className={classes.img} />
+            <Typography component="div" gutterBottom>
+              <Link
+                href="https://mailchi.mp/97886570610a/prereview-newsletter-signup"
+                className={classes.signUp}
+              >
+                Sign up
+                <ArrowForwardIosIcon className={classes.signUpIcon} />
+              </Link>
+            </Typography>
             <Typography variant="h5" component="div">
               <em>
                 By providing your email address, you are opting in to receive
