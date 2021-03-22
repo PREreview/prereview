@@ -225,11 +225,13 @@ export default function Footer() {
           </Box>
         </Grid>
         <Grid item xs={12} md={4}>
-          <TwitterTimelineEmbed
-            sourceType="profile"
-            screenName="PREreview_"
-            options={{ height: 600 }}
-          />
+          <Box borderTop="1px solid #54948E">
+            <TwitterTimelineEmbed
+              sourceType="profile"
+              screenName="PREreview_"
+              options={{ height: 700 }}
+            />
+          </Box>
         </Grid>
       </Grid>
     </Box>

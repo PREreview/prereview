@@ -65,18 +65,23 @@ import LancetImg from '../assets/images/press-awards/the-lancet.jpg';
 import { ORG } from '../constants';
 
 const useStyles = makeStyles(theme => ({
-  buttonLink: {
+  buttonBox: {
     background: theme.palette.primary.main,
     borderRadius: '20px',
     boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)',
+    maxWidth: 360,
+    position: 'relative',
+    textAlign: 'center',
+  },
+  buttonLink: {
     color: '#fff !important',
+    display: 'block',
     fontSize: '1.25rem',
     fontWeight: 'bold',
     padding: '20px',
-    position: 'relative',
-    '&:hover': {
+    '&:active, &:focus, &:hover': {
       textDecoration: 'underline',
-      '&:after': {
+      '&:before': {
         border: '3px solid #fff',
         borderRadius: '20px',
         content: '" "',
@@ -180,7 +185,9 @@ const useStyles = makeStyles(theme => ({
       maxWidth: '70%',
     },
   },
-  home: {},
+  home: {
+    overflow: 'hidden',
+  },
   img: {
     display: 'block',
     width: '100%',
@@ -289,7 +296,7 @@ export default function Home() {
               openly, rapidly, constructively, and by a global community of
               peers.
             </Typography>
-            <Box my={6}>
+            <Box my={6} className={classes.buttonBox}>
               <Link href="/login" className={classes.buttonLink}>
                 Join us and start reviewing now
               </Link>

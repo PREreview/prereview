@@ -32,7 +32,7 @@ const useStyles = makeStyles(theme => ({
   },
   mobileNav: {
     marginLeft: 'auto',
-    [theme.breakpoints.up('md')]: {
+    [theme.breakpoints.up('lg')]: {
       display: 'none',
     },
   },
@@ -41,13 +41,13 @@ const useStyles = makeStyles(theme => ({
   },
   nav: {
     marginRight: '1rem',
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down('md')]: {
       display: 'none',
     },
   },
   navItem: {
     color: '#000 !important', // #FIXME remove after porting to MUI
-    fontSize: '1.25rem',
+    fontSize: '1.2rem',
     lineHeight: 1.75,
     padding: 8,
     textTransform: 'none',
@@ -124,8 +124,8 @@ export default function HeaderBar({ thisUser }) {
       <Banner />
 
       <Box className={classes.content}>
-        <Grid container justify="space-between" spacing={2}>
-          <Grid item xs={8} sm={10} md={3}>
+        <Grid container alignItems="center" justify="space-between" spacing={2}>
+          <Grid item xs={8} sm={10} md={2}>
             <Box className={classes.logo}>
               <Link to="/" href={homeLink}>
                 <PreReviewLogo />
@@ -140,7 +140,7 @@ export default function HeaderBar({ thisUser }) {
             spacing={1}
             xs={4}
             sm={2}
-            md={9}
+            md={10}
           >
             <Grid item>
               <IconButton
