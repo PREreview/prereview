@@ -5,7 +5,7 @@ import noop from 'lodash/noop';
 import isEqual from 'lodash/isEqual';
 import classNames from 'classnames';
 import ReactHtmlParser, { convertNodeToElement } from 'react-html-parser';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 
 // material UI
 import { makeStyles, withStyles } from '@material-ui/core/styles';
@@ -14,6 +14,7 @@ import MuiAccordionSummary from '@material-ui/core/AccordionSummary';
 import AccordionDetails from '@material-ui/core/AccordionDetails';
 import Box from '@material-ui/core/Box';
 import Grid from '@material-ui/core/Grid';
+import Hidden from '@material-ui/core/Hidden';
 import Link from '@material-ui/core/Link';
 import Typography from '@material-ui/core/Typography';
 
@@ -24,6 +25,7 @@ import { getYesNoStats } from '../utils/stats';
 import Barplot from './barplot';
 import LongformReviewReader from './review-reader-longform';
 import MuiButton from '@material-ui/core/Button';
+import RapidReviewReader from './review-reader-rapid';
 import { Reviewers } from './role-list';
 import ReportButton from './report-button';
 import ShareMenu from './share-menu';
@@ -43,6 +45,10 @@ const useStyles = makeStyles(theme => ({
     borderLeft: '5px solid #EBE9E9',
     boxShadow: 'none',
   },
+  date: {
+    flexBasis: '25%',
+    flexShrink: 1,
+  },
   h3: {
     fontSize: theme.typography.pxToRem(24),
     fontWeight: '600',
@@ -57,12 +63,17 @@ const useStyles = makeStyles(theme => ({
     paddingBottom: 5,
     paddingLeft: 2,
   },
-  date: {
-    flexBasis: '25%',
-    flexShrink: 1,
-  },
   spacing: {
     lineHeight: 1.5,
+  },
+  vh: {
+    clip: 'rect(0 0 0 0)',
+    clipPath: 'inset(50%)',
+    height: 1,
+    overflow: 'hidden',
+    position: 'absolute',
+    whiteSpace: 'nowrap',
+    width: 1,
   },
 }));
 
@@ -93,6 +104,7 @@ const ReviewReader = React.memo(function ReviewReader({
 }) {
   const classes = useStyles();
   const history = useHistory();
+  const location = useLocation();
 
   const [content, setContent] = useState('');
   const [commentTitle, setCommentTitle] = useState('');
@@ -133,10 +145,30 @@ const ReviewReader = React.memo(function ReviewReader({
     defaultHighlightedRoleIds || [],
   );
 
+  // expand/collapse rapid reviews
+  const [rapidAnchorEl, setRapidAnchorEl] = useState(null);
+  const handleClickRapid = event => {
+    setRapidAnchorEl(rapidAnchorEl ? null : event.currentTarget);
+    if (!rapidAnchorEl) {
+      history.push(
+        `${location.pathname}/rapid-reviews/${event.currentTarget.getAttribute(
+          'aria-describedby',
+        )}`,
+      );
+    }
+  };
+
   // expand/collapse longform reviews
-  const [anchorEl, setAnchorEl] = useState(null);
-  const handleClick = event => {
-    setAnchorEl(anchorEl ? null : event.currentTarget);
+  const [longformAnchorEl, setLongformAnchorEl] = useState(null);
+  const handleClickLongform = event => {
+    setLongformAnchorEl(longformAnchorEl ? null : event.currentTarget);
+    if (!longformAnchorEl) {
+      history.push(
+        `${location.pathname}/full-reviews/${event.currentTarget.getAttribute(
+          'aria-describedby',
+        )}`,
+      );
+    }
   };
 
   // react html parser options so the comments do not create an editable interface
@@ -161,13 +193,17 @@ const ReviewReader = React.memo(function ReviewReader({
   };
 
   useEffect(() => {
-    if (history.location.pathname.includes('-reviews')) {
-      const reviewNode = document.querySelector(
-        `[aria-describedby='${
-          history.location.pathname.split('-reviews/')[1]
-        }']`,
+    let reviewNode;
+    if (location.pathname.includes('full-reviews')) {
+      reviewNode = document.querySelector(
+        `[aria-describedby='${location.pathname.split('full-reviews/')[1]}']`,
       );
-      setAnchorEl(reviewNode);
+      setLongformAnchorEl(reviewNode);
+    } else if (location.pathname.includes('rapid-reviews')) {
+      reviewNode = document.querySelector(
+        `[aria-describedby='${location.pathname.split('rapid-reviews/')[1]}']`,
+      );
+      setRapidAnchorEl(reviewNode);
     }
     if (
       rapidContent &&
@@ -189,6 +225,9 @@ const ReviewReader = React.memo(function ReviewReader({
     publishedComment,
     content,
     commentTitle,
+    location,
+    // rapidAnchorEl,
+    // longformAnchorEl,
   ]);
 
   useEffect(() => {
@@ -253,6 +292,33 @@ const ReviewReader = React.memo(function ReviewReader({
                       }}
                     />
                   </div>
+                  {allRapidReviews.map(review => (
+                    <>
+                      <div className={classes.vh}>
+                        <Link
+                          component="button"
+                          className={classes.link}
+                          variant="body1"
+                          aria-describedby={review.uuid}
+                          type="button"
+                          onClick={handleClickRapid}
+                          color="secondary"
+                        >
+                          See review
+                        </Link>
+                      </div>
+                      <RapidReviewReader
+                        anchorEl={rapidAnchorEl}
+                        handleAnchor={handleClickRapid}
+                        height={height}
+                        review={review}
+                        user={user}
+                        identifier={preprint.handle}
+                        roleIds={highlightedRoleIds}
+                        role={role}
+                      />
+                    </>
+                  ))}
                   <Barplot
                     stats={getYesNoStats(allRapidReviews)}
                     nReviews={allRapidReviews.length}
@@ -389,7 +455,7 @@ const ReviewReader = React.memo(function ReviewReader({
                                       variant="body1"
                                       aria-describedby={review.uuid}
                                       type="button"
-                                      onClick={handleClick}
+                                      onClick={handleClickLongform}
                                       color="secondary"
                                     >
                                       Read more
@@ -404,14 +470,14 @@ const ReviewReader = React.memo(function ReviewReader({
                                       <Button
                                         aria-describedby={review.uuid}
                                         type="button"
-                                        onClick={handleClick}
+                                        onClick={handleClickLongform}
                                         color="secondary"
                                       >
                                         Comment
                                       </Button>
                                       <LongformReviewReader
-                                        anchorEl={anchorEl}
-                                        handleAnchor={handleClick}
+                                        anchorEl={longformAnchorEl}
+                                        handleAnchor={handleClickLongform}
                                         content={content}
                                         commentTitle={commentTitle}
                                         publishedComment={publishedComment}
@@ -463,12 +529,14 @@ const ReviewReader = React.memo(function ReviewReader({
           </Accordion>
         </div>
       ) : (
-          <div className="text-answers">
-            <div className="text-answers__question long">
-              There are no reviews on this preprint yet. To add your review, click on "Add Review(s)". To request reviews, click on "Add Request" in the menu above.
-            </div>
+        <div className="text-answers">
+          <div className="text-answers__question long">
+            There are no reviews on this preprint yet. To add your review, click
+            on &quot;Add Review(s).&quot; To request reviews, click on &quot;Add
+            Request&quot; in the menu above.
           </div>
-        )}
+        </div>
+      )}
     </div>
   );
 });

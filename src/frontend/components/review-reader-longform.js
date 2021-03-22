@@ -150,13 +150,9 @@ const LongformReviewReader = props => {
   useEffect(() => {
     if (anchorEl) {
       setButtonRefId(anchorEl.getAttribute('aria-describedby'));
-      if (!history.location.pathname.includes('-reviews')) {
-        history.push(
-          `${history.location.pathname}/full-reviews/${review.uuid}`,
-        );
-      }
     } else {
-      // history.push(`${history.location.pathname.split('/full-reviews')[0]}`);
+      setButtonRefId(null);
+      history.push(`${history.location.pathname.split('/full-reviews')[0]}`);
     }
   }, [anchorEl, content, commentTitle, publishedComment]);
 
@@ -240,12 +236,17 @@ const LongformReviewReader = props => {
                 <Grid item xs={12} sm={3} className={classes.date}>
                   {reviewDate.toLocaleDateString('en-US')}
                 </Grid>
-               { review.doi ?
-                <Grid item xs={12} sm={2}>
-                  <a href={`https://doi.org/${review.doi}`}>
-                  <img src={`https://sandbox.zenodo.org/badge/DOI/${review.doi}.svg`}/></a>
-                </Grid>
-                : null }
+                {review.doi ? (
+                  <Grid item xs={12} sm={2}>
+                    <a href={`https://doi.org/${review.doi}`}>
+                      <img
+                        src={`https://sandbox.zenodo.org/badge/DOI/${
+                          review.doi
+                        }.svg`}
+                      />
+                    </a>
+                  </Grid>
+                ) : null}
               </Grid>
               <Box border="1px solid #E5E5E5" mt={4} px={3} pb={2}>
                 <Box>{ReactHtmlParser(reviewContent.contents, options)}</Box>
@@ -255,10 +256,12 @@ const LongformReviewReader = props => {
                   justify="space-between"
                   spacing={2}
                 >
-                  <Grid item><PlauditScript /></Grid>
+                  <Grid item>
+                    <PlauditScript />
+                  </Grid>
                   {/*#FIXME plaudits*/}
                   <Grid item>
-                    <ReportButton uuid={review.uuid} type='fullReview' />
+                    <ReportButton uuid={review.uuid} type="fullReview" />
                   </Grid>
                 </Grid>
               </Box>

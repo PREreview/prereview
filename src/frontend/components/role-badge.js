@@ -1,6 +1,7 @@
 // base imports
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
+import { useHistory } from 'react-router-dom';
 
 // material UI
 import { makeStyles } from '@material-ui/core/styles';
@@ -46,6 +47,8 @@ const RoleBadge = ({ user, children }) => {
   // ****  USER IN THIS COMPONENT IS A PERSONA OBJECT **** //
 
   const classes = useStyles();
+  const history = useHistory();
+
   const [anchorEl, setAnchorEl] = useState(null);
   const [tooltipDisplay, setTooltipDisplay] = useState('none');
   const handleClick = event => {
@@ -95,7 +98,13 @@ const RoleBadge = ({ user, children }) => {
         <div className={classes.popoverInner}>
           {user.reviewUuid ? (
             <Typography component="div">
-              <Link href={user.reviewUuid}>
+              <Link
+                href={user.reviewUuid}
+                onClick={event => {
+                  event.preventDefault();
+                  history.push(user.reviewUuid);
+                }}
+              >
                 {user && user.defaultPersona
                   ? `View ${user.defaultPersona.name}'s Review`
                   : `View ${user.name}'s Review`}
