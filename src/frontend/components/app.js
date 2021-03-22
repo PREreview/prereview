@@ -34,6 +34,7 @@ import ModeratorRoute from './moderator-route';
 import NotFound from './not-found';
 import PrivateRoute, { AdminRoute } from './private-route';
 import Profile from './profile';
+import Reviews from './reviews';
 import Settings from './settings';
 import SuspenseLoading from './suspense-loading';
 import ToCPage from './toc-page';
