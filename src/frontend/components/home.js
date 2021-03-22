@@ -193,6 +193,9 @@ const useStyles = makeStyles(theme => ({
   standoutLink: {
     color: '#fff !important',
     textDecoration: 'underline',
+    '&:hover': {
+      color: '#000 !important',
+    },
   },
 }));
 
