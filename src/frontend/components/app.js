@@ -113,6 +113,10 @@ export default function App({ user }) {
                   </ToCPage>
                 </Route>
 
+                <Route exact={true} path="/reviews">
+                  <Reviews />
+                </Route>
+
                 <Route exact={true} path="/personas">
                   <PersonaSearch />
                 </Route>
