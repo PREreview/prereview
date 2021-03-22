@@ -157,8 +157,8 @@ export default function Profile() {
 
   const onSave = () => {
     if (name === displayedPersona.name && bio === displayedPersona.bio) {
-      alert(`No changes were made.`);
-      return;
++      setEditMode(false);      
+        return;
     }
     let data = {
       name: name,
@@ -181,12 +181,19 @@ export default function Profile() {
     setAvatarModalOpen(true);
   };
 
+  const handleAvatarSave = updated => {
+    setDisplayedPersona({ ...displayedPersona, avatar: updated.avatar });
+    setAvatarModalOpen(false);
+  };
+
   const personas = !thisUser || !thisUser.personas ? [] : thisUser.personas;
 
   const [name, setName] = useState('');
   const orcid = ownProfile
     ? thisUser.orcid
-    : displayedPersona && !displayedPersona.isAnonymous && displayedPersona.identity 
+    : displayedPersona &&
+      !displayedPersona.isAnonymous &&
+      displayedPersona.identity
     ? displayedPersona.identity.orcid
     : '';
   const [contacts, setContacts] = useState(
@@ -222,9 +229,13 @@ export default function Profile() {
   useEffect(() => {
     if (displayedPersona && ownProfile) {
       setName(displayedPersona.name);
-      setBio(displayedPersona.bio);
+      setBio(displayedPersona.bio ? displayedPersona.bio : '');
     }
-    if (displayedPersona && !displayedPersona.isAnonymous && displayedPersona.identity) {
+    if (
+      displayedPersona &&
+      !displayedPersona.isAnonymous &&
+      displayedPersona.identity
+    ) {
       setContacts(displayedPersona.identity.contacts);
     }
   }, [displayedPersona]);
@@ -509,6 +520,7 @@ export default function Profile() {
                       onCancel={() => {
                         setAvatarModalOpen(false);
                       }}
+                      onSaved={handleAvatarSave}
                     />
                   </Modal>
                 ) : null}
