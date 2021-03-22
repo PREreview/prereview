@@ -50,6 +50,17 @@ import IOIImg from '../assets/images/sponsors/ioi.png';
 import MozillaImg from '../assets/images/sponsors/mozilla.png';
 import WellcomeImg from '../assets/images/sponsors/wellcome.jpg';
 
+// press and awards images
+import ASAPbioImg from '../assets/images/press-awards/ASAPbio.jpg';
+import Bio2040Img from '../assets/images/press-awards/bio2040.jpg';
+import JROSTImg from '../assets/images/press-awards/JROST.png';
+import NatureOSrPREImg from '../assets/images/press-awards/nature-comm-OSrPRE.png';
+import NatureIndexImg from '../assets/images/press-awards/nature-index.jpg';
+import NoManifestoImg from '../assets/images/press-awards/no-manifesto.png';
+import SCMornPostImg from '../assets/images/press-awards/sc-morning-post.jpg';
+import SPARCImg from '../assets/images/press-awards/sparc.jpg';
+import LancetImg from '../assets/images/press-awards/the-lancet.jpg';
+
 // constants
 import { ORG } from '../constants';
 
@@ -177,6 +188,7 @@ const useStyles = makeStyles(theme => ({
   sliderImage: {
     marginLeft: 'auto',
     marginRight: 'auto',
+    maxHeight: 600,
   },
   sliderItem: {
     paddingLeft: 20,
@@ -201,6 +213,15 @@ const useStyles = makeStyles(theme => ({
     '&:hover': {
       color: '#000 !important',
     },
+  },
+  vh: {
+    clip: 'rect(0 0 0 0)',
+    clipPath: 'inset(50%)',
+    height: 1,
+    overflow: 'hidden',
+    position: 'absolute',
+    whiteSpace: 'nowrap',
+    width: 1,
   },
 }));
 
@@ -813,25 +834,135 @@ export default function Home() {
           </Typography>
           <Slider {...settings}>
             <Box textAlign="center">
-              <img
-                src="http://satyr.io/988x588/red"
-                alt="FIXME"
-                className={classes.sliderImage}
-              />
+              <Link
+                href="https://asapbio.org/sprint-recap"
+                target="_blank"
+                rel="noreferrer"
+              >
+                <span className={classes.vh}>ASAPbio article</span>
+                <img
+                  src={ASAPbioImg}
+                  alt=""
+                  ariaHidden="true"
+                  className={classes.sliderImage}
+                />
+              </Link>
             </Box>
             <Box textAlign="center">
-              <img
-                src="http://satyr.io/988x588/red"
-                alt="FIXME"
-                className={classes.sliderImage}
-              />
+              <Link
+                href="https://investinopen.org/blog/jrost-rapid-response-fund-awardees/"
+                target="_blank"
+                rel="noreferrer"
+              >
+                <span className={classes.vh}>JROST award</span>
+                <img
+                  src={JROSTImg}
+                  alt=""
+                  ariaHidden="true"
+                  className={classes.sliderImage}
+                />
+              </Link>
             </Box>
             <Box textAlign="center">
-              <img
-                src="http://satyr.io/988x588/red"
-                alt="FIXME"
-                className={classes.sliderImage}
-              />
+              <Link
+                href="https://www.nature.com/articles/d41586-020-00613-4"
+                target="_blank"
+                rel="noreferrer"
+              >
+                <span className={classes.vh}>Nature article</span>
+                <img
+                  src={NatureOSrPREImg}
+                  alt=""
+                  ariaHidden="true"
+                  className={classes.sliderImage}
+                />
+              </Link>
+            </Box>
+            <Box textAlign="center">
+              <Link
+                href="https://www.thelancet.com/journals/lanplh/article/PIIS2542-5196(21)00011-5/fulltext"
+                target="_blank"
+                rel="noreferrer"
+              >
+                <span className={classes.vh}>The Lancet article</span>
+                <img
+                  src={LancetImg}
+                  alt=""
+                  ariaHidden="true"
+                  className={classes.sliderImage}
+                />
+              </Link>
+            </Box>
+            <Box textAlign="center">
+              <Link
+                href="https://www.natureindex.com/news-blog/three-online-tools-aimed-at-improving-preprints"
+                target="_blank"
+                rel="noreferrer"
+              >
+                <span className={classes.vh}>Nature Index article</span>
+                <img
+                  src={NatureIndexImg}
+                  alt=""
+                  ariaHidden="true"
+                  className={classes.sliderImage}
+                />
+              </Link>
+            </Box>
+            <Box textAlign="center">
+              <Link href="#FIXME" target="_blank" rel="noreferrer">
+                <span className={classes.vh}>ASAPbio article</span>
+                <img
+                  src={SCMornPostImg}
+                  alt=""
+                  ariaHidden="true"
+                  className={classes.sliderImage}
+                />
+              </Link>
+            </Box>
+            <Box textAlign="center">
+              <Link
+                href="https://sparcopen.org/news/2020/opencon-community-members-support-rapid-covid-response-through-preprints/"
+                target="_blank"
+                rel="noreferrer"
+              >
+                <span className={classes.vh}>SPARC article</span>
+                <img
+                  src={SPARCImg}
+                  alt=""
+                  ariaHidden="true"
+                  className={classes.sliderImage}
+                />
+              </Link>
+            </Box>
+            <Box textAlign="center">
+              <Link
+                href="https://bio2040.com/2018/04/09/opening-up-the-opaque-peer-review-process-with-sam-daniela-from-prereview/"
+                target="_blank"
+                rel="noreferrer"
+              >
+                <span className={classes.vh}>bio2040 interview</span>
+                <img
+                  src={Bio2040Img}
+                  alt=""
+                  ariaHidden="true"
+                  className={classes.sliderImage}
+                />
+              </Link>
+            </Box>
+            <Box textAlign="center">
+              <Link
+                href="https://www.nomanifestos.com/episodes/4"
+                target="_blank"
+                rel="noreferrer"
+              >
+                <span className={classes.vh}>No Manifestos interview</span>
+                <img
+                  src={NoManifestoImg}
+                  alt=""
+                  ariaHidden="true"
+                  className={classes.sliderImage}
+                />
+              </Link>
             </Box>
           </Slider>
         </Container>
