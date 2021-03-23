@@ -24,7 +24,7 @@ import { createError } from '../common/errors.ts';
 import { dbWrapper } from './db.ts';
 
 // Our middlewares
-//import cloudflareAccess from './middleware/cloudflare.js';
+import cloudflareAccess from './middleware/cloudflare.js';
 import authWrapper from './middleware/auth.js'; // authorization/user roles
 import currentCommunity from './middleware/community.js';
 import currentPersona from './middleware/persona.js';
