@@ -2,6 +2,7 @@ import {
   Collection,
   Entity,
   EntityRepositoryType,
+  Index,
   ManyToMany,
   Property,
   Unique,
@@ -22,6 +23,7 @@ export class Group extends BaseEntity {
   name!: string;
 
   @ManyToMany({ entity: () => User, inversedBy: 'groups' })
+  @Index()
   members: Collection<User> = new Collection<User>(this);
 
   constructor(name: string) {

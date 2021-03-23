@@ -1,6 +1,7 @@
 import {
   Entity,
   EntityRepositoryType,
+  Index,
   ManyToOne,
   Property,
   Unique,
@@ -25,6 +26,7 @@ export class Template extends BaseEntity {
   contents!: string;
 
   @ManyToOne({ entity: () => Community, nullable: true })
+  @Index()
   community?: Community;
 
   constructor(title: string, contents: string, community?: Community) {

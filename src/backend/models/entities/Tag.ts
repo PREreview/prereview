@@ -2,6 +2,7 @@ import {
   Collection,
   Entity,
   EntityRepositoryType,
+  Index,
   ManyToMany,
   Property,
   Unique,
@@ -28,9 +29,11 @@ export class Tag extends BaseEntity {
   color?: string;
 
   @ManyToMany({ entity: () => Preprint, inversedBy: 'tags' })
+  @Index()
   preprints: Collection<Preprint> = new Collection<Preprint>(this);
 
   @ManyToMany({ entity: () => Community, mappedBy: 'tags' })
+  @Index()
   communities: Collection<Community> = new Collection<Community>(this);
 
   constructor(name: string, color = '#FF0000') {

@@ -1,6 +1,7 @@
 import {
   Entity,
   EntityRepositoryType,
+  Index,
   ManyToOne,
   Property,
 } from '@mikro-orm/core';
@@ -24,9 +25,11 @@ export class Statement extends BaseEntity {
   isFlagged: boolean = false;
 
   @ManyToOne({ entity: () => Persona })
+  @Index()
   author!: Persona;
 
   @ManyToOne({ entity: () => FullReview })
+  @Index()
   parent!: FullReview;
 
   constructor(contents: string, author: Persona, parent: FullReview) {

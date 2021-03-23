@@ -2,6 +2,7 @@ import {
   Collection,
   Entity,
   EntityRepositoryType,
+  Index,
   ManyToMany,
   Property,
   Unique,
@@ -27,6 +28,7 @@ export class Badge extends BaseEntity {
   color?: string;
 
   @ManyToMany({ entity: () => Persona, inversedBy: 'badges' })
+  @Index()
   personas: Collection<Persona> = new Collection<Persona>(this);
 
   constructor(name: string, color = '#FF0000') {

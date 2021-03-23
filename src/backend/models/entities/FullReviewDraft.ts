@@ -1,6 +1,7 @@
 import {
   Entity,
   EntityRepositoryType,
+  Index,
   ManyToOne,
   Property,
 } from '@mikro-orm/core';
@@ -14,6 +15,7 @@ export class FullReviewDraft extends BaseEntity {
   [EntityRepositoryType]: FullReviewDraftModel;
 
   @ManyToOne({ entity: () => FullReview })
+  @Index()
   parent!: FullReview;
 
   @Fixture(faker => faker.lorem.paragraph())
