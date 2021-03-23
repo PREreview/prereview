@@ -25,8 +25,8 @@ const authWrapper = (users, groups, communities, personas) => {
     }
 
     try {
-      const app = ctx.headers['X-API-App'];
-      const key = ctx.headers['X-API-Key'];
+      const app = ctx.headers['x-api-app'];
+      const key = ctx.headers['x-api-key'];
       if (app && key) {
         return users.findOneByKey(app, key);
       }

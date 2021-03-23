@@ -28,9 +28,13 @@ export class UserModel extends EntityRepository<User> {
     }
   }
 
-  findOneByKey(app: string, key: string, params: string[]): any {
+  findOneByKey(app: string, secret: string, params: string[]): any {
     try {
-      return this.em.findOne(User, { keys: { app: app, key: key } }, params);
+      return this.em.findOne(
+        User,
+        { keys: { app: app, secret: secret } },
+        params,
+      );
     } catch (err) {
       throw new ChainError(`Failed to find user for API appId ${app}.`, err);
     }
