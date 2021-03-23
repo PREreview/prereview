@@ -1,12 +1,13 @@
 // base imports
 import React, { Suspense, lazy, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import mobile from 'is-mobile';
-import { HTML5Backend } from 'react-dnd-html5-backend';
-import { TouchBackend } from 'react-dnd-touch-backend';
 import { DndProvider } from 'react-dnd';
-import { Switch, Route, useLocation } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
+import { HTML5Backend } from 'react-dnd-html5-backend';
+import mobile from 'is-mobile';
+import { Switch, Route, useLocation } from 'react-router-dom';
+import { ThemeProvider } from '@material-ui/core/styles';
+import { TouchBackend } from 'react-dnd-touch-backend';
 //import smoothscroll from 'smoothscroll-polyfill';
 import 'url-search-params-polyfill'; /* pollyfill for IE / Edge */
 import { IntlProvider } from 'react-intl';
@@ -44,6 +45,9 @@ import Validate from './Validate';
 // constants
 import API from './api';
 
+// Material UI customized theme
+import theme from '../theme.js';
+
 // icons
 import PreReviewLogo from './pre-review-logo';
 
@@ -76,115 +80,117 @@ export default function App({ user }) {
         >
           <StoresProvider>
             <UserProvider user={user}>
-              <Switch>
-                <Route path="/:new(new)?" exact={true}>
-                  {subdomain && subdomain === 'outbreaksci' ? (
-                    <Community id="outbreaksci" />
-                  ) : (
-                    <Home />
-                  )}
-                </Route>
-                <Route exact={true} path="/login">
-                  <Login />
-                </Route>
-                <Route exact={true} path="/logout">
-                  <Logout />
-                </Route>
+              <ThemeProvider theme={theme}>
+                <Switch>
+                  <Route path="/:new(new)?" exact={true}>
+                    {subdomain && subdomain === 'outbreaksci' ? (
+                      <Community id="outbreaksci" />
+                    ) : (
+                      <Home />
+                    )}
+                  </Route>
+                  <Route exact={true} path="/login">
+                    <Login />
+                  </Route>
+                  <Route exact={true} path="/logout">
+                    <Logout />
+                  </Route>
 
-                <Route exact={true} path="/about">
-                  <ToCPage>
-                    <About />
-                  </ToCPage>
-                </Route>
+                  <Route exact={true} path="/about">
+                    <ToCPage>
+                      <About />
+                    </ToCPage>
+                  </Route>
 
-                <Route exact={true} path="/dashboard/:new(new)?">
-                  <Dashboard />
-                </Route>
+                  <Route exact={true} path="/dashboard/:new(new)?">
+                    <Dashboard />
+                  </Route>
 
-                <Route exact={true} path="/code-of-conduct">
-                  <ToCPage>
-                    <CodeOfConduct />
-                  </ToCPage>
-                </Route>
+                  <Route exact={true} path="/code-of-conduct">
+                    <ToCPage>
+                      <CodeOfConduct />
+                    </ToCPage>
+                  </Route>
 
-                <Route exact={true} path="/api">
-                  <ToCPage>
-                    <API />
-                  </ToCPage>
-                </Route>
+                  <Route exact={true} path="/api">
+                    <ToCPage>
+                      <API />
+                    </ToCPage>
+                  </Route>
 
-              <Route exact={true} path="/reviews">
-                <Reviews />
-              </Route>
-              <Route exact={true} path="/personas">
-                <PersonaSearch />
-              </Route>
-              <Route exact={true} path="/about/:id">
-                <Profile />
-              </Route>
-              <Route exact={true} path="/extension">
-                <ExtensionSplash />
-              </Route>
-              <PrivateRoute exact={true} path="/settings">
-                <Settings />
-              </PrivateRoute>
-              <AdminRoute exact={true} path="/admin">
-                <AdminPanel />
-              </AdminRoute>
-              <AdminRoute exact={true} path="/block">
-                <BlockPanel />
-              </AdminRoute>
-              <Route exact={true} path="/community-settings/:id">
-                <CommunityPanel />
-              </Route>
-              <ModeratorRoute exact={true} path="/moderate">
-                <Suspense fallback={<SuspenseLoading>Loading</SuspenseLoading>}>
-                  <Moderate />
-                </Suspense>
-              </ModeratorRoute>
-              <Route
-                exact={true}
-                path="/preprints/:id"
-              >
-                <ExtensionFallback />
-              </Route>
-              <Route
-                exact={true}
-                path="/communities/"
+                <Route exact={true} path="/reviews">
+                  <Reviews />
+                </Route>
+                <Route exact={true} path="/personas">
+                  <PersonaSearch />
+                </Route>
+                <Route exact={true} path="/about/:id">
+                  <Profile />
+                </Route>
+                <Route exact={true} path="/extension">
+                  <ExtensionSplash />
+                </Route>
+                <PrivateRoute exact={true} path="/settings">
+                  <Settings />
+                </PrivateRoute>
+                <AdminRoute exact={true} path="/admin">
+                  <AdminPanel />
+                </AdminRoute>
+                <AdminRoute exact={true} path="/block">
+                  <BlockPanel />
+                </AdminRoute>
+                <Route exact={true} path="/community-settings/:id">
+                  <CommunityPanel />
+                </Route>
+                <ModeratorRoute exact={true} path="/moderate">
+                  <Suspense fallback={<SuspenseLoading>Loading</SuspenseLoading>}>
+                    <Moderate />
+                  </Suspense>
+                </ModeratorRoute>
+                <Route
+                  exact={true}
+                  path="/preprints/:id"
                 >
-                <Communities />
-              </Route>
-              <Route
-                exact={true}
-                path="/communities/:id"
-                >
-                <Community />
-              </Route>
+                  <ExtensionFallback />
+                </Route>
+                <Route
+                  exact={true}
+                  path="/communities/"
+                  >
+                  <Communities />
+                </Route>
+                <Route
+                  exact={true}
+                  path="/communities/:id"
+                  >
+                  <Community />
+                </Route>
 
-              <Route
-                exact={true}
-                path="/events/:id"
-                >
-                <Event />
-              </Route>
+                <Route
+                  exact={true}
+                  path="/events/:id"
+                  >
+                  <Event />
+                </Route>
 
-              <Route
-                exact={true}
-                path="/preprints/:id/reviews/:cid?"
-              >
-                <ExtensionFallback />
-              </Route>
-              <Route
-                exact={true}
-                path="/validate/:token"
+                <Route
+                  exact={true}
+                  path="/preprints/:id/reviews/:cid?"
                 >
-                <Validate />
-              </Route>
+                  <ExtensionFallback />
+                </Route>
+                <Route
+                  exact={true}
+                  path="/validate/:token"
+                  >
+                  <Validate />
+                </Route>
 
-              <Route>
-                <NotFound />
-              </Route>
-            </Switch>
+                <Route>
+                  <NotFound />
+                </Route>
+              </Switch>
+            </ThemeProvider>
           </UserProvider>
         </StoresProvider>
       </DndProvider>
