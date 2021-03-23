@@ -74,7 +74,7 @@ export default function controller(
         'owned', //communities
         'groups',
       ]);
-      log.trace('verifyCallback() user:', user);
+      log.debug('verifyCallback() user:', user);
     } catch (err) {
       log.error('Error fetching user:', err);
     }
@@ -94,7 +94,7 @@ export default function controller(
       try {
         log.debug('Creating new user.');
         newUser = users.create({ orcid: params.orcid });
-        log.trace('verifyCallback() newUser:', newUser);
+        log.debug('verifyCallback() newUser:', newUser);
       } catch (err) {
         log.error('Error creating user:', err);
       }
@@ -180,7 +180,7 @@ export default function controller(
       if (newUser) {
         log.debug('Authenticated & created user.', newUser);
         const completeUser = merge(profile, { ...newUser, isNew: true });
-        log.trace('verifyCallback() new completeUser:', completeUser);
+        log.debug('verifyCallback() new completeUser:', completeUser);
         return done(null, completeUser);
       } else {
         return done(null, false);
@@ -223,12 +223,12 @@ export default function controller(
     method: 'GET',
     path: '/orcid/callback',
     handler: async ctx => {
+      log.debug('/orcid/callback ctx.request:', ctx.request);
       return passport.authenticate('orcid', (err, user) => {
         log.debug('Receiving ORCiD callback.');
         if (!user) {
-          ctx.body = { success: false };
           log.error('Authentication failed: ', err);
-          ctx.throw(401, 'Authentication failed.');
+          ctx.redirect('/login');
         } else {
           log.debug('Received user: ', user.uuid);
           ctx.state.user = user;
