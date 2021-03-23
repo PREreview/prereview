@@ -1,6 +1,7 @@
 import {
   Entity,
   EntityRepositoryType,
+  Index,
   ManyToOne,
   Property,
 } from '@mikro-orm/core';
@@ -23,6 +24,7 @@ export class Contact extends BaseEntity {
   value!: string;
 
   @ManyToOne({ entity: () => User })
+  @Index()
   identity!: User;
 
   @Fixture(() => false)
