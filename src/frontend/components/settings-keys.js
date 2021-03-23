@@ -71,9 +71,6 @@ export default function SettingsKeys({ user }) {
               <TableCell className="settings__persona-list-header">
                 Key
               </TableCell>
-              <TableCell className="settings__persona-list-header">
-                Anonymity
-              </TableCell>
               <TableCell>
                 <div className="vh">Controls</div>
               </TableCell>
@@ -153,36 +150,34 @@ function ApiKey({ userId, credentials, onDelete }) {
   });
   return (
     <TableRow key={credentials.uuid}>
-      <div className="settings-keys__delete">
-        <TableCell>
-          <div className="settings__persona-list-item__active-state">
-            {`${credentials.app}`}
-          </div>
-        </TableCell>
-        <TableCell>
-          <div className="settings__persona-list-item__username">
-            {`${credentials.secret}`}
-          </div>
-        </TableCell>
-        <TableCell>
-          <div className="settings__persona-status">
-            <IconButton
-              onClick={() => {
-                if (confirm('Are you sure you want to delete this API key?')) {
-                  deleteKey()
-                    .then(() => {
-                      onDelete();
-                      return alert('API key deleted successfully.');
-                    })
-                    .catch(err => alert(`An error occurred: ${err.message}`));
-                }
-              }}
-            >
-              <Delete />
-            </IconButton>
-          </div>
-        </TableCell>
-      </div>
+      <TableCell>
+        <div className="settings__persona-list-item__active-state">
+          {`${credentials.app}`}
+        </div>
+      </TableCell>
+      <TableCell>
+        <div className="settings__persona-list-item__username">
+          {`${credentials.secret}`}
+        </div>
+      </TableCell>
+      <TableCell>
+        <div className="settings__persona-status">
+          <IconButton
+            onClick={() => {
+              if (confirm('Are you sure you want to delete this API key?')) {
+                deleteKey()
+                  .then(() => {
+                    onDelete();
+                    return alert('API key deleted successfully.');
+                  })
+                  .catch(err => alert(`An error occurred: ${err.message}`));
+              }
+            }}
+          >
+            <Delete />
+          </IconButton>
+        </div>
+      </TableCell>
     </TableRow>
   );
 }
