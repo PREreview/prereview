@@ -1,6 +1,7 @@
 import {
   Entity,
   EntityRepositoryType,
+  Index,
   ManyToOne,
   Property,
 } from '@mikro-orm/core';
@@ -20,6 +21,7 @@ export class Work extends BaseEntity {
   title?: string;
 
   @ManyToOne({ entity: () => User })
+  @Index()
   author!: User;
 
   @Fixture(faker => faker.internet.url())
