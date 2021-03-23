@@ -149,13 +149,15 @@ const useStyles = makeStyles(theme => ({
   gridTitle: {
     color: '#54948E',
     fontSize: '2rem',
+    fontWeight: 'bold',
   },
   gridContent: {
     fontSize: '1.5rem',
     marginBottom: 30,
   },
   gridContentLink: {
-    color: `${theme.palette.primary.main} !important`,
+    color: `#000 !important`,
+    fontWeight: 'bold',
   },
   gridLink: {
     backgroundColor: '#FCBD4C',
@@ -190,6 +192,9 @@ const useStyles = makeStyles(theme => ({
   },
   img: {
     display: 'block',
+    marginLeft: 'auto',
+    marginRight: 'auto',
+    maxWidth: 800,
     width: '100%',
   },
   sliderImage: {
@@ -292,13 +297,13 @@ export default function Home() {
               collaboration
             </Typography>
             <Typography variant="h5" component="div">
-              We envision a world in which feedback to scholarly outputs is done
-              openly, rapidly, constructively, and by a global community of
-              peers.
+              PREreview is a platform, resource center and convener. We provide
+              ways for feedback to preprints to be done openly, rapidly,
+              constructively, and by a global community of peers. Join us!
             </Typography>
             <Box my={6} className={classes.buttonBox}>
               <Link href="/login" className={classes.buttonLink}>
-                Join us and start reviewing now
+                Start reviewing now
               </Link>
             </Box>
           </Box>
@@ -501,7 +506,7 @@ export default function Home() {
       <Box py={8} textAlign="center">
         <Container>
           <Grid container spacing={10} alignItems="center" justify="center">
-            <Grid item sm={12} md={6}>
+            <Grid item xs={12}>
               <Typography
                 component="div"
                 variant="h6"
@@ -516,8 +521,8 @@ export default function Home() {
                 className={classes.gridContent}
                 gutterBottom
               >
-                On our preprint review platform, any researcher with an ORCID iD
-                can request or provide constructive feedback to preprints.
+                Researchers can join or start their own community to bring
+                together peers with shared interests and values.
               </Typography>
               <Typography
                 component="div"
@@ -534,23 +539,12 @@ export default function Home() {
                 </Link>
                 .
               </Typography>
-            </Grid>
-            <Grid item sm={12} md={6}>
               <img
                 src={CommunitiesImg}
                 alt=""
                 aria-hidden="true"
                 className={classes.img}
               />
-              <Typography
-                component="div"
-                variant="body1"
-                className={classes.gridContent}
-                gutterBottom
-              >
-                Researchers can join or start their own community to bring
-                together peers with shared interests and values.
-              </Typography>
               <Link href="/communities" className={classes.gridLink}>
                 Explore Communities
               </Link>
