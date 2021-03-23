@@ -910,8 +910,14 @@ export default function Home() {
               </Link>
             </Box>
             <Box textAlign="center">
-              <Link href="#FIXME" target="_blank" rel="noreferrer">
-                <span className={classes.vh}>ASAPbio article</span>
+              <Link
+                href="https://www.scmp.com/news/china/article/3075431/will-coronavirus-kill-dinosaur-world-academic-publishing"
+                target="_blank"
+                rel="noreferrer"
+              >
+                <span className={classes.vh}>
+                  South China Morning Post article
+                </span>
                 <img
                   src={SCMornPostImg}
                   alt=""
