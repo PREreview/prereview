@@ -1,4 +1,9 @@
-import { Entity, EntityRepositoryType, ManyToOne } from '@mikro-orm/core';
+import {
+  Entity,
+  EntityRepositoryType,
+  Index,
+  ManyToOne,
+} from '@mikro-orm/core';
 import { Fixture } from 'class-fixtures-factory';
 import { RequestModel } from '../requests';
 import { BaseEntity } from './BaseEntity';
@@ -11,9 +16,11 @@ export class Request extends BaseEntity {
   [EntityRepositoryType]?: RequestModel;
 
   @ManyToOne({ entity: () => Persona })
+  @Index()
   author!: Persona;
 
   @ManyToOne({ entity: () => Preprint })
+  @Index()
   preprint!: Preprint;
 
   constructor(author: Persona, preprint: Preprint) {

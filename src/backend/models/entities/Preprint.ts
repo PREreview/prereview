@@ -3,6 +3,7 @@ import {
   Collection,
   Entity,
   EntityRepositoryType,
+  Index,
   ManyToMany,
   OneToMany,
   Property,
@@ -93,18 +94,23 @@ export class Preprint extends BaseEntity {
   //}
 
   @OneToMany({ entity: () => RapidReview, mappedBy: 'preprint' })
+  @Index()
   rapidReviews: Collection<RapidReview> = new Collection<RapidReview>(this);
 
   @OneToMany({ entity: () => FullReview, mappedBy: 'preprint' })
+  @Index()
   fullReviews: Collection<FullReview> = new Collection<FullReview>(this);
 
   @OneToMany({ entity: () => Request, mappedBy: 'preprint' })
+  @Index()
   requests: Collection<Request> = new Collection<Request>(this);
 
   @ManyToMany({ entity: () => Community, mappedBy: 'preprints' })
+  @Index()
   communities: Collection<Community> = new Collection<Community>(this);
 
   @ManyToMany({ entity: () => Tag, mappedBy: 'preprints' })
+  @Index()
   tags: Collection<Tag> = new Collection<Tag>(this);
 
   constructor(

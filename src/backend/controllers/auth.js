@@ -62,7 +62,8 @@ export default function controller(
       },
     };
 
-    log.trace('verifyCallback() profile:', profile);
+    log.debug('verifyCallback() req:', req);
+    log.debug('verifyCallback() profile:', profile);
 
     let user;
 
