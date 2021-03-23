@@ -30,6 +30,7 @@ const useStyles = makeStyles(() => ({
     maxHeight: 650,
   },
   button: {
+    marginTop: 20,
     textTransform: 'none',
   },
 }));
@@ -171,7 +172,7 @@ function ApiKey({ userId, credentials, onDelete }) {
                   deleteKey()
                     .then(() => {
                       onDelete();
-                      alert('API key deleted successfully.');
+                      return alert('API key deleted successfully.');
                     })
                     .catch(err => alert(`An error occurred: ${err.message}`));
                 }
