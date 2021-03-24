@@ -1,10 +1,13 @@
 // base imports
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
+import { Helmet } from 'react-helmet-async';
 
 // material ui imports
 import { makeStyles, withStyles } from '@material-ui/core/styles';
 import Box from '@material-ui/core/Box';
 import CircularProgress from '@material-ui/core/CircularProgress';
+import Container from '@material-ui/core/Container';
 import IconButton from '@material-ui/core/IconButton';
 import Modal from '@material-ui/core/Modal';
 import MuiButton from '@material-ui/core/Button';
@@ -22,15 +25,20 @@ import {
   useDeleteTemplate,
   useGetTemplates,
   usePostTemplates,
-  usePutTemplates,
 } from '../hooks/api-hooks.tsx';
+
+// contexts
+import UserProvider from '../contexts/user-context';
 
 // components
 import EditTemplate from './edit-template';
-import TemplateEditor from './template-editor';
+import HeaderBar from './header-bar';
 
 // icons
 import DeleteIcon from '@material-ui/icons/Delete';
+
+// constants
+import { ORG } from '../constants';
 
 const Button = withStyles({
   root: {
@@ -74,7 +82,27 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-export default function SettingsTemplates() {
+export default function SettingsDrafts() {
+  const [user] = useContext(UserProvider.context);
+
+  useEffect(() => {}, [user]);
+
+  return (
+    <Box>
+      <Helmet>
+        <title>Settings • {ORG}</title>
+      </Helmet>
+
+      <HeaderBar thisUser={user} />
+
+      <Container>
+        <Templates />
+      </Container>
+    </Box>
+  );
+}
+
+function Templates() {
   const classes = useStyles();
 
   // fetch all templates from the API
@@ -240,7 +268,9 @@ export default function SettingsTemplates() {
                       key={template.uuid}
                       template={template}
                       onDelete={() => {
-                        setTemplates(templates.filter(t => t.uuid !== template.uuid));
+                        setTemplates(
+                          templates.filter(t => t.uuid !== template.uuid),
+                        );
                       }}
                     />
                   ))}
@@ -261,14 +291,12 @@ function SettingsRow({ template, onDelete }) {
   // delete template from the database
   const { mutate: deleteTemplate } = useDeleteTemplate({
     queryParams: {
-      id: template.uuid
-    }
+      id: template.uuid,
+    },
   });
 
   return (
-    <StyledTableRow
-      key={template.uuid}
-    >
+    <StyledTableRow key={template.uuid}>
       <TableCell component="th" scope="row">
         {template.title}
       </TableCell>
@@ -303,3 +331,8 @@ function SettingsRow({ template, onDelete }) {
     </StyledTableRow>
   );
 }
+
+SettingsRow.propTypes = {
+  template: PropTypes.object,
+  onDelete: PropTypes.func,
+};
