@@ -4,6 +4,7 @@ export * from './Comment';
 export * from './Community';
 export * from './Contact';
 export * from './Event';
+export * from './Expertise';
 export * from './FullReview';
 export * from './FullReviewDraft';
 export * from './Group';

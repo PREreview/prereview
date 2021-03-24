@@ -35,7 +35,12 @@ const querySchema = Joi.object({
   ),
 });
 
-export default function controller(personasModel, badgesModel, thisUser) {
+export default function controller(
+  personasModel,
+  badgesModel,
+  expertisesModel,
+  thisUser,
+) {
   const personaRouter = router();
 
   // no POST because personas are only created by the auth controller when
@@ -70,6 +75,7 @@ export default function controller(personasModel, badgesModel, thisUser) {
           'rapidReviews',
           'requests',
           'badges',
+          'expertises',
         ];
         let foundPersonas, count;
         const order = ctx.query.asc
@@ -185,8 +191,9 @@ export default function controller(personasModel, badgesModel, thisUser) {
           'fullReviews.preprint',
           'rapidReviews.preprint',
           'badges',
+          'expertises',
           'identity',
-          'identity.contacts'
+          'identity.contacts',
         ]);
         if (!persona) {
           ctx.throw(404, `Persona with ID ${ctx.params.id} doesn't exist`);
@@ -314,7 +321,7 @@ export default function controller(personasModel, badgesModel, thisUser) {
         await badgesModel.persistAndFlush(badge);
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
-        ctx.throw(400, `Failed to add user to badge: ${err}`);
+        ctx.throw(400, `Failed to add badge to persona: ${err}`);
       }
 
       ctx.body = { status: 200, message: 'ok', data: persona };
@@ -360,7 +367,7 @@ export default function controller(personasModel, badgesModel, thisUser) {
         await badgesModel.persistAndFlush(badge);
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
-        ctx.throw(400, `Failed to remove user from group: ${err}`);
+        ctx.throw(400, `Failed to remove badge from persona: ${err}`);
       }
 
       // if deleted
@@ -376,6 +383,108 @@ export default function controller(personasModel, badgesModel, thisUser) {
     },
   });
 
+  personaRouter.route({
+    method: 'put',
+    path: '/personas/:id/expertises/:bid',
+    validate: {
+      type: 'json',
+      params: {
+        id: Joi.string()
+          .description('Persona id')
+          .required(),
+        bid: Joi.string()
+          .description('Expertise id')
+          .required(),
+      },
+    },
+    pre: thisUser.can('edit this persona'),
+    handler: async ctx => {
+      log.debug(
+        `Adding expertise ${ctx.params.uid} to persona ${ctx.params.id}.`,
+      );
+      let persona, expertise;
+
+      try {
+        expertise = await expertisesModel.findOneByIdOrName(ctx.params.bid, [
+          'personas',
+        ]);
+        persona = await personasModel.findOne({ uuid: ctx.params.id });
+      } catch (err) {
+        log.error('HTTP 400 Error: ', err);
+        ctx.throw(400, `Failed to parse query: ${err}`);
+      }
+
+      try {
+        log.debug(
+          `Persona ${persona.id} found. Adding expertise ${
+            expertise.id
+          } to persona.`,
+        );
+        expertise.personas.add(persona);
+        await expertisesModel.persistAndFlush(expertise);
+      } catch (err) {
+        log.error('HTTP 400 Error: ', err);
+        ctx.throw(400, `Failed to add expertise to persona: ${err}`);
+      }
+
+      ctx.body = { status: 200, message: 'ok', data: persona };
+      ctx.status = 200;
+    },
+    meta: {
+      swagger: {
+        operationId: 'PutPersonaExpertise',
+        summary:
+          'Endpoint to PUT one expertise to a persona by ID from PREreview.',
+        required: true,
+      },
+    },
+  });
+
+  personaRouter.route({
+    method: 'DELETE',
+    path: '/personas/:id/expertises/:bid',
+    pre: thisUser.can('edit this persona'),
+    handler: async ctx => {
+      log.debug(
+        `Removing expertise ${ctx.params.bid} from persona ${ctx.params.id}.`,
+      );
+      let persona, expertise;
+
+      try {
+        expertise = await expertisesModel.findOneByIdOrName(ctx.params.bid, [
+          'personas',
+        ]);
+        persona = await personasModel.findOne({ uuid: ctx.params.id });
+      } catch (err) {
+        log.error('HTTP 400 Error: ', err);
+        ctx.throw(400, `Failed to parse query: ${err}`);
+      }
+
+      try {
+        log.debug(
+          `Persona ${persona.id} found. Removing expertise ${
+            expertise.id
+          } from persona.`,
+        );
+        expertise.personas.remove(persona);
+        await expertisesModel.persistAndFlush(expertise);
+      } catch (err) {
+        log.error('HTTP 400 Error: ', err);
+        ctx.throw(400, `Failed to remove expertise from persona: ${err}`);
+      }
+
+      // if deleted
+      ctx.status = 204;
+    },
+    meta: {
+      swagger: {
+        operationId: 'DeletePersonaExpertise',
+        summary:
+          'Endpoint to DELETE one expertise from a persona by ID from PREreview.',
+        required: true,
+      },
+    },
+  });
   // TODO: do we need delete?
 
   return personaRouter;

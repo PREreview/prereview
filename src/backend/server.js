@@ -38,6 +38,7 @@ import {
   communityModelWrapper,
   contactModelWrapper,
   eventModelWrapper,
+  expertiseModelWrapper,
   fullReviewModelWrapper,
   fullReviewDraftModelWrapper,
   groupModelWrapper,
@@ -57,6 +58,7 @@ import AuthController from './controllers/auth.js'; // authentication/logins
 import BadgeController from './controllers/badge.js';
 import CommentController from './controllers/comment.js';
 import CommunityController from './controllers/community.js';
+import ExpertiseController from './controllers/expertise.js';
 import FullReviewController from './controllers/fullReview.js';
 import DraftController from './controllers/fullReviewDraft.js';
 import GroupController from './controllers/group.js';
@@ -128,7 +130,9 @@ export default async function configServer(config) {
     authz,
   );
   const badgeModel = badgeModelWrapper(db);
+  const expertiseModel = expertiseModelWrapper(db);
   const badges = BadgeController(badgeModel, authz);
+  const expertises = ExpertiseController(expertiseModel, authz);
   const commentModel = commentModelWrapper(db);
   const eventModel = eventModelWrapper(db);
   const fullReviewModel = fullReviewModelWrapper(db);
@@ -136,7 +140,12 @@ export default async function configServer(config) {
   const fullReviewDrafts = DraftController(draftModel, authz);
   const comments = CommentController(commentModel, fullReviewModel, authz);
   const groups = GroupController(groupModel, userModel, authz);
-  const personas = PersonaController(personaModel, badgeModel, authz);
+  const personas = PersonaController(
+    personaModel,
+    badgeModel,
+    expertiseModel,
+    authz,
+  );
   const preprintModel = preprintModelWrapper(db);
   const preprints = PreprintController(preprintModel, authz);
   const rapidReviewModel = rapidReviewModelWrapper(db);
@@ -187,6 +196,7 @@ export default async function configServer(config) {
     comments.middleware(),
     communities.middleware(),
     events.middleware(),
+    expertises.middleware(),
     fullReviews.middleware(),
     fullReviewDrafts.middleware(),
     groups.middleware(),

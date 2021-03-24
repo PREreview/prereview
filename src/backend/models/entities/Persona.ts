@@ -12,6 +12,7 @@ import { PersonaModel } from '../personas';
 import { BaseEntity } from './BaseEntity';
 import { Badge } from './Badge';
 import { Community } from './Community';
+import { Expertise } from './Expertise';
 import { FullReview } from './FullReview';
 import { RapidReview } from './RapidReview';
 import { Request } from './Request';
@@ -78,6 +79,9 @@ export class Persona extends BaseEntity {
 
   @ManyToMany({ entity: () => Badge, mappedBy: 'personas' })
   badges: Collection<Badge> = new Collection<Badge>(this);
+
+  @ManyToMany({ entity: () => Expertise, mappedBy: 'personas' })
+  expertises: Collection<Expertise> = new Collection<Expertise>(this);
 
   constructor(
     name: string,

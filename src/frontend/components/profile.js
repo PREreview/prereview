@@ -9,6 +9,7 @@ import UserProvider from '../contexts/user-context';
 
 // hooks
 import {
+  useGetExpertises,
   useGetPersona,
   usePutPersona,
   usePutUser,
@@ -140,6 +141,10 @@ export default function Profile() {
     id: id,
   });
 
+  const { data: expertises, loading: loadingExpertises } = useGetExpertises({
+    resolve: res => res.data,
+  });
+
   const [displayedPersona, setDisplayedPersona] = useState(null);
   const [selectedPersona, setSelectedPersona] = useState(null);
 
@@ -157,8 +162,8 @@ export default function Profile() {
 
   const onSave = () => {
     if (name === displayedPersona.name && bio === displayedPersona.bio) {
-+      setEditMode(false);      
-        return;
+      setEditMode(false);
+      return;
     }
     let data = {
       name: name,
@@ -474,9 +479,9 @@ export default function Profile() {
                             onChange={handleChange}
                             input={<Input />}
                           >
-                            {EXAMPLE_EXPERTISE.map(exp => (
-                              <MenuItem key={exp} value={exp}>
-                                {exp}
+                            {expertises.map(exp => (
+                              <MenuItem key={exp.uuid} value={exp.name}>
+                                {exp.name}
                               </MenuItem>
                             ))}
                           </Select>
