@@ -176,15 +176,27 @@ const useStyles = makeStyles(theme => ({
   hero: {
     [theme.breakpoints.up('md')]: {
       backgroundImage: `url(${HeroImg})`,
-      backgroundPosition: 'right bottom',
+      backgroundPosition: 'right bottom -22px',
       backgroundRepeat: 'no-repeat',
-      backgroundSize: '70vh',
-      padding: '1rem',
+      backgroundSize: '600px',
+      paddingBottom: '4rem',
+      paddingTop: '6rem',
     },
   },
   heroContent: {
     [theme.breakpoints.up('md')]: {
       maxWidth: '70%',
+    },
+  },
+  heroContentSubtext: {
+    [theme.breakpoints.up('md')]: {
+      maxWidth: '70%',
+    },
+  },
+  heroContentText: {
+    [theme.breakpoints.up('md')]: {
+      fontSize: '2.5rem',
+      lineHeight: '57px',
     },
   },
   home: {
@@ -291,12 +303,21 @@ export default function Home() {
 
       <Box className={classes.hero}>
         <Container>
-          <Box my={4} className={classes.heroContent}>
-            <Typography variant="h4" component="div" gutterBottom>
+          <Box mb={4} className={classes.heroContent}>
+            <Typography
+              variant="h4"
+              component="div"
+              className={classes.heroContentText}
+              gutterBottom
+            >
               Catalyzing change in peer review through equity, openness, and
               collaboration
             </Typography>
-            <Typography variant="h5" component="div">
+            <Typography
+              variant="h5"
+              component="div"
+              className={classes.heroContentSubtext}
+            >
               PREreview is a platform, resource center and convener. We provide
               ways for feedback to preprints to be done openly, rapidly,
               constructively, and by a global community of peers. Join us!
