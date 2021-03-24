@@ -2,7 +2,7 @@ import React, { useContext, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import UserProvider from '../contexts/user-context';
 import SettingsRoles from './settings-roles';
-import SettingsApi from './settings-api';
+import SettingsApi from './settings-keys';
 import SettingsInvites from './settings-invites';
 import SettingsNotifications from './settings-notifications';
 import SettingsTemplates from './settings-templates';
@@ -11,7 +11,6 @@ import { ORG } from '../constants';
 
 export default function Settings() {
   const [user, setUser] = useContext(UserProvider.context);
-
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -38,7 +37,7 @@ export default function Settings() {
         <SettingsRoles user={user} updateUser={setUser} />
         <SettingsNotifications user={user} />
         <SettingsInvites user={user} />
-        {/*<SettingsApi user={user} />*/}
+        <SettingsApi user={user} />
 
         {user.isAdmin ? <SettingsTemplates /> : null}
       </div>
