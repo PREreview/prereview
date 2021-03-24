@@ -526,7 +526,7 @@ export default function Home() {
       </Box>
       <Box py={8} textAlign="center">
         <Container>
-          <Grid container spacing={10} alignItems="center" justify="center">
+          <Grid container spacing={10} alignItems="flex-start" justify="center">
             <Grid item xs={12}>
               <Typography
                 component="div"
@@ -570,7 +570,7 @@ export default function Home() {
                 Explore Communities
               </Link>
             </Grid>
-            <Grid item sm={12} md={6}>
+            <Grid item sm={12} md={5}>
               <Typography
                 component="div"
                 variant="h6"
@@ -605,7 +605,7 @@ export default function Home() {
                 Stay connected via our newsletter
               </Link>
             </Grid>
-            <Grid item sm={12} md={6}>
+            <Grid item sm={12} md={5}>
               <Typography
                 component="div"
                 variant="h6"
