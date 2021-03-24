@@ -260,11 +260,14 @@ export default function controller(
           );
         }
         const expertises = ctx.request.body.expertises || [];
-        let newExpertises;
+        const newExpertises = [];
         if (expertises.length > 0) {
-          newExpertises = await expertisesModel.find({ $in: expertises });
+          for (let p of expertises) {
+            const exp = await expertisesModel.findOneOrFail({ uuid: p });
+            newExpertises.push(exp);
+          }
         }
-        if (newExpertises) {
+        if (newExpertises.length) {
           persona.expertises.set(newExpertises);
           delete ctx.request.body.expertises;
         }
@@ -278,6 +281,7 @@ export default function controller(
       if (persona.avatar && Buffer.isBuffer(persona.avatar)) {
         persona.avatar = persona.avatar.toString();
       }
+
       // if updated
       ctx.status = 200;
       ctx.body = {

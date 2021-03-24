@@ -158,7 +158,11 @@ export default function Profile() {
   };
 
   const onSave = () => {
-    if (name === displayedPersona.name && bio === displayedPersona.bio) {
+    if (
+      name === displayedPersona.name &&
+      bio === displayedPersona.bio &&
+      expertise === displayedPersona.expertise
+    ) {
       setEditMode(false);
       return;
     }
@@ -170,15 +174,21 @@ export default function Profile() {
     updatePersona(data)
       .then(resp => {
         let updated = resp.data;
+        console.log('updated: ', resp.data);
         alert(`You've successfully updated your persona.`);
         setEditMode(false);
         setDisplayedPersona(updated);
         setName(updated.name);
         setBio(updated.bio);
+        // const newExpertises = expertises.filter(exp => {
+        //   return updated.expertises.map(e => {
+        //     return e === exp.id ? exp.name : '';
+        //   });
+        // });
         setExpertise(updated.expertises);
         return;
       })
-      .catch(err => alert(`ERROR!`, err.message));
+      .catch(err => alert(`An error occurred:`, err.message));
   };
 
   const [avatarModalOpen, setAvatarModalOpen] = useState(false);
@@ -215,9 +225,10 @@ export default function Profile() {
   const [bio, setBio] = useState(
     displayedPersona && displayedPersona.bio ? displayedPersona.bio : '',
   );
+
   const [expertise, setExpertise] = useState(
     displayedPersona && displayedPersona.expertises
-      ? displayedPersona.expertises
+      ? displayedPersona.expertises.reduce((a, o) => (a.push(o.name), a), [])
       : [],
   );
 
@@ -237,6 +248,7 @@ export default function Profile() {
   };
 
   useEffect(() => {
+    console.log('exp: ', expertise);
     if (displayedPersona && ownProfile) {
       setName(displayedPersona.name);
       setBio(displayedPersona.bio ? displayedPersona.bio : '');
@@ -282,7 +294,7 @@ export default function Profile() {
         <HeaderBar thisUser={thisUser} />
 
         <Box my={10}>
-          <Container className="profile">
+          <Container>
             {ownProfile ? (
               <Box my={4}>
                 <Container>
@@ -483,14 +495,14 @@ export default function Profile() {
                             input={<Input />}
                           >
                             {expertises.map(exp => (
-                              <MenuItem key={exp.uuid} value={exp.name}>
+                              <MenuItem key={exp.uuid} value={exp.uuid}>
                                 {exp.name}
                               </MenuItem>
                             ))}
                           </Select>
                         ) : expertise && expertise.length > 0 ? (
                           expertise.map(exp => (
-                            <span key={exp.uuid}>{exp}, </span>
+                            <span key={exp.uuid}>{exp.name}, </span>
                           ))
                         ) : (
                           'No expertise selected yet.'
