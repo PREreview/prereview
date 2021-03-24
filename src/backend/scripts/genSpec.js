@@ -6,6 +6,8 @@ import authWrapper from '../middleware/auth.js';
 import userRoutes from '../controllers/user.js';
 import fullReviewRoutes from '../controllers/fullReview.js';
 import commentRoutes from '../controllers/comment.js';
+import badgeRoutes from '../controllers/badge.js';
+import expertiseRoutes from '../controllers/expertise.js';
 import communityRoutes from '../controllers/community.js';
 import eventRoutes from '../controllers/event.js';
 import groupRoutes from '../controllers/group.js';
@@ -25,13 +27,15 @@ function docs() {
   const authz = authWrapper({}); // authorization, not authentication
 
   generator.addJoiRouter(preprintRoutes({}, authz));
-  generator.addJoiRouter(userRoutes({}, {}, authz));
+  generator.addJoiRouter(userRoutes({}, {}, {}, authz));
   generator.addJoiRouter(fullReviewRoutes({}, {}, {}, {}, {}, authz));
   generator.addJoiRouter(eventRoutes({}, authz));
   generator.addJoiRouter(groupRoutes({}, {}, authz));
   generator.addJoiRouter(commentRoutes({}, {}, authz));
+  generator.addJoiRouter(badgeRoutes({}, authz));
+  generator.addJoiRouter(expertiseRoutes({}, authz));
   generator.addJoiRouter(communityRoutes({}, {}, {}, {}, {}, authz));
-  generator.addJoiRouter(personaRoutes({}, {}, authz));
+  generator.addJoiRouter(personaRoutes({}, {}, {}, authz));
   generator.addJoiRouter(rapidReviewRoutes({}, {}, authz));
   generator.addJoiRouter(reportRoutes({}, {}, {}, {}, {}, authz));
   generator.addJoiRouter(requestRoutes({}, {}, authz));

@@ -1,203 +1,603 @@
 // base imports
-import React, { Fragment, useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { useLocation } from 'react-router-dom';
+import { useParams, useHistory, useLocation } from 'react-router-dom';
 import { format } from 'date-fns';
 
 // contexts
 import UserProvider from '../contexts/user-context';
 
 // hooks
-import { useGetPersona } from '../hooks/api-hooks.tsx';
+import {
+  useGetExpertises,
+  useGetPersona,
+  usePutPersona,
+  usePutUser,
+  usePostUserContacts,
+  usePutUserContacts,
+} from '../hooks/api-hooks.tsx';
 
 // Material UI components
-import { makeStyles } from '@material-ui/core/styles';
+import {
+  ThemeProvider,
+  makeStyles,
+  withStyles,
+  createMuiTheme,
+} from '@material-ui/core/styles';
 import Avatar from '@material-ui/core/Avatar';
+import Box from '@material-ui/core/Box';
 import Chip from '@material-ui/core/Chip';
+import Container from '@material-ui/core/Container';
+import FormHelperText from '@material-ui/core/FormHelperText';
 import IconButton from '@material-ui/core/IconButton';
-import Modal from '@material-ui/core/Modal';
+import Input from '@material-ui/core/Input';
+import Link from '@material-ui/core/Link';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import MenuItem from '@material-ui/core/MenuItem';
+import MuiButton from '@material-ui/core/Button';
+import Grid from '@material-ui/core/Grid';
+import Typography from '@material-ui/core/Typography';
+import Select from '@material-ui/core/Select';
+import TextField from '@material-ui/core/TextField';
 
 // components
-//import Avatar from './avatar';
 import HeaderBar from './header-bar';
-import LabelStyle from './label-style';
 import Loading from './loading.js';
-import NotFound from './not-found';
+import Modal from './modal';
 import RoleActivity from './role-activity';
-import XLink from './xlink';
-//import RoleEditor from './role-editor';
-
-// icons
-import { MdPublic } from 'react-icons/md';
-import IncognitoIcon from '../svgs/incognito_icon.svg';
+import RoleEditor from './role-editor';
+import SettingsNotifications from './settings-notifications';
 
 // constants
 import { ORG } from '../constants';
 
-export default function Profile() {
-  const location = useLocation();
-  const [thisUser] = useContext(UserProvider.context);
-  //const [editAvatar, setEditAvatar] = useState(false);
+const Button = withStyles({
+  root: {
+    textTransform: 'none',
+  },
+})(MuiButton);
 
-  const { data: persona, loading, error } = useGetPersona({
-    id: location.pathname.slice(7),
+const prereviewTheme = createMuiTheme({
+  palette: {
+    primary: {
+      main: '#F77463',
+      contrastText: '#fff',
+    },
+    secondary: {
+      main: '#eaeaf0',
+    },
+  },
+  typography: {
+    fontFamily: ['Open Sans', 'sans-serif'].join(','),
+  },
+});
+
+const useStyles = makeStyles(theme => ({
+  avatar: {
+    height: 220,
+    width: 220,
+  },
+  buttonText: {
+    fontSize: '1rem',
+    textTransform: 'uppercase',
+  },
+  button: {
+    marginTop: theme.spacing(1),
+    marginRight: theme.spacing(1),
+  },
+  formControl: {
+    margin: theme.spacing(1),
+    minWidth: 120,
+  },
+  input: {
+    marginBottom: 20,
+    minWidth: 250,
+  },
+  label: {
+    lineHeight: 5,
+    marginRight: 10,
+  },
+  right: {
+    textAlign: 'right',
+  },
+  small: {
+    height: 30,
+    width: 30,
+  },
+  select: {
+    marginTop: theme.spacing(2),
+    minWidth: 200,
+    width: '100%',
+  },
+  textField: {
+    width: '100%',
+  },
+}));
+
+export default function Profile() {
+  const classes = useStyles();
+  const [thisUser, setUser] = useContext(UserProvider.context);
+  const history = useHistory();
+  const { id } = useParams();
+  const ownProfile =
+    thisUser && thisUser.personas
+      ? thisUser.personas.some(persona => persona.uuid === id)
+      : false; // returns true if the profile page belongs to the logged in user
+
+  const { data: persona, loading: loadingPersona } = useGetPersona({
+    id: id,
     resolve: persona => persona.data[0],
   });
 
-  if (loading || !persona) {
+  const { mutate: updateUser } = usePutUser({
+    id: thisUser ? thisUser.uuid : null,
+  });
+
+  const { mutate: updatePersona } = usePutPersona({
+    id: id,
+  });
+
+  const { data: expertises } = useGetExpertises({
+    resolve: res => res.data,
+  });
+
+  const [displayedPersona, setDisplayedPersona] = useState(null);
+  const [selectedPersona, setSelectedPersona] = useState(null);
+
+  const [editMode, setEditMode] = useState(false);
+  const handleEdit = () => {
+    setEditMode(true);
+  };
+  const cancelEdit = () => {
+    setEditMode(false);
+  };
+
+  const handleChange = event => {
+    setExpertise(event.target.value);
+  };
+
+  const onSave = () => {
+    if (
+      name === displayedPersona.name &&
+      bio === displayedPersona.bio &&
+      expertise === displayedPersona.expertise
+    ) {
+      setEditMode(false);
+      return;
+    }
+    let data = {
+      name: name,
+      bio: bio,
+      expertises: expertise,
+    };
+    updatePersona(data)
+      .then(resp => {
+        let updated = resp.data;
+        console.log('updated: ', resp.data);
+        alert(`You've successfully updated your persona.`);
+        setEditMode(false);
+        setDisplayedPersona(updated);
+        setName(updated.name);
+        setBio(updated.bio);
+        // const newExpertises = expertises.filter(exp => {
+        //   return updated.expertises.map(e => {
+        //     return e === exp.id ? exp.name : '';
+        //   });
+        // });
+        setExpertise(updated.expertises);
+        return;
+      })
+      .catch(err => alert(`An error occurred:`, err.message));
+  };
+
+  const [avatarModalOpen, setAvatarModalOpen] = useState(false);
+  const handleAvatarClick = () => {
+    setAvatarModalOpen(true);
+  };
+
+  const handleAvatarSave = updated => {
+    setDisplayedPersona({ ...displayedPersona, avatar: updated.avatar });
+    setAvatarModalOpen(false);
+  };
+
+  const personas = !thisUser || !thisUser.personas ? [] : thisUser.personas;
+
+  const [name, setName] = useState('');
+  const orcid = ownProfile
+    ? thisUser.orcid
+    : displayedPersona &&
+      !displayedPersona.isAnonymous &&
+      displayedPersona.identity
+    ? displayedPersona.identity.orcid
+    : '';
+  const [contacts, setContacts] = useState(
+    ownProfile
+      ? thisUser.contacts
+      : displayedPersona &&
+        !displayedPersona.isAnonymous &&
+        displayedPersona.identity
+      ? displayedPersona.identity.contacts
+      : [],
+  );
+  const badges =
+    displayedPersona && displayedPersona.badges ? displayedPersona.badges : [];
+  const [bio, setBio] = useState(
+    displayedPersona && displayedPersona.bio ? displayedPersona.bio : '',
+  );
+
+  const [expertise, setExpertise] = useState(
+    displayedPersona && displayedPersona.expertises
+      ? displayedPersona.expertises.reduce((a, o) => (a.push(o.name), a), [])
+      : [],
+  );
+
+  const handlePersonaChange = e => {
+    updateUser({ defaultPersona: e.target.value.uuid })
+      .then(() => {
+        alert(
+          `You've successfully updated your active persona to ${
+            e.target.value.name
+          }.`,
+        );
+        setSelectedPersona(e.target.value);
+        setDisplayedPersona(e.target.value);
+        return;
+      })
+      .catch(err => alert(`An error occurred: ${err.message}`));
+  };
+
+  useEffect(() => {
+    console.log('exp: ', expertise);
+    if (displayedPersona && ownProfile) {
+      setName(displayedPersona.name);
+      setBio(displayedPersona.bio ? displayedPersona.bio : '');
+    }
+    if (
+      displayedPersona &&
+      !displayedPersona.isAnonymous &&
+      displayedPersona.identity
+    ) {
+      setContacts(displayedPersona.identity.contacts);
+    }
+  }, [displayedPersona]);
+
+  useEffect(() => {
+    if (!loadingPersona && persona) setDisplayedPersona(persona);
+  }, [loadingPersona, persona]);
+
+  useEffect(() => {
+    if (
+      ownProfile &&
+      selectedPersona &&
+      selectedPersona.uuid !== thisUser.defaultPersona.uuid
+    ) {
+      history.push(`/about/${selectedPersona.uuid}`);
+      setUser({
+        ...thisUser,
+        defaultPersona: selectedPersona,
+      });
+    }
+  }, [selectedPersona]);
+
+  if (!displayedPersona) {
     return <Loading />;
-  } else if (error) {
-    return <NotFound />;
   } else {
     return (
-      <div className="profile">
-        <HeaderBar thisUser={thisUser} closeGap />
-
+      <ThemeProvider theme={prereviewTheme}>
         <Helmet>
           <title>
-            {persona.name} • {ORG}
+            {displayedPersona.name} • {ORG}
           </title>
         </Helmet>
 
-        <section className="profile__content">
-          <header className="profile__header">
-            {thisUser && thisUser.personas &&
-            thisUser.personas.some(p => p.uuid === persona.uuid) ? (
-              <IconButton href="/settings">
-                <Avatar src={persona.avatar} className="profile__avatar-img" />
-              </IconButton>
-            ) : (
-              <Avatar src={persona.avatar} className="profile__avatar-img" />
-            )}
+        <HeaderBar thisUser={thisUser} />
 
-            {/*
-            <Modal
-              className="settings-role-editor-modal"
-              title="Edit Persona Settings"
-              open={editAvatar}
-              onClose={() => {
-                setEditAvatar(false);
-              }}
-            >
-              <RoleEditor
-                persona={persona}
-                onCancel={() => {
-                  setEditAvatar(false);
-                }}
-                onSaved={() => {
-                  setEditAvatar(false);
-                }}
-              />
-            </Modal>
-            */}
-
-            <section className="profile__identity-info">
-              <header className="profile__indentity-info-header">
-                <h2 className="profile__username">
-                  {persona && persona.name ? persona.name : 'Name goes here'}
-                </h2>
-                {thisUser && thisUser.personas &&
-                thisUser.personas.some(p => p.uuid === persona.uuid) ? (
-                  <XLink to={`/settings`} href={`/settings`}>
-                    Edit user settings
-                  </XLink>
-                ) : null}
-                {persona ? (
-                  <span className="profile__persona-status">
-                    {persona && !persona.isAnonymous ? (
-                      <div className="profile__persona-status__icon-container">
-                        <MdPublic className="profile__persona-status__icon" />{' '}
-                        Public
-                      </div>
-                    ) : (
-                      <div className="profile__persona-status__icon-container">
-                        <img
-                          src={IncognitoIcon}
-                          className="profile__persona-status__icon"
-                        />{' '}
-                        Anonymous
-                      </div>
-                    )}
-                  </span>
-                ) : null}
-              </header>
-
-              <dl>
-                <dt>
-                  <LabelStyle>PREreview Name</LabelStyle>
-                </dt>
-                <dd>
-                  <XLink
-                    to={`/about/${persona.uuid}`}
-                    href={`/about/${persona.uuid}`}
+        <Box my={10}>
+          <Container>
+            {ownProfile ? (
+              <Box my={4}>
+                <Container>
+                  <Grid
+                    component="label"
+                    container
+                    alignItems="center"
+                    justify="space-between"
+                    spacing={8}
                   >
-                    {persona.name}
-                  </XLink>
-                </dd>
-                {persona && persona.badges.length > 0 && (
-                  <Fragment>
-                    <dt>
-                      <LabelStyle>Badges</LabelStyle>
-                    </dt>
-                    <dd className="profile__chips">
-                      {persona.badges.map(badge => (
-                        <Chip
-                          key={badge.uuid}
-                          label={badge.name}
+                    <Grid
+                      container
+                      item
+                      xs={12}
+                      md={8}
+                      alignItems="center"
+                      justify="flex-start"
+                      spacing={2}
+                    >
+                      <Grid item>
+                        <Typography component="div" variant="body1">
+                          Active persona:
+                        </Typography>
+                      </Grid>
+                      <Grid item>
+                        <Select
+                          value={
+                            thisUser
+                              ? personas.filter(
+                                  p => p.uuid === thisUser.defaultPersona.uuid,
+                                )[0]
+                              : ''
+                          }
+                          onChange={handlePersonaChange}
+                          className={classes.select}
+                          renderValue={selected => (
+                            <Grid
+                              container
+                              alignItems="center"
+                              justify="flex-start"
+                              spacing={2}
+                            >
+                              <Grid item>
+                                <Avatar className={classes.small}>
+                                  {selected.name.charAt(0)}
+                                </Avatar>
+                              </Grid>
+                              <Grid item>
+                                <span>
+                                  {selected.isAnonymous
+                                    ? `Anonymous persona`
+                                    : `Public persona`}
+                                </span>
+                              </Grid>
+                            </Grid>
+                          )}
+                        >
+                          {personas
+                            ? personas.map(p => {
+                                return (
+                                  <MenuItem key={p.uuid} value={p}>
+                                    {p.isAnonymous
+                                      ? `Anonymous persona: ${p.name}`
+                                      : `Public persona: ${p.name}`}
+                                  </MenuItem>
+                                );
+                              })
+                            : null}
+                        </Select>
+                        <FormHelperText>
+                          Choose the profile persona you wish to use as default
+                          in your activity.
+                        </FormHelperText>
+                      </Grid>
+                    </Grid>
+                    <Grid item xs={12} md={4} className={classes.right}>
+                      {editMode ? (
+                        <Grid container spacing={2} justify="flex-end">
+                          <Grid item>
+                            <Button
+                              type="button"
+                              onClick={onSave}
+                              color="primary"
+                              variant="contained"
+                            >
+                              <span className={classes.buttonText}>Save</span>
+                            </Button>
+                          </Grid>
+                          <Grid item>
+                            <Button
+                              type="button"
+                              onClick={cancelEdit}
+                              color="primary"
+                              variant="outlined"
+                            >
+                              <span className={classes.buttonText}>Cancel</span>
+                            </Button>
+                          </Grid>
+                        </Grid>
+                      ) : (
+                        <Button
+                          onClick={handleEdit}
+                          className={classes.buttonText}
                           color="primary"
-                          size="small"
-                          className="profile__chip"
+                          variant="contained"
+                        >
+                          Edit profile
+                        </Button>
+                      )}
+                    </Grid>
+                  </Grid>
+                </Container>
+              </Box>
+            ) : null}
+
+            <Box my={8} pb={6} borderBottom="1px solid #C1BFBF">
+              <Container>
+                <Grid container justify="space-between" alignItems="flex-start">
+                  <Grid item>
+                    <Box>
+                      {editMode && !displayedPersona.isAnonymous ? (
+                        <TextField
+                          className={classes.input}
+                          required
+                          id="name"
+                          label="Name"
+                          value={name}
+                          onChange={e => {
+                            setName(e.target.value);
+                          }}
+                          variant="outlined"
                         />
-                      ))}
-                    </dd>
-                  </Fragment>
-                )}
-                {persona && (
-                  <Fragment>
-                    <dt>
-                      <LabelStyle>Identity</LabelStyle>
-                    </dt>
-                    <dd>
-                      {persona && persona.isAnonymous ? 'Anonymous' : 'Public'}
-                    </dd>
-                  </Fragment>
-                )}
+                      ) : (
+                        <Typography component="div" variant="h6" gutterBottom>
+                          {displayedPersona.name}
+                        </Typography>
+                      )}
+                    </Box>
+                    {!displayedPersona.isAnonymous && !editMode ? (
+                      <>
+                        <Box>
+                          <Typography
+                            component="div"
+                            variant="body1"
+                            gutterBottom
+                          >
+                            <Link href={`https://orcid.org/${orcid}`}>
+                              ORCiD: {orcid}
+                            </Link>
+                          </Typography>
+                        </Box>
+                        <Box>
+                          <Typography
+                            component="div"
+                            variant="body1"
+                            gutterBottom
+                          >
+                            <b className={editMode ? classes.label : ''}>
+                              Contact information:{' '}
+                            </b>
+                            {contacts && contacts.length ? (
+                              <List>
+                                {contacts.map(contact => (
+                                  <ListItem key={contact.uuid}>
+                                    {contact.value}
+                                  </ListItem>
+                                ))}
+                              </List>
+                            ) : (
+                              `None provided.`
+                            )}
+                          </Typography>
+                        </Box>
+                      </>
+                    ) : null}
+                    <Box>
+                      <Typography component="div" variant="body1" gutterBottom>
+                        <b>Badges: </b>
+                        {badges && badges.length > 0
+                          ? badges.map(badge => (
+                              <Chip
+                                key={badge.uuid}
+                                label={badge.name}
+                                color="primary"
+                                size="small"
+                              />
+                            ))
+                          : 'No badges yet.'}
+                      </Typography>
+                      <Typography component="div" variant="body1" gutterBottom>
+                        <b>Area(s) of expertise: </b>
+                        {editMode ? (
+                          <Select
+                            className={classes.input}
+                            multiple
+                            value={expertise}
+                            onChange={handleChange}
+                            input={<Input />}
+                          >
+                            {expertises.map(exp => (
+                              <MenuItem key={exp.uuid} value={exp.uuid}>
+                                {exp.name}
+                              </MenuItem>
+                            ))}
+                          </Select>
+                        ) : expertise && expertise.length > 0 ? (
+                          expertise.map(exp => (
+                            <span key={exp.uuid}>{exp.name}, </span>
+                          ))
+                        ) : (
+                          'No expertise selected yet.'
+                        )}
+                      </Typography>
+                      <Typography component="div" variant="body1" gutterBottom>
+                        Community member since{' '}
+                        {format(new Date(persona.createdAt), 'MMM. d, yyyy')}
+                      </Typography>
+                    </Box>
+                  </Grid>
+                  <Grid item>
+                    {ownProfile ? (
+                      <IconButton onClick={handleAvatarClick}>
+                        <Avatar
+                          src={displayedPersona.avatar}
+                          className={classes.avatar}
+                        />
+                      </IconButton>
+                    ) : (
+                      <Avatar
+                        src={displayedPersona.avatar}
+                        className={classes.avatar}
+                      />
+                    )}
+                  </Grid>
+                </Grid>
 
-                {/*
-                {!persona.isAnonymous && (
-                  <Fragment>
-                    <dt>
-                      <LabelStyle>ORCID</LabelStyle>
-                    </dt>
-                    <dd>
-                      <a href={`https://orcid.org/${persona.identity.orcid}`}>
-                        {persona.identity.orcid}
-                      </a>
-                    </dd>
-                  </Fragment>
+                {avatarModalOpen ? (
+                  <Modal
+                    className="settings-role-editor-modal"
+                    title="Edit avatar"
+                    onClose={() => {
+                      setAvatarModalOpen(false);
+                    }}
+                  >
+                    <RoleEditor
+                      persona={displayedPersona}
+                      onCancel={() => {
+                        setAvatarModalOpen(false);
+                      }}
+                      onSaved={handleAvatarSave}
+                    />
+                  </Modal>
+                ) : null}
+                {displayedPersona.isAnonymous ? (
+                  ''
+                ) : (
+                  <Typography component="div" variant="body1" gutterBottom>
+                    <b>About</b>
+                  </Typography>
                 )}
-                  */}
-
-                {persona && (
-                  <Fragment>
-                    <dt>
-                      <LabelStyle>Member since</LabelStyle>
-                    </dt>
-                    <dd>
-                      {format(new Date(persona.createdAt), 'MMM. d, yyyy')}
-                    </dd>
-                  </Fragment>
+                {editMode && !displayedPersona.isAnonymous ? (
+                  <TextField
+                    className={classes.textField}
+                    multiline
+                    rowsMax={24}
+                    id="bio"
+                    name="bio"
+                    value={bio}
+                    onChange={e => setBio(e.target.value)}
+                    variant="outlined"
+                  />
+                ) : (
+                  <Typography component="div" variant="body1">
+                    {displayedPersona.bio}
+                  </Typography>
                 )}
-              </dl>
-            </section>
-          </header>
-          <section className="profile__activity-section">
-            <h2 className="profile__section-title">Activity</h2>
+                {ownProfile && editMode ? (
+                  <SettingsNotifications user={thisUser} />
+                ) : null}
+              </Container>
+            </Box>
 
-            <RoleActivity persona={persona} />
-          </section>
-        </section>
-      </div>
+            {editMode ? null : (
+              <Box>
+                <Container>
+                  <Typography component="h2" variant="h6" gutterBottom>
+                    PREreview Communities
+                  </Typography>
+                  <Typography component="h2" variant="h6" gutterBottom>
+                    PREreview Contributions
+                  </Typography>
+                  {!ownProfile ? (
+                    <RoleActivity persona={displayedPersona} />
+                  ) : null}
+                  <Typography component="h2" variant="h6" gutterBottom>
+                    List of Publications
+                  </Typography>
+                </Container>
+              </Box>
+            )}
+          </Container>
+        </Box>
+      </ThemeProvider>
     );
   }
 }

@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import router from 'koa-joi-router';
+import { Key } from '../models/entities/index.ts';
 import { isString } from '../../common/utils/index.ts';
 import { getLogger } from '../log.js';
 
@@ -22,7 +23,7 @@ const querySchema = Joi.object({
 });
 
 // eslint-disable-next-line no-unused-vars
-export default function controller(users, contacts, thisUser) {
+export default function controller(users, contacts, keys, thisUser) {
   const userRouter = router();
 
   userRouter.route({
@@ -87,6 +88,7 @@ export default function controller(users, contacts, thisUser) {
           'personas.requests',
           'groups',
           'contacts',
+          'keys',
           'defaultPersona.badges',
         ]);
       } catch (err) {
@@ -370,7 +372,7 @@ export default function controller(users, contacts, thisUser) {
     meta: {
       swagger: {
         operationId: 'DeleteUserContacts',
-        summary: 'Endpoint to PUT contacts for a single user.',
+        summary: 'Endpoint to DELETE contacts for a single user.',
       },
     },
     method: 'DELETE',
@@ -534,6 +536,152 @@ export default function controller(users, contacts, thisUser) {
         message: 'ok',
         data: { schema: contact.schema, value: contact.value },
       };
+    },
+  });
+
+  userRouter.route({
+    meta: {
+      swagger: {
+        operationId: 'PostUserKey',
+        summary: 'Endpoint to POST new API key for a single user.',
+      },
+    },
+    method: 'POST',
+    path: '/users/:id/keys',
+    validate: {
+      params: {
+        id: Joi.string()
+          .description('User id')
+          .required(),
+      },
+      body: Joi.object({
+        app: Joi.string().required(),
+      }),
+      type: 'json',
+    },
+    pre: thisUser.can('edit this user'), // TODO: can users delete their own account?
+    handler: async ctx => {
+      log.debug(`Adding a new API key to user ${ctx.params.id}`);
+      let newKey, user;
+      try {
+        user = await users.findOneByUuidOrOrcid(ctx.params.id);
+      } catch (err) {
+        log.error('HTTP 400 Error: ', err);
+        ctx.throw(400, `Failed to parse contact schema: ${err}`);
+      }
+      if (!user) {
+        log.error(
+          `HTTP 404 Error: That user with ID ${ctx.params.id} does not exist.`,
+        );
+        ctx.throw(404, `That user with ID ${ctx.params.id} does not exist.`);
+      }
+
+      let conflict, app;
+      try {
+        log.debug(`Create a new API key entry.`);
+        ({ app } = ctx.request.body);
+
+        conflict = await keys.findOne({ app, owner: user });
+      } catch (err) {
+        log.error('HTTP 400 Error: ', err);
+        ctx.throw(400, `Failed to parse API key schema: ${err}`);
+      }
+
+      if (conflict) {
+        log.error(
+          `HTTP 409 Error: API key with identifier ${app} already exists for user ${
+            ctx.params.id
+          }`,
+        );
+        ctx.throw(
+          409,
+          `API key with identifier ${app} already exists for user ${
+            ctx.params.id
+          }`,
+        );
+      }
+
+      try {
+        newKey = new Key(user, app);
+        await keys.persistAndFlush(newKey);
+      } catch (err) {
+        log.error('HTTP 400 Error: ', err);
+        ctx.throw(400, `Failed to parse API key schema: ${err}`);
+      }
+
+      ctx.status = 201;
+      ctx.body = {
+        status: 201,
+        message: 'created',
+        data: newKey,
+      };
+    },
+  });
+
+  userRouter.route({
+    meta: {
+      swagger: {
+        operationId: 'DeleteUserKeys',
+        summary: 'Endpoint to DELETE key for a single user.',
+      },
+    },
+    method: 'DELETE',
+    path: '/users/:id/keys',
+    validate: {
+      params: {
+        id: Joi.string()
+          .description('User id')
+          .required(),
+      },
+      query: {
+        kid: Joi.string()
+          .description('Key id')
+          .required(),
+      },
+      type: 'json',
+      continueOnError: true,
+    },
+    pre: thisUser.can('edit this user'), // TODO: can users delete their own account?
+    handler: async ctx => {
+      const keyId = ctx.query.kid;
+      let user;
+      log.debug(`Deleting key for user ${ctx.params.id}`);
+      try {
+        user = await users.findOneByUuidOrOrcid(ctx.params.id);
+      } catch (err) {
+        log.error('HTTP 400 Error: ', err);
+        ctx.throw(400, `Failed to parse key schema: ${err}`);
+      }
+      if (!user) {
+        ctx.throw(404, `That user with ID ${ctx.params.id} does not exist.`);
+      }
+      try {
+        const exists = await keys.findOne({
+          uuid: keyId,
+          owner: user,
+        });
+        if (exists) {
+          log.debug('Deleting key.');
+          await keys.removeAndFlush(exists);
+          ctx.status = 200;
+          ctx.body = {
+            status: 200,
+            message: 'ok',
+            data: exists,
+          };
+        } else {
+          log.error('Key does not exist.');
+          ctx.throw(
+            404,
+            `That key ${ctx.query.cid} for user with ID ${
+              ctx.params.id
+            } does not exist.`,
+          );
+        }
+      } catch (err) {
+        log.error('HTTP 400 Error: ', err);
+        ctx.throw(400, `Failed to parse key schema: ${err}`);
+      }
     },
   });
 
