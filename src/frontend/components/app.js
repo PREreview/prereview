@@ -35,7 +35,9 @@ import NotFound from './not-found';
 import PrivateRoute, { AdminRoute } from './private-route';
 import Profile from './profile';
 import Reviews from './reviews';
-import Settings from './settings';
+import SettingsAPI from './settings-api';
+import SettingsDrafts from './settings-drafts';
+import SettingsTemplates from './settings-templates';
 import SuspenseLoading from './suspense-loading';
 import ToCPage from './toc-page';
 import PersonaSearch from './PersonaSearch';
@@ -125,14 +127,20 @@ export default function App({ user }) {
               <Route exact={true} path="/extension">
                 <ExtensionSplash />
               </Route>
-              <PrivateRoute exact={true} path="/settings">
-                <Settings />
+              <PrivateRoute exact={true} path="/settings/api">
+                <SettingsAPI />
+              </PrivateRoute>
+              <PrivateRoute exact={true} path="/settings/drafts">
+                <SettingsDrafts />
               </PrivateRoute>
               <AdminRoute exact={true} path="/admin">
                 <AdminPanel />
               </AdminRoute>
               <AdminRoute exact={true} path="/block">
                 <BlockPanel />
+              </AdminRoute>
+              <AdminRoute exact={true} path="/templates">
+                <SettingsTemplates />
               </AdminRoute>
               <Route exact={true} path="/community-settings/:id">
                 <CommunityPanel />

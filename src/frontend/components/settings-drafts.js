@@ -11,12 +11,12 @@ import Container from '@material-ui/core/Container';
 
 // components
 import HeaderBar from './header-bar';
-import SettingsKeys from './settings-keys';
+import SettingsInvites from './settings-invites';
 
 // constants
 import { ORG } from '../constants';
 
-export default function SettingsAPI() {
+export default function SettingsDrafts() {
   const [user] = useContext(UserProvider.context);
 
   useEffect(() => {}, [user]);
@@ -30,7 +30,7 @@ export default function SettingsAPI() {
       <HeaderBar thisUser={user} />
 
       <Container>
-        <SettingsKeys user={user} />
+        <SettingsInvites user={user} />
       </Container>
     </Box>
   );

@@ -576,11 +576,25 @@ export default function HeaderBar({ thisUser }) {
                     )}
 
                     <Link
-                      to={process.env.IS_EXTENSION ? undefined : '/settings'}
-                      href={`/settings`}
+                      to={
+                        process.env.IS_EXTENSION ? undefined : '/settings/api'
+                      }
+                      href={`/settings/api`}
                       target={process.env.IS_EXTENSION ? '_blank' : undefined}
                     >
-                      User Settings
+                      API Settings
+                    </Link>
+
+                    <Link
+                      to={
+                        process.env.IS_EXTENSION
+                          ? undefined
+                          : '/settings/drafts'
+                      }
+                      href={`/settings/drafts`}
+                      target={process.env.IS_EXTENSION ? '_blank' : undefined}
+                    >
+                      User Drafts
                     </Link>
 
                     {thisUser.isAdmin && (
@@ -590,6 +604,16 @@ export default function HeaderBar({ thisUser }) {
                         target={process.env.IS_EXTENSION ? '_blank' : undefined}
                       >
                         Admin Settings
+                      </Link>
+                    )}
+
+                    {thisUser.isAdmin && (
+                      <Link
+                        to={process.env.IS_EXTENSION ? undefined : '/templates'}
+                        href={`/templates`}
+                        target={process.env.IS_EXTENSION ? '_blank' : undefined}
+                      >
+                        Templates Settings
                       </Link>
                     )}
 
