@@ -259,6 +259,15 @@ export default function controller(
             `That persona with ID ${ctx.params.id} does not exist.`,
           );
         }
+        const expertises = ctx.request.body.expertises || [];
+        let newExpertises;
+        if (expertises.length > 0) {
+          newExpertises = await expertisesModel.find({ $in: expertises });
+        }
+        if (newExpertises) {
+          persona.expertises.set(newExpertises);
+          delete ctx.request.body.expertises;
+        }
         personasModel.assign(persona, ctx.request.body);
         await personasModel.persistAndFlush(persona);
       } catch (err) {
