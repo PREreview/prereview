@@ -25,6 +25,7 @@ const querySchema = Joi.object({
   search: Joi.string().allow(''),
   communities: Joi.string().allow(''),
   badges: Joi.string().allow(''),
+  expertises: Joi.array(),
   sort: Joi.string().allow(
     'name',
     'dateJoined',
@@ -230,6 +231,7 @@ export default function controller(
         name: Joi.string(),
         avatar: Joi.string(),
         bio: Joi.string().allow(''),
+        expertises: Joi.array(),
         isLocked: Joi.boolean(),
       }),
       type: 'json',

@@ -43,7 +43,6 @@ import TextField from '@material-ui/core/TextField';
 
 // components
 import HeaderBar from './header-bar';
-import Banner from './banner.js';
 import Loading from './loading.js';
 import Modal from './modal';
 import RoleActivity from './role-activity';
@@ -58,8 +57,6 @@ const Button = withStyles({
     textTransform: 'none',
   },
 })(MuiButton);
-
-const EXAMPLE_EXPERTISE = ['Biology', 'Microbiology', 'Physics', 'COVID-19'];
 
 const prereviewTheme = createMuiTheme({
   palette: {
@@ -141,7 +138,7 @@ export default function Profile() {
     id: id,
   });
 
-  const { data: expertises, loading: loadingExpertises } = useGetExpertises({
+  const { data: expertises } = useGetExpertises({
     resolve: res => res.data,
   });
 
@@ -156,8 +153,8 @@ export default function Profile() {
     setEditMode(false);
   };
 
-  const handleChange = () => {
-    console.log('changing expertise');
+  const handleChange = event => {
+    setExpertise(event.target.value);
   };
 
   const onSave = () => {
@@ -168,6 +165,7 @@ export default function Profile() {
     let data = {
       name: name,
       bio: bio,
+      expertises: expertise,
     };
     updatePersona(data)
       .then(resp => {
@@ -177,6 +175,8 @@ export default function Profile() {
         setDisplayedPersona(updated);
         setName(updated.name);
         setBio(updated.bio);
+        setExpertise(updated.expertises);
+        return;
       })
       .catch(err => alert(`ERROR!`, err.message));
   };
@@ -210,11 +210,15 @@ export default function Profile() {
       ? displayedPersona.identity.contacts
       : [],
   );
-  const [expertise, setExpertise] = useState([]);
   const badges =
     displayedPersona && displayedPersona.badges ? displayedPersona.badges : [];
   const [bio, setBio] = useState(
     displayedPersona && displayedPersona.bio ? displayedPersona.bio : '',
+  );
+  const [expertise, setExpertise] = useState(
+    displayedPersona && displayedPersona.expertises
+      ? displayedPersona.expertises
+      : [],
   );
 
   const handlePersonaChange = e => {
@@ -227,6 +231,7 @@ export default function Profile() {
         );
         setSelectedPersona(e.target.value);
         setDisplayedPersona(e.target.value);
+        return;
       })
       .catch(err => alert(`An error occurred: ${err.message}`));
   };
@@ -273,7 +278,7 @@ export default function Profile() {
             {displayedPersona.name} • {ORG}
           </title>
         </Helmet>
-        {/* <Banner /> */}
+
         <HeaderBar thisUser={thisUser} />
 
         <Box my={10}>
@@ -363,9 +368,7 @@ export default function Profile() {
                               color="primary"
                               variant="contained"
                             >
-                              <span className={classes.buttonText}>
-                                Save changes
-                              </span>
+                              <span className={classes.buttonText}>Save</span>
                             </Button>
                           </Grid>
                           <Grid item>
@@ -375,9 +378,7 @@ export default function Profile() {
                               color="primary"
                               variant="outlined"
                             >
-                              <span className={classes.buttonText}>
-                                Cancel edits
-                              </span>
+                              <span className={classes.buttonText}>Cancel</span>
                             </Button>
                           </Grid>
                         </Grid>
@@ -445,7 +446,9 @@ export default function Profile() {
                             {contacts && contacts.length ? (
                               <List>
                                 {contacts.map(contact => (
-                                  <ListItem>{contact.value}</ListItem>
+                                  <ListItem key={contact.uuid}>
+                                    {contact.value}
+                                  </ListItem>
                                 ))}
                               </List>
                             ) : (
@@ -485,8 +488,12 @@ export default function Profile() {
                               </MenuItem>
                             ))}
                           </Select>
+                        ) : expertise && expertise.length > 0 ? (
+                          expertise.map(exp => (
+                            <span key={exp.uuid}>{exp}, </span>
+                          ))
                         ) : (
-                          `No area of expertise selected yet.`
+                          'No expertise selected yet.'
                         )}
                       </Typography>
                       <Typography component="div" variant="body1" gutterBottom>
