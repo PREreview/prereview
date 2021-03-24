@@ -17,6 +17,7 @@ import { Contact } from './Contact';
 import { Group } from './Group';
 import { Persona } from './Persona';
 import { Work } from './Work';
+import { Key } from './Key';
 import { createRandomOrcid } from '../../../common/utils/orcid.js';
 
 @Entity()
@@ -56,6 +57,9 @@ export class User extends BaseEntity {
   @OneToMany({ entity: () => Work, mappedBy: 'author' })
   @Index()
   works: Collection<Work> = new Collection<Work>(this);
+
+  @OneToMany({ entity: () => Key, mappedBy: 'owner' })
+  keys: Collection<Key> = new Collection<Key>(this);
 
   constructor(orcid: string, isPrivate = false, defaultPersona?: Persona) {
     super();

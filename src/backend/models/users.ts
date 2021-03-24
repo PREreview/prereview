@@ -27,6 +27,18 @@ export class UserModel extends EntityRepository<User> {
       throw new ChainError(`Failed to find user for persona ${value}.`, err);
     }
   }
+
+  findOneByKey(app: string, secret: string, params: string[]): any {
+    try {
+      return this.em.findOne(
+        User,
+        { keys: { app: app, secret: secret } },
+        params,
+      );
+    } catch (err) {
+      throw new ChainError(`Failed to find user for API appId ${app}.`, err);
+    }
+  }
 }
 
 export function userModelWrapper(db: MikroORM): UserModel {
