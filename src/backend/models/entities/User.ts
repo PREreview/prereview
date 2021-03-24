@@ -2,6 +2,7 @@ import {
   Collection,
   Entity,
   EntityRepositoryType,
+  Index,
   ManyToMany,
   OneToMany,
   OneToOne,
@@ -16,6 +17,7 @@ import { Contact } from './Contact';
 import { Group } from './Group';
 import { Persona } from './Persona';
 import { Work } from './Work';
+import { Key } from './Key';
 import { createRandomOrcid } from '../../../common/utils/orcid.js';
 
 @Entity()
@@ -29,6 +31,7 @@ export class User extends BaseEntity {
   orcid!: string;
 
   @OneToOne({ entity: () => Persona, nullable: true })
+  @Index()
   defaultPersona?: Persona;
 
   @Fixture(() => false)
@@ -36,19 +39,27 @@ export class User extends BaseEntity {
   isPrivate?: boolean;
 
   @ManyToMany({ entity: () => Group, mappedBy: 'members' })
+  @Index()
   groups: Collection<Group> = new Collection<Group>(this);
 
   @ManyToMany({ entity: () => Community, mappedBy: 'owners' })
+  @Index()
   owned: Collection<Community> = new Collection<Community>(this);
 
   @OneToMany({ entity: () => Persona, mappedBy: 'identity' })
+  @Index()
   personas: Collection<Persona> = new Collection<Persona>(this);
 
   @OneToMany({ entity: () => Contact, mappedBy: 'identity' })
+  @Index()
   contacts: Collection<Contact> = new Collection<Contact>(this);
 
   @OneToMany({ entity: () => Work, mappedBy: 'author' })
+  @Index()
   works: Collection<Work> = new Collection<Work>(this);
+
+  @OneToMany({ entity: () => Key, mappedBy: 'owner' })
+  keys: Collection<Key> = new Collection<Key>(this);
 
   constructor(orcid: string, isPrivate = false, defaultPersona?: Persona) {
     super();

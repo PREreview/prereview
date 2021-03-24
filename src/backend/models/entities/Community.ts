@@ -2,6 +2,7 @@ import {
   Collection,
   Entity,
   EntityRepositoryType,
+  Index,
   ManyToMany,
   OneToMany,
   Property,
@@ -47,21 +48,27 @@ export class Community extends BaseEntity {
   logo?: Buffer;
 
   @ManyToMany({ entity: () => Persona, inversedBy: 'communities' })
+  @Index()
   members: Collection<Persona> = new Collection<Persona>(this);
 
   @ManyToMany({ entity: () => User, inversedBy: 'owned' })
+  @Index()
   owners: Collection<User> = new Collection<User>(this);
 
   @ManyToMany({ entity: () => Preprint, inversedBy: 'communities' })
+  @Index()
   preprints: Collection<Preprint> = new Collection<Preprint>(this);
 
   @OneToMany({ entity: () => Event, mappedBy: 'community' })
+  @Index()
   events: Collection<Event> = new Collection<Event>(this);
 
   @ManyToMany({ entity: () => Tag, inversedBy: 'communities' })
+  @Index()
   tags: Collection<Tag> = new Collection<Tag>(this);
 
   @OneToMany({ entity: () => Template, mappedBy: 'community' })
+  @Index()
   templates: Collection<Template> = new Collection<Template>(this);
 
   constructor(name: string, description?: string, logo?: Buffer) {

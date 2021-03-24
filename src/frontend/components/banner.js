@@ -23,7 +23,7 @@ export default function Banner() {
     <>
       <Box className={classes.announcement}>
         <Container>
-          <Typography variant="body1" component="div">
+          <Typography component="div">
             Get involved with rapidly reviewing COVID-19 preprints and then view
             our{' '}
             <a
@@ -33,18 +33,6 @@ export default function Banner() {
               COVID-19 Dashboard
             </a>{' '}
             of review activities and recommendations.
-          </Typography>
-          <Typography variant="body1" component="div">
-            Read about the{' '}
-            <a
-              className="announcement-link"
-              href="https://oaspa.org/covid-19-publishers-open-letter-of-intent-rapid-review/?highlight=covid-19"
-              target="_blank"
-              rel="noreferrer"
-            >
-              OASPA’s initiative
-            </a>{' '}
-            to ensure rapid review of key COVID-19 work.
           </Typography>
         </Container>
       </Box>

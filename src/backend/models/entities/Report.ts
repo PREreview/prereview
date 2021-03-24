@@ -2,6 +2,7 @@ import { v4 as uuidv4 } from 'uuid';
 import {
   Entity,
   EntityRepositoryType,
+  Index,
   ManyToOne,
   Property,
 } from '@mikro-orm/core';
@@ -24,6 +25,7 @@ export class Report extends BaseEntity {
   title?: string;
 
   @ManyToOne({ entity: () => Persona })
+  @Index()
   author!: Persona;
 
   @Fixture(() => uuidv4())

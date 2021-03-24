@@ -2,6 +2,7 @@ import {
   Entity,
   EntityRepositoryType,
   Enum,
+  Index,
   ManyToOne,
   Property,
 } from '@mikro-orm/core';
@@ -24,9 +25,11 @@ export class RapidReview extends BaseEntity {
   [EntityRepositoryType]?: RapidReviewModel;
 
   @ManyToOne({ entity: () => Persona })
+  @Index()
   author!: Persona;
 
   @ManyToOne({ entity: () => Preprint })
+  @Index()
   preprint!: Preprint;
 
   //eslint-disable-next-line

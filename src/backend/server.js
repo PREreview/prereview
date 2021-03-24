@@ -42,6 +42,7 @@ import {
   fullReviewModelWrapper,
   fullReviewDraftModelWrapper,
   groupModelWrapper,
+  keyModelWrapper,
   personaModelWrapper,
   preprintModelWrapper,
   rapidReviewModelWrapper,
@@ -119,7 +120,12 @@ export default async function configServer(config) {
   server.use(currentCommunity());
   server.use(currentPersona());
   server.use(currentUser());
-  const authz = authWrapper(groupModel, communityModel, personaModel); // authorization, not authentication
+  const authz = authWrapper(
+    userModel,
+    groupModel,
+    communityModel,
+    personaModel,
+  ); // authorization, not authentication
 
   // setup API handlers
   const auth = AuthController(
@@ -174,7 +180,8 @@ export default async function configServer(config) {
   const tags = TagController(tagModel, authz);
   const templateModel = templateModelWrapper(db);
   const templates = TemplateController(templateModel, communityModel, authz);
-  const users = UserController(userModel, contactModel, authz);
+  const keyModel = keyModelWrapper(db);
+  const users = UserController(userModel, contactModel, keyModel, authz);
   const notifications = NotificationController(userModel, authz);
   const communities = CommunityController(
     communityModel,
