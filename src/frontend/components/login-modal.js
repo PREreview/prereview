@@ -9,33 +9,48 @@ import Button from '@material-ui/core/Button';
 import CheckIcon from '@material-ui/icons/Check';
 import ClearIcon from '@material-ui/icons/Clear';
 import Dialog from '@material-ui/core/Dialog';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import IconButton from '@material-ui/core/IconButton';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
-import MuiDialogTitle from '@material-ui/core/DialogTitle';
-import MuiDialogContent from '@material-ui/core/DialogContent';
-import IconButton from '@material-ui/core/IconButton';
-import CloseIcon from '@material-ui/icons/Close';
 import Typography from '@material-ui/core/Typography';
 
 // components
 import CoCStepper from './coc-stepper';
-import PreReviewLogo from './pre-review-logo';
+
+// icons
+import CloseIcon from '@material-ui/icons/Close';
+import preReviewLogo from '../svgs/prereview-logo.svg';
 
 const useStyles = makeStyles(theme => ({
   root: {
     width: '100%',
   },
+  actionsContainer: {
+    marginBottom: theme.spacing(2),
+  },
   button: {
     marginTop: theme.spacing(1),
     marginRight: theme.spacing(1),
   },
-  actionsContainer: {
-    marginBottom: theme.spacing(2),
+  close: {
+    position: 'absolute',
+    right: 10,
+    top: 10,
+    width: 50,
   },
   dialog: {
     overflowX: 'hidden !important',
+  },
+  logo: {
+    display: 'block',
+    marginLeft: 'auto',
+    marginRight: 'auto',
+    maxWidth: 200,
+    width: '100%',
   },
   resetContainer: {
     padding: theme.spacing(3),
@@ -55,30 +70,6 @@ const styles = theme => ({
     color: theme.palette.grey[500],
   },
 });
-
-const DialogTitle = withStyles(styles)(props => {
-  const { children, classes, onClose, ...other } = props;
-  return (
-    <MuiDialogTitle disableTypography className={classes.root} {...other}>
-      <Typography variant="h6">{children}</Typography>
-      {onClose ? (
-        <IconButton
-          aria-label="close"
-          className={classes.closeButton}
-          onClick={onClose}
-        >
-          <CloseIcon />
-        </IconButton>
-      ) : null}
-    </MuiDialogTitle>
-  );
-});
-
-const DialogContent = withStyles(theme => ({
-  root: {
-    padding: theme.spacing(2),
-  },
-}))(MuiDialogContent);
 
 function LoginModal({ open, handleClose }) {
   const [modalContent, setModalContent] = useState('coc');
@@ -219,9 +210,21 @@ function LoginModal({ open, handleClose }) {
       disableBackdropClick={true}
       onClose={handleClose}
     >
-      <Box className={classes.dialog} p={4}>
-        <DialogTitle id="login-modal-title" onClose={handleClose}>
-          <PreReviewLogo />
+      <Box className={classes.dialog}>
+        <IconButton
+          aria-label="close"
+          onClick={handleClose}
+          className={classes.close}
+        >
+          <CloseIcon />
+        </IconButton>
+        <DialogTitle id="login-modal-title">
+          <img
+            src={preReviewLogo}
+            className={classes.logo}
+            alt="Login to PREreview"
+            outline="0"
+          />
         </DialogTitle>
         {getModalContent(modalContent)}
       </Box>

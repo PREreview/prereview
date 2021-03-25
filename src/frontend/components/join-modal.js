@@ -27,8 +27,9 @@ const styles = makeStyles(theme => ({
     },
   },
   close: {
-    marginLeft: 'auto',
-    marginRight: 0,
+    position: 'absolute',
+    right: 10,
+    top: 10,
     width: 50,
   },
   dialogTitle: {
