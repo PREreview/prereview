@@ -13,6 +13,8 @@ import MenuItem from '@material-ui/core/MenuItem';
 
 // components
 import Banner from './banner';
+import JoinModal from './join-modal';
+import LoginModal from './login-modal';
 import NoticeBadge from './notice-badge';
 import UserBadge from './user-badge';
 
@@ -48,6 +50,7 @@ const useStyles = makeStyles(theme => ({
   navItem: {
     color: '#000 !important', // #FIXME remove after porting to MUI
     fontSize: '1.2rem',
+    fontWeight: 400,
     lineHeight: 1.75,
     padding: 8,
     textTransform: 'none',
@@ -74,6 +77,21 @@ export default function HeaderBar({ thisUser }) {
 
   const [loginLink, setLoginLink] = useState('/login');
   const [homeLink, setHomeLink] = useState('/');
+
+  // handle login modal
+  const [loginModalOpen, setLoginModalOpen] = useState(false);
+  const [joinModalOpen, setJoinModalOpen] = useState(false);
+
+  const handleJoinModalToggle = next => {
+    if (next === 'next') {
+      handleLoginModalToggle();
+    }
+    setJoinModalOpen(joinModalOpen => !joinModalOpen);
+  };
+
+  const handleLoginModalToggle = () => {
+    setLoginModalOpen(loginModalOpen => !loginModalOpen);
+  };
 
   /* Handle popper menus */
   // #FIXME refactor
@@ -287,9 +305,21 @@ export default function HeaderBar({ thisUser }) {
                 </MenuItem>
                 {!thisUser ? (
                   <MenuItem>
-                    <Link className={classes.mobileNavItem} href="/login">
+                    <Link
+                      className={classes.mobileNavItem}
+                      href="#"
+                      onClick={handleJoinModalToggle}
+                    >
                       Log in / Sign up
                     </Link>
+                    <JoinModal
+                      open={joinModalOpen}
+                      handleClose={handleJoinModalToggle}
+                    />
+                    <LoginModal
+                      open={loginModalOpen}
+                      handleClose={handleLoginModalToggle}
+                    />
                   </MenuItem>
                 ) : null}
               </Menu>
@@ -546,13 +576,14 @@ export default function HeaderBar({ thisUser }) {
                 </Grid>
                 {!thisUser ? (
                   <Grid item>
-                    <Link
+                    <Button
+                      aria-controls="login-modal"
+                      aria-haspopup="true"
+                      onClick={handleJoinModalToggle}
                       className={classes.navItem}
-                      color="textPrimary"
-                      href="/login"
                     >
                       Log in / Sign up
-                    </Link>
+                    </Button>
                   </Grid>
                 ) : null}
               </Grid>

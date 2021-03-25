@@ -1,14 +1,9 @@
 // base imports
-import React, { Fragment, useState, useEffect } from 'react';
+import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 
 // material ui
-import {
-  ThemeProvider,
-  createMuiTheme,
-  makeStyles,
-  withStyles,
-} from '@material-ui/core/styles';
+import { makeStyles } from '@material-ui/core/styles';
 import ArrowRightAltIcon from '@material-ui/icons/ArrowRightAlt';
 import Button from '@material-ui/core/Button';
 import List from '@material-ui/core/List';
@@ -19,9 +14,8 @@ import Stepper from '@material-ui/core/Stepper';
 import Step from '@material-ui/core/Step';
 import StepLabel from '@material-ui/core/StepLabel';
 import StepContent from '@material-ui/core/StepContent';
-import Typography from '@material-ui/core/Typography';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(theme => ({
   root: {
     width: '100%',
   },
@@ -36,21 +30,6 @@ const useStyles = makeStyles((theme) => ({
     padding: theme.spacing(3),
   },
 }));
-
-const prereviewTheme = createMuiTheme({
-  palette: {
-    primary: {
-      main: '#F77463',
-      contrastText: '#fff',
-    },
-    secondary: {
-      main: '#eaeaf0',
-    },
-  },
-  typography: {
-    fontFamily: ['Open Sans', 'sans-serif'].join(','),
-  },
-});
 
 const getSteps = () => {
   return [
@@ -104,11 +83,27 @@ export default function CoCStepper({ openNext }) {
             <List>
               <ListItem>
                 <ListItemText>
-                  In the interest of fostering an open and welcoming environment we, as PREreview's leaders, contributors, and maintainers, pledge to make participation in our project and our  community a harassment-free experience for everyone, regardless of background, family status, gender, gender identity or expression, marital status, sex, sexual orientation, native language, age, ability, race/ethnicity, caste, national origin, socioeconomic status, religion, geographic location, and any other dimension of diversity.
+                  In the interest of fostering an open and welcoming environment
+                  we, as PREreview&apos;s leaders, contributors, and
+                  maintainers, pledge to make participation in our project and
+                  our community a harassment-free experience for everyone,
+                  regardless of background, family status, gender, gender
+                  identity or expression, marital status, sex, sexual
+                  orientation, native language, age, ability, race/ethnicity,
+                  caste, national origin, socioeconomic status, religion,
+                  geographic location, and any other dimension of diversity.
                 </ListItemText>
               </ListItem>
               <ListItemText>
-                  You, as a member of our community, are expected to abide by <a href='https://content.prereview.org/coc'target="_blank" rel="noopener noreferrer">PREreview Code of Conduct</a>. In short, you are expected to:
+                You, as a member of our community, are expected to abide by{' '}
+                <a
+                  href="https://content.prereview.org/coc"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  PREreview Code of Conduct
+                </a>
+                . In short, you are expected to:
               </ListItemText>
               <ListItem>
                 <ListItemIcon>
@@ -154,40 +149,88 @@ export default function CoCStepper({ openNext }) {
           <Fragment>
             <List>
               <ListItem>
-                <ListItemText>PREreview operates as a non-for-profit organization via the fiscal sponsorship of <a href='https://codeforscience.org/' target="_blank" rel="noopener noreferrer"> Code for Science and Society</a>.
+                <ListItemText>
+                  PREreview operates as a non-for-profit organization via the
+                  fiscal sponsorship of{' '}
+                  <a
+                    href="https://codeforscience.org/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {' '}
+                    Code for Science and Society
+                  </a>
+                  .
                 </ListItemText>
               </ListItem>
               <ListItem>
                 <ListItemText>
-                This platform is funded by public grants and private donations.
+                  This platform is funded by public grants and private
+                  donations.
                 </ListItemText>
               </ListItem>
               <ListItem>
-                <ListItemText>             
-                  The code that runs this platform is open source and can be found <a href='https://github.com/PREreview/prereview/' target="_blank" rel="noopener noreferrer">on our GitHub repository</a> under the MIT licence.
-                  </ListItemText> 
+                <ListItemText>
+                  The code that runs this platform is open source and can be
+                  found{' '}
+                  <a
+                    href="https://github.com/PREreview/prereview/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    on our GitHub repository
+                  </a>{' '}
+                  under the MIT licence.
+                </ListItemText>
               </ListItem>
-          </List>
-        </Fragment>
+            </List>
+          </Fragment>
         );
       case 3:
         return (
-            <List>           
-              <ListItem>
-                <ListItemText>
-                Our login is via <a href='https://info.orcid.org/documentation/features/public-api/' target="_blank" rel="noopener noreferrer">ORCID's public API</a>. If you do not already have an account with ORCID, to sign up on PREreview you will need to make one.  <a href='https://orcid.org/register' target="_blank" rel="noopener noreferrer">Register here</a>.
-                </ListItemText>
-              </ListItem>
-              <ListItem>
-                <ListItemText>
-                  The reviews published on this platform will be licensed <a href='https://creativecommons.org/licenses/by/4.0/' target="_blank" rel="noopener noreferrer">CC-BY 4.0</a> and be openly available to everyone. However, you will be able to set your account to anonymous or public.
-                </ListItemText>
-              </ListItem>
+          <List>
             <ListItem>
-                <ListItemText>
-              We DO NOT share your data with advertisers, social media companies, or analytics partners.
-            </ListItemText>
-              </ListItem>
+              <ListItemText>
+                Our login is via{' '}
+                <a
+                  href="https://info.orcid.org/documentation/features/public-api/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  ORCID's public API
+                </a>
+                . If you do not already have an account with ORCID, to sign up
+                on PREreview you will need to make one.{' '}
+                <a
+                  href="https://orcid.org/register"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Register here
+                </a>
+                .
+              </ListItemText>
+            </ListItem>
+            <ListItem>
+              <ListItemText>
+                The reviews published on this platform will be licensed
+                <a
+                  href="https://creativecommons.org/licenses/by/4.0/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  CC-BY 4.0
+                </a>{' '}
+                and be openly available to everyone. However, you will be able
+                to set your account to anonymous or public.
+              </ListItemText>
+            </ListItem>
+            <ListItem>
+              <ListItemText>
+                We DO NOT share your data with advertisers, social media
+                companies, or analytics partners.
+              </ListItemText>
+            </ListItem>
           </List>
         );
       default:
@@ -196,38 +239,40 @@ export default function CoCStepper({ openNext }) {
   };
 
   return (
-    <ThemeProvider theme={prereviewTheme}>
-      <div className={classes.root}>
-        <Stepper activeStep={activeStep} orientation="vertical">
-          {steps.map((label, index) => (
-            <Step key={label}>
-              <StepLabel>{label}</StepLabel>
-              <StepContent>
-                <Typography>{getStepContent(index)}</Typography>
-                <div className={classes.actionsContainer}>
-                  <div>
-                    <Button
-                      disabled={activeStep === 0}
-                      onClick={handleBack}
-                      className={classes.button}
-                    >
-                      Back
-                    </Button>
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      onClick={handleNext}
-                      className={classes.button}
-                    >
-                      Next
-                    </Button>
-                  </div>
+    <div className={classes.root}>
+      <Stepper activeStep={activeStep} orientation="vertical">
+        {steps.map((label, index) => (
+          <Step key={label}>
+            <StepLabel>{label}</StepLabel>
+            <StepContent>
+              <div>{getStepContent(index)}</div>
+              <div className={classes.actionsContainer}>
+                <div>
+                  <Button
+                    disabled={activeStep === 0}
+                    onClick={handleBack}
+                    className={classes.button}
+                  >
+                    Back
+                  </Button>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={handleNext}
+                    className={classes.button}
+                  >
+                    Next
+                  </Button>
                 </div>
-              </StepContent>
-            </Step>
-          ))}
-        </Stepper>
-      </div>
-    </ThemeProvider>
+              </div>
+            </StepContent>
+          </Step>
+        ))}
+      </Stepper>
+    </div>
   );
 }
+
+CoCStepper.propTypes = {
+  openNext: PropTypes.func,
+};

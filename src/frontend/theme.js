@@ -3,6 +3,14 @@ import { createMuiTheme } from '@material-ui/core/styles';
 
 // A custom theme for this app
 const theme = createMuiTheme({
+  overrides: {
+    MuiDialog: {
+      paper: {
+        borderRadius: 50,
+        padding: 20,
+      },
+    },
+  },
   palette: {
     primary: {
       light: '#F77463',
@@ -72,11 +80,11 @@ const theme = createMuiTheme({
       fontWeight: 400,
     },
     body2: {
-      fontSize: '1.5rem',
+      fontSize: '1.2rem',
       fontWeight: 400,
     },
     button: {
-      fontSize: '1.75rem',
+      fontSize: '1.25rem',
       fontWeight: 600,
     },
   },

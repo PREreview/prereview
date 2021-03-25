@@ -3,12 +3,7 @@ import React, { Fragment, useState } from 'react';
 import PropTypes from 'prop-types';
 
 // material ui
-import {
-  ThemeProvider,
-  createMuiTheme,
-  withStyles,
-  makeStyles,
-} from '@material-ui/core/styles';
+import { withStyles, makeStyles } from '@material-ui/core/styles';
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
 import CheckIcon from '@material-ui/icons/Check';
@@ -27,21 +22,6 @@ import Typography from '@material-ui/core/Typography';
 // components
 import CoCStepper from './coc-stepper';
 import PreReviewLogo from './pre-review-logo';
-
-const prereviewTheme = createMuiTheme({
-  palette: {
-    primary: {
-      main: '#F77463',
-      contrastText: '#fff',
-    },
-    secondary: {
-      main: '#eaeaf0',
-    },
-  },
-  typography: {
-    fontFamily: ['Open Sans', 'sans-serif'].join(','),
-  },
-});
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -204,17 +184,17 @@ function LoginModal({ open, handleClose }) {
             <DialogContent>
               <List>
                 <ListItemText>
-                  We are sorry you cannot join our community at this moment.
-                  We hope you come back soon!
+                  We are sorry you cannot join our community at this moment. We
+                  hope you come back soon!
                 </ListItemText>
 
                 <ListItemText>
-                  If you have any questions or concerns, please do not
-                  hesitate to contact us at{' '}
+                  If you have any questions or concerns, please do not hesitate
+                  to contact us at{' '}
                   <a href="mailto:contact:prereview.org">
                     contact@prereview.org
-                  </a>. {' '}
-                  You can also give us anonymous feedback via{' '}
+                  </a>
+                  . You can also give us anonymous feedback via{' '}
                   <a
                     href="https://docs.google.com/forms/d/e/1FAIpQLSdjlXuPgmA0p3xcQ316_qJAXvisEN_jywzAJ5jQREmj1c-uCA/viewform"
                     target="_blank"
@@ -233,21 +213,19 @@ function LoginModal({ open, handleClose }) {
   };
 
   return (
-    <ThemeProvider theme={prereviewTheme}>
-      <Dialog
-        open={open}
-        aria-labelledby="login-modal-title"
-        disableBackdropClick={true}
-        onClose={handleClose}
-      >
-        <Box className={classes.dialog} p={4}>
-          <DialogTitle id="login-modal-title" onClose={handleClose}>
-            <PreReviewLogo />
-          </DialogTitle>
-          {getModalContent(modalContent)}
-        </Box>
-      </Dialog>
-    </ThemeProvider>
+    <Dialog
+      open={open}
+      aria-labelledby="login-modal-title"
+      disableBackdropClick={true}
+      onClose={handleClose}
+    >
+      <Box className={classes.dialog} p={4}>
+        <DialogTitle id="login-modal-title" onClose={handleClose}>
+          <PreReviewLogo />
+        </DialogTitle>
+        {getModalContent(modalContent)}
+      </Box>
+    </Dialog>
   );
 }
 

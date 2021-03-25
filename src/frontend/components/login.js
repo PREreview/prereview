@@ -7,7 +7,6 @@ import { useHistory } from 'react-router-dom';
 import UserProvider from '../contexts/user-context';
 
 // components
-import Banner from './banner'
 import HeaderBar from './header-bar';
 import JoinModal from './join-modal';
 import LoginModal from './login-modal';
@@ -23,29 +22,27 @@ export default function Login() {
   }, []);
 
   const [thisUser] = useContext(UserProvider.context);
-  const [loginModalOpen, setLoginModalOpen] = useState(false)
-  const [joinModalOpen, setJoinModalOpen] = useState(true)
+  const [loginModalOpen, setLoginModalOpen] = useState(false);
+  const [joinModalOpen, setJoinModalOpen] = useState(true);
 
   const handleJoinModalClose = () => {
-    setLoginModalOpen(true)
-    setJoinModalOpen(false)
-  }
+    setLoginModalOpen(true);
+    setJoinModalOpen(false);
+  };
 
   const handleLoginModalClose = () => {
-    console.log("loginmodalclose")
-    setLoginModalOpen(false)
+    setLoginModalOpen(false);
     return history.push('/');
-  }
+  };
 
   return (
-    <div className="login">
+    <div>
       <Helmet>
         <title>{ORG} • Login</title>
       </Helmet>
-      <Banner />
       <HeaderBar thisUser={thisUser} />
-        { joinModalOpen ? <JoinModal open={joinModalOpen} handleClose={handleJoinModalClose}/> : null }
-        { loginModalOpen ? <LoginModal open={loginModalOpen} handleClose={handleLoginModalClose} /> : null }
+      <JoinModal open={joinModalOpen} handleClose={handleJoinModalClose} />
+      <LoginModal open={loginModalOpen} handleClose={handleLoginModalClose} />
     </div>
   );
 }
