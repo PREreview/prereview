@@ -12,6 +12,15 @@
     background-color: white;
     color: red;
     margin-left: var(--xxsgrd);
+    position: relative;
+
+    & img {
+      height: 20px;
+      left: 50%;
+      position: absolute;
+      top: 50%;
+      transform: translate(-50%, -50%);
+    }
   }
 
   & .add-button__left {

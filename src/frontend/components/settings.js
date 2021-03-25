@@ -1,47 +1,42 @@
+// base imports
 import React, { useContext, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
+
+// contexts
 import UserProvider from '../contexts/user-context';
-import SettingsRoles from './settings-roles';
-import SettingsApi from './settings-api';
-import SettingsInvites from './settings-invites';
-import SettingsNotifications from './settings-notifications';
-import SettingsTemplates from './settings-templates';
+
+// Material UI components
+import Box from '@material-ui/core/Box';
+import Container from '@material-ui/core/Container';
+
+// components
 import HeaderBar from './header-bar';
+import SettingsApi from './settings-keys';
+import SettingsInvites from './settings-invites';
+import SettingsTemplates from './settings-templates';
+
+// constants
 import { ORG } from '../constants';
 
 export default function Settings() {
-  const [user, setUser] = useContext(UserProvider.context);
+  const [user] = useContext(UserProvider.context);
 
-
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [user]);
+  useEffect(() => {}, [user]);
 
   return (
-    <div className="settings">
+    <Box>
       <Helmet>
         <title>Settings • {ORG}</title>
       </Helmet>
 
-      <HeaderBar thisUser={user} closeGap />
-      <div className="settings__content">
-        <section className="settings__section">
-          <h2 className="settings__title">User Settings</h2>
-          <dl className="settings__info-list">
-            <dt className="settings__info-list__term">ORCID:</dt>
-            <dd className="settings__info-list__def">
-              <a href={`https://orcid.org/${user.orcid}`}>{user.orcid}</a>
-            </dd>
-          </dl>
-        </section>
+      <HeaderBar thisUser={user} />
 
-        <SettingsRoles user={user} updateUser={setUser} />
-        <SettingsNotifications user={user} />
+      <Container>
         <SettingsInvites user={user} />
-        {/*<SettingsApi user={user} />*/}
+        <SettingsApi user={user} />
 
         {user.isAdmin ? <SettingsTemplates /> : null}
-      </div>
-    </div>
+      </Container>
+    </Box>
   );
 }

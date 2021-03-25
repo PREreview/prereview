@@ -64,6 +64,9 @@ if [ $NODE_ENV == "staging" ] && [ -z $IMPORT_SOURCES ]; then
   echo "Importing dump to staging"
   env -i PGPASSWORD="$PASS" /usr/bin/psql -U "$USER" -d "$NAME" -h "$HOST" -p "$PORT" -f /tmp/import.sql
   echo "Done copying!"
+
+  echo "Updating database schema"
+  npm run db:migrations
 else
   env -i PGPASSWORD="$PASS" /usr/bin/psql -U "$USER" -d "$NAME" -h "$HOST" -p "$PORT" -tAc "SELECT to_regclass('public.user')" | grep -q user
   
