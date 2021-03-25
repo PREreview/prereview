@@ -43,39 +43,40 @@ const theme = createMuiTheme({
     fontFamily: ['Open Sans', 'sans-serif'],
     lineHeight: 1.2,
     h1: {
-      fontSize: 42,
+      fontSize: '2.6rem',
       fontWeight: 600,
     },
     h2: {
-      fontSize: 36,
+      fontSize: '2.2rem',
       fontWeight: 700,
     },
     h3: {
-      fontSize: 30,
+      fontSize: '1.9rem',
       fontWeight: 400,
+      letterSpacing: 0.7,
     },
     h4: {
-      fontSize: 24,
+      fontSize: '1.5rem',
       fontWeight: 700,
     },
     h5: {
-      fontSize: 20,
+      fontSize: '1.25rem',
       fontWeight: 600,
     },
     subtitle1: {
-      fontSize: 18,
+      fontSize: '1.2rem',
       fontWeight: 400,
     },
     body1: {
-      fontSize: 16,
+      fontSize: '1rem',
       fontWeight: 400,
     },
     body2: {
-      fontSize: 20,
+      fontSize: '1.5rem',
       fontWeight: 400,
     },
     button: {
-      fontSize: 28,
+      fontSize: '1.75rem',
       fontWeight: 600,
     },
   },

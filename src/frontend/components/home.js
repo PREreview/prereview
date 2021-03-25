@@ -72,6 +72,10 @@ const useStyles = makeStyles(theme => ({
     maxWidth: 360,
     position: 'relative',
     textAlign: 'center',
+    '&:active, &:focus, &:hover': {
+      background: theme.palette.primary.dark,
+      textDecoration: 'underline',
+    },
   },
   buttonLink: {
     color: '#fff !important',
@@ -79,27 +83,13 @@ const useStyles = makeStyles(theme => ({
     fontSize: '1.25rem',
     fontWeight: 'bold',
     padding: '20px',
-    '&:active, &:focus, &:hover': {
-      textDecoration: 'underline',
-      '&:before': {
-        border: '3px solid #fff',
-        borderRadius: '20px',
-        content: '" "',
-        height: '70%',
-        left: '50%',
-        position: 'absolute',
-        top: '50%',
-        transform: 'translate(-50%, -50%)',
-        width: '95%',
-      },
-    },
   },
   card: {
     borderRadius: 32,
-    height: 300,
+    height: 350,
     marginBottom: '1rem',
     [theme.breakpoints.up('md')]: {
-      height: 500,
+      height: 580,
       width: '30%',
     },
   },
@@ -148,11 +138,9 @@ const useStyles = makeStyles(theme => ({
   },
   gridTitle: {
     color: '#54948E',
-    fontSize: '2rem',
-    fontWeight: 'bold',
+    marginBottom: 30,
   },
   gridContent: {
-    fontSize: '1.5rem',
     marginBottom: 30,
   },
   gridContentLink: {
@@ -160,17 +148,17 @@ const useStyles = makeStyles(theme => ({
     fontWeight: 'bold',
   },
   gridLink: {
-    backgroundColor: '#FCBD4C',
-    border: '4px solid #FCBD4C',
+    backgroundColor: theme.palette.community.main,
     borderRadius: '20px',
+    boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)',
     color: '#000 !important',
     display: 'inline-block',
     fontSize: '1.5rem',
     fontWeight: 'bold',
     marginTop: '20px',
-    padding: '16px',
+    padding: '20px',
     '&:hover': {
-      border: '4px solid #000',
+      backgroundColor: theme.palette.community.dark,
     },
   },
   hero: {
@@ -227,10 +215,7 @@ const useStyles = makeStyles(theme => ({
     objectFit: 'contain',
     width: '100%',
   },
-  standout: {
-    fontSize: '2.5rem',
-    fontWeight: 'bold',
-  },
+  standout: {},
   standoutLink: {
     color: '#fff !important',
     textDecoration: 'underline',
@@ -335,7 +320,7 @@ export default function Home() {
       </Hidden>
       <Box bgcolor="#D2D1CE" py={8}>
         <Container>
-          <Typography variant="h4" component="div">
+          <Typography variant="h3" component="div">
             Search and browse preprint reviews
           </Typography>
           <Box mt={3}>
@@ -383,7 +368,7 @@ export default function Home() {
               >
                 <Box p={3} className={classes.cardFront}>
                   <CardContent>
-                    <Typography className={classes.cardTitle}>
+                    <Typography component="h2" variant="h2" align="center">
                       Preprint Review Platform
                     </Typography>
                   </CardContent>
@@ -402,15 +387,15 @@ export default function Home() {
                       A platform for crowdsourcing of preprint reviews
                     </Link>
                   </Typography>
-                  <Typography variant="body1" component="div" gutterBottom>
+                  <Typography variant="body2" component="div" gutterBottom>
                     <b>Read, request, and write</b> rapid and long-form preprint
                     reviews
                   </Typography>
-                  <Typography variant="body1" component="div" gutterBottom>
+                  <Typography variant="body2" component="div" gutterBottom>
                     <b>Work collaboratively</b> with your peers or find a mentor
                     who can help you write your review
                   </Typography>
-                  <Typography variant="body1" component="div" gutterBottom>
+                  <Typography variant="body2" component="div" gutterBottom>
                     <b>Build your profile</b> as an expert reviewer and get
                     recognized for your contributions
                   </Typography>
@@ -431,7 +416,7 @@ export default function Home() {
               >
                 <Box p={3} className={classes.cardFront}>
                   <CardContent>
-                    <Typography className={classes.cardTitle}>
+                    <Typography component="h2" variant="h2" align="center">
                       Resource Center
                     </Typography>
                   </CardContent>
@@ -454,13 +439,13 @@ export default function Home() {
                       reviewer
                     </Link>
                   </Typography>
-                  <Typography variant="body1" component="div" gutterBottom>
+                  <Typography variant="body2" component="div" gutterBottom>
                     <b>Learn</b> how to provide constructive feedback
                   </Typography>
-                  <Typography variant="body1" component="div" gutterBottom>
+                  <Typography variant="body2" component="div" gutterBottom>
                     <b>Discover</b> your biases and how to mitigate them
                   </Typography>
-                  <Typography variant="body1" component="div" gutterBottom>
+                  <Typography variant="body2" component="div" gutterBottom>
                     <b>Repurpose</b> journal clubs to collaboratively discuss
                     and review preprints
                   </Typography>
@@ -481,7 +466,7 @@ export default function Home() {
               >
                 <Box p={3} className={classes.cardFront}>
                   <CardContent>
-                    <Typography className={classes.cardTitle}>
+                    <Typography component="h2" variant="h2" align="center">
                       PREreview Communities
                     </Typography>
                   </CardContent>
@@ -500,14 +485,14 @@ export default function Home() {
                       A hub for peer review communities
                     </Link>
                   </Typography>
-                  <Typography variant="body1" component="div" gutterBottom>
+                  <Typography variant="body2" component="div" gutterBottom>
                     <b>Find</b> communities that are discussing research
                     relevant to you
                   </Typography>
-                  <Typography variant="body1" component="div" gutterBottom>
+                  <Typography variant="body2" component="div" gutterBottom>
                     <b>Join and engage</b> with a global network of peers
                   </Typography>
-                  <Typography variant="body1" component="div" gutterBottom>
+                  <Typography variant="body2" component="div" gutterBottom>
                     <b>Start and lead</b> your own PREreview community
                   </Typography>
                 </Box>
@@ -518,7 +503,7 @@ export default function Home() {
       </Box>
       <Box bgcolor="#54948E" color="#fff" textAlign="center" py={8}>
         <Container>
-          <Typography className={classes.standout}>
+          <Typography component="div" variant="h1" className={classes.standout}>
             We believe in equitable access, connecting people, self reflection,
             and measurable success.
           </Typography>
@@ -530,7 +515,7 @@ export default function Home() {
             <Grid item xs={12}>
               <Typography
                 component="div"
-                variant="h6"
+                variant="h2"
                 gutterBottom
                 className={classes.gridTitle}
               >
@@ -538,7 +523,7 @@ export default function Home() {
               </Typography>
               <Typography
                 component="div"
-                variant="body1"
+                variant="h3"
                 className={classes.gridContent}
                 gutterBottom
               >
@@ -547,7 +532,7 @@ export default function Home() {
               </Typography>
               <Typography
                 component="div"
-                variant="body1"
+                variant="h3"
                 className={classes.gridContent}
               >
                 We are committed to providing a safe space for all voices to be
@@ -573,7 +558,7 @@ export default function Home() {
             <Grid item sm={12} md={5}>
               <Typography
                 component="div"
-                variant="h6"
+                variant="h2"
                 gutterBottom
                 className={classes.gridTitle}
               >
@@ -581,7 +566,7 @@ export default function Home() {
               </Typography>
               <Typography
                 component="div"
-                variant="body1"
+                variant="h3"
                 className={classes.gridContent}
                 gutterBottom
               >
@@ -590,7 +575,7 @@ export default function Home() {
               </Typography>
               <Typography
                 component="div"
-                variant="body1"
+                variant="h3"
                 className={classes.gridContent}
                 gutterBottom
               >
@@ -608,7 +593,7 @@ export default function Home() {
             <Grid item sm={12} md={5}>
               <Typography
                 component="div"
-                variant="h6"
+                variant="h2"
                 gutterBottom
                 className={classes.gridTitle}
               >
@@ -616,7 +601,7 @@ export default function Home() {
               </Typography>
               <Typography
                 component="div"
-                variant="body1"
+                variant="h3"
                 className={classes.gridContent}
                 gutterBottom
               >
@@ -627,7 +612,7 @@ export default function Home() {
               </Typography>
               <Typography
                 component="div"
-                variant="body1"
+                variant="h3"
                 className={classes.gridContent}
                 gutterBottom
               >
@@ -650,7 +635,7 @@ export default function Home() {
             <Box>
               <Typography
                 component="div"
-                variant="body1"
+                variant="h2"
                 className={classes.gridContent}
                 gutterBottom
               >
@@ -664,7 +649,7 @@ export default function Home() {
               </Typography>
               <Typography
                 component="div"
-                variant="body1"
+                variant="h3"
                 className={classes.gridContent}
                 gutterBottom
               >
@@ -674,7 +659,7 @@ export default function Home() {
             <Box>
               <Typography
                 component="div"
-                variant="body1"
+                variant="h2"
                 className={classes.gridContent}
                 gutterBottom
               >
@@ -682,7 +667,7 @@ export default function Home() {
               </Typography>
               <Typography
                 component="div"
-                variant="body1"
+                variant="h3"
                 className={classes.gridContent}
                 gutterBottom
               >
@@ -692,7 +677,7 @@ export default function Home() {
             <Box>
               <Typography
                 component="div"
-                variant="body1"
+                variant="h2"
                 className={classes.gridContent}
                 gutterBottom
               >
@@ -709,7 +694,7 @@ export default function Home() {
               </Typography>
               <Typography
                 component="div"
-                variant="body1"
+                variant="h3"
                 className={classes.gridContent}
                 gutterBottom
               >
@@ -719,7 +704,7 @@ export default function Home() {
             <Box>
               <Typography
                 component="div"
-                variant="body1"
+                variant="h2"
                 className={classes.gridContent}
                 gutterBottom
               >
@@ -730,7 +715,7 @@ export default function Home() {
               </Typography>
               <Typography
                 component="div"
-                variant="body1"
+                variant="h3"
                 className={classes.gridContent}
                 gutterBottom
               >
@@ -740,7 +725,7 @@ export default function Home() {
             <Box>
               <Typography
                 component="div"
-                variant="body1"
+                variant="h2"
                 className={classes.gridContent}
                 gutterBottom
               >
@@ -753,7 +738,7 @@ export default function Home() {
               </Typography>
               <Typography
                 component="div"
-                variant="body1"
+                variant="h3"
                 className={classes.gridContent}
                 gutterBottom
               >
@@ -763,7 +748,7 @@ export default function Home() {
             <Box>
               <Typography
                 component="div"
-                variant="body1"
+                variant="h2"
                 className={classes.gridContent}
                 gutterBottom
               >
@@ -774,7 +759,7 @@ export default function Home() {
               </Typography>
               <Typography
                 component="div"
-                variant="body1"
+                variant="h3"
                 className={classes.gridContent}
                 gutterBottom
               >
@@ -831,7 +816,12 @@ export default function Home() {
       </Hidden>
       <Box bgcolor="#54948E" color="#fff" textAlign="center" py={8}>
         <Container>
-          <Typography className={classes.standout} gutterBottom>
+          <Typography
+            component="div"
+            variant="h1"
+            className={classes.standout}
+            gutterBottom
+          >
             PREreview is a fiscally sponsored project of{' '}
             <Link
               href="https://codeforscience.org/"
