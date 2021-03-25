@@ -132,9 +132,6 @@ export default function App({ user }) {
                 <Route exact={true} path="/extension">
                   <ExtensionSplash />
                 </Route>
-                <PrivateRoute exact={true} path="/settings">
-                  <Settings />
-                </PrivateRoute>
                 <AdminRoute exact={true} path="/admin">
                   <AdminPanel />
                 </AdminRoute>
