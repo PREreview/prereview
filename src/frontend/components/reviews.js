@@ -156,7 +156,7 @@ export default function Reviews() {
                 spacing={2}
               >
                 <Grid item>
-                  <Typography component="h2" variant="h5">
+                  <Typography component="h2" variant="h2">
                     Preprints with reviews or requests for reviews
                   </Typography>
                 </Grid>

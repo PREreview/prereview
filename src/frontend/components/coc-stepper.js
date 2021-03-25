@@ -197,7 +197,7 @@ export default function CoCStepper({ openNext }) {
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  ORCID's public API
+                  ORCID&apos;s public API
                 </a>
                 . If you do not already have an account with ORCID, to sign up
                 on PREreview you will need to make one.{' '}
