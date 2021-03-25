@@ -484,6 +484,7 @@ export default function Profile() {
                             ))
                           : 'No badges yet.'}
                       </Typography>
+                      {/*
                       <Typography component="div" variant="body1" gutterBottom>
                         <b>Area(s) of expertise: </b>
                         {editMode ? (
@@ -508,6 +509,7 @@ export default function Profile() {
                           'No expertise selected yet.'
                         )}
                       </Typography>
+                      */}
                       <Typography component="div" variant="body1" gutterBottom>
                         Community member since{' '}
                         {format(new Date(persona.createdAt), 'MMM. d, yyyy')}

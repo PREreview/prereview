@@ -79,6 +79,14 @@ export default function controller(
       log.error('Error fetching user:', err);
     }
 
+    let fullProfile;
+    try {
+      fullProfile = await getOrcidPerson(profile.orcid, profile.token);
+      log.debug('ORCiD Profile:', fullProfile);
+    } catch (error) {
+      log.error('Could not fetch user profile from ORCiD:', error);
+    }
+
     if (user) {
       const completeUser = merge(profile, user); // including the access.token in the user that gets sent to the passport serializer
       log.debug('Authenticated user: ', completeUser);
@@ -140,11 +148,6 @@ export default function controller(
         }
 
         try {
-          const fullProfile = await getOrcidPerson(
-            profile.orcid,
-            profile.token,
-          );
-
           if (
             Array.isArray(fullProfile.emails.email) &&
             fullProfile.emails.email.length > 0

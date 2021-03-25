@@ -259,19 +259,24 @@ export default function controller(
             `That persona with ID ${ctx.params.id} does not exist.`,
           );
         }
+        log.debug('ctx.request.body:', ctx.request.body);
         const expertises = ctx.request.body.expertises || [];
         const newExpertises = [];
         if (expertises.length > 0) {
           for (let p of expertises) {
             const exp = await expertisesModel.findOneOrFail({ uuid: p });
+            exp.personas.add(persona);
             newExpertises.push(exp);
           }
         }
+        log.debug('newExpertises:', newExpertises);
         if (newExpertises.length) {
           persona.expertises.set(newExpertises);
           delete ctx.request.body.expertises;
+          log.debug('persona:', persona);
         }
         personasModel.assign(persona, ctx.request.body);
+        log.debug('persona:', persona);
         await personasModel.persistAndFlush(persona);
       } catch (err) {
         log.error('HTTP 400 Error: ', err);

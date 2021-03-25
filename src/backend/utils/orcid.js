@@ -1,6 +1,7 @@
 import orcidUtils from 'orcid-utils';
 import fetch from 'node-fetch';
 import { createError } from '../../frontend/utils/errors';
+import config from '../config.ts';
 
 const ORCID_API_VERSION = 'v3.0';
 
@@ -33,12 +34,13 @@ async function getOrcidData(orcid, endpoint, token) {
   if (token) {
     headers.Authorization = `${token.tokenType} ${token.accessToken}`;
   }
-  const r = await fetch(
-    `https://pub.orcid.org/${ORCID_API_VERSION}/${orcid}/${endpoint}`,
-    {
-      headers: headers,
-    },
-  );
+  const url = config.orcidSandbox
+    ? `https://api.sandbox.orcid.org/${ORCID_API_VERSION}/${orcid}/${endpoint}`
+    : `https://pub.orcid.org/${ORCID_API_VERSION}/${orcid}/${endpoint}`;
+
+  const r = await fetch(url, {
+    headers: headers,
+  });
 
   if (r.ok) {
     return await r.json();
