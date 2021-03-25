@@ -99,7 +99,7 @@ export default function Footer() {
                 <Link
                   className={classes.footerNavItem}
                   color="textPrimary"
-                  href="https://content.prereview.org/blog"
+                  href="https://content.prereview.org"
                 >
                   Blog
                 </Link>

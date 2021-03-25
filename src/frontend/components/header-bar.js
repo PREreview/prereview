@@ -231,7 +231,7 @@ export default function HeaderBar({ thisUser }) {
                 <MenuItem>
                   <Link
                     className={classes.mobileNavItem}
-                    href="https://content.prereview.org/blog/"
+                    href="https://content.prereview.org"
                   >
                     Blog
                   </Link>
@@ -458,7 +458,7 @@ export default function HeaderBar({ thisUser }) {
                   <Link
                     className={classes.navItem}
                     color="textPrimary"
-                    href="https://content.prereview.org/blog"
+                    href="https://content.prereview.org"
                   >
                     Blog
                   </Link>
