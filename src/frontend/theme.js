@@ -7,6 +7,7 @@ const theme = createMuiTheme({
     primary: {
       light: '#F77463',
       main: '#FF3333',
+      dark: '#BB1E1E',
       contrastText: '#FFF',
     },
     secondary: {
@@ -16,13 +17,18 @@ const theme = createMuiTheme({
       contrastText: '#000',
     },
     community: {
+      main: '#FCBD4C',
+      dark: '#C18A27',
+      contrastText: '#000',
+    },
+    section: {
       light: '#FFFAEE',
       main: '#FBE890',
-      dark: '#F7CB15',
-      contrastText: '#000',
+      dark: '#AF9F55',
     },
     resource: {
       main: '#54948E',
+      dark: '#08564F',
       contrastText: '#FFF',
     },
     error: {
@@ -33,9 +39,45 @@ const theme = createMuiTheme({
     },
   },
   typography: {
-    lineHeight: 1.2,
     color: '#000',
     fontFamily: ['Open Sans', 'sans-serif'],
+    lineHeight: 1.2,
+    h1: {
+      fontSize: 42,
+      fontWeight: 600,
+    },
+    h2: {
+      fontSize: 36,
+      fontWeight: 700,
+    },
+    h3: {
+      fontSize: 30,
+      fontWeight: 400,
+    },
+    h4: {
+      fontSize: 24,
+      fontWeight: 700,
+    },
+    h5: {
+      fontSize: 20,
+      fontWeight: 600,
+    },
+    subtitle1: {
+      fontSize: 18,
+      fontWeight: 400,
+    },
+    body1: {
+      fontSize: 16,
+      fontWeight: 400,
+    },
+    body2: {
+      fontSize: 20,
+      fontWeight: 400,
+    },
+    button: {
+      fontSize: 28,
+      fontWeight: 600,
+    },
   },
 });
 

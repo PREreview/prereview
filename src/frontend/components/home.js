@@ -190,13 +190,13 @@ const useStyles = makeStyles(theme => ({
   },
   heroContentSubtext: {
     [theme.breakpoints.up('md')]: {
-      maxWidth: '70%',
+      maxWidth: '75%',
     },
   },
   heroContentText: {
     [theme.breakpoints.up('md')]: {
-      fontSize: '2.5rem',
-      lineHeight: '57px',
+      // fontSize: '2.5rem',
+      // lineHeight: '57px',
     },
   },
   home: {
@@ -305,7 +305,7 @@ export default function Home() {
         <Container>
           <Box mb={4} className={classes.heroContent}>
             <Typography
-              variant="h4"
+              variant="h1"
               component="div"
               className={classes.heroContentText}
               gutterBottom
@@ -314,7 +314,7 @@ export default function Home() {
               collaboration
             </Typography>
             <Typography
-              variant="h5"
+              variant="h3"
               component="div"
               className={classes.heroContentSubtext}
             >
@@ -865,7 +865,7 @@ export default function Home() {
                 <img
                   src={ASAPbioImg}
                   alt=""
-                  ariaHidden="true"
+                  aria-hidden="true"
                   className={classes.sliderImage}
                 />
               </Link>
@@ -880,7 +880,7 @@ export default function Home() {
                 <img
                   src={JROSTImg}
                   alt=""
-                  ariaHidden="true"
+                  aria-hidden="true"
                   className={classes.sliderImage}
                 />
               </Link>
@@ -895,7 +895,7 @@ export default function Home() {
                 <img
                   src={NatureOSrPREImg}
                   alt=""
-                  ariaHidden="true"
+                  aria-hidden="true"
                   className={classes.sliderImage}
                 />
               </Link>
@@ -910,7 +910,7 @@ export default function Home() {
                 <img
                   src={LancetImg}
                   alt=""
-                  ariaHidden="true"
+                  aria-hidden="true"
                   className={classes.sliderImage}
                 />
               </Link>
@@ -925,7 +925,7 @@ export default function Home() {
                 <img
                   src={NatureIndexImg}
                   alt=""
-                  ariaHidden="true"
+                  aria-hidden="true"
                   className={classes.sliderImage}
                 />
               </Link>
@@ -942,7 +942,7 @@ export default function Home() {
                 <img
                   src={SCMornPostImg}
                   alt=""
-                  ariaHidden="true"
+                  aria-hidden="true"
                   className={classes.sliderImage}
                 />
               </Link>
@@ -957,7 +957,7 @@ export default function Home() {
                 <img
                   src={SPARCImg}
                   alt=""
-                  ariaHidden="true"
+                  aria-hidden="true"
                   className={classes.sliderImage}
                 />
               </Link>
@@ -972,7 +972,7 @@ export default function Home() {
                 <img
                   src={Bio2040Img}
                   alt=""
-                  ariaHidden="true"
+                  aria-hidden="true"
                   className={classes.sliderImage}
                 />
               </Link>
@@ -987,7 +987,7 @@ export default function Home() {
                 <img
                   src={NoManifestoImg}
                   alt=""
-                  ariaHidden="true"
+                  aria-hidden="true"
                   className={classes.sliderImage}
                 />
               </Link>

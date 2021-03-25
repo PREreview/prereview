@@ -319,7 +319,7 @@ function CommunityHeader({
       >
         <Container>
           <Box className={classes.banner}>
-            <Typography variant="h3" component="h2" gutterBottom={true}>
+            <Typography component="h2" variant="h2" gutterBottom={true}>
               {name}
             </Typography>
             <Grid container spacing={2} alignItems="center">
