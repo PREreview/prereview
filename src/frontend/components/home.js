@@ -519,7 +519,7 @@ export default function Home() {
       <Box bgcolor="#54948E" color="#fff" textAlign="center" py={8}>
         <Container>
           <Typography className={classes.standout}>
-            We believe in equatable access, connecting people, self reflection,
+            We believe in equitable access, connecting people, self reflection,
             and measurable success.
           </Typography>
         </Container>
