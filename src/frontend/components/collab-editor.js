@@ -1,6 +1,7 @@
 // base imports
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
+import './collab-editor.scss';
 
 // yjs imports
 import * as Y from 'yjs';

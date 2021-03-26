@@ -9,11 +9,13 @@ import UserProvider from '../contexts/user-context';
 // hooks
 import { useGetValidateContact } from '../hooks/api-hooks.tsx';
 
+// Material UI components
+import Link from '@material-ui/core/Link';
+
 // components
 import HeaderBar from './header-bar';
 import Loading from './loading';
 import Org from './org';
-import XLink from './xlink';
 
 // constants
 import { ORG } from '../constants';
@@ -42,10 +44,7 @@ export default function NotFound() {
           <h1>Hey there is an error</h1>
 
           <p>
-            Visit <Org />{' '}
-            <XLink to="/" href="/">
-              Homepage
-            </XLink>
+            Visit <Org /> <Link href="/">Homepage</Link>
           </p>
         </div>
       </div>
@@ -63,10 +62,7 @@ export default function NotFound() {
           <h1>Email {contact.value} successfully validated</h1>
 
           <p>
-            Visit <Org />{' '}
-            <XLink to="/" href="/">
-              Homepage
-            </XLink>
+            Visit <Org /> <Link href="/">Homepage</Link>
           </p>
         </div>
       </div>
