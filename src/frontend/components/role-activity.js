@@ -14,7 +14,7 @@ export default function RoleActivity({ persona }) {
       : null;
 
     setActivity(() => [fullReviews, persona.rapidReviews].flat());
-  }, []);
+  }, [persona]);
 
   return (
     <div className="role-activity">
