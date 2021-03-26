@@ -1,18 +1,13 @@
 // base imports
-import React, { Fragment, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useHistory } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import classNames from 'classnames';
 import { formatDistanceStrict } from 'date-fns';
 
 // utils
 import { getTags } from '../utils/stats';
 import { getFormattedDatePosted } from '../utils/preprints';
-import {
-  createPreprintId,
-  decodePreprintId,
-  getCanonicalArxivUrl,
-  getCanonicalDoiUrl,
-} from '../../common/utils/ids.js';
+import { createPreprintId, decodePreprintId } from '../../common/utils/ids.js';
 
 // hooks
 import { useAnimatedScore } from '../hooks/score-hooks';
@@ -74,6 +69,7 @@ const useStyles = makeStyles(theme => ({
   },
   gridMain: {
     borderBottom: `1px solid ${theme.palette.secondary.light}`,
+    cursor: 'pointer',
     padding: 20,
   },
   gridSecondary: {},
@@ -120,6 +116,7 @@ export default function PreprintCard({
   isNew = false,
 }) {
   const classes = useStyles();
+  const history = useHistory();
 
   const [isOpened, setIsOpened] = useState(false);
 
@@ -155,7 +152,12 @@ export default function PreprintCard({
   );
 
   const handleHover = () => {
-    setElevation(elevation => elevation ? 0 : 3);
+    setElevation(elevation => (elevation ? 0 : 3));
+  };
+
+  const handleCardClick = () => {
+    console.log('clicked');
+    history.push(`/preprints/${preprintId}`);
   };
 
   useEffect(() => {
@@ -198,6 +200,7 @@ export default function PreprintCard({
       onMouseLeave={handleHover}
     >
       <Grid
+        onClick={handleCardClick}
         container
         direction="row-reverse"
         justifyContent="space-between"
@@ -248,7 +251,7 @@ export default function PreprintCard({
               </Grid>
               <Grid item className={`${classes.activityItem} ${classes.meta}`}>
                 <span className={classes.activityPop}>
-                  {preprint.fullReviews.length}
+                  {publishedReviews.length}
                 </span>{' '}
                 longform reviews
               </Grid>
@@ -272,14 +275,14 @@ export default function PreprintCard({
           </Grid>
         </AccordionSummary>
         <AccordionDetails>
-          <Box>
+          <Box width="100%">
             <ReviewReader
               user={user}
               identifier={id}
               preprint={preprint}
               preview={true}
             />
-            <Grid container alignItems="center" justify="flex-end">
+            <Grid container alignItems="center" justify="flex-end" spacing={2}>
               <Grid item>
                 {!hasReviewed && (
                   <Button
@@ -307,7 +310,6 @@ export default function PreprintCard({
               <Grid item>
                 <Link
                   className={classes.button}
-                  component="button"
                   href={`/preprints/${preprintId}`}
                 >
                   View More
