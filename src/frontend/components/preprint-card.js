@@ -1,34 +1,82 @@
+// base imports
 import React, { Fragment, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { formatDistanceStrict } from 'date-fns';
-import {
-  MdTimeline,
-  MdCode,
-  MdChevronRight,
-  MdExpandLess,
-  MdExpandMore,
-} from 'react-icons/md';
-import Tooltip from '@reach/tooltip';
-import Value from './value';
+
+// utils
 import { getTags } from '../utils/stats';
-import ScoreBadge from './score-badge';
-import IconButton from './icon-button';
-import TagPill from './tag-pill';
-import addPrereviewIcon from '../svgs/add_prereview_icon.svg';
-import Collapse from './collapse';
-import ReviewReader from './review-reader';
-import XLink from './xlink';
-import Button from './button';
-import { useAnimatedScore } from '../hooks/score-hooks';
 import { getFormattedDatePosted } from '../utils/preprints';
-import AnimatedNumber from './animated-number';
 import {
   createPreprintId,
   decodePreprintId,
   getCanonicalArxivUrl,
   getCanonicalDoiUrl,
 } from '../../common/utils/ids.js';
+
+// hooks
+import { useAnimatedScore } from '../hooks/score-hooks';
+
+// Material UI components
+import { makeStyles } from '@material-ui/core/styles';
+import Grid from '@material-ui/core/Grid';
+import Link from '@material-ui/core/Link';
+import Paper from '@material-ui/core/Paper';
+import Typography from '@material-ui/core/Typography';
+
+// components
+
+
+// icons
+import ChevronRightIcon from '@material-ui/icons/ChevronRight';
+import addPrereviewIcon from '../svgs/add_prereview_icon.svg';
+
+const useStyles = makeStyles(theme => ({
+  authors: {
+    fontSize: '0.9rem',
+    fontStyle: 'italic',
+    marginBottom: 10,
+  },
+  date: {
+    color: theme.palette.secondary.main,
+    fontSize: '1.2rem',
+    textAlign: 'right',
+  },
+  grid: {
+    padding: 20,
+  },
+  icon: {
+    color: theme.palette.secondary.main,
+    height: 30,
+    position: 'absolute',
+    right: 0,
+    top: '50%',
+    transform: 'translateY(-50%)',
+    width: 30,
+  },
+  meta: {
+    color: theme.palette.secondary.main,
+    fontSize: '0.9rem',
+  },
+  paper: {
+    borderBottom: `1px solid ${theme.palette.secondary.main}`,
+    marginBottom: 10,
+  },
+  preprintServer: {
+    color: theme.palette.primary.main,
+    fontSize: '0.9rem',
+    fontWeight: 700,
+    paddingRight: 40,
+    position: 'relative',
+  },
+  title: {
+    color: '#000 !important',
+    display: 'block',
+    fontSize: '1.3rem',
+    fontWeight: 700,
+    marginBottom: 10,
+  },
+}));
 
 export default function PreprintCard({
   user,
@@ -39,6 +87,8 @@ export default function PreprintCard({
   hoveredSortOption,
   isNew = false,
 }) {
+  const classes = useStyles();
+
   const [isOpened, setIsOpened] = useState(false);
 
   const { title, preprintServer, handle, datePosted } = preprint;
@@ -46,6 +96,7 @@ export default function PreprintCard({
   const preprintId = createPreprintId(handle);
   const { id, scheme } = decodePreprintId(preprintId);
 
+  const [elevation, setElevation] = useState(0);
   const [hasReviewed, setHasReviewed] = useState(false);
   const [hasRequested, setHasRequested] = useState(false);
 
@@ -71,6 +122,10 @@ export default function PreprintCard({
     review => review.isPublished,
   );
 
+  const handleHover = () => {
+    setElevation(elevation => elevation ? 0 : 3);
+  };
+
   useEffect(() => {
     if (user) {
       if (preprint.requests.length) {
@@ -79,317 +134,75 @@ export default function PreprintCard({
           request.author.uuid
             ? (author = request.author.uuid)
             : (author = request.author);
-          setHasRequested(user.personas.some(persona => persona.uuid === author));
+          setHasRequested(
+            user.personas.some(persona => persona.uuid === author),
+          );
         });
       }
       if (preprint.fullReviews.length) {
         preprint.fullReviews.map(review => {
           review.authors.map(author => {
-            setHasReviewed(user.personas.some(persona => persona.uuid === author.uuid));
+            setHasReviewed(
+              user.personas.some(persona => persona.uuid === author.uuid),
+            );
           });
         });
       } else if (preprint.rapidReviews.length) {
         preprint.rapidReviews.map(review => {
-          setHasReviewed(user.personas.some(persona => persona.uuid === review.author.uuid));
+          setHasReviewed(
+            user.personas.some(persona => persona.uuid === review.author.uuid),
+          );
         });
       }
     }
   }, []);
 
   return (
-    <Fragment>
-      <div
-        className={classNames('preprint-card', { 'preprint-card--new': isNew })}
+    <Paper
+      elevation={elevation}
+      square
+      className={classes.paper}
+      onMouseEnter={handleHover}
+      onMouseLeave={handleHover}
+    >
+      <Grid
+        container
+        direction="row-reverse"
+        justifyContent="space-between"
+        spacing={2}
+        className={classes.grid}
       >
-        <div className="preprint-card__contents">
-          <div className="preprint-card__header">
-            <div className="preprint-card__header__left">
-              <XLink
-                href={`/preprints/${preprintId}`}
-                to={{
-                  pathname: `/preprints/${preprintId}`,
-                  state: {
-                    tab: 'read',
-                  },
-                }}
-                className="preprint-card__title"
-              >
-                {!!title && (
-                  <Value tagName="h2" className="preprint-card__title-text">
-                    {title}
-                  </Value>
-                )}
-              </XLink>
-            </div>
-
-            {!!datePosted && (
-              <span
-                className={classNames('preprint-card__pub-date', {
-                  'preprint-card__pub-date--highlighted':
-                    hoveredSortOption === 'datePosted',
-                })}
-              >
-                {getFormattedDatePosted(datePosted)}
-              </span>
-            )}
-          </div>
-          <div className="preprint-card__info-row">
-            <div className="preprint-card__info-row__left">
-              {!!preprintServer && (
-                <Value tagName="span" className="preprint-card__server-name">
-                  {preprintServer}
-                </Value>
-              )}
-              <MdChevronRight className="preprint-card__server-arrow-icon" />
-              <Value tagName="span" className="preprint-card__server-id">
-                {scheme === 'doi' ? (
-                  <a
-                    href={`${getCanonicalDoiUrl(id)}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    {id}
-                  </a>
-                ) : (
-                    <a
-                      href={`${getCanonicalArxivUrl(id)}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      {id}
-                    </a>
-                  )}
-              </Value>
-            </div>
-
-            <div className="preprint-card__info-row__right">
-              <ul className="preprint-card__tag-list">
-                {subjects.map(subject => (
-                  <li
-                    key={subject.uuid}
-                    className="preprint-card__tag-list__item"
-                  >
-                    <Tooltip
-                      label={`Reviewers tagged this preprint as ${subject.name
-                        }`}
-                    >
-                      <div>
-                        <TagPill>{subject.name}</TagPill>
-                      </div>
-                    </Tooltip>
-                  </li>
-                ))}
-                <li className="preprint-card__tag-list__item">
-                  <Tooltip
-                    label={
-                      hasData
-                        ? 'Majority of reviewers reported data'
-                        : 'Majority of reviewers did not report data'
-                    }
-                  >
-                    <div
-                      className={`preprint-card__tag-icon ${hasData
-                        ? 'preprint-card__tag-icon--active'
-                        : 'preprint-card__tag-icon--inactive'
-                        }`}
-                    >
-                      <MdTimeline className="preprint-card__tag-icon__icon" />
-                    </div>
-                  </Tooltip>
-                </li>
-                <li className="preprint-card__tag-list__item">
-                  <Tooltip
-                    label={
-                      hasCode
-                        ? 'Majority of reviewers reported code'
-                        : 'Majority of reviewers did not report code'
-                    }
-                  >
-                    <div
-                      className={`preprint-card__tag-icon ${hasCode
-                        ? 'preprint-card__tag-icon--active'
-                        : 'preprint-card__tag-icon--inactive'
-                        }`}
-                    >
-                      <MdCode className="preprint-card__tag-icon__icon" />
-                    </div>
-                  </Tooltip>
-                </li>
-              </ul>
-            </div>
-          </div>
-
-          <div className="preprint-card__expansion-header">
-            <div className="preprint-card__expansion-header__left">
-              {/*<Tooltip label="Number of reviews and requests for reviews for this preprint">*/}
-              {/* ScoreBadge uses forwardRef but Tooltip doesn't work without extra div :( */}
-              <div className="preprint-card__score-badge-container">
-                {isNew ? (
-                  <div className="preprint-card__new-badge">new</div>
-                ) : (
-                    <ScoreBadge
-                      isHighlighted={hoveredSortOption === 'score'}
-                      now={now}
-                      nRequests={nRequests}
-                      nRapidReviews={nRapidReviews}
-                      nLongReviews={nLongReviews}
-                      dateFirstActivity={dateFirstActivity}
-                      onMouseEnter={onStartAnim}
-                      onMouseLeave={onStopAnim}
-                      isAnimating={isAnimating}
-                    />
-                  )}
-              </div>
-              {/*</Tooltip>*/}
-              <button
-                className="preprint-card__cta-button"
-                onClick={() => {
-                  if (!hasReviewed && !hasRequested) {
-                    onNew(preprintId);
-                  } else if (!hasReviewed && hasRequested) {
-                    onNewReview(preprintId);
-                  } else if (hasReviewed && !hasRequested) {
-                    onNewRequest(preprintId);
-                  } else {
-                    onNew(preprintId);
-                  }
-                }}
-              >
-                <div className="preprint-card__cta-button__contents">
-                  <div className="preprint-card__cta-button__icon-container">
-                    <img
-                      src={addPrereviewIcon}
-                      className="preprint-card__cta-button__icon"
-                      aria-hidden="true"
-                      alt=""
-                    />
-                  </div>
-                  <div className="preprint-card__count-badge">
-                    <AnimatedNumber
-                      value={preprint.rapidReviews.length}
-                      isAnimating={isAnimating}
-                    />
-                  </div>
-
-                  <div className="preprint-card__count-label">
-                    Rapid Review{preprint.rapidReviews.length > 1 ? 's' : ''}
-                  </div>
-                  <div className="preprint-card__count-divider" />
-
-                  <div className="preprint-card__count-badge">
-                    <AnimatedNumber
-                      value={publishedReviews.length}
-                      isAnimating={isAnimating}
-                    />
-                  </div>
-                  <div className="preprint-card__count-label">
-                    Long-form Review{publishedReviews.length > 1 ? 's' : ''}
-                  </div>
-                  <div className="preprint-card__count-divider" />
-                  <div className="preprint-card__count-badge">
-                    <AnimatedNumber
-                      value={nRequests}
-                      isAnimating={isAnimating}
-                    />
-                  </div>
-                  <div className="preprint-card__count-label">
-                    Request{nRequests > 1 ? 's' : ''}
-                  </div>
-
-                  {isAnimating && (
-                    <span className="preprint-card__animation-time">
-                      {`(${formatDistanceStrict(
-                        new Date(now),
-                        new Date(),
-                      )} ago)`}
-                    </span>
-                  )}
-                </div>
-              </button>
-            </div>
-            <div className="preprint-card__expansion-header__right">
-              <span
-                className={classNames('preprint-card__days-ago', {
-                  'preprint-card__days-ago--highlighted':
-                    hoveredSortOption === 'recentRequests' ||
-                    hoveredSortOption === 'recentRapid' ||
-                    hoveredSortOption === 'recentFull',
-                })}
-              >
-                <span className="preprint-card__days-ago__prefix">
-                  {dateLastActivity
-                    ? `Last activity ${formatDistanceStrict(
-                      new Date(dateLastActivity),
-                      new Date(),
-                    )} ago`
-                    : `No activity yet`}
-                </span>
-              </span>
-              <IconButton
-                className="preprint-card__expansion-toggle"
-                onClick={() => {
-                  setIsOpened(!isOpened);
-                }}
-              >
-                {isOpened ? (
-                  <MdExpandLess className="preprint-card__expansion-toggle-icon" />
-                ) : (
-                    <MdExpandMore className="preprint-card__expansion-toggle-icon" />
-                  )}
-              </IconButton>
-            </div>
-          </div>
-        </div>
-      </div>
-      <Collapse isOpened={isOpened} className="preprint-card__collapse">
-        <div className="preprint-card-expansion">
-          <ReviewReader
-            user={user}
-            identifier={id}
-            preprint={preprint}
-            preview={true}
-          />
-
-          <div className="preprint-card__view-more">
-            <div>
-              {!hasReviewed && (
-                <Button
-                  onClick={() => {
-                    onNewReview(preprintId);
-                  }}
-                >
-                  Add Review
-                </Button>
-              )}
-
-              {!hasRequested && (
-                <Button
-                  onClick={() => {
-                    onNewRequest(preprintId);
-                  }}
-                >
-                  Request Review
-                </Button>
-              )}
-
-              <Button
-                element="XLink"
-                to={`/preprints/${preprintId}`}
-                href={`/preprints/${preprintId}`}
-              >
-                View More
-              </Button>
-            </div>
-          </div>
-        </div>
-      </Collapse>
-    </Fragment>
+        <Grid item xs={12} sm={4}>
+          <Typography className={classes.date}>
+            {getFormattedDatePosted(preprint.datePosted)}
+          </Typography>
+        </Grid>
+        <Grid item xs={12} sm={8}>
+          <Typography>
+            <Link href={`/preprints/${preprintId}`} className={classes.title}>
+              {preprint.title}
+            </Link>
+          </Typography>
+          <Typography className={classes.authors}>
+            {preprint.authors}
+          </Typography>
+          <Typography>
+            <span className={classes.preprintServer}>
+              {preprint.preprintServer}
+              <ChevronRightIcon className={classes.icon} />
+            </span>
+            <span className={classes.meta}>{preprint.handle}</span>
+          </Typography>
+        </Grid>
+      </Grid>
+    </Paper>
   );
 }
 
 PreprintCard.propTypes = {
   user: PropTypes.object,
   preprint: PropTypes.shape({
+    authors: PropTypes.string,
     handle: PropTypes.string,
     datePosted: PropTypes.string,
     title: PropTypes.string.isRequired,
