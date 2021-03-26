@@ -22,20 +22,20 @@ export default function RoleActivity({ persona }) {
         <div className="role-activity__summary">
           <div className="role-activity__summary">
             <LabelStyle>
-              Total number of requests: {persona.requests.length || 0}
+              Total number of requests: {persona.requests ? persona.requests.length || 0 : ''}
             </LabelStyle>
           </div>
           <div className="role-activity__summary">
             <LabelStyle>
-              Total number of rapid reviews: {persona.rapidReviews.length || 0}
+              Total number of rapid reviews: {persona.rapidReviews ? persona.rapidReviews.length || 0 : ''}
             </LabelStyle>
           </div>
 
           <div className="role-activity__summary">
             <LabelStyle>
               Total number of long-form reviews:{' '}
-              {persona.fullReviews.filter(review => review.isPublished)
-                .length || 0}
+              {persona.fullReviews ? persona.fullReviews.filter(review => review.isPublished)
+                .length || 0 : null}
             </LabelStyle>
           </div>
         </div>

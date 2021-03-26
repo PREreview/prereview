@@ -174,7 +174,6 @@ export default function Profile() {
     updatePersona(data)
       .then(resp => {
         let updated = resp.data;
-        console.log('updated: ', resp.data);
         alert(`You've successfully updated your persona.`);
         setEditMode(false);
         setDisplayedPersona(updated);
@@ -186,6 +185,7 @@ export default function Profile() {
         //   });
         // });
         setExpertise(updated.expertises);
+        setPersonas(personas.map(persona => persona.uuid === updated.uuid ? updated : persona))
         return;
       })
       .catch(err => alert(`An error occurred:`, err.message));
@@ -201,7 +201,9 @@ export default function Profile() {
     setAvatarModalOpen(false);
   };
 
-  const personas = !thisUser || !thisUser.personas ? [] : thisUser.personas;
+  const [personas, setPersonas] = useState(
+    !thisUser || !thisUser.personas ? [] : thisUser.personas,
+  );
 
   const [name, setName] = useState('');
   const orcid = ownProfile
@@ -263,8 +265,8 @@ export default function Profile() {
   }, [displayedPersona]);
 
   useEffect(() => {
-    if (!loadingPersona && persona) setDisplayedPersona(persona);
-  }, [loadingPersona, persona]);
+    setDisplayedPersona(persona);
+  }, [persona]);
 
   useEffect(() => {
     if (
@@ -573,7 +575,7 @@ export default function Profile() {
                     {displayedPersona.bio}
                   </Typography>
                 )}
-                {ownProfile && editMode ? (
+                {ownProfile && editMode && !displayedPersona.isAnonymous ? (
                   <SettingsNotifications user={thisUser} />
                 ) : null}
               </Container>
@@ -588,9 +590,7 @@ export default function Profile() {
                   <Typography component="h2" variant="h6" gutterBottom>
                     PREreview Contributions
                   </Typography>
-                  {!ownProfile ? (
                     <RoleActivity persona={displayedPersona} />
-                  ) : null}
                   <Typography component="h2" variant="h6" gutterBottom>
                     List of Publications
                   </Typography>
