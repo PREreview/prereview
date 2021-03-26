@@ -164,19 +164,19 @@ export default function Reviews() {
                   <AddButton
                     onClick={() => {
                       if (thisUser) {
-                        history.push('/new');
+                        history.push('/reviews/new');
                       } else {
-                        setLoginModalOpenNext('/new');
+                        setLoginModalOpenNext('/reviews/new');
                       }
                     }}
-                    disabled={location.pathname === '/new'}
+                    disabled={location.pathname === '/reviews/new'}
                   />
-                  <PrivateRoute path="/new" exact={true}>
+                  <PrivateRoute path="/reviews/new" exact={true}>
                     <Modal
                       showCloseButton={true}
                       title="Add Entry"
                       onClose={() => {
-                        history.push('/');
+                        history.push('/reviews');
                       }}
                     >
                       <Helmet>
@@ -185,10 +185,10 @@ export default function Reviews() {
                       <NewPreprint
                         user={thisUser}
                         onCancel={() => {
-                          history.push('/');
+                          history.push('/reviews');
                         }}
                         onSuccess={preprint => {
-                          history.push('/');
+                          history.push('/reviews');
                           setNewPreprints(newPreprints.concat(preprint));
                         }}
                         onViewInContext={({ preprint, tab }) => {

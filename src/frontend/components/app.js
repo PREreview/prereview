@@ -79,7 +79,7 @@ export default function App({ user }) {
           <StoresProvider>
             <UserProvider user={user}>
               <Switch>
-                <Route path="/:new(new)?" exact={true}>
+                <Route path="/" exact={true}>
                   {subdomain && subdomain === 'outbreaksci' ? (
                     <Community id="outbreaksci" />
                   ) : (
@@ -115,7 +115,7 @@ export default function App({ user }) {
                   </ToCPage>
                 </Route>
 
-              <Route exact={true} path="/reviews">
+              <Route exact={true} path="/reviews/:new(new)?">
                 <Reviews />
               </Route>
               <Route exact={true} path="/personas">
