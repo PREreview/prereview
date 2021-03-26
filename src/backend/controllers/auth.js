@@ -252,7 +252,7 @@ export default function controller(
             ctx.login(user);
 
             if (user.isNew) {
-              ctx.redirect('/settings');
+              ctx.redirect(`/about/${user.defaultPersona.uuid}`);
               return;
             }
 
