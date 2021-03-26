@@ -181,7 +181,7 @@ export function usePreprint(
         const controller = new AbortController();
 
         fetch(
-          `api/v2/resolve?identifier=${encodeURIComponent(identifier)}${
+          `/api/v2/resolve?identifier=${encodeURIComponent(identifier)}${
             fallbackUrl ? `&url=${encodeURIComponent(fallbackUrl)}` : ''
           }`,
           {
