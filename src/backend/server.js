@@ -148,6 +148,7 @@ export default async function configServer(config) {
   const groups = GroupController(groupModel, userModel, authz);
   const personas = PersonaController(
     personaModel,
+    userModel,
     badgeModel,
     expertiseModel,
     authz,
