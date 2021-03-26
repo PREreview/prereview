@@ -151,7 +151,7 @@ export default function Reviews() {
             <Box my={4}>
               <Grid
                 container
-                alignItems="center"
+                alignItems="flex-start"
                 justify="space-between"
                 spacing={2}
               >
