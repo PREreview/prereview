@@ -1,11 +1,27 @@
+// base imports
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { MdChevronRight, MdFirstPage } from 'react-icons/md';
-import Button from './button';
-import LabelStyle from './label-style';
+
+// Material UI Componets
+import { makeStyles } from '@material-ui/core/styles';
+import Box from '@material-ui/core/Box';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import Typography from '@material-ui/core/Typography';
+
+// components
 import ActivityCard from './activity-card';
 
+const useStyles = makeStyles(theme => ({
+  box: {
+    color: theme.palette.secondary.main,
+    textTransform: 'uppercase',
+  },
+}));
+
 export default function RoleActivity({ persona }) {
+  const classes = useStyles();
+
   const [activity, setActivity] = useState(null);
 
   useEffect(() => {
@@ -17,66 +33,40 @@ export default function RoleActivity({ persona }) {
   }, []);
 
   return (
-    <div className="role-activity">
+    <>
       {activity && activity.length ? (
-        <div className="role-activity__summary">
-          <div className="role-activity__summary">
-            <LabelStyle>
-              Total number of requests: {persona.requests.length || 0}
-            </LabelStyle>
-          </div>
-          <div className="role-activity__summary">
-            <LabelStyle>
-              Total number of rapid reviews: {persona.rapidReviews.length || 0}
-            </LabelStyle>
-          </div>
-
-          <div className="role-activity__summary">
-            <LabelStyle>
-              Total number of long-form reviews:{' '}
-              {persona.fullReviews.filter(review => review.isPublished)
-                .length || 0}
-            </LabelStyle>
-          </div>
-        </div>
+        <Box className={classes.box}>
+          <Typography>
+            Total number of requests: {persona.requests.length || 0}
+          </Typography>
+          <Typography>
+            Total number of rapid reviews: {persona.rapidReviews.length || 0}
+          </Typography>
+          <Typography>
+            Total number of long-form reviews:{' '}
+            {persona.fullReviews.filter(review => review.isPublished).length ||
+              0}
+          </Typography>
+        </Box>
       ) : null}
-
       {!activity || !activity.length ? (
-        <div>No activity yet.</div>
+        <Typography>No activity yet.</Typography>
       ) : (
-        <section className="role-activity__history">
-          <h3 className="role-activity__sub-title">History</h3>
-          <ul className="role-activity__list">
+        <Box mt={4}>
+          <Typography component="h3" variant="h3">
+            History
+          </Typography>
+          <List>
             {activity.length &&
               activity.map(activity => (
-                <li key={activity.handle} className="role-activity__list-item">
+                <ListItem key={activity.handle}>
                   <ActivityCard key={activity.uuid} activity={activity} />
-                </li>
+                </ListItem>
               ))}
-          </ul>
-        </section>
+          </List>
+        </Box>
       )}
-
-      {/* <div className="role-activity__pagination">
-        <Button
-          disabled
-          onClick={() => {
-            // #FIXME pagination
-          }}
-        >
-          <MdFirstPage /> First page
-        </Button>
-
-        <Button
-          disabled
-          onClick={() => {
-            // #FIXME pagination
-          }}
-        >
-          Next Page <MdChevronRight />
-        </Button>
-      </div> */}
-    </div>
+    </>
   );
 }
 

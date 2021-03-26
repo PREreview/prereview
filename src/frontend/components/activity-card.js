@@ -72,6 +72,7 @@ const useStyles = makeStyles(theme => ({
   paper: {
     borderBottom: `2px solid ${theme.palette.secondary.light}`,
     marginBottom: 10,
+    width: '100%',
   },
   preprintServer: {
     color: theme.palette.primary.main,
@@ -150,7 +151,7 @@ export default function ActivityCard({ activity }) {
           spacing={0}
           className={classes.gridMain}
         >
-          <Grid item xs={12} sm={4}>
+          <Grid item xs={12} sm={5}>
             <Typography className={classes.date}>
               {activity.ynAvailableCode
                 ? 'Rapid reviewed on '
@@ -158,7 +159,7 @@ export default function ActivityCard({ activity }) {
               {getFormattedDatePosted(activity.preprint.datePosted)}
             </Typography>
           </Grid>
-          <Grid item xs={12} sm={8}>
+          <Grid item xs={12} sm={7}>
             <Typography>
               <Link
                 href={`/preprints/${createPreprintId(
