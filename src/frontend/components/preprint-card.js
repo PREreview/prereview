@@ -30,7 +30,6 @@ import ReviewReader from './review-reader';
 // icons
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import addPrereviewIcon from '../svgs/add_prereview_icon.svg';
 
 const useStyles = makeStyles(theme => ({
   activity: {
@@ -111,18 +110,11 @@ export default function PreprintCard({
   preprint,
   onNewRequest,
   onNewReview,
-  onNew,
-  hoveredSortOption,
-  isNew = false,
 }) {
   const classes = useStyles();
   const history = useHistory();
 
-  const [isOpened, setIsOpened] = useState(false);
-
-  const { title, preprintServer, handle, datePosted } = preprint;
-
-  const preprintId = createPreprintId(handle);
+  const preprintId = createPreprintId(preprint.handle);
   const { id, scheme } = decodePreprintId(preprintId);
 
   const [elevation, setElevation] = useState(0);

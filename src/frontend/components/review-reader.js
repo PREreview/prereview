@@ -5,7 +5,6 @@ import noop from 'lodash/noop';
 import isEqual from 'lodash/isEqual';
 import classNames from 'classnames';
 import ReactHtmlParser, { convertNodeToElement } from 'react-html-parser';
-import { useHistory } from 'react-router-dom';
 
 // material UI
 import { makeStyles, withStyles } from '@material-ui/core/styles';
@@ -35,23 +34,13 @@ const Button = withStyles({
   },
 })(MuiButton);
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles(() => ({
   root: {
     width: '100%',
   },
   accordion: {
     borderLeft: '5px solid #EBE9E9',
     boxShadow: 'none',
-  },
-  h3: {
-    fontSize: theme.typography.pxToRem(24),
-    fontWeight: '600',
-  },
-  h4: {
-    flexBasis: '75%',
-    flexShrink: 0,
-    fontSize: theme.typography.pxToRem(16),
-    fontWeight: '600',
   },
   link: {
     paddingBottom: 5,
@@ -92,7 +81,6 @@ const ReviewReader = React.memo(function ReviewReader({
   height,
 }) {
   const classes = useStyles();
-  const history = useHistory();
 
   const [content, setContent] = useState('');
   const [commentTitle, setCommentTitle] = useState('');
@@ -218,14 +206,14 @@ const ReviewReader = React.memo(function ReviewReader({
               aria-controls="rapid-reviews-content"
               id="rapid-reviews-header"
             >
-              <Typography variant="h3" className={classes.h3}>
+              <Typography variant="h3" component="h3">
                 Rapid Reviews
               </Typography>
             </AccordionSummary>
             <AccordionDetails>
               {allRapidReviews && allRapidReviews.length ? (
                 <div>
-                  <Typography variant="h4" className={classes.h4} gutterBottom>
+                  <Typography variant="h4" component="h4" gutterBottom>
                     Reviewers
                   </Typography>
                   <div className="review-reader__persona-selector">
@@ -278,14 +266,14 @@ const ReviewReader = React.memo(function ReviewReader({
               aria-controls="longform-content"
               id="longform-header"
             >
-              <Typography variant="h3" className={classes.h3}>
+              <Typography variant="h3" component="h3">
                 Longform Reviews
               </Typography>
             </AccordionSummary>
             <AccordionDetails>
               {publishedReviews && publishedReviews.length ? (
                 <div>
-                  <Typography variant="h4" className={classes.h4} gutterBottom>
+                  <Typography variant="h4" component="h4" gutterBottom>
                     Reviewers
                   </Typography>
                   <div className="review-reader__persona-selector">
@@ -414,7 +402,10 @@ const ReviewReader = React.memo(function ReviewReader({
                                       />
                                     </Grid>
                                     <Grid item>
-                                      <ReportButton uuid={review.uuid} type="fullReview" />
+                                      <ReportButton
+                                        uuid={review.uuid}
+                                        type="fullReview"
+                                      />
                                     </Grid>
                                   </Grid>
                                 </Box>
@@ -451,12 +442,12 @@ const ReviewReader = React.memo(function ReviewReader({
           </Accordion>
         </div>
       ) : (
-          <div className="text-answers">
-            <div className="text-answers__question long">
-              There are no reviews on this preprint yet. To add your review, click on "Add Review(s)". To request reviews, click on "Add Request" in the menu above.          
-            </div>
-          </div>
-        )}
+        <div>
+          There are no reviews on this preprint yet. To add your review, click
+          on &quot;Add Review(s)&quot;. To request reviews, click on &quot;Add
+          Request&quot; in the menu above.
+        </div>
+      )}
     </div>
   );
 });
