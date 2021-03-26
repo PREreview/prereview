@@ -18,12 +18,7 @@ import {
 } from '../hooks/api-hooks.tsx';
 
 // Material UI components
-import {
-  ThemeProvider,
-  makeStyles,
-  withStyles,
-  createMuiTheme,
-} from '@material-ui/core/styles';
+import { makeStyles, withStyles } from '@material-ui/core/styles';
 import Avatar from '@material-ui/core/Avatar';
 import Box from '@material-ui/core/Box';
 import Chip from '@material-ui/core/Chip';
@@ -43,7 +38,7 @@ import TextField from '@material-ui/core/TextField';
 
 // components
 import HeaderBar from './header-bar';
-import Loading from './loading.js';
+import Loading from './loading';
 import Modal from './modal';
 import RoleActivity from './role-activity';
 import RoleEditor from './role-editor';
@@ -57,21 +52,6 @@ const Button = withStyles({
     textTransform: 'none',
   },
 })(MuiButton);
-
-const prereviewTheme = createMuiTheme({
-  palette: {
-    primary: {
-      main: '#F77463',
-      contrastText: '#fff',
-    },
-    secondary: {
-      main: '#eaeaf0',
-    },
-  },
-  typography: {
-    fontFamily: ['Open Sans', 'sans-serif'].join(','),
-  },
-});
 
 const useStyles = makeStyles(theme => ({
   avatar: {
@@ -174,7 +154,6 @@ export default function Profile() {
     updatePersona(data)
       .then(resp => {
         let updated = resp.data;
-        console.log('updated: ', resp.data);
         alert(`You've successfully updated your persona.`);
         setEditMode(false);
         setDisplayedPersona(updated);
@@ -248,7 +227,6 @@ export default function Profile() {
   };
 
   useEffect(() => {
-    console.log('exp: ', expertise);
     if (displayedPersona && ownProfile) {
       setName(displayedPersona.name);
       setBio(displayedPersona.bio ? displayedPersona.bio : '');
@@ -284,7 +262,7 @@ export default function Profile() {
     return <Loading />;
   } else {
     return (
-      <ThemeProvider theme={prereviewTheme}>
+      <Box>
         <Helmet>
           <title>
             {displayedPersona.name} • {ORG}
@@ -588,9 +566,7 @@ export default function Profile() {
                   <Typography component="h2" variant="h6" gutterBottom>
                     PREreview Contributions
                   </Typography>
-                  {!ownProfile ? (
-                    <RoleActivity persona={displayedPersona} />
-                  ) : null}
+                  <RoleActivity persona={displayedPersona} />
                   <Typography component="h2" variant="h6" gutterBottom>
                     List of Publications
                   </Typography>
@@ -599,7 +575,7 @@ export default function Profile() {
             )}
           </Container>
         </Box>
-      </ThemeProvider>
+      </Box>
     );
   }
 }

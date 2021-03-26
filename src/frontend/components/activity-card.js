@@ -1,18 +1,102 @@
+// base imports
 import React, { useEffect, useState } from 'react';
+import { useHistory } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import { format, formatDistanceStrict } from 'date-fns';
-import { useGetPreprint } from '../hooks/api-hooks.tsx';
+
+// utils
+import { getFormattedDatePosted } from '../utils/preprints';
 import { createPreprintId } from '../../common/utils/ids.js';
-import Value from './value';
-import LabelStyle from './label-style';
-import XLink from './xlink';
-import AnimatedNumber from './animated-number';
+
+// hooks
+import { useGetPreprint } from '../hooks/api-hooks.tsx';
+
+// Material UI components
+import { makeStyles } from '@material-ui/core/styles';
+import Box from '@material-ui/core/Box';
+import Grid from '@material-ui/core/Grid';
+import Link from '@material-ui/core/Link';
+import Paper from '@material-ui/core/Paper';
+import Typography from '@material-ui/core/Typography';
+
+// components
+import Loading from './loading';
 import NotFound from './not-found';
-import { MdChevronRight } from 'react-icons/md';
+
+// icons
+import ChevronRightIcon from '@material-ui/icons/ChevronRight';
+
+const useStyles = makeStyles(theme => ({
+  activity: {
+    padding: 10,
+  },
+  activityItem: {
+    '&:not(:last-child)': {
+      borderRight: `2px solid ${theme.palette.secondary.light}`,
+      marginRight: 10,
+      paddingRight: 10,
+    },
+  },
+  activityPop: {
+    color: theme.palette.primary.main,
+    fontSize: '0.9rem',
+    fontWeight: 700,
+  },
+  authors: {
+    fontSize: '0.9rem',
+    fontStyle: 'italic',
+    marginBottom: 10,
+  },
+  date: {
+    color: theme.palette.secondary.main,
+    fontSize: '1.2rem',
+    textAlign: 'right',
+  },
+  gridMain: {
+    borderBottom: `1px solid ${theme.palette.secondary.light}`,
+    cursor: 'pointer',
+    padding: 20,
+  },
+  icon: {
+    color: theme.palette.secondary.main,
+    height: 30,
+    position: 'absolute',
+    right: 0,
+    top: '50%',
+    transform: 'translateY(-50%)',
+    width: 30,
+  },
+  meta: {
+    color: theme.palette.secondary.main,
+    fontSize: '0.9rem',
+  },
+  paper: {
+    borderBottom: `2px solid ${theme.palette.secondary.light}`,
+    marginBottom: 10,
+  },
+  preprintServer: {
+    color: theme.palette.primary.main,
+    fontSize: '0.9rem',
+    fontWeight: 700,
+    paddingRight: 40,
+    position: 'relative',
+  },
+  title: {
+    color: '#000 !important',
+    display: 'block',
+    fontSize: '1.3rem',
+    fontWeight: 700,
+    marginBottom: 10,
+  },
+}));
 
 export default function ActivityCard({ activity }) {
+  const classes = useStyles();
+  const history = useHistory();
+
+  const [elevation, setElevation] = useState(0);
   const [loading, setLoading] = useState(true);
   const [preprint, setPreprint] = useState(null);
+  const [publishedReviews, setPublishedReviews] = useState(null);
 
   const {
     data: preprintData,
@@ -22,9 +106,23 @@ export default function ActivityCard({ activity }) {
     id: createPreprintId(activity.preprint.handle),
   });
 
+  const handleHover = () => {
+    setElevation(elevation => (elevation ? 0 : 3));
+  };
+
+  const handleCardClick = () => {
+    history.push(`/preprints/${createPreprintId(activity.preprint.handle)}`);
+  };
+
   useEffect(() => {
     if (!loadingPreprint) {
       if (preprintData) {
+        if (preprintData.data[0].fullReviews) {
+          let newPublishedReviews = preprintData.data[0].fullReviews.filter(
+            review => review.isPublished,
+          );
+          setPublishedReviews(newPublishedReviews);
+        }
         setPreprint(preprintData.data[0]);
         setLoading(false);
       }
@@ -32,94 +130,87 @@ export default function ActivityCard({ activity }) {
   }, [loadingPreprint, preprintData]);
 
   if (error) {
-    // #FIXME
     return <NotFound />;
   } else if (loading) {
-    return <div>Loading...</div>;
+    return <Loading />;
   } else {
     return (
-      <div key={preprint.uuid} className="activity-card">
-        <LabelStyle>
-          {format(new Date(preprint.createdAt), 'MMM. d, yyyy')}{' '}
-          {preprint['@type'] === 'RequestForRapidPREreviewAction'
-            ? 'requested feedback on'
-            : 'reviewed'}
-        </LabelStyle>
-        <div>
-          <XLink
-            to={`/preprints/${createPreprintId(preprint.handle)}`}
-            href={`/preprints/${createPreprintId(preprint.handle)}`}
-          >
-            <Value tagName="span">{preprint.title}</Value>
-          </XLink>
-
-          <div className="activity-card__server-info">
-            <Value tagName="span" className="activity-card__server-name">
-              {preprint.preprintServer}
-            </Value>
-            <MdChevronRight className="activity-card__server-arrow-icon" />
-            <Value tagName="span">
-              {preprint.handle ? (
-                <a
-                  href={`https://doi.org/${preprint.handle}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {preprint.handle}
-                </a>
-              ) : (
-                <a
-                  href={`https://arxiv.org/abs/${preprint.handle}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {preprint.handle}
-                </a>
-              )}
-            </Value>
-          </div>
-
-          <div className="activity-card__stats">
-            <div className="activity-card__count">
-              <div className="activity-card__count-badge">
-                <AnimatedNumber
-                  value={preprint.rapidReviews.length}
-                  isAnimating={false} // #FIXME
-                />
-              </div>
-              Rapid Review{preprint.rapidReviews.length > 1 ? 's' : ''}
-            </div>
-            <div className="activity-card__count">
-              <div className="activity-card__count-badge">
-                <AnimatedNumber
-                  value={preprint.fullReviews.length}
-                  isAnimating={false} // #FIXME
-                />
-              </div>
-              Long-form Review{preprint.fullReviews.length > 1 ? 's' : ''}
-            </div>
-            <div className="activity-card__count">
-              <div className="activity-card__count-badge">
-                <AnimatedNumber
-                  value={preprint.requests.length}
-                  isAnimating={false} // #FIXME
-                />{' '}
-              </div>
-              Request{preprint.requests.length > 1 ? 's' : ''}
-            </div>
-            {activity.isAnimating && (
-              <div className="activity-card__count">
-                <span className="preprint-card__animation-time">
-                  {`(${formatDistanceStrict(
-                    new Date(activity.now),
-                    new Date(),
-                  )} ago)`}
-                </span>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
+      <Paper
+        elevation={elevation}
+        square
+        className={classes.paper}
+        onMouseEnter={handleHover}
+        onMouseLeave={handleHover}
+      >
+        <Grid
+          onClick={handleCardClick}
+          container
+          direction="row-reverse"
+          justifyContent="space-between"
+          spacing={0}
+          className={classes.gridMain}
+        >
+          <Grid item xs={12} sm={4}>
+            <Typography className={classes.date}>
+              {activity.ynAvailableCode
+                ? 'Rapid reviewed on '
+                : 'Published a longform review on '}
+              {getFormattedDatePosted(activity.preprint.datePosted)}
+            </Typography>
+          </Grid>
+          <Grid item xs={12} sm={8}>
+            <Typography>
+              <Link
+                href={`/preprints/${createPreprintId(
+                  activity.preprint.handle,
+                )}`}
+                className={classes.title}
+              >
+                {preprint.title}
+              </Link>
+            </Typography>
+            <Typography className={classes.authors}>
+              {preprint.authors}
+            </Typography>
+            <Typography>
+              <span className={classes.preprintServer}>
+                {preprint.preprintServer}
+                <ChevronRightIcon className={classes.icon} />
+              </span>
+              <span className={classes.meta}>{preprint.handle}</span>
+            </Typography>
+          </Grid>
+        </Grid>
+        <Box
+          container
+          alignItems="center"
+          justifyContent="space-between"
+          className={classes.gridSecondary}
+        >
+          <Grid container xs={12} sm={10} className={classes.activity}>
+            <Grid item className={`${classes.activityItem} ${classes.meta}`}>
+              <span className={classes.activityPop}>
+                {preprint.rapidReviews.length}
+              </span>{' '}
+              rapid reviews
+            </Grid>
+            <Grid item className={`${classes.activityItem} ${classes.meta}`}>
+              <span className={classes.activityPop}>
+                {publishedReviews && publishedReviews.length
+                  ? publishedReviews.length
+                  : 0}
+              </span>{' '}
+              longform reviews
+            </Grid>
+            <Grid item className={`${classes.activityItem} ${classes.meta}`}>
+              <span className={classes.activityPop}>
+                {preprint.requests.length}
+              </span>{' '}
+              requests
+            </Grid>
+          </Grid>
+        </Box>
+      </Paper>
     );
   }
 }

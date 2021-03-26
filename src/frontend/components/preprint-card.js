@@ -148,7 +148,6 @@ export default function PreprintCard({
   };
 
   const handleCardClick = () => {
-    console.log('clicked');
     history.push(`/preprints/${preprintId}`);
   };
 
