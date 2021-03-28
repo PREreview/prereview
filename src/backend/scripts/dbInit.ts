@@ -11,7 +11,14 @@ async function main() {
     console.log('Created users group:', userGroup);
     const modsGroup = groups.create({ name: 'moderators' });
     console.log('Created moderators group:', modsGroup);
-    await groups.persistAndFlush([adminGroup, userGroup, modsGroup]);
+    const partnersGroup = groups.create({ name: 'partners' });
+    console.log('Created partners group:', partnersGroup);
+    await groups.persistAndFlush([
+      adminGroup,
+      userGroup,
+      modsGroup,
+      partnersGroup,
+    ]);
     db.close();
     return;
   } catch (err) {

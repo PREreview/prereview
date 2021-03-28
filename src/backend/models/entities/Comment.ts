@@ -12,6 +12,8 @@ import { FullReview } from './FullReview';
 import { Persona } from './Persona';
 
 @Entity()
+@Index({ properties: ['author'] })
+@Index({ properties: ['parent'] })
 export class Comment extends BaseEntity {
   //eslint-disable-next-line
   [EntityRepositoryType]?: CommentModel;
@@ -29,11 +31,9 @@ export class Comment extends BaseEntity {
   isFlagged: boolean = false;
 
   @ManyToOne({ entity: () => Persona })
-  @Index()
   author!: Persona;
 
   @ManyToOne({ entity: () => FullReview })
-  @Index()
   parent!: FullReview;
 
   constructor(contents: string, author: Persona, parent: FullReview) {

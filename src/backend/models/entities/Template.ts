@@ -12,6 +12,7 @@ import { BaseEntity } from './BaseEntity';
 import { Community } from './Community';
 
 @Entity()
+@Index({ properties: ['community'] })
 export class Template extends BaseEntity {
   //eslint-disable-next-line
   [EntityRepositoryType]?: TemplateModel;
@@ -26,7 +27,6 @@ export class Template extends BaseEntity {
   contents!: string;
 
   @ManyToOne({ entity: () => Community, nullable: true })
-  @Index()
   community?: Community;
 
   constructor(title: string, contents: string, community?: Community) {

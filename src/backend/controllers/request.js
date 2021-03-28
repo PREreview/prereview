@@ -49,9 +49,18 @@ export default function controller(reqModel, preprintModel, thisUser) {
 
     log.debug(`Adding a request.`);
 
+    let isPreprintAuthor = false;
+    if (ctx.query.isAuthor && ctx.isMemberOf('partners', authorPersona.uuid)) {
+      isPreprintAuthor = true;
+    }
+
     try {
       preprint.isPublished = true;
-      request = reqModel.create({ preprint: preprint, author: authorPersona });
+      request = reqModel.create({
+        preprint,
+        author: authorPersona,
+        isPreprintAuthor,
+      });
       await reqModel.persistAndFlush(request);
     } catch (err) {
       log.error('HTTP 400 Error: ', err);
