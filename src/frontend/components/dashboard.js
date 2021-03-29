@@ -24,6 +24,7 @@ import UserProvider from '../contexts/user-context';
 import { makeStyles } from '@material-ui/core/styles';
 import Box from '@material-ui/core/Box';
 import Container from '@material-ui/core/Container';
+import Dialog from '@material-ui/core/Dialog';
 import Grid from '@material-ui/core/Grid';
 import Link from '@material-ui/core/Link';
 import List from '@material-ui/core/List';
@@ -42,7 +43,6 @@ import SearchBar from './search-bar';
 import RecentActivity from './recent-activity';
 import PrivateRoute from './private-route';
 import NewPreprint from './new-preprint';
-import Modal from './modal';
 import Loading from './loading';
 import NotFound from './not-found';
 
@@ -67,6 +67,7 @@ export default function Dashboard() {
   const [user] = useContext(UserProvider.context);
 
   const [loginModalOpenNext, setLoginModalOpenNext] = useState(null);
+  const [newPreprintOpen, setNewPreprintOpen] = useState(false);
   const [newPreprints, setNewPreprints] = useNewPreprints();
 
   // search
@@ -200,7 +201,8 @@ export default function Dashboard() {
             />
           )}
           <PrivateRoute path="/dashboard/new" exact={true}>
-            <Modal
+            <Dialog
+              open={newPreprintOpen}
               showCloseButton={true}
               title="Add Entry"
               onClose={() => {
@@ -238,13 +240,13 @@ export default function Dashboard() {
                   );
                 }}
               />
-            </Modal>
+            </Dialog>
           </PrivateRoute>
           <Box my={6}>
             <Typography
               component="h2"
               variant="h2"
-              textAlign="center"
+              textalign="center"
               gutterBottom
             >
               COVID-19 Dashboard
@@ -359,6 +361,8 @@ export default function Dashboard() {
                     <AddButton
                       onClick={() => {
                         if (user) {
+                          console.log('user present');
+                          setNewPreprintOpen(true);
                           history.push({
                             pathname: '/dashboard/new',
                             search: location.search,
@@ -369,7 +373,6 @@ export default function Dashboard() {
                           );
                         }
                       }}
-                      disabled={location.pathname === '/dashboard/new'}
                     />
                   </Box>
                   <Grid container spacing={2} justify="space-between">

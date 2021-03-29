@@ -20,11 +20,9 @@ import Button from './button';
 import TextInput from './text-input';
 import PreprintPreview from './preprint-preview';
 
-export default function NewPreprint({ user, onCancel, onSuccess }) {
+export default function NewPreprint({ user, onCancel }) {
   const location = useLocation(); // location.state can be {preprint, tab, isSingleStep} with tab being `request` or `review` (so that we know on which tab the shell should be activated with
   const qs = new URLSearchParams(location.search);
-
-  const isSingleStep = location.state && location.state.isSingleStep;
 
   const [{ identifier, url }, setIdentifierAndUrl] = useState({
     identifier:

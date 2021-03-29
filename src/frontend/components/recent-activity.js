@@ -8,6 +8,7 @@ import { createPreprintId } from '../../common/utils/ids.js';
 
 //material ui
 import Link from '@material-ui/core/Link';
+import Typography from '@material-ui/core/Typography';
 
 export default function RecentActivity({ activity }) {
   let author;
@@ -30,37 +31,30 @@ export default function RecentActivity({ activity }) {
     switch (type) {
       case 'request':
         return (
-          <>
-            <div className="dashboard__activity_item_text">
-              <Link href={`/about/${author.uuid}`}>{author.name}</Link>{' '}
-              requested reviews for{' '}
-              <Link href={`/preprints/${preprintId}`}>{title}</Link>{' '}
-              {formatDistanceStrict(new Date(activity.createdAt), new Date()) +
-                ` ago.`}
-            </div>
-          </>
+          <Typography component="div" variant="body2">
+            <Link href={`/about/${author.uuid}`}>{author.name}</Link> requested
+            reviews for <Link href={`/preprints/${preprintId}`}>{title}</Link>{' '}
+            {formatDistanceStrict(new Date(activity.createdAt), new Date()) +
+              ` ago.`}
+          </Typography>
         );
       case 'rapid':
         return (
-          <>
-            <div className="dashboard__activity_item_text">
-              <Link href={`/about/${author.uuid}`}>{author.name}</Link> rapid
-              reviewed <Link href={`/preprints/${preprintId}`}>{title}</Link>{' '}
-              {formatDistanceStrict(new Date(activity.createdAt), new Date()) +
-                ` ago.`}
-            </div>
-          </>
+          <Typography component="div" variant="body2">
+            <Link href={`/about/${author.uuid}`}>{author.name}</Link> rapid
+            reviewed <Link href={`/preprints/${preprintId}`}>{title}</Link>{' '}
+            {formatDistanceStrict(new Date(activity.createdAt), new Date()) +
+              ` ago.`}
+          </Typography>
         );
       case 'long':
         return (
-          <>
-            <div className="dashboard__activity_item_text">
-              {multiAuthors()} reviewed{' '}
-              <Link href={`/preprints/${preprintId}`}>{title}</Link>{' '}
-              {formatDistanceStrict(new Date(activity.createdAt), new Date()) +
-                ` ago.`}
-            </div>
-          </>
+          <Typography component="div" variant="body2">
+            {multiAuthors()} reviewed{' '}
+            <Link href={`/preprints/${preprintId}`}>{title}</Link>{' '}
+            {formatDistanceStrict(new Date(activity.createdAt), new Date()) +
+              ` ago.`}
+          </Typography>
         );
       default:
         return '';
