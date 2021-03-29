@@ -26,10 +26,13 @@ import Box from '@material-ui/core/Box';
 import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
 import Link from '@material-ui/core/Link';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
 import Pagination from '@material-ui/lab/Pagination';
 import Typography from '@material-ui/core/Typography';
 
 // components
+import ActiveUser from './active-user';
 import AddButton from './add-button';
 import LoginRequiredModal from './login-required-modal';
 import SortOptions from './sort-options';
@@ -37,7 +40,6 @@ import HeaderBar from './header-bar';
 import PreprintCard from './preprint-card';
 import SearchBar from './search-bar';
 import RecentActivity from './recent-activity';
-import ActiveUser from './active-user';
 import PrivateRoute from './private-route';
 import NewPreprint from './new-preprint';
 import Modal from './modal';
@@ -45,8 +47,16 @@ import Loading from './loading';
 import NotFound from './not-found';
 
 const useStyles = makeStyles(theme => ({
+  gridItem: {
+    borderRadius: 50,
+    border: `1px solid ${theme.palette.secondary.light}`,
+  },
   link: {
     color: `${theme.palette.primary.main} !important`,
+  },
+  listItem: {
+    paddingLeft: 0,
+    paddingRight: 0,
   },
 }));
 
@@ -180,7 +190,7 @@ export default function Dashboard() {
           <title>{ORG} • Dashboard</title>
         </Helmet>
         <HeaderBar thisUser={user} />
-        <Container>
+        <Container maxWidth="xl">
           {loginModalOpenNext && (
             <LoginRequiredModal
               open={loginModalOpenNext}
@@ -264,7 +274,7 @@ export default function Dashboard() {
               }}
             />
             <Box mt={4}>
-              <Grid container spacing={2}>
+              <Grid container spacing={4}>
                 <Grid item xs={12} md={6}>
                   <SortOptions
                     sort={params.get('sort') || ''}
@@ -308,10 +318,10 @@ export default function Dashboard() {
                       </Link>
                     </div>
                   ) : (
-                    <ul>
+                    <List>
                       {preprints &&
                         preprints.data.map(row => (
-                          <li key={row.id}>
+                          <ListItem key={row.id} className={classes.listItem}>
                             <PreprintCard
                               isNew={false}
                               user={user}
@@ -322,9 +332,9 @@ export default function Dashboard() {
                               hoveredSortOption={hoveredSortOption}
                               sortOption={params.get('asc') === 'true'}
                             />
-                          </li>
+                          </ListItem>
                         ))}
-                    </ul>
+                    </List>
                   )}
                   {preprints && preprints.totalCount > params.get('limit') && (
                     <div className="home__pagination">
@@ -362,27 +372,40 @@ export default function Dashboard() {
                       disabled={location.pathname === '/dashboard/new'}
                     />
                   </Box>
-                  <Grid container spacing={2}>
-                    <Grid item xs={12} md={6}>
-                      <Typography component="h3" variant="h3">
-                        Recent Activity
-                      </Typography>
-                      {sortedActivities.map(activity =>
-                        <RecentActivity
-                          key={activity.uuid}
-                          activity={activity}
-                        />
-                      )}
+                  <Grid container spacing={2} justify="space-between">
+                    <Grid item xs={12} md={6} className={classes.gridItem}>
+                      <Box m={2}>
+                        <Typography component="h3" variant="h3">
+                          Recent Activity
+                        </Typography>
+                        <List>
+                          {sortedActivities.map(activity => (
+                            <ListItem
+                              key={activity.uuid}
+                              className={classes.listItem}
+                            >
+                              <RecentActivity activity={activity} />
+                            </ListItem>
+                          ))}
+                        </List>
+                      </Box>
                     </Grid>
-                    <Grid item xs={12} md={6}>
-                      <Typography component="h3" variant="h3">
-                        Active Reviewers
-                      </Typography>
-                      {activeUsers.map(user => (
-                        <li key={user.uuid}>
-                          <ActiveUser user={user} />
-                        </li>
-                      ))}
+                    <Grid item xs={12} md={6} className={classes.gridItem}>
+                      <Box m={2}>
+                        <Typography component="h3" variant="h3">
+                          Active Reviewers
+                        </Typography>
+                        <List>
+                          {activeUsers.map(user => (
+                            <ListItem
+                              key={user.uuid}
+                              className={classes.listItem}
+                            >
+                              <ActiveUser user={user} />
+                            </ListItem>
+                          ))}
+                        </List>
+                      </Box>
                     </Grid>
                   </Grid>
                 </Grid>

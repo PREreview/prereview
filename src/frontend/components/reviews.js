@@ -4,10 +4,13 @@ import { useHistory, useLocation } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 
 // Material UI imports
+import { makeStyles } from '@material-ui/core/styles';
 import Box from '@material-ui/core/Box';
 import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
 import Link from '@material-ui/core/Link';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
 import Pagination from '@material-ui/lab/Pagination';
 import Typography from '@material-ui/core/Typography';
 
@@ -24,7 +27,6 @@ import {
 
 // utils
 import { createPreprintId } from '../../common/utils/ids.js';
-import { getId } from '../utils/jsonld';
 import { processParams, searchParamsToObject } from '../utils/search';
 
 // components
@@ -45,7 +47,18 @@ import WelcomeModal from './welcome-modal';
 // constants
 import { ORG } from '../constants';
 
+const useStyles = makeStyles(theme => ({
+  link: {
+    color: `${theme.palette.primary.main} !important`,
+  },
+  listItem: {
+    paddingLeft: 0,
+    paddingRight: 0,
+  },
+}));
+
 export default function Reviews() {
+  const classes = useStyles();
   const history = useHistory();
   const location = useLocation();
   const params = processParams(location.search);
@@ -238,9 +251,9 @@ export default function Reviews() {
             )}
 
             {newPreprints.length > 0 && (
-              <ul>
+              <List>
                 {newPreprints.map(preprint => (
-                  <li key={preprint.uuid}>
+                  <ListItem key={preprint.uuid} className={classes.listItem}>
                     <PreprintCard
                       isNew={true}
                       preprint={preprint}
@@ -250,9 +263,9 @@ export default function Reviews() {
                       hoveredSortOption={hoveredSortOption}
                       sortOption={params.get('asc') === 'true'}
                     />
-                  </li>
+                  </ListItem>
                 ))}
-              </ul>
+              </List>
             )}
 
             {!preprints ||
