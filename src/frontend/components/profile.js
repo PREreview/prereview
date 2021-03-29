@@ -230,6 +230,10 @@ export default function Profile() {
   );
   const badges =
     displayedPersona && displayedPersona.badges ? displayedPersona.badges : [];
+  const communities =
+    displayedPersona && displayedPersona.communities
+      ? displayedPersona.communities
+      : [];
   const [bio, setBio] = useState(
     displayedPersona && displayedPersona.bio ? displayedPersona.bio : '',
   );
@@ -592,6 +596,21 @@ export default function Profile() {
                   <Typography component="h2" variant="h6" gutterBottom>
                     PREreview Communities
                   </Typography>
+                  <Grid>
+                    {communities.map(community => {
+                      return (
+                        <Chip
+                          key={community.uuid}
+                          label={community.name}
+                          variant="outlined"
+                          href={`/communities/${community.slug}`}
+                          component="a"
+                          target="_blank"
+                          clickable
+                        />
+                      );
+                    })}
+                  </Grid>
                   <Typography component="h2" variant="h6" gutterBottom>
                     PREreview Contributions
                   </Typography>
