@@ -190,24 +190,30 @@ export default function ActivityCard({ activity }) {
         >
           <Grid container xs={12} sm={10} className={classes.activity}>
             <Grid item className={`${classes.activityItem} ${classes.meta}`}>
-              <span className={classes.activityPop}>
-                {preprint.rapidReviews.length}
-              </span>{' '}
-              rapid reviews
+              <Typography component="div" variant="body1">
+                <span className={classes.activityPop}>
+                  {preprint.rapidReviews.length}
+                </span>{' '}
+                rapid reviews
+              </Typography>
             </Grid>
             <Grid item className={`${classes.activityItem} ${classes.meta}`}>
-              <span className={classes.activityPop}>
-                {publishedReviews && publishedReviews.length
-                  ? publishedReviews.length
-                  : 0}
-              </span>{' '}
-              longform reviews
+              <Typography component="div" variant="body1">
+                <span className={classes.activityPop}>
+                  {publishedReviews && publishedReviews.length
+                    ? publishedReviews.length
+                    : 0}
+                </span>{' '}
+                longform reviews
+              </Typography>
             </Grid>
             <Grid item className={`${classes.activityItem} ${classes.meta}`}>
-              <span className={classes.activityPop}>
-                {preprint.requests.length}
-              </span>{' '}
-              requests
+              <Typography component="div" variant="body1">
+                <span className={classes.activityPop}>
+                  {preprint.requests.length}
+                </span>{' '}
+                requests
+              </Typography>
             </Grid>
           </Grid>
         </Box>

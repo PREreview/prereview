@@ -17,6 +17,10 @@ const useStyles = makeStyles(theme => ({
     color: theme.palette.secondary.main,
     textTransform: 'uppercase',
   },
+  listItem: {
+    paddingLeft: 0,
+    paddingRight: 0,
+  },
 }));
 
 export default function RoleActivity({ persona }) {
@@ -59,7 +63,7 @@ export default function RoleActivity({ persona }) {
           <List>
             {activity.length &&
               activity.map(activity => (
-                <ListItem key={activity.handle}>
+                <ListItem key={activity.handle} className={classes.listItem}>
                   <ActivityCard key={activity.uuid} activity={activity} />
                 </ListItem>
               ))}

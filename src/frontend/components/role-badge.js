@@ -154,7 +154,7 @@ RoleBadgeUI.propTypes = {
   tooltip: PropTypes.bool,
   user: PropTypes.shape({
     defaultPersona: PropTypes.object,
-    id: PropTypes.number,
+    uuid: PropTypes.string,
     identity: PropTypes.oneOfType([PropTypes.object, PropTypes.number]),
     orcid: PropTypes.string,
     name: PropTypes.string,
@@ -182,6 +182,7 @@ Tooltipify.propTypes = {
   tooltip: PropTypes.bool,
   user: PropTypes.shape({
     name: PropTypes.string,
+    uuid: PropTypes.string,
     defaultPersona: PropTypes.object,
     identity: PropTypes.oneOfType([PropTypes.object, PropTypes.number]),
   }),

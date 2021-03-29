@@ -47,7 +47,7 @@ import WelcomeModal from './welcome-modal';
 // constants
 import { ORG } from '../constants';
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles(() => ({
   listItem: {
     paddingLeft: 0,
     paddingRight: 0,
@@ -286,10 +286,10 @@ export default function Reviews() {
                 </Link>
               </div>
             ) : (
-              <ul className="home__preprint-list">
+              <List>
                 {preprints &&
                   preprints.data.map(row => (
-                    <li key={row.id} className="home__preprint-list__item">
+                    <ListItem key={row.id} className={classes.listItem}>
                       <PreprintCard
                         isNew={false}
                         user={thisUser}
@@ -300,9 +300,9 @@ export default function Reviews() {
                         hoveredSortOption={hoveredSortOption}
                         sortOption={params.get('asc') === 'true'}
                       />
-                    </li>
+                    </ListItem>
                   ))}
-              </ul>
+              </List>
             )}
 
             {preprints && preprints.totalCount > params.get('limit') && (
