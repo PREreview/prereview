@@ -182,10 +182,10 @@ export default function Reviews() {
                         setNewPreprintOpen(true);
                         history.push('/new');
                       } else {
-                        setLoginModalOpenNext('/new');
+                        setLoginModalOpenNext('/reviews/new');
                       }
                     }}
-                    disabled={location.pathname === '/new'}
+                    disabled={location.pathname === '/reviews/new'}
                   />
                   <PrivateRoute path="/new" exact={true}>
                     <Dialog

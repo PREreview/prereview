@@ -20,16 +20,16 @@ enum Checkboxes {
 }
 
 @Entity()
+@Index({ properties: ['author'] })
+@Index({ properties: ['preprint'] })
 export class RapidReview extends BaseEntity {
   //eslint-disable-next-line
   [EntityRepositoryType]?: RapidReviewModel;
 
   @ManyToOne({ entity: () => Persona })
-  @Index()
   author!: Persona;
 
   @ManyToOne({ entity: () => Preprint })
-  @Index()
   preprint!: Preprint;
 
   //eslint-disable-next-line

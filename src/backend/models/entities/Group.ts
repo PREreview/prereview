@@ -13,6 +13,7 @@ import { BaseEntity } from './BaseEntity';
 import { User } from './User';
 
 @Entity()
+@Index({ properties: ['members'] })
 export class Group extends BaseEntity {
   //eslint-disable-next-line
   [EntityRepositoryType]?: GroupModel;
@@ -23,7 +24,6 @@ export class Group extends BaseEntity {
   name!: string;
 
   @ManyToMany({ entity: () => User, inversedBy: 'groups' })
-  @Index()
   members: Collection<User> = new Collection<User>(this);
 
   constructor(name: string) {

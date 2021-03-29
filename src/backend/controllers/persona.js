@@ -38,6 +38,7 @@ const querySchema = Joi.object({
 
 export default function controller(
   personasModel,
+  usersModel,
   badgesModel,
   expertisesModel,
   thisUser,
@@ -193,25 +194,44 @@ export default function controller(
           'rapidReviews.preprint',
           'badges',
           'expertises',
-          'identity',
-          'identity.contacts',
         ]);
-        if (!persona) {
-          ctx.throw(404, `Persona with ID ${ctx.params.id} doesn't exist`);
-        }
-        if (persona.avatar && Buffer.isBuffer(persona.avatar)) {
-          persona.avatar = persona.avatar.toString();
-        }
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse schema: ${err}`);
       }
 
-      ctx.body = {
-        status: 200,
-        message: 'ok',
-        data: [persona],
-      };
+      if (!persona) {
+        ctx.throw(404, `Persona with ID ${ctx.params.id} doesn't exist`);
+      }
+      if (persona.avatar && Buffer.isBuffer(persona.avatar)) {
+        persona.avatar = persona.avatar.toString();
+      }
+
+      let user;
+      if (!persona.isAnonymous) {
+        log.debug('This is a public persona, retrieving user data.');
+        try {
+          user = await usersModel.findOneByPersona(persona.uuid, ['contacts']);
+        } catch (err) {
+          log.error('HTTP 400 Error: ', err);
+          ctx.throw(400, `Failed to parse schema: ${err}`);
+        }
+      }
+
+      if (user) {
+        log.debug('Found corresponding user:', user);
+        ctx.body = {
+          status: 200,
+          message: 'ok',
+          data: [{ orcid: user.orcid, contacts: user.contacts, ...persona }],
+        };
+      } else {
+        ctx.body = {
+          status: 200,
+          message: 'ok',
+          data: [persona],
+        };
+      }
       ctx.status = 200;
     },
     meta: {

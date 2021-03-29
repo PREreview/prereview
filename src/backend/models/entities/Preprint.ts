@@ -20,6 +20,11 @@ import { Tag } from './Tag';
 import { createRandomDoi } from '../../../common/utils/ids';
 
 @Entity()
+@Index({ properties: ['rapidReviews'] })
+@Index({ properties: ['fullReviews'] })
+@Index({ properties: ['requests'] })
+@Index({ properties: ['communities'] })
+@Index({ properties: ['tags'] })
 export class Preprint extends BaseEntity {
   //eslint-disable-next-line
   [EntityRepositoryType]?: PreprintModel;
@@ -94,23 +99,18 @@ export class Preprint extends BaseEntity {
   //}
 
   @OneToMany({ entity: () => RapidReview, mappedBy: 'preprint' })
-  @Index()
   rapidReviews: Collection<RapidReview> = new Collection<RapidReview>(this);
 
   @OneToMany({ entity: () => FullReview, mappedBy: 'preprint' })
-  @Index()
   fullReviews: Collection<FullReview> = new Collection<FullReview>(this);
 
   @OneToMany({ entity: () => Request, mappedBy: 'preprint' })
-  @Index()
   requests: Collection<Request> = new Collection<Request>(this);
 
   @ManyToMany({ entity: () => Community, mappedBy: 'preprints' })
-  @Index()
   communities: Collection<Community> = new Collection<Community>(this);
 
   @ManyToMany({ entity: () => Tag, mappedBy: 'preprints' })
-  @Index()
   tags: Collection<Tag> = new Collection<Tag>(this);
 
   constructor(
