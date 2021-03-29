@@ -238,12 +238,9 @@ export default function Reviews() {
             )}
 
             {newPreprints.length > 0 && (
-              <ul className="home__preprint-list home__preprint-list--new">
+              <ul>
                 {newPreprints.map(preprint => (
-                  <li
-                    key={getId(preprint)}
-                    className="home__preprint-list__item"
-                  >
+                  <li key={preprint.uuid}>
                     <PreprintCard
                       isNew={true}
                       preprint={preprint}

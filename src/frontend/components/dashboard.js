@@ -7,10 +7,6 @@ import { useHistory, useLocation } from 'react-router-dom';
 // utils
 import { createPreprintId } from '../../common/utils/ids.js';
 
-// Material UI
-import Link from '@material-ui/core/Link';
-import Pagination from '@material-ui/lab/Pagination';
-
 import { ORG } from '../constants';
 
 // hooks
@@ -25,8 +21,13 @@ import { processParams, searchParamsToObject } from '../utils/search';
 import UserProvider from '../contexts/user-context';
 
 // Material UI components
+import { makeStyles } from '@material-ui/core/styles';
 import Box from '@material-ui/core/Box';
 import Container from '@material-ui/core/Container';
+import Grid from '@material-ui/core/Grid';
+import Link from '@material-ui/core/Link';
+import Pagination from '@material-ui/lab/Pagination';
+import Typography from '@material-ui/core/Typography';
 
 // components
 import AddButton from './add-button';
@@ -43,7 +44,14 @@ import Modal from './modal';
 import Loading from './loading';
 import NotFound from './not-found';
 
+const useStyles = makeStyles(theme => ({
+  link: {
+    color: `${theme.palette.primary.main} !important`,
+  },
+}));
+
 export default function Dashboard() {
+  const classes = useStyles();
   const history = useHistory();
   const location = useLocation();
   const [user] = useContext(UserProvider.context);
@@ -222,39 +230,42 @@ export default function Dashboard() {
               />
             </Modal>
           </PrivateRoute>
-          <article className="toc-page__main">
-            <div className="toc-page__body">
-              <section className="dashboard home__main">
-              <h1 id="Dashboard">COVID-19 Dashboard</h1>
-              <div className="fixed__search-bar">
-                <SearchBar
-                  defaultValue={search}
-                  isFetching={loadingPreprints}
-                  onChange={value => {
-                    params.delete('page');
-                    setSearch(value);
-                  }}
-                  onCancelSearch={() => {
-                    params.delete('search');
-                    setSearch('');
-                    history.push({
-                      pathname: location.pathame,
-                      search: params.toString(),
-                    });
-                  }}
-                  onRequestSearch={() => {
-                    params.set('search', search);
-                    params.delete('page');
-                    history.push({
-                      pathname: location.pathame,
-                      search: params.toString(),
-                    });
-                  }}
-                />
-              </div>
-                <div className="dashboard__flex">
-                  <div className="dashboard__flex_item">
-
+          <Box my={6}>
+            <Typography
+              component="h2"
+              variant="h2"
+              textAlign="center"
+              gutterBottom
+            >
+              COVID-19 Dashboard
+            </Typography>
+            <SearchBar
+              defaultValue={search}
+              isFetching={loadingPreprints}
+              onChange={value => {
+                params.delete('page');
+                setSearch(value);
+              }}
+              onCancelSearch={() => {
+                params.delete('search');
+                setSearch('');
+                history.push({
+                  pathname: location.pathame,
+                  search: params.toString(),
+                });
+              }}
+              onRequestSearch={() => {
+                params.set('search', search);
+                params.delete('page');
+                history.push({
+                  pathname: location.pathame,
+                  search: params.toString(),
+                });
+              }}
+            />
+            <Box mt={4}>
+              <Grid container spacing={2}>
+                <Grid item xs={12} md={6}>
                   <SortOptions
                     sort={params.get('sort') || ''}
                     order={params.get('asc') === 'true' ? 'asc' : 'desc'}
@@ -273,109 +284,111 @@ export default function Dashboard() {
                       });
                     }}
                   />
-
-                    {preprints && preprints.totalCount === 0 && !loadingPreprints ? (
-                      <div>
-                        No preprints about this topic have been added to Rapid PREreview.{' '}
-                        {!!location.search && (
-                          <Link
-                            onClick={() => {
-                              setSearch('');
-                              if (user) {
-                                history.push('/new');
-                              } else {
-                                setLoginModalOpenNext('/new');
-                              }
-                            }}
-                          >
-                            Review or request a review of a Preprint to add it to the
-                            site.
-                          </Link>
-                        )}
-                      </div>
-                    ) :
-                      <ul className="dashboard__preprint-list">
-                        {preprints &&
-                          preprints.data.map(row => (
-                            <li key={row.uuid} className="dashboard__preprint-list__item">
-                              <PreprintCard
-                                isNew={false}
-                                user={user}
-                                preprint={row}
-                                onNewRequest={handleNewRequest}
-                                onNew={handleNew}
-                                onNewReview={handleNewReview}
-                                hoveredSortOption={hoveredSortOption}
-                                sortOption={params.get('asc') === 'true'}
-                              />
-                            </li>
-                          ))}
-                      </ul>}
-                    <br/>
-                    {preprints && preprints.totalCount > params.get('limit') && (
-                      <div className="home__pagination">
-                        <Pagination
-                          count={Math.ceil(
-                            preprints.totalCount / params.get('limit'),
-                          )}
-                          page={parseInt('' + params.get('page'))}
-                          onChange={(ev, page) => {
-                            params.set('page', page);
-                            history.push({
-                              pathname: location.pathname,
-                              search: params.toString(),
-                            });
-                          }}
-                        />
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="dashboard__flex_item">
+                  {!preprints ||
+                  (preprints &&
+                    preprints.totalCount <= 0 &&
+                    !loadingPreprints) ? (
                     <div>
-                      <AddButton
+                      No preprints about this topic have been added to Rapid
+                      PREreview.{' '}
+                      <Link
+                        className={classes.link}
+                        href="/dashboard/new"
                         onClick={() => {
+                          setSearch('');
                           if (user) {
-                            history.push({
-                              pathname: '/dashboard/new',
-                              search: location.search,
-                            });
+                            history.push('/dashboard/new');
                           } else {
-                            setLoginModalOpenNext(
-                              `/dashboard/new${location.search}`,
-                            );
+                            setLoginModalOpenNext('/dashboard/new');
                           }
                         }}
-                        disabled={location.pathname === '/dashboard/new'}
+                      >
+                        Review or request a review of a Preprint to add it to
+                        the site.
+                      </Link>
+                    </div>
+                  ) : (
+                    <ul>
+                      {preprints &&
+                        preprints.data.map(row => (
+                          <li key={row.id}>
+                            <PreprintCard
+                              isNew={false}
+                              user={user}
+                              preprint={row}
+                              onNewRequest={handleNewRequest}
+                              onNew={handleNew}
+                              onNewReview={handleNewReview}
+                              hoveredSortOption={hoveredSortOption}
+                              sortOption={params.get('asc') === 'true'}
+                            />
+                          </li>
+                        ))}
+                    </ul>
+                  )}
+                  {preprints && preprints.totalCount > params.get('limit') && (
+                    <div className="home__pagination">
+                      <Pagination
+                        count={Math.ceil(
+                          preprints.totalCount / params.get('limit'),
+                        )}
+                        page={parseInt('' + params.get('page'))}
+                        onChange={(ev, page) => {
+                          params.set('page', page);
+                          history.push({
+                            pathname: location.pathname,
+                            search: params.toString(),
+                          });
+                        }}
                       />
                     </div>
-                    <div className="dashboard__activity">
-                      <div  className="dashboard__activity_item">
-                        <h2 className="dashboard__h2">Recent Activity</h2>
-                        {sortedActivities.map(activity =>
-                          <RecentActivity
-                            key={activity.uuid}
-                            activity={activity}
-                          />
-                        )}
-                      </div>
-                      <div  className="dashboard__activity_item">
-                        <h2 className="dashboard__h2">Active Reviewers</h2>
-                        <ol className="dashboard__activity_item_list">
-                          {activeUsers.map(user => (
-                            <li key={user.uuid}>
-                              <ActiveUser user={user} />
-                            </li>
-                          ))}
-                        </ol>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </section>
-            </div>
-          </article>
-
+                  )}
+                </Grid>
+                <Grid item xs={12} md={6}>
+                  <Box mb={4}>
+                    <AddButton
+                      onClick={() => {
+                        if (user) {
+                          history.push({
+                            pathname: '/dashboard/new',
+                            search: location.search,
+                          });
+                        } else {
+                          setLoginModalOpenNext(
+                            `/dashboard/new${location.search}`,
+                          );
+                        }
+                      }}
+                      disabled={location.pathname === '/dashboard/new'}
+                    />
+                  </Box>
+                  <Grid container spacing={2}>
+                    <Grid item xs={12} md={6}>
+                      <Typography component="h3" variant="h3">
+                        Recent Activity
+                      </Typography>
+                      {sortedActivities.map(activity =>
+                        <RecentActivity
+                          key={activity.uuid}
+                          activity={activity}
+                        />
+                      )}
+                    </Grid>
+                    <Grid item xs={12} md={6}>
+                      <Typography component="h3" variant="h3">
+                        Active Reviewers
+                      </Typography>
+                      {activeUsers.map(user => (
+                        <li key={user.uuid}>
+                          <ActiveUser user={user} />
+                        </li>
+                      ))}
+                    </Grid>
+                  </Grid>
+                </Grid>
+              </Grid>
+            </Box>
+          </Box>
         </Container>
       </Box>
     );
