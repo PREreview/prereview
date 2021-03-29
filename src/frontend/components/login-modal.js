@@ -1,9 +1,9 @@
 // base imports
-import React, { Fragment, useState } from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 
 // material ui
-import { withStyles, makeStyles } from '@material-ui/core/styles';
+import { makeStyles } from '@material-ui/core/styles';
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
 import CheckIcon from '@material-ui/icons/Check';
@@ -52,24 +52,7 @@ const useStyles = makeStyles(theme => ({
     maxWidth: 200,
     width: '100%',
   },
-  resetContainer: {
-    padding: theme.spacing(3),
-  },
 }));
-
-const styles = theme => ({
-  root: {
-    margin: 0,
-    padding: theme.spacing(2),
-    align: 'center',
-  },
-  closeButton: {
-    position: 'absolute',
-    right: theme.spacing(1),
-    top: theme.spacing(1),
-    color: theme.palette.grey[500],
-  },
-});
 
 function LoginModal({ open, handleClose }) {
   const [modalContent, setModalContent] = useState('coc');
@@ -91,7 +74,7 @@ function LoginModal({ open, handleClose }) {
         return <CoCStepper openNext={openNext} />;
       case 'continue':
         return (
-          <Fragment>
+          <>
             <DialogContent>
               <Typography variant="h6" gutterBottom>
                 Continue if:
@@ -167,11 +150,11 @@ function LoginModal({ open, handleClose }) {
                 Continue to ORCID sign-in
               </Button>
             </DialogContent>
-          </Fragment>
+          </>
         );
       case 'cancel':
         return (
-          <Fragment>
+          <>
             <DialogContent>
               <List>
                 <ListItemText>
@@ -198,7 +181,7 @@ function LoginModal({ open, handleClose }) {
                 <ListItemText>Thank you!</ListItemText>
               </List>
             </DialogContent>
-          </Fragment>
+          </>
         );
     }
   };

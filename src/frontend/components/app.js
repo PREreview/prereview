@@ -97,6 +97,10 @@ export default function App({ user }) {
                     <Logout />
                   </Route>
 
+                  <Route exact={true} path="/dashboard/:new(new)?">
+                    <Dashboard />
+                  </Route>
+
                   <Route exact={true} path="/reviews">
                     <Reviews />
                   </Route>

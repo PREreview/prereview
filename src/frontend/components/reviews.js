@@ -35,6 +35,7 @@ import Loading from './loading';
 import LoginRequiredModal from './login-required-modal';
 import Modal from './modal';
 import NewPreprint from './new-preprint';
+import NotFound from './not-found';
 import PreprintCard from './preprint-card';
 import PrivateRoute from './private-route';
 import SearchBar from './search-bar';
@@ -100,7 +101,7 @@ export default function Reviews() {
   if (loadingPreprints) {
     return <Loading />;
   } else if (error) {
-    return <div>An error occurred: {error.message}</div>;
+    return <NotFound />;
   } else {
     return (
       <div className="home">
@@ -185,10 +186,10 @@ export default function Reviews() {
                       <NewPreprint
                         user={thisUser}
                         onCancel={() => {
-                          history.push('/');
+                          history.push('/reviews');
                         }}
                         onSuccess={preprint => {
-                          history.push('/');
+                          history.push('/reviews');
                           setNewPreprints(newPreprints.concat(preprint));
                         }}
                         onViewInContext={({ preprint, tab }) => {
@@ -205,7 +206,7 @@ export default function Reviews() {
                   </PrivateRoute>
                   {loginModalOpenNext && (
                     <LoginRequiredModal
-                      next={loginModalOpenNext}
+                      open={loginModalOpenNext}
                       onClose={() => {
                         setLoginModalOpenNext(null);
                       }}
