@@ -13,8 +13,10 @@ export default function RoleActivity({ persona }) {
       ? persona.fullReviews.filter(item => item.isPublished)
       : null;
 
-    setActivity(() => [fullReviews, persona.rapidReviews].flat());
-  }, []);
+    setActivity(() =>
+      [fullReviews, persona.rapidReviews, persona.requests].flat(),
+    );
+  }, [persona]);
 
   return (
     <div className="role-activity">
@@ -22,20 +24,24 @@ export default function RoleActivity({ persona }) {
         <div className="role-activity__summary">
           <div className="role-activity__summary">
             <LabelStyle>
-              Total number of requests: {persona.requests.length || 0}
+              Total number of requests:{' '}
+              {persona.requests ? persona.requests.length || 0 : ''}
             </LabelStyle>
           </div>
           <div className="role-activity__summary">
             <LabelStyle>
-              Total number of rapid reviews: {persona.rapidReviews.length || 0}
+              Total number of rapid reviews:{' '}
+              {persona.rapidReviews ? persona.rapidReviews.length || 0 : ''}
             </LabelStyle>
           </div>
 
           <div className="role-activity__summary">
             <LabelStyle>
               Total number of long-form reviews:{' '}
-              {persona.fullReviews.filter(review => review.isPublished)
-                .length || 0}
+              {persona.fullReviews
+                ? persona.fullReviews.filter(review => review.isPublished)
+                    .length || 0
+                : null}
             </LabelStyle>
           </div>
         </div>
@@ -45,7 +51,6 @@ export default function RoleActivity({ persona }) {
         <div>No activity yet.</div>
       ) : (
         <section className="role-activity__history">
-          <h3 className="role-activity__sub-title">History</h3>
           <ul className="role-activity__list">
             {activity.length &&
               activity.map(activity => (

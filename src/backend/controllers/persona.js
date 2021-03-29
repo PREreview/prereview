@@ -192,8 +192,10 @@ export default function controller(
           'requests',
           'fullReviews.preprint',
           'rapidReviews.preprint',
+          'requests.preprint',
           'badges',
           'expertises',
+          'communities',
         ]);
       } catch (err) {
         log.error('HTTP 400 Error: ', err);

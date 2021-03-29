@@ -174,10 +174,9 @@ export default function Profile() {
     updatePersona(data)
       .then(resp => {
         let updated = resp.data;
-        console.log('updated: ', resp.data);
         alert(`You've successfully updated your persona.`);
         setEditMode(false);
-        setDisplayedPersona(updated);
+        setDisplayedPersona({ ...displayedPersona, ...updated });
         setName(updated.name);
         setBio(updated.bio);
         // const newExpertises = expertises.filter(exp => {
@@ -186,6 +185,13 @@ export default function Profile() {
         //   });
         // });
         setExpertise(updated.expertises);
+        setPersonas(
+          personas.map(persona =>
+            persona.uuid === updated.uuid
+              ? { ...persona, ...updated }
+              : persona,
+          ),
+        );
         return;
       })
       .catch(err => alert(`An error occurred:`, err.message));
@@ -198,10 +204,16 @@ export default function Profile() {
 
   const handleAvatarSave = updated => {
     setDisplayedPersona({ ...displayedPersona, avatar: updated.avatar });
+    setUser({
+      ...thisUser,
+      defaultPersona: { ...displayedPersona, avatar: updated.avatar },
+    });
     setAvatarModalOpen(false);
   };
 
-  const personas = !thisUser || !thisUser.personas ? [] : thisUser.personas;
+  const [personas, setPersonas] = useState(
+    !thisUser || !thisUser.personas ? [] : thisUser.personas,
+  );
 
   const [name, setName] = useState('');
   const orcid = ownProfile
@@ -218,6 +230,10 @@ export default function Profile() {
   );
   const badges =
     displayedPersona && displayedPersona.badges ? displayedPersona.badges : [];
+  const communities =
+    displayedPersona && displayedPersona.communities
+      ? displayedPersona.communities
+      : [];
   const [bio, setBio] = useState(
     displayedPersona && displayedPersona.bio ? displayedPersona.bio : '',
   );
@@ -244,7 +260,6 @@ export default function Profile() {
   };
 
   useEffect(() => {
-    console.log('exp: ', expertise);
     if (displayedPersona && ownProfile) {
       setName(displayedPersona.name);
       setBio(displayedPersona.bio ? displayedPersona.bio : '');
@@ -259,8 +274,8 @@ export default function Profile() {
   }, [displayedPersona]);
 
   useEffect(() => {
-    if (!loadingPersona && persona) setDisplayedPersona(persona);
-  }, [loadingPersona, persona]);
+    setDisplayedPersona(persona);
+  }, [persona]);
 
   useEffect(() => {
     if (
@@ -569,7 +584,7 @@ export default function Profile() {
                     {displayedPersona.bio}
                   </Typography>
                 )}
-                {ownProfile && editMode ? (
+                {ownProfile && editMode && !displayedPersona.isAnonymous ? (
                   <SettingsNotifications user={thisUser} />
                 ) : null}
               </Container>
@@ -581,12 +596,25 @@ export default function Profile() {
                   <Typography component="h2" variant="h6" gutterBottom>
                     PREreview Communities
                   </Typography>
+                  <Grid>
+                    {communities.map(community => {
+                      return (
+                        <Chip
+                          key={community.uuid}
+                          label={community.name}
+                          variant="outlined"
+                          href={`/communities/${community.slug}`}
+                          component="a"
+                          target="_blank"
+                          clickable
+                        />
+                      );
+                    })}
+                  </Grid>
                   <Typography component="h2" variant="h6" gutterBottom>
                     PREreview Contributions
                   </Typography>
-                  {!ownProfile ? (
-                    <RoleActivity persona={displayedPersona} />
-                  ) : null}
+                  <RoleActivity persona={displayedPersona} />
                   <Typography component="h2" variant="h6" gutterBottom>
                     List of Publications
                   </Typography>
