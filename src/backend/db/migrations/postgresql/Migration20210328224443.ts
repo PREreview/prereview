@@ -3,7 +3,10 @@ import { Migration } from '@mikro-orm/migrations';
 export class Migration20210328224443 extends Migration {
   async up(): Promise<void> {
     this.addSql(
-      'alter table "request" add column "is_preprint_author" bool not null;',
+      'alter table "request" add column "is_preprint_author" bool not null default false;',
+    );
+    this.addSql(
+      'alter table "request" alter column "is_preprint_author" drop default;',
     );
   }
 }
