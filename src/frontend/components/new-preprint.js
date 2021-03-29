@@ -12,7 +12,6 @@ import { unprefix } from '../utils/jsonld';
 
 // hooks
 import { usePreprint } from '../hooks/old-hooks';
-import { usePostRequests } from '../hooks/api-hooks.tsx';
 
 // Material UI components
 import { makeStyles } from '@material-ui/core/styles';
@@ -26,7 +25,7 @@ import Controls from './controls';
 import TextInput from './text-input';
 import PreprintPreview from './preprint-preview';
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles(() => ({
   input: {
     minWidth: 460,
   },
@@ -59,30 +58,17 @@ export default function NewPreprint({ user, onCancel }) {
     url,
   );
 
-  const [step, setStep] = useState(
-    location.state && location.state.tab === 'reviews'
-      ? 'NEW_REVIEW'
-      : location.state && location.state.tab === 'request'
-      ? 'NEW_REQUEST'
-      : 'NEW_PREPRINT',
-  );
-
   return (
-    <Box>
-      {step === 'NEW_PREPRINT' ? (
-        <StepPreprint
-          user={user}
-          onCancel={onCancel}
-          onStep={setStep}
-          onIdentifier={(identifier, url = null) => {
-            setIdentifierAndUrl({ identifier, url });
-          }}
-          identifier={identifier}
-          preprint={preprint}
-          resolvePreprintStatus={resolvePreprintStatus}
-        />
-      ) : null}
-    </Box>
+    <StepPreprint
+      user={user}
+      onCancel={onCancel}
+      onIdentifier={(identifier, url = null) => {
+        setIdentifierAndUrl({ identifier, url });
+      }}
+      identifier={identifier}
+      preprint={preprint}
+      resolvePreprintStatus={resolvePreprintStatus}
+    />
   );
 }
 NewPreprint.propTypes = {
@@ -152,6 +138,8 @@ function StepPreprint({
 
     setValue(value);
   };
+
+  console.log(error);
 
   return (
     <Box className={classes.box}>
@@ -239,119 +227,8 @@ function StepPreprint({
 StepPreprint.propTypes = {
   user: PropTypes.object,
   onCancel: PropTypes.func.isRequired,
-  onStep: PropTypes.func.isRequired,
   onIdentifier: PropTypes.func.isRequired,
   identifier: PropTypes.string,
   preprint: PropTypes.object,
   resolvePreprintStatus: PropTypes.object,
-};
-
-function StepRequest({ isSingleStep, preprint, onCancel, onSuccess }) {
-  const {
-    mutate: postReviewRequest,
-    loadingPostReviewRequest,
-    errorPostReviewRequest,
-  } = usePostRequests({ preprint: preprint.uuid });
-
-  return (
-    <div className="new-preprint__step-request">
-      <header className="new-preprint__title">
-        Please confirm your request for review:
-      </header>
-
-      <PreprintPreview preprint={preprint} />
-
-      <Controls
-        error={errorPostReviewRequest}
-        className="new-preprint__button-bar"
-      >
-        <Button
-          onClick={() => {
-            onCancel();
-          }}
-          disabled={loadingPostReviewRequest}
-        >
-          {isSingleStep ? 'Cancel' : 'Go Back'}
-        </Button>
-
-        <Button
-          primary={true}
-          isWaiting={loadingPostReviewRequest}
-          onClick={() => {
-            postReviewRequest({ preprint: preprint })
-              .then(() => {
-                alert('Request for reviews submitted succesfully.');
-                return onSuccess();
-              })
-              .catch(err => alert(`An error occured: ${err.message}`));
-          }}
-          disabled={loadingPostReviewRequest}
-        >
-          Submit
-        </Button>
-      </Controls>
-    </div>
-  );
-}
-StepRequest.propTypes = {
-  isSingleStep: PropTypes.bool,
-  preprint: PropTypes.object.isRequired,
-  onCancel: PropTypes.func.isRequired,
-  onSuccess: PropTypes.func.isRequired,
-};
-
-function StepReviewSuccess({ preprint, onClose, onViewInContext }) {
-  return (
-    <div className="new-preprint__step-review-success">
-      <header className="new-preprint__title">Success</header>
-
-      <PreprintPreview preprint={preprint} />
-
-      <p>Your review has been successfully posted.</p>
-
-      <Controls>
-        <Button
-          onClick={() => {
-            onViewInContext({ preprint, tab: 'read' });
-          }}
-        >
-          View In Context
-        </Button>
-        <Button onClick={onClose}>Close</Button>
-      </Controls>
-    </div>
-  );
-}
-StepReviewSuccess.propTypes = {
-  preprint: PropTypes.object.isRequired,
-  onClose: PropTypes.func.isRequired,
-  onViewInContext: PropTypes.func.isRequired
-};
-
-function StepRequestSuccess({ preprint, onClose, onViewInContext }) {
-  return (
-    <div className="new-preprint__step-review-success">
-      <header className="new-preprint__title">Success</header>
-
-      <PreprintPreview preprint={preprint} />
-
-      <p>Your request has been successfully posted.</p>
-
-      <Controls>
-        <Button
-          onClick={() => {
-            onViewInContext({ preprint, tab: 'read' });
-          }}
-        >
-          View In Context
-        </Button>
-        <Button onClick={onClose}>Close</Button>
-      </Controls>
-    </div>
-  );
-}
-StepRequestSuccess.propTypes = {
-  preprint: PropTypes.object.isRequired,
-  onClose: PropTypes.func.isRequired,
-  onViewInContext: PropTypes.func.isRequired
 };
