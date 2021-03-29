@@ -211,7 +211,10 @@ export default function HeaderBar({ thisUser }) {
                   </Link>
                 </MenuItem>
                 <MenuItem className={classes.nested}>
-                  <Link className={classes.mobileNavItem} href="/api/docs">
+                  <Link
+                    className={classes.mobileNavItem}
+                    href="https://content.prereview.org/api"
+                  >
                     API
                   </Link>
                 </MenuItem>
@@ -429,7 +432,7 @@ export default function HeaderBar({ thisUser }) {
                       <Link
                         className={classes.subnavItem}
                         color="textPrimary"
-                        href="/api/docs"
+                        href="https://content.prereview.org/api"
                       >
                         API
                       </Link>

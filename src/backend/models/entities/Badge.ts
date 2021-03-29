@@ -13,6 +13,7 @@ import { BaseEntity } from './BaseEntity';
 import { Persona } from './Persona';
 
 @Entity()
+@Index({ properties: ['personas'] })
 export class Badge extends BaseEntity {
   //eslint-disable-next-line
   [EntityRepositoryType]?: BadgeModel;
@@ -28,7 +29,6 @@ export class Badge extends BaseEntity {
   color?: string;
 
   @ManyToMany({ entity: () => Persona, inversedBy: 'badges' })
-  @Index()
   personas: Collection<Persona> = new Collection<Persona>(this);
 
   constructor(name: string, color = '#FF0000') {

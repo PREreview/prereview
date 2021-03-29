@@ -20,6 +20,16 @@ import { Request } from './Request';
 import { User } from './User';
 
 @Entity()
+@Index({ properties: ['identity'] })
+@Index({ properties: ['communities'] })
+@Index({ properties: ['rapidReviews'] })
+@Index({ properties: ['fullReviews'] })
+@Index({ properties: ['invitedToAuthor'] })
+@Index({ properties: ['mentoring'] })
+@Index({ properties: ['invitedToMentor'] })
+@Index({ properties: ['requests'] })
+@Index({ properties: ['badges'] })
+@Index({ properties: ['expertises'] })
 export class Persona extends BaseEntity {
   //eslint-disable-next-line
   [EntityRepositoryType]?: PersonaModel;
@@ -29,7 +39,6 @@ export class Persona extends BaseEntity {
   name!: string;
 
   @ManyToOne({ entity: () => User, nullable: true, hidden: true })
-  @Index()
   identity?: User;
 
   @Fixture(() => false)
@@ -59,35 +68,27 @@ export class Persona extends BaseEntity {
   avatar_encoding?: string;
 
   @ManyToMany({ entity: () => Community, mappedBy: 'members' })
-  @Index()
   communities: Collection<Community> = new Collection<Community>(this);
 
   @OneToMany({ entity: () => RapidReview, mappedBy: 'author' })
-  @Index()
   rapidReviews: Collection<RapidReview> = new Collection<RapidReview>(this);
 
   @ManyToMany({ entity: () => FullReview, mappedBy: 'authors' })
-  @Index()
   fullReviews: Collection<FullReview> = new Collection<FullReview>(this);
 
   @ManyToMany({ entity: () => FullReview, mappedBy: 'authorInvites' })
-  @Index()
   invitedToAuthor: Collection<FullReview> = new Collection<FullReview>(this);
 
   @ManyToMany({ entity: () => FullReview, mappedBy: 'mentors' })
-  @Index()
   mentoring: Collection<FullReview> = new Collection<FullReview>(this);
 
   @ManyToMany({ entity: () => FullReview, mappedBy: 'mentorInvites' })
-  @Index()
   invitedToMentor: Collection<FullReview> = new Collection<FullReview>(this);
 
   @OneToMany({ entity: () => Request, mappedBy: 'author' })
-  @Index()
   requests: Collection<Request> = new Collection<Request>(this);
 
   @ManyToMany({ entity: () => Badge, mappedBy: 'personas' })
-  @Index()
   badges: Collection<Badge> = new Collection<Badge>(this);
 
   @ManyToMany({ entity: () => Expertise, mappedBy: 'personas' })

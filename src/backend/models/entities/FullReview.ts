@@ -20,6 +20,14 @@ import { Statement } from './Statement';
 import { createRandomDoi } from '../../../common/utils/ids';
 
 @Entity()
+@Index({ properties: ['drafts'] })
+@Index({ properties: ['mentorInvites'] })
+@Index({ properties: ['mentors'] })
+@Index({ properties: ['authorInvites'] })
+@Index({ properties: ['authors'] })
+@Index({ properties: ['preprint'] })
+@Index({ properties: ['comments'] })
+@Index({ properties: ['statements'] })
 export class FullReview extends BaseEntity {
   //eslint-disable-next-line
   [EntityRepositoryType]?: FullReviewModel;
@@ -39,35 +47,27 @@ export class FullReview extends BaseEntity {
   doi?: string;
 
   @OneToMany({ entity: () => FullReviewDraft, mappedBy: 'parent' })
-  @Index()
   drafts: Collection<FullReviewDraft> = new Collection<FullReviewDraft>(this);
 
   @ManyToMany({ entity: () => Persona, inversedBy: 'invitedToMentor' })
-  @Index()
   mentorInvites: Collection<Persona> = new Collection<Persona>(this);
 
   @ManyToMany({ entity: () => Persona, inversedBy: 'mentoring' })
-  @Index()
   mentors: Collection<Persona> = new Collection<Persona>(this);
 
   @ManyToMany({ entity: () => Persona, inversedBy: 'invitedToAuthor' })
-  @Index()
   authorInvites: Collection<Persona> = new Collection<Persona>(this);
 
   @ManyToMany({ entity: () => Persona, inversedBy: 'fullReviews' })
-  @Index()
   authors: Collection<Persona> = new Collection<Persona>(this);
 
   @ManyToOne({ entity: () => Preprint })
-  @Index()
   preprint!: Preprint;
 
   @OneToMany({ entity: () => Comment, mappedBy: 'parent' })
-  @Index()
   comments: Collection<Comment> = new Collection<Comment>(this);
 
   @OneToMany({ entity: () => Comment, mappedBy: 'parent' })
-  @Index()
   statements: Collection<Statement> = new Collection<Statement>(this);
 
   constructor(preprint: Preprint, isPublished = false, doi?: string) {
