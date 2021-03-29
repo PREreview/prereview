@@ -17,7 +17,7 @@ import ArrowForwardIosIcon from '@material-ui/icons/ArrowForwardIos';
 
 const useStyles = makeStyles(() => ({
   footerNav: {
-    height: 210,
+    height: 220,
     marginTop: '2rem',
   },
   footerNavItem: {

@@ -173,7 +173,6 @@ export default function RoleEditor({ persona, onCancel, onSaved }) {
           primary={true}
           onClick={() => {
             const data = {};
-            console.log("HASNEWAVATAR,", hasNewAvatar)
             if (hasNewAvatar) {
               const canvas = editorRef.current.getImage();
 
@@ -187,8 +186,6 @@ export default function RoleEditor({ persona, onCancel, onSaved }) {
               }
               data.avatar = dataUrl;
             }
-
-            console.log("DATA", data)
 
             updatePersona(data)
               .then(resp => {
