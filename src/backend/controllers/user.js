@@ -114,6 +114,7 @@ export default function controller(users, contacts, keys, thisUser) {
 
         let avatar;
         if (
+          user.defaultPersona &&
           user.defaultPersona.avatar &&
           Buffer.isBuffer(user.defaultPersona.avatar)
         ) {

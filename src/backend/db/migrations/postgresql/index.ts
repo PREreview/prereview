@@ -7,3 +7,4 @@ export * from "./Migration20210218002037";
 export * from "./Migration20210311221340";
 export * from "./Migration20210322000000";
 export * from "./Migration20210324151516";
+export * from "./Migration20210328224443";

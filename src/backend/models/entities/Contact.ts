@@ -11,6 +11,7 @@ import { BaseEntity } from './BaseEntity';
 import { User } from './User';
 
 @Entity()
+@Index({ properties: ['identity'] })
 export class Contact extends BaseEntity {
   //eslint-disable-next-line
   [EntityRepositoryType]?: ContactModel;
@@ -24,7 +25,6 @@ export class Contact extends BaseEntity {
   value!: string;
 
   @ManyToOne({ entity: () => User })
-  @Index()
   identity!: User;
 
   @Fixture(() => false)

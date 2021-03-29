@@ -12,6 +12,7 @@ import { User } from './User';
 import { createRandomDoi } from '../../../common/utils/ids';
 
 @Entity()
+@Index({ properties: ['author'] })
 export class Work extends BaseEntity {
   //eslint-disable-next-line
   [EntityRepositoryType]?: WorkModel;
@@ -21,7 +22,6 @@ export class Work extends BaseEntity {
   title?: string;
 
   @ManyToOne({ entity: () => User })
-  @Index()
   author!: User;
 
   @Fixture(faker => faker.internet.url())

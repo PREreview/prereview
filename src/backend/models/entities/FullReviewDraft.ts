@@ -11,11 +11,11 @@ import { BaseEntity } from './BaseEntity';
 import { FullReview } from './FullReview';
 
 @Entity()
+@Index({ properties: ['parent'] })
 export class FullReviewDraft extends BaseEntity {
   [EntityRepositoryType]: FullReviewDraftModel;
 
   @ManyToOne({ entity: () => FullReview })
-  @Index()
   parent!: FullReview;
 
   @Fixture(faker => faker.lorem.paragraph())

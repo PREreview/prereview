@@ -12,6 +12,7 @@ import { BaseEntity } from './BaseEntity';
 import { Persona } from './Persona';
 
 @Entity()
+@Index({ properties: ['author'] })
 export class Report extends BaseEntity {
   //eslint-disable-next-line
   [EntityRepositoryType]?: ReportModel;
@@ -25,7 +26,6 @@ export class Report extends BaseEntity {
   title?: string;
 
   @ManyToOne({ entity: () => Persona })
-  @Index()
   author!: Persona;
 
   @Fixture(() => uuidv4())

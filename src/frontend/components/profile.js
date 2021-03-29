@@ -218,18 +218,14 @@ export default function Profile() {
   const [name, setName] = useState('');
   const orcid = ownProfile
     ? thisUser.orcid
-    : displayedPersona &&
-      !displayedPersona.isAnonymous &&
-      displayedPersona.identity
-    ? displayedPersona.identity.orcid
+    : displayedPersona && !displayedPersona.isAnonymous
+    ? displayedPersona.orcid
     : '';
   const [contacts, setContacts] = useState(
     ownProfile
       ? thisUser.contacts
-      : displayedPersona &&
-        !displayedPersona.isAnonymous &&
-        displayedPersona.identity
-      ? displayedPersona.identity.contacts
+      : displayedPersona && !displayedPersona.isAnonymous
+      ? displayedPersona.contacts
       : [],
   );
   const badges =
