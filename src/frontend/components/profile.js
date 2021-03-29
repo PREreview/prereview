@@ -176,7 +176,7 @@ export default function Profile() {
         let updated = resp.data;
         alert(`You've successfully updated your persona.`);
         setEditMode(false);
-        setDisplayedPersona({...displayedPersona, ...updated});
+        setDisplayedPersona({ ...displayedPersona, ...updated });
         setName(updated.name);
         setBio(updated.bio);
         // const newExpertises = expertises.filter(exp => {
@@ -185,7 +185,13 @@ export default function Profile() {
         //   });
         // });
         setExpertise(updated.expertises);
-        setPersonas(personas.map(persona => persona.uuid === updated.uuid ? {...persona, ...updated} : persona))
+        setPersonas(
+          personas.map(persona =>
+            persona.uuid === updated.uuid
+              ? { ...persona, ...updated }
+              : persona,
+          ),
+        );
         return;
       })
       .catch(err => alert(`An error occurred:`, err.message));
@@ -198,6 +204,10 @@ export default function Profile() {
 
   const handleAvatarSave = updated => {
     setDisplayedPersona({ ...displayedPersona, avatar: updated.avatar });
+    setUser({
+      ...thisUser,
+      defaultPersona: { ...displayedPersona, avatar: updated.avatar },
+    });
     setAvatarModalOpen(false);
   };
 
@@ -250,7 +260,6 @@ export default function Profile() {
   };
 
   useEffect(() => {
-    console.log('exp: ', expertise);
     if (displayedPersona && ownProfile) {
       setName(displayedPersona.name);
       setBio(displayedPersona.bio ? displayedPersona.bio : '');
@@ -590,7 +599,7 @@ export default function Profile() {
                   <Typography component="h2" variant="h6" gutterBottom>
                     PREreview Contributions
                   </Typography>
-                    <RoleActivity persona={displayedPersona} />
+                  <RoleActivity persona={displayedPersona} />
                   <Typography component="h2" variant="h6" gutterBottom>
                     List of Publications
                   </Typography>

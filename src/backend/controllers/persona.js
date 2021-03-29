@@ -191,6 +191,7 @@ export default function controller(
           'requests',
           'fullReviews.preprint',
           'rapidReviews.preprint',
+          'requests.preprint',
           'badges',
           'expertises',
           'identity',

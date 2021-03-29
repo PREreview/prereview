@@ -13,7 +13,7 @@ export default function RoleActivity({ persona }) {
       ? persona.fullReviews.filter(item => item.isPublished)
       : null;
 
-    setActivity(() => [fullReviews, persona.rapidReviews].flat());
+    setActivity(() => [fullReviews, persona.rapidReviews, persona.requests].flat());
   }, [persona]);
 
   return (
