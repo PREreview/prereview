@@ -315,7 +315,9 @@ export default function Dashboard() {
                     {preprints && preprints.totalCount > params.get('limit') && (
                       <div className="home__pagination">
                         <Pagination
-                          count={Math.ceil(preprints.totalCount / params.get('limit'))}
+                          count={Math.ceil(
+                            preprints.totalCount / params.get('limit'),
+                          )}
                           page={parseInt('' + params.get('page'))}
                           onChange={(ev, page) => {
                             params.set('page', page);

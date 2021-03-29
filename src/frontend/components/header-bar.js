@@ -10,6 +10,7 @@ import IconButton from '@material-ui/core/IconButton';
 import Link from '@material-ui/core/Link';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
+import Typography from '@material-ui/core/Typography';
 
 // components
 import Banner from './banner';
@@ -145,6 +146,11 @@ export default function HeaderBar({ thisUser }) {
         <Grid container alignItems="center" justify="space-between" spacing={2}>
           <Grid item xs={8} sm={10} md={2}>
             <Box className={classes.logo}>
+              <Typography component="h1" variant="srOnly">
+                <Link to="/" href={homeLink}>
+                  PREreview
+                </Link>
+              </Typography>
               <Link to="/" href={homeLink}>
                 <PreReviewLogo />
               </Link>
