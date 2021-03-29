@@ -176,7 +176,7 @@ export default function Profile() {
         let updated = resp.data;
         alert(`You've successfully updated your persona.`);
         setEditMode(false);
-        setDisplayedPersona(updated);
+        setDisplayedPersona({...displayedPersona, ...updated});
         setName(updated.name);
         setBio(updated.bio);
         // const newExpertises = expertises.filter(exp => {
@@ -185,7 +185,7 @@ export default function Profile() {
         //   });
         // });
         setExpertise(updated.expertises);
-        setPersonas(personas.map(persona => persona.uuid === updated.uuid ? updated : persona))
+        setPersonas(personas.map(persona => persona.uuid === updated.uuid ? {...persona, ...updated} : persona))
         return;
       })
       .catch(err => alert(`An error occurred:`, err.message));
