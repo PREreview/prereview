@@ -88,6 +88,7 @@ const useStyles = makeStyles(theme => ({
   paper: {
     borderBottom: `2px solid ${theme.palette.secondary.light}`,
     marginBottom: 10,
+    width: '100%',
   },
   preprintServer: {
     color: theme.palette.primary.main,

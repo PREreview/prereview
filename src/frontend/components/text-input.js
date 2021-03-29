@@ -1,14 +1,15 @@
-import React, { useState, createRef, useEffect } from 'react';
+// base imports
+import React, { createRef, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import classNames from 'classnames';
 import noop from 'lodash/noop';
+
+// material UI imports
+import TextField from '@material-ui/core/TextField';
 
 export default function TextInput({
   label,
   inputId,
-  className,
   type = 'text',
-  minimal = false,
   onChange = noop,
   ...inputProps
 }) {
@@ -19,40 +20,19 @@ export default function TextInput({
    */
 
   const inputRef = createRef();
-  const [empty, setEmpty] = useState(true);
 
-  useEffect(() => {
-    if (inputRef.current && inputRef.current.value) {
-      setEmpty(false);
-    }
-  }, [inputRef]);
+  useEffect(() => {}, [inputRef]);
 
   return (
-    <div
-      className={classNames('text-input', className, {
-        'text-input--minimal': minimal,
-        'text-input--empty': empty,
-      })}
-    >
-      <label className="text-input__label" htmlFor={inputId}>
-        {label}
-      </label>
-      <input
-        className="text-input__input"
-        ref={inputRef}
-        id={inputId}
-        type={type}
-        onChange={e => {
-          if (e.currentTarget.value) {
-            setEmpty(false);
-          } else {
-            setEmpty(true);
-          }
-          onChange(e);
-        }}
-        {...inputProps}
-      />
-    </div>
+    <TextField
+      variant="outlined"
+      label={label}
+      ref={inputRef}
+      id={inputId}
+      type={type}
+      onChange={e => onChange(e)}
+      {...inputProps}
+    />
   );
 }
 
@@ -60,7 +40,5 @@ TextInput.propTypes = {
   type: PropTypes.string,
   label: PropTypes.any,
   inputId: PropTypes.string,
-  className: PropTypes.string,
-  minimal: PropTypes.bool,
   onChange: PropTypes.func,
 };

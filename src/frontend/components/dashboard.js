@@ -202,8 +202,8 @@ export default function Dashboard() {
           )}
           <PrivateRoute path="/dashboard/new" exact={true}>
             <Dialog
+              maxWidth="md"
               open={newPreprintOpen}
-              showCloseButton={true}
               title="Add Entry"
               onClose={() => {
                 history.push({
@@ -361,7 +361,6 @@ export default function Dashboard() {
                     <AddButton
                       onClick={() => {
                         if (user) {
-                          console.log('user present');
                           setNewPreprintOpen(true);
                           history.push({
                             pathname: '/dashboard/new',

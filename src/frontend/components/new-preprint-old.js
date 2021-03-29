@@ -14,23 +14,11 @@ import { unprefix } from '../utils/jsonld';
 import { usePreprint } from '../hooks/old-hooks';
 import { usePostRequests } from '../hooks/api-hooks.tsx';
 
-// Material UI components
-import { makeStyles } from '@material-ui/core/styles';
-import Box from '@material-ui/core/Box';
-import Button from '@material-ui/core/Button';
-import Link from '@material-ui/core/Link';
-import Typography from '@material-ui/core/Typography';
-
 // components
 import Controls from './controls';
+import Button from './button';
 import TextInput from './text-input';
 import PreprintPreview from './preprint-preview';
-
-const useStyles = makeStyles(theme => ({
-  input: {
-    minWidth: 460,
-  },
-}));
 
 export default function NewPreprint({ user, onCancel }) {
   const location = useLocation(); // location.state can be {preprint, tab, isSingleStep} with tab being `request` or `review` (so that we know on which tab the shell should be activated with
@@ -68,7 +56,7 @@ export default function NewPreprint({ user, onCancel }) {
   );
 
   return (
-    <Box>
+    <div className="new-preprint">
       {step === 'NEW_PREPRINT' ? (
         <StepPreprint
           user={user}
@@ -82,7 +70,7 @@ export default function NewPreprint({ user, onCancel }) {
           resolvePreprintStatus={resolvePreprintStatus}
         />
       ) : null}
-    </Box>
+    </div>
   );
 }
 NewPreprint.propTypes = {
@@ -98,7 +86,6 @@ function StepPreprint({
   preprint,
   resolvePreprintStatus,
 }) {
-  const classes = useStyles();
   const history = useHistory();
   const location = useLocation();
 
@@ -118,66 +105,69 @@ function StepPreprint({
 
   const url = /^\s*https?:\/\//.test(value) ? value.trim() : undefined;
 
-  const handleChange = event => {
-    const value = event.target.value;
-    if (value) {
-      const qs = new URLSearchParams(value);
-      if (qs.get('identifier')) {
-        qs.delete('identifier');
-        history.replace({
-          pathname: location.pathname,
-          search: qs.toString(),
-        });
-      }
-    }
-
-    const [arxivId] = identifiersArxiv.extract(value);
-    let nextIdentifier;
-    if (arxivId) {
-      nextIdentifier = arxivId;
-    } else {
-      const doiMatch = value.match(doiRegex());
-      const doi = doiMatch && doiMatch[0];
-      if (doi) {
-        nextIdentifier = doi;
-      } else {
-        nextIdentifier = '';
-        value === '' ? setError(false) : setError(true);
-      }
-    }
-
-    if (nextIdentifier !== identifier) {
-      onIdentifier(nextIdentifier, url);
-    }
-
-    setValue(value);
-  };
-
   return (
-    <Box className={classes.box}>
-      <Typography component="div" variant="body2" gutterBottom>
-        Search for a preprint
-      </Typography>
-      <TextInput
-        inputId="step-preprint-input-new"
-        label="Enter preprint Digital Object Identifier (DOI) or an arXiv ID"
-        autoComplete="off"
-        placeholder=""
-        onChange={handleChange}
-        value={value}
-        className={classes.input}
-      />
+    <div className="new-preprint__step-preprint">
+      <div className="new-preprint__input-row">
+        <TextInput
+          inputId="step-preprint-input-new"
+          label={
+            <span>
+              Enter preprint <abbr title="Digital Object Identifier">DOI</abbr>{' '}
+              or an arXiv ID
+            </span>
+          }
+          minimal={true}
+          autoComplete="off"
+          placeholder=""
+          onChange={event => {
+            const value = event.target.value;
+            if (value) {
+              const qs = new URLSearchParams(value);
+              if (qs.get('identifier')) {
+                qs.delete('identifier');
+                history.replace({
+                  pathname: location.pathname,
+                  search: qs.toString(),
+                });
+              }
+            }
+
+            const [arxivId] = identifiersArxiv.extract(value);
+            let nextIdentifier;
+            if (arxivId) {
+              nextIdentifier = arxivId;
+            } else {
+              const doiMatch = value.match(doiRegex());
+              const doi = doiMatch && doiMatch[0];
+              if (doi) {
+                nextIdentifier = doi;
+              } else {
+                nextIdentifier = '';
+                value === '' ? setError(false) : setError(true);
+              }
+            }
+
+            if (nextIdentifier !== identifier) {
+              onIdentifier(nextIdentifier, url);
+            }
+
+            setValue(value);
+          }}
+          value={value}
+        />
+      </div>
+
       {preprint ? (
         <PreprintPreview preprint={preprint} />
       ) : resolvePreprintStatus.isActive ? (
-        <Typography>{`resolving ${identifier}`}</Typography>
+        <p>{`resolving ${identifier}`}</p>
       ) : resolvePreprintStatus.error &&
         resolvePreprintStatus.error.statusCode === 404 &&
         unversionedDoi &&
         unversionedDoi !== doi ? (
-        <Typography>
+        <p>
           Could not find an entry corresponding to <code>{doi}</code>. Try with{' '}
-          <Link
+          <a
             href="#"
             onClick={e => {
               e.preventDefault();
@@ -186,15 +176,13 @@ function StepPreprint({
             }}
           >
             {unversionedDoi}
-          </Link>{' '}
+          </a>{' '}
           ?
-        </Typography>
+        </p>
       ) : null}
 
       {resolvePreprintStatus.loading && (
-        <Typography component="div" variant="body1">
-          Checking for existing reviews or requests for reviews…
-        </Typography>
+        <p>Checking for existing reviews or requests for reviews…</p>
       )}
 
       <Controls
@@ -233,7 +221,7 @@ function StepPreprint({
           Add reviews
         </Button>
       </Controls>
-    </Box>
+    </div>
   );
 }
 StepPreprint.propTypes = {

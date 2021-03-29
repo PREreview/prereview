@@ -36,7 +36,6 @@ import Footer from './footer';
 import HeaderBar from './header-bar';
 import Loading from './loading';
 import LoginRequiredModal from './login-required-modal';
-import Modal from './modal';
 import NewPreprint from './new-preprint';
 import NotFound from './not-found';
 import PreprintCard from './preprint-card';
@@ -68,6 +67,7 @@ export default function Reviews() {
   const isMobile = useIsMobile();
   const [showLeftPanel, setShowLeftPanel] = useState(!isMobile);
   const [loginModalOpenNext, setLoginModalOpenNext] = useState(null);
+  const [newPreprintOpen, setNewPreprintOpen] = useState(false);
   const isNewVisitor = useIsNewVisitor();
   const [isWelcomeModalOpen, setIsWelcomeModalOpen] = useState(true);
   const [newPreprints, setNewPreprints] = useNewPreprints();
@@ -179,6 +179,7 @@ export default function Reviews() {
                   <AddButton
                     onClick={() => {
                       if (thisUser) {
+                        setNewPreprintOpen(true);
                         history.push('/new');
                       } else {
                         setLoginModalOpenNext('/new');
@@ -187,11 +188,10 @@ export default function Reviews() {
                     disabled={location.pathname === '/new'}
                   />
                   <PrivateRoute path="/new" exact={true}>
-                    <Modal
-                      showCloseButton={true}
-                      title="Add Entry"
+                    <Dialog
+                      open={newPreprintOpen}
                       onClose={() => {
-                        history.push('/');
+                        history.push('/reviews');
                       }}
                     >
                       <Helmet>
@@ -216,7 +216,7 @@ export default function Reviews() {
                           );
                         }}
                       />
-                    </Modal>
+                    </Dialog>
                   </PrivateRoute>
                   {loginModalOpenNext && (
                     <LoginRequiredModal

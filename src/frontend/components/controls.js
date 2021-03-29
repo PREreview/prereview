@@ -1,24 +1,25 @@
+// base imports
 import React from 'react';
 import PropTypes from 'prop-types';
-import classNames from 'classnames';
 
-export default function Controls({ error, className, children }) {
+// Material UI imports
+import Box from '@material-ui/core/Box';
+import Typography from '@material-ui/core/Typography';
+
+export default function Controls({ error, children }) {
   return (
-    <div className={classNames('controls', className)}>
-      {!!error && (
-        <div className="controls__error">
+    <Box>
+      {error && (
+        <Typography component="div">
           Not found. Check for errors and try again.
-        </div>
+        </Typography>
       )}
 
-      <div className="controls__body">
-        <div className="controls__buttons">{children}</div>
-      </div>
-    </div>
+      <Typography component="div">{children}</Typography>
+    </Box>
   );
 }
 Controls.propTypes = {
-  className: PropTypes.string,
   children: PropTypes.any,
   error: PropTypes.oneOfType([PropTypes.instanceOf(Error), PropTypes.string]),
 };
