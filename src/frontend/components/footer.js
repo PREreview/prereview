@@ -126,7 +126,7 @@ export default function Footer() {
                 <Link
                   className={classes.footerNavItem}
                   color="textPrimary"
-                  href="/api/docs"
+                  href="https://content.prereview.org/api"
                 >
                   API
                 </Link>
