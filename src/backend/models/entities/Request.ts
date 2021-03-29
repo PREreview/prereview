@@ -24,9 +24,10 @@ export class Request extends BaseEntity {
   @ManyToOne({ entity: () => Preprint })
   preprint!: Preprint;
 
+  //eslint-disable-next-line
   @Fixture(() => false)
   @Property()
-  isPreprintAuthor: boolean;
+  isPreprintAuthor: boolean = false;
 
   constructor(author: Persona, preprint: Preprint, isPreprintAuthor = false) {
     super();
