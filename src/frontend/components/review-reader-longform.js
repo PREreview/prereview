@@ -137,8 +137,8 @@ const LongformReviewReader = props => {
   };
 
   const Plaudits = () => {
-    return useScript(PLAUDITURL)
-  }
+    return useScript(PLAUDITURL);
+  };
 
   // comments
   const {
@@ -241,9 +241,7 @@ const LongformReviewReader = props => {
                   <Grid item xs={12} sm={2}>
                     <a href={`https://doi.org/${review.doi}`}>
                       <img
-                        src={`https://zenodo.org/badge/DOI/${
-                          review.doi
-                        }.svg`}
+                        src={`https://zenodo.org/badge/DOI/${review.doi}.svg`}
                       />
                     </a>
                   </Grid>

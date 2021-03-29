@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-// with thanks to https://usehooks.com/useScript/  
+// with thanks to https://usehooks.com/useScript/
 
 export default function useScript(src) {
   // Keep track of script status ("idle", "loading", "ready", "error")
@@ -26,9 +26,11 @@ export default function useScript(src) {
         scriptTag.setAttribute('data-status', 'loading');
         scriptTag.setAttribute('data-embedder-id', 'prereview');
 
-        let plauditDiv = document.getElementById('plaudits-div')
+        let plauditDiv = document.getElementById('plaudits-div');
 
-        plauditDiv ? plauditDiv.appendChild(scriptTag) : document.body.appendChild(scriptTag)
+        plauditDiv
+          ? plauditDiv.appendChild(scriptTag)
+          : document.body.appendChild(scriptTag);
 
         // Store status in attribute on script
         // This can be read by other instances of this hook
@@ -68,5 +70,5 @@ export default function useScript(src) {
     [src], // Only re-run effect if script src changes
   );
 
-  return <p>Endorsements</p>
+  return <p>Endorsements</p>;
 }
