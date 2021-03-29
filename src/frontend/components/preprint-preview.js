@@ -1,94 +1,188 @@
 // base imports
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 
 // utils
 import { getFormattedDatePosted } from '../utils/preprints';
-import {
-  createPreprintId,
-  decodePreprintId,
-  getCanonicalDoiUrl,
-  getCanonicalArxivUrl,
-} from '../../common/utils/ids.js';
+import { createPreprintId } from '../../common/utils/ids.js';
+
+// Material UI components
+import { makeStyles } from '@material-ui/core/styles';
+import Box from '@material-ui/core/Box';
+import Grid from '@material-ui/core/Grid';
+import Link from '@material-ui/core/Link';
+import Paper from '@material-ui/core/Paper';
+import Typography from '@material-ui/core/Typography';
 
 // components
-import Value from './value';
-import XLink from './xlink';
 
 // icons
-import { MdChevronRight } from 'react-icons/md';
-import ShellIcon from '../svgs/shell_icon.svg';
+import ChevronRightIcon from '@material-ui/icons/ChevronRight';
+
+const useStyles = makeStyles(theme => ({
+  activity: {
+    padding: 10,
+  },
+  activityItem: {
+    '&:not(:last-child)': {
+      borderRight: `2px solid ${theme.palette.secondary.light}`,
+      marginRight: 10,
+      paddingRight: 10,
+    },
+  },
+  activityPop: {
+    color: theme.palette.primary.main,
+    fontSize: '0.9rem',
+    fontWeight: 700,
+  },
+  authors: {
+    fontSize: '0.9rem',
+    fontStyle: 'italic',
+    marginBottom: 10,
+  },
+  button: {
+    color: '#000 !important',
+    fontSize: '1.2rem',
+    fontWeight: 600,
+    textTransform: 'none',
+    '&:hover': {
+      textDecoration: 'underline',
+    },
+  },
+  date: {
+    color: theme.palette.secondary.main,
+    fontSize: '1.2rem',
+    textAlign: 'right',
+  },
+  gridMain: {
+    borderBottom: `1px solid ${theme.palette.secondary.light}`,
+    cursor: 'pointer',
+    padding: 20,
+  },
+  gridSecondary: {},
+  icon: {
+    color: theme.palette.secondary.main,
+    height: 30,
+    position: 'absolute',
+    right: 0,
+    top: '50%',
+    transform: 'translateY(-50%)',
+    width: 30,
+  },
+  meta: {
+    color: theme.palette.secondary.main,
+    fontSize: '0.9rem',
+  },
+  paper: {
+    backgroundColor: theme.palette.secondary.light,
+    marginBottom: 10,
+    marginTop: 10,
+    width: '100%',
+  },
+  preprintServer: {
+    color: theme.palette.primary.main,
+    fontSize: '0.9rem',
+    fontWeight: 700,
+    paddingRight: 40,
+    position: 'relative',
+  },
+  title: {
+    color: '#000 !important',
+    display: 'block',
+    fontSize: '1.3rem',
+    fontWeight: 700,
+    marginBottom: 10,
+  },
+}));
 
 export default function PreprintPreview({ preprint }) {
+  const classes = useStyles();
+  const [elevation, setElevation] = useState(0);
   const preprintId = createPreprintId(preprint.handle);
-  const { id, scheme } = decodePreprintId(preprintId);
+  const publishedReviews = preprint.fullReviews.filter(
+    review => review.isPublished,
+  );
+
+  const handleHover = () => {
+    setElevation(elevation => (elevation ? 0 : 3));
+  };
+
+  const handleCardClick = () => {
+    history.push(`/preprints/${preprintId}`);
+  };
 
   return (
-    <div className="preprint-preview">
-      <div className="preprint-preview__header">
-        {preprint.title ? (
-          <XLink
-            href={`/preprints/${preprintId}`}
-            to={{
-              pathname: `/preprints/${preprintId}`,
-            }}
-            className="preprint-preview__hyperlink"
-          >
-            <Value className="preprint-preview__title" tagName="h2">
-              {preprint.title}
-            </Value>
-            <img
-              src={ShellIcon}
-              className="preprint-preview__shell-icon"
-              aria-hidden="true"
-              alt=""
-            />
-          </XLink>
-        ) : (
-          <Value className="preprint-preview__title" tagName="h2">
-            {preprint.title}
-          </Value>
-        )}
-
-        {preprint.datePosted ? (
-          <span className="preprint-preview__date">
+    <Paper
+      elevation={elevation}
+      square
+      className={classes.paper}
+      onMouseEnter={handleHover}
+      onMouseLeave={handleHover}
+    >
+      <Grid
+        onClick={handleCardClick}
+        container
+        direction="row-reverse"
+        justifyContent="space-between"
+        spacing={0}
+        className={classes.gridMain}
+      >
+        <Grid item xs={12} sm={4}>
+          <Typography className={classes.date}>
             {getFormattedDatePosted(preprint.datePosted)}
-          </span>
-        ) : (
-          ' '
-        )}
-      </div>
-
-      <div className="preprint-preview__info">
-        {preprint.preprintServer ? (
-          <Value className="preprint-preview__server" tagName="span">
-            {preprint.preprintServer}
-          </Value>
-        ) : (
-          ' '
-        )}
-        <MdChevronRight className="preprint-preview__server-arrow-icon" />
-        <span className="preprint-preview__id">
-          {preprint.handle && scheme === 'doi' ? (
-            <a
-              href={`${getCanonicalDoiUrl(id)}`}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {id}
-            </a>
-          ) : (
-            <a
-              href={`${getCanonicalArxivUrl(id)}`}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {id}
-            </a>
-          )}
-        </span>
-      </div>
-    </div>
+          </Typography>
+        </Grid>
+        <Grid item xs={12} sm={8}>
+          <Typography>
+            <Link href={`/preprints/${preprintId}`} className={classes.title}>
+              {preprint.title}
+            </Link>
+          </Typography>
+          <Typography>
+            <span className={classes.preprintServer}>
+              {preprint.preprintServer}
+              <ChevronRightIcon className={classes.icon} />
+            </span>
+            <span className={classes.meta}>{preprint.handle}</span>
+          </Typography>
+        </Grid>
+      </Grid>
+      <Box
+        container
+        alignItems="center"
+        justifyContent="space-between"
+        className={classes.gridSecondary}
+      >
+        <Grid container xs={12} sm={10} className={classes.activity}>
+          <Grid item className={`${classes.activityItem} ${classes.meta}`}>
+            <Typography component="div" variant="body1">
+              <span className={classes.activityPop}>
+                {preprint.rapidReviews.length}
+              </span>{' '}
+              rapid reviews
+            </Typography>
+          </Grid>
+          <Grid item className={`${classes.activityItem} ${classes.meta}`}>
+            <Typography component="div" variant="body1">
+              <span className={classes.activityPop}>
+                {publishedReviews && publishedReviews.length
+                  ? publishedReviews.length
+                  : 0}
+              </span>{' '}
+              longform reviews
+            </Typography>
+          </Grid>
+          <Grid item className={`${classes.activityItem} ${classes.meta}`}>
+            <Typography component="div" variant="body1">
+              <span className={classes.activityPop}>
+                {preprint.requests.length}
+              </span>{' '}
+              requests
+            </Typography>
+          </Grid>
+        </Grid>
+      </Box>
+    </Paper>
   );
 }
 PreprintPreview.propTypes = {

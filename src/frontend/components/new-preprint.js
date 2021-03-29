@@ -139,8 +139,6 @@ function StepPreprint({
     setValue(value);
   };
 
-  console.log(error);
-
   return (
     <Box className={classes.box}>
       <Typography component="div" variant="body2" gutterBottom>
