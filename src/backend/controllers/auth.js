@@ -166,7 +166,7 @@ export default function controller(
           }
         } catch (err) {
           log.error(
-            `Failed resolving user ${profile.orcid}'s emails from ORCID's 
+            `Failed resolving user ${profile.orcid}'s emails from ORCID's
             public API: ${err}.`,
           );
         }
@@ -252,7 +252,7 @@ export default function controller(
             ctx.login(user);
 
             if (user.isNew) {
-              ctx.redirect('/settings');
+              ctx.redirect(`about/${user.uuid}`);
               return;
             }
 

@@ -17,10 +17,8 @@ import UserProvider from '../contexts/user-context';
 import { StoresProvider } from '../contexts/store-context';
 
 // components
-import About from './about';
 import AdminPanel from './admin-panel';
 import BlockPanel from './block-panel';
-import CodeOfConduct from './code-of-conduct';
 import Community from './Community';
 import Communities from './Communities';
 import CommunityPanel from './community-panel';
@@ -42,9 +40,6 @@ import SettingsTemplates from './settings-templates';
 import SuspenseLoading from './suspense-loading';
 import PersonaSearch from './PersonaSearch';
 import Validate from './Validate';
-
-// constants
-import API from './api';
 
 // Material UI customized theme
 import theme from '../theme.js';
@@ -96,103 +91,85 @@ export default function App({ user }) {
                   <Logout />
                 </Route>
 
-                <Route exact={true} path="/about">
-                  <ToCPage>
-                    <About />
-                  </ToCPage>
-                </Route>
-
                 <Route exact={true} path="/dashboard/:new(new)?">
                   <Dashboard />
                 </Route>
 
-                <Route exact={true} path="/code-of-conduct">
-                  <ToCPage>
-                    <CodeOfConduct />
-                  </ToCPage>
+                <Route exact={true} path="/reviews/:new(new)?">
+                  <Reviews />
+                </Route>
+                <Route exact={true} path="/personas">
+                  <PersonaSearch />
+                </Route>
+                <Route exact={true} path="/about/:id">
+                  <Profile />
+                </Route>
+                <Route exact={true} path="/extension">
+                  <ExtensionSplash />
+                </Route>
+                <PrivateRoute exact={true} path="/settings/api">
+                  <SettingsAPI />
+                </PrivateRoute>
+                <PrivateRoute exact={true} path="/settings/drafts">
+                  <SettingsDrafts />
+                </PrivateRoute>
+                <AdminRoute exact={true} path="/admin">
+                  <AdminPanel />
+                </AdminRoute>
+                <AdminRoute exact={true} path="/block">
+                  <BlockPanel />
+                </AdminRoute>
+                <AdminRoute exact={true} path="/templates">
+                  <SettingsTemplates />
+                </AdminRoute>
+                <Route exact={true} path="/community-settings/:id">
+                  <CommunityPanel />
+                </Route>
+                <ModeratorRoute exact={true} path="/moderate">
+                  <Suspense fallback={<SuspenseLoading>Loading</SuspenseLoading>}>
+                    <Moderate />
+                  </Suspense>
+                </ModeratorRoute>
+                <Route
+                  exact={true}
+                  path="/preprints/:id"
+                >
+                  <ExtensionFallback />
+                </Route>
+                <Route
+                  exact={true}
+                  path="/communities/"
+                  >
+                  <Communities />
+                </Route>
+                <Route
+                  exact={true}
+                  path="/communities/:id"
+                  >
+                  <Community />
                 </Route>
 
-                <Route exact={true} path="/api">
-                  <ToCPage>
-                    <API />
-                  </ToCPage>
+                <Route
+                  exact={true}
+                  path="/events/:id"
+                  >
+                  <Event />
                 </Route>
 
-              <Route exact={true} path="/reviews/:new(new)?">
-                <Reviews />
-              </Route>
-              <Route exact={true} path="/personas">
-                <PersonaSearch />
-              </Route>
-              <Route exact={true} path="/about/:id">
-                <Profile />
-              </Route>
-              <Route exact={true} path="/extension">
-                <ExtensionSplash />
-              </Route>
-              <PrivateRoute exact={true} path="/settings/api">
-                <SettingsAPI />
-              </PrivateRoute>
-              <PrivateRoute exact={true} path="/settings/drafts">
-                <SettingsDrafts />
-              </PrivateRoute>
-              <AdminRoute exact={true} path="/admin">
-                <AdminPanel />
-              </AdminRoute>
-              <AdminRoute exact={true} path="/block">
-                <BlockPanel />
-              </AdminRoute>
-              <AdminRoute exact={true} path="/templates">
-                <SettingsTemplates />
-              </AdminRoute>
-              <Route exact={true} path="/community-settings/:id">
-                <CommunityPanel />
-              </Route>
-              <ModeratorRoute exact={true} path="/moderate">
-                <Suspense fallback={<SuspenseLoading>Loading</SuspenseLoading>}>
-                  <Moderate />
-                </Suspense>
-              </ModeratorRoute>
-              <Route
-                exact={true}
-                path="/preprints/:id"
-              >
-                <ExtensionFallback />
-              </Route>
-              <Route
-                exact={true}
-                path="/communities/"
+                <Route
+                  exact={true}
+                  path="/preprints/:id/reviews/:cid?"
                 >
-                <Communities />
-              </Route>
-              <Route
-                exact={true}
-                path="/communities/:id"
-                >
-                <Community />
-              </Route>
+                  <ExtensionFallback />
+                </Route>
+                <Route
+                  exact={true}
+                  path="/validate/:token"
+                  >
+                  <Validate />
+                </Route>
 
-              <Route
-                exact={true}
-                path="/events/:id"
-                >
-                <Event />
-              </Route>
-
-              <Route
-                exact={true}
-                path="/preprints/:id/reviews/:cid?"
-              >
-                <ExtensionFallback />
-              </Route>
-              <Route
-                exact={true}
-                path="/validate/:token"
-                >
-                <Validate />
-              </Route>
-
-              <Route>
+                <Route>
                 <NotFound />
               </Route>
             </Switch>
@@ -206,8 +183,5 @@ export default function App({ user }) {
 
 App.propTypes = {
   // `null` if user is not logged in
-  user: PropTypes.shape({
-    '@id': PropTypes.string,
-    hasRole: PropTypes.array,
-  }),
+  user: PropTypes.object,
 };

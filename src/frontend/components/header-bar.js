@@ -21,7 +21,7 @@ import UserBadge from './user-badge';
 
 // icons
 import MenuIcon from '@material-ui/icons/Menu';
-import PreReviewLogo from './pre-review-logo';
+import preReviewLogo from '../svgs/prereview-logo.svg';
 
 const useStyles = makeStyles(theme => ({
   content: {
@@ -32,6 +32,11 @@ const useStyles = makeStyles(theme => ({
   },
   headerBar: {
     boxShadow: '0 0 5px #000',
+  },
+  img: {
+    display: 'block',
+    maxWidth: 200,
+    width: '100%',
   },
   mobileNav: {
     marginLeft: 'auto',
@@ -152,7 +157,7 @@ export default function HeaderBar({ thisUser }) {
                 </Link>
               </Typography>
               <Link to="/" href={homeLink}>
-                <PreReviewLogo />
+                <img src={preReviewLogo} className={classes.img} />
               </Link>
             </Box>
           </Grid>

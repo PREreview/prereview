@@ -11,6 +11,12 @@ const theme = createMuiTheme({
         position: 'relative',
       },
     },
+    MuiLink: {
+      root: {
+        color: '#FF3333',
+        fontFamily: ['Open Sans', 'sans-serif'],
+      },
+    },
   },
   palette: {
     primary: {

@@ -1,30 +1,39 @@
 // base imports
 import React from 'react';
 import PropTypes from 'prop-types';
-import classNames from 'classnames';
 import Tooltip from '@reach/tooltip';
 
 // material UI
 import { makeStyles, withStyles } from '@material-ui/core/styles';
+import Box from '@material-ui/core/Box';
+import IconButton from '@material-ui/core/IconButton';
+import Link from '@material-ui/core/Link';
 import MuiAvatar from '@material-ui/core/Avatar';
 import Popover from '@material-ui/core/Popover';
-
-// components
-//import Avatar from './avatar';
-import NoticeBadge from './notice-badge';
-import XLink from './xlink';
+import Typography from '@material-ui/core/Typography';
 
 // icons
-import { MdPerson } from 'react-icons/md';
+import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
 
 const Avatar = withStyles({
   root: {
     height: 28,
     width: 28,
-  }
+  },
 })(MuiAvatar);
 
 const useStyles = makeStyles(theme => ({
+  box: {
+    position: 'relative',
+  },
+  icon: {
+    height: 12,
+    position: 'absolute',
+    right: 0,
+    top: 0,
+    width: 12,
+    zIndex: 10,
+  },
   popover: {
     zIndex: '20000 !important',
   },
@@ -68,11 +77,10 @@ export default RoleBadge;
  * Non hooked version (handy for story book and `UserBadge`)
  */
 const RoleBadgeUI = React.forwardRef(function RoleBadgeUI(
-  { user, className, children, tooltip, showNotice = false, disabled = false },
+  { user, children, tooltip, showNotice = false },
   ref,
 ) {
-
-// ****  USER IN THIS COMPONENT IS ACTUALLY A PERSONA OBJECT **** //
+  // ****  USER IN THIS COMPONENT IS ACTUALLY A PERSONA OBJECT **** //
 
   const classes = useStyles();
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -90,24 +98,20 @@ const RoleBadgeUI = React.forwardRef(function RoleBadgeUI(
 
   return (
     <>
-      <div className="role-badge-menu-container">
-        {showNotice && <NoticeBadge />}
-        <button
-          type="button"
+      <Box className={classes.box}>
+        {showNotice && <ErrorOutlineIcon className={classes.icon} />}
+        <IconButton
           aria-describedby={id}
           variant="contained"
           color="primary"
           onClick={handleClick}
-          className={classNames('role-badge-menu', className)}
         >
-          <span data-expands-text="Close" className="vh">
-            Open
-          </span>
+          <Typography variant="srOnly">Open</Typography>
           <Tooltipify tooltip={tooltip} user={user}>
             <Avatar src={user.avatar} ref={ref} />
           </Tooltipify>
-        </button>
-      </div>
+        </IconButton>
+      </Box>
       <Popover
         id={id}
         open={open}
@@ -124,11 +128,9 @@ const RoleBadgeUI = React.forwardRef(function RoleBadgeUI(
         className={classes.popover}
       >
         <div className={classes.popoverInner}>
-          <XLink
-            className="menu__list__link-item"
-            href={`/about/${user.uuid}`}
+          <Link
             target={process.env.IS_EXTENSION ? '_blank' : undefined}
-            to={
+            href={
               process.env.IS_EXTENSION
                 ? undefined
                 : `/about/${
@@ -139,7 +141,7 @@ const RoleBadgeUI = React.forwardRef(function RoleBadgeUI(
             {user && user.defaultPersona
               ? `View Profile ${user.defaultPersona.name}`
               : `View Profile ${user.name}`}
-          </XLink>
+          </Link>
           {children}
         </div>
       </Popover>
@@ -159,7 +161,6 @@ RoleBadgeUI.propTypes = {
     avatar: PropTypes.oneOfType([PropTypes.object, PropTypes.string]),
   }),
   children: PropTypes.any,
-  className: PropTypes.string,
   disabled: PropTypes.bool,
 };
 

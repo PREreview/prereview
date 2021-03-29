@@ -48,9 +48,6 @@ import WelcomeModal from './welcome-modal';
 import { ORG } from '../constants';
 
 const useStyles = makeStyles(theme => ({
-  link: {
-    color: `${theme.palette.primary.main} !important`,
-  },
   listItem: {
     paddingLeft: 0,
     paddingRight: 0,

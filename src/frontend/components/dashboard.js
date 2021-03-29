@@ -51,9 +51,6 @@ const useStyles = makeStyles(theme => ({
     borderRadius: 50,
     border: `1px solid ${theme.palette.secondary.light}`,
   },
-  link: {
-    color: `${theme.palette.primary.main} !important`,
-  },
   listItem: {
     paddingLeft: 0,
     paddingRight: 0,
@@ -301,10 +298,9 @@ export default function Dashboard() {
                     preprints.totalCount <= 0 &&
                     !loadingPreprints) ? (
                     <div>
-                      No preprints about this topic have been added to Rapid
+                      No preprints about this topic have been added to
                       PREreview.{' '}
                       <Link
-                        className={classes.link}
                         href="/dashboard/new"
                         onClick={() => {
                           setSearch('');

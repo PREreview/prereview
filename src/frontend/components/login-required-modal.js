@@ -27,9 +27,6 @@ const useStyles = makeStyles(theme => ({
   dialog: {
     overflowX: 'hidden !important',
   },
-  link: {
-    color: `${theme.palette.primary.main} !important`,
-  },
   linkContainer: {
     marginTop: 20,
   },
@@ -91,9 +88,7 @@ export default function LoginRequiredModal({ onClose, open }) {
             variant="body2"
             className={classes.linkContainer}
           >
-            <Link href={url} className={classes.link}>
-              Log in or sign up for an account
-            </Link>
+            <Link href={url}>Log in or sign up for an account</Link>
           </Typography>
         </Box>
       </Box>
