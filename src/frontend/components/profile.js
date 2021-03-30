@@ -24,10 +24,16 @@ import {
   withStyles,
   createMuiTheme,
 } from '@material-ui/core/styles';
+import Accordion from '@material-ui/core/Accordion';
+import AccordionSummary from '@material-ui/core/AccordionSummary';
+import AccordionDetails from '@material-ui/core/AccordionDetails';
 import Avatar from '@material-ui/core/Avatar';
 import Box from '@material-ui/core/Box';
+import Card from '@material-ui/core/Card';
+import CardContent from '@material-ui/core/CardContent';
 import Chip from '@material-ui/core/Chip';
 import Container from '@material-ui/core/Container';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import IconButton from '@material-ui/core/IconButton';
 import Input from '@material-ui/core/Input';
@@ -144,6 +150,14 @@ export default function Profile() {
 
   const [displayedPersona, setDisplayedPersona] = useState(null);
   const [selectedPersona, setSelectedPersona] = useState(null);
+
+  displayedPersona && !displayedPersona.isAnonymous
+    ? console.log(
+        'persona user',
+        displayedPersona.name,
+        displayedPersona.identity,
+      )
+    : console.log('no persona yet');
 
   const [editMode, setEditMode] = useState(false);
   const handleEdit = () => {
@@ -593,31 +607,49 @@ export default function Profile() {
             {editMode ? null : (
               <Box>
                 <Container>
-                  <Typography component="h2" variant="h6" gutterBottom>
-                    PREreview Communities
-                  </Typography>
-                  <Grid>
-                    {communities.map(community => {
-                      return (
-                        <Chip
-                          key={community.uuid}
-                          label={community.name}
-                          variant="outlined"
-                          href={`/communities/${community.slug}`}
-                          component="a"
-                          target="_blank"
-                          clickable
-                        />
-                      );
-                    })}
-                  </Grid>
-                  <Typography component="h2" variant="h6" gutterBottom>
-                    PREreview Contributions
-                  </Typography>
-                  <RoleActivity persona={displayedPersona} />
-                  <Typography component="h2" variant="h6" gutterBottom>
-                    List of Publications
-                  </Typography>
+                  <Accordion>
+                    <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                      <Typography component="h2" variant="h6" gutterBottom>
+                        PREreview Communities
+                      </Typography>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                      <Grid>
+                        {communities.map(community => {
+                          return (
+                            <Chip
+                              key={community.uuid}
+                              label={community.name}
+                              variant="outlined"
+                              href={`/communities/${community.slug}`}
+                              component="a"
+                              target="_blank"
+                              clickable
+                            />
+                          );
+                        })}
+                      </Grid>
+                    </AccordionDetails>
+                  </Accordion>
+                  <Accordion>
+                    <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                      <Typography component="h2" variant="h6" gutterBottom>
+                        PREreview Contributions
+                      </Typography>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                      <Grid>
+                        <RoleActivity persona={displayedPersona} />
+                      </Grid>
+                    </AccordionDetails>
+                  </Accordion>
+                  <Accordion>
+                    <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                      <Typography component="h2" variant="h6" gutterBottom>
+                        List of Publications
+                      </Typography>
+                    </AccordionSummary>
+                  </Accordion>
                 </Container>
               </Box>
             )}
