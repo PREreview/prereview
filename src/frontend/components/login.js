@@ -7,7 +7,6 @@ import { useHistory } from 'react-router-dom';
 import UserProvider from '../contexts/user-context';
 
 // components
-import Banner from './banner';
 import HeaderBar from './header-bar';
 import JoinModal from './join-modal';
 import LoginModal from './login-modal';

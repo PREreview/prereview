@@ -401,7 +401,7 @@ export default function ReviewStepper({
             setReviewId(response.body.uuid);
             onReviewChange(response.body);
             return history.push(
-              `${location.pathname}/reviews/${response.body.uuid}`,
+              `${location.pathname}/drafts/${response.body.uuid}`,
             );
           })
           .catch(err => alert(`An error occurred: ${err.message}`));
