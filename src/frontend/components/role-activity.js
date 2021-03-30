@@ -48,7 +48,7 @@ export default function RoleActivity({ persona }) {
       ) : null}
 
       {!activity || !activity.length ? (
-        <div>No activity yet.</div>
+        <div>{persona.name} hasn't yet reviewed or requested reviews for preprints.</div>
       ) : (
         <section className="role-activity__history">
           <ul className="role-activity__list">

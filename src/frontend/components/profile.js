@@ -151,14 +151,6 @@ export default function Profile() {
   const [displayedPersona, setDisplayedPersona] = useState(null);
   const [selectedPersona, setSelectedPersona] = useState(null);
 
-  displayedPersona && !displayedPersona.isAnonymous
-    ? console.log(
-        'persona user',
-        displayedPersona.name,
-        displayedPersona.identity,
-      )
-    : console.log('no persona yet');
-
   const [editMode, setEditMode] = useState(false);
   const handleEdit = () => {
     setEditMode(true);
@@ -248,6 +240,8 @@ export default function Profile() {
     displayedPersona && displayedPersona.communities
       ? displayedPersona.communities
       : [];
+  const works =
+    displayedPersona && displayedPersona.works ? displayedPersona.works : [];
   const [bio, setBio] = useState(
     displayedPersona && displayedPersona.bio ? displayedPersona.bio : '',
   );
@@ -610,31 +604,35 @@ export default function Profile() {
                   <Accordion>
                     <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                       <Typography component="h2" variant="h6" gutterBottom>
-                        PREreview Communities
+                        PREreview communities
                       </Typography>
                     </AccordionSummary>
                     <AccordionDetails>
                       <Grid>
-                        {communities.map(community => {
-                          return (
-                            <Chip
-                              key={community.uuid}
-                              label={community.name}
-                              variant="outlined"
-                              href={`/communities/${community.slug}`}
-                              component="a"
-                              target="_blank"
-                              clickable
-                            />
-                          );
-                        })}
+                        {communities.length > 0
+                          ? communities.map(community => {
+                              return (
+                                <Chip
+                                  key={community.uuid}
+                                  label={community.name}
+                                  variant="outlined"
+                                  href={`/communities/${community.slug}`}
+                                  component="a"
+                                  target="_blank"
+                                  clickable
+                                />
+                              );
+                            })
+                          : `${
+                              displayedPersona.name
+                            } hasn't joined any communities yet.`}
                       </Grid>
                     </AccordionDetails>
                   </Accordion>
                   <Accordion>
                     <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                       <Typography component="h2" variant="h6" gutterBottom>
-                        PREreview Contributions
+                        PREreview contributions
                       </Typography>
                     </AccordionSummary>
                     <AccordionDetails>
@@ -646,9 +644,32 @@ export default function Profile() {
                   <Accordion>
                     <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                       <Typography component="h2" variant="h6" gutterBottom>
-                        List of Publications
+                        Publications
                       </Typography>
                     </AccordionSummary>
+                    <AccordionDetails>
+                      <Grid>
+                        {works.length > 0
+                          ? works.map(work => {
+                            return (
+                              <Card>
+                                <CardContent>
+                                  <Typography
+                                    className={classes.title}
+                                    color="textSecondary"
+                                    gutterBottom
+                                  >
+                                    {`${work.title}`}
+                                  </Typography>
+                                </CardContent>
+                              </Card>
+                            )}
+                            )
+                          : `${
+                              displayedPersona.name
+                            } has no publications connected to their ORCiD account.`}
+                      </Grid>
+                    </AccordionDetails>
                   </Accordion>
                 </Container>
               </Box>
