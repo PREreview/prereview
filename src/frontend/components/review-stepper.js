@@ -623,14 +623,19 @@ export default function ReviewStepper({
         return (
           <Box mt={2}>
             <Box className={classes.red}>
-              <Typography variant="button" display="block" gutterBottom>
+              <Typography
+                component="div"
+                variant="button"
+                display="block"
+                gutterBottom
+              >
                 Instructions
               </Typography>
-              <Typography variant="body2" gutterBottom>
+              <Typography component="div" variant="body2" gutterBottom>
                 Use the space below to compose your long-form review. For
                 guidance, you can load one of our templates.
               </Typography>
-              <Typography variant="body2" gutterBottom>
+              <Typography component="div" variant="body2" gutterBottom>
                 Please remember to be constructive and to abide by the{' '}
                 <Link
                   href="https://content.prereview.org/coc/"
@@ -830,7 +835,9 @@ export default function ReviewStepper({
             const buttonProps = {};
             if (isStepOptional(index)) {
               buttonProps.optional = (
-                <Typography variant="caption">Optional</Typography>
+                <Typography component="div" variant="caption">
+                  Optional
+                </Typography>
               );
             }
             if (isStepSkipped(index)) {

@@ -195,7 +195,7 @@ export default function PreprintCard({
         onClick={handleCardClick}
         container
         direction="row-reverse"
-        justifyContent="space-between"
+        justifycontent="space-between"
         spacing={0}
         className={classes.gridMain}
       >
@@ -231,7 +231,7 @@ export default function PreprintCard({
           <Grid
             container
             alignItems="center"
-            justifyContent="space-between"
+            justifycontent="space-between"
             className={classes.gridSecondary}
           >
             <Grid container item xs={12} sm={10} className={classes.activity}>

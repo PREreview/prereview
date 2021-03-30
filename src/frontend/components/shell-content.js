@@ -390,26 +390,6 @@ function ShellContentReviews({
 }) {
   return cid ? (
     review ? (
-      <div className="shell-content-review">
-        <ReviewStepper
-          preprint={preprint}
-          disabled={disabled}
-          onClose={onClose}
-          onContentChange={onContentChange}
-          hasRapidReviewed={hasRapidReviewed}
-          hasLongReviewed={hasLongReviewed}
-          content={initialContent}
-          review={review}
-          onReviewChange={onReviewChange}
-        />
-      </div>
-    ) : (
-      <Typography component="div" variant="body2">
-        Sorry, you are not authorized to contribute to this review.
-      </Typography>
-    )
-  ) : (
-    <div className="shell-content-review">
       <ReviewStepper
         preprint={preprint}
         disabled={disabled}
@@ -421,7 +401,23 @@ function ShellContentReviews({
         review={review}
         onReviewChange={onReviewChange}
       />
-    </div>
+    ) : (
+      <Typography component="div" variant="body2">
+        Sorry, you are not authorized to contribute to this review.
+      </Typography>
+    )
+  ) : (
+    <ReviewStepper
+      preprint={preprint}
+      disabled={disabled}
+      onClose={onClose}
+      onContentChange={onContentChange}
+      hasRapidReviewed={hasRapidReviewed}
+      hasLongReviewed={hasLongReviewed}
+      content={initialContent}
+      review={review}
+      onReviewChange={onReviewChange}
+    />
   );
 }
 ShellContentReviews.propTypes = {

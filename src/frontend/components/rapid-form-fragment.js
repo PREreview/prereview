@@ -1,34 +1,32 @@
+// base imports
 import React, { useState } from 'react';
-import { makeStyles, withStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
 
 // MaterialUI components
+import { makeStyles, withStyles } from '@material-ui/core/styles';
+import IconButton from '@material-ui/core/IconButton';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
+import TextField from '@material-ui/core/TextField';
+import Typography from '@material-ui/core/Typography';
+
+// components
+import Value from './value';
+import YesNoQuestion from './yes-no-question';
 
 // icons
-import { MdHelpOutline } from 'react-icons/md';
+import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
 
 // constants
 import { QUESTIONS } from '../constants';
 
-// components
-import Value from './value';
-import RadioButton from './radio-button';
-import IconButton from './icon-button';
-import Collapse from './collapse';
-
 const StyledTableCell = withStyles(() => ({
   root: {
     borderBottom: 'none',
-  },
-  body: {
-    fontSize: 14,
-    // minWidth: '250px',
   },
 }))(TableCell);
 
@@ -45,6 +43,22 @@ const StyledTableRow = withStyles(theme => ({
 }))(TableRow);
 
 const useStyles = makeStyles({
+  absolute: {
+    left: 0,
+    minWidth: 300,
+    position: 'absolute',
+    top: '50%',
+    transform: 'translateY(-50%)',
+  },
+  help: {
+    position: 'absolute',
+    right: '-40px',
+    top: '50%',
+    transform: 'translateY(-50%)',
+  },
+  question: {
+    position: 'relative',
+  },
   relative: {
     position: 'relative',
   },
@@ -59,8 +73,8 @@ const useStyles = makeStyles({
 export default function RapidFormFragment({ answerMap = {}, onChange }) {
   const classes = useStyles();
 
-  function handleChange(key, value) {
-    onChange(key, value);
+  function handleChange(event, value) {
+    onChange(event.target.value, value);
   }
 
   const [isOpenedMap, setIsOpenedMap] = useState(
@@ -69,6 +83,8 @@ export default function RapidFormFragment({ answerMap = {}, onChange }) {
       return map;
     }, {}),
   );
+
+  // useEffect(() => {}, [selectedValue]);
 
   return (
     <div className="rapid-form-fragment">
@@ -81,12 +97,28 @@ export default function RapidFormFragment({ answerMap = {}, onChange }) {
           <TableHead>
             <TableRow>
               <StyledTableCell>
-                <div className="vh">Question</div>
+                <Typography variant="srOnly">Question</Typography>
               </StyledTableCell>
-              <StyledTableCell align="left">Yes</StyledTableCell>
-              <StyledTableCell align="left">No</StyledTableCell>
-              <StyledTableCell align="left">N/A</StyledTableCell>
-              <StyledTableCell align="left">Unsure</StyledTableCell>
+              <StyledTableCell align="right">
+                <Typography component="div" variant="body1">
+                  Yes
+                </Typography>
+              </StyledTableCell>
+              <StyledTableCell align="center">
+                <Typography component="div" variant="body1">
+                  No
+                </Typography>
+              </StyledTableCell>
+              <StyledTableCell align="center">
+                <Typography component="div" variant="body1">
+                  N/A
+                </Typography>
+              </StyledTableCell>
+              <StyledTableCell align="center">
+                <Typography component="div" variant="body1">
+                  Unsure
+                </Typography>
+              </StyledTableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -94,89 +126,13 @@ export default function RapidFormFragment({ answerMap = {}, onChange }) {
               const answer = answerMap[identifier];
               return type == 'YesNoQuestion' ? (
                 <StyledTableRow key={identifier}>
-                  <StyledTableCell
-                    component="th"
-                    scope="row"
-                    className="radid-form-fragment__question"
-                  >
-                    <Value tagName="p">{question}</Value>
-
-                    {!!help && (
-                      <IconButton
-                        className="radid-form-fragment__help"
-                        onClick={e => {
-                          e.preventDefault();
-                          setIsOpenedMap(
-                            Object.assign({}, isOpenedMap, {
-                              [identifier]: !isOpenedMap[identifier],
-                            }),
-                          );
-                        }}
-                      >
-                        <MdHelpOutline />
-                      </IconButton>
-                    )}
-                    <Collapse isOpened={isOpenedMap[identifier]}>
-                      <Value
-                        tagName="p"
-                        className="rapid-form-fragment__help-text"
-                      >
-                        {help}
-                      </Value>
-                    </Collapse>
-                  </StyledTableCell>
-                  <StyledTableCell align="right">
-                    <RadioButton
-                      required={required}
-                      inputId={`question-${identifier}-yes`}
-                      name={identifier}
-                      value="yes"
-                      checked={answer === 'yes'}
-                      onChange={() => {
-                        handleChange(identifier, 'yes');
-                      }}
-                      label="Yes"
-                    />
-                  </StyledTableCell>
-                  <StyledTableCell align="right">
-                    <RadioButton
-                      required={required}
-                      inputId={`question-${identifier}-no`}
-                      name={identifier}
-                      value="no"
-                      checked={answer === 'no'}
-                      onChange={() => {
-                        handleChange(identifier, 'no');
-                      }}
-                      label="No"
-                    />
-                  </StyledTableCell>
-                  <StyledTableCell align="right">
-                    <RadioButton
-                      required={required}
-                      inputId={`question-${identifier}-na`}
-                      name={identifier}
-                      value="N/A"
-                      checked={answer === 'N/A'}
-                      onChange={() => {
-                        handleChange(identifier, 'N/A');
-                      }}
-                      label={<abbr title="Not Applicable">N/A</abbr>}
-                    />
-                  </StyledTableCell>
-                  <StyledTableCell align="right">
-                    <RadioButton
-                      required={required}
-                      inputId={`question-${identifier}-unsure`}
-                      name={identifier}
-                      value="unsure"
-                      checked={answer === 'unsure'}
-                      onChange={() => {
-                        handleChange(identifier, 'unsure');
-                      }}
-                      label="Unsure"
-                    />
-                  </StyledTableCell>
+                  <YesNoQuestion
+                    identifier={identifier}
+                    question={question}
+                    help={help}
+                    required={required}
+                    onChange={onChange}
+                  />
                 </StyledTableRow>
               ) : (
                 <StyledTableRow key={identifier} className={classes.textAnswer}>
@@ -185,7 +141,9 @@ export default function RapidFormFragment({ answerMap = {}, onChange }) {
                     scope="row"
                     className="radid-form-fragment__question"
                   >
-                    <Value tagName="p">{question}</Value>
+                    <Typography component="p" variant="body1">
+                      {question}
+                    </Typography>
 
                     {!!help && (
                       <IconButton
@@ -199,18 +157,19 @@ export default function RapidFormFragment({ answerMap = {}, onChange }) {
                           );
                         }}
                       >
-                        <MdHelpOutline />
+                        <HelpOutlineIcon />
                       </IconButton>
                     )}
                   </StyledTableCell>
                   <StyledTableCell align="right" className={classes.relative}>
-                    <input
-                      type="text"
-                      required={required}
-                      className="radid-form-fragment__text-answer"
+                    <TextField
+                      fullWidth
+                      className={classes.absolute}
                       id={`question-${identifier}`}
                       name={identifier}
                       value={answer || ''}
+                      variant="outlined"
+                      required={required}
                       onChange={e => {
                         handleChange(identifier, e.target.value);
                       }}

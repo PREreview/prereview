@@ -309,7 +309,10 @@ const ReviewReader = React.memo(function ReviewReader({
                                 aria-controls={`review-content-${review.uuid}`}
                                 id={`review-header-${review.uuid}`}
                               >
-                                <Typography className={classes.h4}>
+                                <Typography
+                                  component="div"
+                                  className={classes.h4}
+                                >
                                   {review.authors.length ? (
                                     <>
                                       {review.authors.length >= 2 ? (
@@ -345,6 +348,8 @@ const ReviewReader = React.memo(function ReviewReader({
                                 <Typography
                                   className={`${classes.h4} ${classes.date}`}
                                   align="right"
+                                  component="div"
+                                  variant="body2"
                                 >
                                   {reviewDate.toLocaleDateString('en-US')}
                                 </Typography>

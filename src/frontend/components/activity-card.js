@@ -147,7 +147,7 @@ export default function ActivityCard({ activity }) {
           onClick={handleCardClick}
           container
           direction="row-reverse"
-          justifyContent="space-between"
+          justifycontent="space-between"
           spacing={0}
           className={classes.gridMain}
         >
@@ -185,7 +185,7 @@ export default function ActivityCard({ activity }) {
         <Box
           container
           alignItems="center"
-          justifyContent="space-between"
+          justifycontent="space-between"
           className={classes.gridSecondary}
         >
           <Grid container xs={12} sm={10} className={classes.activity}>
