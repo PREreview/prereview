@@ -84,6 +84,7 @@ const Communities = () => {
             </Typography>
             <SearchBar
               defaultValue={search}
+              placeholderValue="Search communities by name, description, members, events, or preprints"
               isFetching={loading}
               onChange={value => {
                 params.delete('page');

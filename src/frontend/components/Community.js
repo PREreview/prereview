@@ -230,7 +230,11 @@ export default function Community(props) {
           <Box bgcolor="rgba(229, 229, 229, 0.35)">
             <Container>
               <Box p={4}>
-                {(user && community.owners.some(owner => user.personas.some(persona => persona.uuid === owner.uuid))) || (user && user.isAdmin) ? (
+                {(user &&
+                  community.owners.some(owner =>
+                    user.personas.some(persona => persona.uuid === owner.uuid),
+                  )) ||
+                (user && user.isAdmin) ? (
                   <IconButton
                     href={`/community-settings/${community.uuid}`}
                     className={classes.settings}
@@ -487,7 +491,7 @@ function CommunityEvents({ community, events }) {
           <Typography variant="subtitle1" color="textSecondary" />
         </Box>
         <Grid container spacing={2} direction="column">
-          {events.slice(0,3).map(event => {
+          {events.slice(0, 3).map(event => {
             return (
               <Link
                 key={event.uuid}
@@ -641,8 +645,9 @@ function CommunityContent({ thisUser, community, params }) {
   } else {
     return (
       <Box>
-        <CommunitySearch
+        <SearchBar
           defaultValue={search}
+          placeholderValue="Search preprints in this community by title, author, abstract, DOI, or arXiv ID"
           isFetching={loadingPreprints}
           onChange={value => {
             params.delete('page');

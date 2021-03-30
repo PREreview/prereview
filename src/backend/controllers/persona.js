@@ -127,13 +127,19 @@ export default function controller(
 
         if (ctx.query.badges) {
           const badges = ctx.query.badges.split(',');
-          queries.push({ badges: { uuid: { $in: badges } } });
+          queries.push({
+            $or: [
+              { badges: { name: { $in: badges } } },
+              { badges: { uuid: { $in: badges } } },
+            ],
+          });
         }
 
         if (ctx.query.communities) {
           const communities = ctx.query.communities.split(',');
           queries.push({
             $or: [
+              { communities: { name: { $in: communities } } },
               { communities: { uuid: { $in: communities } } },
               { communities: { slug: { $in: communities } } },
             ],

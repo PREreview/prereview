@@ -1,7 +1,7 @@
 // base imports
 import React, { useContext, useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { useParams, useHistory, useLocation } from 'react-router-dom';
+import { useParams, useHistory } from 'react-router-dom';
 import { format } from 'date-fns';
 
 // contexts
@@ -13,8 +13,6 @@ import {
   useGetPersona,
   usePutPersona,
   usePutUser,
-  usePostUserContacts,
-  usePutUserContacts,
 } from '../hooks/api-hooks.tsx';
 
 // Material UI components
@@ -24,12 +22,12 @@ import {
   withStyles,
   createMuiTheme,
 } from '@material-ui/core/styles';
+import Avatar from '@material-ui/core/Avatar';
 import Box from '@material-ui/core/Box';
 import Chip from '@material-ui/core/Chip';
 import Container from '@material-ui/core/Container';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import IconButton from '@material-ui/core/IconButton';
-import Input from '@material-ui/core/Input';
 import Link from '@material-ui/core/Link';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
@@ -41,7 +39,6 @@ import Select from '@material-ui/core/Select';
 import TextField from '@material-ui/core/TextField';
 
 // components
-import Avatar from './avatar';
 import HeaderBar from './header-bar';
 import Loading from './loading.js';
 import Modal from './modal';
@@ -75,6 +72,7 @@ const prereviewTheme = createMuiTheme({
 
 const useStyles = makeStyles(theme => ({
   avatar: {
+    fontSize: '5rem',
     height: 220,
     width: 220,
   },
@@ -346,17 +344,12 @@ export default function Profile() {
                             >
                               <Grid item>
                                 <Avatar
-                                  avatar={displayedPersona.avatar}
-                                  email={
-                                    contacts &&
-                                    Array.isArray(contacts) &&
-                                    contacts.length > 0
-                                      ? contacts[0].value
-                                      : undefined
-                                  }
-                                  personaName={displayedPersona.name}
-                                  className="selector"
-                                />
+                                  src={displayedPersona.avatar}
+                                  alt={displayedPersona.name}
+                                  className={classes.small}
+                                >
+                                  {displayedPersona.name.charAt(0)}
+                                </Avatar>
                               </Grid>
                               <Grid item>
                                 <span>
@@ -538,31 +531,21 @@ export default function Profile() {
                     {ownProfile ? (
                       <IconButton onClick={handleAvatarClick}>
                         <Avatar
-                          avatar={displayedPersona.avatar}
-                          email={
-                            contacts &&
-                            Array.isArray(contacts) &&
-                            contacts.length > 0
-                              ? contacts[0].value
-                              : undefined
-                          }
-                          personaName={displayedPersona.name}
-                          className="profile"
-                        />
+                          src={displayedPersona.avatar}
+                          alt={displayedPersona.name}
+                          className={classes.avatar}
+                        >
+                          {displayedPersona.name.charAt(0)}
+                        </Avatar>
                       </IconButton>
                     ) : (
                       <Avatar
-                        avatar={displayedPersona.avatar}
-                        email={
-                          contacts &&
-                          Array.isArray(contacts) &&
-                          contacts.length > 0
-                            ? contacts[0].value
-                            : undefined
-                        }
-                        personaName={displayedPersona.name}
-                        className="profile"
-                      />
+                        src={displayedPersona.avatar}
+                        alt={displayedPersona.name}
+                        className={classes.avatar}
+                      >
+                        {displayedPersona.name.charAt(0)}
+                      </Avatar>
                     )}
                   </Grid>
                 </Grid>
