@@ -96,6 +96,7 @@ const useStyles = makeStyles(theme => ({
     boxShadow: theme.shadows[5],
     left: '50%',
     minWidth: 300,
+    overflow: 'scroll',
     padding: theme.spacing(2, 4, 3),
     position: 'absolute',
     top: '50%',
