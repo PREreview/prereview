@@ -28,8 +28,6 @@ const useStyles = makeStyles(theme => ({
 export default function PersonaCard({ persona }) {
   const classes = useStyles();
 
-  console.log('persona:', persona);
-
   return (
     <Card className={classes.card}>
       <Grid container>
@@ -108,6 +106,7 @@ PersonaCard.propTypes = {
     requests: PropTypes.array,
     name: PropTypes.string,
     avatar: PropTypes.string,
+    email: PropTypes.email,
     createdAt: PropTypes.date,
   }),
 };
