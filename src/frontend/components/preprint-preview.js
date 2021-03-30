@@ -75,8 +75,8 @@ const useStyles = makeStyles(theme => ({
   },
   paper: {
     backgroundColor: theme.palette.secondary.light,
-    marginBottom: 10,
-    marginTop: 10,
+    // marginBottom: 10,
+    // marginTop: 10,
     width: '100%',
   },
   preprintServer: {
@@ -92,6 +92,7 @@ const useStyles = makeStyles(theme => ({
     fontSize: '1.3rem',
     fontWeight: 700,
     marginBottom: 10,
+    whiteSpace: 'pre-wrap',
   },
 }));
 

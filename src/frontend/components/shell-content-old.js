@@ -2,21 +2,18 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useLocation } from 'react-router-dom';
+import classNames from 'classnames';
 import { Helmet } from 'react-helmet-async';
+
+// material ui
+import { makeStyles } from '@material-ui/core/styles';
+import Box from '@material-ui/core/Box';
 
 // hooks
 import { usePostRequests } from '../hooks/api-hooks.tsx';
 
-// Material UI imports
-import { makeStyles } from '@material-ui/core/styles';
-import AppBar from '@material-ui/core/AppBar';
-import Box from '@material-ui/core/Box';
-import Button from '@material-ui/core/Button';
-import Tabs from '@material-ui/core/Tabs';
-import Tab from '@material-ui/core/Tab';
-import Typography from '@material-ui/core/Typography';
-
 // components
+import Button from './button';
 import Controls from './controls';
 import LoginRequiredModal from './login-required-modal';
 import ModerationModal from './moderation-modal';
@@ -24,43 +21,9 @@ import PreprintPreview from './preprint-preview';
 import ReviewReader from './review-reader';
 import ReviewStepper from './review-stepper';
 
-function TabPanel(props) {
-  const { children, value, index, ...other } = props;
-
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`simple-tabpanel-${index}`}
-      aria-labelledby={`simple-tab-${index}`}
-      {...other}
-    >
-      {value === index && (
-        <Box p={3}>
-          <Typography>{children}</Typography>
-        </Box>
-      )}
-    </div>
-  );
-}
-
-TabPanel.propTypes = {
-  children: PropTypes.node,
-  index: PropTypes.any.isRequired,
-  value: PropTypes.any.isRequired,
-};
-
-function a11yProps(index) {
-  return {
-    id: `simple-tab-${index}`,
-    'aria-controls': `simple-tabpanel-${index}`,
-  };
-}
-
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles(() => ({
   root: {
-    flexGrow: 1,
-    backgroundColor: theme.palette.background.paper,
+    width: '100%',
   },
   yellow: {
     backgroundColor: '#FFFAEE',
@@ -71,23 +34,30 @@ const useStyles = makeStyles(theme => ({
 export default function ShellContent({
   preprint,
   user,
+  defaultTab = 'read',
+  onRequireScreen,
   cid,
 }) {
-  const classes = useStyles();
   const location = useLocation();
-  const [hasRapidReviewed, setHasRapidReviewed] = useState(false);
-  const [hasLongReviewed, setHasLongReviewed] = useState(false);
-  const [hasRequested, setHasRequested] = useState(false);
-  const [newRequest, setNewRequest] = useState(false);
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-  const [review, setReview] = useState(null);
-  const [tab, setTab] = useState(0);
+
+  // initial height of the header
+  const [height, setHeight] = useState(0);
 
   const {
     mutate: postReviewRequest,
     loadingPostReviewRequest,
     errorPostReviewRequest,
   } = usePostRequests({ pid: preprint.uuid });
+
+  const [hasRapidReviewed, setHasRapidReviewed] = useState(false);
+  const [hasLongReviewed, setHasLongReviewed] = useState(false);
+  const [hasRequested, setHasRequested] = useState(false);
+  const [newRequest, setNewRequest] = useState(false);
+  const [review, setReview] = useState(null);
+
+  const [tab, setTab] = useState(defaultTab);
+
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
   const counts =
     preprint.requests.length +
@@ -124,9 +94,12 @@ export default function ShellContent({
     setReview(review);
   };
 
-  const handleChange = (event, newValue) => {
-    setTab(newValue);
-  };
+  useEffect(() => {
+    const newHeight = document.getElementsByClassName(
+      'shell-content__preview',
+    )[0].clientHeight;
+    setHeight(newHeight + 20);
+  }, [review]);
 
   useEffect(() => {
     if (user) {
@@ -247,32 +220,90 @@ export default function ShellContent({
   ]);
 
   return (
-    <>
-      <Helmet>
-        {/* Data for the extension popup menu */}
-        <meta
-          name="rapid-prereview-extension-nreviews"
-          content={preprint.rapidReviews.length + preprint.fullReviews.length}
-        />
-        <meta
-          name="rapid-prereview-extension-nrequests"
-          content={preprint.requests.length}
-        />
-      </Helmet>
-      <div className={classes.root}>
+    <div className="shell-content">
+      {!process.env.IS_EXTENSION && (
+        <Helmet>
+          {/* Data for the extension popup menu */}
+          <meta
+            name="rapid-prereview-extension-nreviews"
+            content={preprint.rapidReviews.length + preprint.fullReviews.length}
+          />
+          <meta
+            name="rapid-prereview-extension-nrequests"
+            content={preprint.requests.length}
+          />
+        </Helmet>
+      )}
+
+      <div className="shell-content__preview">
         <PreprintPreview preprint={preprint} />
-        <AppBar position="static">
-          <Tabs
-            value={tab}
-            onChange={handleChange}
-            aria-label="Reviews and requests"
-          >
-            <Tab label="Read Reviews" {...a11yProps(0)} />
-            <Tab label="Add Review(s)" {...a11yProps(1)} />
-            <Tab label="Add Request" {...a11yProps(2)} />
-          </Tabs>
-        </AppBar>
-        <TabPanel value={tab} index={0}>
+        <header className="shell-content__header">
+          <nav>
+            <ul>
+              <li>
+                <Button
+                  className={classNames('shell-content__tab-button', {
+                    'shell-content__tab-button--active': tab === 'read',
+                  })}
+                  disabled={!preprint}
+                  onClick={() => {
+                    onRequireScreen();
+                    setTab('read');
+                  }}
+                >
+                  Read Reviews
+                </Button>
+              </li>
+              <li>
+                <Button
+                  className={classNames('shell-content__tab-button', {
+                    'shell-content__tab-button--active': tab === 'reviews',
+                  })}
+                  disabled={!preprint}
+                  onClick={() => {
+                    if (user) {
+                      onRequireScreen();
+                      setTab('reviews');
+                    } else {
+                      setIsLoginModalOpen(true);
+                    }
+                  }}
+                >
+                  Add Review(s)
+                </Button>
+              </li>
+              <li>
+                <Button
+                  className={classNames('shell-content__tab-button', {
+                    'shell-content__tab-button--active': tab === 'request',
+                  })}
+                  disabled={loadingPostReviewRequest}
+                  onClick={() => {
+                    if (user) {
+                      onRequireScreen();
+                      setTab('request');
+                    } else {
+                      setIsLoginModalOpen(true);
+                    }
+                  }}
+                >
+                  Add Request
+                </Button>
+              </li>
+            </ul>
+          </nav>
+        </header>
+      </div>
+      {isLoginModalOpen && (
+        <LoginRequiredModal
+          next={process.env.IS_EXTENSION ? undefined : location.pathname}
+          onClose={() => {
+            setIsLoginModalOpen(false);
+          }}
+        />
+      )}
+      <div className="shell-content__body" style={{ paddingTop: height }}>
+        {tab === 'read' ? (
           <ShellContentRead
             user={user}
             preprint={preprint}
@@ -280,23 +311,9 @@ export default function ShellContent({
             rapidContent={rapidContent}
             longContent={longContent}
             newRequest={newRequest}
+            height={height}
           />
-        </TabPanel>
-        <TabPanel value={tab} index={1}>
-          <ShellContentReviews
-            cid={cid}
-            review={review}
-            user={user}
-            preprint={preprint}
-            onClose={onCloseReviews}
-            onContentChange={onContentChange}
-            onReviewChange={onReviewChange}
-            hasRapidReviewed={hasRapidReviewed}
-            hasLongReviewed={hasLongReviewed}
-            initialContent={initialContent}
-          />
-        </TabPanel>
-        <TabPanel value={tab} index={2}>
+        ) : tab === 'request' ? (
           <ShellContentRequest
             user={user}
             preprint={preprint}
@@ -313,15 +330,30 @@ export default function ShellContent({
             hasRequested={hasRequested}
             newRequest={newRequest}
           />
-        </TabPanel>
+        ) : tab === 'reviews' ? (
+          <ShellContentReviews
+            cid={cid}
+            review={review}
+            user={user}
+            preprint={preprint}
+            onClose={onCloseReviews}
+            onContentChange={onContentChange}
+            onReviewChange={onReviewChange}
+            hasRapidReviewed={hasRapidReviewed}
+            hasLongReviewed={hasLongReviewed}
+            initialContent={initialContent}
+          />
+        ) : null}
       </div>
-    </>
+    </div>
   );
 }
 
 ShellContent.propTypes = {
+  onRequireScreen: PropTypes.func.isRequired,
   preprint: PropTypes.object.isRequired,
   user: PropTypes.object,
+  defaultTab: PropTypes.oneOf(['read', 'review', 'request']),
   cid: PropTypes.string,
 };
 
@@ -332,6 +364,7 @@ function ShellContentRead({
   rapidContent,
   longContent,
   newRequest,
+  height,
 }) {
   // Note: !! this needs to work both in the webApp where it is URL driven and in
   // the extension where it is shell driven
@@ -340,7 +373,7 @@ function ShellContentRead({
   const postReport = usePostRequests(preprint); // #FIXME should be PostReport() when built
 
   return (
-    <>
+    <div className="shell-content-read">
       <ReviewReader
         user={user}
         preprint={preprint}
@@ -348,6 +381,7 @@ function ShellContentRead({
         rapidContent={rapidContent}
         longContent={longContent}
         newRequest={newRequest}
+        height={height}
       />
       {!!moderatedReviewId && (
         <ModerationModal
@@ -364,7 +398,7 @@ function ShellContentRead({
           }}
         />
       )}
-    </>
+    </div>
   );
 }
 ShellContentRead.propTypes = {
@@ -374,6 +408,7 @@ ShellContentRead.propTypes = {
   rapidContent: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]),
   longContent: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]),
   newRequest: PropTypes.bool,
+  height: PropTypes.number,
 };
 
 function ShellContentReviews({
@@ -404,9 +439,7 @@ function ShellContentReviews({
         />
       </div>
     ) : (
-      <Typography component="div" variant="body2">
-        Sorry, you are not authorized to contribute to this review.
-      </Typography>
+      <div>Sorry, you are not authorized to contribute to this review.</div>
     )
   ) : (
     <div className="shell-content-review">
@@ -450,30 +483,29 @@ function ShellContentRequest({
   return (
     <div>
       {hasRequested || newRequest ? (
-        <Box mt={2} mb={2} className={classes.yellow}>
-          <Typography component="div" variant="body2">
+        <div className="shell-content-request">
+          <Box mt={2} mb={2} className={classes.yellow}>
             Your request has been successfully posted.
-          </Typography>
-        </Box>
+          </Box>
+        </div>
       ) : (
-        <Box>
-          <Typography component="h3" variant="body2">
+        <div className="shell-content-request">
+          <header className="shell-content-request__title">
             Add a request for review
-          </Typography>
+          </header>
 
           <Controls error={error}>
             <Button
-              color="primary"
-              primary="true"
+              primary={true}
               isWaiting={isPosting}
               onClick={() => {
                 onSubmit(preprint);
               }}
             >
-              Submit request
+              Submit
             </Button>
           </Controls>
-        </Box>
+        </div>
       )}
     </div>
   );

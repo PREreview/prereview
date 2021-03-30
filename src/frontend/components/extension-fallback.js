@@ -223,7 +223,7 @@ export default function ExtensionFallback() {
               </IconButton>
             </Toolbar>
           </AppBar>
-          <main className={classes.content} style={{ marginTop: height + 20 }}>
+          <main className={classes.content} style={{ marginTop: height}}>
             <div className={classes.toolbar} />
             <object
               key={pdfUrl}
@@ -290,19 +290,12 @@ export default function ExtensionFallback() {
               </IconButton>
             </div>
             <Divider />
-            <Shell>
-              {onRequireScreen =>
-                !!preprint && (
-                  <ShellContent
-                    cid={cid}
-                    onRequireScreen={onRequireScreen}
-                    preprint={preprint}
-                    user={user}
-                    defaultTab={location.state && location.state.tab}
-                  />
-                )
-              }
-            </Shell>
+            <ShellContent
+              cid={cid}
+              preprint={preprint}
+              user={user}
+              defaultTab={location.state && location.state.tab}
+            />
           </Drawer>
         </div>
       </>

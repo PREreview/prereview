@@ -78,7 +78,6 @@ const ReviewReader = React.memo(function ReviewReader({
   rapidContent,
   longContent,
   newRequest,
-  height,
 }) {
   const classes = useStyles();
 
@@ -396,7 +395,6 @@ const ReviewReader = React.memo(function ReviewReader({
                                         publishedComment={publishedComment}
                                         onChange={handleCommentChange}
                                         onSubmit={handleCommentSubmit}
-                                        height={height}
                                         review={review}
                                         user={user}
                                       />
@@ -436,17 +434,19 @@ const ReviewReader = React.memo(function ReviewReader({
                   </div>
                 </div>
               ) : (
-                <div>No longform reviews to display.</div>
+                <Typography component="div" variant="body2">
+                  No longform reviews to display.
+                </Typography>
               )}
             </AccordionDetails>
           </Accordion>
         </div>
       ) : (
-        <div>
+        <Typography component="div" variant="body2">
           There are no reviews on this preprint yet. To add your review, click
           on &quot;Add Review(s)&quot;. To request reviews, click on &quot;Add
           Request&quot; in the menu above.
-        </div>
+        </Typography>
       )}
     </div>
   );
@@ -464,7 +464,6 @@ ReviewReader.propTypes = {
   rapidContent: PropTypes.object,
   longContent: PropTypes.oneOfType([PropTypes.object, PropTypes.string]),
   newRequest: PropTypes.bool,
-  height: PropTypes.number,
 };
 
 export default ReviewReader;

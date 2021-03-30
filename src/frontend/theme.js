@@ -85,14 +85,17 @@ const theme = createMuiTheme({
     body1: {
       fontSize: '1rem',
       fontWeight: 400,
+      whiteSpace: 'pre-wrap',
     },
     body2: {
       fontSize: '1.2rem',
       fontWeight: 400,
+      whiteSpace: 'pre-wrap',
     },
     button: {
       fontSize: '1.25rem',
       fontWeight: 600,
+      textTransform: 'none',
     },
   },
 });
