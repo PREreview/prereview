@@ -314,9 +314,10 @@ export default function controller(users, contacts, keys, thisUser) {
           .required(),
       },
       body: Joi.object({
-        schema: Joi.string().required(),
-        value: Joi.string().required(),
-        isNotified: Joi.boolean().required(),
+        schema: Joi.string(),
+        value: Joi.string(),
+        isNotified: Joi.boolean(),
+        isPublic: Joi.boolean(),
       }),
       type: 'json',
     },

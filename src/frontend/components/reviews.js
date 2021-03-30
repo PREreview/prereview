@@ -126,6 +126,7 @@ export default function Reviews() {
           <Container>
             <SearchBar
               defaultValue={search}
+              placeholderValue="Search preprints by title, author, abstract, DOI, or arXiv ID"
               isFetching={loadingPreprints}
               onChange={value => {
                 params.delete('page');

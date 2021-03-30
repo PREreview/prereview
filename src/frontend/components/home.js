@@ -265,9 +265,10 @@ export default function Home() {
   const [search, setSearch] = useState(params.get('search') || '');
   const [showLeftPanel, setShowLeftPanel] = useState(!isMobile);
 
-  const handleFlip = index => {
+  const handleFlip = (index, flip) => {
     let updatedFlipped = [...isFlipped];
-    updatedFlipped[index] = !isFlipped[index];
+    updatedFlipped[index] = flip;
+    //updatedFlipped[index] = !isFlipped[index];
     setIsFlipped(updatedFlipped);
   };
 
@@ -340,6 +341,7 @@ export default function Home() {
           </Typography>
           <Box mt={3}>
             <SearchBar
+              placeholderValue="Search preprints by title, author, abstract, DOI, or arXiv ID"
               onChange={value => {
                 params.delete('page');
                 setSearch(value);
@@ -373,8 +375,8 @@ export default function Home() {
             {/* FIXME loop*/}
             <CardActionArea
               className={classes.cardAction}
-              onMouseEnter={() => handleFlip(0)}
-              onMouseLeave={() => handleFlip(0)}
+              onMouseEnter={() => handleFlip(0, true)}
+              onMouseLeave={() => handleFlip(0, false)}
             >
               <ReactCardFlip
                 className={classes.cardContent}
@@ -421,8 +423,8 @@ export default function Home() {
           <Card className={classes.card} elevation={3}>
             <CardActionArea
               className={classes.cardAction}
-              onMouseEnter={() => handleFlip(1)}
-              onMouseLeave={() => handleFlip(1)}
+              onMouseEnter={() => handleFlip(1, true)}
+              onMouseLeave={() => handleFlip(1, false)}
             >
               <ReactCardFlip
                 className={classes.cardContent}
@@ -471,8 +473,8 @@ export default function Home() {
           <Card className={classes.card} elevation={3}>
             <CardActionArea
               className={classes.cardAction}
-              onMouseEnter={() => handleFlip(2)}
-              onMouseLeave={() => handleFlip(2)}
+              onMouseEnter={() => handleFlip(2, true)}
+              onMouseLeave={() => handleFlip(2, false)}
             >
               <ReactCardFlip
                 className={classes.cardContent}
@@ -865,7 +867,7 @@ export default function Home() {
                 <img
                   src={ASAPbioImg}
                   alt=""
-                  ariaHidden="true"
+                  aria-hidden="true"
                   className={classes.sliderImage}
                 />
               </Link>
@@ -880,7 +882,7 @@ export default function Home() {
                 <img
                   src={JROSTImg}
                   alt=""
-                  ariaHidden="true"
+                  aria-hidden="true"
                   className={classes.sliderImage}
                 />
               </Link>
@@ -895,7 +897,7 @@ export default function Home() {
                 <img
                   src={NatureOSrPREImg}
                   alt=""
-                  ariaHidden="true"
+                  aria-hidden="true"
                   className={classes.sliderImage}
                 />
               </Link>
@@ -910,7 +912,7 @@ export default function Home() {
                 <img
                   src={LancetImg}
                   alt=""
-                  ariaHidden="true"
+                  aria-hidden="true"
                   className={classes.sliderImage}
                 />
               </Link>
@@ -925,7 +927,7 @@ export default function Home() {
                 <img
                   src={NatureIndexImg}
                   alt=""
-                  ariaHidden="true"
+                  aria-hidden="true"
                   className={classes.sliderImage}
                 />
               </Link>
@@ -942,7 +944,7 @@ export default function Home() {
                 <img
                   src={SCMornPostImg}
                   alt=""
-                  ariaHidden="true"
+                  aria-hidden="true"
                   className={classes.sliderImage}
                 />
               </Link>
@@ -957,7 +959,7 @@ export default function Home() {
                 <img
                   src={SPARCImg}
                   alt=""
-                  ariaHidden="true"
+                  aria-hidden="true"
                   className={classes.sliderImage}
                 />
               </Link>
@@ -972,7 +974,7 @@ export default function Home() {
                 <img
                   src={Bio2040Img}
                   alt=""
-                  ariaHidden="true"
+                  aria-hidden="true"
                   className={classes.sliderImage}
                 />
               </Link>
@@ -987,7 +989,7 @@ export default function Home() {
                 <img
                   src={NoManifestoImg}
                   alt=""
-                  ariaHidden="true"
+                  aria-hidden="true"
                   className={classes.sliderImage}
                 />
               </Link>

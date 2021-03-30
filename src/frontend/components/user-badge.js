@@ -4,7 +4,11 @@ import RoleBadge from './role-badge';
 
 export default function UserBadge({ user, children, ...others }) {
   return (
-    <RoleBadge {...others} user={user.defaultPersona ? user.defaultPersona : user}>
+    <RoleBadge
+      {...others}
+      user={user.defaultPersona ? user.defaultPersona : user}
+      contacts={user.contacts ? user.contacts : []}
+    >
       {children}
     </RoleBadge>
   );

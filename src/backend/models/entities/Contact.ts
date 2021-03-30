@@ -35,6 +35,10 @@ export class Contact extends BaseEntity {
   @Property()
   isNotified: boolean;
 
+  @Fixture(() => false)
+  @Property()
+  isPublic: boolean;
+
   @Fixture(faker => faker.random.alphaNumeric(16))
   @Property({ nullable: true })
   token?: string;
@@ -45,6 +49,7 @@ export class Contact extends BaseEntity {
     identity: User,
     isVerified = false,
     isNotified = false,
+    isPublic = false,
   ) {
     super();
     this.schema = schema;
@@ -52,5 +57,6 @@ export class Contact extends BaseEntity {
     this.identity = identity;
     this.isVerified = isVerified;
     this.isNotified = isNotified;
+    this.isPublic = isPublic;
   }
 }

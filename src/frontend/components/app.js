@@ -164,7 +164,7 @@ export default function App({ user }) {
               </Route>
               <Route
                 exact={true}
-                path="/communities/:id"
+                path="/communities/:id/:new(new)?"
                 >
                 <Community />
               </Route>
@@ -176,26 +176,26 @@ export default function App({ user }) {
                 <Event />
               </Route>
 
-              <Route
-                exact={true}
-                path="/preprints/:id/reviews/:cid?"
-              >
-                <ExtensionFallback />
-              </Route>
-              <Route
-                exact={true}
-                path="/validate/:token"
-                >
-                <Validate />
-              </Route>
+                <Route exact={true} path="/preprints/:id/drafts/:cid?">
+                  <ExtensionFallback />
+                </Route>
+                <Route exact={true} path="/preprints/:id/full-reviews/:cid">
+                  <ExtensionFallback />
+                </Route>
+                <Route exact={true} path="/preprints/:id/rapid-reviews/:cid">
+                  <ExtensionFallback />
+                </Route>
+                <Route exact={true} path="/validate/:token">
+                  <Validate />
+                </Route>
 
-              <Route>
-                <NotFound />
-              </Route>
-            </Switch>
-          </UserProvider>
-        </StoresProvider>
-      </DndProvider>
+                <Route>
+                  <NotFound />
+                </Route>
+              </Switch>
+            </UserProvider>
+          </StoresProvider>
+        </DndProvider>
       </IntlProvider>
     </HelmetProvider>
   );
