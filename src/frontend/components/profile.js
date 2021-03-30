@@ -24,10 +24,16 @@ import {
   withStyles,
   createMuiTheme,
 } from '@material-ui/core/styles';
+import Accordion from '@material-ui/core/Accordion';
+import AccordionSummary from '@material-ui/core/AccordionSummary';
+import AccordionDetails from '@material-ui/core/AccordionDetails';
 import Avatar from '@material-ui/core/Avatar';
 import Box from '@material-ui/core/Box';
+import Card from '@material-ui/core/Card';
+import CardContent from '@material-ui/core/CardContent';
 import Chip from '@material-ui/core/Chip';
 import Container from '@material-ui/core/Container';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import IconButton from '@material-ui/core/IconButton';
 import Input from '@material-ui/core/Input';
@@ -174,10 +180,9 @@ export default function Profile() {
     updatePersona(data)
       .then(resp => {
         let updated = resp.data;
-        console.log('updated: ', resp.data);
         alert(`You've successfully updated your persona.`);
         setEditMode(false);
-        setDisplayedPersona(updated);
+        setDisplayedPersona({ ...displayedPersona, ...updated });
         setName(updated.name);
         setBio(updated.bio);
         // const newExpertises = expertises.filter(exp => {
@@ -186,6 +191,13 @@ export default function Profile() {
         //   });
         // });
         setExpertise(updated.expertises);
+        setPersonas(
+          personas.map(persona =>
+            persona.uuid === updated.uuid
+              ? { ...persona, ...updated }
+              : persona,
+          ),
+        );
         return;
       })
       .catch(err => alert(`An error occurred:`, err.message));
@@ -198,10 +210,16 @@ export default function Profile() {
 
   const handleAvatarSave = updated => {
     setDisplayedPersona({ ...displayedPersona, avatar: updated.avatar });
+    setUser({
+      ...thisUser,
+      defaultPersona: { ...displayedPersona, avatar: updated.avatar },
+    });
     setAvatarModalOpen(false);
   };
 
-  const personas = !thisUser || !thisUser.personas ? [] : thisUser.personas;
+  const [personas, setPersonas] = useState(
+    !thisUser || !thisUser.personas ? [] : thisUser.personas,
+  );
 
   const [name, setName] = useState('');
   const orcid = ownProfile
@@ -218,6 +236,12 @@ export default function Profile() {
   );
   const badges =
     displayedPersona && displayedPersona.badges ? displayedPersona.badges : [];
+  const communities =
+    displayedPersona && displayedPersona.communities
+      ? displayedPersona.communities
+      : [];
+  const works =
+    displayedPersona && displayedPersona.works ? displayedPersona.works : [];
   const [bio, setBio] = useState(
     displayedPersona && displayedPersona.bio ? displayedPersona.bio : '',
   );
@@ -244,7 +268,6 @@ export default function Profile() {
   };
 
   useEffect(() => {
-    console.log('exp: ', expertise);
     if (displayedPersona && ownProfile) {
       setName(displayedPersona.name);
       setBio(displayedPersona.bio ? displayedPersona.bio : '');
@@ -259,8 +282,8 @@ export default function Profile() {
   }, [displayedPersona]);
 
   useEffect(() => {
-    if (!loadingPersona && persona) setDisplayedPersona(persona);
-  }, [loadingPersona, persona]);
+    setDisplayedPersona(persona);
+  }, [persona]);
 
   useEffect(() => {
     if (
@@ -569,7 +592,7 @@ export default function Profile() {
                     {displayedPersona.bio}
                   </Typography>
                 )}
-                {ownProfile && editMode ? (
+                {ownProfile && editMode && !displayedPersona.isAnonymous ? (
                   <SettingsNotifications user={thisUser} />
                 ) : null}
               </Container>
@@ -578,18 +601,80 @@ export default function Profile() {
             {editMode ? null : (
               <Box>
                 <Container>
-                  <Typography component="h2" variant="h6" gutterBottom>
-                    PREreview Communities
-                  </Typography>
-                  <Typography component="h2" variant="h6" gutterBottom>
-                    PREreview Contributions
-                  </Typography>
-                  {!ownProfile ? (
-                    <RoleActivity persona={displayedPersona} />
-                  ) : null}
-                  <Typography component="h2" variant="h6" gutterBottom>
-                    List of Publications
-                  </Typography>
+                  <Accordion>
+                    <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                      <Typography component="h2" variant="h6" gutterBottom>
+                        PREreview communities
+                      </Typography>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                      <Grid>
+                        {communities.length > 0
+                          ? communities.map(community => {
+                              return (
+                                <Chip
+                                  key={community.uuid}
+                                  label={community.name}
+                                  variant="outlined"
+                                  href={`/communities/${community.slug}`}
+                                  component="a"
+                                  target="_blank"
+                                  clickable
+                                />
+                              );
+                            })
+                          : `${
+                              displayedPersona.name
+                            } hasn't joined any communities yet.`}
+                      </Grid>
+                    </AccordionDetails>
+                  </Accordion>
+                  <Accordion>
+                    <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                      <Typography component="h2" variant="h6" gutterBottom>
+                        PREreview contributions
+                      </Typography>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                      <Grid>
+                        <RoleActivity persona={displayedPersona} />
+                      </Grid>
+                    </AccordionDetails>
+                  </Accordion>
+                  <Accordion>
+                    <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                      <Typography component="h2" variant="h6" gutterBottom>
+                        Publications
+                      </Typography>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                      <Grid>
+                        {works.length > 0
+                          ? works.map(work => {
+                              return (
+                                <Card key={work.uuid}>
+                                  <CardContent>
+                                    <Typography
+                                      variant="h6"
+                                      component="h2"
+                                      gutterBottom
+                                    >
+                                      {work.title}
+                                    </Typography>
+                                    <Typography>{work.publisher}</Typography>
+                                    <Typography>
+                                      {work.publicationDate}
+                                    </Typography>
+                                  </CardContent>
+                                </Card>
+                              );
+                            })
+                          : `${
+                              displayedPersona.name
+                            } has no publications connected to their ORCiD account.`}
+                      </Grid>
+                    </AccordionDetails>
+                  </Accordion>
                 </Container>
               </Box>
             )}

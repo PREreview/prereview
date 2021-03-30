@@ -41,9 +41,9 @@ export default function ActivityCard({ activity }) {
       <div key={preprint.uuid} className="activity-card">
         <LabelStyle>
           {format(new Date(preprint.createdAt), 'MMM. d, yyyy')}{' '}
-          {preprint['@type'] === 'RequestForRapidPREreviewAction'
-            ? 'requested feedback on'
-            : 'reviewed'}
+          {activity.ynPeerReview || activity.doi 
+            ? 'reviewed'
+            : 'requested feedback for'}
         </LabelStyle>
         <div>
           <XLink

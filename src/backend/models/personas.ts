@@ -11,7 +11,7 @@ export class PersonaModel extends EntityRepository<Persona> {
   async isIdentityOf(personaId: string, userId: string): Promise<boolean> {
     let persona: any;
     if (uuidValidate(personaId)) {
-      persona = await this.findOne({ uuid: personaId }, ['members']);
+      persona = await this.findOne({ uuid: personaId });
     }
 
     if (!persona) {
@@ -21,9 +21,9 @@ export class PersonaModel extends EntityRepository<Persona> {
 
     let user: any;
     if (orcidUtils.isValid(userId)) {
-      user = await this.em.findOne(User, { orcid: userId as string });
+      user = await this.em.findOne(User, { orcid: userId as string }, ['personas']);
     } else if (uuidValidate(userId)) {
-      user = await this.em.findOne(User, { uuid: userId as string });
+      user = await this.em.findOne(User, { uuid: userId as string }, ['personas']);
     }
 
     if (!user) return false;

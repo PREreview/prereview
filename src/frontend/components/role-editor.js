@@ -27,11 +27,13 @@ export default function RoleEditor({ persona, onCancel, onSaved }) {
   };
 
   useEffect(() => {
+    const ac = new AbortController();
     if (persona && persona.avatar) {
       dataUrlToFile(persona.avatar)
         .then(file => setImage(file))
         .catch(err => alert(`An error occurred: ${err.message}`));
     }
+    return () => ac.abort()
   }, [persona]);
 
   const onDrop = useCallback(acceptedFiles => {
@@ -173,7 +175,6 @@ export default function RoleEditor({ persona, onCancel, onSaved }) {
           primary={true}
           onClick={() => {
             const data = {};
-            console.log("HASNEWAVATAR,", hasNewAvatar)
             if (hasNewAvatar) {
               const canvas = editorRef.current.getImage();
 
@@ -187,8 +188,6 @@ export default function RoleEditor({ persona, onCancel, onSaved }) {
               }
               data.avatar = dataUrl;
             }
-
-            console.log("DATA", data)
 
             updatePersona(data)
               .then(resp => {
