@@ -10,18 +10,22 @@ import Link from '@material-ui/core/Link';
 import Popover from '@material-ui/core/Popover';
 import Typography from '@material-ui/core/Typography';
 
-const useStyles = makeStyles(theme => ({
-  avatar: {
-    cursor: 'pointer',
+
+// components
+import NoticeBadge from './notice-badge';
+import XLink from './xlink';
+
+// icons
+import { MdPerson } from 'react-icons/md';
+
+const Avatar = withStyles({
+  root: {
     height: 28,
     width: 28,
   },
-  container: {
-    border: '2px solid #fff',
-    borderRadius: '50%',
-    marginRight: '-10px',
-    position: 'relative',
-  },
+})(MuiAvatar);
+
+const useStyles = makeStyles(theme => ({
   popover: {
     zIndex: '20000 !important',
   },
@@ -43,8 +47,52 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const RoleBadge = ({ user, children }) => {
-  // ****  USER IN THIS COMPONENT IS A PERSONA OBJECT **** //
+const RoleBadge = React.forwardRef(function RoleBadge(
+  { children, className, tooltip, showNotice, disabled, user, contacts },
+  ref,
+) {
+  return (
+    <RoleBadgeUI
+      ref={ref}
+      tooltip={tooltip}
+      user={user}
+      contacts={contacts}
+      className={className}
+      showNotice={showNotice}
+      disabled={disabled}
+    >
+      {children}
+    </RoleBadgeUI>
+  );
+});
+
+RoleBadge.propTypes = {
+  tooltip: PropTypes.bool,
+  user: PropTypes.object.isRequired,
+  children: PropTypes.any,
+  className: PropTypes.string,
+  showNotice: PropTypes.bool,
+  disabled: PropTypes.bool,
+};
+
+export default RoleBadge;
+
+/**
+ * Non hooked version (handy for story book and `UserBadge`)
+ */
+const RoleBadgeUI = React.forwardRef(function RoleBadgeUI(
+  {
+    user,
+    contacts,
+    className,
+    children,
+    tooltip,
+    showNotice = false,
+    disabled = false,
+  },
+  ref,
+) {
+  // ****  USER IN THIS COMPONENT IS ACTUALLY A PERSONA OBJECT **** //
 
   const classes = useStyles();
   const history = useHistory();
@@ -69,16 +117,26 @@ const RoleBadge = ({ user, children }) => {
   };
 
   return (
-    <div className={classes.container}>
-      <Avatar
-        className={classes.avatar}
-        onClick={handleClick}
-        onMouseEnter={toggleTooltip}
-        onMouseLeave={toggleTooltip}
-        src={user.avatar}
-      />
-      <div className={classes.tooltip} style={{ display: tooltipDisplay }}>
-        {`${user.defaultPersona ? user.defaultPersona.name : user.name}`}
+    <>
+      <div className="role-badge-menu-container">
+        {showNotice && <NoticeBadge />}
+        <button
+          type="button"
+          aria-describedby={id}
+          variant="contained"
+          color="primary"
+          onClick={handleClick}
+          className={classNames('role-badge-menu', className)}
+        >
+          <span data-expands-text="Close" className="vh">
+            Open
+          </span>
+          <Tooltipify tooltip={tooltip} user={user}>
+            <Avatar src={user.avatar} alt={user.name} ref={ref}>
+              {user.name.charAt(0)}
+            </Avatar>
+          </Tooltipify>
+        </button>
       </div>
       <Popover
         id={id}

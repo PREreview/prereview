@@ -1,7 +1,7 @@
 // base imports
 import React, { useContext, useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { useParams, useHistory, useLocation } from 'react-router-dom';
+import { useParams, useHistory } from 'react-router-dom';
 import { format } from 'date-fns';
 
 // contexts
@@ -13,8 +13,6 @@ import {
   useGetPersona,
   usePutPersona,
   usePutUser,
-  usePostUserContacts,
-  usePutUserContacts,
 } from '../hooks/api-hooks.tsx';
 
 // Material UI components
@@ -36,7 +34,6 @@ import Container from '@material-ui/core/Container';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import IconButton from '@material-ui/core/IconButton';
-import Input from '@material-ui/core/Input';
 import Link from '@material-ui/core/Link';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
@@ -81,6 +78,7 @@ const prereviewTheme = createMuiTheme({
 
 const useStyles = makeStyles(theme => ({
   avatar: {
+    fontSize: '5rem',
     height: 220,
     width: 220,
   },
@@ -272,12 +270,8 @@ export default function Profile() {
       setName(displayedPersona.name);
       setBio(displayedPersona.bio ? displayedPersona.bio : '');
     }
-    if (
-      displayedPersona &&
-      !displayedPersona.isAnonymous &&
-      displayedPersona.identity
-    ) {
-      setContacts(displayedPersona.identity.contacts);
+    if (displayedPersona && !displayedPersona.isAnonymous) {
+      setContacts(displayedPersona.contacts);
     }
   }, [displayedPersona]);
 
@@ -357,8 +351,12 @@ export default function Profile() {
                               spacing={2}
                             >
                               <Grid item>
-                                <Avatar className={classes.small}>
-                                  {selected.name.charAt(0)}
+                                <Avatar
+                                  src={displayedPersona.avatar}
+                                  alt={displayedPersona.name}
+                                  className={classes.small}
+                                >
+                                  {displayedPersona.name.charAt(0)}
                                 </Avatar>
                               </Grid>
                               <Grid item>
@@ -478,7 +476,9 @@ export default function Profile() {
                               <List>
                                 {contacts.map(contact => (
                                   <ListItem key={contact.uuid}>
-                                    {contact.value}
+                                    <a href={`mailto:${contact.value}`}>
+                                      {contact.value}
+                                    </a>
                                   </ListItem>
                                 ))}
                               </List>
@@ -540,14 +540,20 @@ export default function Profile() {
                       <IconButton onClick={handleAvatarClick}>
                         <Avatar
                           src={displayedPersona.avatar}
+                          alt={displayedPersona.name}
                           className={classes.avatar}
-                        />
+                        >
+                          {displayedPersona.name.charAt(0)}
+                        </Avatar>
                       </IconButton>
                     ) : (
                       <Avatar
                         src={displayedPersona.avatar}
+                        alt={displayedPersona.name}
                         className={classes.avatar}
-                      />
+                      >
+                        {displayedPersona.name.charAt(0)}
+                      </Avatar>
                     )}
                   </Grid>
                 </Grid>
