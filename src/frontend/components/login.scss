@@ -3,7 +3,7 @@
   font: var(--ui-basic-font);
   margin: 0;
   position: relative;
-  top: calc(var(--announcement-bar-height) + var(--header-bar-height));
+  top: 0;
   /* padding: calc(var(--header-bar-height) + var(--lgrd)) 0 var(--lgrd); */
   box-sizing: border-box;
   color: var(--ui-basic-font-color);
@@ -11,7 +11,7 @@
     text-decoration: none;
   }
   & .login__content {
-    top: calc(var(--announcement-bar-height) + var(--header-bar-height));
+    top: var(--header-bar-height);
     max-width: var(--middle-column-default-width);
     margin: 0 auto;
     background-color: white;
