@@ -1,6 +1,7 @@
 import {
   Entity,
   EntityRepositoryType,
+  Index,
   ManyToOne,
   Property,
 } from '@mikro-orm/core';
@@ -11,6 +12,8 @@ import { FullReview } from './FullReview';
 import { Persona } from './Persona';
 
 @Entity()
+@Index({ properties: ['author'] })
+@Index({ properties: ['parent'] })
 export class Comment extends BaseEntity {
   //eslint-disable-next-line
   [EntityRepositoryType]?: CommentModel;

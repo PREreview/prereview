@@ -1,6 +1,7 @@
 import {
   Entity,
   EntityRepositoryType,
+  Index,
   ManyToOne,
   Property,
 } from '@mikro-orm/core';
@@ -11,6 +12,7 @@ import { User } from './User';
 import { createRandomDoi } from '../../../common/utils/ids';
 
 @Entity()
+@Index({ properties: ['author'] })
 export class Work extends BaseEntity {
   //eslint-disable-next-line
   [EntityRepositoryType]?: WorkModel;

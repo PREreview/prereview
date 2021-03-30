@@ -18,6 +18,10 @@ export default function Login() {
   const history = useHistory();
 
   useEffect(() => {
+    if (thisUser) {
+      history.push('/reviews');
+      return;
+    }
     window.scrollTo(0, 0);
   }, []);
 

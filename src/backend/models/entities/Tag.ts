@@ -2,6 +2,7 @@ import {
   Collection,
   Entity,
   EntityRepositoryType,
+  Index,
   ManyToMany,
   Property,
   Unique,
@@ -13,6 +14,8 @@ import { Community } from './Community';
 import { Preprint } from './Preprint';
 
 @Entity()
+@Index({ properties: ['preprints'] })
+@Index({ properties: ['communities'] })
 export class Tag extends BaseEntity {
   //eslint-disable-next-line
   [EntityRepositoryType]?: TagModel;

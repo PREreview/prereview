@@ -2,6 +2,7 @@ import {
   Collection,
   Entity,
   EntityRepositoryType,
+  Index,
   ManyToMany,
   OneToMany,
   Property,
@@ -18,6 +19,12 @@ import { Template } from './Template';
 import { User } from './User';
 
 @Entity()
+@Index({ properties: ['members'] })
+@Index({ properties: ['owners'] })
+@Index({ properties: ['preprints'] })
+@Index({ properties: ['events'] })
+@Index({ properties: ['tags'] })
+@Index({ properties: ['templates'] })
 export class Community extends BaseEntity {
   //eslint-disable-next-line
   [EntityRepositoryType]?: CommunityModel;

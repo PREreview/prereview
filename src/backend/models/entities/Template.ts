@@ -1,6 +1,7 @@
 import {
   Entity,
   EntityRepositoryType,
+  Index,
   ManyToOne,
   Property,
   Unique,
@@ -11,6 +12,7 @@ import { BaseEntity } from './BaseEntity';
 import { Community } from './Community';
 
 @Entity()
+@Index({ properties: ['community'] })
 export class Template extends BaseEntity {
   //eslint-disable-next-line
   [EntityRepositoryType]?: TemplateModel;

@@ -2,6 +2,7 @@ import { v4 as uuidv4 } from 'uuid';
 import {
   Entity,
   EntityRepositoryType,
+  Index,
   ManyToOne,
   Property,
 } from '@mikro-orm/core';
@@ -11,6 +12,7 @@ import { BaseEntity } from './BaseEntity';
 import { Persona } from './Persona';
 
 @Entity()
+@Index({ properties: ['author'] })
 export class Report extends BaseEntity {
   //eslint-disable-next-line
   [EntityRepositoryType]?: ReportModel;

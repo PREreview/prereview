@@ -1,6 +1,7 @@
 import {
   Entity,
   EntityRepositoryType,
+  Index,
   ManyToOne,
   Property,
 } from '@mikro-orm/core';
@@ -10,6 +11,7 @@ import { BaseEntity } from './BaseEntity';
 import { User } from './User';
 
 @Entity()
+@Index({ properties: ['identity'] })
 export class Contact extends BaseEntity {
   //eslint-disable-next-line
   [EntityRepositoryType]?: ContactModel;

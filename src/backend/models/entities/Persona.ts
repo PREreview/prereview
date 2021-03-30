@@ -2,6 +2,7 @@ import {
   Collection,
   Entity,
   EntityRepositoryType,
+  Index,
   ManyToMany,
   ManyToOne,
   OneToMany,
@@ -12,12 +13,23 @@ import { PersonaModel } from '../personas';
 import { BaseEntity } from './BaseEntity';
 import { Badge } from './Badge';
 import { Community } from './Community';
+import { Expertise } from './Expertise';
 import { FullReview } from './FullReview';
 import { RapidReview } from './RapidReview';
 import { Request } from './Request';
 import { User } from './User';
 
 @Entity()
+@Index({ properties: ['identity'] })
+@Index({ properties: ['communities'] })
+@Index({ properties: ['rapidReviews'] })
+@Index({ properties: ['fullReviews'] })
+@Index({ properties: ['invitedToAuthor'] })
+@Index({ properties: ['mentoring'] })
+@Index({ properties: ['invitedToMentor'] })
+@Index({ properties: ['requests'] })
+@Index({ properties: ['badges'] })
+@Index({ properties: ['expertises'] })
 export class Persona extends BaseEntity {
   //eslint-disable-next-line
   [EntityRepositoryType]?: PersonaModel;
@@ -78,6 +90,9 @@ export class Persona extends BaseEntity {
 
   @ManyToMany({ entity: () => Badge, mappedBy: 'personas' })
   badges: Collection<Badge> = new Collection<Badge>(this);
+
+  @ManyToMany({ entity: () => Expertise, mappedBy: 'personas' })
+  expertises: Collection<Expertise> = new Collection<Expertise>(this);
 
   constructor(
     name: string,

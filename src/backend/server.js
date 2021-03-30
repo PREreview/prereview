@@ -38,9 +38,11 @@ import {
   communityModelWrapper,
   contactModelWrapper,
   eventModelWrapper,
+  expertiseModelWrapper,
   fullReviewModelWrapper,
   fullReviewDraftModelWrapper,
   groupModelWrapper,
+  keyModelWrapper,
   personaModelWrapper,
   preprintModelWrapper,
   rapidReviewModelWrapper,
@@ -57,6 +59,7 @@ import AuthController from './controllers/auth.js'; // authentication/logins
 import BadgeController from './controllers/badge.js';
 import CommentController from './controllers/comment.js';
 import CommunityController from './controllers/community.js';
+import ExpertiseController from './controllers/expertise.js';
 import FullReviewController from './controllers/fullReview.js';
 import DraftController from './controllers/fullReviewDraft.js';
 import GroupController from './controllers/group.js';
@@ -117,7 +120,12 @@ export default async function configServer(config) {
   server.use(currentCommunity());
   server.use(currentPersona());
   server.use(currentUser());
-  const authz = authWrapper(groupModel, communityModel, personaModel); // authorization, not authentication
+  const authz = authWrapper(
+    userModel,
+    groupModel,
+    communityModel,
+    personaModel,
+  ); // authorization, not authentication
 
   // setup API handlers
   const auth = AuthController(
@@ -128,7 +136,9 @@ export default async function configServer(config) {
     authz,
   );
   const badgeModel = badgeModelWrapper(db);
+  const expertiseModel = expertiseModelWrapper(db);
   const badges = BadgeController(badgeModel, authz);
+  const expertises = ExpertiseController(expertiseModel, authz);
   const commentModel = commentModelWrapper(db);
   const eventModel = eventModelWrapper(db);
   const fullReviewModel = fullReviewModelWrapper(db);
@@ -136,7 +146,13 @@ export default async function configServer(config) {
   const fullReviewDrafts = DraftController(draftModel, authz);
   const comments = CommentController(commentModel, fullReviewModel, authz);
   const groups = GroupController(groupModel, userModel, authz);
-  const personas = PersonaController(personaModel, badgeModel, authz);
+  const personas = PersonaController(
+    personaModel,
+    userModel,
+    badgeModel,
+    expertiseModel,
+    authz,
+  );
   const preprintModel = preprintModelWrapper(db);
   const preprints = PreprintController(preprintModel, authz);
   const rapidReviewModel = rapidReviewModelWrapper(db);
@@ -165,7 +181,8 @@ export default async function configServer(config) {
   const tags = TagController(tagModel, authz);
   const templateModel = templateModelWrapper(db);
   const templates = TemplateController(templateModel, communityModel, authz);
-  const users = UserController(userModel, contactModel, authz);
+  const keyModel = keyModelWrapper(db);
+  const users = UserController(userModel, contactModel, keyModel, authz);
   const notifications = NotificationController(userModel, authz);
   const communities = CommunityController(
     communityModel,
@@ -187,6 +204,7 @@ export default async function configServer(config) {
     comments.middleware(),
     communities.middleware(),
     events.middleware(),
+    expertises.middleware(),
     fullReviews.middleware(),
     fullReviewDrafts.middleware(),
     groups.middleware(),

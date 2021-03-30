@@ -2,6 +2,7 @@ import {
   Collection,
   Entity,
   EntityRepositoryType,
+  Index,
   ManyToMany,
   OneToMany,
   OneToOne,
@@ -16,9 +17,17 @@ import { Contact } from './Contact';
 import { Group } from './Group';
 import { Persona } from './Persona';
 import { Work } from './Work';
+import { Key } from './Key';
 import { createRandomOrcid } from '../../../common/utils/orcid.js';
 
 @Entity()
+@Index({ properties: ['defaultPersona'] })
+@Index({ properties: ['groups'] })
+@Index({ properties: ['owned'] })
+@Index({ properties: ['personas'] })
+@Index({ properties: ['contacts'] })
+@Index({ properties: ['works'] })
+@Index({ properties: ['keys'] })
 export class User extends BaseEntity {
   //eslint-disable-next-line
   [EntityRepositoryType]?: UserModel;
@@ -49,6 +58,9 @@ export class User extends BaseEntity {
 
   @OneToMany({ entity: () => Work, mappedBy: 'author' })
   works: Collection<Work> = new Collection<Work>(this);
+
+  @OneToMany({ entity: () => Key, mappedBy: 'owner' })
+  keys: Collection<Key> = new Collection<Key>(this);
 
   constructor(orcid: string, isPrivate = false, defaultPersona?: Persona) {
     super();

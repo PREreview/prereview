@@ -1,98 +1,37 @@
-import React, { useState } from 'react';
-import PropTypes from 'prop-types';
-import Org from './org';
-import XLink from './xlink';
-import Controls from './controls';
-import Button from './button';
+// base imports
+import React, { useContext, useEffect } from 'react';
+import { Helmet } from 'react-helmet-async';
 
-export default function SettingsApi({ user }) {
-  const updateKeys = () => {};
+// contexts
+import UserProvider from '../contexts/user-context';
 
-  const handleSubmit = () => {
-    updateKeys(user)
-      .then(() => alert('API key successfully updated.'))
-      .catch(err => alert(`An error occurred: ${err}`));
-  };
+// Material UI components
+import Box from '@material-ui/core/Box';
+import Container from '@material-ui/core/Container';
 
-  return (
-    <section className="settings-api settings__section">
-      <h3 className="settings__title">API key</h3>
+// components
+import HeaderBar from './header-bar';
+import SettingsKeys from './settings-keys';
 
-      <p>
-        An API key lets you create requests for reviews using the <Org />{' '}
-        <XLink href="/api" to="/api">
-          API
-        </XLink>
-        .
-      </p>
+// constants
+import { ORG } from '../constants';
 
-      {user.apiKey ? (
-        <div>
-          <p>
-            <Secret value={user.apiKey.value} />
-          </p>
+export default function SettingsAPI() {
+  const [user] = useContext(UserProvider.context);
 
-          <Controls
-            error={updateKeys.error} // #FIXME
-          >
-            <Button
-              onClick={handleSubmit}
-              disabled={updateKeys.loading}
-              isWaiting={updateKeys.loading}
-            >
-              Regenerate API key
-            </Button>
-          </Controls>
-        </div>
-      ) : (
-        <div>
-          <Controls
-            error={updateKeys.error} // #FIXME
-          >
-            <Button
-              onClick={handleSubmit}
-              disabled={updateKeys.loading}
-              isWaiting={updateKeys.loading}
-            >
-              Create API key
-            </Button>
-          </Controls>
-        </div>
-      )}
-    </section>
-  );
-}
-
-SettingsApi.propTypes = {
-  user: PropTypes.object.isRequired,
-};
-
-function Secret({ value, defaultIsVisible = false }) {
-  const [isVisible, setIsVisible] = useState(defaultIsVisible);
-
-  const [prefix, ...others] = value.split('-');
-  const suffix = others.join('-');
-
-  const displayedValue = isVisible
-    ? value
-    : `${value.substring(0, prefix.length)}-${'∙'.repeat(suffix.length)}`;
+  useEffect(() => {}, [user]);
 
   return (
-    <span className="settings-api__secret">
-      <code>{displayedValue}</code>
+    <Box>
+      <Helmet>
+        <title>Settings • {ORG}</title>
+      </Helmet>
 
-      <Button
-        onClick={() => {
-          setIsVisible(!isVisible);
-        }}
-      >
-        {isVisible ? 'Hide' : 'View'}
-      </Button>
-    </span>
+      <HeaderBar thisUser={user} />
+
+      <Container>
+        <SettingsKeys user={user} />
+      </Container>
+    </Box>
   );
 }
-
-Secret.propTypes = {
-  value: PropTypes.string.isRequired,
-  defaultIsVisible: PropTypes.bool,
-};

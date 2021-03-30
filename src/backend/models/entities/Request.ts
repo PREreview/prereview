@@ -1,4 +1,10 @@
-import { Entity, EntityRepositoryType, ManyToOne } from '@mikro-orm/core';
+import {
+  Entity,
+  EntityRepositoryType,
+  Index,
+  ManyToOne,
+  Property,
+} from '@mikro-orm/core';
 import { Fixture } from 'class-fixtures-factory';
 import { RequestModel } from '../requests';
 import { BaseEntity } from './BaseEntity';
@@ -6,6 +12,8 @@ import { Persona } from './Persona';
 import { Preprint } from './Preprint';
 
 @Entity()
+@Index({ properties: ['author'] })
+@Index({ properties: ['preprint'] })
 export class Request extends BaseEntity {
   //eslint-disable-next-line
   [EntityRepositoryType]?: RequestModel;
@@ -16,9 +24,15 @@ export class Request extends BaseEntity {
   @ManyToOne({ entity: () => Preprint })
   preprint!: Preprint;
 
-  constructor(author: Persona, preprint: Preprint) {
+  //eslint-disable-next-line
+  @Fixture(() => false)
+  @Property()
+  isPreprintAuthor: boolean = false;
+
+  constructor(author: Persona, preprint: Preprint, isPreprintAuthor = false) {
     super();
     this.author = author;
     this.preprint = preprint;
+    this.isPreprintAuthor = isPreprintAuthor;
   }
 }

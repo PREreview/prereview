@@ -8,14 +8,10 @@ import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 
 // hooks
-import {
-  useIsNewVisitor,
-  useIsMobile,
-  useNewPreprints,
-} from '../hooks/ui-hooks';
+import { useIsNewVisitor, useIsMobile } from '../hooks/ui-hooks';
 
 // utils
-import { processParams, searchParamsToObject } from '../utils/search';
+import { processParams } from '../utils/search';
 
 // contexts
 import UserProvider from '../contexts/user-context';
@@ -54,22 +50,38 @@ import IOIImg from '../assets/images/sponsors/ioi.png';
 import MozillaImg from '../assets/images/sponsors/mozilla.png';
 import WellcomeImg from '../assets/images/sponsors/wellcome.jpg';
 
+// press and awards images
+import ASAPbioImg from '../assets/images/press-awards/ASAPbio.jpg';
+import Bio2040Img from '../assets/images/press-awards/bio2040.jpg';
+import JROSTImg from '../assets/images/press-awards/JROST.png';
+import NatureOSrPREImg from '../assets/images/press-awards/nature-comm-OSrPRE.png';
+import NatureIndexImg from '../assets/images/press-awards/nature-index.jpg';
+import NoManifestoImg from '../assets/images/press-awards/no-manifesto.png';
+import SCMornPostImg from '../assets/images/press-awards/sc-morning-post.jpg';
+import SPARCImg from '../assets/images/press-awards/sparc.jpg';
+import LancetImg from '../assets/images/press-awards/the-lancet.jpg';
+
 // constants
 import { ORG } from '../constants';
 
 const useStyles = makeStyles(theme => ({
-  buttonLink: {
+  buttonBox: {
     background: theme.palette.primary.main,
     borderRadius: '20px',
     boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)',
+    maxWidth: 360,
+    position: 'relative',
+    textAlign: 'center',
+  },
+  buttonLink: {
     color: '#fff !important',
+    display: 'block',
     fontSize: '1.25rem',
     fontWeight: 'bold',
     padding: '20px',
-    position: 'relative',
-    '&:hover': {
+    '&:active, &:focus, &:hover': {
       textDecoration: 'underline',
-      '&:after': {
+      '&:before': {
         border: '3px solid #fff',
         borderRadius: '20px',
         content: '" "',
@@ -108,9 +120,6 @@ const useStyles = makeStyles(theme => ({
     flexDirection: 'column',
     height: '100%',
     justifyContent: 'space-between',
-    '&:hover': {
-      backgroundColor: '#ccc',
-    },
   },
   cardImage: {
     display: 'block',
@@ -140,12 +149,15 @@ const useStyles = makeStyles(theme => ({
   gridTitle: {
     color: '#54948E',
     fontSize: '2rem',
+    fontWeight: 'bold',
   },
   gridContent: {
     fontSize: '1.5rem',
+    marginBottom: 30,
   },
   gridContentLink: {
-    color: `${theme.palette.primary.main} !important`,
+    color: `#000 !important`,
+    fontWeight: 'bold',
   },
   gridLink: {
     backgroundColor: '#FCBD4C',
@@ -164,10 +176,11 @@ const useStyles = makeStyles(theme => ({
   hero: {
     [theme.breakpoints.up('md')]: {
       backgroundImage: `url(${HeroImg})`,
-      backgroundPosition: 'right bottom',
+      backgroundPosition: 'right bottom -22px',
       backgroundRepeat: 'no-repeat',
-      backgroundSize: '70vh',
-      padding: '1rem',
+      backgroundSize: '600px',
+      paddingBottom: '4rem',
+      paddingTop: '6rem',
     },
   },
   heroContent: {
@@ -175,14 +188,35 @@ const useStyles = makeStyles(theme => ({
       maxWidth: '70%',
     },
   },
-  home: {},
+  heroContentSubtext: {
+    [theme.breakpoints.up('md')]: {
+      maxWidth: '70%',
+    },
+  },
+  heroContentText: {
+    [theme.breakpoints.up('md')]: {
+      fontSize: '2.5rem',
+      lineHeight: '57px',
+    },
+  },
+  home: {
+    overflow: 'hidden',
+  },
   img: {
     display: 'block',
+    marginLeft: 'auto',
+    marginRight: 'auto',
+    maxWidth: 800,
     width: '100%',
   },
   sliderImage: {
     marginLeft: 'auto',
     marginRight: 'auto',
+    maxHeight: 600,
+  },
+  sliderItem: {
+    paddingLeft: 20,
+    paddingRight: 20,
   },
   sponsorImage: {
     display: 'block',
@@ -200,6 +234,18 @@ const useStyles = makeStyles(theme => ({
   standoutLink: {
     color: '#fff !important',
     textDecoration: 'underline',
+    '&:hover': {
+      color: '#000 !important',
+    },
+  },
+  vh: {
+    clip: 'rect(0 0 0 0)',
+    clipPath: 'inset(50%)',
+    height: 1,
+    overflow: 'hidden',
+    position: 'absolute',
+    whiteSpace: 'nowrap',
+    width: 1,
   },
 }));
 
@@ -228,9 +274,10 @@ export default function Home() {
   /* Slider settings */
   const settings = {
     autoplay: true,
+    autoplaySpeed: 6000,
+    centerPadding: '80px',
     dots: true,
   };
-
 
   useEffect(() => {}, [isFlipped, search]);
 
@@ -256,19 +303,28 @@ export default function Home() {
 
       <Box className={classes.hero}>
         <Container>
-          <Box my={4} className={classes.heroContent}>
-            <Typography variant="h4" component="div" gutterBottom>
+          <Box mb={4} className={classes.heroContent}>
+            <Typography
+              variant="h4"
+              component="div"
+              className={classes.heroContentText}
+              gutterBottom
+            >
               Catalyzing change in peer review through equity, openness, and
               collaboration
             </Typography>
-            <Typography variant="h5" component="div">
-              We envision a world in which feedback to scholarly outputs is done
-              openly, rapidly, constructively, and by a global community of
-              peers.
+            <Typography
+              variant="h5"
+              component="div"
+              className={classes.heroContentSubtext}
+            >
+              PREreview is a platform, resource center and convener. We provide
+              ways for feedback to preprints to be done openly, rapidly,
+              constructively, and by a global community of peers. Join us!
             </Typography>
-            <Box my={6}>
+            <Box my={6} className={classes.buttonBox}>
               <Link href="/login" className={classes.buttonLink}>
-                Join us and start reviewing now
+                Start reviewing now
               </Link>
             </Box>
           </Box>
@@ -317,7 +373,8 @@ export default function Home() {
             {/* FIXME loop*/}
             <CardActionArea
               className={classes.cardAction}
-              onClick={() => handleFlip(0)}
+              onMouseEnter={() => handleFlip(0)}
+              onMouseLeave={() => handleFlip(0)}
             >
               <ReactCardFlip
                 className={classes.cardContent}
@@ -326,9 +383,9 @@ export default function Home() {
               >
                 <Box p={3} className={classes.cardFront}>
                   <CardContent>
-                    <Link href="/reviews" className={classes.cardTitle}>
+                    <Typography className={classes.cardTitle}>
                       Preprint Review Platform
-                    </Link>
+                    </Typography>
                   </CardContent>
                   <CardMedia>
                     <img
@@ -364,7 +421,8 @@ export default function Home() {
           <Card className={classes.card} elevation={3}>
             <CardActionArea
               className={classes.cardAction}
-              onClick={() => handleFlip(1)}
+              onMouseEnter={() => handleFlip(1)}
+              onMouseLeave={() => handleFlip(1)}
             >
               <ReactCardFlip
                 className={classes.cardContent}
@@ -373,12 +431,9 @@ export default function Home() {
               >
                 <Box p={3} className={classes.cardFront}>
                   <CardContent>
-                    <Link
-                      href="https://content.prereview.org/resources/"
-                      className={classes.cardTitle}
-                    >
+                    <Typography className={classes.cardTitle}>
                       Resource Center
-                    </Link>
+                    </Typography>
                   </CardContent>
                   <CardMedia>
                     <img
@@ -416,7 +471,8 @@ export default function Home() {
           <Card className={classes.card} elevation={3}>
             <CardActionArea
               className={classes.cardAction}
-              onClick={() => handleFlip(2)}
+              onMouseEnter={() => handleFlip(2)}
+              onMouseLeave={() => handleFlip(2)}
             >
               <ReactCardFlip
                 className={classes.cardContent}
@@ -425,9 +481,9 @@ export default function Home() {
               >
                 <Box p={3} className={classes.cardFront}>
                   <CardContent>
-                    <Link href="/communities" className={classes.cardTitle}>
+                    <Typography className={classes.cardTitle}>
                       PREreview Communities
-                    </Link>
+                    </Typography>
                   </CardContent>
                   <CardMedia>
                     <img
@@ -463,15 +519,15 @@ export default function Home() {
       <Box bgcolor="#54948E" color="#fff" textAlign="center" py={8}>
         <Container>
           <Typography className={classes.standout}>
-            We believe in equatable access, connecting people, self reflection,
+            We believe in equitable access, connecting people, self reflection,
             and measurable success.
           </Typography>
         </Container>
       </Box>
       <Box py={8} textAlign="center">
         <Container>
-          <Grid container spacing={10} alignItems="center" justify="center">
-            <Grid item sm={12} md={6}>
+          <Grid container spacing={10} alignItems="flex-start" justify="center">
+            <Grid item xs={12}>
               <Typography
                 component="div"
                 variant="h6"
@@ -486,8 +542,8 @@ export default function Home() {
                 className={classes.gridContent}
                 gutterBottom
               >
-                On our preprint review platform, any researcher with an ORCID iD
-                can request or provide constructive feedback to preprints.
+                Researchers can join or start their own community to bring
+                together peers with shared interests and values.
               </Typography>
               <Typography
                 component="div"
@@ -504,28 +560,17 @@ export default function Home() {
                 </Link>
                 .
               </Typography>
-            </Grid>
-            <Grid item sm={12} md={6}>
               <img
                 src={CommunitiesImg}
                 alt=""
                 aria-hidden="true"
                 className={classes.img}
               />
-              <Typography
-                component="div"
-                variant="body1"
-                className={classes.gridContent}
-                gutterBottom
-              >
-                Researchers can join or start their own community to bring
-                together peers with shared interests and values.
-              </Typography>
               <Link href="/communities" className={classes.gridLink}>
                 Explore Communities
               </Link>
             </Grid>
-            <Grid item sm={12} md={6}>
+            <Grid item sm={12} md={5}>
               <Typography
                 component="div"
                 variant="h6"
@@ -560,7 +605,7 @@ export default function Home() {
                 Stay connected via our newsletter
               </Link>
             </Grid>
-            <Grid item sm={12} md={6}>
+            <Grid item sm={12} md={5}>
               <Typography
                 component="div"
                 variant="h6"
@@ -609,9 +654,123 @@ export default function Home() {
                 className={classes.gridContent}
                 gutterBottom
               >
-                Contra legem facit qui id facit quod lex prohibet. Donec sed
-                odio operae, eu vulputate felis rhoncus. A communi observantia
-                non est recedendum.
+                Inexperience is the greatest barrier to gaining experience. Not
+                only do I not know where to start, I also do not know how to get
+                there. Furthermore, the only advice I have ever received on the
+                topic [of peer review] has been &quot;Don&apos;t do it. It’s a
+                waste of time that doesn&apos;t contribute to your career&quot;,
+                which epitomizes the core problems causing the rot we see in
+                peer review.
+              </Typography>
+              <Typography
+                component="div"
+                variant="body1"
+                className={classes.gridContent}
+                gutterBottom
+              >
+                - Juan Manuel Vazquez, PREreview Open Reviewer 2021
+              </Typography>
+            </Box>
+            <Box>
+              <Typography
+                component="div"
+                variant="body1"
+                className={classes.gridContent}
+                gutterBottom
+              >
+                Please continue to train and recruit young reviewers.
+              </Typography>
+              <Typography
+                component="div"
+                variant="body1"
+                className={classes.gridContent}
+                gutterBottom
+              >
+                - Kishore Wary, PREreview Open Reviewer Mentor 2021
+              </Typography>
+            </Box>
+            <Box>
+              <Typography
+                component="div"
+                variant="body1"
+                className={classes.gridContent}
+                gutterBottom
+              >
+                Science has a racism issue. Many discovered this issue recently
+                with the murder of George Floyd and Breonna Taylor. But we
+                (people of color and underrepresented in science) knew about
+                this a while ago. I believe to balance the inequalities in the
+                scientific enterprise, we should tackle different angles that
+                include but are not limited to scientific training, recruitment,
+                and support. Peer review is an important stage for scientific
+                progress so by diversifying the reviewer pool we can push the
+                needle forward and start to provide different voices to the
+                reviewing process.
+              </Typography>
+              <Typography
+                component="div"
+                variant="body1"
+                className={classes.gridContent}
+                gutterBottom
+              >
+                - Joel Encarnacion-Rosado, PREreview Open Reviewer 2021
+              </Typography>
+            </Box>
+            <Box>
+              <Typography
+                component="div"
+                variant="body1"
+                className={classes.gridContent}
+                gutterBottom
+              >
+                If we really want to diversify science we need to diversify the
+                people who are labeled as &quot;expert&quot; in a field and
+                [who] have the power to evaluate the quality of their
+                peers&apos; work.
+              </Typography>
+              <Typography
+                component="div"
+                variant="body1"
+                className={classes.gridContent}
+                gutterBottom
+              >
+                - Natalia Torres, PREreview Open Reviewer 2021
+              </Typography>
+            </Box>
+            <Box>
+              <Typography
+                component="div"
+                variant="body1"
+                className={classes.gridContent}
+                gutterBottom
+              >
+                My expectations were fully met and beyond. I felt that the
+                discussions on non-violent communication tied with the
+                anti-bias/systems of oppression discussions really highlighted
+                how valuable and important this program really is to our broader
+                scientific community. I am happy to have also become part of
+                this growing community.
+              </Typography>
+              <Typography
+                component="div"
+                variant="body1"
+                className={classes.gridContent}
+                gutterBottom
+              >
+                - Sergio Redondo, PREreview Open Reviewer 2021
+              </Typography>
+            </Box>
+            <Box>
+              <Typography
+                component="div"
+                variant="body1"
+                className={classes.gridContent}
+                gutterBottom
+              >
+                I found getting involved in the peer review process challenging.
+                When I was a graduate student, journal editors seemed reluctant
+                to include me as a peer reviewer. Most often, they did not want
+                to challenge the status quo in peer reviewing.
               </Typography>
               <Typography
                 component="div"
@@ -620,44 +779,6 @@ export default function Home() {
                 gutterBottom
               >
                 - PREreview Open Reviewer 2021
-              </Typography>
-            </Box>
-            <Box>
-              <Typography
-                component="div"
-                variant="body1"
-                className={classes.gridContent}
-                gutterBottom
-              >
-                Quae vero auctorem tractata ab fiducia dicuntur. Quam temere in
-                vitiis, legem sancimus haerentia. Qui ipsorum lingua Celtae,
-                nostra Galli appellantur.
-              </Typography>
-              <Typography
-                component="div"
-                variant="body1"
-                className={classes.gridContent}
-                gutterBottom
-              >
-                - Another PREreview Open Reviewer 2021
-              </Typography>
-            </Box>
-            <Box>
-              <Typography
-                component="div"
-                variant="body1"
-                className={classes.gridContent}
-                gutterBottom
-              >
-                Morbi odio eros, volutpat ut pharetra vitae, lobortis sed nibh.
-              </Typography>
-              <Typography
-                component="div"
-                variant="body1"
-                className={classes.gridContent}
-                gutterBottom
-              >
-                - Yet Another PREreview Open Reviewer 2021
               </Typography>
             </Box>
           </Slider>
@@ -735,25 +856,141 @@ export default function Home() {
           </Typography>
           <Slider {...settings}>
             <Box textAlign="center">
-              <img
-                src="http://satyr.io/988x588/red"
-                alt="FIXME"
-                className={classes.sliderImage}
-              />
+              <Link
+                href="https://asapbio.org/sprint-recap"
+                target="_blank"
+                rel="noreferrer"
+              >
+                <span className={classes.vh}>ASAPbio article</span>
+                <img
+                  src={ASAPbioImg}
+                  alt=""
+                  ariaHidden="true"
+                  className={classes.sliderImage}
+                />
+              </Link>
             </Box>
             <Box textAlign="center">
-              <img
-                src="http://satyr.io/988x588/red"
-                alt="FIXME"
-                className={classes.sliderImage}
-              />
+              <Link
+                href="https://investinopen.org/blog/jrost-rapid-response-fund-awardees/"
+                target="_blank"
+                rel="noreferrer"
+              >
+                <span className={classes.vh}>JROST award</span>
+                <img
+                  src={JROSTImg}
+                  alt=""
+                  ariaHidden="true"
+                  className={classes.sliderImage}
+                />
+              </Link>
             </Box>
             <Box textAlign="center">
-              <img
-                src="http://satyr.io/988x588/red"
-                alt="FIXME"
-                className={classes.sliderImage}
-              />
+              <Link
+                href="https://www.nature.com/articles/d41586-020-00613-4"
+                target="_blank"
+                rel="noreferrer"
+              >
+                <span className={classes.vh}>Nature article</span>
+                <img
+                  src={NatureOSrPREImg}
+                  alt=""
+                  ariaHidden="true"
+                  className={classes.sliderImage}
+                />
+              </Link>
+            </Box>
+            <Box textAlign="center">
+              <Link
+                href="https://www.thelancet.com/journals/lanplh/article/PIIS2542-5196(21)00011-5/fulltext"
+                target="_blank"
+                rel="noreferrer"
+              >
+                <span className={classes.vh}>The Lancet article</span>
+                <img
+                  src={LancetImg}
+                  alt=""
+                  ariaHidden="true"
+                  className={classes.sliderImage}
+                />
+              </Link>
+            </Box>
+            <Box textAlign="center">
+              <Link
+                href="https://www.natureindex.com/news-blog/three-online-tools-aimed-at-improving-preprints"
+                target="_blank"
+                rel="noreferrer"
+              >
+                <span className={classes.vh}>Nature Index article</span>
+                <img
+                  src={NatureIndexImg}
+                  alt=""
+                  ariaHidden="true"
+                  className={classes.sliderImage}
+                />
+              </Link>
+            </Box>
+            <Box textAlign="center">
+              <Link
+                href="https://www.scmp.com/news/china/article/3075431/will-coronavirus-kill-dinosaur-world-academic-publishing"
+                target="_blank"
+                rel="noreferrer"
+              >
+                <span className={classes.vh}>
+                  South China Morning Post article
+                </span>
+                <img
+                  src={SCMornPostImg}
+                  alt=""
+                  ariaHidden="true"
+                  className={classes.sliderImage}
+                />
+              </Link>
+            </Box>
+            <Box textAlign="center">
+              <Link
+                href="https://sparcopen.org/news/2020/opencon-community-members-support-rapid-covid-response-through-preprints/"
+                target="_blank"
+                rel="noreferrer"
+              >
+                <span className={classes.vh}>SPARC article</span>
+                <img
+                  src={SPARCImg}
+                  alt=""
+                  ariaHidden="true"
+                  className={classes.sliderImage}
+                />
+              </Link>
+            </Box>
+            <Box textAlign="center">
+              <Link
+                href="https://bio2040.com/2018/04/09/opening-up-the-opaque-peer-review-process-with-sam-daniela-from-prereview/"
+                target="_blank"
+                rel="noreferrer"
+              >
+                <span className={classes.vh}>bio2040 interview</span>
+                <img
+                  src={Bio2040Img}
+                  alt=""
+                  ariaHidden="true"
+                  className={classes.sliderImage}
+                />
+              </Link>
+            </Box>
+            <Box textAlign="center">
+              <Link
+                href="https://www.nomanifestos.com/episodes/4"
+                target="_blank"
+                rel="noreferrer"
+              >
+                <span className={classes.vh}>No Manifestos interview</span>
+                <img
+                  src={NoManifestoImg}
+                  alt=""
+                  ariaHidden="true"
+                  className={classes.sliderImage}
+                />
+              </Link>
             </Box>
           </Slider>
         </Container>

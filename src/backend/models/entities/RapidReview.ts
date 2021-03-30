@@ -2,6 +2,7 @@ import {
   Entity,
   EntityRepositoryType,
   Enum,
+  Index,
   ManyToOne,
   Property,
 } from '@mikro-orm/core';
@@ -19,6 +20,8 @@ enum Checkboxes {
 }
 
 @Entity()
+@Index({ properties: ['author'] })
+@Index({ properties: ['preprint'] })
 export class RapidReview extends BaseEntity {
   //eslint-disable-next-line
   [EntityRepositoryType]?: RapidReviewModel;

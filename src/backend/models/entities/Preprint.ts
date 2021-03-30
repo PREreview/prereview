@@ -3,6 +3,7 @@ import {
   Collection,
   Entity,
   EntityRepositoryType,
+  Index,
   ManyToMany,
   OneToMany,
   Property,
@@ -19,6 +20,11 @@ import { Tag } from './Tag';
 import { createRandomDoi } from '../../../common/utils/ids';
 
 @Entity()
+@Index({ properties: ['rapidReviews'] })
+@Index({ properties: ['fullReviews'] })
+@Index({ properties: ['requests'] })
+@Index({ properties: ['communities'] })
+@Index({ properties: ['tags'] })
 export class Preprint extends BaseEntity {
   //eslint-disable-next-line
   [EntityRepositoryType]?: PreprintModel;

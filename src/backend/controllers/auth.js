@@ -4,7 +4,7 @@ import router from 'koa-joi-router';
 import anonymus from 'anonymus';
 import merge from 'lodash.merge';
 import { getLogger } from '../log.js';
-import { getOrcidPerson } from '../utils/orcid.js';
+import { getOrcidPerson, getOrcidWorks, processWorks } from '../utils/orcid.js';
 
 const log = getLogger('backend:controllers:auth');
 
@@ -62,7 +62,8 @@ export default function controller(
       },
     };
 
-    log.trace('verifyCallback() profile:', profile);
+    log.debug('verifyCallback() req:', req);
+    log.debug('verifyCallback() profile:', profile);
 
     let user;
 
@@ -73,13 +74,34 @@ export default function controller(
         'owned', //communities
         'groups',
       ]);
-      log.trace('verifyCallback() user:', user);
+      log.debug('verifyCallback() user:', user);
     } catch (err) {
       log.error('Error fetching user:', err);
     }
 
+    let fullProfile;
+    try {
+      fullProfile = await getOrcidPerson(profile.orcid, profile.token);
+      log.debug('ORCiD Profile:', fullProfile);
+    } catch (error) {
+      log.error('Could not fetch user profile from ORCiD:', error);
+    }
+
+    let works;
+    try {
+      works = await getOrcidWorks(profile.orcid, profile.token);
+      log.debug(`User's works from ORCiD: `, works);
+    } catch (error) {
+      log.error(`Could not fetch user works from ORCiD: `, error);
+    }
+
     if (user) {
       const completeUser = merge(profile, user); // including the access.token in the user that gets sent to the passport serializer
+      works
+        ? processWorks(works, user)
+        : log.debug(
+            `This user has no published works connected to their ORCiD account`,
+          );
       log.debug('Authenticated user: ', completeUser);
       return done(null, completeUser);
     } else {
@@ -93,7 +115,7 @@ export default function controller(
       try {
         log.debug('Creating new user.');
         newUser = users.create({ orcid: params.orcid });
-        log.trace('verifyCallback() newUser:', newUser);
+        log.debug('verifyCallback() newUser:', newUser);
       } catch (err) {
         log.error('Error creating user:', err);
       }
@@ -131,6 +153,12 @@ export default function controller(
             isAnonymous: false,
           });
 
+          works
+            ? processWorks(works, newUser)
+            : log.debug(
+                `This user has no published works connected to their ORCiD account`,
+              );
+
           newUser.defaultPersona = anonPersona;
           personas.persist([anonPersona, publicPersona]);
           users.persist(newUser);
@@ -139,11 +167,6 @@ export default function controller(
         }
 
         try {
-          const fullProfile = await getOrcidPerson(
-            profile.orcid,
-            profile.token,
-          );
-
           if (
             Array.isArray(fullProfile.emails.email) &&
             fullProfile.emails.email.length > 0
@@ -179,7 +202,7 @@ export default function controller(
       if (newUser) {
         log.debug('Authenticated & created user.', newUser);
         const completeUser = merge(profile, { ...newUser, isNew: true });
-        log.trace('verifyCallback() new completeUser:', completeUser);
+        log.debug('verifyCallback() new completeUser:', completeUser);
         return done(null, completeUser);
       } else {
         return done(null, false);
@@ -222,12 +245,12 @@ export default function controller(
     method: 'GET',
     path: '/orcid/callback',
     handler: async ctx => {
+      log.debug('/orcid/callback ctx.request:', ctx.request);
       return passport.authenticate('orcid', (err, user) => {
         log.debug('Receiving ORCiD callback.');
         if (!user) {
-          ctx.body = { success: false };
           log.error('Authentication failed: ', err);
-          ctx.throw(401, 'Authentication failed.');
+          ctx.redirect('/login');
         } else {
           log.debug('Received user: ', user.uuid);
           ctx.state.user = user;
@@ -248,7 +271,7 @@ export default function controller(
             ctx.login(user);
 
             if (user.isNew) {
-              ctx.redirect('/settings');
+              ctx.redirect(`/about/${user.defaultPersona.uuid}`);
               return;
             }
 
