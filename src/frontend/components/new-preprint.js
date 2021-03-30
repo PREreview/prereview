@@ -20,7 +20,7 @@ import Button from './button';
 import TextInput from './text-input';
 import PreprintPreview from './preprint-preview';
 
-export default function NewPreprint({ user, onCancel, onSuccess }) {
+export default function NewPreprint({ user, community, onCancel, onSuccess }) {
   const location = useLocation(); // location.state can be {preprint, tab, isSingleStep} with tab being `request` or `review` (so that we know on which tab the shell should be activated with
   const qs = new URLSearchParams(location.search);
 
@@ -47,6 +47,7 @@ export default function NewPreprint({ user, onCancel, onSuccess }) {
     identifier,
     location.state && location.state.preprint,
     url,
+    community,
   );
 
   const [step, setStep] = useState(
@@ -315,7 +316,7 @@ function StepReviewSuccess({ preprint, onClose, onViewInContext }) {
 StepReviewSuccess.propTypes = {
   preprint: PropTypes.object.isRequired,
   onClose: PropTypes.func.isRequired,
-  onViewInContext: PropTypes.func.isRequired
+  onViewInContext: PropTypes.func.isRequired,
 };
 
 function StepRequestSuccess({ preprint, onClose, onViewInContext }) {
@@ -343,5 +344,5 @@ function StepRequestSuccess({ preprint, onClose, onViewInContext }) {
 StepRequestSuccess.propTypes = {
   preprint: PropTypes.object.isRequired,
   onClose: PropTypes.func.isRequired,
-  onViewInContext: PropTypes.func.isRequired
+  onViewInContext: PropTypes.func.isRequired,
 };

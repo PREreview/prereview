@@ -164,7 +164,7 @@ export default function App({ user }) {
               </Route>
               <Route
                 exact={true}
-                path="/communities/:id"
+                path="/communities/:id/:new(new)?"
                 >
                 <Community />
               </Route>

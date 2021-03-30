@@ -140,6 +140,7 @@ export function usePreprint(
   identifier, // arXivId or DOI
   prefetchedPreprint,
   fallbackUrl, // a URL to use in case `identifier` hasn't been registered with the DOI service yet (e.g., crossref)
+  community,
 ) {
   identifier = unprefix(identifier);
 
@@ -183,7 +184,7 @@ export function usePreprint(
         fetch(
           `/api/v2/resolve?identifier=${encodeURIComponent(identifier)}${
             fallbackUrl ? `&url=${encodeURIComponent(fallbackUrl)}` : ''
-          }`,
+          }${community ? `&community=${encodeURIComponent(community)}` : ''}`,
           {
             signal: controller.signal,
           },
