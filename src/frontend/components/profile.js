@@ -24,7 +24,6 @@ import {
   withStyles,
   createMuiTheme,
 } from '@material-ui/core/styles';
-import Avatar from '@material-ui/core/Avatar';
 import Box from '@material-ui/core/Box';
 import Chip from '@material-ui/core/Chip';
 import Container from '@material-ui/core/Container';
@@ -42,6 +41,7 @@ import Select from '@material-ui/core/Select';
 import TextField from '@material-ui/core/TextField';
 
 // components
+import Avatar from './avatar';
 import HeaderBar from './header-bar';
 import Loading from './loading.js';
 import Modal from './modal';
@@ -264,12 +264,8 @@ export default function Profile() {
       setName(displayedPersona.name);
       setBio(displayedPersona.bio ? displayedPersona.bio : '');
     }
-    if (
-      displayedPersona &&
-      !displayedPersona.isAnonymous &&
-      displayedPersona.identity
-    ) {
-      setContacts(displayedPersona.identity.contacts);
+    if (displayedPersona && !displayedPersona.isAnonymous) {
+      setContacts(displayedPersona.contacts);
     }
   }, [displayedPersona]);
 
@@ -349,9 +345,18 @@ export default function Profile() {
                               spacing={2}
                             >
                               <Grid item>
-                                <Avatar className={classes.small}>
-                                  {selected.name.charAt(0)}
-                                </Avatar>
+                                <Avatar
+                                  avatar={displayedPersona.avatar}
+                                  email={
+                                    contacts &&
+                                    Array.isArray(contacts) &&
+                                    contacts.length > 0
+                                      ? contacts[0].value
+                                      : undefined
+                                  }
+                                  personaName={displayedPersona.name}
+                                  className="selector"
+                                />
                               </Grid>
                               <Grid item>
                                 <span>
@@ -470,7 +475,9 @@ export default function Profile() {
                               <List>
                                 {contacts.map(contact => (
                                   <ListItem key={contact.uuid}>
-                                    {contact.value}
+                                    <a href={`mailto:${contact.value}`}>
+                                      {contact.value}
+                                    </a>
                                   </ListItem>
                                 ))}
                               </List>
@@ -531,14 +538,30 @@ export default function Profile() {
                     {ownProfile ? (
                       <IconButton onClick={handleAvatarClick}>
                         <Avatar
-                          src={displayedPersona.avatar}
-                          className={classes.avatar}
+                          avatar={displayedPersona.avatar}
+                          email={
+                            contacts &&
+                            Array.isArray(contacts) &&
+                            contacts.length > 0
+                              ? contacts[0].value
+                              : undefined
+                          }
+                          personaName={displayedPersona.name}
+                          className="profile"
                         />
                       </IconButton>
                     ) : (
                       <Avatar
-                        src={displayedPersona.avatar}
-                        className={classes.avatar}
+                        avatar={displayedPersona.avatar}
+                        email={
+                          contacts &&
+                          Array.isArray(contacts) &&
+                          contacts.length > 0
+                            ? contacts[0].value
+                            : undefined
+                        }
+                        personaName={displayedPersona.name}
+                        className="profile"
                       />
                     )}
                   </Grid>

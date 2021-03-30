@@ -10,19 +10,19 @@ import MuiAvatar from '@material-ui/core/Avatar';
 import Popover from '@material-ui/core/Popover';
 
 // components
-//import Avatar from './avatar';
+import Avatar from './avatar';
 import NoticeBadge from './notice-badge';
 import XLink from './xlink';
 
 // icons
 import { MdPerson } from 'react-icons/md';
 
-const Avatar = withStyles({
-  root: {
-    height: 28,
-    width: 28,
-  }
-})(MuiAvatar);
+//const Avatar = withStyles({
+//  root: {
+//    height: 28,
+//    width: 28,
+//  },
+//})(MuiAvatar);
 
 const useStyles = makeStyles(theme => ({
   popover: {
@@ -36,7 +36,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const RoleBadge = React.forwardRef(function RoleBadge(
-  { children, className, tooltip, showNotice, disabled, user },
+  { children, className, tooltip, showNotice, disabled, user, contacts },
   ref,
 ) {
   return (
@@ -44,6 +44,7 @@ const RoleBadge = React.forwardRef(function RoleBadge(
       ref={ref}
       tooltip={tooltip}
       user={user}
+      contacts={contacts}
       className={className}
       showNotice={showNotice}
       disabled={disabled}
@@ -68,11 +69,18 @@ export default RoleBadge;
  * Non hooked version (handy for story book and `UserBadge`)
  */
 const RoleBadgeUI = React.forwardRef(function RoleBadgeUI(
-  { user, className, children, tooltip, showNotice = false, disabled = false },
+  {
+    user,
+    contacts,
+    className,
+    children,
+    tooltip,
+    showNotice = false,
+    disabled = false,
+  },
   ref,
 ) {
-
-// ****  USER IN THIS COMPONENT IS ACTUALLY A PERSONA OBJECT **** //
+  // ****  USER IN THIS COMPONENT IS ACTUALLY A PERSONA OBJECT **** //
 
   const classes = useStyles();
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -88,6 +96,7 @@ const RoleBadgeUI = React.forwardRef(function RoleBadgeUI(
   const open = Boolean(anchorEl);
   const id = open ? 'user-menu' : undefined;
 
+  console.log('user:', user);
   return (
     <>
       <div className="role-badge-menu-container">
@@ -104,7 +113,17 @@ const RoleBadgeUI = React.forwardRef(function RoleBadgeUI(
             Open
           </span>
           <Tooltipify tooltip={tooltip} user={user}>
-            <Avatar src={user.avatar} ref={ref} />
+            <Avatar
+              avatar={user.avatar}
+              email={
+                contacts && Array.isArray(contacts) && contacts.length > 0
+                  ? contacts[0].value
+                  : undefined
+              }
+              personaName={user.name}
+              className="corner"
+              ref={ref}
+            />
           </Tooltipify>
         </button>
       </div>

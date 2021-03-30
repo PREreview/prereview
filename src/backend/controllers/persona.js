@@ -220,12 +220,25 @@ export default function controller(
         }
       }
 
+      delete persona.identity;
       if (user) {
         log.debug('Found corresponding user:', user);
+        console.log(
+          'contacts:',
+          user.contacts.getItems().filter(contact => contact.isPublic),
+        );
         ctx.body = {
           status: 200,
           message: 'ok',
-          data: [{ orcid: user.orcid, contacts: user.contacts, ...persona }],
+          data: [
+            {
+              ...persona,
+              orcid: user.orcid,
+              contacts: user.contacts
+                .getItems()
+                .filter(contact => contact.isPublic),
+            },
+          ],
         };
       } else {
         ctx.body = {
