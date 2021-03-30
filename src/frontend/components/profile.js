@@ -652,7 +652,7 @@ export default function Profile() {
                         {works.length > 0
                           ? works.map(work => {
                             return (
-                              <Card>
+                              <Card key={work.uuid}>
                                 <CardContent>
                                   <Typography
                                     className={classes.title}
