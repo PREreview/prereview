@@ -22,10 +22,16 @@ import {
   withStyles,
   createMuiTheme,
 } from '@material-ui/core/styles';
+import Accordion from '@material-ui/core/Accordion';
+import AccordionSummary from '@material-ui/core/AccordionSummary';
+import AccordionDetails from '@material-ui/core/AccordionDetails';
 import Avatar from '@material-ui/core/Avatar';
 import Box from '@material-ui/core/Box';
+import Card from '@material-ui/core/Card';
+import CardContent from '@material-ui/core/CardContent';
 import Chip from '@material-ui/core/Chip';
 import Container from '@material-ui/core/Container';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import IconButton from '@material-ui/core/IconButton';
 import Link from '@material-ui/core/Link';
@@ -232,6 +238,8 @@ export default function Profile() {
     displayedPersona && displayedPersona.communities
       ? displayedPersona.communities
       : [];
+  const works =
+    displayedPersona && displayedPersona.works ? displayedPersona.works : [];
   const [bio, setBio] = useState(
     displayedPersona && displayedPersona.bio ? displayedPersona.bio : '',
   );
@@ -599,31 +607,80 @@ export default function Profile() {
             {editMode ? null : (
               <Box>
                 <Container>
-                  <Typography component="h2" variant="h6" gutterBottom>
-                    PREreview Communities
-                  </Typography>
-                  <Grid>
-                    {communities.map(community => {
-                      return (
-                        <Chip
-                          key={community.uuid}
-                          label={community.name}
-                          variant="outlined"
-                          href={`/communities/${community.slug}`}
-                          component="a"
-                          target="_blank"
-                          clickable
-                        />
-                      );
-                    })}
-                  </Grid>
-                  <Typography component="h2" variant="h6" gutterBottom>
-                    PREreview Contributions
-                  </Typography>
-                  <RoleActivity persona={displayedPersona} />
-                  <Typography component="h2" variant="h6" gutterBottom>
-                    List of Publications
-                  </Typography>
+                  <Accordion>
+                    <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                      <Typography component="h2" variant="h6" gutterBottom>
+                        PREreview communities
+                      </Typography>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                      <Grid>
+                        {communities.length > 0
+                          ? communities.map(community => {
+                              return (
+                                <Chip
+                                  key={community.uuid}
+                                  label={community.name}
+                                  variant="outlined"
+                                  href={`/communities/${community.slug}`}
+                                  component="a"
+                                  target="_blank"
+                                  clickable
+                                />
+                              );
+                            })
+                          : `${
+                              displayedPersona.name
+                            } hasn't joined any communities yet.`}
+                      </Grid>
+                    </AccordionDetails>
+                  </Accordion>
+                  <Accordion>
+                    <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                      <Typography component="h2" variant="h6" gutterBottom>
+                        PREreview contributions
+                      </Typography>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                      <Grid>
+                        <RoleActivity persona={displayedPersona} />
+                      </Grid>
+                    </AccordionDetails>
+                  </Accordion>
+                  <Accordion>
+                    <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                      <Typography component="h2" variant="h6" gutterBottom>
+                        Publications
+                      </Typography>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                      <Grid>
+                        {works.length > 0
+                          ? works.map(work => {
+                              return (
+                                <Card key={work.uuid}>
+                                  <CardContent>
+                                    <Typography
+                                      variant="h6"
+                                      component="h2"
+                                      gutterBottom
+                                    >
+                                      {work.title}
+                                    </Typography>
+                                    <Typography>{work.publisher}</Typography>
+                                    <Typography>
+                                      {work.publicationDate}
+                                    </Typography>
+                                  </CardContent>
+                                </Card>
+                              );
+                            })
+                          : `${
+                              displayedPersona.name
+                            } has no publications connected to their ORCiD account.`}
+                      </Grid>
+                    </AccordionDetails>
+                  </Accordion>
                 </Container>
               </Box>
             )}

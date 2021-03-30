@@ -219,7 +219,10 @@ export default function controller(
       if (!persona.isAnonymous) {
         log.debug('This is a public persona, retrieving user data.');
         try {
-          user = await usersModel.findOneByPersona(persona.uuid, ['contacts']);
+          user = await usersModel.findOneByPersona(persona.uuid, [
+            'contacts',
+            'works',
+          ]);
         } catch (err) {
           log.error('HTTP 400 Error: ', err);
           ctx.throw(400, `Failed to parse schema: ${err}`);
@@ -234,11 +237,12 @@ export default function controller(
           message: 'ok',
           data: [
             {
-              ...persona,
               orcid: user.orcid,
               contacts: user.contacts
                 .getItems()
                 .filter(contact => contact.isPublic),
+              works: user.works,
+              ...persona,
             },
           ],
         };

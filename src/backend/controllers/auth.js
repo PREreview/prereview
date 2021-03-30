@@ -4,7 +4,7 @@ import router from 'koa-joi-router';
 import anonymus from 'anonymus';
 import merge from 'lodash.merge';
 import { getLogger } from '../log.js';
-import { getOrcidPerson } from '../utils/orcid.js';
+import { getOrcidPerson, getOrcidWorks, processWorks } from '../utils/orcid.js';
 
 const log = getLogger('backend:controllers:auth');
 
@@ -87,8 +87,21 @@ export default function controller(
       log.error('Could not fetch user profile from ORCiD:', error);
     }
 
+    let works;
+    try {
+      works = await getOrcidWorks(profile.orcid, profile.token);
+      log.debug(`User's works from ORCiD: `, works);
+    } catch (error) {
+      log.error(`Could not fetch user works from ORCiD: `, error);
+    }
+
     if (user) {
       const completeUser = merge(profile, user); // including the access.token in the user that gets sent to the passport serializer
+      works
+        ? processWorks(works, user)
+        : log.debug(
+            `This user has no published works connected to their ORCiD account`,
+          );
       log.debug('Authenticated user: ', completeUser);
       return done(null, completeUser);
     } else {
@@ -139,6 +152,12 @@ export default function controller(
             identity: newUser,
             isAnonymous: false,
           });
+
+          works
+            ? processWorks(works, newUser)
+            : log.debug(
+                `This user has no published works connected to their ORCiD account`,
+              );
 
           newUser.defaultPersona = anonPersona;
           personas.persist([anonPersona, publicPersona]);
