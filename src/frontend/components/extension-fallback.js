@@ -1,9 +1,8 @@
 // base imports
-import React, { Suspense, useContext, useEffect, useMemo, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
+import clsx from 'clsx';
 import { Helmet } from 'react-helmet-async';
-import Cookies from 'js-cookie';
-import mobile from 'is-mobile';
 
 // contexts
 import UserProvider from '../contexts/user-context';
@@ -13,53 +12,154 @@ import { useGetPreprint } from '../hooks/api-hooks.tsx';
 import { useExtension } from '../hooks/extension-hooks';
 
 // utils
-import { createPreprintId } from '../utils/ids';
 import { getCanonicalUrl } from '../utils/preprints';
-import { unprefix } from '../utils/jsonld';
 
-// Material UI components
-import { makeStyles } from '@material-ui/core/styles';
+// Material UI imports
+import { makeStyles, useTheme } from '@material-ui/core/styles';
+import AppBar from '@material-ui/core/AppBar';
 import Box from '@material-ui/core/Box';
-import Grid from '@material-ui/core/Grid';
-import Link from '@material-ui/core/Link';
+import CssBaseline from '@material-ui/core/CssBaseline';
+import Divider from '@material-ui/core/Divider';
+import Drawer from '@material-ui/core/Drawer';
+import IconButton from '@material-ui/core/IconButton';
+import MenuOpenIcon from '@material-ui/icons/MenuOpen';
+import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 
+// icons
+import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
+import ChevronRightIcon from '@material-ui/icons/ChevronRight';
+
 // components
+import HeaderBar from './header-bar';
+import Link from '@material-ui/core/Link';
 import Loading from './loading';
 import NotFound from './not-found';
 import Shell from './shell';
 import ShellContent from './shell-content';
-import SuspenseLoading from './suspense-loading';
 
 // constants
 import { ORG } from '../constants';
 
-const PdfViewer = React.lazy(() =>
-  import(/* webpackChunkName: "pdf-viewer" */ './pdf-viewer'),
-);
+const drawerWidth = '40vw';
 
 const useStyles = makeStyles(theme => ({
-  grid: {},
-  object: {
-    height: '100%',
+  root: {
+    display: 'flex',
+  },
+  appBar: {
+    transition: theme.transitions.create(['width', 'margin'], {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.leavingScreen,
+    }),
     width: '100%',
+    zIndex: theme.zIndex.drawer + 1,
+  },
+  appBarContent: {
+    alignItems: 'center',
+    display: 'flex',
+    justifyContent: 'space-between',
+    paddingLeft: 0,
+    paddingRight: 0,
+    width: '100%',
+  },
+  appBarShift: {
+    marginRight: drawerWidth,
+    transition: theme.transitions.create(['width', 'margin'], {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+    width: `calc(100% - ${drawerWidth})`,
+  },
+  content: {
+    flexGrow: 1,
+    padding: theme.spacing(3),
+  },
+  drawer: {
+    flexShrink: 0,
+    width: drawerWidth,
+    whiteSpace: 'nowrap',
+  },
+  drawerOpen: {
+    transition: theme.transitions.create('width', {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+    width: drawerWidth,
+  },
+  drawerClose: {
+    overflowX: 'hidden',
+    transition: theme.transitions.create('width', {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.leavingScreen,
+    }),
+    width: theme.spacing(7) + 1,
+    [theme.breakpoints.up('sm')]: {
+      width: theme.spacing(9) + 1,
+    },
+  },
+  headerBarFull: {
+    width: `calc(100% - 74px)`,
+  },
+  headerBarCondensed: {
+    width: `100%`,
+  },
+  hide: {
+    display: 'none',
+  },
+  menuButton: {
+    marginLeft: theme.spacing(1),
+    marginRight: theme.spacing(1),
+  },
+  object: {
+    height: '100vh',
+    width: '100%',
+  },
+  toolbar: {
+    alignItems: 'center',
+    display: 'flex',
+    justifyContent: 'flex-end',
+    padding: theme.spacing(0, 1),
+    // necessary for content to be below app bar
+    // ...theme.mixins.toolbar,
   },
 }));
 
-// TODO? if no PDF is available display shell in full screen ?
-
 export default function ExtensionFallback() {
   const classes = useStyles();
+  const { id, cid } = useParams();
   const location = useLocation(); // location.state can be {preprint, tab} with tab being `request` or `review` (so that we know on which tab the shell should be activated with
+  const theme = useTheme();
+  const appBarElement = useRef(null);
+
   const [user] = useContext(UserProvider.context);
 
-  const [loading, setLoading] = useState(true);
-  const [preprint, setPreprint] = useState(null);
   const [authors, setAuthors] = useState(null);
+  const [height, setHeight] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [open, setOpen] = useState(true);
+  const [preprint, setPreprint] = useState(null);
 
-  const { id, cid } = useParams();
+  const { data: preprintData, loadingPreprint, errorPreprint } = useGetPreprint(
+    { id: id },
+  );
 
-  const { data: preprintData, loadingPreprint, errorPreprint } = useGetPreprint({id: id});
+  const handleDrawerOpen = () => {
+    setOpen(true);
+  };
+
+  const handleDrawerClose = () => {
+    setOpen(false);
+  };
+
+  useExtension(preprint && id);
+
+  useEffect(() => {
+    console.log(appBarElement);
+    appBarElement && appBarElement.current
+      ? setHeight(appBarElement.current.clientHeight)
+      : null;
+  }, [appBarElement.current]);
 
   useEffect(() => {
     if (!loadingPreprint) {
@@ -70,31 +170,15 @@ export default function ExtensionFallback() {
     }
   }, [loadingPreprint, preprintData]);
 
-  const isMobile = useMemo(() => mobile({ tablet: true }), []);
-
-  // See https://github.com/PREreview/rapid-prereview/issues/13
-  // Drag and drop over a PDF object is currently broken in Chrome for Mac
-  // Bug is tracked here: https://bugs.chromium.org/p/chromium/issues/detail?id=984891&q=drag%20object&colspec=ID%20Pri%20M%20Stars%20ReleaseBlock%20Component%20Status%20Owner%20Summary%20OS%20Modified
-  const [isChromeOnMac, setIsChroneOnMac] = useState(false);
-
-  useExtension(preprint && id);
-
   const pdfUrl = preprint ? preprint.contentUrl : '';
   const canonicalUrl = getCanonicalUrl(preprint ? preprint : null);
 
   useEffect(() => {
     if (preprint && preprint.authors) {
-      const string = preprint.authors.replace(/[|&;$%@"<>()\[\]+]/g, "");
+      const string = preprint.authors.replace(/[|&;$%@"<>()\[\]+]/g, '');
       setAuthors(string);
     }
-
   }, [preprint]);
-
-  useEffect(() => {
-    if (window) {
-      setIsChroneOnMac(!!window.chrome && navigator.platform.includes('Mac'));
-    }
-  }, []);
 
   if (loading) {
     return <Loading />;
@@ -108,8 +192,39 @@ export default function ExtensionFallback() {
             {id} • {ORG}
           </title>
         </Helmet>
-        <Grid container spacing={0} className={classes.grid}>
-          <Grid item xs={12} md={7}>
+        <div className={classes.root}>
+          <CssBaseline />
+          <AppBar
+            ref={appBarElement}
+            color="default"
+            position="fixed"
+            className={clsx(classes.appBar, {
+              [classes.appBarShift]: open,
+            })}
+          >
+            <Toolbar className={classes.appBarContent}>
+              <Box
+                className={
+                  open ? classes.headerBarCondensed : classes.headerBarFull
+                }
+              >
+                <HeaderBar />
+              </Box>
+              <IconButton
+                color="inherit"
+                aria-label="open drawer"
+                onClick={handleDrawerOpen}
+                edge="end"
+                className={clsx(classes.menuButton, {
+                  [classes.hide]: open,
+                })}
+              >
+                <MenuOpenIcon />
+              </IconButton>
+            </Toolbar>
+          </AppBar>
+          <main className={classes.content} style={{ marginTop: height + 20 }}>
+            <div className={classes.toolbar} />
             <object
               key={pdfUrl}
               data={pdfUrl}
@@ -119,11 +234,19 @@ export default function ExtensionFallback() {
             >
               {/* fallback text in case we can't load the PDF */}
               <Box>
-                <Typography component="h2" variant="h2" gutterBottom>{preprint.title}</Typography>
-                <Typography component="div" variant="h4" gutterBottom>{authors}</Typography>
-                <Typography component="h3" variant="h3">Abstract</Typography>
+                <Typography component="h2" variant="h2" gutterBottom>
+                  {preprint.title}
+                </Typography>
+                <Typography component="div" variant="h4" gutterBottom>
+                  {authors}
+                </Typography>
+                <Typography component="h3" variant="h3">
+                  Abstract
+                </Typography>
                 <Typography component="div" variant="body2" gutterBottom>
-                  <div dangerouslySetInnerHTML={{ __html: preprint.abstractText }} />
+                  <div
+                    dangerouslySetInnerHTML={{ __html: preprint.abstractText }}
+                  />
                 </Typography>
                 {!!canonicalUrl && (
                   <Typography component="div" variant="body1">
@@ -137,37 +260,36 @@ export default function ExtensionFallback() {
                         full text of this preprint
                       </Link>
                     }{' '}
-                    at the preprint server's website.
+                    at the preprint server&apos;s website.
                   </Typography>
                 )}
               </Box>
-
-              <div className="extension-fallback__no-pdf-message">
-                <div className="extension-fallback__no-pdf-message-inner">
-                  <h2>{preprint.title}</h2>
-                  <div className="extension-fallback__no-pdf-message-inner-authors">{authors}</div>
-                  <h3>Abstract</h3>
-                  <div  className="extension-fallback__no-pdf-message-inner-content"  />
-                  {!!canonicalUrl && (
-                    <div  className="extension-fallback__no-pdf-message-inner-link">
-                      You can access the{' '}
-                      {
-                        <a
-                          href={canonicalUrl}
-                          target="_blank"
-                          rel="noreferrer noopener"
-                        >
-                          full text of this preprint
-                        </a>
-                      }{' '}
-                      at the preprint server's website.
-                    </div>
-                  )}
-                </div>
-              </div>
             </object>
-          </Grid>
-          <Grid item xs={12} md={5}>
+          </main>
+          <Drawer
+            variant="permanent"
+            anchor="right"
+            className={clsx(classes.drawer, {
+              [classes.drawerOpen]: open,
+              [classes.drawerClose]: !open,
+            })}
+            classes={{
+              paper: clsx({
+                [classes.drawerOpen]: open,
+                [classes.drawerClose]: !open,
+              }),
+            }}
+          >
+            <div className={classes.toolbar}>
+              <IconButton onClick={handleDrawerClose}>
+                {theme.direction === 'ltr' ? (
+                  <ChevronRightIcon />
+                ) : (
+                  <ChevronLeftIcon />
+                )}
+              </IconButton>
+            </div>
+            <Divider />
             <Shell>
               {onRequireScreen =>
                 !!preprint && (
@@ -181,8 +303,8 @@ export default function ExtensionFallback() {
                 )
               }
             </Shell>
-          </Grid>
-        </Grid>
+          </Drawer>
+        </div>
       </>
     );
   }
