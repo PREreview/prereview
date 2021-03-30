@@ -651,20 +651,24 @@ export default function Profile() {
                       <Grid>
                         {works.length > 0
                           ? works.map(work => {
-                            return (
-                              <Card key={work.uuid}>
-                                <CardContent>
-                                  <Typography
-                                    className={classes.title}
-                                    color="textSecondary"
-                                    gutterBottom
-                                  >
-                                    {`${work.title}`}
-                                  </Typography>
-                                </CardContent>
-                              </Card>
-                            )}
-                            )
+                              return (
+                                <Card key={work.uuid}>
+                                  <CardContent>
+                                    <Typography
+                                      variant="h6"
+                                      component="h2"
+                                      gutterBottom
+                                    >
+                                      {work.title}
+                                    </Typography>
+                                    <Typography>{work.publisher}</Typography>
+                                    <Typography>
+                                      {work.publicationDate}
+                                    </Typography>
+                                  </CardContent>
+                                </Card>
+                              );
+                            })
                           : `${
                               displayedPersona.name
                             } has no publications connected to their ORCiD account.`}
