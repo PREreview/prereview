@@ -5,7 +5,7 @@ import { useHistory } from 'react-router-dom';
 
 // material UI
 import { makeStyles } from '@material-ui/core/styles';
-import Avatar from '@material-ui/core/Avatar';
+import MuiAvatar from '@material-ui/core/Avatar';
 import Link from '@material-ui/core/Link';
 import Popover from '@material-ui/core/Popover';
 import Typography from '@material-ui/core/Typography';
@@ -13,10 +13,6 @@ import Typography from '@material-ui/core/Typography';
 
 // components
 import NoticeBadge from './notice-badge';
-import XLink from './xlink';
-
-// icons
-import { MdPerson } from 'react-icons/md';
 
 const Avatar = withStyles({
   root: {
