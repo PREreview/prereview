@@ -616,7 +616,7 @@ export default function Profile() {
                   <Accordion>
                     <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                       <Typography component="h2" variant="h6" gutterBottom>
-                        PREreview communities
+                        {displayedPersona.name}'s PREreview communities
                       </Typography>
                     </AccordionSummary>
                     <AccordionDetails>
@@ -644,7 +644,7 @@ export default function Profile() {
                   <Accordion>
                     <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                       <Typography component="h2" variant="h6" gutterBottom>
-                        PREreview contributions
+                        {displayedPersona.name}'s PREreview contributions
                       </Typography>
                     </AccordionSummary>
                     <AccordionDetails>
@@ -653,10 +653,11 @@ export default function Profile() {
                       </Grid>
                     </AccordionDetails>
                   </Accordion>
+                  { !displayedPersona.isAnonymous ? 
                   <Accordion>
                     <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                       <Typography component="h2" variant="h6" gutterBottom>
-                        Publications
+                        {displayedPersona.name}'s publications
                       </Typography>
                     </AccordionSummary>
                     <AccordionDetails>
@@ -686,7 +687,7 @@ export default function Profile() {
                             } has no publications on their ORCID record.`}
                       </Grid>
                     </AccordionDetails>
-                  </Accordion>
+                  </Accordion> : null }
                 </Container>
               </Box>
             )}

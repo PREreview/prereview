@@ -146,9 +146,15 @@ function LoginModal({ open, handleClose }) {
                   <ListItemIcon>
                     <CheckIcon />
                   </ListItemIcon>
-                  <ListItemText
-                    primary={`You commit to abiding by our Code of Conduct. `}
-                  />
+                  <ListItemText>
+                    You commit to abiding by our{' '}
+                    <a
+                      href="https://content.prereview.org/coc"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                    Code of Conduct</a>.
+                  </ListItemText>
                 </ListItem>
               </List>
             </DialogContent>
