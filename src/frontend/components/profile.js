@@ -610,7 +610,7 @@ export default function Profile() {
                   <Accordion>
                     <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                       <Typography component="h2" variant="h6" gutterBottom>
-                        PREreview communities
+                        {displayedPersona.name}'s PREreview communities
                       </Typography>
                     </AccordionSummary>
                     <AccordionDetails>
@@ -638,7 +638,7 @@ export default function Profile() {
                   <Accordion>
                     <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                       <Typography component="h2" variant="h6" gutterBottom>
-                        PREreview contributions
+                        {displayedPersona.name}'s PREreview contributions
                       </Typography>
                     </AccordionSummary>
                     <AccordionDetails>
@@ -647,40 +647,42 @@ export default function Profile() {
                       </Grid>
                     </AccordionDetails>
                   </Accordion>
-                  <Accordion>
-                    <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                      <Typography component="h2" variant="h6" gutterBottom>
-                        Publications
-                      </Typography>
-                    </AccordionSummary>
-                    <AccordionDetails>
-                      <Grid>
-                        {works.length > 0
-                          ? works.map(work => {
-                              return (
-                                <Card key={work.uuid}>
-                                  <CardContent>
-                                    <Typography
-                                      variant="h6"
-                                      component="h2"
-                                      gutterBottom
-                                    >
-                                      {work.title}
-                                    </Typography>
-                                    <Typography>{work.publisher}</Typography>
-                                    <Typography>
-                                      {work.publicationDate}
-                                    </Typography>
-                                  </CardContent>
-                                </Card>
-                              );
-                            })
-                          : `${
-                              displayedPersona.name
-                            } has no publications connected to their ORCiD account.`}
-                      </Grid>
-                    </AccordionDetails>
-                  </Accordion>
+                  {!displayedPersona.isAnonymous ? (
+                    <Accordion>
+                      <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                        <Typography component="h2" variant="h6" gutterBottom>
+                          {displayedPersona.name}'s Publications
+                        </Typography>
+                      </AccordionSummary>
+                      <AccordionDetails>
+                        <Grid>
+                          {works.length > 0
+                            ? works.map(work => {
+                                return (
+                                  <Card key={work.uuid}>
+                                    <CardContent>
+                                      <Typography
+                                        variant="h6"
+                                        component="h2"
+                                        gutterBottom
+                                      >
+                                        {work.title}
+                                      </Typography>
+                                      <Typography>{work.publisher}</Typography>
+                                      <Typography>
+                                        {work.publicationDate}
+                                      </Typography>
+                                    </CardContent>
+                                  </Card>
+                                );
+                              })
+                            : `${
+                                displayedPersona.name
+                              } has no publications connected to their ORCiD account.`}
+                        </Grid>
+                      </AccordionDetails>
+                    </Accordion>
+                  ) : null}
                 </Container>
               </Box>
             )}
