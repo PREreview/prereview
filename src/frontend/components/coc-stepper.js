@@ -172,22 +172,61 @@ export default function CoCStepper({ openNext }) {
         );
       case 3:
         return (
-            <List>           
-              <ListItem>
-                <ListItemText>
-                Our login is via <a href='https://info.orcid.org/documentation/features/public-api/' target="_blank" rel="noopener noreferrer">ORCID's public API</a>. If you do not already have an account with ORCID, to sign up on PREreview you will need to make one.  <a href='https://orcid.org/register' target="_blank" rel="noopener noreferrer">Register here</a>.
-                </ListItemText>
-              </ListItem>
-              <ListItem>
-                <ListItemText>
-                  The reviews published on this platform will be licensed <a href='https://creativecommons.org/licenses/by/4.0/' target="_blank" rel="noopener noreferrer">CC-BY 4.0</a> and be openly available to everyone. However, you will be able to set your account to anonymous or public.
-                </ListItemText>
-              </ListItem>
+          <List>
             <ListItem>
-                <ListItemText>
-              We DO NOT share your data with advertisers, social media companies, or analytics partners.
-            </ListItemText>
-              </ListItem>
+              <ListItemText>
+                Our login is via{' '}
+                <a
+                  href="https://info.orcid.org/documentation/features/public-api/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  ORCID's public API
+                </a>
+                . If you do not already have an account with ORCID, to sign up
+                on PREreview you will need to make one.{' '}
+                <a
+                  href="https://orcid.org/register"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Register here
+                </a>
+                .
+              </ListItemText>
+            </ListItem>
+            <ListItem>
+              <ListItemText>
+                The reviews published on this platform will be licensed{' '}
+                <a
+                  href="https://creativecommons.org/licenses/by/4.0/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  CC-BY 4.0
+                </a>{' '}
+                and be openly available to everyone. However, you will be able
+                to set your account to anonymous or public.
+              </ListItemText>
+            </ListItem>
+            <ListItem>
+              <ListItemText>
+                We DO NOT share your data with advertisers, social media
+                companies, or analytics partners.
+              </ListItemText>
+            </ListItem>
+            <ListItem>
+              <ListItemText>
+                To learn more about how we handle data, please refer to our{' '}
+                <a
+                  href="https://content.prereview.org/privacypolicy"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  privacy policy
+                </a>.
+              </ListItemText>
+            </ListItem>
           </List>
         );
       default:
