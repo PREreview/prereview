@@ -175,15 +175,15 @@ export default function CoCStepper({ openNext }) {
           <List>
             <ListItem>
               <ListItemText>
-                Our login is via{' '}
+                Our login uses{' '}
                 <a
                   href="https://info.orcid.org/documentation/features/public-api/"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  ORCID's public API
+                  ORCID®'s public API
                 </a>
-                . If you do not already have an account with ORCID, to sign up
+                . If you do not already have a record with ORCID®, to sign up
                 on PREreview you will need to make one.{' '}
                 <a
                   href="https://orcid.org/register"

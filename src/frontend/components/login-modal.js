@@ -130,11 +130,9 @@ function LoginModal({ open, handleClose }) {
                   <ListItemIcon>
                     <CheckIcon />
                   </ListItemIcon>
-                  <ListItemText>
-                    You are okay with us connecting your public ORCID
-                    record to your PREreview account and storing it in our
-                    database.
-                  </ListItemText>
+                  <ListItemText
+                    primary={`You are okay with us connecting your public ORCID record to your PREreview account and storing it in our database`}
+                  />
                 </ListItem>
                 <ListItem>
                   <ListItemIcon>
@@ -170,7 +168,7 @@ function LoginModal({ open, handleClose }) {
                     <ClearIcon />
                   </ListItemIcon>
                   <ListItemText
-                    primary={`You DO NOT want to have your ORCID proflie’s public information imported to PREreview.`}
+                    primary={`You DO NOT want to have your public ORCID record imported to PREreview.`}
                   />
                 </ListItem>
                 <ListItem>
