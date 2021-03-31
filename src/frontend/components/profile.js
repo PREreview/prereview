@@ -459,7 +459,13 @@ export default function Profile() {
                             gutterBottom
                           >
                             <Link href={`https://orcid.org/${orcid}`}>
-                              ORCiD: {orcid}
+                              <img
+                                alt="ORCID logo"
+                                src="https://info.orcid.org/wp-content/uploads/2019/11/orcid_16x16.png"
+                                width="16"
+                                height="16"
+                              />{' '}
+                              {orcid}
                             </Link>
                           </Typography>
                         </Box>
@@ -677,7 +683,7 @@ export default function Profile() {
                             })
                           : `${
                               displayedPersona.name
-                            } has no publications connected to their ORCiD account.`}
+                            } has no publications on their ORCID record.`}
                       </Grid>
                     </AccordionDetails>
                   </Accordion>
