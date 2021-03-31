@@ -1,15 +1,15 @@
 // base imports
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
+import classNames from 'classnames';
 import { useHistory } from 'react-router-dom';
 
 // material UI
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles, withStyles } from '@material-ui/core/styles';
 import MuiAvatar from '@material-ui/core/Avatar';
 import Link from '@material-ui/core/Link';
 import Popover from '@material-ui/core/Popover';
 import Typography from '@material-ui/core/Typography';
-
 
 // components
 import NoticeBadge from './notice-badge';
@@ -67,16 +67,15 @@ RoleBadge.propTypes = {
   user: PropTypes.object.isRequired,
   children: PropTypes.any,
   className: PropTypes.string,
+  contacts: PropTypes.any,
   showNotice: PropTypes.bool,
   disabled: PropTypes.bool,
 };
 
-export default RoleBadge;
-
 /**
  * Non hooked version (handy for story book and `UserBadge`)
  */
-const RoleBadgeUI = React.forwardRef(function RoleBadgeUI(
+export const RoleBadgeUI = React.forwardRef(function RoleBadgeUI(
   {
     user,
     contacts,
@@ -127,11 +126,9 @@ const RoleBadgeUI = React.forwardRef(function RoleBadgeUI(
           <span data-expands-text="Close" className="vh">
             Open
           </span>
-          <Tooltipify tooltip={tooltip} user={user}>
-            <Avatar src={user.avatar} alt={user.name} ref={ref}>
-              {user.name.charAt(0)}
-            </Avatar>
-          </Tooltipify>
+          <Avatar src={user.avatar} alt={user.name} ref={ref}>
+            {user.name.charAt(0)}
+          </Avatar>
         </button>
       </div>
       <Popover
@@ -179,11 +176,11 @@ const RoleBadgeUI = React.forwardRef(function RoleBadgeUI(
           {children}
         </div>
       </Popover>
-    </div>
+    </>
   );
-};
+});
 
-RoleBadge.propTypes = {
+RoleBadgeUI.propTypes = {
   children: PropTypes.any,
   className: PropTypes.string,
   showNotice: PropTypes.bool,
