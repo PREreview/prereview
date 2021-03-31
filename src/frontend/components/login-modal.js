@@ -131,7 +131,7 @@ function LoginModal({ open, handleClose }) {
                     <CheckIcon />
                   </ListItemIcon>
                   <ListItemText
-                    primary={`You are okay with us connecting your public ORCID record to your PREreview account and storing it in our database`}
+                    primary={`You are okay with us connecting your public ORCID record to your PREreview account and storing it in our database.`}
                   />
                 </ListItem>
                 <ListItem>
