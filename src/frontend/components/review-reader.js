@@ -204,6 +204,11 @@ const ReviewReader = React.memo(function ReviewReader({
         `[aria-describedby='${location.pathname.split('rapid-reviews/')[1]}']`,
       );
       setRapidAnchorEl(reviewNode);
+    } else if (location.pathname.includes('reviews')) {
+      reviewNode = document.querySelector(
+        `[aria-describedby='${location.pathname.split('reviews/')[1]}']`,
+      );
+      setLongformAnchorEl(reviewNode);
     }
     if (
       rapidContent &&

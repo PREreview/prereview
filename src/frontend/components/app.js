@@ -182,6 +182,9 @@ export default function App({ user }) {
                 <Route exact={true} path="/preprints/:id/full-reviews/:cid">
                   <ExtensionFallback />
                 </Route>
+                <Route exact={true} path="/preprints/:id/reviews/:cid">
+                  <ExtensionFallback />
+                </Route>
                 <Route exact={true} path="/preprints/:id/rapid-reviews/:cid">
                   <ExtensionFallback />
                 </Route>
