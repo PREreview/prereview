@@ -261,8 +261,7 @@ export default function Reviews() {
             {!preprints ||
             (preprints && preprints.totalCount <= 0 && !loadingPreprints) ? (
               <div>
-                No preprints about this topic have been added to Rapid
-                PREreview.{' '}
+                No preprints about this topic have been added to PREreview.{' '}
                 <Link
                   onClick={() => {
                     setSearch('');
@@ -273,8 +272,8 @@ export default function Reviews() {
                     }
                   }}
                 >
-                  Review or request a review of a Preprint to add it to the
-                  site.
+                  Review or request a review of a preprint to add it to the
+                  platform.
                 </Link>
               </div>
             ) : (

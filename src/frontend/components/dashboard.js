@@ -281,7 +281,7 @@ export default function Dashboard() {
 
                 {preprints && preprints.totalCount === 0 && !loadingPreprints ? (
                   <div>
-                    No preprints about this topic have been added to Rapid PREreview.{' '}
+                    No preprints about this topic have been added to PREreview.{' '}
                     {!!location.search && (
                       <Link
                         onClick={() => {
@@ -293,8 +293,8 @@ export default function Dashboard() {
                           }
                         }}
                       >
-                        Review or request a review of a Preprint to add it to the
-                        site.
+                        Review or request a review of a preprint to add it to the
+                        platform.
                       </Link>
                     )}
                   </div>
