@@ -131,7 +131,7 @@ function LoginModal({ open, handleClose }) {
                     <CheckIcon />
                   </ListItemIcon>
                   <ListItemText
-                    primary={`You are okay with us connecting your public ORCID record to your PREreview account and storing it in our database`}
+                    primary={`You are okay with us connecting your public ORCID record to your PREreview account and storing it in our database.`}
                   />
                 </ListItem>
                 <ListItem>
@@ -146,9 +146,17 @@ function LoginModal({ open, handleClose }) {
                   <ListItemIcon>
                     <CheckIcon />
                   </ListItemIcon>
-                  <ListItemText
-                    primary={`You commit to abiding by our Code of Conduct. `}
-                  />
+                  <ListItemText>
+                    You commit to abiding by our{' '}
+                    <a
+                      href="https://content.prereview.org/coc"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Code of Conduct
+                    </a>
+                    .
+                  </ListItemText>
                 </ListItem>
               </List>
             </DialogContent>
