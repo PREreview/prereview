@@ -18,7 +18,6 @@ import Typography from '@material-ui/core/Typography';
 
 // components
 import Controls from './controls';
-import LoginRequiredModal from './login-required-modal';
 import ModerationModal from './moderation-modal';
 import PreprintPreview from './preprint-preview';
 import ReviewReader from './review-reader';
@@ -31,15 +30,11 @@ function TabPanel(props) {
     <div
       role="tabpanel"
       hidden={value !== index}
-      id={`simple-tabpanel-${index}`}
-      aria-labelledby={`simple-tab-${index}`}
+      id={`reviews-requests-tab-panel-${index}`}
+      aria-labelledby={`reviews-requests-tab-${index}`}
       {...other}
     >
-      {value === index && (
-        <Box p={3}>
-          <Typography>{children}</Typography>
-        </Box>
-      )}
+      {value === index && <Box p={3}>{children}</Box>}
     </div>
   );
 }
@@ -52,8 +47,8 @@ TabPanel.propTypes = {
 
 function a11yProps(index) {
   return {
-    id: `simple-tab-${index}`,
-    'aria-controls': `simple-tabpanel-${index}`,
+    id: `reviews-requests-tab-${index}`,
+    'aria-controls': `reviews-requests-tab-panel-${index}`,
   };
 }
 
@@ -68,11 +63,7 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-export default function ShellContent({
-  preprint,
-  user,
-  cid,
-}) {
+export default function ShellContent({ preprint, user, cid }) {
   const classes = useStyles();
   const location = useLocation();
   const [hasRapidReviewed, setHasRapidReviewed] = useState(false);

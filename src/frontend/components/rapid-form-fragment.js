@@ -87,101 +87,99 @@ export default function RapidFormFragment({ answerMap = {}, onChange }) {
   // useEffect(() => {}, [selectedValue]);
 
   return (
-    <div className="rapid-form-fragment">
-      <TableContainer>
-        <Table
-          stickyHeader
-          className={classes.table}
-          aria-label="questions table"
-        >
-          <TableHead>
-            <TableRow>
-              <StyledTableCell>
-                <Typography variant="srOnly">Question</Typography>
-              </StyledTableCell>
-              <StyledTableCell align="right">
-                <Typography component="div" variant="body1">
-                  Yes
-                </Typography>
-              </StyledTableCell>
-              <StyledTableCell align="center">
-                <Typography component="div" variant="body1">
-                  No
-                </Typography>
-              </StyledTableCell>
-              <StyledTableCell align="center">
-                <Typography component="div" variant="body1">
-                  N/A
-                </Typography>
-              </StyledTableCell>
-              <StyledTableCell align="center">
-                <Typography component="div" variant="body1">
-                  Unsure
-                </Typography>
-              </StyledTableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {QUESTIONS.map(({ type, identifier, question, help, required }) => {
-              const answer = answerMap[identifier];
-              return type == 'YesNoQuestion' ? (
-                <StyledTableRow key={identifier}>
-                  <YesNoQuestion
-                    identifier={identifier}
-                    question={question}
-                    help={help}
-                    required={required}
-                    onChange={onChange}
-                  />
-                </StyledTableRow>
-              ) : (
-                <StyledTableRow key={identifier} className={classes.textAnswer}>
-                  <StyledTableCell
-                    component="th"
-                    scope="row"
-                    className="radid-form-fragment__question"
-                  >
-                    <Typography component="p" variant="body1">
-                      {question}
-                    </Typography>
+    <TableContainer>
+      <Table
+        stickyHeader
+        className={classes.table}
+        aria-label="questions table"
+      >
+        <TableHead>
+          <TableRow>
+            <StyledTableCell>
+              <Typography variant="srOnly">Question</Typography>
+            </StyledTableCell>
+            <StyledTableCell align="right">
+              <Typography component="div" variant="body1">
+                Yes
+              </Typography>
+            </StyledTableCell>
+            <StyledTableCell align="center">
+              <Typography component="div" variant="body1">
+                No
+              </Typography>
+            </StyledTableCell>
+            <StyledTableCell align="center">
+              <Typography component="div" variant="body1">
+                N/A
+              </Typography>
+            </StyledTableCell>
+            <StyledTableCell align="center">
+              <Typography component="div" variant="body1">
+                Unsure
+              </Typography>
+            </StyledTableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {QUESTIONS.map(({ type, identifier, question, help, required }) => {
+            const answer = answerMap[identifier];
+            return type == 'YesNoQuestion' ? (
+              <StyledTableRow key={identifier}>
+                <YesNoQuestion
+                  identifier={identifier}
+                  question={question}
+                  help={help}
+                  required={required}
+                  onChange={onChange}
+                />
+              </StyledTableRow>
+            ) : (
+              <StyledTableRow key={identifier} className={classes.textAnswer}>
+                <StyledTableCell
+                  component="th"
+                  scope="row"
+                  className="radid-form-fragment__question"
+                >
+                  <Typography component="p" variant="body1">
+                    {question}
+                  </Typography>
 
-                    {!!help && (
-                      <IconButton
-                        className="radid-form-fragment__help"
-                        onClick={e => {
-                          e.preventDefault();
-                          setIsOpenedMap(
-                            Object.assign({}, isOpenedMap, {
-                              [identifier]: !isOpenedMap[identifier],
-                            }),
-                          );
-                        }}
-                      >
-                        <HelpOutlineIcon />
-                      </IconButton>
-                    )}
-                  </StyledTableCell>
-                  <StyledTableCell align="right" className={classes.relative}>
-                    <TextField
-                      fullWidth
-                      className={classes.absolute}
-                      id={`question-${identifier}`}
-                      name={identifier}
-                      value={answer || ''}
-                      variant="outlined"
-                      required={required}
-                      onChange={e => {
-                        handleChange(identifier, e.target.value);
+                  {!!help && (
+                    <IconButton
+                      className="radid-form-fragment__help"
+                      onClick={e => {
+                        e.preventDefault();
+                        setIsOpenedMap(
+                          Object.assign({}, isOpenedMap, {
+                            [identifier]: !isOpenedMap[identifier],
+                          }),
+                        );
                       }}
-                    />
-                  </StyledTableCell>
-                </StyledTableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
-      </TableContainer>
-    </div>
+                    >
+                      <HelpOutlineIcon />
+                    </IconButton>
+                  )}
+                </StyledTableCell>
+                <StyledTableCell align="right" className={classes.relative}>
+                  <TextField
+                    fullWidth
+                    className={classes.absolute}
+                    id={`question-${identifier}`}
+                    name={identifier}
+                    value={answer || ''}
+                    variant="outlined"
+                    required={required}
+                    onChange={e => {
+                      handleChange(identifier, e.target.value);
+                    }}
+                  />
+                </StyledTableCell>
+              </StyledTableRow>
+            );
+          })}
+        </TableBody>
+      </Table>
+    </TableContainer>
   );
 }
 

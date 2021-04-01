@@ -40,7 +40,7 @@ const useStyles = makeStyles(theme => ({
   },
   mobileNav: {
     marginLeft: 'auto',
-    [theme.breakpoints.up('xl')]: {
+    [theme.breakpoints.up('lg')]: {
       display: 'none',
     },
   },
@@ -49,7 +49,7 @@ const useStyles = makeStyles(theme => ({
   },
   nav: {
     marginRight: '1rem',
-    [theme.breakpoints.down('lg')]: {
+    [theme.breakpoints.down('md')]: {
       display: 'none',
     },
   },

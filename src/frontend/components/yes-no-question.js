@@ -41,10 +41,10 @@ export default function YesNoQuestion({
   const classes = useStyles();
   const [selectedValue, setSelectedValue] = useState({});
 
-  const handleChange = (event, value) => {
-    console.log(event.target);
+  const handleChange = event => {
+    console.log(event.target.name);
     setSelectedValue(event.target.value);
-    onChange(event.target.value, value);
+    onChange(event.target.name, event.target.value);
   };
 
   return (
@@ -75,6 +75,7 @@ export default function YesNoQuestion({
       <StyledTableCell align="right">
         <Radio
           required={required}
+          color="primary"
           id={`question-${identifier}-yes`}
           checked={selectedValue === 'yes'}
           onChange={handleChange}
@@ -87,6 +88,7 @@ export default function YesNoQuestion({
       <StyledTableCell align="right">
         <Radio
           required={required}
+          color="primary"
           id={`question-${identifier}-no`}
           checked={selectedValue === 'no'}
           onChange={handleChange}
@@ -99,6 +101,7 @@ export default function YesNoQuestion({
       <StyledTableCell align="right">
         <Radio
           required={required}
+          color="primary"
           id={`question-${identifier}-na`}
           checked={selectedValue === 'N/A'}
           onChange={handleChange}
@@ -111,6 +114,7 @@ export default function YesNoQuestion({
       <StyledTableCell align="right">
         <Radio
           required={required}
+          color="primary"
           id={`question-${identifier}-unsure`}
           checked={selectedValue === 'unsure'}
           onChange={handleChange}

@@ -78,11 +78,6 @@ const useStyles = makeStyles(theme => ({
   completed: {
     display: 'inline-block',
   },
-  formLabel: {
-    '& span:last-child': {
-      fontSize: '0.9rem',
-    },
-  },
   fullWidth: {
     padding: 5,
     width: '100%',
@@ -94,7 +89,6 @@ const useStyles = makeStyles(theme => ({
   },
   inputLabel: {
     color: 'rgba(0, 0, 0, 0.87)',
-    fontSize: '0.9rem',
     margin: '0 15px',
   },
   instructions: {
@@ -128,6 +122,10 @@ const useStyles = makeStyles(theme => ({
     margin: '0 15px',
     padding: 10,
   },
+  redLink: {
+    color: '#000 !important',
+    textDecoration: 'underline',
+  },
   select: {
     marginTop: '1rem',
     width: '100%',
@@ -135,7 +133,6 @@ const useStyles = makeStyles(theme => ({
   template: {},
   yellow: {
     backgroundColor: '#FFFAEE',
-    fontSize: '0.9rem',
     lineHeight: '1.4',
     padding: 10,
   },
@@ -333,6 +330,7 @@ export default function ReviewStepper({
 
   // handle submit functions
   const canSubmitRapid = answerMap => {
+    console.log(answerMap);
     return QUESTIONS.filter(q => q.type == 'YesNoQuestion').every(
       question => question.identifier in answerMap,
     );
@@ -625,22 +623,23 @@ export default function ReviewStepper({
             <Box className={classes.red}>
               <Typography
                 component="div"
-                variant="button"
+                variant="body1"
                 display="block"
                 gutterBottom
               >
-                Instructions
+                <b>Instructions</b>
               </Typography>
-              <Typography component="div" variant="body2" gutterBottom>
+              <Typography component="div" variant="body1" gutterBottom>
                 Use the space below to compose your long-form review. For
                 guidance, you can load one of our templates.
               </Typography>
-              <Typography component="div" variant="body2" gutterBottom>
+              <Typography component="div" variant="body1" gutterBottom>
                 Please remember to be constructive and to abide by the{' '}
                 <Link
                   href="https://content.prereview.org/coc/"
                   target="_blank"
                   rel="noopener noreferrer"
+                  className={classes.redLink}
                 >
                   PREreview Code of Conduct
                 </Link>

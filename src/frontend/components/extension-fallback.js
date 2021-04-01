@@ -78,7 +78,6 @@ const useStyles = makeStyles(theme => ({
   drawer: {
     flexShrink: 0,
     width: drawerWidth,
-    whiteSpace: 'nowrap',
   },
   drawerOpen: {
     transition: theme.transitions.create('width', {
@@ -155,7 +154,6 @@ export default function ExtensionFallback() {
   useExtension(preprint && id);
 
   useEffect(() => {
-    console.log(appBarElement);
     appBarElement && appBarElement.current
       ? setHeight(appBarElement.current.clientHeight)
       : null;
