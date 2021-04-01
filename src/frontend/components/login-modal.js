@@ -153,7 +153,9 @@ function LoginModal({ open, handleClose }) {
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                    Code of Conduct</a>.
+                      Code of Conduct
+                    </a>
+                    .
                   </ListItemText>
                 </ListItem>
               </List>
