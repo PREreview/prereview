@@ -215,6 +215,18 @@ export default function CoCStepper({ openNext }) {
                 companies, or analytics partners.
               </ListItemText>
             </ListItem>
+            <ListItem>
+              <ListItemText>
+                To learn more about how we handle data, please refer to our{' '}
+                <a
+                  href="https://content.prereview.org/privacypolicy"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  privacy policy
+                </a>.
+              </ListItemText>
+            </ListItem>
           </List>
         );
       default:
