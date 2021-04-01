@@ -73,7 +73,7 @@ export default function ModerationCard({
         </div>
         <div className="moderation-card__header__right">
           Reviewed on{' '}
-          <span>{format(new Date(review.updatedAt), 'MMM. d, yyyy')}</span>
+          <span>{format(new Date(review.updatedAt), 'yyyy/MM/dd')}</span>
         </div>
       </div>
 
