@@ -9,9 +9,11 @@ export default function RoleActivity({ persona }) {
   const [activity, setActivity] = useState(null);
 
   useEffect(() => {
-    const fullReviews = persona.fullReviews
+    const reviews = persona.fullReviews
       ? persona.fullReviews.filter(item => item.isPublished)
       : null;
+
+    const fullReviews = reviews.map(review => ({...review, isLongReview: true}))
 
     setActivity(() =>
       [fullReviews, persona.rapidReviews, persona.requests].flat(),

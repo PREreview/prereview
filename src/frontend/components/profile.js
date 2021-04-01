@@ -537,7 +537,7 @@ export default function Profile() {
                       */}
                       <Typography component="div" variant="body1" gutterBottom>
                         Community member since{' '}
-                        {format(new Date(persona.createdAt), 'MMM. d, yyyy')}
+                        {format(new Date(persona.createdAt), 'yyyy/MM/dd')}
                       </Typography>
                     </Box>
                   </Grid>

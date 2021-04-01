@@ -74,7 +74,7 @@ export function getCanonicalUrl(preprint = {}) {
  */
 export function getFormattedDatePosted(isoString) {
   const [year, month, day] = isoString.substr(0, 10).split('-');
-  return format(new Date(year, month - 1, day), 'MMM. d, yyyy');
+  return format(new Date(year, month-1, day), 'yyyy/MM/dd');
 }
 
 /**

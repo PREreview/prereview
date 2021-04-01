@@ -40,8 +40,8 @@ export default function ActivityCard({ activity }) {
     return (
       <div key={preprint.uuid} className="activity-card">
         <LabelStyle>
-          {format(new Date(preprint.createdAt), 'MMM. d, yyyy')}{' '}
-          {activity.ynPeerReview || activity.doi 
+          {format(new Date(activity.createdAt), 'yyyy/MM/dd')}{' '}
+          {activity.ynPeerReview || activity.isLongReview 
             ? 'reviewed'
             : 'requested feedback for'}
         </LabelStyle>
