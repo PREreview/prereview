@@ -635,7 +635,7 @@ export default function ReviewStepper({
               and more in-depth feedback to a preprint. It can be authored by one or more users. 
               To add a co-reviewer, save your draft and click on + Add Co-Reviewer. 
               To invite someone to edit your review before submitting, save your draft and click on + Add Mentor. 
-              When submitted, the Longform Review is assigned a digital object identifier (DOI) via Zenodo."`}
+              When submitted, the Longform Review is assigned a digital object identifier (DOI) via Zenodo.`}
             >
               <header className="shell-content-reviews__title">
                 Longform Review <HelpOutlineIcon />
