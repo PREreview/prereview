@@ -15,7 +15,6 @@ import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 
 // components
-import Value from './value';
 import YesNoQuestion from './yes-no-question';
 
 // icons
@@ -72,10 +71,7 @@ const useStyles = makeStyles({
 
 export default function RapidFormFragment({ answerMap = {}, onChange }) {
   const classes = useStyles();
-
-  function handleChange(event, value) {
-    onChange(event.target.value, value);
-  }
+  const [textValue, setTextValue] = useState('');
 
   const [isOpenedMap, setIsOpenedMap] = useState(
     QUESTIONS.filter(q => q.type == 'YesNoQuestion').reduce((map, q) => {
@@ -83,8 +79,6 @@ export default function RapidFormFragment({ answerMap = {}, onChange }) {
       return map;
     }, {}),
   );
-
-  // useEffect(() => {}, [selectedValue]);
 
   return (
     <TableContainer>
@@ -166,11 +160,12 @@ export default function RapidFormFragment({ answerMap = {}, onChange }) {
                     className={classes.absolute}
                     id={`question-${identifier}`}
                     name={identifier}
-                    value={answer || ''}
+                    value={textValue || ''}
                     variant="outlined"
                     required={required}
-                    onChange={e => {
-                      handleChange(identifier, e.target.value);
+                    onChange={event => {
+                      setTextValue(event.target.value);
+                      onChange(identifier, event.target.value);
                     }}
                   />
                 </StyledTableCell>

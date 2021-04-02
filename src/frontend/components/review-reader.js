@@ -23,7 +23,7 @@ import { getYesNoStats } from '../utils/stats';
 import Barplot from './barplot';
 import LongformReviewReader from './review-reader-longform';
 import MuiButton from '@material-ui/core/Button';
-import { PotentialRoles } from './role-list';
+import RoleList from './role-list';
 import ReportButton from './report-button';
 import ShareMenu from './share-menu';
 import TextAnswers from './text-answers';
@@ -66,7 +66,7 @@ const AccordionSummary = withStyles({
   },
 })(MuiAccordionSummary);
 
-const ReviewReader = React.memo(function ReviewReader({
+export default function ReviewReader({
   user,
   role,
   preview,
@@ -90,8 +90,8 @@ const ReviewReader = React.memo(function ReviewReader({
     preprint.fullReviews.filter(review => review.isPublished),
   );
   const [allReviews] = useState(publishedReviews.concat(allRapidReviews));
-  const [expandRapid, setExpandRapid] = React.useState(true);
-  const [expandLong, setExpandLong] = React.useState(true);
+  const [expandRapid, setExpandRapid] = useState(true);
+  const [expandLong, setExpandLong] = useState(true);
 
   // expand and collapse rapid and longform review sections
   const handleChangeRapid = panel => (event, newExpanded) => {
@@ -121,7 +121,7 @@ const ReviewReader = React.memo(function ReviewReader({
   );
 
   // expand/collapse longform reviews
-  const [anchorEl, setAnchorEl] = React.useState(null);
+  const [anchorEl, setAnchorEl] = useState(null);
   const handleClick = event => {
     setAnchorEl(anchorEl ? null : event.currentTarget);
   };
@@ -187,12 +187,7 @@ const ReviewReader = React.memo(function ReviewReader({
   ]);
 
   return (
-    <div
-      className={classNames('review-reader', {
-        'review-reader--full': !preview,
-        'review-reader--preview': preview,
-      })}
-    >
+    <div>
       {allReviews.length ? (
         <div className={classes.root}>
           <Accordion
@@ -216,7 +211,7 @@ const ReviewReader = React.memo(function ReviewReader({
                     Reviewers
                   </Typography>
                   <div className="review-reader__persona-selector">
-                    <PotentialRoles
+                    <RoleList
                       role={role}
                       allReviews={allRapidReviews}
                       hasReviewed={rapidContent}
@@ -276,7 +271,7 @@ const ReviewReader = React.memo(function ReviewReader({
                     Reviewers
                   </Typography>
                   <div className="review-reader__persona-selector">
-                    <PotentialRoles
+                    <RoleList
                       role={role}
                       allReviews={publishedReviews}
                       hasReviewed={longContent && longContent.length}
@@ -455,7 +450,7 @@ const ReviewReader = React.memo(function ReviewReader({
       )}
     </div>
   );
-});
+};
 
 ReviewReader.propTypes = {
   user: PropTypes.object,
@@ -470,5 +465,3 @@ ReviewReader.propTypes = {
   longContent: PropTypes.oneOfType([PropTypes.object, PropTypes.string]),
   newRequest: PropTypes.bool,
 };
-
-export default ReviewReader;

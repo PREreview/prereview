@@ -1,38 +1,24 @@
 // base imports
-import React, { useEffect, useState } from 'react';
+import React, { Fragment, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
+import { useDrag, useDrop } from 'react-dnd';
+import classNames from 'classnames';
 
 // Material UI imports
-import { makeStyles } from '@material-ui/core/styles';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
 import Typography from '@material-ui/core/Typography';
 
-// components
+import { MdClear } from 'react-icons/md';
 import RoleBadge from './role-badge';
+import IconButton from './icon-button';
 
-const useStyles = makeStyles(theme => ({
-  list: {
-    display: 'flex',
-    justifyContent: 'flex-start',
-    marginLeft: 30,
-  },
-  listItem: {
-    marginLeft: '-30px',
-    height: 50,
-    padding: 0,
-    width: 50,
-  },
-}));
-
-export default function RoleList({
+export function PotentialRoles({
   user,
   allReviews,
+  onRemoved,
   onModerate,
   isModerationInProgress,
   hasReviewed,
 }) {
-  const classes = useStyles();
   const [reviews] = useState(allReviews);
   const [authors, setAuthors] = useState([]);
 
@@ -64,19 +50,24 @@ export default function RoleList({
   useEffect(() => {}), [authors];
 
   return (
-    <>
+    <div>
       {!authors.length && (
         <Typography variant="body1" component="div">
           No reviewers.
         </Typography>
       )}
 
-      <List className={classes.list}>
+      <ul className="role-list__list">
         {authors.length
           ? authors.map(author => {
               return (
-                <ListItem key={author.uuid} className={classes.listItem}>
-                  <RoleBadge user={author}>
+                <li key={author.uuid} className="role-list__list-item">
+                  <RoleBadge
+                    author={author}
+                    onDropped={author => {
+                      onRemoved(author.uuid);
+                    }}
+                  >
                     {user && user.isAdmin && (
                       <div
                         disabled={isModerationInProgress || author.uuid}
@@ -88,16 +79,16 @@ export default function RoleList({
                       </div>
                     )}
                   </RoleBadge>
-                </ListItem>
+                </li>
               );
             })
           : null}
-      </List>
-    </>
+      </ul>
+    </div>
   );
 }
 
-RoleList.propTypes = {
+PotentialRoles.propTypes = {
   user: PropTypes.object,
   allReviews: PropTypes.array.isRequired,
   onModerate: PropTypes.func,

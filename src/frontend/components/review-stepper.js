@@ -85,6 +85,7 @@ const useStyles = makeStyles(theme => ({
   input: {
     border: '1px solid #ccc',
     margin: 15,
+    padding: 10,
     width: '98%',
   },
   inputLabel: {

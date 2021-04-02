@@ -23,7 +23,13 @@ const Avatar = withStyles({
 })(MuiAvatar);
 
 const useStyles = makeStyles(theme => ({
+  avatar: {
+    border: '2px solid #fff',
+    borderRadius: '50%',
+  },
   box: {
+    minHeight: 50,
+    minWidth: 50,
     position: 'relative',
   },
   icon: {
@@ -108,7 +114,7 @@ const RoleBadgeUI = React.forwardRef(function RoleBadgeUI(
         >
           <Typography variant="srOnly">Open</Typography>
           <Tooltipify tooltip={tooltip} user={user}>
-            <Avatar src={user.avatar} ref={ref} />
+            <Avatar src={user.avatar} ref={ref} className={classes.avatar} />
           </Tooltipify>
         </IconButton>
       </Box>

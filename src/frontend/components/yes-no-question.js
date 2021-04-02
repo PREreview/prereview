@@ -42,7 +42,6 @@ export default function YesNoQuestion({
   const [selectedValue, setSelectedValue] = useState({});
 
   const handleChange = event => {
-    console.log(event.target.name);
     setSelectedValue(event.target.value);
     onChange(event.target.name, event.target.value);
   };

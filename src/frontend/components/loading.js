@@ -6,7 +6,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import CircularProgress from '@material-ui/core/CircularProgress';
 
 // icons
-import PreReviewLogo from './pre-review-logo';
+import preReviewLogo from '../svgs/prereview-logo.svg';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -17,6 +17,10 @@ const useStyles = makeStyles(theme => ({
     '& > * + *': {
       marginLeft: theme.spacing(2),
     },
+  },
+  img: {
+    display: 'block',
+    width: 300,
   },
   spinning: {
     color: '#ff3333',
@@ -31,7 +35,7 @@ export default function Loading() {
   const classes = useStyles();
   return (
     <div className={classes.root}>
-      <PreReviewLogo />
+      <img src={preReviewLogo} className={classes.img} />
       <CircularProgress className={classes.spinning} size={60} />
     </div>
   );
