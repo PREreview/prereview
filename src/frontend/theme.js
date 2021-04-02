@@ -36,6 +36,9 @@ const theme = createMuiTheme({
       dark: '#C18A27',
       contrastText: '#000',
     },
+    reviews: {
+      main: '#197CF4',
+    },
     section: {
       light: '#FFFAEE',
       main: '#FBE890',
