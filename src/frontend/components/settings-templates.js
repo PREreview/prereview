@@ -212,7 +212,7 @@ function Templates() {
           onClick={handleOpenAdd}
           type="button"
           variant="contained"
-          color="secondary"
+          color="primary"
         >
           Add a template
         </Button>
@@ -258,7 +258,7 @@ function Templates() {
               onClick={handleSubmit}
               type="button"
               variant="contained"
-              color="secondary"
+              color="primary"
               className={classes.submit}
             >
               Submit
@@ -267,7 +267,7 @@ function Templates() {
         </Modal>
         <Box my={4}>
           <TableContainer>
-            <Table className={classes.table} aria-label="customized table">
+            <Table className={classes.table} aria-label="templates table">
               <TableHead>
                 <TableRow>
                   <TableCell className="vh">Name</TableCell>
@@ -314,7 +314,7 @@ function SettingsRow({ template, onDelete }) {
       <TableCell component="th" scope="row">
         {template.title}
       </TableCell>
-      <TableCell align="right">
+      <TableCell>
         <EditTemplate
           title={title}
           content={content}
@@ -323,7 +323,7 @@ function SettingsRow({ template, onDelete }) {
           handleContentChange={newContent => setContent(newContent)}
         />
       </TableCell>
-      <TableCell align="right">
+      <TableCell>
         <IconButton
           onClick={() => {
             if (confirm('Are you sure you want to delete this template?')) {
@@ -338,7 +338,7 @@ function SettingsRow({ template, onDelete }) {
           }}
           type="button"
         >
-          <div className="vh">{`Delete ${title}`}</div>
+          <Typography variant="srOnly">{`Delete ${title}`}</Typography>
           <DeleteIcon />
         </IconButton>
       </TableCell>

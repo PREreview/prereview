@@ -13,9 +13,6 @@ import Typography from '@material-ui/core/Typography';
 // utils
 import { usePutTemplate } from '../hooks/api-hooks.tsx';
 
-// components
-import TemplateEditor from './template-editor';
-
 //icons
 import EditOutlinedIcon from '@material-ui/icons/EditOutlined';
 
@@ -122,7 +119,7 @@ const EditTemplate = ({
   return (
     <>
       <IconButton onClick={handleOpenEdit} type="button">
-        <div className="vh">{`Edit ${template.title}`}</div>
+        <Typography variant="srOnly">{`Edit ${template.title}`}</Typography>
         <EditOutlinedIcon />
       </IconButton>
       <Modal
