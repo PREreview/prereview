@@ -23,6 +23,7 @@ import Avatar from '@material-ui/core/Avatar';
 import Box from '@material-ui/core/Box';
 import Chip from '@material-ui/core/Chip';
 import Container from '@material-ui/core/Container';
+import Dialog from '@material-ui/core/Dialog';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import IconButton from '@material-ui/core/IconButton';
 import Link from '@material-ui/core/Link';
@@ -38,10 +39,12 @@ import TextField from '@material-ui/core/TextField';
 // components
 import HeaderBar from './header-bar';
 import Loading from './loading';
-import Modal from './modal';
 import RoleActivity from './role-activity';
 import RoleEditor from './role-editor';
 import SettingsNotifications from './settings-notifications';
+
+// icons
+import CloseIcon from '@material-ui/icons/Close';
 
 // constants
 import { ORG } from '../constants';
@@ -58,12 +61,17 @@ const useStyles = makeStyles(theme => ({
     width: 220,
   },
   buttonText: {
-    fontSize: '1rem',
     textTransform: 'uppercase',
   },
   button: {
     marginTop: theme.spacing(1),
     marginRight: theme.spacing(1),
+  },
+  close: {
+    position: 'absolute',
+    right: 10,
+    top: 10,
+    width: 50,
   },
   formControl: {
     margin: theme.spacing(1),
@@ -506,14 +514,23 @@ export default function Profile() {
                   </Grid>
                 </Grid>
 
-                {avatarModalOpen ? (
-                  <Modal
-                    className="settings-role-editor-modal"
-                    title="Edit avatar"
+                {editMode && avatarModalOpen ? (
+                  <Dialog
+                    aria-label="edit-avatar"
+                    open={open}
                     onClose={() => {
                       setAvatarModalOpen(false);
                     }}
                   >
+                    <IconButton
+                      aria-label="close"
+                      onClick={() => {
+                        setAvatarModalOpen(false);
+                      }}
+                      className={classes.close}
+                    >
+                      <CloseIcon />
+                    </IconButton>
                     <RoleEditor
                       persona={displayedPersona}
                       onCancel={() => {
@@ -521,7 +538,7 @@ export default function Profile() {
                       }}
                       onSaved={handleAvatarSave}
                     />
-                  </Modal>
+                  </Dialog>
                 ) : null}
                 {displayedPersona.isAnonymous ? (
                   ''
@@ -555,14 +572,14 @@ export default function Profile() {
             {editMode ? null : (
               <Box>
                 <Container>
-                  <Typography component="h2" variant="h6" gutterBottom>
+                  <Typography component="h2" variant="h2" gutterBottom>
                     PREreview Communities
                   </Typography>
-                  <Typography component="h2" variant="h6" gutterBottom>
+                  <Typography component="h2" variant="h2" gutterBottom>
                     PREreview Contributions
                   </Typography>
                   <RoleActivity persona={displayedPersona} />
-                  <Typography component="h2" variant="h6" gutterBottom>
+                  <Typography component="h3" variant="h3" gutterBottom>
                     List of Publications
                   </Typography>
                 </Container>

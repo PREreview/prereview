@@ -11,17 +11,40 @@ import TextInput from './text-input';
 import ToggleSwitch from './toggle-switch';
 
 // MaterialUI components
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles, withStyles } from '@material-ui/core/styles';
+import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
+import Dialog from '@material-ui/core/Dialog';
 import IconButton from '@material-ui/core/IconButton';
-import Delete from '@material-ui/icons/Delete';
+import MuiTooltip from '@material-ui/core/Tooltip';
+import TextField from '@material-ui/core/TextField';
+import Typography from '@material-ui/core/Typography';
 
 // icons
-import { MdInfoOutline } from 'react-icons/md';
+import CloseIcon from '@material-ui/icons/Close';
+import Delete from '@material-ui/icons/Delete';
+import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
 
-const useStyles = makeStyles(theme => ({
+const Tooltip = withStyles(theme => ({
+  tooltip: {
+    fontSize: theme.typography.pxToRem(16),
+    padding: 10,
+  },
+}))(MuiTooltip);
+
+const useStyles = makeStyles(() => ({
   button: {
-    textTransform: 'none',
+    marginLeft: 10,
+    padding: 10,
+  },
+  close: {
+    position: 'absolute',
+    right: 10,
+    top: 10,
+    width: 50,
+  },
+  textField: {
+    minWidth: 300,
   },
 }));
 
@@ -53,48 +76,45 @@ export default function SettingsNotifications({ user }) {
   useEffect(() => { }, [userContacts]);
 
   return (
-    <section className="settings-notifications settings__section">
-      <h3 className="settings__title">Email settings and enabling notifications</h3>
-
-      <p className="settings-notifications__notice">
-        <MdInfoOutline className="settings-notifications__notice-icon" />
-        <span>
-          Enabling notifications ensures that you receive an email every time a
-          review is added to a preprint for which you requested reviews. The
-          email provided will only be used for notifications and will never be
-          shared.
-        </span>
-      </p>
+    <>
+      <Typography variant="h3" component="h2">
+        Email settings and enabling notifications
+        <Tooltip title="Enabling notifications ensures that you receive an email every time a review is added to a preprint for which you requested reviews. The email provided will only be used for notifications and will never be shared.">
+          <IconButton>
+            <HelpOutlineIcon />
+          </IconButton>
+        </Tooltip>
+      </Typography>
 
       {userContacts.length
         ? userContacts.map(contact => (
-          <EmailToggle
-            key={contact.uuid}
-            userId={user.uuid}
-            contact={contact}
-            onDelete={() => {
-              setUserContacts(userContacts.filter(c => c.uuid !== contact.uuid));
-              return;
-            }}
-          />
-        ))
+            <EmailToggle
+              key={contact.uuid}
+              userId={user.uuid}
+              contact={contact}
+              onDelete={() => {
+                setUserContacts(
+                  userContacts.filter(c => c.uuid !== contact.uuid),
+                );
+                return;
+              }}
+            />
+          ))
         : null}
 
-      <div className="settings-notifications__email">
-        <TextInput
-          label="Add an email address"
+      <Box>
+        <TextField
+          className={classes.textField}
+          label="Email address"
           type="email"
+          variant="outlined"
           value={email}
-          className="settings-notifications__email-input"
           onChange={e => {
             const isValid = !e.target.validity.typeMismatch;
             setEmail(e.target.value);
             setIsEmailValid(isValid);
           }}
         />
-      </div>
-
-      <Controls>
         <Button
           className={classes.button}
           color="primary"
@@ -116,26 +136,33 @@ export default function SettingsNotifications({ user }) {
             setModalType('verifying');
           }}
         >
-          Add email address
+          Add
         </Button>
-      </Controls>
+      </Box>
 
       {!!modalType && (
-        <Modal title="Info" showCloseButton={true} onClose={handleClose}>
-          <p>
+        <Dialog aria-label="email-verification" onClose={handleClose}>
+          <IconButton
+            aria-label="close"
+            onClick={handleClose}
+            className={classes.close}
+          >
+            <CloseIcon />
+          </IconButton>
+          <Typography variant="body1">
             {modalType === 'checked'
               ? 'The email address was successfully verified.'
               : modalType === 'verifying'
-                ? 'An email with a verification link has been sent. Please check your inbox and follow the instructions.'
-                : 'An email must be set to be able to receive notifications.'}
-          </p>
+              ? 'An email with a verification link has been sent. Please check your inbox and follow the instructions.'
+              : 'An email must be set to be able to receive notifications.'}
+          </Typography>
 
           <Controls>
             <Button onClick={handleClose}>Close</Button>
           </Controls>
-        </Modal>
+        </Dialog>
       )}
-    </section>
+    </>
   );
 }
 
