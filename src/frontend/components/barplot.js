@@ -93,35 +93,40 @@ export default function Barplot({ stats, nReviews, children }) {
           >
             Showing {nReviews} Reviews
           </Typography>
-          <Typography variant="srOnly">Answer key</Typography>
-          <Typography
-            component="span"
-            variant="button"
-            className={`${classes.keyYes} ${classes.key}`}
-          >
-            Yes
-          </Typography>
-          <Typography
-            component="span"
-            variant="button"
-            className={`${classes.keyUnsure} ${classes.key}`}
-          >
-            Unsure
-          </Typography>
-          <Typography
-            component="span"
-            variant="button"
-            className={`${classes.keyNA} ${classes.key}`}
-          >
-            N/A
-          </Typography>
-          <Typography
-            component="span"
-            variant="button"
-            className={`${classes.keyNo} ${classes.key}`}
-          >
-            No
-          </Typography>
+          <Grid container spacing={2} justify="space-between">
+            <Grid item>
+              <Typography variant="srOnly">Answer key</Typography>
+              <Typography
+                component="span"
+                variant="button"
+                className={`${classes.keyYes} ${classes.key}`}
+              >
+                Yes
+              </Typography>
+              <Typography
+                component="span"
+                variant="button"
+                className={`${classes.keyUnsure} ${classes.key}`}
+              >
+                Unsure
+              </Typography>
+              <Typography
+                component="span"
+                variant="button"
+                className={`${classes.keyNA} ${classes.key}`}
+              >
+                N/A
+              </Typography>
+              <Typography
+                component="span"
+                variant="button"
+                className={`${classes.keyNo} ${classes.key}`}
+              >
+                No
+              </Typography>
+            </Grid>
+            <Grid item>{children}</Grid>
+          </Grid>
         </>
       ) : null}
 

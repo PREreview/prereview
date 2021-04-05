@@ -1,25 +1,16 @@
 // base imports
-import React, { Fragment, useState, useEffect, useRef } from 'react';
-import PropTypes from 'prop-types';
+import React, { useState } from 'react';
 import copy from 'clipboard-copy';
-import VisuallyHidden from '@reach/visually-hidden';
 
 // material UI
 import { makeStyles } from '@material-ui/core/styles';
+import Button from '@material-ui/core/Button';
+import IconButton from '@material-ui/core/IconButton';
 import Popover from '@material-ui/core/Popover';
-
-// utils
-import { createPreprintId } from '../../common/utils/ids';
-import { unprefix } from '../utils/jsonld';
-
-// components
-import Button from './button';
-import Controls from './controls';
-import Modal from './modal';
-import XLink from './xlink';
+import Typography from '@material-ui/core/Typography';
 
 // icons
-import { MdShare } from 'react-icons/md';
+import ShareIcon from '@material-ui/icons/Share';
 
 const useStyles = makeStyles(theme => ({
   popoverInner: {
@@ -29,12 +20,12 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-export default function ShareMenu({ identifier, roleIds = [] }) {
+export default function ShareMenu() {
   const classes = useStyles();
 
-  const [permalink, setPermalink] = useState(null);
+  const [permalinkText, setPermalinkText] = useState('Copy permalink');
 
-  const [anchorEl, setAnchorEl] = React.useState(null);
+  const [anchorEl, setAnchorEl] = useState(null);
 
   const handleClick = event => {
     setAnchorEl(event.currentTarget);
@@ -42,164 +33,52 @@ export default function ShareMenu({ identifier, roleIds = [] }) {
 
   const handleClose = () => {
     setAnchorEl(null);
+    setPermalinkText('Copy permalink');
   };
 
   const open = Boolean(anchorEl);
   const id = open ? 'share-menu' : undefined;
 
+  const handleCopy = () => {
+    copy(window.location.href);
+    setPermalinkText('Copied');
+  };
+
   return (
-    <Fragment>
-      <div className="share-menu-container">
-        <button
-          className="share-menu"
-          type="button"
-          aria-describedby={id}
-          variant="contained"
-          color="primary"
-          onClick={handleClick}
-        >
-          <VisuallyHidden>Share</VisuallyHidden>
-          <MdShare className="share-menu__icon" />
-        </button>
-        <Popover
-          id={id}
-          open={open}
-          anchorEl={anchorEl}
-          onClose={handleClose}
-          anchorOrigin={{
-            vertical: 'bottom',
-            horizontal: 'left',
-          }}
-          transformOrigin={{
-            vertical: 'top',
-            horizontal: 'left',
-          }}
-          className={classes.popover}
-        >
-          <div className={classes.popoverInner}>
-            <XLink
-              className="menu__list__link-item"
-              download="rapid-prereview-data.jsonld"
-              href={`/preprints/${createPreprintId(identifier)}`}
-              to={`/preprints/${createPreprintId(identifier)}`}
-            >
-              Permalink
-            </XLink>
-
-            {/* <XLink
-              className="menu__list__link-item"
-              download="rapid-prereview-data.jsonld"
-              href={`/api/v2/preprint/${unprefix(
-                createPreprintId(identifier),
-              )}`}
-              to={`/api/v2/preprint/${unprefix(createPreprintId(identifier))}`}
-            >
-              Download data (JSON-LD)
-            </XLink> */}
-          </div>
-        </Popover>
-      </div>
-
-      {!!permalink && (
-        <PermalinkModal
-          permalink={permalink}
-          onClose={() => {
-            setPermalink(null);
-          }}
-        />
-      )}
-    </Fragment>
-  );
-}
-
-ShareMenu.propTypes = {
-  identifier: PropTypes.string.isRequired,
-  roleIds: PropTypes.arrayOf(PropTypes.number),
-};
-
-function PermalinkModal({ permalink, onClose }) {
-  const isMountedRef = useRef(false);
-  useEffect(() => {
-    isMountedRef.current = true;
-    return () => {
-      isMountedRef.current = false;
-    };
-  }, []);
-
-  const [status, setStatus] = useState({
-    isActive: false,
-    success: false,
-    error: null,
-  });
-
-  useEffect(() => {
-    if (status.isActive) {
-      copy(permalink)
-        .then(() => {
-          if (isMountedRef.current) {
-            setStatus({ isActive: false, success: true, error: null });
-          }
-        })
-        .catch(err => {
-          if (isMountedRef.current) {
-            setStatus({ isActive: false, success: false, error: err });
-          }
-        });
-    } else if (status.success) {
-      const timeoutId = setTimeout(() => {
-        if (isMountedRef.current) {
-          setStatus({ isActive: false, success: false, error: null });
-        }
-      }, 1000);
-
-      return () => {
-        clearTimeout(timeoutId);
-      };
-    }
-  }, [status, permalink]);
-
-  const url = new URL(permalink);
-  return (
-    <Modal
-      title="Get permalink"
-      showCloseButton={true}
-      onClose={onClose}
-      className="permalink-modal"
-    >
-      <XLink
-        href={`/${url.pathname}${url.search}${url.hash}`}
-        to={{
-          pathname: url.pathname,
-          search: url.search,
-          hash: url.hash,
+    <>
+      <IconButton aria-describedby={id} onClick={handleClick}>
+        <Typography variant="srOnly">Share</Typography>
+        <ShareIcon />
+      </IconButton>
+      <Popover
+        id={id}
+        open={open}
+        anchorEl={anchorEl}
+        onClose={handleClose}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'left',
         }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'left',
+        }}
+        className={classes.popover}
       >
-        {permalink}
-      </XLink>
+        <div className={classes.popoverInner}>
+          <Button onClick={handleCopy}>{permalinkText}</Button>
 
-      <Controls error={status.error}>
-        <Button
-          disabled={status.isActive || status.success}
-          onClick={e => {
-            setStatus({
-              isActive: true,
-              success: false,
-              error: null,
-            });
-          }}
-        >
-          {status.isActive
-            ? 'Copying'
-            : status.success
-            ? 'Copied!'
-            : ' Copy to clipboard'}
-        </Button>
-      </Controls>
-    </Modal>
+          {/* <Link
+            download="rapid-prereview-data.jsonld"
+            href={`/api/v2/preprint/${unprefix(
+              createPreprintId(identifier),
+            )}`}
+            to={`/api/v2/preprint/${unprefix(createPreprintId(identifier))}`}
+          >
+            Download data (JSON-LD)
+          </Link> */}
+        </div>
+      </Popover>
+    </>
   );
 }
-
-PermalinkModal.propTypes = {
-  permalink: PropTypes.string.isRequired,
-  onClose: PropTypes.func.isRequired,
-};
