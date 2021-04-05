@@ -116,7 +116,6 @@ export default function RapidFormFragment({ answerMap = {}, onChange }) {
         </TableHead>
         <TableBody>
           {QUESTIONS.map(({ type, identifier, question, help, required }) => {
-            const answer = answerMap[identifier];
             return type == 'YesNoQuestion' ? (
               <StyledTableRow key={identifier}>
                 <YesNoQuestion
@@ -129,18 +128,13 @@ export default function RapidFormFragment({ answerMap = {}, onChange }) {
               </StyledTableRow>
             ) : (
               <StyledTableRow key={identifier} className={classes.textAnswer}>
-                <StyledTableCell
-                  component="th"
-                  scope="row"
-                  className="radid-form-fragment__question"
-                >
+                <StyledTableCell component="th" scope="row">
                   <Typography component="p" variant="body1">
                     {question}
                   </Typography>
 
                   {!!help && (
                     <IconButton
-                      className="radid-form-fragment__help"
                       onClick={e => {
                         e.preventDefault();
                         setIsOpenedMap(

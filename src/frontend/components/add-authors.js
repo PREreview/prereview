@@ -10,14 +10,13 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import IconButton from '@material-ui/core/IconButton';
 import Modal from '@material-ui/core/Modal';
 import MuiButton from '@material-ui/core/Button';
+import MuiTooltip from '@material-ui/core/Tooltip';
 
 // hooks
 import { useGetPersonas } from '../hooks/api-hooks.tsx';
 
 // components
 import Search from './search';
-import Collapse from './collapse';
-import Value from './value';
 
 // icons
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
@@ -28,6 +27,13 @@ const Button = withStyles({
     textTransform: 'none',
   },
 })(MuiButton);
+
+const Tooltip = withStyles(theme => ({
+  tooltip: {
+    fontSize: theme.typography.pxToRem(16),
+    padding: 10,
+  },
+}))(MuiTooltip);
 
 const useStyles = makeStyles(theme => ({
   buttonText: {
@@ -67,9 +73,6 @@ const AddAuthors = ({ isMentor, reviewId, members, membersLimit = 5 }) => {
     setOpen(false);
   };
 
-  const [mentorHelpTextOpen, setMentorHelpTextOpen] = useState(false);
-  const [coReviewerHelpTextOpen, setCoReviewerHelpTextOpen] = useState(false);
-
   if (loading) {
     return <CircularProgress className={classes.spinning} />;
   } else {
@@ -81,30 +84,17 @@ const AddAuthors = ({ isMentor, reviewId, members, membersLimit = 5 }) => {
             {isMentor ? 'Add mentor' : 'Add co-reviewer(s)'}
           </span>
         </Button>
-        <IconButton
-          type="button"
-          className={classes.button}
-          onClick={e => {
-            e.preventDefault();
+        <Tooltip
+          title={
             isMentor
-              ? setMentorHelpTextOpen(!mentorHelpTextOpen)
-              : setCoReviewerHelpTextOpen(!coReviewerHelpTextOpen);
-          }}
+              ? `A mentor is a person you wish to invite to give you feedback and/or edit your review. They will not be authors of the review, but they will be recognized as having helped you write it. A mentor can be a PREreview user or a prospective PREreview user. In order to invite a mentor, you first need to SAVE the draft of your review.`
+              : `A co-reviewer is a person you wish to invite to write this review with you. They can be a PREreview user or a prospective PREreview user. In order to invite one or more co-reviewer(s), you first need to SAVE the draft of your review.`
+          }
         >
-          <HelpOutlineIcon color="action" fontSize="small" />
-        </IconButton>
-        <Collapse isOpened={mentorHelpTextOpen || coReviewerHelpTextOpen}>
-          <Value tagName="p" className="rapid-form-fragment__help-text">
-            {isMentor
-              ? `A mentor is a person you wish to invite to give you feedback
-                and/or edit your review. They will not be authors of the review, but
-                they will be recognized as having helped you write it. A mentor can be
-                a PREreview user or a prospective PREreview user. In order to
-                invite a mentor, you first need to SAVE the draft of your review.`
-              : `A co-reviewer is a person you wish to invite to write this review with you. They can be a PREreview user or a prospective PREreview user.
-                In order to invite one or more co-reviewer(s), you first need to SAVE the draft of your review.`}
-          </Value>
-        </Collapse>
+          <IconButton type="button" className={classes.button}>
+            <HelpOutlineIcon color="action" fontSize="small" />
+          </IconButton>
+        </Tooltip>
         {!!members && (
           <AvatarGroup max={membersLimit}>
             {members.map(member => (
