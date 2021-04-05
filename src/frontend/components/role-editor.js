@@ -39,7 +39,7 @@ export default function RoleEditor({ persona, onCancel, onSaved }) {
   const [file, setFile] = useState(null);
   const [scale, setScale] = useState(1);
   const [rotate, setRotate] = useState(0);
-  const { mutate: updatePersona, loading, error } = usePutPersona({
+  const { mutate: updatePersona, loading } = usePutPersona({
     id: persona.uuid,
   });
 
@@ -98,7 +98,6 @@ export default function RoleEditor({ persona, onCancel, onSaved }) {
       </Typography>
       <div {...getRootProps()}>
         <AvatarEditor
-          className="role-editor__avatar-editor"
           ref={editorRef}
           image={image}
           width={250}

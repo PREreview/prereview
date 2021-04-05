@@ -10,7 +10,7 @@ import Link from '@material-ui/core/Link';
 import Typography from '@material-ui/core/Typography';
 
 // site logo
-import PreReviewLogo from './pre-review-logo';
+import preReviewLogo from '../svgs/prereview-logo.svg';
 
 // icons
 import ArrowForwardIosIcon from '@material-ui/icons/ArrowForwardIos';
@@ -26,6 +26,7 @@ const useStyles = makeStyles(() => ({
   },
   img: {
     display: 'block',
+    maxWidth: 300,
     width: '100%',
   },
   signUp: {
@@ -53,7 +54,10 @@ export default function Footer() {
         <Grid item xs={12} md={4}>
           <Box pt={3} px={3} borderTop="1px solid #54948E">
             <Link to="/" href={'https://prereview.org'}>
-              <PreReviewLogo />
+              <img src={preReviewLogo} className={classes.img} />
+              <Typography component="span" variant="srOnly">
+                PREreview home
+              </Typography>
             </Link>
             <Grid
               container

@@ -20,6 +20,7 @@ import NoticeBadge from './notice-badge';
 import UserBadge from './user-badge';
 
 // icons
+import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
 import MenuIcon from '@material-ui/icons/Menu';
 import preReviewLogo from '../svgs/prereview-logo.svg';
 
@@ -158,6 +159,9 @@ export default function HeaderBar({ thisUser }) {
               </Typography>
               <Link to="/" href={homeLink}>
                 <img src={preReviewLogo} className={classes.img} />
+                <Typography component="span" variant="srOnly">
+                  PREreview home
+                </Typography>
               </Link>
             </Box>
           </Grid>
@@ -609,13 +613,12 @@ export default function HeaderBar({ thisUser }) {
                   <UserBadge user={thisUser} showNotice={showProfileNotice}>
                     {showProfileNotice && (
                       <Link
-                        to={process.env.IS_EXTENSION ? undefined : '/settings'}
                         href={`/settings`}
                         target={process.env.IS_EXTENSION ? '_blank' : undefined}
                       >
                         Complete Profile
-                        <div className="menu__link-item__icon">
-                          <NoticeBadge />
+                        <div>
+                          <ErrorOutlineIcon />
                         </div>
                       </Link>
                     )}

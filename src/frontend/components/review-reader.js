@@ -69,7 +69,6 @@ const AccordionSummary = withStyles({
 export default function ReviewReader({
   user,
   role,
-  preview,
   preprint,
   defaultHighlightedRoleIds,
   onHighlighedRoleIdsChange = noop,
@@ -450,12 +449,11 @@ export default function ReviewReader({
       )}
     </div>
   );
-};
+}
 
 ReviewReader.propTypes = {
   user: PropTypes.object,
   role: PropTypes.object,
-  preview: PropTypes.bool,
   preprint: PropTypes.object, // DOI or arXivID
   onHighlighedRoleIdsChange: PropTypes.func,
   defaultHighlightedRoleIds: PropTypes.arrayOf(PropTypes.string),

@@ -12,7 +12,6 @@ import Typography from '@material-ui/core/Typography';
 
 // components
 import HeaderBar from './header-bar';
-import Org from './org';
 
 // constants
 import { ORG } from '../constants';
@@ -41,7 +40,7 @@ export default function NotFound() {
             Not found
           </Typography>
           <Typography component="div" variant="body2">
-            Visit <Org />{' '}
+            Visit PREreview.org{' '}
             <Link href="/" color="primary">
               homepage
             </Link>

@@ -27,6 +27,7 @@ import Event from './Event';
 import ExtensionFallback from './extension-fallback';
 import ExtensionSplash from './extension-splash';
 import Home from './home';
+import Loading from './loading';
 import Login from './login';
 import Logout from './logout';
 import ModeratorRoute from './moderator-route';
@@ -37,15 +38,11 @@ import Reviews from './reviews';
 import SettingsAPI from './settings-api';
 import SettingsDrafts from './settings-drafts';
 import SettingsTemplates from './settings-templates';
-import SuspenseLoading from './suspense-loading';
 import PersonaSearch from './PersonaSearch';
 import Validate from './Validate';
 
 // Material UI customized theme
 import theme from '../theme.js';
-
-// icons
-import PreReviewLogo from './pre-review-logo';
 
 const Moderate = React.lazy(() => import('./moderate'));
 
@@ -126,7 +123,7 @@ export default function App({ user }) {
                   <CommunityPanel />
                 </Route>
                 <ModeratorRoute exact={true} path="/moderate">
-                  <Suspense fallback={<SuspenseLoading>Loading</SuspenseLoading>}>
+                  <Suspense fallback={<Loading />}>
                     <Moderate />
                   </Suspense>
                 </ModeratorRoute>

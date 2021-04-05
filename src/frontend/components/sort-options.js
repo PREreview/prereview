@@ -15,12 +15,7 @@ export default function SortOptions({
   onMouseEnterSortOption,
   onMouseLeaveSortOption,
 }) {
-  const isMobile = useIsMobile();
-
-  return (
-    <Grid container justify="space-between" spacing={2}>
-    </Grid>
-  );
+  return <Grid container justify="space-between" spacing={2} />;
 }
 
 SortOptions.propTypes = {

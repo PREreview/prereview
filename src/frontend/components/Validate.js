@@ -15,7 +15,6 @@ import Link from '@material-ui/core/Link';
 // components
 import HeaderBar from './header-bar';
 import Loading from './loading';
-import Org from './org';
 
 // constants
 import { ORG } from '../constants';
@@ -33,36 +32,42 @@ export default function NotFound() {
     return <Loading />;
   } else if (error) {
     return (
-      <div className="not-found">
+      <div>
         <HeaderBar thisUser={thisUser} />
 
         <Helmet>
           <title>{ORG} • Validate email</title>
         </Helmet>
 
-        <div className="not-found__body">
+        <div>
           <h1>Hey there is an error</h1>
 
           <p>
-            Visit <Org /> <Link href="/">Homepage</Link>
+            Visit PREreview.org{' '}
+            <Link href="/" color="primary">
+              Homepage
+            </Link>
           </p>
         </div>
       </div>
     );
   } else {
     return (
-      <div className="not-found">
+      <div>
         <HeaderBar thisUser={thisUser} />
 
         <Helmet>
           <title>{ORG} • Validate email</title>
         </Helmet>
 
-        <div className="not-found__body">
+        <div>
           <h1>Email {contact.value} successfully validated</h1>
 
           <p>
-            Visit <Org /> <Link href="/">Homepage</Link>
+            Visit PREreview.org{' '}
+            <Link href="/" color="primary">
+              homepage
+            </Link>
           </p>
         </div>
       </div>

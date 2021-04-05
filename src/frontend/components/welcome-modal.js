@@ -9,7 +9,7 @@ import MuiButton from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 
 // icons
-import PreReviewLogo from './pre-review-logo';
+import preReviewLogo from '../svgs/prereview-logo.svg';
 
 const Button = withStyles({
   root: {
@@ -20,6 +20,11 @@ const Button = withStyles({
 const useStyles = makeStyles(theme => ({
   root: {
     overflow: 'scroll',
+  },
+  img: {
+    display: 'block',
+    maxWidth: 150,
+    width: '100%',
   },
   logo: {
     marginBottom: '2rem',
@@ -63,7 +68,7 @@ export default function WelcomeModal(props) {
     >
       <div className={classes.modal}>
         <header className={classes.logo}>
-          <PreReviewLogo />
+          <img src={preReviewLogo} className={classes.img} />
         </header>
         <div className="welcome-modal__body" align="center">
           <Typography variant="h5" paragraph gutterBottom>

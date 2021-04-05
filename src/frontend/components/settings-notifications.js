@@ -2,7 +2,11 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useLocation, useHistory } from 'react-router-dom';
-import { usePutUserContacts, usePostUserContacts, useDeleteUserContacts } from '../hooks/api-hooks.tsx';
+import {
+  usePutUserContacts,
+  usePostUserContacts,
+  useDeleteUserContacts,
+} from '../hooks/api-hooks.tsx';
 
 // components
 import Controls from './controls';
@@ -71,7 +75,7 @@ export default function SettingsNotifications({ user }) {
     setModalType(null);
   }
 
-  useEffect(() => { }, [userContacts]);
+  useEffect(() => {}, [userContacts]);
 
   return (
     <>
@@ -200,8 +204,9 @@ function EmailToggle({ userId, contact, onDelete }) {
             .catch(err => alert(`An error occurred: ${err.message}`));
         }}
       />
-      <IconButton onClick={() => {
-        if (confirm('Are you sure you want to delete this email address?')) {
+      <IconButton
+        onClick={() => {
+          if (confirm('Are you sure you want to delete this email address?')) {
             deleteContact()
               .then(() => {
                 onDelete();

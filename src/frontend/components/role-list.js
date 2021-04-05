@@ -11,7 +11,7 @@ import Typography from '@material-ui/core/Typography';
 // components
 import RoleBadge from './role-badge';
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles(() => ({
   list: {
     display: 'flex',
     justifyContent: 'flex-start',
