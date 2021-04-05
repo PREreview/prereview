@@ -498,7 +498,7 @@ export default function Profile() {
                     </Box>
                   </Grid>
                   <Grid item>
-                    {ownProfile ? (
+                    {editMode && ownProfile ? (
                       <IconButton onClick={handleAvatarClick}>
                         <Avatar
                           src={displayedPersona.avatar}

@@ -1,13 +1,39 @@
+// base imports
 import React, { useCallback, useEffect, useState, useRef } from 'react';
 import PropTypes from 'prop-types';
 import AvatarEditor from 'react-avatar-editor';
 import { useDropzone } from 'react-dropzone';
-import { MdPerson } from 'react-icons/md';
-import Button from './button';
-import Controls from './controls';
+
+// hooks
 import { usePutPersona } from '../hooks/api-hooks.tsx';
 
+// MaterialUI imports
+import { makeStyles, withStyles } from '@material-ui/core/styles';
+import Box from '@material-ui/core/Box';
+import Grid from '@material-ui/core/Grid';
+import MuiButton from '@material-ui/core/Button';
+import Typography from '@material-ui/core/Typography';
+
+// icons
+import AccountCircleIcon from '@material-ui/icons/AccountCircle';
+
+const Button = withStyles({
+  root: {
+    textTransform: 'none',
+  },
+})(MuiButton);
+
+const useStyles = makeStyles(() => ({
+  label: {
+    display: 'block',
+  },
+  title: {
+    marginBottom: 20,
+  },
+}));
+
 export default function RoleEditor({ persona, onCancel, onSaved }) {
+  const classes = useStyles();
   const editorRef = useRef();
   const [image, setImage] = useState(null);
   const [file, setFile] = useState(null);
@@ -66,75 +92,83 @@ export default function RoleEditor({ persona, onCancel, onSaved }) {
   const hasNewAvatar = !!file || (!file && (rotate !== 0 || scale !== 1));
 
   return (
-    <div className="role-editor">
-      <div className="role-editor__content">
+    <>
+      <Typography variant="h4" component="h1" className={classes.title}>
+        Avatar Editor
+      </Typography>
+      <div {...getRootProps()}>
+        <AvatarEditor
+          className="role-editor__avatar-editor"
+          ref={editorRef}
+          image={image}
+          width={250}
+          height={250}
+          border={25}
+          borderRadius={150}
+          scale={scale}
+          rotate={rotate}
+        />
+        {!image && <input {...getInputProps()} />}
+        {!image && <AccountCircleIcon />}
+        <Typography
+          className={classes.label}
+          component="label"
+          variant="body1"
+          htmlFor="role-editor-input"
+        >
+          Drag and drop file or click to upload image.
+        </Typography>
+      </div>
+      {/* Control to allow editors to open the file picker (and to replace the one on the canvas). Once a file is in the canvas clicking on the canvas does _not_ open the file picker so this is necessary  */}
 
-        <div className="role-editor__avatar-block">
-          <h4 className="role-editor__avatar-block-title">Avatar Editor</h4>
-          {/* The Dropzone. Note that we remove the input if an image is present so that when editor moves the image with DmD it doesn't open the file picker */}
-          <div
-            {...getRootProps()}
-            className="role-editor__avatar-editor-dropzone"
-          >
-            <AvatarEditor
-              className="role-editor__avatar-editor"
-              ref={editorRef}
-              image={image}
-              width={150}
-              height={150}
-              border={25}
-              borderRadius={75}
-              scale={scale}
-              rotate={rotate}
-              /*style={{ width: '100%', height: '100%' }}*/
-            />
-            {!image && <input {...getInputProps()} />}
-            {!image && (
-              <MdPerson className="role-editor__avatar-placeholder-image" />
-            )}
-            <label
-              htmlFor="role-editor-input"
-              className="role-editor__avatar-block-label"
+      <input {...getInputProps()} id="role-editor-input" />
+      {!!image && (
+        <>
+          <Typography variant="body1" component="span">
+            Then drag the image to select the part of your avatar that you want
+            to display.
+          </Typography>
+          <Box my={2}>
+            <Box mb={1}>
+              <Grid
+                container
+                spacing="2"
+                alignItems="flex-start"
+                justify="flex-start"
+              >
+                <Grid item>
+                  <input
+                    type="range"
+                    id="role-editor-scale"
+                    name="scale"
+                    min={1}
+                    max={10}
+                    step={0.1}
+                    onChange={e => {
+                      setScale(parseFloat(e.target.value));
+                    }}
+                    value={scale}
+                  />
+                </Grid>
+                <Grid item>
+                  <Typography
+                    component="label"
+                    variant="body1"
+                    htmlFor="role-editor-scale"
+                  >
+                    Zoom
+                  </Typography>
+                </Grid>
+              </Grid>
+            </Box>
+            <Grid
+              container
+              spacing="2"
+              alignItems="flex-start"
+              justify="flex-start"
             >
-              Drag and drop file or click to upload image.
-            </label>
-          </div>
-
-          {/* Control to allow editors to open the file picker (and to replace the one on the canvas). Once a file is in the canvas clicking on the canvas does _not_ open the file picker so this is necessary  */}
-
-          <input {...getInputProps()} id="role-editor-input" />
-
-          {!!image && (
-            <div className="role-editor__image-controls">
-              <span className="role-editor__image-controls-label">
-                Drag the image to select the part that you want part of your
-                avatar
-              </span>
-              <div className="role-editor__input-row">
+              <Grid item>
                 <input
-                  className="role-editor__scale-input"
-                  type="range"
-                  id="role-editor-scale"
-                  name="scale"
-                  min={1}
-                  max={10}
-                  step={0.1}
-                  onChange={e => {
-                    setScale(parseFloat(e.target.value));
-                  }}
-                  value={scale}
-                />
-                <label
-                  className="role-editor__input-label role-editor__input-label--scale"
-                  htmlFor="role-editor-scale"
-                >
-                  Zoom
-                </label>
-              </div>
-
-              <div className="role-editor__input-row">
-                <input
-                  className="role-editor__rotate-input"
                   type="range"
                   id="role-editor-rotate"
                   name="scale"
@@ -146,60 +180,64 @@ export default function RoleEditor({ persona, onCancel, onSaved }) {
                   }}
                   value={rotate}
                 />
-                <label
-                  className="role-editor__input-label role-editor__input-label--rotate"
+              </Grid>
+              <Grid item>
+                <Typography
+                  component="label"
+                  variant="body1"
                   htmlFor="role-editor-scale"
                 >
                   Rotate
-                </label>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-      <Controls error={error} className="role-editor__controls">
-        <Button
-          disabled={loading}
-          onClick={() => {
-            onCancel();
-          }}
-        >
-          Cancel
-        </Button>
+                </Typography>
+              </Grid>
+            </Grid>
+          </Box>
+          <div>
+            <Button
+              color="primary"
+              isWaiting={loading}
+              disabled={(name === persona.name && !hasNewAvatar) || loading}
+              primary={true}
+              onClick={() => {
+                const data = {};
+                if (hasNewAvatar) {
+                  const canvas = editorRef.current.getImage();
 
-        <Button
-          isWaiting={loading}
-          disabled={(name === persona.name && !hasNewAvatar) || loading}
-          primary={true}
-          onClick={() => {
-            const data = {};
-            if (hasNewAvatar) {
-              const canvas = editorRef.current.getImage();
+                  // We need to keep the base64 string small to avoid hitting the
+                  // size limit on JSON documents for Cloudant
+                  let q = 0.92;
+                  let dataUrl = canvas.toDataURL('image/jpeg', q);
+                  while (dataUrl.length > 200000 && q > 0.1) {
+                    q -= 0.05;
+                    dataUrl = canvas.toDataURL('image/jpeg', q);
+                  }
+                  data.avatar = dataUrl;
+                }
 
-              // We need to keep the base64 string small to avoid hitting the
-              // size limit on JSON documents for Cloudant
-              let q = 0.92;
-              let dataUrl = canvas.toDataURL('image/jpeg', q);
-              while (dataUrl.length > 200000 && q > 0.1) {
-                q -= 0.05;
-                dataUrl = canvas.toDataURL('image/jpeg', q);
-              }
-              data.avatar = dataUrl;
-            }
-
-            updatePersona(data)
-              .then(resp => {
-                let updatedPersona = resp.data;
-                alert('Persona updated successfully.');
-                return onSaved(updatedPersona);
-              })
-              .catch(err => alert(`An error occurred: ${err.message}`));
-          }}
-        >
-          Save
-        </Button>
-      </Controls>
-    </div>
+                updatePersona(data)
+                  .then(resp => {
+                    let updatedPersona = resp.data;
+                    alert('Persona updated successfully.');
+                    return onSaved(updatedPersona);
+                  })
+                  .catch(err => alert(`An error occurred: ${err.message}`));
+              }}
+            >
+              Save
+            </Button>
+            <Button
+              color="primary"
+              disabled={loading}
+              onClick={() => {
+                onCancel();
+              }}
+            >
+              Cancel
+            </Button>
+          </div>
+        </>
+      )}
+    </>
   );
 }
 
