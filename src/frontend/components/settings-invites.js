@@ -1,10 +1,14 @@
 // base imports
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { useLocation } from 'react-router-dom';
 
 // hooks
-import { useGetUserNotifications, useGetFullReviews, usePostFullReviewInviteAccept, useDeleteFullReviewInvite } from '../hooks/api-hooks.tsx';
+import {
+  useGetUserNotifications,
+  useGetFullReviews,
+  usePostFullReviewInviteAccept,
+  useDeleteFullReviewInvite,
+} from '../hooks/api-hooks.tsx';
 
 // MaterialUI components
 import { makeStyles, withStyles } from '@material-ui/core/styles';
@@ -18,6 +22,7 @@ import TableCell from '@material-ui/core/TableCell';
 import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
+import Typography from '@material-ui/core/Typography';
 
 const Button = withStyles({
   root: {
@@ -122,13 +127,21 @@ function InviteRow({ invite, onRemove }) {
   );
 }
 
+InviteRow.propTypes = {
+  invite: PropTypes.object,
+  onRemove: PropTypes.func.isRequired,
+};
+
 export default function SettingsInvites({ user }) {
   const classes = useStyles();
 
   // fetch all invites from the API
   const [invites, setInvites] = useState(null);
   const [reviews, setReviews] = useState(null);
-  const { data: invitesData, loading: invitesLoading } = useGetUserNotifications({
+  const {
+    data: invitesData,
+    loading: invitesLoading,
+  } = useGetUserNotifications({
     uid: user.orcid,
     resolve: invites => invites.data,
   });
@@ -157,7 +170,11 @@ export default function SettingsInvites({ user }) {
   }, [invitesLoading]);
 
   const onRemove = remove => {
-    const filtered = invites.filter(invite => invite.preprint !== remove.preprint && invite.persona !== remove.persona);
+    const filtered = invites.filter(
+      invite =>
+        invite.preprint !== remove.preprint &&
+        invite.persona !== remove.persona,
+    );
     setInvites(filtered);
   };
 
@@ -165,11 +182,16 @@ export default function SettingsInvites({ user }) {
     return <CircularProgress className={classes.spinning} />;
   } else {
     return (
-      <section className="settings-notifications settings__section">
-        <h3 className="settings__title">Collaboration</h3>
-        <h4 className="settings__subtitle">Invites</h4>
-        {invites && invites.length ? (
-          <Box my={4}>
+      <>
+        <Typography component="h2" variant="h2">
+          Collaboration
+        </Typography>
+
+        <Box mt={4}>
+          <Typography component="h3" variant="h3">
+            Invites
+          </Typography>
+          {invites && invites.length ? (
             <TableContainer>
               <Table className={classes.table} aria-label="customized table">
                 <TableHead>
@@ -190,13 +212,18 @@ export default function SettingsInvites({ user }) {
                 </TableBody>
               </Table>
             </TableContainer>
-          </Box>
-        ) : (
-            <div>No invites yet.</div>
+          ) : (
+            <Typography component="div" variant="body1">
+              No invites yet.
+            </Typography>
           )}
-        <h4 className="settings__subtitle">Drafts</h4>
-        {reviews && reviews.length ? (
-          <Box my={4}>
+        </Box>
+
+        <Box mt={4}>
+          <Typography component="h3" variant="h3">
+            Drafts
+          </Typography>
+          {reviews && reviews.length ? (
             <TableContainer>
               <Table className={classes.table} aria-label="customized table">
                 <TableHead>
@@ -207,30 +234,41 @@ export default function SettingsInvites({ user }) {
                 </TableHead>
                 <TableBody>
                   {reviews.map(review => (
-                    <Link
-                      href={`/preprints/${review.preprint.uuid}/reviews/${review.uuid}`}
-                      target="_blank"
-                      rel="noreferrer"
-                      key={review.uuid}
-                    >
-                      <StyledTableRow>
-                        <TableCell component="th" scope="row">
+                    <StyledTableRow key={review.uuid}>
+                      <TableCell component="th" scope="row">
+                        <Link
+                          href={`/preprints/${review.preprint.uuid}/reviews/${
+                            review.uuid
+                          }`}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
                           {review.preprint.title}
-                        </TableCell>
-                        <TableCell align="right">
+                        </Link>
+                      </TableCell>
+                      <TableCell>
+                        <Link
+                          href={`/preprints/${review.preprint.uuid}/reviews/${
+                            review.uuid
+                          }`}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
                           {review.preprint.handle}
-                        </TableCell>
-                      </StyledTableRow>
-                    </Link>
+                        </Link>
+                      </TableCell>
+                    </StyledTableRow>
                   ))}
                 </TableBody>
               </Table>
             </TableContainer>
-          </Box>
-        ) : (
-            <div>No accepted invites to display.</div>
+          ) : (
+            <Typography component="div" variant="body1">
+              No accepted invites to display.
+            </Typography>
           )}
-      </section>
+        </Box>
+      </>
     );
   }
 }

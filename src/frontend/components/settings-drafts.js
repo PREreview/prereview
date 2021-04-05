@@ -30,7 +30,9 @@ export default function SettingsDrafts() {
       <HeaderBar thisUser={user} />
 
       <Container>
-        <SettingsInvites user={user} />
+        <Box my={4}>
+          <SettingsInvites user={user} />
+        </Box>
       </Container>
     </Box>
   );
