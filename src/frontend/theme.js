@@ -7,6 +7,7 @@ const theme = createMuiTheme({
     MuiDialog: {
       paper: {
         borderRadius: 50,
+        minHeight: 150,
         padding: 40,
         position: 'relative',
       },

@@ -140,7 +140,7 @@ function StepPreprint({
   };
 
   return (
-    <Box className={classes.box}>
+    <Box>
       <Typography component="div" variant="body2" gutterBottom>
         Search for a preprint
       </Typography>
@@ -184,10 +184,7 @@ function StepPreprint({
         </Typography>
       )}
 
-      <Controls
-        className="new-preprint__button-bar"
-        error={error || resolvePreprintStatus.error}
-      >
+      <Controls error={error || resolvePreprintStatus.error}>
         <Button
           onClick={() => {
             setValue('');

@@ -177,14 +177,14 @@ export default function Reviews() {
                     onClick={() => {
                       if (thisUser) {
                         setNewPreprintOpen(true);
-                        history.push('/new');
+                        history.push('/reviews/new');
                       } else {
                         setLoginModalOpenNext('/reviews/new');
                       }
                     }}
                     disabled={location.pathname === '/reviews/new'}
                   />
-                  <PrivateRoute path="/new" exact={true}>
+                  <PrivateRoute path="/reviews/new" exact={true}>
                     <Dialog
                       open={newPreprintOpen}
                       onClose={() => {
