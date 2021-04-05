@@ -1,7 +1,6 @@
 // base imports
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { useLocation } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 
 // hooks
@@ -65,12 +64,10 @@ const useStyles = makeStyles(theme => ({
 
 export default function ShellContent({ preprint, user, cid }) {
   const classes = useStyles();
-  const location = useLocation();
   const [hasRapidReviewed, setHasRapidReviewed] = useState(false);
   const [hasLongReviewed, setHasLongReviewed] = useState(false);
   const [hasRequested, setHasRequested] = useState(false);
   const [newRequest, setNewRequest] = useState(false);
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [review, setReview] = useState(null);
   const [tab, setTab] = useState(0);
 

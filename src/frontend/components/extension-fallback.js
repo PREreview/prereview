@@ -35,7 +35,6 @@ import HeaderBar from './header-bar';
 import Link from '@material-ui/core/Link';
 import Loading from './loading';
 import NotFound from './not-found';
-import Shell from './shell';
 import ShellContent from './shell-content';
 
 // constants
@@ -206,7 +205,7 @@ export default function ExtensionFallback() {
                   open ? classes.headerBarCondensed : classes.headerBarFull
                 }
               >
-                <HeaderBar />
+                <HeaderBar thisUser={user} />
               </Box>
               <IconButton
                 color="inherit"
