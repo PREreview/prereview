@@ -33,7 +33,9 @@ const useStyles = makeStyles(() => ({
   },
   info: {
     backgroundColor: '#FAB7B7',
-    padding: 10,
+  },
+  infoIcon: {
+    paddingRight: 5,
   },
   relative: {
     position: 'relative',
@@ -63,9 +65,9 @@ export default function SettingsKeys({ user }) {
       <Typography component="h2" variant="h2">
         API keys
       </Typography>
-      <Box my={2} className={classes.info}>
+      <Box my={2} p={2} className={classes.info}>
         <Typography component="div" variant="body1">
-          <InfoOutlinedIcon />
+          <InfoOutlinedIcon className={classes.infoIcon} />
           API keys allow an application to access this site with the same
           identity and privileges as your user account.{' '}
           <em>

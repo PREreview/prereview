@@ -240,8 +240,6 @@ export default function SettingsInvites({ user }) {
                           href={`/preprints/${review.preprint.uuid}/reviews/${
                             review.uuid
                           }`}
-                          target="_blank"
-                          rel="noreferrer"
                         >
                           {review.preprint.title}
                         </Link>
@@ -251,8 +249,6 @@ export default function SettingsInvites({ user }) {
                           href={`/preprints/${review.preprint.uuid}/reviews/${
                             review.uuid
                           }`}
-                          target="_blank"
-                          rel="noreferrer"
                         >
                           {review.preprint.handle}
                         </Link>

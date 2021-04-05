@@ -36,6 +36,7 @@ import HeaderBar from './header-bar';
 
 // icons
 import DeleteIcon from '@material-ui/icons/Delete';
+import InfoOutlinedIcon from '@material-ui/icons/InfoOutlined';
 
 // constants
 import { ORG } from '../constants';
@@ -56,6 +57,12 @@ const StyledTableRow = withStyles(theme => ({
 }))(TableRow);
 
 const useStyles = makeStyles(theme => ({
+  info: {
+    backgroundColor: '#FAB7B7',
+  },
+  infoIcon: {
+    paddingRight: 5,
+  },
   input: {
     marginBottom: '1rem',
     width: '100%',
@@ -96,7 +103,9 @@ export default function SettingsDrafts() {
       <HeaderBar thisUser={user} />
 
       <Container>
-        <Templates />
+        <Box my={4}>
+          <Templates />
+        </Box>
       </Container>
     </Box>
   );
@@ -188,12 +197,17 @@ function Templates() {
     return <CircularProgress className={classes.spinning} />;
   } else {
     return (
-      <section className="settings-templates settings__section">
-        <h3 className="settings__title">Review Templates</h3>
-        <p>
-          Review templates are guides a user can choose from when starting their
-          long-form review.
-        </p>
+      <>
+        <Typography component="h2" variant="h2">
+          Review Templates
+        </Typography>
+        <Box my={2} p={2} className={classes.info}>
+          <Typography component="div" variant="body1">
+            <InfoOutlinedIcon className={classes.infoIcon} />
+            Review templates are guides a user can choose from when starting
+            their long-form review.
+          </Typography>
+        </Box>
         <Button
           onClick={handleOpenAdd}
           type="button"
@@ -278,7 +292,7 @@ function Templates() {
             </Table>
           </TableContainer>
         </Box>
-      </section>
+      </>
     );
   }
 }
