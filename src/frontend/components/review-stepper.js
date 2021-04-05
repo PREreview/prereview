@@ -17,6 +17,7 @@ import Button from '@material-ui/core/Button';
 import Check from '@material-ui/icons/Check';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Grid from '@material-ui/core/Grid';
+import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
 import Input from '@material-ui/core/Input';
 import InputLabel from '@material-ui/core/InputLabel';
 import Link from '@material-ui/core/Link';
@@ -30,6 +31,7 @@ import Stepper from '@material-ui/core/Stepper';
 import Step from '@material-ui/core/Step';
 import StepConnector from '@material-ui/core/StepConnector';
 import StepLabel from '@material-ui/core/StepLabel';
+import Tooltip from '@material-ui/core/Tooltip';
 import Typography from '@material-ui/core/Typography';
 
 import { v4 as uuidv4 } from 'uuid';
@@ -571,9 +573,15 @@ export default function ReviewStepper({
           </>
         ) : (
           <Box>
-            <header className="shell-content-reviews__title">
-              Rapid Review
-            </header>
+            <Tooltip
+              title={`A Rapid Review is a structured form with Yes/No/n.a./Not Sure answer options 
+              designed for researchers with subject matter expertise to provide quick and accurate feedback to a preprint. 
+              You'll be able to provide a longer, more in-depth review after you complete this rapid-review form.`}
+            >
+              <header className="shell-content-reviews__title">
+                Rapid Review <HelpOutlineIcon />
+              </header>
+            </Tooltip>
             <form>
               <RapidFormFragment
                 answerMap={answerMap}
@@ -622,6 +630,17 @@ export default function ReviewStepper({
       case 1:
         return (
           <Box mt={2}>
+            <Tooltip
+              title={`A Longform Review is a space designed for researchers with subject matter expertise to provide longer, 
+              and more in-depth feedback to a preprint. It can be authored by one or more users. 
+              To add a co-reviewer, save your draft and click on + Add Co-Reviewer. 
+              To invite someone to edit your review before submitting, save your draft and click on + Add Mentor. 
+              When submitted, the Longform Review is assigned a digital object identifier (DOI) via Zenodo.`}
+            >
+              <header className="shell-content-reviews__title">
+                Longform Review <HelpOutlineIcon />
+              </header>
+            </Tooltip>
             <Box className={classes.red}>
               <Typography variant="button" display="block" gutterBottom>
                 Instructions
