@@ -8,6 +8,7 @@ import Box from '@material-ui/core/Box';
 import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
 import Link from '@material-ui/core/Link';
+import HelpOutlinedIcon from '@material-ui/icons/HelpOutlined';
 import Pagination from '@material-ui/lab/Pagination';
 import Typography from '@material-ui/core/Typography';
 
@@ -124,6 +125,17 @@ export default function Reviews() {
 
         <Box py={8}>
           <Container>
+            <Grid container alignItems="center">
+              <Grid item>
+                <Typography variant="caption">
+                  This is a platform for the crowdsourcing of preprint reviews.
+                  Use the search bar below to find preprints that already have
+                  reviews or requests for reviews. To add your own review or
+                  request, use the Add Review | Request Review button, paste the
+                  preprint DOI and follow the instructions.
+                </Typography>
+              </Grid>
+            </Grid>
             <SearchBar
               defaultValue={search}
               placeholderValue="Search preprints by title, author, abstract, DOI, or arXiv ID"

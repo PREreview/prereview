@@ -13,7 +13,7 @@ import debounce from 'lodash/debounce';
 
 // utils
 import UserProvider from '../contexts/user-context';
-import { checkIfRoleLacksMininmalData } from '../utils/roles';
+import { checkIfProfileNeedsUpdate } from '../utils/roles';
 
 // components
 import NoticeBadge from './notice-badge';
@@ -47,7 +47,7 @@ export default function Shell({ children, defaultStatus = 'default' }) {
     ? `/login?next=${encodeURIComponent(extensionNextURL)}`
     : `/login?next=${location.pathname}`;
 
-  const showProfileNotice = checkIfRoleLacksMininmalData(user);
+  const showProfileNotice = checkIfProfileNeedsUpdate(user);
 
   // shell height is set in `%` units through the `max-height` CSS property
   const [height, setHeight] = useState(50);
@@ -321,8 +321,12 @@ export default function Shell({ children, defaultStatus = 'default' }) {
               >
                 {showProfileNotice && (
                   <XLink
-                    to={process.env.IS_EXTENSION ? undefined : '/settings'}
-                    href={`/settings`}
+                    to={
+                      process.env.IS_EXTENSION
+                        ? undefined
+                        : `/about/${user.defaultPersona.uuid}`
+                    }
+                    href={`/about/${user.defaultPersona.uuid}`}
                     target={process.env.IS_EXTENSION ? '_blank' : undefined}
                   >
                     Complete Profile

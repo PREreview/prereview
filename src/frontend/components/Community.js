@@ -644,6 +644,17 @@ function CommunityContent({ thisUser, community, params }) {
   } else {
     return (
       <Box>
+        <Grid container alignItems="center" justify="space-between">
+          <Grid item>
+            <Typography variant="caption">
+              This is a platform for the crowdsourcing of preprint reviews. Use
+              the search bar below to find preprints that already have reviews
+              or requests for reviews. To add your own review or request, use
+              the Add Review | Request Review button, paste the preprint DOI and
+              follow the instructions.
+            </Typography>
+          </Grid>
+        </Grid>
         <SearchBar
           defaultValue={search}
           placeholderValue="Search preprints in this community by title, author, abstract, DOI, or arXiv ID"

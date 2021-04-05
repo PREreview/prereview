@@ -16,6 +16,9 @@ import Banner from './banner';
 import NoticeBadge from './notice-badge';
 import UserBadge from './user-badge';
 
+// utils
+import { checkIfProfileNeedsUpdate } from '../utils/roles';
+
 // icons
 import MenuIcon from '@material-ui/icons/Menu';
 import PreReviewLogo from './pre-review-logo';
@@ -70,7 +73,7 @@ const useStyles = makeStyles(theme => ({
 
 export default function HeaderBar({ thisUser }) {
   const classes = useStyles();
-  const showProfileNotice = false;
+  const showProfileNotice = checkIfProfileNeedsUpdate(thisUser);
 
   const [loginLink, setLoginLink] = useState('/login');
   const [homeLink, setHomeLink] = useState('/');
@@ -567,8 +570,12 @@ export default function HeaderBar({ thisUser }) {
                   <UserBadge user={thisUser} showNotice={showProfileNotice}>
                     {showProfileNotice && (
                       <Link
-                        to={process.env.IS_EXTENSION ? undefined : '/settings'}
-                        href={`/settings`}
+                        to={
+                          process.env.IS_EXTENSION
+                            ? undefined
+                            : `/about/${thisUser.defaultPersona.uuid}`
+                        }
+                        href={`/about/${thisUser.defaultPersona.uuid}`}
                         target={process.env.IS_EXTENSION ? '_blank' : undefined}
                       >
                         Complete Profile
