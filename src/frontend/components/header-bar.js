@@ -567,8 +567,12 @@ export default function HeaderBar({ thisUser }) {
                   <UserBadge user={thisUser} showNotice={showProfileNotice}>
                     {showProfileNotice && (
                       <Link
-                        to={process.env.IS_EXTENSION ? undefined : '/settings'}
-                        href={`/settings`}
+                        to={
+                          process.env.IS_EXTENSION
+                            ? undefined
+                            : `/about/${thisUser.defaultPersona.uuid}`
+                        }
+                        href={`/about/${thisUser.defaultPersona.uuid}`}
                         target={process.env.IS_EXTENSION ? '_blank' : undefined}
                       >
                         Complete Profile
