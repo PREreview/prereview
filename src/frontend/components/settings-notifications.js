@@ -6,8 +6,6 @@ import { usePutUserContacts, usePostUserContacts, useDeleteUserContacts } from '
 
 // components
 import Controls from './controls';
-import Modal from './modal';
-import TextInput from './text-input';
 import ToggleSwitch from './toggle-switch';
 
 // MaterialUI components
@@ -171,7 +169,7 @@ SettingsNotifications.propTypes = {
 };
 
 function EmailToggle({ userId, contact, onDelete }) {
-  const [toggle, setToggle] = useState(contact.isNotified)
+  const [toggle, setToggle] = useState(contact.isNotified);
   const { mutate: updateContact, loading } = usePutUserContacts({
     id: userId,
     cid: contact.uuid,
@@ -180,42 +178,47 @@ function EmailToggle({ userId, contact, onDelete }) {
   const { mutate: deleteContact } = useDeleteUserContacts({
     id: userId,
     queryParams: {
-      cid: contact.uuid
-    }
+      cid: contact.uuid,
+    },
   });
   return (
-    <div className="settings-notifications__toggle">
+    <div>
       <span>{`${contact.value}`}</span>
       <ToggleSwitch
         id="notification-switch"
         disabled={loading}
         checked={toggle}
         onChange={() => {
-          updateContact(
-            {
-              isNotified: !toggle,
-              schema: contact.schema,
-              value: contact.value,
-            })
+          updateContact({
+            isNotified: !toggle,
+            schema: contact.schema,
+            value: contact.value,
+          })
             .then(() => {
-              setToggle(!toggle);
+              return setToggle(!toggle);
             })
             .catch(err => alert(`An error occurred: ${err.message}`));
         }}
       />
       <IconButton onClick={() => {
         if (confirm('Are you sure you want to delete this email address?')) {
-          deleteContact()
+            deleteContact()
               .then(() => {
                 onDelete();
-                alert('Contact info deleted successfully.');
+                return alert('Contact info deleted successfully.');
               })
               .catch(err => alert(`An error occurred: ${err.message}`));
-        }
-      }}
+          }
+        }}
       >
         <Delete />
       </IconButton>
     </div>
   );
 }
+
+EmailToggle.propTypes = {
+  contact: PropTypes.object,
+  userId: PropTypes.string.isRequired,
+  onDelete: PropTypes.func.isRequired,
+};
