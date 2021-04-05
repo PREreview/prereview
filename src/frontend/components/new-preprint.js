@@ -18,11 +18,11 @@ import { makeStyles } from '@material-ui/core/styles';
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
 import Link from '@material-ui/core/Link';
+import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 
 // components
 import Controls from './controls';
-import TextInput from './text-input';
 import PreprintPreview from './preprint-preview';
 
 const useStyles = makeStyles(() => ({
@@ -144,7 +144,8 @@ function StepPreprint({
       <Typography component="div" variant="body2" gutterBottom>
         Search for a preprint
       </Typography>
-      <TextInput
+      <TextField
+        variant="outlined"
         inputId="step-preprint-input-new"
         label="Enter preprint Digital Object Identifier (DOI) or an arXiv ID"
         autoComplete="off"

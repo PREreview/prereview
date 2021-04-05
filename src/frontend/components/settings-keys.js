@@ -1,14 +1,16 @@
 // base imports
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
+
+// hooks
 import { usePostUserKey, useDeleteUserKeys } from '../hooks/api-hooks.tsx';
 
 // components
 import Controls from './controls';
-import TextInput from './text-input';
 
 // MaterialUI components
 import { makeStyles } from '@material-ui/core/styles';
+import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
 import Delete from '@material-ui/icons/Delete';
@@ -18,20 +20,31 @@ import TableCell from '@material-ui/core/TableCell';
 import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
+import TextField from '@material-ui/core/TextField';
+import Typography from '@material-ui/core/Typography';
 
 // icons
-import { MdInfoOutline } from 'react-icons/md';
+import InfoOutlinedIcon from '@material-ui/icons/InfoOutlined';
 
 const useStyles = makeStyles(() => ({
+  button: {
+    marginTop: 20,
+    textTransform: 'none',
+  },
+  info: {
+    backgroundColor: '#FAB7B7',
+    padding: 10,
+  },
   relative: {
     position: 'relative',
   },
   table: {
     maxHeight: 650,
   },
-  button: {
+  textField: {
+    marginBottom: 20,
     marginTop: 20,
-    textTransform: 'none',
+    minWidth: 360,
   },
 }));
 
@@ -46,33 +59,38 @@ export default function SettingsKeys({ user }) {
   useEffect(() => {}, [userKeys]);
 
   return (
-    <section className="settings-keys settings__section">
-      <h3 className="settings__title">API keys</h3>
-
-      <p className="settings-keys__notice">
-        <MdInfoOutline className="settings-keys__notice-icon" />
-        <span>
+    <>
+      <Typography component="h2" variant="h2">
+        API keys
+      </Typography>
+      <Box my={2} className={classes.info}>
+        <Typography component="div" variant="body1">
+          <InfoOutlinedIcon />
           API keys allow an application to access this site with the same
           identity and privileges as your user account.{' '}
           <em>
             Please be careful who you share these keys with, and delete any that
             are no longer used or may be compromised.
           </em>
-        </span>
-      </p>
+        </Typography>
+      </Box>
 
       <TableContainer>
         <Table stickyHeader className={classes.table} aria-label="keys table">
           <TableHead>
             <TableRow>
-              <TableCell className="settings__persona-list-header">
-                App
-              </TableCell>
-              <TableCell className="settings__persona-list-header">
-                Key
+              <TableCell>
+                <Typography component="div" variant="body2">
+                  App
+                </Typography>
               </TableCell>
               <TableCell>
-                <div className="vh">Controls</div>
+                <Typography component="div" variant="body2">
+                  Key
+                </Typography>
+              </TableCell>
+              <TableCell>
+                <Typography variant="srOnly">Controls</Typography>
               </TableCell>
             </TableRow>
           </TableHead>
@@ -96,11 +114,12 @@ export default function SettingsKeys({ user }) {
         </Table>
       </TableContainer>
 
-      <div className="settings-keys__name">
-        <TextInput
+      <div>
+        <TextField
+          className={classes.textField}
+          variant="outlined"
           label="Choose a name to distinguish a new API key"
           value={app}
-          className="settings-keys__name-input"
           onChange={e => {
             const isValid = !e.target.validity.typeMismatch;
             setApp(e.target.value);
@@ -133,7 +152,7 @@ export default function SettingsKeys({ user }) {
           Add API Key
         </Button>
       </Controls>
-    </section>
+    </>
   );
 }
 

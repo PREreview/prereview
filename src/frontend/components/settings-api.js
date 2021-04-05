@@ -30,7 +30,9 @@ export default function SettingsAPI() {
       <HeaderBar thisUser={user} />
 
       <Container>
-        <SettingsKeys user={user} />
+        <Box my={4}>
+          <SettingsKeys user={user} />
+        </Box>
       </Container>
     </Box>
   );
