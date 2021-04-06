@@ -4,6 +4,21 @@ import Value from './value';
 import RoleBadge from './role-badge';
 import { getTextAnswers } from '../utils/stats';
 
+// material ui imports
+import Box from '@material-ui/core/Box';
+import Container from '@material-ui/core/Container';
+import Grid from '@material-ui/core/Grid';
+import List from '@material-ui/core/List';
+import ListItemMui from '@material-ui/core/ListItem';
+import Typography from '@material-ui/core/Typography';
+
+const ListItem = withStyles(theme => ({
+  root: {
+    '&:nth-of-type(odd)': {
+      backgroundColor: theme.palette.action.hover,
+    },
+  },
+}))(ListItemMui);
 export default function TextAnswers({
   user,
   reviews,
@@ -21,45 +36,45 @@ export default function TextAnswers({
   const isLoggedIn = !!user;
 
   return (
-    <div className="text-answers">
-      <dl>
-        {answers &&
-          answers.map(({ questionId, question, answers }) => (
-            <div key={questionId}>
-              <dt className="text-answers__question">
-                <Value tagName="span">{question}</Value>
-              </dt>
+    <Container>
+      {answers &&
+        answers.map(({ questionId, question, answers }) => (
+          <>
+            <Box key={questionId} my={4} borderBottom="1px solid #C1BFBF">
+              <Typography variant="h5">{question}</Typography>
+            </Box>
+            <List>
               {answers.map(({ author, text }) => {
                 if (text && text.length) {
                   return (
-                    <dd
-                      className="text-answers__response-row"
-                      key={author ? author.uuid : user.uuid}
-                    >
-                      <div className="text-answers__user-badge-container">
-                        <RoleBadge user={author ? author : user}>
-                          {isLoggedIn && (
-                            <div
-                              disabled={isModerationInProgress}
-                              onSelect={() => {
-                                onModerate(author ? author.uuid : user.uuid);
-                              }}
-                            >
-                              Report Review
-                            </div>
-                          )}
-                        </RoleBadge>
-                      </div>
-
-                      <Value className="text-answers__response">{text}</Value>
-                    </dd>
+                    <ListItem>
+                      <Grid container>
+                        <Grid item key={author ? author.uuid : user.uuid}>
+                          <RoleBadge user={author ? author : user}>
+                            {isLoggedIn && (
+                              <div
+                                disabled={isModerationInProgress}
+                                onSelect={() => {
+                                  onModerate(author ? author.uuid : user.uuid);
+                                }}
+                              >
+                                Report Review
+                              </div>
+                            )}
+                          </RoleBadge>
+                        </Grid>
+                        <Grid item>
+                          <Typography>{text}</Typography>
+                        </Grid>
+                      </Grid>
+                    </ListItem>
                   );
                 }
               })}
-            </div>
-          ))}
-      </dl>
-    </div>
+            </List>
+          </>
+        ))}
+    </Container>
   );
 }
 
