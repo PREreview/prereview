@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 
 // Material UI imports
 import { makeStyles } from '@material-ui/core/styles';
+import AvatarGroup from '@material-ui/lab/AvatarGroup';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import Typography from '@material-ui/core/Typography';
@@ -25,12 +26,11 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-export default function RoleList({
+export default function Reviewers({
   user,
   allReviews,
-  onModerate,
-  isModerationInProgress,
   hasReviewed,
+  preprintId,
 }) {
   const classes = useStyles();
   const [reviews] = useState(allReviews);
@@ -40,10 +40,20 @@ export default function RoleList({
     let newAuthors = [];
     reviews.map(review => {
       if (review.author) {
-        newAuthors = [...newAuthors, review.author];
+        const newAuthor = review.author;
+        newAuthor.reviewUuid = preprintId
+          ? `/preprints/${preprintId}/rapid-reviews/${review.uuid}`
+          : `/rapid-reviews/${review.uuid}`;
+        newAuthors = [...newAuthors, newAuthor];
       } else if (review.authors) {
         if (review.isPublished) {
-          review.authors.map(author => (newAuthors = [...newAuthors, author]));
+          review.authors.map(author => {
+            const newAuthor = author;
+            newAuthor.reviewUuid = preprintId
+              ? `/preprints/${preprintId}/full-reviews/${review.uuid}`
+              : `/full-reviews/${review.uuid}`;
+            newAuthors = [...newAuthors, newAuthor];
+          });
         }
       }
       return newAuthors;
@@ -71,7 +81,7 @@ export default function RoleList({
         </Typography>
       )}
 
-      <List className={classes.list}>
+      <AvatarGroup max={20} className={classes.list}>
         {authors.length
           ? authors.map(author => {
               return (
@@ -92,17 +102,15 @@ export default function RoleList({
               );
             })
           : null}
-      </List>
+      </AvatarGroup>
     </>
   );
 }
 
-RoleList.propTypes = {
+Reviewers.propTypes = {
+  preprintId: PropTypes.string,
   user: PropTypes.object,
   allReviews: PropTypes.array.isRequired,
-  onModerate: PropTypes.func,
-  isModerationInProgress: PropTypes.bool,
-  onRemoved: PropTypes.func.isRequired,
   roleIds: PropTypes.arrayOf(PropTypes.object),
   hasReviewed: PropTypes.oneOfType([
     PropTypes.object,

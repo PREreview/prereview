@@ -19,9 +19,14 @@ import Loading from './loading';
 import SearchBar from './search-bar';
 
 // Material-ui components
-import { makeStyles } from '@material-ui/core/styles';
+import {
+  createMuiTheme,
+  makeStyles,
+  ThemeProvider,
+  withStyles,
+} from '@material-ui/core/styles';
 import Box from '@material-ui/core/Box';
-import Button from '@material-ui/core/Button';
+import MuiButton from '@material-ui/core/Button';
 import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
 import Pagination from '@material-ui/lab/Pagination';
@@ -30,11 +35,41 @@ import Typography from '@material-ui/core/Typography';
 // constants
 import { ORG } from '../constants';
 
+const Button = withStyles({
+  root: {
+    textTransform: 'none',
+  },
+})(MuiButton);
+
+const prereviewTheme = createMuiTheme({
+  palette: {
+    primary: {
+      main: '#F77463',
+      contrastText: '#fff',
+    },
+    secondary: {
+      main: '#eaeaf0',
+    },
+  },
+  typography: {
+    fontFamily: ['Open Sans', 'sans-serif'].join(','),
+  },
+});
+
 const useStyles = makeStyles(theme => ({
-  button: {
+  buttonTag: {
     color: `${theme.palette.primary.main} !important`,
     margin: '0.5rem',
     textTransform: 'none',
+  },
+  button: {
+    color: `${theme.palette.primary.main}`,
+    marginTop: theme.spacing(1),
+    marginRight: theme.spacing(1),
+  },
+  buttonText: {
+    fontSize: '1rem',
+    textTransform: 'uppercase',
   },
   communities: {
     overflow: 'hidden',
@@ -43,6 +78,9 @@ const useStyles = makeStyles(theme => ({
     marginBottom: '3rem',
     marginTop: 72,
     overflow: 'hidden',
+  },
+  right: {
+    textAlign: 'right',
   },
   smallColumn: {
     marginTop: '2.5rem',
@@ -71,101 +109,127 @@ const Communities = () => {
     return <div>An error occurred: {error.message}</div>;
   } else {
     return (
-      <div className={`${classes.communities} communities`}>
-        <Helmet>
-          <title>Communities • {ORG}</title>
-        </Helmet>
-        <HeaderBar thisUser={user} />
+      <ThemeProvider theme={prereviewTheme}>
+        <div className={`${classes.communities} communities`}>
+          <Helmet>
+            <title>Communities • {ORG}</title>
+          </Helmet>
+          <HeaderBar thisUser={user} />
 
-        <Container className={classes.container} maxWidth="lg">
-          <Box m={4}>
-            <Typography variant="h3" component="h1" gutterBottom={true}>
-              Communities
-            </Typography>
-            <SearchBar
-              defaultValue={search}
-              isFetching={loading}
-              onChange={value => {
-                params.delete('page');
-                setSearch(value);
-              }}
-              onCancelSearch={() => {
-                params.delete('search');
-                setSearch('');
-                history.push({
-                  pathname: location.pathame,
-                  search: params.toString(),
-                });
-              }}
-              onRequestSearch={() => {
-                params.set('search', search);
-                params.delete('page');
-                history.push({
-                  pathname: location.pathame,
-                  search: params.toString(),
-                });
-              }}
-            />
-            <Grid container spacing={4}>
-              <Grid item xs={12} md={8}>
-                {communities && communities.totalCount === 0 && !loading ? (
-                  <div>No communities found.</div>
-                ) : (
-                  <>
-                    {communities &&
-                      communities.data.map(community => (
-                        <CommunityCard
-                          key={community.uuid}
-                          community={community}
-                        />
-                      ))}
-                  </>
-                )}
+          <Container className={classes.container} maxWidth="lg">
+            <Box m={4}>
+              <Grid
+                component="label"
+                container
+                alignItems="center"
+                justify="space-between"
+                spacing={8}
+              >
+                <Grid item>
+                  <Typography variant="h3" component="h1" gutterBottom={true}>
+                    Communities
+                  </Typography>
+                </Grid>
+                <Grid item xs={12} md={4} className={classes.right}>
+                  <Button
+                    type="button"
+                    color="primary"
+                    variant="outlined"
+                    href={`https://forms.gle/3dDeanAhQggRZTef6`}
+                  >
+                    <span className={classes.buttonText}>
+                      Start your own community
+                    </span>
+                  </Button>
+                </Grid>
+              </Grid>
+              <SearchBar
+                defaultValue={search}
+                placeholderValue="Search communities by name, description, members, events, or preprints"
+                isFetching={loading}
+                onChange={value => {
+                  params.delete('page');
+                  setSearch(value);
+                }}
+                onCancelSearch={() => {
+                  params.delete('search');
+                  setSearch('');
+                  history.push({
+                    pathname: location.pathame,
+                    search: params.toString(),
+                  });
+                }}
+                onRequestSearch={() => {
+                  params.set('search', search);
+                  params.delete('page');
+                  history.push({
+                    pathname: location.pathame,
+                    search: params.toString(),
+                  });
+                }}
+              />
 
-                {communities && communities.totalCount > params.get('limit') && (
-                  <div className="home__pagination">
-                    <Pagination
-                      count={Math.ceil(
-                        communities.totalCount / params.get('limit'),
+              <Grid container spacing={4}>
+                <Grid item xs={12} md={8}>
+                  {communities && communities.totalCount === 0 && !loading ? (
+                    <div>No communities found.</div>
+                  ) : (
+                    <>
+                      {communities &&
+                        communities.data.map(community => (
+                          <CommunityCard
+                            key={community.uuid}
+                            community={community}
+                          />
+                        ))}
+                    </>
+                  )}
+
+                  {communities && communities.totalCount > params.get('limit') && (
+                    <div className="home__pagination">
+                      <Pagination
+                        count={Math.ceil(
+                          communities.totalCount / params.get('limit'),
+                        )}
+                        page={parseInt('' + params.get('page'))}
+                        onChange={(ev, page) => {
+                          params.set('page', page);
+                          history.push({
+                            pathname: location.pathname,
+                            search: params.toString(),
+                          });
+                        }}
+                      />
+                    </div>
+                  )}
+                </Grid>
+                <Grid item xs={12} md={4} className={classes.smallColumn}>
+                  <Typography variant="h5" component="h2" gutterBottom={true}>
+                    Search communities by tag
+                    <Box mt={4}>
+                      {!loadingTags && tags && tags.data.length ? (
+                        tags.data.map(tag => (
+                          <Button
+                            key={tag.uuid}
+                            href={`/communities/?tags=${tag.name}`}
+                            variant="outlined"
+                            color="primary"
+                            className={classes.buttonTag}
+                          >
+                            {tag.name}
+                          </Button>
+                        ))
+                      ) : (
+                        <div>No tags to display.</div>
                       )}
-                      page={parseInt('' + params.get('page'))}
-                      onChange={(ev, page) => {
-                        params.set('page', page);
-                        history.push({
-                          pathname: location.pathname,
-                          search: params.toString(),
-                        });
-                      }}
-                    />
-                  </div>
-                )}
+                    </Box>
+                  </Typography>
+                </Grid>
               </Grid>
-              <Grid item xs={12} md={4} className={classes.smallColumn}>
-                <Typography variant="h5" component="h2" gutterBottom={true}>
-                  Search communities by tag
-                  <Box mt={4}>
-                    {!loadingTags && tags && tags.data.length ? (
-                      tags.data.map(tag => (
-                        <Button
-                          key={tag.uuid}
-                          href={`/communities/?tags=${tag.name}`}
-                          variant="outlined"
-                          color="primary"
-                          className={classes.button}
-                        >
-                          {tag.name}
-                        </Button>
-                      ))
-                    ) : (
-                      <div>No tags to display.</div>
-                    )}
-                  </Box>
-                </Typography>
-              </Grid>
-            </Grid>
-          </Box>
-        </Container>
-      </div>
+            </Box>
+          </Container>
+        </div>
+      </ThemeProvider>
     );
   }
 };

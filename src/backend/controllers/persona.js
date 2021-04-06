@@ -127,13 +127,19 @@ export default function controller(
 
         if (ctx.query.badges) {
           const badges = ctx.query.badges.split(',');
-          queries.push({ badges: { uuid: { $in: badges } } });
+          queries.push({
+            $or: [
+              { badges: { name: { $in: badges } } },
+              { badges: { uuid: { $in: badges } } },
+            ],
+          });
         }
 
         if (ctx.query.communities) {
           const communities = ctx.query.communities.split(',');
           queries.push({
             $or: [
+              { communities: { name: { $in: communities } } },
               { communities: { uuid: { $in: communities } } },
               { communities: { slug: { $in: communities } } },
             ],
@@ -192,8 +198,10 @@ export default function controller(
           'requests',
           'fullReviews.preprint',
           'rapidReviews.preprint',
+          'requests.preprint',
           'badges',
           'expertises',
+          'communities',
         ]);
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
@@ -211,19 +219,32 @@ export default function controller(
       if (!persona.isAnonymous) {
         log.debug('This is a public persona, retrieving user data.');
         try {
-          user = await usersModel.findOneByPersona(persona.uuid, ['contacts']);
+          user = await usersModel.findOneByPersona(persona.uuid, [
+            'contacts',
+            'works',
+          ]);
         } catch (err) {
           log.error('HTTP 400 Error: ', err);
           ctx.throw(400, `Failed to parse schema: ${err}`);
         }
       }
 
+      delete persona.identity;
       if (user) {
         log.debug('Found corresponding user:', user);
         ctx.body = {
           status: 200,
           message: 'ok',
-          data: [{ orcid: user.orcid, contacts: user.contacts, ...persona }],
+          data: [
+            {
+              orcid: user.orcid,
+              contacts: user.contacts
+                .getItems()
+                .filter(contact => contact.isPublic),
+              works: user.works,
+              ...persona,
+            },
+          ],
         };
       } else {
         ctx.body = {

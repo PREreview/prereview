@@ -1,7 +1,7 @@
 // base imports
 import React, { useContext, useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { useParams, useHistory, useLocation } from 'react-router-dom';
+import { useParams, useHistory } from 'react-router-dom';
 import { format } from 'date-fns';
 
 // contexts
@@ -13,17 +13,19 @@ import {
   useGetPersona,
   usePutPersona,
   usePutUser,
-  usePostUserContacts,
-  usePutUserContacts,
 } from '../hooks/api-hooks.tsx';
 
 // Material UI components
 import { makeStyles, withStyles } from '@material-ui/core/styles';
+import Accordion from '@material-ui/core/Accordion';
+import AccordionSummary from '@material-ui/core/AccordionSummary';
+import AccordionDetails from '@material-ui/core/AccordionDetails';
 import Avatar from '@material-ui/core/Avatar';
 import Box from '@material-ui/core/Box';
 import Chip from '@material-ui/core/Chip';
 import Container from '@material-ui/core/Container';
 import Dialog from '@material-ui/core/Dialog';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import IconButton from '@material-ui/core/IconButton';
 import Link from '@material-ui/core/Link';
@@ -163,7 +165,7 @@ export default function Profile() {
         let updated = resp.data;
         alert(`You've successfully updated your persona.`);
         setEditMode(false);
-        setDisplayedPersona(updated);
+        setDisplayedPersona({ ...displayedPersona, ...updated });
         setName(updated.name);
         setBio(updated.bio);
         // const newExpertises = expertises.filter(exp => {
@@ -172,6 +174,13 @@ export default function Profile() {
         //   });
         // });
         setExpertise(updated.expertises);
+        setPersonas(
+          personas.map(persona =>
+            persona.uuid === updated.uuid
+              ? { ...persona, ...updated }
+              : persona,
+          ),
+        );
         return;
       })
       .catch(err => alert(`An error occurred:`, err.message));
@@ -184,10 +193,16 @@ export default function Profile() {
 
   const handleAvatarSave = updated => {
     setDisplayedPersona({ ...displayedPersona, avatar: updated.avatar });
+    setUser({
+      ...thisUser,
+      defaultPersona: { ...displayedPersona, avatar: updated.avatar },
+    });
     setAvatarModalOpen(false);
   };
 
-  const personas = !thisUser || !thisUser.personas ? [] : thisUser.personas;
+  const [personas, setPersonas] = useState(
+    !thisUser || !thisUser.personas ? [] : thisUser.personas,
+  );
 
   const [name, setName] = useState('');
   const orcid = ownProfile
@@ -204,6 +219,12 @@ export default function Profile() {
   );
   const badges =
     displayedPersona && displayedPersona.badges ? displayedPersona.badges : [];
+  const communities =
+    displayedPersona && displayedPersona.communities
+      ? displayedPersona.communities
+      : [];
+  const works =
+    displayedPersona && displayedPersona.works ? displayedPersona.works : [];
   const [bio, setBio] = useState(
     displayedPersona && displayedPersona.bio ? displayedPersona.bio : '',
   );
@@ -234,18 +255,14 @@ export default function Profile() {
       setName(displayedPersona.name);
       setBio(displayedPersona.bio ? displayedPersona.bio : '');
     }
-    if (
-      displayedPersona &&
-      !displayedPersona.isAnonymous &&
-      displayedPersona.identity
-    ) {
-      setContacts(displayedPersona.identity.contacts);
+    if (displayedPersona && !displayedPersona.isAnonymous) {
+      setContacts(displayedPersona.contacts);
     }
   }, [displayedPersona]);
 
   useEffect(() => {
-    if (!loadingPersona && persona) setDisplayedPersona(persona);
-  }, [loadingPersona, persona]);
+    setDisplayedPersona(persona);
+  }, [persona]);
 
   useEffect(() => {
     if (
@@ -319,8 +336,12 @@ export default function Profile() {
                               spacing={2}
                             >
                               <Grid item>
-                                <Avatar className={classes.small}>
-                                  {selected.name.charAt(0)}
+                                <Avatar
+                                  src={displayedPersona.avatar}
+                                  alt={displayedPersona.name}
+                                  className={classes.small}
+                                >
+                                  {displayedPersona.name.charAt(0)}
                                 </Avatar>
                               </Grid>
                               <Grid item>
@@ -423,7 +444,13 @@ export default function Profile() {
                             gutterBottom
                           >
                             <Link href={`https://orcid.org/${orcid}`}>
-                              ORCiD: {orcid}
+                              <img
+                                alt="ORCID logo"
+                                src="https://info.orcid.org/wp-content/uploads/2019/11/orcid_16x16.png"
+                                width="16"
+                                height="16"
+                              />{' '}
+                              {orcid}
                             </Link>
                           </Typography>
                         </Box>
@@ -440,7 +467,9 @@ export default function Profile() {
                               <List>
                                 {contacts.map(contact => (
                                   <ListItem key={contact.uuid}>
-                                    {contact.value}
+                                    <a href={`mailto:${contact.value}`}>
+                                      {contact.value}
+                                    </a>
                                   </ListItem>
                                 ))}
                               </List>
@@ -493,7 +522,7 @@ export default function Profile() {
                       */}
                       <Typography component="div" variant="body1" gutterBottom>
                         Community member since{' '}
-                        {format(new Date(persona.createdAt), 'MMM. d, yyyy')}
+                        {format(new Date(persona.createdAt), 'yyyy/MM/dd')}
                       </Typography>
                     </Box>
                   </Grid>
@@ -502,14 +531,20 @@ export default function Profile() {
                       <IconButton onClick={handleAvatarClick}>
                         <Avatar
                           src={displayedPersona.avatar}
+                          alt={displayedPersona.name}
                           className={classes.avatar}
-                        />
+                        >
+                          {displayedPersona.name.charAt(0)}
+                        </Avatar>
                       </IconButton>
                     ) : (
                       <Avatar
                         src={displayedPersona.avatar}
+                        alt={displayedPersona.name}
                         className={classes.avatar}
-                      />
+                      >
+                        {displayedPersona.name.charAt(0)}
+                      </Avatar>
                     )}
                   </Grid>
                 </Grid>
@@ -538,7 +573,7 @@ export default function Profile() {
                       }}
                       onSaved={handleAvatarSave}
                     />
-                  </Dialog>
+                  </Modal>
                 ) : null}
                 {displayedPersona.isAnonymous ? (
                   ''
@@ -563,7 +598,7 @@ export default function Profile() {
                     {displayedPersona.bio}
                   </Typography>
                 )}
-                {ownProfile && editMode ? (
+                {ownProfile && editMode && !displayedPersona.isAnonymous ? (
                   <Box mt={6}>
                     <SettingsNotifications user={thisUser} />
                   </Box>
@@ -574,22 +609,87 @@ export default function Profile() {
             {editMode ? null : (
               <Box>
                 <Container>
-                  <Typography component="h2" variant="h2" gutterBottom>
-                    PREreview Communities
-                  </Typography>
-                  <Typography component="h2" variant="h2" gutterBottom>
-                    PREreview Contributions
-                  </Typography>
-                  <RoleActivity persona={displayedPersona} />
-                  <Typography component="h3" variant="h3" gutterBottom>
-                    List of Publications
-                  </Typography>
+                  <Accordion>
+                    <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                      <Typography component="h2" variant="h2" gutterBottom>
+                        {displayedPersona.name}'s PREreview communities
+                      </Typography>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                      <Grid>
+                        {communities.length > 0
+                          ? communities.map(community => {
+                              return (
+                                <Chip
+                                  key={community.uuid}
+                                  label={community.name}
+                                  variant="outlined"
+                                  href={`/communities/${community.slug}`}
+                                  component="a"
+                                  target="_blank"
+                                  clickable
+                                />
+                              );
+                            })
+                          : `${
+                              displayedPersona.name
+                            } hasn't joined any communities yet.`}
+                      </Grid>
+                    </AccordionDetails>
+                  </Accordion>
+                  <Accordion>
+                    <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                      <Typography component="h2" variant="h2" gutterBottom>
+                        {displayedPersona.name}'s PREreview contributions
+                      </Typography>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                      <Grid>
+                        <RoleActivity persona={displayedPersona} />
+                      </Grid>
+                    </AccordionDetails>
+                  </Accordion>
+                  { !displayedPersona.isAnonymous ? 
+                  <Accordion>
+                    <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                      <Typography component="h2" variant="h3" gutterBottom>
+                        {displayedPersona.name}'s publications
+                      </Typography>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                      <Grid>
+                        {works.length > 0
+                          ? works.map(work => {
+                              return (
+                                <Card key={work.uuid}>
+                                  <CardContent>
+                                    <Typography
+                                      variant="h6"
+                                      component="h2"
+                                      gutterBottom
+                                    >
+                                      {work.title}
+                                    </Typography>
+                                    <Typography>{work.publisher}</Typography>
+                                    <Typography>
+                                      {work.publicationDate}
+                                    </Typography>
+                                  </CardContent>
+                                </Card>
+                              );
+                            })
+                          : `${
+                              displayedPersona.name
+                            } has no publications on their ORCID record.`}
+                      </Grid>
+                    </AccordionDetails>
+                  </Accordion> : null }
                 </Container>
               </Box>
             )}
           </Container>
         </Box>
-      </Box>
+      </ThemeProvider>
     );
   }
 }

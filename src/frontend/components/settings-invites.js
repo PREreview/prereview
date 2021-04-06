@@ -237,7 +237,7 @@ export default function SettingsInvites({ user }) {
                     <StyledTableRow key={review.uuid}>
                       <TableCell component="th" scope="row">
                         <Link
-                          href={`/preprints/${review.preprint.uuid}/reviews/${
+                          href={`/preprints/${review.preprint.uuid}/drafts/${
                             review.uuid
                           }`}
                         >
@@ -246,7 +246,7 @@ export default function SettingsInvites({ user }) {
                       </TableCell>
                       <TableCell>
                         <Link
-                          href={`/preprints/${review.preprint.uuid}/reviews/${
+                          href={`/preprints/${review.preprint.uuid}/drafts/${
                             review.uuid
                           }`}
                         >

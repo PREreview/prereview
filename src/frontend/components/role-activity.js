@@ -1,4 +1,3 @@
-// base imports
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 
@@ -29,32 +28,39 @@ export default function RoleActivity({ persona }) {
   const [activity, setActivity] = useState(null);
 
   useEffect(() => {
-    const fullReviews = persona.fullReviews
+    const reviews = persona.fullReviews
       ? persona.fullReviews.filter(item => item.isPublished)
       : null;
 
-    setActivity(() => [fullReviews, persona.rapidReviews].flat());
-  }, []);
+    const fullReviews = reviews.map(review => ({...review, isLongReview: true}))
+
+    setActivity(() =>
+      [fullReviews, persona.rapidReviews, persona.requests].flat(),
+    );
+  }, [persona]);
 
   return (
     <>
       {activity && activity.length ? (
         <Box className={classes.box}>
           <Typography>
-            Total number of requests: {persona.requests.length || 0}
+            Total number of requests: {persona.requests ? persona.requests.length || 0 : ''}
           </Typography>
           <Typography>
-            Total number of rapid reviews: {persona.rapidReviews.length || 0}
+            Total number of rapid reviews: {persona.rapidReviews ? persona.rapidReviews.length || 0 : ''}
           </Typography>
           <Typography>
             Total number of long-form reviews:{' '}
-            {persona.fullReviews.filter(review => review.isPublished).length ||
-              0}
+            {persona.fullReviews
+                ? persona.fullReviews.filter(review => review.isPublished)
+                    .length || 0
+                : ''}
           </Typography>
         </Box>
       ) : null}
+
       {!activity || !activity.length ? (
-        <Typography>No activity yet.</Typography>
+        <Typography>{persona.name} hasn't yet reviewed or requested reviews for preprints.</Typography>
       ) : (
         <Box mt={4}>
           <Typography component="h3" variant="h3">

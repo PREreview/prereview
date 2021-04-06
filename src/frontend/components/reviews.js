@@ -136,8 +136,20 @@ export default function Reviews() {
 
         <Box py={8}>
           <Container>
+            <Grid container alignItems="center">
+              <Grid item>
+                <Typography variant="caption">
+                  This is a platform for the crowdsourcing of preprint reviews.
+                  Use the search bar below to find preprints that already have
+                  reviews or requests for reviews. To add your own review or
+                  request, use the Add Review | Request Review button, paste the
+                  preprint DOI and follow the instructions.
+                </Typography>
+              </Grid>
+            </Grid>
             <SearchBar
               defaultValue={search}
+              placeholderValue="Search preprints by title, author, abstract, DOI, or arXiv ID"
               isFetching={loadingPreprints}
               onChange={value => {
                 params.delete('page');
@@ -269,8 +281,7 @@ export default function Reviews() {
             {!preprints ||
             (preprints && preprints.totalCount <= 0 && !loadingPreprints) ? (
               <div>
-                No preprints about this topic have been added to Rapid
-                PREreview.{' '}
+                No preprints about this topic have been added to PREreview.{' '}
                 <Link
                   onClick={() => {
                     setSearch('');
@@ -281,8 +292,8 @@ export default function Reviews() {
                     }
                   }}
                 >
-                  Review or request a review of a Preprint to add it to the
-                  site.
+                  Review or request a review of a preprint to add it to the
+                  platform.
                 </Link>
               </div>
             ) : (

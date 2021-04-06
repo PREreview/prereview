@@ -1,5 +1,6 @@
 // base imports
 import React, { useEffect, useState } from 'react';
+import { useHistory } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import ReactHtmlParser, { convertNodeToElement } from 'react-html-parser';
 
@@ -105,6 +106,7 @@ const LongformReviewReader = props => {
   }));
 
   const classes = useStyles();
+  const history = useHistory();
 
   const [buttonRefId, setButtonRefId] = useState(null);
 
@@ -153,6 +155,9 @@ const LongformReviewReader = props => {
   useEffect(() => {
     if (anchorEl) {
       setButtonRefId(anchorEl.getAttribute('aria-describedby'));
+    } else {
+      setButtonRefId(null);
+      history.push(`${history.location.pathname.split('/full-reviews')[0]}`);
     }
   }, [anchorEl, content, commentTitle, publishedComment]);
 
@@ -261,7 +266,7 @@ const LongformReviewReader = props => {
                   </Grid>
                   {/*#FIXME plaudits*/}
                   <Grid item>
-                    <ReportButton uuid={review.uuid} type="fullReview" />
+                    <ReportButton uuid={review.uuid} type='fullReview' />
                   </Grid>
                 </Grid>
               </Box>

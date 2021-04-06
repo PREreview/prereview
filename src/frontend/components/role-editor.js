@@ -53,11 +53,13 @@ export default function RoleEditor({ persona, onCancel, onSaved }) {
   };
 
   useEffect(() => {
+    const ac = new AbortController();
     if (persona && persona.avatar) {
       dataUrlToFile(persona.avatar)
         .then(file => setImage(file))
         .catch(err => alert(`An error occurred: ${err.message}`));
     }
+    return () => ac.abort()
   }, [persona]);
 
   const onDrop = useCallback(acceptedFiles => {

@@ -23,6 +23,8 @@ export const QUESTIONS = [
     identifier: 'ynReproducibility',
     question:
       'Is sufficient detail provided to allow reproduction of the study?',
+    help:
+      'Would another research group be able to reproduce these findings based solely on the information present in the manuscript, particularly the methods section and, if present, any supplementary/supporting information?',
     type: 'YesNoQuestion',
     required: true,
   },
@@ -30,6 +32,8 @@ export const QUESTIONS = [
   {
     identifier: 'ynMethods',
     question: 'Are the methods and statistics appropriate for the analysis?',
+    help:
+      'Do you think the methods used to analyze the data were adequately chosen and utilized to answer the research question(s)?',
     type: 'YesNoQuestion',
     required: true,
   },

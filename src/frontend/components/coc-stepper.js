@@ -191,15 +191,15 @@ export default function CoCStepper({ openNext }) {
           <List>
             <ListItem>
               <ListItemText>
-                Our login is via{' '}
+                Our login uses{' '}
                 <a
                   href="https://info.orcid.org/documentation/features/public-api/"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  ORCID&apos;s public API
+                  ORCID®&apos;s public API
                 </a>
-                . If you do not already have an account with ORCID, to sign up
+                . If you do not already have a record with ORCID®, to sign up
                 on PREreview you will need to make one.{' '}
                 <a
                   href="https://orcid.org/register"
@@ -213,7 +213,7 @@ export default function CoCStepper({ openNext }) {
             </ListItem>
             <ListItem>
               <ListItemText>
-                The reviews published on this platform will be licensed
+                The reviews published on this platform will be licensed{' '}
                 <a
                   href="https://creativecommons.org/licenses/by/4.0/"
                   target="_blank"
@@ -229,6 +229,18 @@ export default function CoCStepper({ openNext }) {
               <ListItemText>
                 We DO NOT share your data with advertisers, social media
                 companies, or analytics partners.
+              </ListItemText>
+            </ListItem>
+            <ListItem>
+              <ListItemText>
+                To learn more about how we handle data, please refer to our{' '}
+                <a
+                  href="https://content.prereview.org/privacypolicy"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  privacy policy
+                </a>.
               </ListItemText>
             </ListItem>
           </List>
@@ -272,7 +284,3 @@ export default function CoCStepper({ openNext }) {
     </div>
   );
 }
-
-CoCStepper.propTypes = {
-  openNext: PropTypes.func,
-};

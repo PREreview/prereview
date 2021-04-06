@@ -5,6 +5,7 @@ import noop from 'lodash/noop';
 import isEqual from 'lodash/isEqual';
 import classNames from 'classnames';
 import ReactHtmlParser, { convertNodeToElement } from 'react-html-parser';
+import { useHistory, useLocation } from 'react-router-dom';
 
 // material UI
 import { makeStyles, withStyles } from '@material-ui/core/styles';
@@ -23,7 +24,8 @@ import { getYesNoStats } from '../utils/stats';
 import Barplot from './barplot';
 import LongformReviewReader from './review-reader-longform';
 import MuiButton from '@material-ui/core/Button';
-import RoleList from './role-list';
+import RapidReviewReader from './review-reader-rapid';
+import { Reviewers } from './role-list';
 import ReportButton from './report-button';
 import ShareMenu from './share-menu';
 import TextAnswers from './text-answers';
@@ -42,16 +44,31 @@ const useStyles = makeStyles(() => ({
     borderLeft: '5px solid #EBE9E9',
     boxShadow: 'none',
   },
-  link: {
-    paddingBottom: 5,
-    paddingLeft: 2,
-  },
   date: {
     flexBasis: '25%',
     flexShrink: 1,
   },
+  h4: {
+    flexBasis: '75%',
+    flexShrink: 0,
+    fontSize: theme.typography.pxToRem(16),
+    fontWeight: '600',
+  },
+  link: {
+    paddingBottom: 5,
+    paddingLeft: 2,
+  },
   spacing: {
     lineHeight: 1.5,
+  },
+  vh: {
+    clip: 'rect(0 0 0 0)',
+    clipPath: 'inset(50%)',
+    height: 1,
+    overflow: 'hidden',
+    position: 'absolute',
+    whiteSpace: 'nowrap',
+    width: 1,
   },
 }));
 
@@ -77,8 +94,11 @@ export default function ReviewReader({
   rapidContent,
   longContent,
   newRequest,
+  height,
 }) {
   const classes = useStyles();
+  const history = useHistory();
+  const location = useLocation();
 
   const [content, setContent] = useState('');
   const [commentTitle, setCommentTitle] = useState('');
@@ -119,10 +139,30 @@ export default function ReviewReader({
     defaultHighlightedRoleIds || [],
   );
 
+  // expand/collapse rapid reviews
+  const [rapidAnchorEl, setRapidAnchorEl] = useState(null);
+  const handleClickRapid = event => {
+    setRapidAnchorEl(rapidAnchorEl ? null : event.currentTarget);
+    if (!rapidAnchorEl) {
+      history.push(
+        `${location.pathname}/rapid-reviews/${event.currentTarget.getAttribute(
+          'aria-describedby',
+        )}`,
+      );
+    }
+  };
+
   // expand/collapse longform reviews
-  const [anchorEl, setAnchorEl] = useState(null);
-  const handleClick = event => {
-    setAnchorEl(anchorEl ? null : event.currentTarget);
+  const [longformAnchorEl, setLongformAnchorEl] = useState(null);
+  const handleClickLongform = event => {
+    setLongformAnchorEl(longformAnchorEl ? null : event.currentTarget);
+    if (!longformAnchorEl) {
+      history.push(
+        `${location.pathname}/full-reviews/${event.currentTarget.getAttribute(
+          'aria-describedby',
+        )}`,
+      );
+    }
   };
 
   // react html parser options so the comments do not create an editable interface
@@ -147,6 +187,23 @@ export default function ReviewReader({
   };
 
   useEffect(() => {
+    let reviewNode;
+    if (location.pathname.includes('full-reviews')) {
+      reviewNode = document.querySelector(
+        `[aria-describedby='${location.pathname.split('full-reviews/')[1]}']`,
+      );
+      setLongformAnchorEl(reviewNode);
+    } else if (location.pathname.includes('rapid-reviews')) {
+      reviewNode = document.querySelector(
+        `[aria-describedby='${location.pathname.split('rapid-reviews/')[1]}']`,
+      );
+      setRapidAnchorEl(reviewNode);
+    } else if (location.pathname.includes('reviews')) {
+      reviewNode = document.querySelector(
+        `[aria-describedby='${location.pathname.split('reviews/')[1]}']`,
+      );
+      setLongformAnchorEl(reviewNode);
+    }
     if (
       rapidContent &&
       Object.keys(rapidContent).length !== 0 &&
@@ -167,6 +224,7 @@ export default function ReviewReader({
     publishedComment,
     content,
     commentTitle,
+    location,
   ]);
 
   useEffect(() => {
@@ -210,8 +268,8 @@ export default function ReviewReader({
                     Reviewers
                   </Typography>
                   <div className="review-reader__persona-selector">
-                    <RoleList
-                      role={role}
+                    <Reviewers
+                      preprintId={preprint.uuid}
                       allReviews={allRapidReviews}
                       hasReviewed={rapidContent}
                       user={user}
@@ -226,6 +284,33 @@ export default function ReviewReader({
                       }}
                     />
                   </div>
+                  {allRapidReviews.map(review => (
+                    <>
+                      <div className={classes.vh}>
+                        <Link
+                          component="button"
+                          className={classes.link}
+                          variant="body1"
+                          aria-describedby={review.uuid}
+                          type="button"
+                          onClick={handleClickRapid}
+                          color="secondary"
+                        >
+                          See review
+                        </Link>
+                      </div>
+                      <RapidReviewReader
+                        anchorEl={rapidAnchorEl}
+                        handleAnchor={handleClickRapid}
+                        height={height}
+                        review={review}
+                        user={user}
+                        identifier={preprint.handle}
+                        roleIds={highlightedRoleIds}
+                        role={role}
+                      />
+                    </>
+                  ))}
                   <Barplot
                     stats={getYesNoStats(allRapidReviews)}
                     nReviews={allRapidReviews.length}
@@ -270,7 +355,8 @@ export default function ReviewReader({
                     Reviewers
                   </Typography>
                   <div className="review-reader__persona-selector">
-                    <RoleList
+                    <Reviewers
+                      preprintId={preprint.uuid}
                       role={role}
                       allReviews={publishedReviews}
                       hasReviewed={longContent && longContent.length}
@@ -366,7 +452,7 @@ export default function ReviewReader({
                                       variant="body1"
                                       aria-describedby={review.uuid}
                                       type="button"
-                                      onClick={handleClick}
+                                      onClick={handleClickLongform}
                                       color="secondary"
                                     >
                                       Read more
@@ -381,28 +467,26 @@ export default function ReviewReader({
                                       <Button
                                         aria-describedby={review.uuid}
                                         type="button"
-                                        onClick={handleClick}
+                                        onClick={handleClickLongform}
                                         color="secondary"
                                       >
                                         Comment
                                       </Button>
                                       <LongformReviewReader
-                                        anchorEl={anchorEl}
-                                        handleAnchor={handleClick}
+                                        anchorEl={longformAnchorEl}
+                                        handleAnchor={handleClickLongform}
                                         content={content}
                                         commentTitle={commentTitle}
                                         publishedComment={publishedComment}
                                         onChange={handleCommentChange}
                                         onSubmit={handleCommentSubmit}
+                                        height={height}
                                         review={review}
                                         user={user}
                                       />
                                     </Grid>
                                     <Grid item>
-                                      <ReportButton
-                                        uuid={review.uuid}
-                                        type="fullReview"
-                                      />
+                                      <ReportButton uuid={review.uuid} type="fullReview" />
                                     </Grid>
                                   </Grid>
                                 </Box>
@@ -462,4 +546,5 @@ ReviewReader.propTypes = {
   rapidContent: PropTypes.object,
   longContent: PropTypes.oneOfType([PropTypes.object, PropTypes.string]),
   newRequest: PropTypes.bool,
+  height: PropTypes.number,
 };

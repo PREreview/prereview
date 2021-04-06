@@ -118,6 +118,11 @@ export default function SettingsNotifications({ user }) {
               </TableCell>
               <TableCell>
                 <Typography component="span" variant="body2">
+                  Display on Profile
+                </Typography>
+              </TableCell>
+              <TableCell>
+                <Typography component="span" variant="body2">
                   Delete
                 </Typography>
               </TableCell>
@@ -211,7 +216,8 @@ SettingsNotifications.propTypes = {
 };
 
 function EmailToggle({ userId, contact, onDelete }) {
-  const [toggle, setToggle] = useState(contact.isNotified);
+  const [isNotify, setIsNotify] = useState(contact.isNotified);
+  const [isPublic, setIsPublic] = useState(contact.isPublic);
   const { mutate: updateContact, loading } = usePutUserContacts({
     id: userId,
     cid: contact.uuid,
@@ -232,18 +238,40 @@ function EmailToggle({ userId, contact, onDelete }) {
       </TableCell>
       <TableCell>
         <ToggleSwitch
-          id="notification-switch"
+          id={`notify-switch-${contact.uuid}`}
           disabled={loading}
-          checked={toggle}
+          checked={isNotify}
           label="Turn on or off email notifications"
           onChange={() => {
             updateContact({
-              isNotified: !toggle,
+              isNotified: !isNotify,
               schema: contact.schema,
               value: contact.value,
             })
               .then(() => {
-                return setToggle(!toggle);
+                return setIsNotifyToggle(!isNotify);
+              })
+                .then(() => {
+                  setIsNotify(!isNotify);
+                })
+                .catch(err => alert(`An error occurred: ${err.message}`));
+            }}
+          />
+        </div>
+      </TableCell>
+      <TableCell>
+        <ToggleSwitch
+          id={`public-switch-${contact.uuid}`}
+          disabled={loading}
+          checked={isPublic}
+          onChange={() => {
+            updateContact({
+              isPublic: !isPublic,
+              schema: contact.schema,
+              value: contact.value,
+            })
+              .then(() => {
+                setIsPublic(!isPublic);
               })
               .catch(err => alert(`An error occurred: ${err.message}`));
           }}
@@ -258,7 +286,7 @@ function EmailToggle({ userId, contact, onDelete }) {
               deleteContact()
                 .then(() => {
                   onDelete();
-                  return alert('Contact info deleted successfully.');
+                  alert('Contact info deleted successfully.');
                 })
                 .catch(err => alert(`An error occurred: ${err.message}`));
             }
@@ -270,9 +298,3 @@ function EmailToggle({ userId, contact, onDelete }) {
     </TableRow>
   );
 }
-
-EmailToggle.propTypes = {
-  contact: PropTypes.object,
-  userId: PropTypes.string.isRequired,
-  onDelete: PropTypes.func.isRequired,
-};

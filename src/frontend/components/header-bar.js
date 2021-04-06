@@ -19,6 +19,9 @@ import LoginModal from './login-modal';
 import NoticeBadge from './notice-badge';
 import UserBadge from './user-badge';
 
+// utils
+import { checkIfProfileNeedsUpdate } from '../utils/roles';
+
 // icons
 import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
 import MenuIcon from '@material-ui/icons/Menu';
@@ -80,7 +83,7 @@ const useStyles = makeStyles(theme => ({
 
 export default function HeaderBar({ thisUser }) {
   const classes = useStyles();
-  const showProfileNotice = false;
+  const showProfileNotice = checkIfProfileNeedsUpdate(thisUser);
 
   const [loginLink, setLoginLink] = useState('/login');
   const [homeLink, setHomeLink] = useState('/');

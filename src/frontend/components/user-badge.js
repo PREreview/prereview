@@ -10,6 +10,7 @@ export default function UserBadge({ user, children, ...others }) {
     <RoleBadge
       {...others}
       user={user.defaultPersona ? user.defaultPersona : user}
+      contacts={user.contacts ? user.contacts : []}
     >
       {children}
     </RoleBadge>

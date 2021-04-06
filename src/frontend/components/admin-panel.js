@@ -94,7 +94,12 @@ export default function AdminPanel() {
                         className="admin-panel__card-list-item"
                       >
                         <div className="admin-panel__card-list-item__left">
-                          <RoleBadgeUI user={moderator} />
+                          <RoleBadgeUI
+                            user={moderator}
+                            contacts={
+                              moderator.contacts ? moderator.contacts : []
+                            }
+                          />
                           <span>{moderator.defaultPersona.name}</span>
                         </div>
                         <div className="admin-panel__card-list-item__right">

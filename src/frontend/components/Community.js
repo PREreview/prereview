@@ -6,20 +6,25 @@ import { Helmet } from 'react-helmet-async';
 import MuiSearchBar from 'material-ui-search-bar';
 import { useIntl } from 'react-intl';
 
+import { createPreprintId } from '../../common/utils/ids.js';
+
 // contexts
 import UserProvider from '../contexts/user-context';
 
 // hooks
 import { useGetCommunity, useGetPreprints } from '../hooks/api-hooks.tsx';
+import { useNewPreprints } from '../hooks/ui-hooks';
 
 // components
 import AddButton from './add-button';
 import HeaderBar from './header-bar';
 import Loading from './loading';
+import NewPreprint from './new-preprint';
 import NotFound from './not-found';
 import SearchBar from './search-bar';
 import SortOptions from './sort-options';
 import PreprintCard from './preprint-card';
+import PrivateRoute from './private-route';
 import LoginRequiredModal from './login-required-modal';
 
 // Material-ui components
@@ -91,6 +96,7 @@ const useStyles = makeStyles(theme => ({
     boxShadow: theme.shadows[5],
     left: '50%',
     minWidth: 300,
+    overflow: 'scroll',
     padding: theme.spacing(2, 4, 3),
     position: 'absolute',
     top: '50%',
@@ -192,13 +198,6 @@ export default function Community(props) {
         community.data.length > 0
       ) {
         return { ...community.data[0] };
-        const owners = community.data[0].owners.reduce((results, owner) => {
-          if (owner.defaultPersona && owner.defaultPersona.uuid) {
-            return results.concat(owner.defaultPersona);
-          }
-          return results;
-        }, []);
-        return { ...community.data[0], owners };
       }
     },
     id: id,
@@ -230,7 +229,11 @@ export default function Community(props) {
           <Box bgcolor="rgba(229, 229, 229, 0.35)">
             <Container>
               <Box p={4}>
-                {(user && community.owners.some(owner => user.personas.some(persona => persona.uuid === owner.uuid))) || (user && user.isAdmin) ? (
+                {(user &&
+                  community.owners.some(owner =>
+                    user.personas.some(persona => persona.uuid === owner.uuid),
+                  )) ||
+                (user && user.isAdmin) ? (
                   <IconButton
                     href={`/community-settings/${community.uuid}`}
                     className={classes.settings}
@@ -306,7 +309,6 @@ function CommunityHeader({
   return (
     <section>
       <Container
-        maxWidth="false"
         style={
           banner
             ? {
@@ -487,7 +489,7 @@ function CommunityEvents({ community, events }) {
           <Typography variant="subtitle1" color="textSecondary" />
         </Box>
         <Grid container spacing={2} direction="column">
-          {events.slice(0,3).map(event => {
+          {events.slice(0, 3).map(event => {
             return (
               <Link
                 key={event.uuid}
@@ -592,6 +594,7 @@ function CommunityContent({ thisUser, community, params }) {
   const [search, setSearch] = useState(params.get('search') || '');
   const [loginModalOpenNext, setLoginModalOpenNext] = useState(null);
   const [selectedTags, setSelectedTags] = useState([]);
+  const [newPreprints, setNewPreprints] = useNewPreprints();
 
   const { data: preprints, loading: loadingPreprints, error } = useGetPreprints(
     {
@@ -641,8 +644,20 @@ function CommunityContent({ thisUser, community, params }) {
   } else {
     return (
       <Box>
-        <CommunitySearch
+        <Grid container alignItems="center" justify="space-between">
+          <Grid item>
+            <Typography variant="caption">
+              This is a platform for the crowdsourcing of preprint reviews. Use
+              the search bar below to find preprints that already have reviews
+              or requests for reviews. To add your own review or request, use
+              the Add Review | Request Review button, paste the preprint DOI and
+              follow the instructions.
+            </Typography>
+          </Grid>
+        </Grid>
+        <SearchBar
           defaultValue={search}
+          placeholderValue="Search preprints in this community by title, author, abstract, DOI, or arXiv ID"
           isFetching={loadingPreprints}
           onChange={value => {
             params.delete('page');
@@ -691,13 +706,64 @@ function CommunityContent({ thisUser, community, params }) {
                   <AddButton
                     onClick={() => {
                       if (thisUser) {
-                        history.push('/new');
+                        history.push(`/communities/${community.slug}/new`);
                       } else {
-                        setLoginModalOpenNext('/new');
+                        setLoginModalOpenNext(
+                          `/communities/${community.slug}/new`,
+                        );
                       }
                     }}
-                    disabled={location.pathname === '/new'}
+                    disabled={
+                      location.pathname === `/communities/${community.slug}/new`
+                    }
                   />
+                  <PrivateRoute
+                    path={`/communities/${community.slug}/new`}
+                    exact={true}
+                  >
+                    <Modal
+                      open={true}
+                      showCloseButton={true}
+                      title="Add Entry"
+                      onClose={() => {
+                        history.push(`/communities/${community.slug}`);
+                      }}
+                    >
+                      <div className={classes.modal}>
+                        <Helmet>
+                          <title>PREreview • Add entry</title>
+                        </Helmet>
+                        <NewPreprint
+                          user={thisUser}
+                          community={community.uuid}
+                          onCancel={() => {
+                            history.push(`/communities/${community.slug}`);
+                          }}
+                          onSuccess={preprint => {
+                            history.push(`/communities/${community.slug}`);
+                            setNewPreprints(newPreprints.concat(preprint));
+                          }}
+                          onViewInContext={({ preprint, tab }) => {
+                            history.push(
+                              `/preprints/${createPreprintId(preprint.handle)}`,
+                              {
+                                preprint: preprint,
+                                tab,
+                              },
+                            );
+                          }}
+                        />
+                      </div>
+                    </Modal>
+                  </PrivateRoute>
+                  {loginModalOpenNext && (
+                    <LoginRequiredModal
+                      next={loginModalOpenNext}
+                      onClose={() => {
+                        setLoginModalOpenNext(null);
+                      }}
+                    />
+                  )}
                 </Box>
               </Grid>
             </Grid>
@@ -756,12 +822,26 @@ function CommunityContent({ thisUser, community, params }) {
                 }}
               />
             )}
+            {newPreprints.length > 0 &&
+              newPreprints.map(preprint => (
+                <Grid item key={preprint.uuid}>
+                  <PreprintCard
+                    isNew={true}
+                    preprint={preprint}
+                    onNewRequest={handleNewRequest}
+                    onNew={handleNew}
+                    onNewReview={handleNewReview}
+                    hoveredSortOption={hoveredSortOption}
+                    sortOption={params.get('asc') === 'true'}
+                  />
+                </Grid>
+              ))}
             {preprints && preprints.totalCount === 0 && !loadingPreprints ? (
               <div>No preprints have been added to this community.</div>
             ) : (
               preprints &&
               preprints.data.map(row => (
-                <Grid item key={row.id}>
+                <Grid item key={row.uuid}>
                   <PreprintCard
                     isNew={false}
                     user={thisUser}

@@ -53,9 +53,9 @@ export default function controller(preprints, thisUser) {
     method: 'GET',
     path: '/resolve',
     handler: async ctx => {
-      const { identifier } = ctx.query;
+      const { identifier, community } = ctx.query;
       log.debug(`Resolving preprint with ID: ${identifier}`);
-      let preprint, data;
+      let preprint, data, belongsTo;
       try {
         preprint = await preprints.findOneByUuidOrHandle(
           createPreprintId(identifier),
@@ -67,8 +67,24 @@ export default function controller(preprints, thisUser) {
             'tags',
           ],
         );
+        if (community) {
+          belongsTo = await preprints.em.findOne(
+            'Community',
+            { uuid: community },
+            ['preprints'],
+          );
+        }
         if (preprint) {
           log.debug(`Found cached preprint ${identifier}`);
+          if (belongsTo) {
+            log.debug(
+              `Adding existing preprint to community ${belongsTo.name}`,
+            );
+            preprint.communities.add(belongsTo);
+            belongsTo.preprints.add(preprint);
+            await preprints.em.persistAndFlush(belongsTo);
+            await preprints.persistAndFlush(preprint);
+          }
           ctx.body = preprint;
           return;
         }
@@ -76,6 +92,12 @@ export default function controller(preprints, thisUser) {
         if (data) {
           log.debug('Adding a preprint & its resolved metadata to database.');
           preprint = preprints.create(data);
+          if (belongsTo) {
+            log.debug(`Adding new preprint to community ${belongsTo.name}`);
+            preprint.communities.add(belongsTo);
+            belongsTo.preprints.add(preprint);
+            await preprints.em.persistAndFlush(belongsTo);
+          }
           await preprints.persistAndFlush(preprint);
         }
       } catch (err) {
