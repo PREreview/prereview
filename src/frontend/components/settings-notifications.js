@@ -22,7 +22,6 @@ import MuiTooltip from '@material-ui/core/Tooltip';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
-import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import MuiTableRow from '@material-ui/core/TableRow';
 import TextField from '@material-ui/core/TextField';
@@ -251,13 +250,12 @@ function EmailToggle({ userId, contact, onDelete }) {
               .then(() => {
                 return setIsNotifyToggle(!isNotify);
               })
-                .then(() => {
-                  setIsNotify(!isNotify);
-                })
-                .catch(err => alert(`An error occurred: ${err.message}`));
-            }}
-          />
-        </div>
+              .then(() => {
+                setIsNotify(!isNotify);
+              })
+              .catch(err => alert(`An error occurred: ${err.message}`));
+          }}
+        />
       </TableCell>
       <TableCell>
         <ToggleSwitch

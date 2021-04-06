@@ -22,6 +22,8 @@ import AccordionSummary from '@material-ui/core/AccordionSummary';
 import AccordionDetails from '@material-ui/core/AccordionDetails';
 import Avatar from '@material-ui/core/Avatar';
 import Box from '@material-ui/core/Box';
+import Card from '@material-ui/core/Card';
+import CardContent from '@material-ui/core/CardContent';
 import Chip from '@material-ui/core/Chip';
 import Container from '@material-ui/core/Container';
 import Dialog from '@material-ui/core/Dialog';
@@ -573,7 +575,7 @@ export default function Profile() {
                       }}
                       onSaved={handleAvatarSave}
                     />
-                  </Modal>
+                  </Dialog>
                 ) : null}
                 {displayedPersona.isAnonymous ? (
                   ''
@@ -612,7 +614,7 @@ export default function Profile() {
                   <Accordion>
                     <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                       <Typography component="h2" variant="h2" gutterBottom>
-                        {displayedPersona.name}'s PREreview communities
+                        {displayedPersona.name}&apos;s PREreview communities
                       </Typography>
                     </AccordionSummary>
                     <AccordionDetails>
@@ -640,7 +642,7 @@ export default function Profile() {
                   <Accordion>
                     <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                       <Typography component="h2" variant="h2" gutterBottom>
-                        {displayedPersona.name}'s PREreview contributions
+                        {displayedPersona.name}&apos;s PREreview contributions
                       </Typography>
                     </AccordionSummary>
                     <AccordionDetails>
@@ -649,47 +651,48 @@ export default function Profile() {
                       </Grid>
                     </AccordionDetails>
                   </Accordion>
-                  { !displayedPersona.isAnonymous ? 
-                  <Accordion>
-                    <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                      <Typography component="h2" variant="h3" gutterBottom>
-                        {displayedPersona.name}'s publications
-                      </Typography>
-                    </AccordionSummary>
-                    <AccordionDetails>
-                      <Grid>
-                        {works.length > 0
-                          ? works.map(work => {
-                              return (
-                                <Card key={work.uuid}>
-                                  <CardContent>
-                                    <Typography
-                                      variant="h6"
-                                      component="h2"
-                                      gutterBottom
-                                    >
-                                      {work.title}
-                                    </Typography>
-                                    <Typography>{work.publisher}</Typography>
-                                    <Typography>
-                                      {work.publicationDate}
-                                    </Typography>
-                                  </CardContent>
-                                </Card>
-                              );
-                            })
-                          : `${
-                              displayedPersona.name
-                            } has no publications on their ORCID record.`}
-                      </Grid>
-                    </AccordionDetails>
-                  </Accordion> : null }
+                  {!displayedPersona.isAnonymous ? (
+                    <Accordion>
+                      <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                        <Typography component="h2" variant="h3" gutterBottom>
+                          {displayedPersona.name}&apos;s publications
+                        </Typography>
+                      </AccordionSummary>
+                      <AccordionDetails>
+                        <Grid>
+                          {works.length > 0
+                            ? works.map(work => {
+                                return (
+                                  <Card key={work.uuid}>
+                                    <CardContent>
+                                      <Typography
+                                        variant="h6"
+                                        component="h2"
+                                        gutterBottom
+                                      >
+                                        {work.title}
+                                      </Typography>
+                                      <Typography>{work.publisher}</Typography>
+                                      <Typography>
+                                        {work.publicationDate}
+                                      </Typography>
+                                    </CardContent>
+                                  </Card>
+                                );
+                              })
+                            : `${
+                                displayedPersona.name
+                              } has no publications on their ORCID record.`}
+                        </Grid>
+                      </AccordionDetails>
+                    </Accordion>
+                  ) : null}
                 </Container>
               </Box>
             )}
           </Container>
         </Box>
-      </ThemeProvider>
+      </Box>
     );
   }
 }

@@ -23,8 +23,6 @@ import Typography from '@material-ui/core/Typography';
 
 // components
 import Controls from './controls';
-import Button from './button';
-import TextInput from './text-input';
 import PreprintPreview from './preprint-preview';
 
 const useStyles = makeStyles(() => ({

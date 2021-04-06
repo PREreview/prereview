@@ -3,7 +3,6 @@ import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import noop from 'lodash/noop';
 import isEqual from 'lodash/isEqual';
-import classNames from 'classnames';
 import ReactHtmlParser, { convertNodeToElement } from 'react-html-parser';
 import { useHistory, useLocation } from 'react-router-dom';
 
@@ -25,7 +24,7 @@ import Barplot from './barplot';
 import LongformReviewReader from './review-reader-longform';
 import MuiButton from '@material-ui/core/Button';
 import RapidReviewReader from './review-reader-rapid';
-import { Reviewers } from './role-list';
+import Reviewers from './role-list';
 import ReportButton from './report-button';
 import ShareMenu from './share-menu';
 import TextAnswers from './text-answers';
@@ -47,12 +46,6 @@ const useStyles = makeStyles(() => ({
   date: {
     flexBasis: '25%',
     flexShrink: 1,
-  },
-  h4: {
-    flexBasis: '75%',
-    flexShrink: 0,
-    fontSize: theme.typography.pxToRem(16),
-    fontWeight: '600',
   },
   link: {
     paddingBottom: 5,
@@ -389,10 +382,7 @@ export default function ReviewReader({
                                 aria-controls={`review-content-${review.uuid}`}
                                 id={`review-header-${review.uuid}`}
                               >
-                                <Typography
-                                  component="div"
-                                  className={classes.h4}
-                                >
+                                <Typography component="div" variant="h4">
                                   {review.authors.length ? (
                                     <>
                                       {review.authors.length >= 2 ? (
@@ -426,7 +416,7 @@ export default function ReviewReader({
                                   )}
                                 </Typography>
                                 <Typography
-                                  className={`${classes.h4} ${classes.date}`}
+                                  className={classes.date}
                                   align="right"
                                   component="div"
                                   variant="body2"
@@ -486,7 +476,10 @@ export default function ReviewReader({
                                       />
                                     </Grid>
                                     <Grid item>
-                                      <ReportButton uuid={review.uuid} type="fullReview" />
+                                      <ReportButton
+                                        uuid={review.uuid}
+                                        type="fullReview"
+                                      />
                                     </Grid>
                                   </Grid>
                                 </Box>

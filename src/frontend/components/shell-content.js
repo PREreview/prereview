@@ -17,7 +17,7 @@ import Typography from '@material-ui/core/Typography';
 
 // components
 import Controls from './controls';
-import ModerationModal from './moderation-modal';
+//import ModerationModal from './moderation-modal';
 import PreprintPreview from './preprint-preview';
 import ReviewReader from './review-reader';
 import ReviewStepper from './review-stepper';
@@ -337,6 +337,7 @@ function ShellContentRead({
         longContent={longContent}
         newRequest={newRequest}
       />
+      {/*
       {!!moderatedReviewId && (
         <ModerationModal
           title={`Report review as violating the Code of Conduct`}
@@ -352,6 +353,7 @@ function ShellContentRead({
           }}
         />
       )}
+      */}
     </>
   );
 }

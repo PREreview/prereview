@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import Tooltip from '@reach/tooltip';
+import { useHistory } from 'react-router-dom';
 
 // material UI
 import { makeStyles, withStyles } from '@material-ui/core/styles';
@@ -128,7 +129,12 @@ const RoleBadgeUI = React.forwardRef(function RoleBadgeUI(
         >
           <Typography variant="srOnly">Open</Typography>
           <Tooltipify tooltip={tooltip} user={user}>
-            <Avatar src={user.avatar} ref={ref} className={classes.avatar} alt={user.name}>
+            <Avatar
+              src={user.avatar}
+              ref={ref}
+              className={classes.avatar}
+              alt={user.name}
+            >
               {user.name.charAt(0)}
             </Avatar>
           </Tooltipify>

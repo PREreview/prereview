@@ -16,7 +16,6 @@ import Typography from '@material-ui/core/Typography';
 import Banner from './banner';
 import JoinModal from './join-modal';
 import LoginModal from './login-modal';
-import NoticeBadge from './notice-badge';
 import UserBadge from './user-badge';
 
 // utils

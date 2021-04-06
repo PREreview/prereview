@@ -5,7 +5,6 @@ import PropTypes from 'prop-types';
 // Material UI imports
 import { makeStyles } from '@material-ui/core/styles';
 import AvatarGroup from '@material-ui/lab/AvatarGroup';
-import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import Typography from '@material-ui/core/Typography';
 
@@ -86,18 +85,7 @@ export default function Reviewers({
           ? authors.map(author => {
               return (
                 <ListItem key={author.uuid} className={classes.listItem}>
-                  <RoleBadge user={author}>
-                    {user && user.isAdmin && (
-                      <div
-                        disabled={isModerationInProgress || author.uuid}
-                        onSelect={() => {
-                          onModerate(author.uuid);
-                        }}
-                      >
-                        Report Review
-                      </div>
-                    )}
-                  </RoleBadge>
+                  <RoleBadge user={author} />
                 </ListItem>
               );
             })
