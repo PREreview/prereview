@@ -564,7 +564,9 @@ export default function Profile() {
                   </Typography>
                 )}
                 {ownProfile && editMode ? (
-                  <SettingsNotifications user={thisUser} />
+                  <Box mt={6}>
+                    <SettingsNotifications user={thisUser} />
+                  </Box>
                 ) : null}
               </Container>
             </Box>

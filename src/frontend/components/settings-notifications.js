@@ -19,6 +19,12 @@ import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
 import IconButton from '@material-ui/core/IconButton';
 import MuiTooltip from '@material-ui/core/Tooltip';
+import Table from '@material-ui/core/Table';
+import TableBody from '@material-ui/core/TableBody';
+import TableCell from '@material-ui/core/TableCell';
+import TableContainer from '@material-ui/core/TableContainer';
+import TableHead from '@material-ui/core/TableHead';
+import MuiTableRow from '@material-ui/core/TableRow';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 
@@ -26,6 +32,14 @@ import Typography from '@material-ui/core/Typography';
 import CloseIcon from '@material-ui/icons/Close';
 import Delete from '@material-ui/icons/Delete';
 import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
+
+const TableRow = withStyles(theme => ({
+  root: {
+    '&:nth-of-type(odd)': {
+      backgroundColor: theme.palette.action.hover,
+    },
+  },
+}))(MuiTableRow);
 
 const Tooltip = withStyles(theme => ({
   tooltip: {
@@ -88,22 +102,46 @@ export default function SettingsNotifications({ user }) {
         </Tooltip>
       </Typography>
 
-      {userContacts.length
-        ? userContacts.map(contact => (
-            <EmailToggle
-              key={contact.uuid}
-              userId={user.uuid}
-              contact={contact}
-              onDelete={() => {
-                setUserContacts(
-                  userContacts.filter(c => c.uuid !== contact.uuid),
-                );
-                return;
-              }}
-            />
-          ))
-        : null}
-
+      <Box my={4}>
+        <Table className={classes.table} aria-label="Email addresses table">
+          <TableHead>
+            <TableRow>
+              <TableCell>
+                <Typography component="span" variant="body2">
+                  Email address
+                </Typography>
+              </TableCell>
+              <TableCell>
+                <Typography component="span" variant="body2">
+                  Turn on/off notifications
+                </Typography>
+              </TableCell>
+              <TableCell>
+                <Typography component="span" variant="body2">
+                  Delete
+                </Typography>
+              </TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {userContacts.length
+              ? userContacts.map(contact => (
+                  <EmailToggle
+                    key={contact.uuid}
+                    userId={user.uuid}
+                    contact={contact}
+                    onDelete={() => {
+                      setUserContacts(
+                        userContacts.filter(c => c.uuid !== contact.uuid),
+                      );
+                      return;
+                    }}
+                  />
+                ))
+              : null}
+          </TableBody>
+        </Table>
+      </Box>
       <Box>
         <TextField
           className={classes.textField}
@@ -186,39 +224,50 @@ function EmailToggle({ userId, contact, onDelete }) {
     },
   });
   return (
-    <div>
-      <span>{`${contact.value}`}</span>
-      <ToggleSwitch
-        id="notification-switch"
-        disabled={loading}
-        checked={toggle}
-        onChange={() => {
-          updateContact({
-            isNotified: !toggle,
-            schema: contact.schema,
-            value: contact.value,
-          })
-            .then(() => {
-              return setToggle(!toggle);
+    <TableRow>
+      <TableCell>
+        <Typography component="span" variant="body1">
+          {`${contact.value}`}
+        </Typography>
+      </TableCell>
+      <TableCell>
+        <ToggleSwitch
+          id="notification-switch"
+          disabled={loading}
+          checked={toggle}
+          label="Turn on or off email notifications"
+          onChange={() => {
+            updateContact({
+              isNotified: !toggle,
+              schema: contact.schema,
+              value: contact.value,
             })
-            .catch(err => alert(`An error occurred: ${err.message}`));
-        }}
-      />
-      <IconButton
-        onClick={() => {
-          if (confirm('Are you sure you want to delete this email address?')) {
-            deleteContact()
               .then(() => {
-                onDelete();
-                return alert('Contact info deleted successfully.');
+                return setToggle(!toggle);
               })
               .catch(err => alert(`An error occurred: ${err.message}`));
-          }
-        }}
-      >
-        <Delete />
-      </IconButton>
-    </div>
+          }}
+        />
+      </TableCell>
+      <TableCell>
+        <IconButton
+          onClick={() => {
+            if (
+              confirm('Are you sure you want to delete this email address?')
+            ) {
+              deleteContact()
+                .then(() => {
+                  onDelete();
+                  return alert('Contact info deleted successfully.');
+                })
+                .catch(err => alert(`An error occurred: ${err.message}`));
+            }
+          }}
+        >
+          <Delete />
+        </IconButton>
+      </TableCell>
+    </TableRow>
   );
 }
 

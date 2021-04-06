@@ -1,27 +1,33 @@
+// base imports
 import React from 'react';
 import PropTypes from 'prop-types';
+
+// MaterialUI imports
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Switch from '@material-ui/core/Switch';
+import Typography from '@material-ui/core/Typography';
 
 export default function ToggleSwitch({
   id,
   checked,
   disabled,
   onChange,
-  children,
+  label,
 }) {
   return (
-    <div className="toggle-switch">
-      <input
-        className="toggle-switch__input"
-        type="checkbox"
-        disabled={disabled}
-        id={id}
-        checked={checked}
-        onChange={onChange}
+    <>
+      <FormControlLabel
+        control={
+          <Switch
+            disabled={disabled}
+            id={id}
+            checked={checked}
+            onChange={onChange}
+          />
+        }
+        label={<Typography variant="srOnly">{label}</Typography>}
       />
-      <label className="toggle-switch__label" htmlFor={id}>
-        {children}
-      </label>
-    </div>
+    </>
   );
 }
 
@@ -30,5 +36,5 @@ ToggleSwitch.propTypes = {
   disabled: PropTypes.bool,
   checked: PropTypes.bool,
   onChange: PropTypes.func.isRequired,
-  children: PropTypes.any,
+  label: PropTypes.string,
 };
