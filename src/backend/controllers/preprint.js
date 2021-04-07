@@ -91,6 +91,10 @@ export default function controller(preprints, thisUser) {
         data = await resolvePreprint(identifier);
         if (data) {
           log.debug('Adding a preprint & its resolved metadata to database.');
+          data = {
+            ...data,
+            authors: data.authors.join(', '), // process authors array into string, the data type the db expects
+          };
           preprint = preprints.create(data);
           if (belongsTo) {
             log.debug(`Adding new preprint to community ${belongsTo.name}`);
