@@ -47,7 +47,16 @@ import WelcomeModal from './welcome-modal';
 // constants
 import { ORG } from '../constants';
 
+// icons
+import InfoOutlinedIcon from '@material-ui/icons/InfoOutlined';
+
 const useStyles = makeStyles(() => ({
+  info: {
+    backgroundColor: '#FAB7B7',
+  },
+  infoIcon: {
+    paddingRight: 5,
+  },
   listItem: {
     paddingLeft: 0,
     paddingRight: 0,
@@ -138,13 +147,16 @@ export default function Reviews() {
           <Container>
             <Grid container alignItems="center">
               <Grid item>
-                <Typography variant="caption">
-                  This is a platform for the crowdsourcing of preprint reviews.
-                  Use the search bar below to find preprints that already have
-                  reviews or requests for reviews. To add your own review or
-                  request, use the Add Review | Request Review button, paste the
-                  preprint DOI and follow the instructions.
-                </Typography>
+                <Box mb={5} p={2} className={classes.info}>
+                  <Typography component="div" variant="body1">
+                    <InfoOutlinedIcon className={classes.infoIcon} />
+                    This is a platform for the crowdsourcing of preprint
+                    reviews. Use the search bar below to find preprints that
+                    already have reviews or requests for reviews. To add your
+                    own review or request, use the Add Review | Request Review
+                    button, paste the preprint DOI and follow the instructions.
+                  </Typography>
+                </Box>
               </Grid>
             </Grid>
             <SearchBar
