@@ -613,35 +613,37 @@ export default function Profile() {
                 <Container>
                   <Accordion>
                     <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                      <Typography component="h2" variant="h2" gutterBottom>
+                      <Typography component="h5" variant="h5" gutterBottom>
                         {displayedPersona.name}&apos;s PREreview communities
                       </Typography>
                     </AccordionSummary>
                     <AccordionDetails>
                       <Grid>
-                        {communities.length > 0
-                          ? communities.map(community => {
-                              return (
-                                <Chip
-                                  key={community.uuid}
-                                  label={community.name}
-                                  variant="outlined"
-                                  href={`/communities/${community.slug}`}
-                                  component="a"
-                                  target="_blank"
-                                  clickable
-                                />
-                              );
-                            })
-                          : `${
-                              displayedPersona.name
-                            } hasn't joined any communities yet.`}
+                        {communities.length > 0 ? (
+                          communities.map(community => {
+                            return (
+                              <Chip
+                                key={community.uuid}
+                                label={community.name}
+                                variant="outlined"
+                                href={`/communities/${community.slug}`}
+                                component="a"
+                                target="_blank"
+                                clickable
+                              />
+                            );
+                          })
+                        ) : (
+                          <Typography>
+                            {displayedPersona.name} hasn't joined any PREreview communities yet.
+                          </Typography>
+                        )}
                       </Grid>
                     </AccordionDetails>
                   </Accordion>
                   <Accordion>
                     <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                      <Typography component="h2" variant="h2" gutterBottom>
+                      <Typography component="h5" variant="h5" gutterBottom>
                         {displayedPersona.name}&apos;s PREreview contributions
                       </Typography>
                     </AccordionSummary>
@@ -654,35 +656,38 @@ export default function Profile() {
                   {!displayedPersona.isAnonymous ? (
                     <Accordion>
                       <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                        <Typography component="h2" variant="h3" gutterBottom>
+                        <Typography component="h5" variant="h5" gutterBottom>
                           {displayedPersona.name}&apos;s publications
                         </Typography>
                       </AccordionSummary>
                       <AccordionDetails>
                         <Grid>
-                          {works.length > 0
-                            ? works.map(work => {
-                                return (
-                                  <Card key={work.uuid}>
-                                    <CardContent>
-                                      <Typography
-                                        variant="h6"
-                                        component="h2"
-                                        gutterBottom
-                                      >
-                                        {work.title}
-                                      </Typography>
-                                      <Typography>{work.publisher}</Typography>
-                                      <Typography>
-                                        {work.publicationDate}
-                                      </Typography>
-                                    </CardContent>
-                                  </Card>
-                                );
-                              })
-                            : `${
-                                displayedPersona.name
-                              } has no publications on their ORCID record.`}
+                          {works.length > 0 ? (
+                            works.map(work => {
+                              return (
+                                <Card key={work.uuid}>
+                                  <CardContent>
+                                    <Typography
+                                      variant="h6"
+                                      component="h2"
+                                      gutterBottom
+                                    >
+                                      {work.title}
+                                    </Typography>
+                                    <Typography>{work.publisher}</Typography>
+                                    <Typography>
+                                      {work.publicationDate}
+                                    </Typography>
+                                  </CardContent>
+                                </Card>
+                              );
+                            })
+                          ) : (
+                            <Typography>
+                              {displayedPersona.name} has no publications on
+                              their ORCID record.
+                            </Typography>
+                          )}
                         </Grid>
                       </AccordionDetails>
                     </Accordion>
