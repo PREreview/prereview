@@ -115,6 +115,16 @@ export default function ActivityCard({ activity }) {
     history.push(`/preprints/${createPreprintId(activity.preprint.handle)}`);
   };
 
+  const getActivityText = activity => {
+    if (activity.isLongReview) {
+      return 'published a longform review on '
+    } else if (!!activity.ynAvailableCode) {
+      return 'rapid reviewed on '
+    } else {
+      return 'requested reviews for this preprint on '
+    }
+  }
+
   useEffect(() => {
     if (!loadingPreprint) {
       if (preprintData) {
@@ -153,9 +163,7 @@ export default function ActivityCard({ activity }) {
         >
           <Grid item xs={12} sm={5}>
             <Typography className={classes.date}>
-              {activity.ynAvailableCode
-                ? 'Rapid reviewed on '
-                : 'Published a longform review on '}
+              {getActivityText(activity)}
               {getFormattedDatePosted(activity.preprint.datePosted)}
             </Typography>
           </Grid>

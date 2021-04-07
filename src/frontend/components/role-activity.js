@@ -63,13 +63,10 @@ export default function RoleActivity({ persona }) {
         <Typography>{persona.name} hasn't yet reviewed or requested reviews for preprints.</Typography>
       ) : (
         <Box mt={4}>
-          <Typography component="h3" variant="h3">
-            History
-          </Typography>
           <List>
             {activity.length &&
               activity.map(activity => (
-                <ListItem key={activity.handle} className={classes.listItem}>
+                <ListItem key={activity.uuid} className={classes.listItem}>
                   <ActivityCard key={activity.uuid} activity={activity} />
                 </ListItem>
               ))}
