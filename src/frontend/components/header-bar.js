@@ -618,10 +618,9 @@ export default function HeaderBar({ thisUser }) {
                         href={`/about/${thisUser.defaultPersona.uuid}`}
                         target={process.env.IS_EXTENSION ? '_blank' : undefined}
                       >
-                        Complete Profile
-                        <div>
-                          <ErrorOutlineIcon />
-                        </div>
+                        <span>
+                          Complete Profile <ErrorOutlineIcon />
+                        </span>
                       </Link>
                     )}
 

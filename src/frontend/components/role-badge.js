@@ -6,6 +6,7 @@ import { useHistory } from 'react-router-dom';
 
 // material UI
 import { makeStyles, withStyles } from '@material-ui/core/styles';
+import MuiBadge from '@material-ui/core/Badge';
 import Box from '@material-ui/core/Box';
 import IconButton from '@material-ui/core/IconButton';
 import Link from '@material-ui/core/Link';
@@ -104,7 +105,6 @@ const RoleBadgeUI = React.forwardRef(function RoleBadgeUI(
 
   const classes = useStyles();
   const history = useHistory();
-
   const [anchorEl, setAnchorEl] = useState(null);
   const handleClick = event => {
     setAnchorEl(event.currentTarget);
@@ -120,7 +120,6 @@ const RoleBadgeUI = React.forwardRef(function RoleBadgeUI(
   return (
     <>
       <Box className={classes.box}>
-        {showNotice && <ErrorOutlineIcon className={classes.icon} />}
         <IconButton
           aria-describedby={id}
           variant="contained"
@@ -129,14 +128,17 @@ const RoleBadgeUI = React.forwardRef(function RoleBadgeUI(
         >
           <Typography variant="srOnly">Open</Typography>
           <Tooltipify tooltip={tooltip} user={user}>
-            <Avatar
-              src={user.avatar}
-              ref={ref}
-              className={classes.avatar}
-              alt={user.name}
-            >
-              {user.name.charAt(0)}
-            </Avatar>
+            {/* this badge is only visible if a user's profile is incomplete */}
+            <MuiBadge badgeContent="!" color="primary" invisible={!showNotice}> 
+              <Avatar
+                src={user.avatar}
+                ref={ref}
+                className={classes.avatar}
+                alt={user.name}
+              >
+                {user.name.charAt(0)}
+              </Avatar>
+            </MuiBadge>
           </Tooltipify>
         </IconButton>
       </Box>
