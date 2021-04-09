@@ -50,6 +50,7 @@ import Typography from '@material-ui/core/Typography';
 
 // icons
 import SettingsIcon from '@material-ui/icons/Settings';
+import TwitterIcon from '@material-ui/icons/Twitter';
 
 // constants
 import { ORG } from '../constants';
@@ -73,9 +74,9 @@ const useStyles = makeStyles(theme => ({
     paddingBottom: theme.spacing(6),
     paddingLeft: theme.spacing(4),
     paddingRight: theme.spacing(4),
-    paddingTop: theme.spacing(12),
+    paddingTop: theme.spacing(6),
     [theme.breakpoints.up('lg')]: {
-      paddingTop: theme.spacing(16),
+      paddingTop: theme.spacing(8),
       paddingBottom: theme.spacing(8),
       textAlign: 'left',
     },
@@ -234,6 +235,7 @@ export default function Community(props) {
             members={community.members}
             membersLimit={5}
           />
+          {/* FIXME add to community header twitter={community.twitter }*/}
           <Box bgcolor="rgba(229, 229, 229, 0.35)">
             <Container>
               <Box p={4}>
@@ -317,6 +319,7 @@ function CommunityHeader({
   description,
   members,
   membersLimit = 5,
+  //twitter FIXME,
 }) {
   const classes = useStyles();
 
@@ -358,6 +361,13 @@ function CommunityHeader({
             </Grid>
             <Typography variant="h5" color="textSecondary" paragraph>
               {description}
+            </Typography>
+            <Typography component="div" variant="body1">
+              <Link href="#">
+                {/* FIXME href={twitter}*/}
+                <TwitterIcon />
+                Twitter handle goes here FIXME
+              </Link>
             </Typography>
           </Box>
         </Container>
