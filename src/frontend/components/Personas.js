@@ -206,7 +206,6 @@ export default function Personas() {
                     onChange={ev => {
                       params.delete('badges');
                       setSelectedBadges(ev.target.value);
-                      console.log('ev.target.value:', ev.target.value);
                       if (
                         Array.isArray(ev.target.value) &&
                         ev.target.value.length > 0

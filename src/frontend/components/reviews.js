@@ -2,24 +2,37 @@
 import React, { useContext, useState } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
+import PropTypes from 'prop-types';
+import Tooltip from '@reach/tooltip';
 
 // Material UI imports
 import { makeStyles } from '@material-ui/core/styles';
+import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
+import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
 import Box from '@material-ui/core/Box';
+import Chip from '@material-ui/core/Chip';
 import Container from '@material-ui/core/Container';
 import Dialog from '@material-ui/core/Dialog';
 import Grid from '@material-ui/core/Grid';
+import Input from '@material-ui/core/Input';
+import InputLabel from '@material-ui/core/InputLabel';
 import Link from '@material-ui/core/Link';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
+import MenuItem from '@material-ui/core/MenuItem';
 import Pagination from '@material-ui/lab/Pagination';
+import Select from '@material-ui/core/Select';
 import Typography from '@material-ui/core/Typography';
 
 // contexts
 import UserProvider from '../contexts/user-context';
 
 // hooks
-import { useGetPreprints } from '../hooks/api-hooks.tsx';
+import {
+  useGetCommunities,
+  useGetPreprints,
+  useGetTags,
+} from '../hooks/api-hooks.tsx';
 import {
   useIsNewVisitor,
   useIsMobile,
@@ -41,7 +54,7 @@ import NotFound from './not-found';
 import PreprintCard from './preprint-card';
 import PrivateRoute from './private-route';
 import SearchBar from './search-bar';
-import SortOptions from './sort-options';
+//import SortOptions from './sort-options';
 import WelcomeModal from './welcome-modal';
 
 // constants
@@ -60,6 +73,11 @@ const useStyles = makeStyles(() => ({
   listItem: {
     paddingLeft: 0,
     paddingRight: 0,
+  },
+  sortOptions: {
+    alignItems: 'center',
+    borderBottom: '1px',
+    textTransform: 'uppercase',
   },
 }));
 
@@ -80,11 +98,43 @@ export default function Reviews() {
 
   const [search, setSearch] = useState(params.get('search') || '');
 
-  const { data: preprints, loading: loadingPreprints, error } = useGetPreprints(
-    {
-      queryParams: searchParamsToObject(params),
-    },
+  const tagsParam = params.get('tags') || [];
+  const [selectedTags, setSelectedTags] = useState(
+    Array.isArray(tagsParam) ? tagsParam : [tagsParam],
   );
+
+  const communitiesParam = params.get('communities') || [];
+  const [selectedCommunities, setSelectedCommunities] = useState(
+    Array.isArray(communitiesParam) ? communitiesParam : [communitiesParam],
+  );
+
+  const {
+    data: preprints,
+    loading: loadingPreprints,
+    error: preprintError,
+  } = useGetPreprints({
+    queryParams: searchParamsToObject(params),
+  });
+
+  const {
+    data: communities,
+    loading: loadingCommunities,
+    error: communityError,
+  } = useGetCommunities({
+    resolve: communities => {
+      if (communities.data && Array.isArray(communities.data)) {
+        return communities.data;
+      }
+    },
+  });
+
+  const { data: tags, loading: loadingTags, error: tagError } = useGetTags({
+    resolve: tags => {
+      if (tags.data && Array.isArray(tags.data)) {
+        return tags.data;
+      }
+    },
+  });
 
   const [hoveredSortOption, setHoveredSortOption] = useState(null);
 
@@ -118,9 +168,9 @@ export default function Reviews() {
     }
   };
 
-  if (loadingPreprints) {
+  if (loadingPreprints || loadingTags || loadingCommunities) {
     return <Loading />;
-  } else if (error) {
+  } else if (preprintError || tagError || communityError) {
     return <NotFound />;
   } else {
     return (
@@ -192,8 +242,10 @@ export default function Reviews() {
                 spacing={2}
               >
                 <Grid item>
-                  <Typography component="h2" variant="h2">
-                    Preprints with reviews or requests for reviews
+                  <Typography component="h4" variant="h4">
+                    {preprints.totalCount} preprints with {preprints.totalFull}{' '}
+                    reviews, {preprints.totalRapid} rapid reviews, and{' '}
+                    {preprints.totalRequests} requests for reviews
                   </Typography>
                 </Grid>
                 <Grid item>
@@ -251,6 +303,104 @@ export default function Reviews() {
               </Grid>
             </Box>
 
+            <Grid container spacing={3}>
+              <Grid item className={classes.formControl} xs spacing={2}>
+                <Typography component="h5" variant="h5">
+                  Filter by:
+                </Typography>
+              </Grid>
+              {tags && Array.isArray(tags) && tags.length > 0 ? (
+                <Grid item className={classes.formControl} xs>
+                  <InputLabel htmlFor="personas-tags">Tags</InputLabel>
+                  <Select
+                    id="personas-tags"
+                    className={classes.select}
+                    multiple
+                    value={selectedTags}
+                    onChange={ev => {
+                      params.delete('tags');
+                      setSelectedTags(ev.target.value);
+                      if (
+                        Array.isArray(ev.target.value) &&
+                        ev.target.value.length > 0
+                      ) {
+                        params.set('tags', ev.target.value.toString());
+                      }
+                      history.push({
+                        pathname: location.pathame,
+                        search: params.toString(),
+                      });
+                    }}
+                    input={<Input id="personas-tags-select-multiple" />}
+                    renderValue={() => (
+                      <div className={classes.chips}>
+                        {selectedTags.map(value => (
+                          <Chip
+                            key={value}
+                            label={value}
+                            className={classes.chip}
+                          />
+                        ))}
+                      </div>
+                    )}
+                  >
+                    {tags.map(tag => (
+                      <MenuItem key={tag.uuid} value={tag.name}>
+                        {tag.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </Grid>
+              ) : null}
+              {communities &&
+              Array.isArray(communities) &&
+              communities.length > 0 ? (
+                <Grid item className={classes.formControl} xs>
+                  <InputLabel id="personas-communities-label">
+                    Communities
+                  </InputLabel>
+                  <Select
+                    labelId="personas-communities-label"
+                    id="personas-communities"
+                    className={classes.select}
+                    multiple
+                    value={selectedCommunities}
+                    onChange={ev => {
+                      params.delete('communities');
+                      setSelectedCommunities(ev.target.value);
+                      if (
+                        Array.isArray(ev.target.value) &&
+                        ev.target.value.length > 0
+                      ) {
+                        params.set('communities', ev.target.value.toString());
+                      }
+                      history.push({
+                        pathname: location.pathame,
+                        search: params.toString(),
+                      });
+                    }}
+                    input={<Input id="personas-communities-select-multiple" />}
+                    renderValue={() => (
+                      <div className={classes.chips}>
+                        {selectedCommunities.map(value => (
+                          <Chip
+                            key={value}
+                            label={value}
+                            className={classes.chip}
+                          />
+                        ))}
+                      </div>
+                    )}
+                  >
+                    {communities.map(community => (
+                      <MenuItem key={community.uuid} value={community.name}>
+                        {community.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </Grid>
+              ) : null}
+            </Grid>
             {preprints && preprints.totalCount > 0 && !loadingPreprints && (
               <SortOptions
                 sort={params.get('sort') || ''}
@@ -350,3 +500,90 @@ export default function Reviews() {
     );
   }
 }
+
+function SortOptions({ sort, order, onChange }) {
+  const classes = useStyles();
+  const isMobile = useIsMobile();
+
+  return (
+    <Grid container item className={classes.sortOptions} alignItems="center">
+      {['recentRapid', 'recentFull', 'recentRequests', 'datePosted'].map(
+        name => (
+          <Grid container item xs key={name}>
+            <Box display="none">
+              <Input
+                type="radio"
+                id={`sort-options-${name}`}
+                name={name}
+                value={name}
+                display="none"
+                onClick={e => {
+                  const sortOption = e.target.value;
+                  onChange(sortOption, order === 'asc' ? 'desc' : 'asc');
+                }}
+              />
+            </Box>
+            <Grid item>
+              <Tooltip
+                label={`Sort by ${
+                  name === 'recentRapid'
+                    ? 'Date of latest Rapid Review'
+                    : name === 'recentFull'
+                    ? 'Date of latest Full Review'
+                    : name === 'recentRequests'
+                    ? 'Date of latest request for review'
+                    : 'date posted on preprint server'
+                }`}
+              >
+                <InputLabel
+                  htmlFor={`sort-options-${name}`}
+                  cursor={sort === name ? 'default' : 'pointer'}
+                  focus={sort === name}
+                >
+                  {name === 'recentRapid'
+                    ? isMobile
+                      ? 'Rapid Reviewed'
+                      : 'Recently Rapid Reviewed'
+                    : name === 'recentFull'
+                    ? isMobile
+                      ? 'Reviewed'
+                      : 'Recently Reviewed'
+                    : name === 'recentRequests'
+                    ? isMobile
+                      ? 'Requested'
+                      : 'Recently Requested'
+                    : isMobile
+                    ? 'Published'
+                    : 'Date Published'}
+                </InputLabel>
+              </Tooltip>
+            </Grid>
+            <Grid item>
+              {order === 'asc' ? (
+                <ArrowUpwardIcon
+                  visibility={sort === name ? 'visible' : 'hidden'}
+                />
+              ) : (
+                <ArrowDownwardIcon
+                  visibility={sort === name ? 'visible' : 'hidden'}
+                />
+              )}
+            </Grid>
+          </Grid>
+        ),
+      )}
+    </Grid>
+  );
+}
+
+SortOptions.propTypes = {
+  onChange: PropTypes.func.isRequired,
+  sort: PropTypes.oneOf([
+    'recentRapid',
+    'recentFull',
+    'recentRequests',
+    'datePosted',
+    '',
+  ]),
+  order: PropTypes.string,
+};
