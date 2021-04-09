@@ -1,7 +1,7 @@
 // base imports
 import React, { createRef, useContext, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { useParams } from 'react-router-dom';
+import { useHistory, useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { useIntl } from 'react-intl';
 
@@ -63,6 +63,7 @@ const useStyles = makeStyles(theme => ({
     marginBottom: '1rem',
   },
   button: {
+    marginRight: 10,
     textTransform: 'none',
   },
   textField: {
@@ -73,6 +74,8 @@ const useStyles = makeStyles(theme => ({
 
 const CommunityPanel = () => {
   const classes = useStyles();
+  const history = useHistory();
+
   const { id } = useParams();
   const [user] = useContext(UserProvider.context);
 
@@ -121,6 +124,11 @@ const CommunityPanel = () => {
       ...inputs,
       [event.target.name]: event.target.value,
     }));
+  };
+
+  // return to community page
+  const handleBack = () => {
+    history.push(`/communities/${community.uuid}`);
   };
 
   // save banner and description to API
@@ -290,6 +298,15 @@ const CommunityPanel = () => {
                   onClick={handleSubmit}
                 >
                   Save
+                </Button>
+                <Button
+                  color="primary"
+                  variant="outlined"
+                  component="label"
+                  className={classes.button}
+                  onClick={handleBack}
+                >
+                  Back
                 </Button>
               </Box>
               <Box mb={4}>
