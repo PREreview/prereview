@@ -22,6 +22,14 @@ export class Event extends BaseEntity {
   @Property()
   start!: Date;
 
+  @Fixture(() => new Date())
+  @Property({ nullable: true })
+  end?: Date;
+
+  @Fixture(faker => faker.internet.url())
+  @Property({ nullable: true })
+  twitter?: string;
+
   //eslint-disable-next-line
   @Property()
   isPrivate: boolean = false;
@@ -36,6 +44,8 @@ export class Event extends BaseEntity {
   constructor(
     title: string,
     start: Date,
+    end?: Date,
+    twitter?: string,
     isPrivate = false,
     description?: string,
     community?: Community,
@@ -43,6 +53,8 @@ export class Event extends BaseEntity {
     super();
     this.title = title;
     this.start = start;
+    this.end = end;
+    this.twitter = twitter;
     this.isPrivate = isPrivate;
     this.description = description;
     this.community = community;

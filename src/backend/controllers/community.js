@@ -17,6 +17,7 @@ const eventSchema = Joi.object({
   title: Joi.string(),
   description: Joi.string(),
   start: Joi.string(),
+  end: Joi.string(),
 });
 
 const tagSchema = Joi.object({
@@ -701,22 +702,34 @@ export default function controller(
     validate: {
       body: eventSchema,
       type: 'json',
+      continueOnError: true,
     },
     pre: thisUser.can('edit this community'),
     handler: async ctx => {
+      if (ctx.invalid) {
+        console.log('***invalid!***');
+        handleInvalid(ctx);
+        return;
+      }
       const communityId = ctx.params.id;
       let community, newEvent;
       log.debug(`Add event for community ${communityId}`);
+      console.log('***ctx.request.body***:', ctx.request.body);
 
       try {
         community = await communityModel.findOne({ uuid: communityId }, [
           'events',
         ]);
+        console.log('***fetched community***:', community);
         newEvent = eventModel.create({
           ...ctx.request.body,
+          community: community,
         });
+        console.log('***created event***:', newEvent);
         community.events.add(newEvent);
-        await eventModel.em.flush();
+        console.log('***added***');
+        //await eventModel.flush();
+        console.log('***flushed***');
         ctx.status = 201;
         ctx.body = {
           status: 201,

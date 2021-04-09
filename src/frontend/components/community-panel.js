@@ -1,5 +1,5 @@
 // base imports
-import React, { useContext, useEffect, useState } from 'react';
+import React, { createRef, useContext, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
@@ -80,6 +80,7 @@ const CommunityPanel = () => {
 
   const [loading, setLoading] = useState(true);
   const [community, setCommunity] = useState(null);
+  const bannerRef = createRef(null);
 
   /* API calls*/
   // fetch community
@@ -99,17 +100,17 @@ const CommunityPanel = () => {
     const file = e.target.files[0];
 
     return new Promise((resolve, reject) => {
-      const reader = new FileReader();
+      const image = URL.createObjectURL(file);
+      resolve(image);
 
-      reader.onload = event => {
-        resolve(event.target.result);
-      };
+      //image.onload = event => {
+      //  URL
+      //  resolve(event.target.result);
+      //};
 
-      reader.onerror = err => {
-        reject(err);
-      };
-
-      reader.readAsDataURL(file);
+      //image.onerror = err => {
+      //  reject(err);
+      //};
     });
   };
 
@@ -131,18 +132,14 @@ const CommunityPanel = () => {
 
   // handle banner change differently because it is more complex
   const handleBannerChange = event => {
-    readFileDataAsBase64(event)
-      .then(response => {
-        setInputs(inputs => ({
-          ...inputs,
-          banner: response,
-        }));
-        return response;
-      })
-      .catch(error => {
-        console.error('error:', error);
-        throw Error(error.statusText);
-      });
+    const newBanner = event.target.files[0];
+    if (newBanner) {
+      if (community.banner) {
+        URL.revokeObjectURL(community.banner);
+        bannerRef.current.value = null;
+      }
+      setCommunity({ ...community, banner: URL.createObjectURL(newBanner) });
+    }
   };
 
   const handleDeleteOwner = owner => {
@@ -157,6 +154,13 @@ const CommunityPanel = () => {
 
     const members = personas.filter(persona => persona.uuid !== member.uuid);
     setCommunity({ ...community, members });
+  };
+
+  const handleAddEvent = event => {
+    const { events: oldEvents } = community;
+
+    const events = oldEvents.push(event);
+    setCommunity({ ...community, events });
   };
 
   const handleDeleteEvent = event => {
@@ -229,6 +233,7 @@ const CommunityPanel = () => {
                   className={classes.bannerUpload}
                 />
                 <Button
+                  ref={bannerRef}
                   color="primary"
                   variant="outlined"
                   component="label"
@@ -303,7 +308,10 @@ const CommunityPanel = () => {
                 <Typography variant="h4" component="h2" gutterBottom={true}>
                   Events
                 </Typography>
-                <AddEvent community={community.uuid} />
+                <AddEvent
+                  community={community.uuid}
+                  addEvent={handleAddEvent}
+                />
                 {community.events.map(event => {
                   return (
                     <DeleteCommunityEvent
