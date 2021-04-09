@@ -54,7 +54,7 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const AddEvent = ({ community }) => {
+const AddEvent = ({ community, addTag }) => {
   const classes = useStyles();
 
   const [inputs, setInputs] = useState({});
@@ -77,7 +77,7 @@ const AddEvent = ({ community }) => {
   const handleAddTag = () => {
     addCommunityTag(inputs)
       .then(response => {
-        console.log(response);
+        addTag(response.data)
         handleClose();
         alert(`Tag added successfully.`);
         return;
@@ -148,6 +148,7 @@ const AddEvent = ({ community }) => {
 
 AddEvent.propTypes = {
   community: PropTypes.string,
+  addTag: PropTypes.func,
 };
 
 export default AddEvent;

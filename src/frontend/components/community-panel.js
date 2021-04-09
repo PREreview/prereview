@@ -183,6 +183,13 @@ const CommunityPanel = () => {
     setCommunity({ ...community, events });
   };
 
+  const handleAddTag = tag => {
+    const oldTags = community.tags;
+    const tags = [...oldTags, tag];
+    const newCommunity = { ...community, tags };
+    setCommunity(newCommunity);
+  };
+
   const handleDeleteTag = tag => {
     const { tags: oldTags } = community;
 
@@ -289,7 +296,11 @@ const CommunityPanel = () => {
                 <Typography variant="h4" component="h2" gutterBottom={true}>
                   Moderators
                 </Typography>
-                <AddUser community={community} isModerator={true} />
+                <AddUser
+                  addUser={handleAddUser}
+                  community={community}
+                  isModerator={true}
+                />
                 {community.owners && community.owners.length
                   ? community.owners.map(owner => {
                       return (
@@ -348,17 +359,19 @@ const CommunityPanel = () => {
                 <Typography variant="h4" component="h2" gutterBottom={true}>
                   Tags
                 </Typography>
-                <AddTag community={community.uuid} />
-                {community.tags.map(tag => {
-                  return (
-                    <DeleteCommunityTag
-                      key={tag.uuid}
-                      communityId={community.uuid}
-                      deleteTag={handleDeleteTag}
-                      tag={tag}
-                    />
-                  );
-                })}
+                <AddTag community={community.uuid} addTag={handleAddTag} />
+                {community.tags && community.tags.length
+                  ? community.tags.map(tag => {
+                      return (
+                        <DeleteCommunityTag
+                          key={tag.uuid}
+                          communityId={community.uuid}
+                          deleteTag={handleDeleteTag}
+                          tag={tag}
+                        />
+                      );
+                    })
+                  : null}
               </Box>
             </form>
           </Container>
