@@ -241,13 +241,16 @@ export default function Reviews() {
                 justify="space-between"
                 spacing={2}
               >
-                <Grid item>
-                  <Typography component="h4" variant="h4">
-                    {preprints.totalCount} preprints with {preprints.totalFull}{' '}
-                    reviews, {preprints.totalRapid} rapid reviews, and{' '}
-                    {preprints.totalRequests} requests for reviews
-                  </Typography>
-                </Grid>
+                {preprints ? (
+                  <Grid item>
+                    <Typography component="h4" variant="h4">
+                      {preprints.totalCount} preprints with{' '}
+                      {preprints.totalFull} reviews, {preprints.totalRapid}{' '}
+                      rapid reviews, and {preprints.totalRequests} requests for
+                      reviews
+                    </Typography>
+                  </Grid>
+                ) : null}
                 <Grid item>
                   <AddButton
                     onClick={() => {
@@ -303,104 +306,111 @@ export default function Reviews() {
               </Grid>
             </Box>
 
-            <Grid container spacing={3}>
-              <Grid item className={classes.formControl} xs spacing={2}>
-                <Typography component="h5" variant="h5">
-                  Filter by:
-                </Typography>
+            {preprints && preprints.totalCount > 0 ? (
+              <Grid container spacing={3}>
+                {preprints ? (
+                  <Grid item className={classes.formControl} xs spacing={2}>
+                    <Typography component="h5" variant="h5">
+                      Filter by:
+                    </Typography>
+                  </Grid>
+                ) : null}
+                {tags && Array.isArray(tags) && tags.length > 0 ? (
+                  <Grid item className={classes.formControl} xs>
+                    <InputLabel htmlFor="personas-tags">Tags</InputLabel>
+                    <Select
+                      id="personas-tags"
+                      className={classes.select}
+                      multiple
+                      value={selectedTags}
+                      onChange={ev => {
+                        params.delete('tags');
+                        setSelectedTags(ev.target.value);
+                        if (
+                          Array.isArray(ev.target.value) &&
+                          ev.target.value.length > 0
+                        ) {
+                          params.set('tags', ev.target.value.toString());
+                        }
+                        history.push({
+                          pathname: location.pathame,
+                          search: params.toString(),
+                        });
+                      }}
+                      input={<Input id="personas-tags-select-multiple" />}
+                      renderValue={() => (
+                        <div className={classes.chips}>
+                          {selectedTags.map(value => (
+                            <Chip
+                              key={value}
+                              label={value}
+                              className={classes.chip}
+                            />
+                          ))}
+                        </div>
+                      )}
+                    >
+                      {tags.map(tag => (
+                        <MenuItem key={tag.uuid} value={tag.name}>
+                          {tag.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </Grid>
+                ) : null}
+                {communities &&
+                Array.isArray(communities) &&
+                communities.length > 0 ? (
+                  <Grid item className={classes.formControl} xs>
+                    <InputLabel id="personas-communities-label">
+                      Communities
+                    </InputLabel>
+                    <Select
+                      labelId="personas-communities-label"
+                      id="personas-communities"
+                      className={classes.select}
+                      multiple
+                      value={selectedCommunities}
+                      onChange={ev => {
+                        params.delete('communities');
+                        setSelectedCommunities(ev.target.value);
+                        if (
+                          Array.isArray(ev.target.value) &&
+                          ev.target.value.length > 0
+                        ) {
+                          params.set('communities', ev.target.value.toString());
+                        }
+                        history.push({
+                          pathname: location.pathame,
+                          search: params.toString(),
+                        });
+                      }}
+                      input={
+                        <Input id="personas-communities-select-multiple" />
+                      }
+                      renderValue={() => (
+                        <div className={classes.chips}>
+                          {selectedCommunities.map(value => (
+                            <Chip
+                              key={value}
+                              label={value}
+                              className={classes.chip}
+                            />
+                          ))}
+                        </div>
+                      )}
+                    >
+                      {communities.map(community => (
+                        <MenuItem key={community.uuid} value={community.name}>
+                          {community.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </Grid>
+                ) : null}
               </Grid>
-              {tags && Array.isArray(tags) && tags.length > 0 ? (
-                <Grid item className={classes.formControl} xs>
-                  <InputLabel htmlFor="personas-tags">Tags</InputLabel>
-                  <Select
-                    id="personas-tags"
-                    className={classes.select}
-                    multiple
-                    value={selectedTags}
-                    onChange={ev => {
-                      params.delete('tags');
-                      setSelectedTags(ev.target.value);
-                      if (
-                        Array.isArray(ev.target.value) &&
-                        ev.target.value.length > 0
-                      ) {
-                        params.set('tags', ev.target.value.toString());
-                      }
-                      history.push({
-                        pathname: location.pathame,
-                        search: params.toString(),
-                      });
-                    }}
-                    input={<Input id="personas-tags-select-multiple" />}
-                    renderValue={() => (
-                      <div className={classes.chips}>
-                        {selectedTags.map(value => (
-                          <Chip
-                            key={value}
-                            label={value}
-                            className={classes.chip}
-                          />
-                        ))}
-                      </div>
-                    )}
-                  >
-                    {tags.map(tag => (
-                      <MenuItem key={tag.uuid} value={tag.name}>
-                        {tag.name}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </Grid>
-              ) : null}
-              {communities &&
-              Array.isArray(communities) &&
-              communities.length > 0 ? (
-                <Grid item className={classes.formControl} xs>
-                  <InputLabel id="personas-communities-label">
-                    Communities
-                  </InputLabel>
-                  <Select
-                    labelId="personas-communities-label"
-                    id="personas-communities"
-                    className={classes.select}
-                    multiple
-                    value={selectedCommunities}
-                    onChange={ev => {
-                      params.delete('communities');
-                      setSelectedCommunities(ev.target.value);
-                      if (
-                        Array.isArray(ev.target.value) &&
-                        ev.target.value.length > 0
-                      ) {
-                        params.set('communities', ev.target.value.toString());
-                      }
-                      history.push({
-                        pathname: location.pathame,
-                        search: params.toString(),
-                      });
-                    }}
-                    input={<Input id="personas-communities-select-multiple" />}
-                    renderValue={() => (
-                      <div className={classes.chips}>
-                        {selectedCommunities.map(value => (
-                          <Chip
-                            key={value}
-                            label={value}
-                            className={classes.chip}
-                          />
-                        ))}
-                      </div>
-                    )}
-                  >
-                    {communities.map(community => (
-                      <MenuItem key={community.uuid} value={community.name}>
-                        {community.name}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </Grid>
-              ) : null}
-            </Grid>
+            ) : null}
+
             {preprints && preprints.totalCount > 0 && !loadingPreprints && (
               <SortOptions
                 sort={params.get('sort') || ''}
@@ -443,20 +453,22 @@ export default function Reviews() {
             {!preprints ||
             (preprints && preprints.totalCount <= 0 && !loadingPreprints) ? (
               <div>
-                No preprints about this topic have been added to PREreview.{' '}
-                <Link
-                  onClick={() => {
-                    setSearch('');
-                    if (thisUser) {
-                      history.push('/new');
-                    } else {
-                      setLoginModalOpenNext('/new');
-                    }
-                  }}
-                >
-                  Review or request a review of a preprint to add it to the
-                  platform.
-                </Link>
+                <Typography>
+                  No preprints about this topic have been added to PREreview.{' '}
+                  <Link
+                    onClick={() => {
+                      setSearch('');
+                      if (thisUser) {
+                        history.push('/reviews/new');
+                      } else {
+                        setLoginModalOpenNext('/reviews');
+                      }
+                    }}
+                  >
+                    Review or request a review of a preprint to add it to the
+                    platform.
+                  </Link>
+                </Typography>
               </div>
             ) : (
               <List>
