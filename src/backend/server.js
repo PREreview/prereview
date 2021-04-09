@@ -250,8 +250,15 @@ export default async function configServer(config) {
   }
 
   server
-    .use(bodyParser({ multipart: true }))
-    .use(session(server))
+    .use(bodyParser({ multipart: true, jsonLimit: '50mb' }))
+    .use(
+      session(
+        {
+          domain: 'prereview.org',
+        },
+        server,
+      ),
+    )
     .use(passport.initialize())
     .use(passport.session())
     .use(cors())

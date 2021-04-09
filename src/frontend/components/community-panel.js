@@ -96,24 +96,6 @@ const CommunityPanel = () => {
     id: id,
   });
 
-  const readFileDataAsBase64 = e => {
-    const file = e.target.files[0];
-
-    return new Promise((resolve, reject) => {
-      const image = URL.createObjectURL(file);
-      resolve(image);
-
-      //image.onload = event => {
-      //  URL
-      //  resolve(event.target.result);
-      //};
-
-      //image.onerror = err => {
-      //  reject(err);
-      //};
-    });
-  };
-
   // update inputs with new values
   const handleInputChange = event => {
     event.persist();
@@ -133,12 +115,20 @@ const CommunityPanel = () => {
   // handle banner change differently because it is more complex
   const handleBannerChange = event => {
     const newBanner = event.target.files[0];
-    if (newBanner) {
+    const reader = new FileReader();
+    reader.onload = e => {
       if (community.banner) {
         URL.revokeObjectURL(community.banner);
         bannerRef.current.value = null;
       }
+      setInputs({ ...inputs, banner: e.target.result });
       setCommunity({ ...community, banner: URL.createObjectURL(newBanner) });
+    };
+    reader.onerror = err => {
+      alert(`An error occurred: ${err.message}`);
+    };
+    if (newBanner) {
+      reader.readAsDataURL(newBanner);
     }
   };
 
@@ -228,7 +218,7 @@ const CommunityPanel = () => {
                   Banner
                 </Typography>
                 <img
-                  src={inputs.banner || community.banner || ''}
+                  src={community.banner || inputs.banner || ''}
                   aria-hidden="true"
                   className={classes.bannerUpload}
                 />
