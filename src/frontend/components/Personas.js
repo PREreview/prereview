@@ -174,7 +174,7 @@ export default function Personas() {
               >
                 <Grid item>
                   <Typography component="h2" variant="h2">
-                    {personas.totalCount} PREreview Members
+                    {personas.totalCount} PREreviewers
                   </Typography>
                 </Grid>
                 <Grid item>
