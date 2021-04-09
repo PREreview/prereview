@@ -126,8 +126,7 @@ const AddEvent = ({ community, addEvent }) => {
     if (canSubmit()) {
       addCommunityEvent(inputs)
         .then(addEvent(inputs))
-        .then(response => {
-          console.log(response);
+        .then(() => {
           handleClose();
           alert(`Event added successfully.`);
           return;
@@ -196,11 +195,11 @@ const AddEvent = ({ community, addEvent }) => {
                 id="start"
                 name="start"
                 label="Start"
-                inputFormat="yyyy/MM/dd hh:mm a"
+                inputformat="yyyy/MM/dd hh:mm a"
                 value={selectedStart}
                 className={classes.dateField}
                 onChange={handleStartChange}
-                KeyboardButtonProps={{
+                keyboardbuttonprops={{
                   'aria-label': 'change date',
                 }}
               />
@@ -212,11 +211,11 @@ const AddEvent = ({ community, addEvent }) => {
                 id="end"
                 name="end"
                 label="End"
-                inputFormat="yyyy/MM/dd hh:mm a"
+                inputformat="yyyy/MM/dd hh:mm a"
                 value={selectedEnd}
                 className={classes.dateField}
                 onChange={handleEndChange}
-                KeyboardButtonProps={{
+                keyboardbuttonprops={{
                   'aria-label': 'change date',
                 }}
               />
@@ -225,7 +224,7 @@ const AddEvent = ({ community, addEvent }) => {
               control={
                 <Checkbox
                   color="primary"
-                  checked={inputs.isPrivate}
+                  checked={inputs.isPrivate || false}
                   onChange={handleCheckedChange}
                   name="isPrivate"
                 />
@@ -250,7 +249,7 @@ const AddEvent = ({ community, addEvent }) => {
 
 AddEvent.propTypes = {
   community: PropTypes.string,
-  addEvent: PropTypes.function,
+  addEvent: PropTypes.func,
 };
 
 export default AddEvent;
