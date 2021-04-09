@@ -37,7 +37,7 @@ import Reviews from './reviews';
 import SettingsAPI from './settings-api';
 import SettingsDrafts from './settings-drafts';
 import SettingsTemplates from './settings-templates';
-import PersonaSearch from './PersonaSearch';
+import Personas from './Personas';
 import Validate from './Validate';
 
 //const Moderate = React.lazy(() => import('./moderate'));
@@ -95,14 +95,7 @@ export default function App({ user }) {
                   <Reviews />
                 </Route>
                 <Route exact={true} path="/personas">
-                  <PersonaSearch />
-                </Route>
-
-                <Route exact={true} path="/reviews/:new(new)?">
-                  <Reviews />
-                </Route>
-                <Route exact={true} path="/personas">
-                  <PersonaSearch />
+                  <Personas />
                 </Route>
                 <Route exact={true} path="/about/:id">
                   <Profile />
