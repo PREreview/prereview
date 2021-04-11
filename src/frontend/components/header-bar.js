@@ -35,6 +35,8 @@ const useStyles = makeStyles(theme => ({
   },
   headerBar: {
     boxShadow: '0 0 5px #000',
+    position: 'relative',
+    zIndex: 1,
   },
   img: {
     display: 'block',

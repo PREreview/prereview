@@ -50,9 +50,13 @@ import Typography from '@material-ui/core/Typography';
 
 // icons
 import SettingsIcon from '@material-ui/icons/Settings';
+import TwitterIcon from '@material-ui/icons/Twitter';
 
 // constants
 import { ORG } from '../constants';
+
+// icons
+import InfoOutlinedIcon from '@material-ui/icons/InfoOutlined';
 
 const useStyles = makeStyles(theme => ({
   avatar: {
@@ -67,13 +71,12 @@ const useStyles = makeStyles(theme => ({
     maxWidth: theme.breakpoints.values['md'],
     marginLeft: 'auto',
     marginRight: 'auto',
-    marginBottom: theme.spacing(4),
     paddingBottom: theme.spacing(6),
     paddingLeft: theme.spacing(4),
     paddingRight: theme.spacing(4),
-    paddingTop: theme.spacing(12),
+    paddingTop: theme.spacing(6),
     [theme.breakpoints.up('lg')]: {
-      paddingTop: theme.spacing(16),
+      paddingTop: theme.spacing(8),
       paddingBottom: theme.spacing(8),
       textAlign: 'left',
     },
@@ -85,6 +88,12 @@ const useStyles = makeStyles(theme => ({
   contentMain: {
     marginTop: '2rem',
     padding: theme.spacing(2),
+  },
+  info: {
+    backgroundColor: '#FAB7B7',
+  },
+  infoIcon: {
+    paddingRight: 5,
   },
   link: {
     color: '#000 !important',
@@ -218,7 +227,7 @@ export default function Community(props) {
 
         <HeaderBar thisUser={user} />
 
-        <React.Fragment>
+        <>
           <CommunityHeader
             name={community.name}
             banner={community.banner}
@@ -226,6 +235,7 @@ export default function Community(props) {
             members={community.members}
             membersLimit={5}
           />
+          {/* FIXME add to community header twitter={community.twitter }*/}
           <Box bgcolor="rgba(229, 229, 229, 0.35)">
             <Container>
               <Box p={4}>
@@ -259,35 +269,41 @@ export default function Community(props) {
                     {community.members &&
                       Array.isArray(community.members) &&
                       community.members.length > 0 && (
-                        <CommunityPersonas
-                          title="Members"
-                          personas={community.members}
-                          isSearchable="true"
-                        />
+                        <Box mb={2}>
+                          <CommunityPersonas
+                            title="Members"
+                            personas={community.members}
+                            isSearchable="true"
+                          />
+                        </Box>
                       )}
                     {community.events &&
                       Array.isArray(community.events) &&
                       community.events.length > 0 && (
-                        <CommunityEvents
-                          community={community}
-                          events={community.events}
-                        />
+                        <Box mb={2}>
+                          <CommunityEvents
+                            community={community}
+                            events={community.events}
+                          />
+                        </Box>
                       )}
                     {community.owners &&
                       Array.isArray(community.owners) &&
                       community.owners.length > 0 && (
-                        <CommunityPersonas
-                          title="Moderators"
-                          personas={community.owners}
-                          isSearchable="false"
-                        />
+                        <Box mb={2}>
+                          <CommunityPersonas
+                            title="Moderators"
+                            personas={community.owners}
+                            isSearchable="false"
+                          />
+                        </Box>
                       )}
                   </Grid>
                 </Grid>
               </Box>
             </Container>
           </Box>
-        </React.Fragment>
+        </>
       </div>
     );
   }
@@ -303,12 +319,13 @@ function CommunityHeader({
   description,
   members,
   membersLimit = 5,
+  //twitter FIXME,
 }) {
   const classes = useStyles();
 
   return (
     <section>
-      <Container
+      <Box
         style={
           banner
             ? {
@@ -345,9 +362,16 @@ function CommunityHeader({
             <Typography variant="h5" color="textSecondary" paragraph>
               {description}
             </Typography>
+            <Typography component="div" variant="body1">
+              <Link href="#">
+                {/* FIXME href={twitter}*/}
+                <TwitterIcon />
+                Twitter handle goes here FIXME
+              </Link>
+            </Typography>
           </Box>
         </Container>
-      </Container>
+      </Box>
     </section>
   );
 }
@@ -363,7 +387,7 @@ CommunityHeader.propTypes = {
 function CommunityPersonas({ title, personas, isSearchable = false }) {
   const classes = useStyles();
 
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
 
   const handleOpen = () => {
     setOpen(true);
@@ -375,7 +399,7 @@ function CommunityPersonas({ title, personas, isSearchable = false }) {
 
   return (
     <section>
-      <Box p={4} mb={2} className={classes.paper}>
+      <Box p={4} className={classes.paper}>
         <Box mb={4}>
           <Typography variant="h5" component="h2" gutterBottom={true}>
             {title}
@@ -469,7 +493,7 @@ function CommunityEvents({ community, events }) {
   const classes = useStyles();
   const intl = useIntl();
 
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
 
   const handleOpen = () => {
     setOpen(true);
@@ -646,13 +670,16 @@ function CommunityContent({ thisUser, community, params }) {
       <Box>
         <Grid container alignItems="center" justify="space-between">
           <Grid item>
-            <Typography variant="caption">
-              This is a platform for the crowdsourcing of preprint reviews. Use
-              the search bar below to find preprints that already have reviews
-              or requests for reviews. To add your own review or request, use
-              the Add Review | Request Review button, paste the preprint DOI and
-              follow the instructions.
-            </Typography>
+            <Box mb={4} p={2} className={classes.info}>
+              <Typography component="div" variant="body1">
+                <InfoOutlinedIcon className={classes.infoIcon} />
+                This is a platform for the crowdsourcing of preprint reviews.
+                Use the search bar below to find preprints that already have
+                reviews or requests for reviews. To add your own review or
+                request, use the Add Review | Request Review button, paste the
+                preprint DOI and follow the instructions.
+              </Typography>
+            </Box>
           </Grid>
         </Grid>
         <SearchBar

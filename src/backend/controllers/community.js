@@ -18,6 +18,7 @@ const eventSchema = Joi.object({
   description: Joi.string(),
   start: Joi.string(),
   end: Joi.string(),
+  isPrivate: Joi.boolean(),
 });
 
 const tagSchema = Joi.object({
@@ -427,7 +428,7 @@ export default function controller(
       ctx.body = {
         status: 201,
         message: 'User has been added to community',
-        data: community,
+        data: user,
       };
       ctx.status = 201;
     },
@@ -553,7 +554,7 @@ export default function controller(
       ctx.body = {
         status: 201,
         message: 'User has been added to community',
-        data: community,
+        data: user,
       };
       ctx.status = 201;
     },
@@ -714,22 +715,17 @@ export default function controller(
       const communityId = ctx.params.id;
       let community, newEvent;
       log.debug(`Add event for community ${communityId}`);
-      console.log('***ctx.request.body***:', ctx.request.body);
 
       try {
         community = await communityModel.findOne({ uuid: communityId }, [
           'events',
         ]);
-        console.log('***fetched community***:', community);
         newEvent = eventModel.create({
           ...ctx.request.body,
           community: community,
         });
-        console.log('***created event***:', newEvent);
         community.events.add(newEvent);
-        console.log('***added***');
-        //await eventModel.flush();
-        console.log('***flushed***');
+        await communityModel.persistAndFlush(community);
         ctx.status = 201;
         ctx.body = {
           status: 201,
