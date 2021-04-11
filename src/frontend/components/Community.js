@@ -703,20 +703,31 @@ function CommunityContent({ thisUser, community, params }) {
               </Grid>
               <Grid item xs={12} sm={6}>
                 <Box align="right">
-                  <AddButton
-                    onClick={() => {
-                      if (thisUser) {
-                        history.push(`/communities/${community.slug}/new`);
-                      } else {
-                        setLoginModalOpenNext(
-                          `/communities/${community.slug}/new`,
-                        );
+                  {thisUser.isAdmin ||
+                  (thisUser.defaultPersona &&
+                    thisUser.defaultPersona.communities &&
+                    Array.isArray(thisUser.defaultPersona.communities) &&
+                    thisUser.defaultPersona.communities.some(
+                      c => c.uuid === community.uuid,
+                    )) ? (
+                    <AddButton
+                      onClick={() => {
+                        if (thisUser) {
+                          history.push(`/communities/${community.slug}/new`);
+                        } else {
+                          setLoginModalOpenNext(
+                            `/communities/${community.slug}/new`,
+                          );
+                        }
+                      }}
+                      disabled={
+                        location.pathname ===
+                        `/communities/${community.slug}/new`
                       }
-                    }}
-                    disabled={
-                      location.pathname === `/communities/${community.slug}/new`
-                    }
-                  />
+                    />
+                  ) : (
+                    ''
+                  )}
                   <PrivateRoute
                     path={`/communities/${community.slug}/new`}
                     exact={true}
