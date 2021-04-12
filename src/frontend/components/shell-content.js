@@ -52,6 +52,10 @@ function a11yProps(index) {
 }
 
 const useStyles = makeStyles(theme => ({
+  appBar: {
+    backgroundColor: '#fff',
+    color: '#000',
+  },
   root: {
     flexGrow: 1,
     backgroundColor: theme.palette.background.paper,
@@ -253,7 +257,7 @@ export default function ShellContent({ preprint, user, cid }) {
       </Helmet>
       <div className={classes.root}>
         <PreprintPreview preprint={preprint} />
-        <AppBar position="static">
+        <AppBar position="static" className={classes.appBar}>
           <Tabs
             value={tab}
             onChange={handleChange}
