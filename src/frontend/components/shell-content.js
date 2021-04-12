@@ -6,6 +6,9 @@ import { Helmet } from 'react-helmet-async';
 // hooks
 import { usePostRequests } from '../hooks/api-hooks.tsx';
 
+// utils
+import { createPreprintId } from '../../common/utils/ids.js';
+
 // Material UI imports
 import { makeStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
@@ -237,8 +240,11 @@ export default function ShellContent({ preprint, user, cid }) {
           );
         });
       }
+    } else {
+      setOpen(`/preprints/${createPreprintId(preprint.handle)}`);
     }
   }, [
+    open,
     preprint,
     user,
     rapidContent,

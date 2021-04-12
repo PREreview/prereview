@@ -44,7 +44,6 @@ const drawerWidth = '40vw';
 const useStyles = makeStyles(theme => ({
   root: {
     display: 'flex',
-    whiteSpace: 'revert',
   },
   appBar: {
     transition: theme.transitions.create(['width', 'margin'], {
