@@ -198,13 +198,27 @@ const useStyles = makeStyles(theme => ({
     width: '100%',
   },
   sliderImage: {
-    marginLeft: 'auto',
-    marginRight: 'auto',
-    maxHeight: 600,
+    display: 'block',
+    maxWidth: 475,
+    objectFit: 'cover',
+    width: '100%',
   },
   sliderItem: {
     paddingLeft: 20,
     paddingRight: 20,
+  },
+  sliderLink: {
+    borderRadius: 14,
+    fontSize: '1rem',
+    paddingBottom: 10,
+    paddingTop: 10,
+  },
+  sliderTitle: {
+    color: '#54948E',
+    fontSize: '1.2rem',
+    fontWeight: 'bold',
+    marginBottom: 20,
+    marginTop: 20,
   },
   sponsorImage: {
     display: 'block',
@@ -841,148 +855,493 @@ export default function Home() {
           </Link>
         </Container>
       </Box>
-      <Box py={8} textAlign="center">
+      <Box py={8}>
         <Container>
-          <Typography variant="h4" component="h2" gutterBottom>
-            Press &amp; Awards
-          </Typography>
+          <Box mb={6} textAlign="center">
+            <Typography variant="h4" component="h2" gutterBottom>
+              Press &amp; Awards
+            </Typography>
+          </Box>
           <Slider {...settings}>
-            <Box textAlign="center">
-              <Link
-                href="https://asapbio.org/sprint-recap"
-                target="_blank"
-                rel="noreferrer"
+            <Box>
+              <Grid
+                container
+                spacing={4}
+                alignItems="flex-start"
+                justify="center"
               >
-                <span className={classes.vh}>ASAPbio article</span>
-                <img
-                  src={ASAPbioImg}
-                  alt=""
-                  aria-hidden="true"
-                  className={classes.sliderImage}
-                />
-              </Link>
+                <Grid item xs={12} sm={4}>
+                  <img
+                    src={ASAPbioImg}
+                    alt=""
+                    aria-hidden="true"
+                    className={classes.sliderImage}
+                  />
+                </Grid>
+                <Grid
+                  container
+                  item
+                  xs={12}
+                  sm={8}
+                  spacing={2}
+                  alignItems="flex-end"
+                  direction="column"
+                >
+                  <Grid item>
+                    <Typography
+                      component="div"
+                      variant="body1"
+                      className={classes.sliderTitle}
+                    >
+                      PREreview Awarded &quot;Best in Show&quot; at the ASAPbio
+                      #PreprintSprint 2020
+                    </Typography>
+                    <Typography component="div" variant="body2">
+                      In the fall of 2020, PREreview was one of 20 projects who
+                      participated in the ASAPbio Design Sprint: Encouraging
+                      Preprint Curation and Review. Our team contributed with
+                      two submissions, one in which we proposed a model of
+                      engagement based on mentorship and collaborative review
+                      and one in collaboration with the C19 Rapid Review
+                      Publishers Initiative. At the final pitch presentation on
+                      December 3, our team was awarded &quot;Best in Show&quot;
+                      with the first pitch.
+                    </Typography>
+                  </Grid>
+                  <Grid item>
+                    <Link
+                      href="https://asapbio.org/sprint-recap"
+                      target="_blank"
+                      rel="noreferrer"
+                      className={`${classes.gridLink} ${classes.sliderLink}`}
+                    >
+                      Read More
+                    </Link>
+                  </Grid>
+                </Grid>
+              </Grid>
             </Box>
-            <Box textAlign="center">
-              <Link
-                href="https://investinopen.org/blog/jrost-rapid-response-fund-awardees/"
-                target="_blank"
-                rel="noreferrer"
+            <Box>
+              <Grid
+                container
+                spacing={4}
+                alignItems="flex-start"
+                justify="center"
               >
-                <span className={classes.vh}>JROST award</span>
-                <img
-                  src={JROSTImg}
-                  alt=""
-                  aria-hidden="true"
-                  className={classes.sliderImage}
-                />
-              </Link>
+                <Grid item xs={12} sm={4}>
+                  <img
+                    src={JROSTImg}
+                    alt=""
+                    aria-hidden="true"
+                    className={classes.sliderImage}
+                  />
+                </Grid>
+                <Grid
+                  container
+                  item
+                  xs={12}
+                  sm={8}
+                  spacing={2}
+                  alignItems="flex-end"
+                  direction="column"
+                >
+                  <Grid item>
+                    <Typography
+                      component="div"
+                      variant="body1"
+                      className={classes.sliderTitle}
+                    >
+                      PREreview Awarded the JROST Rapid Response Fund
+                    </Typography>
+                    <Typography component="div" variant="body2">
+                      In the fall of 2020, JROST announced the Rapid Response
+                      Fund &quot;to create a means to give back to the open
+                      infrastructure and technology community.&quot; PREreview
+                      was one of eight projects who were awarded.
+                    </Typography>
+                  </Grid>
+                  <Grid item>
+                    <Link
+                      href="https://investinopen.org/blog/jrost-rapid-response-fund-awardees/"
+                      target="_blank"
+                      rel="noreferrer"
+                      className={`${classes.gridLink} ${classes.sliderLink}`}
+                    >
+                      Read More
+                    </Link>
+                  </Grid>
+                </Grid>
+              </Grid>
             </Box>
-            <Box textAlign="center">
-              <Link
-                href="https://www.nature.com/articles/d41586-020-00613-4"
-                target="_blank"
-                rel="noreferrer"
+            <Box>
+              <Grid
+                container
+                spacing={4}
+                alignItems="flex-start"
+                justify="center"
               >
-                <span className={classes.vh}>Nature article</span>
-                <img
-                  src={NatureOSrPREImg}
-                  alt=""
-                  aria-hidden="true"
-                  className={classes.sliderImage}
-                />
-              </Link>
+                <Grid item xs={12} sm={4}>
+                  <img
+                    src={NatureOSrPREImg}
+                    alt=""
+                    aria-hidden="true"
+                    className={classes.sliderImage}
+                  />
+                </Grid>
+                <Grid
+                  container
+                  item
+                  xs={12}
+                  sm={8}
+                  spacing={2}
+                  alignItems="flex-end"
+                  direction="column"
+                >
+                  <Grid item>
+                    <Typography
+                      component="div"
+                      variant="body1"
+                      className={classes.sliderTitle}
+                    >
+                      Nature: Open peer-review platform for COVID-19 preprints
+                    </Typography>
+                    <Typography component="div" variant="body2">
+                      Just a few weeks before the COVID-19 pandemic hit the
+                      world, we launched Outbreak Science Rapid PREreview, a
+                      platform for the rapid community review of
+                      outbreak-related preprints–now a community on the new
+                      preview.org. In this short Nature commentary, Project
+                      Directors Drs. Daniela Saderi and Michael Johansson
+                      presented the platform to the community.
+                    </Typography>
+                  </Grid>
+                  <Grid item>
+                    <Link
+                      href="https://www.nature.com/articles/d41586-020-00613-4"
+                      target="_blank"
+                      rel="noreferrer"
+                      className={`${classes.gridLink} ${classes.sliderLink}`}
+                    >
+                      Read More
+                    </Link>
+                  </Grid>
+                </Grid>
+              </Grid>
             </Box>
-            <Box textAlign="center">
-              <Link
-                href="https://www.thelancet.com/journals/lanplh/article/PIIS2542-5196(21)00011-5/fulltext"
-                target="_blank"
-                rel="noreferrer"
+            <Box>
+              <Grid
+                container
+                spacing={4}
+                alignItems="flex-start"
+                justify="center"
               >
-                <span className={classes.vh}>The Lancet article</span>
-                <img
-                  src={LancetImg}
-                  alt=""
-                  aria-hidden="true"
-                  className={classes.sliderImage}
-                />
-              </Link>
+                <Grid item xs={12} sm={4}>
+                  <img
+                    src={LancetImg}
+                    alt=""
+                    aria-hidden="true"
+                    className={classes.sliderImage}
+                  />
+                </Grid>
+                <Grid
+                  container
+                  item
+                  xs={12}
+                  sm={8}
+                  spacing={2}
+                  alignItems="flex-end"
+                  direction="column"
+                >
+                  <Grid item>
+                    <Typography
+                      component="div"
+                      variant="body1"
+                      className={classes.sliderTitle}
+                    >
+                      The Lancet: Lessons from the influx of preprints during
+                      the early COVID-19 pandemic
+                    </Typography>
+                    <Typography component="div" variant="body2">
+                      The COVID-19 pandemic led to an unprecedented increase in
+                      the uptake of preprints within the scientific community.
+                      Outbreak Science Rapid PREreview is mentioned in this
+                      commentary on The Lancet as the tool that allows
+                      researchers to conduct public reviews of COVID-19
+                      preprints.
+                    </Typography>
+                  </Grid>
+                  <Grid item>
+                    <Link
+                      href="https://www.thelancet.com/journals/lanplh/article/PIIS2542-5196(21)00011-5/fulltext"
+                      target="_blank"
+                      rel="noreferrer"
+                      className={`${classes.gridLink} ${classes.sliderLink}`}
+                    >
+                      Read More
+                    </Link>
+                  </Grid>
+                </Grid>
+              </Grid>
             </Box>
-            <Box textAlign="center">
-              <Link
-                href="https://www.natureindex.com/news-blog/three-online-tools-aimed-at-improving-preprints"
-                target="_blank"
-                rel="noreferrer"
+            <Box>
+              <Grid
+                container
+                spacing={4}
+                alignItems="flex-start"
+                justify="center"
               >
-                <span className={classes.vh}>Nature Index article</span>
-                <img
-                  src={NatureIndexImg}
-                  alt=""
-                  aria-hidden="true"
-                  className={classes.sliderImage}
-                />
-              </Link>
+                <Grid item xs={12} sm={4}>
+                  <img
+                    src={NatureIndexImg}
+                    alt=""
+                    aria-hidden="true"
+                    className={classes.sliderImage}
+                  />
+                </Grid>
+                <Grid
+                  container
+                  item
+                  xs={12}
+                  sm={8}
+                  spacing={2}
+                  alignItems="flex-end"
+                  direction="column"
+                >
+                  <Grid item>
+                    <Typography
+                      component="div"
+                      variant="body1"
+                      className={classes.sliderTitle}
+                    >
+                      Nature Index: Three online tools aimed at improving
+                      preprints
+                    </Typography>
+                    <Typography component="div" variant="body2">
+                      PREreview showcased as one of three tools &quot;aimed at
+                      helping researchers produce better preprints.&quot;
+                    </Typography>
+                  </Grid>
+                  <Grid item>
+                    <Link
+                      href="https://www.natureindex.com/news-blog/three-online-tools-aimed-at-improving-preprints"
+                      target="_blank"
+                      rel="noreferrer"
+                      className={`${classes.gridLink} ${classes.sliderLink}`}
+                    >
+                      Read More
+                    </Link>
+                  </Grid>
+                </Grid>
+              </Grid>
             </Box>
-            <Box textAlign="center">
-              <Link
-                href="https://www.scmp.com/news/china/article/3075431/will-coronavirus-kill-dinosaur-world-academic-publishing"
-                target="_blank"
-                rel="noreferrer"
+            <Box>
+              <Grid
+                container
+                spacing={4}
+                alignItems="flex-start"
+                justify="center"
               >
-                <span className={classes.vh}>
-                  South China Morning Post article
-                </span>
-                <img
-                  src={SCMornPostImg}
-                  alt=""
-                  aria-hidden="true"
-                  className={classes.sliderImage}
-                />
-              </Link>
+                <Grid item xs={12} sm={4}>
+                  <img
+                    src={SCMornPostImg}
+                    alt=""
+                    aria-hidden="true"
+                    className={classes.sliderImage}
+                  />
+                </Grid>
+                <Grid
+                  container
+                  item
+                  xs={12}
+                  sm={8}
+                  spacing={2}
+                  alignItems="flex-end"
+                  direction="column"
+                >
+                  <Grid item>
+                    <Typography
+                      component="div"
+                      variant="body1"
+                      className={classes.sliderTitle}
+                    >
+                      South China Morning Post: Will the coronavirus kill off
+                      the ‘dinosaur’ world of academic publishing?
+                    </Typography>
+                    <Typography component="div" variant="body2">
+                      PREreview Co-Founder and Director Dr. Daniela Saderi was
+                      interviewed by journalist Linda Lew for this piece on the
+                      future of publishing post-pandemic.
+                    </Typography>
+                  </Grid>
+                  <Grid item>
+                    <Link
+                      href="https://www.scmp.com/news/china/article/3075431/will-coronavirus-kill-dinosaur-world-academic-publishing"
+                      target="_blank"
+                      rel="noreferrer"
+                      className={`${classes.gridLink} ${classes.sliderLink}`}
+                    >
+                      Read More
+                    </Link>
+                  </Grid>
+                </Grid>
+              </Grid>
             </Box>
-            <Box textAlign="center">
-              <Link
-                href="https://sparcopen.org/news/2020/opencon-community-members-support-rapid-covid-response-through-preprints/"
-                target="_blank"
-                rel="noreferrer"
+            <Box>
+              <Grid
+                container
+                spacing={4}
+                alignItems="flex-start"
+                justify="center"
               >
-                <span className={classes.vh}>SPARC article</span>
-                <img
-                  src={SPARCImg}
-                  alt=""
-                  aria-hidden="true"
-                  className={classes.sliderImage}
-                />
-              </Link>
+                <Grid item xs={12} sm={4}>
+                  <img
+                    src={SPARCImg}
+                    alt=""
+                    aria-hidden="true"
+                    className={classes.sliderImage}
+                  />
+                </Grid>
+                <Grid
+                  container
+                  item
+                  xs={12}
+                  sm={8}
+                  spacing={2}
+                  alignItems="flex-end"
+                  direction="column"
+                >
+                  <Grid item>
+                    <Typography
+                      component="div"
+                      variant="body1"
+                      className={classes.sliderTitle}
+                    >
+                      SPARC Community Member Highlight
+                    </Typography>
+                    <Typography component="div" variant="body2">
+                      PREreview Leadership Team member and OpenCon alum Dr.
+                      Monica Granados was interviewed by SPARC to present our
+                      work in the context of the pandemic to the community.
+                    </Typography>
+                  </Grid>
+                  <Grid item>
+                    <Link
+                      href="https://sparcopen.org/news/2020/opencon-community-members-support-rapid-covid-response-through-preprints/"
+                      target="_blank"
+                      rel="noreferrer"
+                      className={`${classes.gridLink} ${classes.sliderLink}`}
+                    >
+                      Read More
+                    </Link>
+                  </Grid>
+                </Grid>
+              </Grid>
             </Box>
-            <Box textAlign="center">
-              <Link
-                href="https://bio2040.com/2018/04/09/opening-up-the-opaque-peer-review-process-with-sam-daniela-from-prereview/"
-                target="_blank"
-                rel="noreferrer"
+            <Box>
+              <Grid
+                container
+                spacing={4}
+                alignItems="flex-start"
+                justify="center"
               >
-                <span className={classes.vh}>bio2040 interview</span>
-                <img
-                  src={Bio2040Img}
-                  alt=""
-                  aria-hidden="true"
-                  className={classes.sliderImage}
-                />
-              </Link>
+                <Grid item xs={12} sm={4}>
+                  <img
+                    src={Bio2040Img}
+                    alt=""
+                    aria-hidden="true"
+                    className={classes.sliderImage}
+                  />
+                </Grid>
+                <Grid
+                  container
+                  item
+                  xs={12}
+                  sm={8}
+                  spacing={2}
+                  alignItems="flex-end"
+                  direction="column"
+                >
+                  <Grid item>
+                    <Typography
+                      component="div"
+                      variant="body1"
+                      className={classes.sliderTitle}
+                    >
+                      bio2040 Podcast: Opening up the opaque Peer Review Process
+                      with Sam & Daniela from PREreview
+                    </Typography>
+                    <Typography component="div" variant="body2">
+                      Want to learn about PREreview&apos;s first baby steps and
+                      what motivated us to work on this project? Listen to
+                      PREreview Co-Founders Drs. Samantha Hindle and Daniela
+                      Saderi talk about it in this 2018 interview with
+                      Entrepreneur and Angel Investor Flavio Rump.
+                    </Typography>
+                  </Grid>
+                  <Grid item>
+                    <Link
+                      href="https://bio2040.com/2018/04/09/opening-up-the-opaque-peer-review-process-with-sam-daniela-from-prereview/"
+                      target="_blank"
+                      rel="noreferrer"
+                      className={`${classes.gridLink} ${classes.sliderLink}`}
+                    >
+                      Read More
+                    </Link>
+                  </Grid>
+                </Grid>
+              </Grid>
             </Box>
-            <Box textAlign="center">
-              <Link
-                href="https://www.nomanifestos.com/episodes/4"
-                target="_blank"
-                rel="noreferrer"
+            <Box>
+              <Grid
+                container
+                spacing={4}
+                alignItems="flex-start"
+                justify="center"
               >
-                <span className={classes.vh}>No Manifestos interview</span>
-                <img
-                  src={NoManifestoImg}
-                  alt=""
-                  aria-hidden="true"
-                  className={classes.sliderImage}
-                />
-              </Link>
+                <Grid item xs={12} sm={4}>
+                  <img
+                    src={NoManifestoImg}
+                    alt=""
+                    aria-hidden="true"
+                    className={classes.sliderImage}
+                  />
+                </Grid>
+                <Grid
+                  container
+                  item
+                  xs={12}
+                  sm={8}
+                  spacing={2}
+                  alignItems="flex-end"
+                  direction="column"
+                >
+                  <Grid item>
+                    <Typography
+                      component="div"
+                      variant="body1"
+                      className={classes.sliderTitle}
+                    >
+                      No Manifesto Podcast: A chat with PREreview Co-Founder and
+                      Neuroscientist Daniela Saderi
+                    </Typography>
+                    <Typography component="div" variant="body2">
+                      Curious about the context PREreview started? Spoiler
+                      alert, it begins with a couple of somewhat frustrated but
+                      optimistic early-career (neuro)scientists.
+                    </Typography>
+                  </Grid>
+                  <Grid item>
+                    <Link
+                      href="https://www.nomanifestos.com/episodes/4"
+                      target="_blank"
+                      rel="noreferrer"
+                      className={`${classes.gridLink} ${classes.sliderLink}`}
+                    >
+                      Read More
+                    </Link>
+                  </Grid>
+                </Grid>
+              </Grid>
             </Box>
           </Slider>
         </Container>
