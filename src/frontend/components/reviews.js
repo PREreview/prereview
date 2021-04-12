@@ -306,7 +306,9 @@ export default function Reviews() {
               </Grid>
             </Box>
 
-            {preprints && preprints.totalCount > 0 ? (
+            {(preprints && preprints.totalCount > 0) ||
+            params.has('tags') ||
+            params.has('communities') ? (
               <Grid container spacing={3}>
                 {preprints ? (
                   <Grid item className={classes.formControl} xs spacing={2}>
