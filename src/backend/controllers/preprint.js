@@ -174,6 +174,9 @@ export default function controller(preprints, thisUser) {
       log.debug(`Retrieving preprints.`);
 
       let foundPreprints, count;
+      let requestCount = 0;
+      let rapidCount = 0;
+      let fullCount = 0;
       try {
         const populate = [
           'fullReviews',
@@ -280,12 +283,27 @@ export default function controller(preprints, thisUser) {
 
       if (!foundPreprints || count <= 0) {
         ctx.status = 204;
+      } else {
+        for (let preprint of foundPreprints) {
+          if (preprint.requests) {
+            requestCount = requestCount + preprint.requests.count();
+          }
+          if (preprint.rapidReviews) {
+            rapidCount = rapidCount + preprint.rapidReviews.count();
+          }
+          if (preprint.fullReviews) {
+            fullCount = fullCount + preprint.fullReviews.count();
+          }
+        }
       }
 
       ctx.body = {
         statusCode: 200,
         status: 'ok',
         totalCount: count,
+        totalRequests: requestCount,
+        totalRapid: rapidCount,
+        totalFull: fullCount,
         data: foundPreprints,
       };
     },

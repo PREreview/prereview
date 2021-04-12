@@ -17,6 +17,12 @@ export const processParams = search => {
       processed.append('sort', value);
     } else if (key.toLowerCase() === 'desc') {
       processed.append('desc', value === 'true');
+    } else if (key.toLowerCase() === 'badges') {
+      const badges = value ? value.split(',') : [];
+      processed.append('badges', badges);
+    } else if (key.toLowerCase() === 'communities') {
+      const communities = value ? value.split(',') : [];
+      processed.append('communities', communities);
     }
   }
 
