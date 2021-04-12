@@ -31,7 +31,6 @@ import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 
 // components
-import HeaderBar from './header-bar';
 import Link from '@material-ui/core/Link';
 import Loading from './loading';
 import NotFound from './not-found';
@@ -45,6 +44,7 @@ const drawerWidth = '40vw';
 const useStyles = makeStyles(theme => ({
   root: {
     display: 'flex',
+    whiteSpace: 'revert',
   },
   appBar: {
     transition: theme.transitions.create(['width', 'margin'], {
@@ -57,7 +57,7 @@ const useStyles = makeStyles(theme => ({
   appBarContent: {
     alignItems: 'center',
     display: 'flex',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-end',
     paddingLeft: 0,
     paddingRight: 0,
     width: '100%',
@@ -133,7 +133,6 @@ export default function ExtensionFallback() {
   const [user] = useContext(UserProvider.context);
 
   const [authors, setAuthors] = useState(null);
-  const [height, setHeight] = useState(0);
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(true);
   const [preprint, setPreprint] = useState(null);
@@ -151,12 +150,6 @@ export default function ExtensionFallback() {
   };
 
   useExtension(preprint && id);
-
-  useEffect(() => {
-    appBarElement && appBarElement.current
-      ? setHeight(appBarElement.current.clientHeight)
-      : null;
-  }, [appBarElement.current]);
 
   useEffect(() => {
     if (!loadingPreprint) {
@@ -199,14 +192,10 @@ export default function ExtensionFallback() {
               [classes.appBarShift]: open,
             })}
           >
-            <Toolbar className={classes.appBarContent}>
-              <Box
-                className={
-                  open ? classes.headerBarCondensed : classes.headerBarFull
-                }
-              >
-                <HeaderBar thisUser={user} />
-              </Box>
+            <Toolbar
+              className={classes.appBarContent}
+              style={open ? { minHeight: 0 } : null}
+            >
               <IconButton
                 color="inherit"
                 aria-label="open drawer"
@@ -220,7 +209,7 @@ export default function ExtensionFallback() {
               </IconButton>
             </Toolbar>
           </AppBar>
-          <main className={classes.content} style={{ marginTop: height}}>
+          <main className={classes.content}>
             <div className={classes.toolbar} />
             <object
               key={pdfUrl}

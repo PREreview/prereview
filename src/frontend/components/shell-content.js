@@ -17,6 +17,7 @@ import Typography from '@material-ui/core/Typography';
 
 // components
 import Controls from './controls';
+import HeaderBarReviews from './header-bar-reviews';
 import LoginRequiredModal from './login-required-modal';
 import PreprintPreview from './preprint-preview';
 import ReviewReader from './review-reader';
@@ -55,6 +56,11 @@ const useStyles = makeStyles(theme => ({
   appBar: {
     backgroundColor: '#fff',
     color: '#000',
+  },
+  headerBar: {
+    position: 'fixed',
+    top: 0,
+    width: '36vw',
   },
   root: {
     flexGrow: 1,
@@ -256,6 +262,9 @@ export default function ShellContent({ preprint, user, cid }) {
         />
       </Helmet>
       <div className={classes.root}>
+        <Box className={classes.headerBar}>
+          <HeaderBarReviews thisUser={user} />
+        </Box>
         <PreprintPreview preprint={preprint} />
         <AppBar position="static" className={classes.appBar}>
           <Tabs
