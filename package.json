@@ -189,6 +189,7 @@
     "log4js": "^6.3.0",
     "lru-cache": "^6.0.0",
     "match-sorter": "^4.2.0",
+    "material-table": "^1.69.2",
     "material-ui-search-bar": "^1.0.0",
     "moment": "^2.27.0",
     "ndjson": "^2.0.0",
