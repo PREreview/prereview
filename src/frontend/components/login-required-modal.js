@@ -97,6 +97,6 @@ export default function LoginRequiredModal({ onClose, open }) {
 }
 
 LoginRequiredModal.propTypes = {
-  open: PropTypes.string,
+  open: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]),
   onClose: PropTypes.func.isRequired,
 };

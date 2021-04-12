@@ -22,9 +22,9 @@ import Typography from '@material-ui/core/Typography';
 
 // utils
 import {
-  useDeleteTemplate,
-  useGetTemplates,
-  usePostTemplates,
+  useDeleteCommunityTemplates,
+  useGetCommunityTemplates,
+  usePostCommunityTemplates,
 } from '../hooks/api-hooks.tsx';
 
 // contexts
@@ -89,38 +89,23 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-export default function SettingsDrafts() {
-  const [user] = useContext(UserProvider.context);
-
-  useEffect(() => {}, [user]);
-
-  return (
-    <Box>
-      <Helmet>
-        <title>Settings • {ORG}</title>
-      </Helmet>
-
-      <HeaderBar thisUser={user} />
-
-      <Container>
-        <Box my={4}>
-          <Templates />
-        </Box>
-      </Container>
-    </Box>
-  );
-}
-
-function Templates() {
+export default function Templates({ community }) {
   const classes = useStyles();
 
   // fetch all templates from the API
   const [templates, setTemplates] = useState(null);
-  const [id, setId] = useState(undefined);
-  const { data: templatesData, loading: loading, error } = useGetTemplates();
+  const {
+    data: templatesData,
+    loading: loading,
+    error,
+  } = useGetCommunityTemplates({
+    cid: community.uuid,
+  });
 
   // post new template via the API
-  const { mutate: postTemplate } = usePostTemplates();
+  const { mutate: postTemplate } = usePostCommunityTemplates({
+    cid: community.uuid,
+  });
 
   // template content
   const [title, setTitle] = useState('');
@@ -191,16 +176,13 @@ function Templates() {
         setTemplates(templatesData.data);
       }
     }
-  }, [id, templates, templatesData, title, content]);
+  }, [templates, templatesData, title, content]);
 
   if (loading) {
     return <CircularProgress className={classes.spinning} />;
   } else {
     return (
       <>
-        <Typography component="h2" variant="h2">
-          Review Templates
-        </Typography>
         <Box my={2} p={2} className={classes.info}>
           <Typography component="div" variant="body1">
             <InfoOutlinedIcon className={classes.infoIcon} />
@@ -281,6 +263,7 @@ function Templates() {
                     <SettingsRow
                       key={template.uuid}
                       template={template}
+                      community={community}
                       onDelete={() => {
                         setTemplates(
                           templates.filter(t => t.uuid !== template.uuid),
@@ -297,16 +280,17 @@ function Templates() {
   }
 }
 
-function SettingsRow({ template, onDelete }) {
+function SettingsRow({ template, community, onDelete }) {
   // template content
   const [title, setTitle] = useState(template.title);
   const [content, setContent] = useState(template.content);
 
   // delete template from the database
-  const { mutate: deleteTemplate } = useDeleteTemplate({
+  const { mutate: deleteTemplate } = useDeleteCommunityTemplates({
     queryParams: {
       id: template.uuid,
     },
+    cid: community.uuid,
   });
 
   return (

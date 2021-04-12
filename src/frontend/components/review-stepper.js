@@ -1,5 +1,5 @@
 // base imports
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useHistory, useLocation, useParams } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import ReactHtmlParser, { convertNodeToElement } from 'react-html-parser';
@@ -36,9 +36,12 @@ import Typography from '@material-ui/core/Typography';
 
 import { v4 as uuidv4 } from 'uuid';
 
-// utils
+// contexts
+import UserProvider from '../contexts/user-context';
+
+// hooks
 import {
-  useGetTemplates,
+  useGetUserTemplates,
   usePostFullReviews,
   usePostRapidReviews,
   usePutFullReview,
@@ -263,6 +266,7 @@ export default function ReviewStepper({
   const location = useLocation();
   const classes = useStyles();
   const { cid } = useParams();
+  const [thisUser, setThisUser] = useContext(UserProvider.context);
   const [activeStep, setActiveStep] = useState(0);
   const [answerMap, setAnswerMap] = useState({});
   const [completed, setCompleted] = useState(new Set());
@@ -272,7 +276,9 @@ export default function ReviewStepper({
   const [skipped, setSkipped] = useState(new Set());
   const steps = getSteps();
   // API queries
-  const { data: templates } = useGetTemplates();
+  const { data: templates } = useGetUserTemplates({
+    uid: thisUser.uuid,
+  });
   const { mutate: postRapidReview } = usePostRapidReviews();
   const { mutate: postLongReview, loading } = usePostFullReviews();
   const { mutate: putLongReview } = usePutFullReview({ id: cid });
