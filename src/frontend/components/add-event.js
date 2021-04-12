@@ -8,6 +8,7 @@ import {
   MuiPickersUtilsProvider,
   KeyboardDatePicker,
   KeyboardTimePicker,
+  DateTimePicker,
 } from '@material-ui/pickers';
 import Checkbox from '@material-ui/core/Checkbox';
 import DateFnsUtils from '@date-io/date-fns';
@@ -92,13 +93,22 @@ const AddEvent = ({ community, addEvent }) => {
   };
 
   /* Date picker */
-  const [selectedDate, setSelectedDate] = React.useState(new Date());
+  const [selectedStart, setSelectedStart] = React.useState(null);
+  const [selectedEnd, setSelectedEnd] = React.useState(null);
 
-  const handleDateChange = date => {
-    setSelectedDate(date);
+  const handleStartChange = date => {
+    setSelectedStart(date);
     setInputs(inputs => ({
       ...inputs,
       start: date,
+    }));
+  };
+
+  const handleEndChange = date => {
+    setSelectedEnd(date);
+    setInputs(inputs => ({
+      ...inputs,
+      end: date,
     }));
   };
 
@@ -116,8 +126,7 @@ const AddEvent = ({ community, addEvent }) => {
     if (canSubmit()) {
       addCommunityEvent(inputs)
         .then(addEvent(inputs))
-        .then(response => {
-          console.log(response);
+        .then(() => {
           handleClose();
           alert(`Event added successfully.`);
           return;
@@ -179,29 +188,35 @@ const AddEvent = ({ community, addEvent }) => {
               onChange={handleInputChange}
             />
             <MuiPickersUtilsProvider utils={DateFnsUtils}>
-              <KeyboardDatePicker
+              <DateTimePicker
                 required
+                autoOk
                 margin="normal"
                 id="start"
                 name="start"
-                label="Date"
-                format="MM/dd/yyyy"
-                value={selectedDate}
+                label="Start"
+                inputformat="yyyy/MM/dd hh:mm a"
+                value={selectedStart}
                 className={classes.dateField}
-                onChange={handleDateChange}
-                KeyboardButtonProps={{
+                onChange={handleStartChange}
+                keyboardbuttonprops={{
                   'aria-label': 'change date',
                 }}
               />
-              <KeyboardTimePicker
-                required
+            </MuiPickersUtilsProvider>
+            <MuiPickersUtilsProvider utils={DateFnsUtils}>
+              <DateTimePicker
+                autoOk
                 margin="normal"
-                id="time-picker"
-                label="Time"
-                value={selectedDate}
-                onChange={handleDateChange}
-                KeyboardButtonProps={{
-                  'aria-label': 'change time',
+                id="end"
+                name="end"
+                label="End"
+                inputformat="yyyy/MM/dd hh:mm a"
+                value={selectedEnd}
+                className={classes.dateField}
+                onChange={handleEndChange}
+                keyboardbuttonprops={{
+                  'aria-label': 'change date',
                 }}
               />
             </MuiPickersUtilsProvider>
@@ -209,7 +224,7 @@ const AddEvent = ({ community, addEvent }) => {
               control={
                 <Checkbox
                   color="primary"
-                  checked={inputs.isPrivate}
+                  checked={inputs.isPrivate || false}
                   onChange={handleCheckedChange}
                   name="isPrivate"
                 />
@@ -234,7 +249,7 @@ const AddEvent = ({ community, addEvent }) => {
 
 AddEvent.propTypes = {
   community: PropTypes.string,
-  addEvent: PropTypes.function,
+  addEvent: PropTypes.func,
 };
 
 export default AddEvent;

@@ -192,8 +192,8 @@ const Search = ({
             }
             throw new Error(response.message);
           })
-          .then(() => {
-            handleClose();
+          .then(result => {
+            handleClose(result.data);
             alert('Moderator(s) successfully added to community.');
             return;
           })
@@ -204,7 +204,6 @@ const Search = ({
 
   // add users to a community if a community is present
   const handleAddUsers = () => {
-    console.log(community);
     if (value.length) {
       value.map(user => {
         fetch(`/api/v2/communities/${community}/members/${user.uuid}`, {
@@ -216,8 +215,8 @@ const Search = ({
             }
             throw new Error(response.message);
           })
-          .then(() => {
-            handleClose();
+          .then(result => {
+            handleClose(result.data);
             alert('User(s) successfully added to community.');
             return;
           })
@@ -321,7 +320,7 @@ Search.propTypes = {
   isMentor: PropTypes.bool,
   isModerator: PropTypes.bool,
   reviewId: PropTypes.string,
-  users: PropTypes.array.isRequired,
+  users: PropTypes.array,
 };
 
 export default Search;

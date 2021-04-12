@@ -1,7 +1,7 @@
 // base imports
-import React, { useContext, useEffect, useState } from 'react';
+import React, { createRef, useContext, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { useParams } from 'react-router-dom';
+import { useHistory, useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { useIntl } from 'react-intl';
 
@@ -25,6 +25,7 @@ import AddUser from './add-user';
 import HeaderBar from './header-bar';
 import Loading from './loading';
 import NotFound from './not-found';
+import TemplateSettings from './settings-templates';
 
 // Material-ui components
 import { makeStyles } from '@material-ui/core/styles';
@@ -63,6 +64,7 @@ const useStyles = makeStyles(theme => ({
     marginBottom: '1rem',
   },
   button: {
+    marginRight: 10,
     textTransform: 'none',
   },
   textField: {
@@ -73,6 +75,8 @@ const useStyles = makeStyles(theme => ({
 
 const CommunityPanel = () => {
   const classes = useStyles();
+  const history = useHistory();
+
   const { id } = useParams();
   const [user] = useContext(UserProvider.context);
 
@@ -80,6 +84,7 @@ const CommunityPanel = () => {
 
   const [loading, setLoading] = useState(true);
   const [community, setCommunity] = useState(null);
+  const bannerRef = createRef(null);
 
   /* API calls*/
   // fetch community
@@ -95,24 +100,6 @@ const CommunityPanel = () => {
     id: id,
   });
 
-  const readFileDataAsBase64 = e => {
-    const file = e.target.files[0];
-
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-
-      reader.onload = event => {
-        resolve(event.target.result);
-      };
-
-      reader.onerror = err => {
-        reject(err);
-      };
-
-      reader.readAsDataURL(file);
-    });
-  };
-
   // update inputs with new values
   const handleInputChange = event => {
     event.persist();
@@ -122,27 +109,56 @@ const CommunityPanel = () => {
     }));
   };
 
+  // return to community page
+  const handleBack = () => {
+    history.push(`/communities/${community.uuid}`);
+  };
+
   // save banner and description to API
   const handleSubmit = () => {
-    updateCommunity(inputs)
+    const submit = inputs || {};
+    if (submit.twitter && submit.twitter.charAt(0) === '@') {
+      submit.twitter = submit.twitter.slice(1);
+    }
+    updateCommunity(submit)
       .then(() => alert(`Community updated successfully.`))
       .catch(err => alert(`An error occurred: ${err.message}`));
   };
 
   // handle banner change differently because it is more complex
   const handleBannerChange = event => {
-    readFileDataAsBase64(event)
-      .then(response => {
-        setInputs(inputs => ({
-          ...inputs,
-          banner: response,
-        }));
-        return response;
-      })
-      .catch(error => {
-        console.error('error:', error);
-        throw Error(error.statusText);
-      });
+    const newBanner = event.target.files[0];
+    const reader = new FileReader();
+    reader.onload = e => {
+      if (community.banner) {
+        URL.revokeObjectURL(community.banner);
+        bannerRef.current.value = null;
+      }
+      setInputs({ ...inputs, banner: e.target.result });
+      setCommunity({ ...community, banner: URL.createObjectURL(newBanner) });
+    };
+    reader.onerror = err => {
+      alert(`An error occurred: ${err.message}`);
+    };
+    if (newBanner) {
+      reader.readAsDataURL(newBanner);
+    }
+  };
+
+  const handleAddUser = (user, isOwner) => {
+    let oldUsers, users, newCommunity;
+    if (user && user.uuid) {
+      if (isOwner) {
+        oldUsers = community.owners;
+        users = [...oldUsers, user];
+        newCommunity = { ...community, owners: users };
+      } else {
+        oldUsers = community.members;
+        users = [...oldUsers, user];
+        newCommunity = { ...community, members: users };
+      }
+      setCommunity(newCommunity);
+    }
   };
 
   const handleDeleteOwner = owner => {
@@ -159,11 +175,25 @@ const CommunityPanel = () => {
     setCommunity({ ...community, members });
   };
 
+  const handleAddEvent = event => {
+    const oldEvents = community.events;
+    const events = [...oldEvents, event];
+    const newCommunity = { ...community, events };
+    setCommunity(newCommunity);
+  };
+
   const handleDeleteEvent = event => {
     const { events: oldEvents } = community;
 
     const events = oldEvents.filter(e => e.uuid !== event.uuid);
     setCommunity({ ...community, events });
+  };
+
+  const handleAddTag = tag => {
+    const oldTags = community.tags;
+    const tags = [...oldTags, tag];
+    const newCommunity = { ...community, tags };
+    setCommunity(newCommunity);
   };
 
   const handleDeleteTag = tag => {
@@ -182,6 +212,8 @@ const CommunityPanel = () => {
     }
   }, [loadingCommunity, communityData]);
 
+  useEffect(() => {}, [community]);
+
   if (loading) {
     return <Loading />;
   } else if (errorCommunity) {
@@ -196,7 +228,7 @@ const CommunityPanel = () => {
         <HeaderBar thisUser={user} />
         <section>
           <Container
-            maxWidth="false"
+            maxWidth={false}
             style={
               community.banner
                 ? {
@@ -224,11 +256,12 @@ const CommunityPanel = () => {
                   Banner
                 </Typography>
                 <img
-                  src={inputs.banner || community.banner || ''}
+                  src={community.banner || inputs.banner || ''}
                   aria-hidden="true"
                   className={classes.bannerUpload}
                 />
                 <Button
+                  ref={bannerRef}
                   color="primary"
                   variant="outlined"
                   component="label"
@@ -255,6 +288,19 @@ const CommunityPanel = () => {
                   className={classes.textField}
                   onChange={handleInputChange}
                 />
+                <Typography variant="h4" component="h2" gutterBottom={true}>
+                  Twitter Handle
+                </Typography>
+                <TextField
+                  id="twitter"
+                  name="twitter"
+                  label="Enter a Twitter handle for this community"
+                  rows={1}
+                  defaultValue={community.twitter || ''}
+                  variant="outlined"
+                  className={classes.textField}
+                  onChange={handleInputChange}
+                />
                 <Button
                   color="primary"
                   variant="contained"
@@ -264,72 +310,102 @@ const CommunityPanel = () => {
                 >
                   Save
                 </Button>
+                <Button
+                  color="primary"
+                  variant="outlined"
+                  component="label"
+                  className={classes.button}
+                  onClick={handleBack}
+                >
+                  Back
+                </Button>
               </Box>
               <Box mb={4}>
                 <Typography variant="h4" component="h2" gutterBottom={true}>
                   Moderators
                 </Typography>
-                <AddUser community={community} isModerator={true} />
-                {community.owners.map(owner => {
-                  return (
-                    <DeleteCommunityMember
-                      key={owner.uuid}
-                      communityId={community.uuid}
-                      member={owner}
-                      deleteMember={handleDeleteOwner}
-                      isOwner={true}
-                    />
-                  );
-                })}
+                <AddUser
+                  addUser={handleAddUser}
+                  community={community}
+                  isModerator={true}
+                />
+                {community.owners && community.owners.length
+                  ? community.owners.map(owner => {
+                      return (
+                        <DeleteCommunityMember
+                          key={owner.uuid}
+                          communityId={community.uuid}
+                          member={owner}
+                          deleteMember={handleDeleteOwner}
+                          isOwner={true}
+                        />
+                      );
+                    })
+                  : null}
               </Box>
               <Box mb={4}>
                 <Typography variant="h4" component="h2" gutterBottom={true}>
                   Users
                 </Typography>
-                <AddUser community={community} />
-                {community.members.map(member => {
-                  return (
-                    <DeleteCommunityMember
-                      key={member.uuid}
-                      communityId={community.uuid}
-                      member={member}
-                      deleteMember={handleDeleteMember}
-                      isOwner={false}
-                    />
-                  );
-                })}
+                <AddUser community={community} addUser={handleAddUser} />
+                {community.members && community.members.length
+                  ? community.members.map(member => {
+                      return (
+                        <DeleteCommunityMember
+                          key={member.uuid}
+                          communityId={community.uuid}
+                          member={member}
+                          deleteMember={handleDeleteMember}
+                          isOwner={false}
+                        />
+                      );
+                    })
+                  : null}
               </Box>
               <Box mb={4}>
                 <Typography variant="h4" component="h2" gutterBottom={true}>
                   Events
                 </Typography>
-                <AddEvent community={community.uuid} />
-                {community.events.map(event => {
-                  return (
-                    <DeleteCommunityEvent
-                      key={event.uuid}
-                      communityId={community.uuid}
-                      deleteEvent={handleDeleteEvent}
-                      event={event}
-                    />
-                  );
-                })}
+                <AddEvent
+                  community={community.uuid}
+                  addEvent={handleAddEvent}
+                />
+                {community.events && community.events.length
+                  ? community.events.map(event => {
+                      return (
+                        <CommunityEvent
+                          key={event.uuid}
+                          communityId={community.uuid}
+                          deleteEvent={handleDeleteEvent}
+                          event={event}
+                        />
+                      );
+                    })
+                  : null}
               </Box>
               <Box mb={4}>
                 <Typography variant="h4" component="h2" gutterBottom={true}>
                   Tags
                 </Typography>
-                <AddTag community={community.uuid} />
-                {community.tags.map(tag => {
-                  return (
-                    <DeleteCommunityTag
-                      key={tag.uuid}
-                      communityId={community.uuid}
-                      deleteTag={handleDeleteTag}
-                      tag={tag}
-                    />
-                  );
-                })}
+                <AddTag community={community.uuid} addTag={handleAddTag} />
+                {community.tags && community.tags.length
+                  ? community.tags.map(tag => {
+                      return (
+                        <DeleteCommunityTag
+                          key={tag.uuid}
+                          communityId={community.uuid}
+                          deleteTag={handleDeleteTag}
+                          tag={tag}
+                        />
+                      );
+                    })
+                  : null}
+              </Box>
+              <Box mb={4}>
+                <Typography variant="h4" component="h2" gutterBottom={true}>
+                  Templates
+                </Typography>
+                <TemplateSettings community={community} />
               </Box>
             </form>
           </Container>
@@ -423,11 +499,11 @@ DeleteCommunityMember.propTypes = {
     avatar: PropTypes.object,
     uuid: PropTypes.string,
   }),
-  deleteMember: PropTypes.function,
+  deleteMember: PropTypes.func,
   isOwner: PropTypes.bool,
 };
 
-function DeleteCommunityEvent({ communityId, event, deleteEvent }) {
+function CommunityEvent({ communityId, event, deleteEvent }) {
   const intl = useIntl();
 
   const { mutate: deleteCommunityEvent } = useDeleteCommunityEvent({
@@ -490,14 +566,14 @@ function DeleteCommunityEvent({ communityId, event, deleteEvent }) {
   );
 }
 
-DeleteCommunityEvent.propTypes = {
+CommunityEvent.propTypes = {
   communityId: PropTypes.string,
   event: PropTypes.shape({
     title: PropTypes.string,
     start: PropTypes.date,
     uuid: PropTypes.string,
   }),
-  deleteEvent: PropTypes.function,
+  deleteEvent: PropTypes.func,
 };
 
 function DeleteCommunityTag({ communityId, tag, deleteTag }) {
@@ -548,7 +624,7 @@ DeleteCommunityTag.propTypes = {
     color: PropTypes.string,
     uuid: PropTypes.string,
   }),
-  deleteTag: PropTypes.function,
+  deleteTag: PropTypes.func,
 };
 
 export default CommunityPanel;

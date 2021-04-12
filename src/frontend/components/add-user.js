@@ -44,7 +44,7 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const AddUsers = ({ community, isModerator }) => {
+const AddUsers = ({ community, isModerator, addUser }) => {
   const classes = useStyles();
 
   const [users, setUsers] = useState(null);
@@ -60,7 +60,8 @@ const AddUsers = ({ community, isModerator }) => {
     setOpen(true);
   };
 
-  const handleClose = () => {
+  const handleClose = user => {
+    addUser(user, isModerator);
     setOpen(false);
   };
 
@@ -101,6 +102,7 @@ const AddUsers = ({ community, isModerator }) => {
 AddUsers.propTypes = {
   community: PropTypes.object,
   isModerator: PropTypes.bool,
+  addUser: PropTypes.func,
 };
 
 export default AddUsers;
