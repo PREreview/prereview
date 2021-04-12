@@ -17,7 +17,7 @@ import Typography from '@material-ui/core/Typography';
 
 // components
 import Controls from './controls';
-//import ModerationModal from './moderation-modal';
+import LoginRequiredModal from './login-required-modal';
 import PreprintPreview from './preprint-preview';
 import ReviewReader from './review-reader';
 import ReviewStepper from './review-stepper';
@@ -98,6 +98,7 @@ export default function ShellContent({ preprint, user, cid }) {
 
   const [longContent, setLongContent] = useState('');
   const [initialContent, setInitialContent] = useState('');
+  const [open, setOpen] = useState(null);
 
   const onContentChange = value => {
     setInitialContent(value);
@@ -105,7 +106,7 @@ export default function ShellContent({ preprint, user, cid }) {
 
   const onCloseRequest = () => {
     setNewRequest(true);
-    setTab('read');
+    setTab(0);
   };
 
   const onReviewChange = review => {
@@ -113,6 +114,9 @@ export default function ShellContent({ preprint, user, cid }) {
   };
 
   const handleChange = (event, newValue) => {
+    if (!user && newValue !== 0) {
+      setOpen(true);
+    }
     setTab(newValue);
   };
 
@@ -271,36 +275,56 @@ export default function ShellContent({ preprint, user, cid }) {
           />
         </TabPanel>
         <TabPanel value={tab} index={1}>
-          <ShellContentReviews
-            cid={cid}
-            review={review}
-            user={user}
-            preprint={preprint}
-            onClose={onCloseReviews}
-            onContentChange={onContentChange}
-            onReviewChange={onReviewChange}
-            hasRapidReviewed={hasRapidReviewed}
-            hasLongReviewed={hasLongReviewed}
-            initialContent={initialContent}
-          />
+          {user ? (
+            <ShellContentReviews
+              cid={cid}
+              review={review}
+              user={user}
+              preprint={preprint}
+              onClose={onCloseReviews}
+              onContentChange={onContentChange}
+              onReviewChange={onReviewChange}
+              hasRapidReviewed={hasRapidReviewed}
+              hasLongReviewed={hasLongReviewed}
+              initialContent={initialContent}
+            />
+          ) : (
+            <LoginRequiredModal
+              open={open}
+              onClose={() => {
+                setOpen(null);
+                setTab(0);
+              }}
+            />
+          )}
         </TabPanel>
         <TabPanel value={tab} index={2}>
-          <ShellContentRequest
-            user={user}
-            preprint={preprint}
-            onSubmit={preprint => {
-              postReviewRequest({ preprint: preprint.uuid })
-                .then(() => {
-                  alert('PREreview request submitted successfully.');
-                  return onCloseRequest();
-                })
-                .catch(err => alert(`An error occurred: ${err.message}`));
-            }}
-            isPosting={loadingPostReviewRequest}
-            error={errorPostReviewRequest}
-            hasRequested={hasRequested}
-            newRequest={newRequest}
-          />
+          {user ? (
+            <ShellContentRequest
+              user={user}
+              preprint={preprint}
+              onSubmit={preprint => {
+                postReviewRequest({ preprint: preprint.uuid })
+                  .then(() => {
+                    alert('PREreview request submitted successfully.');
+                    return onCloseRequest();
+                  })
+                  .catch(err => alert(`An error occurred: ${err.message}`));
+              }}
+              isPosting={loadingPostReviewRequest}
+              error={errorPostReviewRequest}
+              hasRequested={hasRequested}
+              newRequest={newRequest}
+            />
+          ) : (
+            <LoginRequiredModal
+              open={open}
+              onClose={() => {
+                setOpen(null);
+                setTab(0);
+              }}
+            />
+          )}
         </TabPanel>
       </div>
     </>
