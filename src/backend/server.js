@@ -249,16 +249,12 @@ export default async function configServer(config) {
     });
   }
 
+  // Manual override of domain to allow for outbreaksci.* subdomain
+  const sessionOpts = config.isProd ? { domain: 'prereview.org' } : {};
+
   server
     .use(bodyParser({ multipart: true, jsonLimit: '50mb' }))
-    .use(
-      session(
-        {
-          domain: 'prereview.org',
-        },
-        server,
-      ),
-    )
+    .use(session(sessionOpts, server))
     .use(passport.initialize())
     .use(passport.session())
     .use(cors())

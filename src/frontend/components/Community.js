@@ -234,6 +234,7 @@ export default function Community(props) {
             description={community.description}
             members={community.members}
             membersLimit={5}
+            twitter={community.twitter}
           />
           {/* FIXME add to community header twitter={community.twitter }*/}
           <Box bgcolor="rgba(229, 229, 229, 0.35)">
@@ -271,6 +272,7 @@ export default function Community(props) {
                       community.members.length > 0 && (
                         <Box mb={2}>
                           <CommunityPersonas
+                            community={community}
                             title="Members"
                             personas={community.members}
                             isSearchable="true"
@@ -292,6 +294,7 @@ export default function Community(props) {
                       community.owners.length > 0 && (
                         <Box mb={2}>
                           <CommunityPersonas
+                            community={community}
                             title="Moderators"
                             personas={community.owners}
                             isSearchable="false"
@@ -319,7 +322,7 @@ function CommunityHeader({
   description,
   members,
   membersLimit = 5,
-  //twitter FIXME,
+  twitter,
 }) {
   const classes = useStyles();
 
@@ -362,13 +365,15 @@ function CommunityHeader({
             <Typography variant="h5" color="textSecondary" paragraph>
               {description}
             </Typography>
-            <Typography component="div" variant="body1">
-              <Link href="#">
-                {/* FIXME href={twitter}*/}
-                <TwitterIcon />
-                Twitter handle goes here FIXME
-              </Link>
-            </Typography>
+            {twitter && (
+              <Typography component="div" variant="body1">
+                <Link href={`https://twitter.com/${twitter}`}>
+                  <TwitterIcon />
+                  {twitter.charAt(0) !== '@' ? '@' : ''}
+                  {twitter}
+                </Link>
+              </Typography>
+            )}
           </Box>
         </Container>
       </Box>
@@ -384,7 +389,12 @@ CommunityHeader.propTypes = {
   membersLimit: PropTypes.number.isRequired,
 };
 
-function CommunityPersonas({ title, personas, isSearchable = false }) {
+function CommunityPersonas({
+  community,
+  title,
+  personas,
+  isSearchable = false,
+}) {
   const classes = useStyles();
 
   const [open, setOpen] = useState(false);
@@ -433,13 +443,23 @@ function CommunityPersonas({ title, personas, isSearchable = false }) {
           })}
         </Grid>
         <Box borderTop={'1px solid #DADADA'} mt={2} pt={2} textAlign="center">
-          <Button
-            color="secondary"
-            className={classes.button}
-            onClick={handleOpen}
-          >
-            See All {title}
-          </Button>
+          {title === 'Members' ? (
+            <Button
+              color="secondary"
+              className={classes.button}
+              href={`/personas?communities=${community.slug}`}
+            >
+              See All {title}
+            </Button>
+          ) : (
+            <Button
+              color="secondary"
+              className={classes.button}
+              onClick={handleOpen}
+            >
+              See All {title}
+            </Button>
+          )}
           <Modal
             open={open}
             onClose={handleClose}
@@ -674,10 +694,11 @@ function CommunityContent({ thisUser, community, params }) {
               <Typography component="div" variant="body1">
                 <InfoOutlinedIcon className={classes.infoIcon} />
                 This is a platform for the crowdsourcing of preprint reviews.
-                Use the search bar below to find preprints that already have
-                reviews or requests for reviews. To add your own review or
-                request, use the Add Review | Request Review button, paste the
-                preprint DOI and follow the instructions.
+                Use the search bar below to find preprints in this community
+                that already have reviews or requests for reviews. To add your
+                own review or request to this community, use the Add Review |
+                Request Review button, paste the preprint DOI and follow the
+                instructions.
               </Typography>
             </Box>
           </Grid>
@@ -730,8 +751,9 @@ function CommunityContent({ thisUser, community, params }) {
               </Grid>
               <Grid item xs={12} sm={6}>
                 <Box align="right">
-                  {thisUser.isAdmin ||
-                  (thisUser.defaultPersona &&
+                  {(thisUser && thisUser.isAdmin) ||
+                  (thisUser &&
+                    thisUser.defaultPersona &&
                     thisUser.defaultPersona.communities &&
                     Array.isArray(thisUser.defaultPersona.communities) &&
                     thisUser.defaultPersona.communities.some(

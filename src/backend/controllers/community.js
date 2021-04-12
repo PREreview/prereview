@@ -11,6 +11,7 @@ const communitySchema = Joi.object({
   name: Joi.string(),
   description: Joi.string(),
   banner: Joi.string(),
+  twitter: Joi.string().regex(/^[a-zA-Z0-9_]{1,15}$/),
 });
 
 const eventSchema = Joi.object({
@@ -261,7 +262,7 @@ export default function controller(
           {
             $or: [{ uuid: ctx.params.id }, { slug: ctx.params.id }],
           },
-          ['members', 'preprints', 'owners', 'tags', 'events'],
+          ['members', 'preprints', 'owners', 'tags', 'events', 'templates'],
         );
         if (!community) {
           ctx.throw(404, `Community with ID ${ctx.params.id} doesn't exist`);

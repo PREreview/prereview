@@ -660,16 +660,6 @@ export default function HeaderBar({ thisUser }) {
 
                     {thisUser.isAdmin && (
                       <Link
-                        to={process.env.IS_EXTENSION ? undefined : '/templates'}
-                        href={`/templates`}
-                        target={process.env.IS_EXTENSION ? '_blank' : undefined}
-                      >
-                        Templates Settings
-                      </Link>
-                    )}
-
-                    {thisUser.isAdmin && (
-                      <Link
                         to={process.env.IS_EXTENSION ? undefined : '/block'}
                         href={`/block`}
                         target={process.env.IS_EXTENSION ? '_blank' : undefined}

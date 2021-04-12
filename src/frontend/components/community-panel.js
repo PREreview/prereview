@@ -25,6 +25,7 @@ import AddUser from './add-user';
 import HeaderBar from './header-bar';
 import Loading from './loading';
 import NotFound from './not-found';
+import TemplateSettings from './settings-templates';
 
 // Material-ui components
 import { makeStyles } from '@material-ui/core/styles';
@@ -115,7 +116,11 @@ const CommunityPanel = () => {
 
   // save banner and description to API
   const handleSubmit = () => {
-    updateCommunity(inputs)
+    const submit = inputs || {};
+    if (submit.twitter && submit.twitter.charAt(0) === '@') {
+      submit.twitter = submit.twitter.slice(1);
+    }
+    updateCommunity(submit)
       .then(() => alert(`Community updated successfully.`))
       .catch(err => alert(`An error occurred: ${err.message}`));
   };
@@ -141,16 +146,19 @@ const CommunityPanel = () => {
   };
 
   const handleAddUser = (user, isOwner) => {
-    let oldUsers, users;
-    if (isOwner) {
-      oldUsers = community.owners;
-      users = [...oldUsers, user];
-    } else {
-      oldUsers = community.members;
-      users = [...oldUsers, user];
+    let oldUsers, users, newCommunity;
+    if (user && user.uuid) {
+      if (isOwner) {
+        oldUsers = community.owners;
+        users = [...oldUsers, user];
+        newCommunity = { ...community, owners: users };
+      } else {
+        oldUsers = community.members;
+        users = [...oldUsers, user];
+        newCommunity = { ...community, members: users };
+      }
+      setCommunity(newCommunity);
     }
-    const newCommunity = { ...community, users };
-    setCommunity(newCommunity);
   };
 
   const handleDeleteOwner = owner => {
@@ -280,6 +288,19 @@ const CommunityPanel = () => {
                   className={classes.textField}
                   onChange={handleInputChange}
                 />
+                <Typography variant="h4" component="h2" gutterBottom={true}>
+                  Twitter Handle
+                </Typography>
+                <TextField
+                  id="twitter"
+                  name="twitter"
+                  label="Enter a Twitter handle for this community"
+                  rows={1}
+                  defaultValue={community.twitter || ''}
+                  variant="outlined"
+                  className={classes.textField}
+                  onChange={handleInputChange}
+                />
                 <Button
                   color="primary"
                   variant="contained"
@@ -379,6 +400,12 @@ const CommunityPanel = () => {
                       );
                     })
                   : null}
+              </Box>
+              <Box mb={4}>
+                <Typography variant="h4" component="h2" gutterBottom={true}>
+                  Templates
+                </Typography>
+                <TemplateSettings community={community} />
               </Box>
             </form>
           </Container>

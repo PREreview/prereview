@@ -33,14 +33,22 @@ export default function controller(templateModel, communityModel, thisUser) {
 
   // handler for GET multiple templates
   const getHandler = async ctx => {
-    let templates, cid; // cid = community ID
+    let templates, cid, uid; // cid = community ID
 
     ctx.params.cid ? (cid = ctx.params.cid) : null;
+    ctx.params.uid ? (uid = ctx.params.uid) : null;
 
     try {
       if (cid) {
-        log.debug(`Retrieving templates related to review ${cid}.`);
-        templates = await templateModel.find({ community: cid });
+        log.debug(`Retrieving templates related to community ${cid}.`);
+        templates = await templateModel.find({ community: { uuid: cid } });
+      } else if (uid) {
+        log.debug(`Retrieving templates related to user ${uid}.`);
+        templates = await templateModel.find({
+          community: {
+            members: { identity: { $or: [{ uuid: uid }, { orcid: uid }] } },
+          },
+        });
       } else {
         log.debug(`Retrieving all templates.`);
         templates = await templateModel.findAll();
@@ -69,7 +77,7 @@ export default function controller(templateModel, communityModel, thisUser) {
 
     try {
       if (cid) {
-        community = await communityModel.findOne(cid);
+        community = await communityModel.findOne({ uuid: cid });
       }
     } catch (err) {
       log.error(`HTTP 400 error: ${err}`);
@@ -88,7 +96,7 @@ export default function controller(templateModel, communityModel, thisUser) {
         ctx.body = {
           status: 201,
           message: 'created',
-          body: template,
+          data: template,
         };
 
         ctx.status = 201;
@@ -120,7 +128,7 @@ export default function controller(templateModel, communityModel, thisUser) {
   templatesRouter.route({
     method: 'GET',
     path: '/templates',
-    pre: thisUser.can('access private pages'),
+    pre: thisUser.can('access admin pages'),
     validate: {
       query: querySchema,
       continueOnError: true,
@@ -143,7 +151,7 @@ export default function controller(templateModel, communityModel, thisUser) {
   templatesRouter.route({
     method: 'GET',
     path: '/communities/:cid/templates',
-    pre: thisUser.can('access private pages'),
+    pre: thisUser.can('access this community'),
     validate: {
       query: querySchema,
     },
@@ -151,6 +159,23 @@ export default function controller(templateModel, communityModel, thisUser) {
     meta: {
       swagger: {
         operationId: 'GetCommunityTemplates',
+        summary:
+          'Endpoint to GET all templates related to a specific community.',
+      },
+    },
+  });
+
+  templatesRouter.route({
+    method: 'GET',
+    path: '/users/:uid/templates',
+    pre: thisUser.can('edit this user'),
+    validate: {
+      query: querySchema,
+    },
+    handler: async ctx => await getHandler(ctx),
+    meta: {
+      swagger: {
+        operationId: 'GetUserTemplates',
         summary:
           'Endpoint to GET all templates related to a specific community.',
       },
@@ -179,7 +204,7 @@ export default function controller(templateModel, communityModel, thisUser) {
   templatesRouter.route({
     method: 'POST',
     path: '/templates',
-    pre: thisUser.can('access private pages'),
+    pre: thisUser.can('access admin pages'),
     validate: {
       body: templateSchema,
       type: 'json',
@@ -198,7 +223,7 @@ export default function controller(templateModel, communityModel, thisUser) {
   templatesRouter.route({
     method: 'GET',
     path: '/templates/:id',
-    pre: thisUser.can('access private pages'),
+    pre: thisUser.can('access admin pages'),
     validate: {},
     handler: async ctx => {
       log.debug(`Retrieving template ${ctx.params.id}.`);
@@ -234,7 +259,7 @@ export default function controller(templateModel, communityModel, thisUser) {
   templatesRouter.route({
     method: 'PUT',
     path: '/templates/:id',
-    pre: thisUser.can('access private pages'),
+    pre: thisUser.can('access admin pages'),
     validate: {
       body: templateSchema,
       type: 'json',
@@ -283,13 +308,86 @@ export default function controller(templateModel, communityModel, thisUser) {
   templatesRouter.route({
     meta: {
       swagger: {
+        operationId: 'DeleteCommunityTemplates',
+        summary: 'Endpoint to DELETE a template from a community.',
+      },
+    },
+    method: 'DELETE',
+    path: '/communities/:cid/templates',
+    pre: thisUser.can('access admin pages'),
+    validate: {
+      query: {
+        id: Joi.string()
+          .description('Template id')
+          .required(),
+      },
+      params: {
+        cid: Joi.string()
+          .description('Community id')
+          .required(),
+      },
+      type: 'json',
+      continueOnError: true,
+    },
+    handler: async ctx => {
+      log.debug(`Removing template with ID ${ctx.query.id}`);
+      let community, template;
+
+      try {
+        community = await communityModel.findOne({ uuid: ctx.params.cid });
+
+        if (!community) {
+          ctx.throw(404, `A community with ID ${ctx.params.cid} doesn't exist`);
+        }
+      } catch (err) {
+        log.error('HTTP 400 Error: ', err);
+        ctx.throw(400, `Failed to parse template schema: ${err}`);
+      }
+
+      try {
+        template = await templateModel.findOne({
+          $and: [
+            { uuid: ctx.query.id },
+            {
+              $or: [
+                { community: { name: ctx.params.cid } },
+                { community: { uuid: ctx.params.cid } },
+                { community: { slug: ctx.params.cid } },
+              ],
+            },
+          ],
+        });
+
+        if (!template) {
+          ctx.throw(
+            404,
+            `A template with ID ${
+              ctx.query.id
+            } doesn't exist in this community`,
+          );
+        }
+
+        await templateModel.removeAndFlush(template);
+      } catch (err) {
+        log.error('HTTP 400 Error: ', err);
+        ctx.throw(400, `Failed to parse template schema: ${err}`);
+      }
+
+      // if deleted
+      ctx.status = 204;
+    },
+  });
+
+  templatesRouter.route({
+    meta: {
+      swagger: {
         operationId: 'DeleteTemplate',
         summary: 'Endpoint to DELETE a template.',
       },
     },
     method: 'DELETE',
     path: '/templates',
-    pre: thisUser.can('access private pages'),
+    pre: thisUser.can('access admin pages'),
     validate: {
       query: {
         id: Joi.string()

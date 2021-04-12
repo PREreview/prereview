@@ -36,7 +36,6 @@ import Profile from './profile';
 import Reviews from './reviews';
 import SettingsAPI from './settings-api';
 import SettingsDrafts from './settings-drafts';
-import SettingsTemplates from './settings-templates';
 import PersonaSearch from './PersonaSearch';
 import Validate from './Validate';
 
@@ -126,9 +125,6 @@ export default function App({ user }) {
                 <BlockPanel />
               </AdminRoute>
       */}
-                <AdminRoute exact={true} path="/templates">
-                  <SettingsTemplates />
-                </AdminRoute>
                 <Route exact={true} path="/community-settings/:id">
                   <CommunityPanel />
                 </Route>
