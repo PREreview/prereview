@@ -16,7 +16,7 @@ import UserProvider from '../contexts/user-context';
 import { StoresProvider } from '../contexts/store-context';
 
 // components
-//import AdminPanel from './admin-panel';
+import AdminPanel from './admin-panel';
 //import BlockPanel from './block-panel';
 import Community from './Community';
 import Communities from './Communities';
@@ -110,10 +110,10 @@ export default function App({ user }) {
                 <PrivateRoute exact={true} path="/settings/drafts">
                   <SettingsDrafts />
                 </PrivateRoute>
+                <AdminRoute exact={true} path="/admin">
+                  <AdminPanel />
+                </AdminRoute>
                 {/*
-              <AdminRoute exact={true} path="/admin">
-                <AdminPanel />
-              </AdminRoute>
               <AdminRoute exact={true} path="/block">
                 <BlockPanel />
               </AdminRoute>

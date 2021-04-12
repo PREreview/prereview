@@ -658,6 +658,7 @@ export default function HeaderBar({ thisUser }) {
                       </Link>
                     )}
 
+                    {/*
                     {thisUser.isAdmin && (
                       <Link
                         to={process.env.IS_EXTENSION ? undefined : '/block'}
@@ -677,6 +678,7 @@ export default function HeaderBar({ thisUser }) {
                         Moderate Reviews
                       </Link>
                     )}
+                    */}
 
                     <Link to="/logout" href={`/logout`}>
                       Logout
