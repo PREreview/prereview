@@ -309,129 +309,177 @@ export default function Reviews() {
             {(preprints && preprints.totalCount > 0) ||
             params.has('tags') ||
             params.has('communities') ? (
-              <Grid container spacing={3}>
+              <Grid
+                container
+                spacing={2}
+                alignItems="center"
+                justify="flex-start"
+              >
                 {preprints ? (
-                  <Grid item className={classes.formControl} xs spacing={2}>
-                    <Typography component="h5" variant="h5">
+                  <Grid item className={classes.formControl} xs={12} sm={2}>
+                    <Typography component="p" variant="h5">
                       Filter by:
                     </Typography>
                   </Grid>
                 ) : null}
                 {tags && Array.isArray(tags) && tags.length > 0 ? (
-                  <Grid item className={classes.formControl} xs>
-                    <InputLabel htmlFor="personas-tags">Tags</InputLabel>
-                    <Select
-                      id="personas-tags"
-                      className={classes.select}
-                      multiple
-                      value={selectedTags}
-                      onChange={ev => {
-                        params.delete('tags');
-                        setSelectedTags(ev.target.value);
-                        if (
-                          Array.isArray(ev.target.value) &&
-                          ev.target.value.length > 0
-                        ) {
-                          params.set('tags', ev.target.value.toString());
-                        }
-                        history.push({
-                          pathname: location.pathame,
-                          search: params.toString(),
-                        });
-                      }}
-                      input={<Input id="personas-tags-select-multiple" />}
-                      renderValue={() => (
-                        <div className={classes.chips}>
-                          {selectedTags.map(value => (
-                            <Chip
-                              key={value}
-                              label={value}
-                              className={classes.chip}
-                            />
-                          ))}
-                        </div>
-                      )}
-                    >
-                      {tags.map(tag => (
-                        <MenuItem key={tag.uuid} value={tag.name}>
-                          {tag.name}
-                        </MenuItem>
-                      ))}
-                    </Select>
+                  <Grid
+                    container
+                    item
+                    spacing={1}
+                    className={classes.formControl}
+                    alignItems="center"
+                    xs={12}
+                    sm={4}
+                  >
+                    <Grid item>
+                      <InputLabel htmlFor="personas-tags">Tags</InputLabel>
+                    </Grid>
+                    <Grid item>
+                      <Select
+                        id="personas-tags"
+                        className={classes.select}
+                        multiple
+                        value={selectedTags}
+                        onChange={ev => {
+                          params.delete('tags');
+                          setSelectedTags(ev.target.value);
+                          if (
+                            Array.isArray(ev.target.value) &&
+                            ev.target.value.length > 0
+                          ) {
+                            params.set('tags', ev.target.value.toString());
+                          }
+                          history.push({
+                            pathname: location.pathame,
+                            search: params.toString(),
+                          });
+                        }}
+                        input={<Input id="personas-tags-select-multiple" />}
+                        renderValue={() => (
+                          <div className={classes.chips}>
+                            {selectedTags.map(value => (
+                              <Chip
+                                key={value}
+                                label={value}
+                                className={classes.chip}
+                              />
+                            ))}
+                          </div>
+                        )}
+                      >
+                        {tags.map(tag => (
+                          <MenuItem key={tag.uuid} value={tag.name}>
+                            {tag.name}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </Grid>
                   </Grid>
                 ) : null}
                 {communities &&
                 Array.isArray(communities) &&
                 communities.length > 0 ? (
-                  <Grid item className={classes.formControl} xs>
-                    <InputLabel id="personas-communities-label">
-                      Communities
-                    </InputLabel>
-                    <Select
-                      labelId="personas-communities-label"
-                      id="personas-communities"
-                      className={classes.select}
-                      multiple
-                      value={selectedCommunities}
-                      onChange={ev => {
-                        params.delete('communities');
-                        setSelectedCommunities(ev.target.value);
-                        if (
-                          Array.isArray(ev.target.value) &&
-                          ev.target.value.length > 0
-                        ) {
-                          params.set('communities', ev.target.value.toString());
+                  <Grid
+                    container
+                    item
+                    spacing={1}
+                    className={classes.formControl}
+                    alignItems="center"
+                    xs={12}
+                    sm={4}
+                  >
+                    <Grid item>
+                      <InputLabel id="personas-communities-label">
+                        Communities
+                      </InputLabel>
+                    </Grid>
+                    <Grid item>
+                      <Select
+                        labelId="personas-communities-label"
+                        id="personas-communities"
+                        className={classes.select}
+                        multiple
+                        value={selectedCommunities}
+                        onChange={ev => {
+                          params.delete('communities');
+                          setSelectedCommunities(ev.target.value);
+                          if (
+                            Array.isArray(ev.target.value) &&
+                            ev.target.value.length > 0
+                          ) {
+                            params.set(
+                              'communities',
+                              ev.target.value.toString(),
+                            );
+                          }
+                          history.push({
+                            pathname: location.pathame,
+                            search: params.toString(),
+                          });
+                        }}
+                        input={
+                          <Input id="personas-communities-select-multiple" />
                         }
-                        history.push({
-                          pathname: location.pathame,
-                          search: params.toString(),
-                        });
-                      }}
-                      input={
-                        <Input id="personas-communities-select-multiple" />
-                      }
-                      renderValue={() => (
-                        <div className={classes.chips}>
-                          {selectedCommunities.map(value => (
-                            <Chip
-                              key={value}
-                              label={value}
-                              className={classes.chip}
-                            />
-                          ))}
-                        </div>
-                      )}
-                    >
-                      {communities.map(community => (
-                        <MenuItem key={community.uuid} value={community.name}>
-                          {community.name}
-                        </MenuItem>
-                      ))}
-                    </Select>
+                        renderValue={() => (
+                          <div className={classes.chips}>
+                            {selectedCommunities.map(value => (
+                              <Chip
+                                key={value}
+                                label={value}
+                                className={classes.chip}
+                              />
+                            ))}
+                          </div>
+                        )}
+                      >
+                        {communities.map(community => (
+                          <MenuItem key={community.uuid} value={community.name}>
+                            {community.name}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </Grid>
                   </Grid>
                 ) : null}
               </Grid>
             ) : null}
 
             {preprints && preprints.totalCount > 0 && !loadingPreprints && (
-              <SortOptions
-                sort={params.get('sort') || ''}
-                order={params.get('asc') === 'true' ? 'asc' : 'desc'}
-                onMouseEnterSortOption={sortOption => {
-                  setHoveredSortOption(sortOption);
-                }}
-                onMouseLeaveSortOption={() => {
-                  setHoveredSortOption(null);
-                }}
-                onChange={(sortOption, sortOrder) => {
-                  params.set('asc', sortOrder === 'asc');
-                  params.set('sort', sortOption);
-                  history.push({
-                    pathname: location.pathame,
-                    search: params.toString(),
-                  });
-                }}
-              />
+              <Box mt={3} pt={3} borderTop="1px solid #ccc">
+                <Grid
+                  container
+                  spacing={2}
+                  alignItems="baseline"
+                  justify="flex-start"
+                >
+                  <Grid item xs={12} sm={1}>
+                    <Typography component="p" variant="h5">
+                      Sort by:
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={12} sm={11}>
+                    <SortOptions
+                      sort={params.get('sort') || ''}
+                      order={params.get('asc') === 'true' ? 'asc' : 'desc'}
+                      onMouseEnterSortOption={sortOption => {
+                        setHoveredSortOption(sortOption);
+                      }}
+                      onMouseLeaveSortOption={() => {
+                        setHoveredSortOption(null);
+                      }}
+                      onChange={(sortOption, sortOrder) => {
+                        params.set('asc', sortOrder === 'asc');
+                        params.set('sort', sortOption);
+                        history.push({
+                          pathname: location.pathame,
+                          search: params.toString(),
+                        });
+                      }}
+                    />
+                  </Grid>
+                </Grid>
+              </Box>
             )}
 
             {newPreprints.length > 0 && (

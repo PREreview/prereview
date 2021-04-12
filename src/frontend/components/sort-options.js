@@ -15,7 +15,9 @@ export default function SortOptions({
   onMouseEnterSortOption,
   onMouseLeaveSortOption,
 }) {
-  return <Grid container justify="space-between" spacing={2} />;
+  return (
+    <Grid container alignItems="center" justify="space-between" spacing={2} />
+  );
 }
 
 SortOptions.propTypes = {
