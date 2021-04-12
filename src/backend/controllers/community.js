@@ -11,12 +11,15 @@ const communitySchema = Joi.object({
   name: Joi.string(),
   description: Joi.string(),
   banner: Joi.string(),
+  twitter: Joi.string().regex(/^[a-zA-Z0-9_]{1,15}$/),
 });
 
 const eventSchema = Joi.object({
   title: Joi.string(),
   description: Joi.string(),
   start: Joi.string(),
+  end: Joi.string(),
+  isPrivate: Joi.boolean(),
 });
 
 const tagSchema = Joi.object({
@@ -259,7 +262,7 @@ export default function controller(
           {
             $or: [{ uuid: ctx.params.id }, { slug: ctx.params.id }],
           },
-          ['members', 'preprints', 'owners', 'tags', 'events'],
+          ['members', 'preprints', 'owners', 'tags', 'events', 'templates'],
         );
         if (!community) {
           ctx.throw(404, `Community with ID ${ctx.params.id} doesn't exist`);
@@ -426,7 +429,7 @@ export default function controller(
       ctx.body = {
         status: 201,
         message: 'User has been added to community',
-        data: community,
+        data: user,
       };
       ctx.status = 201;
     },
@@ -552,7 +555,7 @@ export default function controller(
       ctx.body = {
         status: 201,
         message: 'User has been added to community',
-        data: community,
+        data: user,
       };
       ctx.status = 201;
     },
@@ -701,9 +704,15 @@ export default function controller(
     validate: {
       body: eventSchema,
       type: 'json',
+      continueOnError: true,
     },
     pre: thisUser.can('edit this community'),
     handler: async ctx => {
+      if (ctx.invalid) {
+        console.log('***invalid!***');
+        handleInvalid(ctx);
+        return;
+      }
       const communityId = ctx.params.id;
       let community, newEvent;
       log.debug(`Add event for community ${communityId}`);
@@ -714,9 +723,10 @@ export default function controller(
         ]);
         newEvent = eventModel.create({
           ...ctx.request.body,
+          community: community,
         });
         community.events.add(newEvent);
-        await eventModel.em.flush();
+        await communityModel.persistAndFlush(community);
         ctx.status = 201;
         ctx.body = {
           status: 201,

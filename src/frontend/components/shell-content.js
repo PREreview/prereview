@@ -6,6 +6,9 @@ import { Helmet } from 'react-helmet-async';
 // hooks
 import { usePostRequests } from '../hooks/api-hooks.tsx';
 
+// utils
+import { createPreprintId } from '../../common/utils/ids.js';
+
 // Material UI imports
 import { makeStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
@@ -17,7 +20,8 @@ import Typography from '@material-ui/core/Typography';
 
 // components
 import Controls from './controls';
-//import ModerationModal from './moderation-modal';
+import HeaderBarReviews from './header-bar-reviews';
+import LoginRequiredModal from './login-required-modal';
 import PreprintPreview from './preprint-preview';
 import ReviewReader from './review-reader';
 import ReviewStepper from './review-stepper';
@@ -52,6 +56,15 @@ function a11yProps(index) {
 }
 
 const useStyles = makeStyles(theme => ({
+  appBar: {
+    backgroundColor: '#fff',
+    color: '#000',
+  },
+  headerBar: {
+    position: 'fixed',
+    top: 0,
+    width: '36vw',
+  },
   root: {
     flexGrow: 1,
     backgroundColor: theme.palette.background.paper,
@@ -98,6 +111,7 @@ export default function ShellContent({ preprint, user, cid }) {
 
   const [longContent, setLongContent] = useState('');
   const [initialContent, setInitialContent] = useState('');
+  const [open, setOpen] = useState(null);
 
   const onContentChange = value => {
     setInitialContent(value);
@@ -105,7 +119,7 @@ export default function ShellContent({ preprint, user, cid }) {
 
   const onCloseRequest = () => {
     setNewRequest(true);
-    setTab('read');
+    setTab(0);
   };
 
   const onReviewChange = review => {
@@ -113,6 +127,9 @@ export default function ShellContent({ preprint, user, cid }) {
   };
 
   const handleChange = (event, newValue) => {
+    if (!user && newValue !== 0) {
+      setOpen(true);
+    }
     setTab(newValue);
   };
 
@@ -223,8 +240,11 @@ export default function ShellContent({ preprint, user, cid }) {
           );
         });
       }
+    } else {
+      setOpen(`/preprints/${createPreprintId(preprint.handle)}`);
     }
   }, [
+    open,
     preprint,
     user,
     rapidContent,
@@ -248,8 +268,11 @@ export default function ShellContent({ preprint, user, cid }) {
         />
       </Helmet>
       <div className={classes.root}>
+        <Box className={classes.headerBar}>
+          <HeaderBarReviews thisUser={user} />
+        </Box>
         <PreprintPreview preprint={preprint} />
-        <AppBar position="static">
+        <AppBar position="static" className={classes.appBar}>
           <Tabs
             value={tab}
             onChange={handleChange}
@@ -271,36 +294,56 @@ export default function ShellContent({ preprint, user, cid }) {
           />
         </TabPanel>
         <TabPanel value={tab} index={1}>
-          <ShellContentReviews
-            cid={cid}
-            review={review}
-            user={user}
-            preprint={preprint}
-            onClose={onCloseReviews}
-            onContentChange={onContentChange}
-            onReviewChange={onReviewChange}
-            hasRapidReviewed={hasRapidReviewed}
-            hasLongReviewed={hasLongReviewed}
-            initialContent={initialContent}
-          />
+          {user ? (
+            <ShellContentReviews
+              cid={cid}
+              review={review}
+              user={user}
+              preprint={preprint}
+              onClose={onCloseReviews}
+              onContentChange={onContentChange}
+              onReviewChange={onReviewChange}
+              hasRapidReviewed={hasRapidReviewed}
+              hasLongReviewed={hasLongReviewed}
+              initialContent={initialContent}
+            />
+          ) : (
+            <LoginRequiredModal
+              open={open}
+              onClose={() => {
+                setOpen(null);
+                setTab(0);
+              }}
+            />
+          )}
         </TabPanel>
         <TabPanel value={tab} index={2}>
-          <ShellContentRequest
-            user={user}
-            preprint={preprint}
-            onSubmit={preprint => {
-              postReviewRequest({ preprint: preprint.uuid })
-                .then(() => {
-                  alert('PREreview request submitted successfully.');
-                  return onCloseRequest();
-                })
-                .catch(err => alert(`An error occurred: ${err.message}`));
-            }}
-            isPosting={loadingPostReviewRequest}
-            error={errorPostReviewRequest}
-            hasRequested={hasRequested}
-            newRequest={newRequest}
-          />
+          {user ? (
+            <ShellContentRequest
+              user={user}
+              preprint={preprint}
+              onSubmit={preprint => {
+                postReviewRequest({ preprint: preprint.uuid })
+                  .then(() => {
+                    alert('PREreview request submitted successfully.');
+                    return onCloseRequest();
+                  })
+                  .catch(err => alert(`An error occurred: ${err.message}`));
+              }}
+              isPosting={loadingPostReviewRequest}
+              error={errorPostReviewRequest}
+              hasRequested={hasRequested}
+              newRequest={newRequest}
+            />
+          ) : (
+            <LoginRequiredModal
+              open={open}
+              onClose={() => {
+                setOpen(null);
+                setTab(0);
+              }}
+            />
+          )}
         </TabPanel>
       </div>
     </>

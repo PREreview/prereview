@@ -53,6 +53,10 @@ export class Community extends BaseEntity {
   @Property({ nullable: true })
   logo?: Buffer;
 
+  @Fixture(faker => faker.internet.userName())
+  @Property({ nullable: true })
+  twitter?: string;
+
   @ManyToMany({ entity: () => Persona, inversedBy: 'communities' })
   members: Collection<Persona> = new Collection<Persona>(this);
 
@@ -71,10 +75,16 @@ export class Community extends BaseEntity {
   @OneToMany({ entity: () => Template, mappedBy: 'community' })
   templates: Collection<Template> = new Collection<Template>(this);
 
-  constructor(name: string, description?: string, logo?: Buffer) {
+  constructor(
+    name: string,
+    description?: string,
+    logo?: Buffer,
+    twitter?: string,
+  ) {
     super();
     this.name = name;
     this.description = description;
     this.logo = logo;
+    this.twitter = twitter;
   }
 }
