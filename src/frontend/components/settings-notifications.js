@@ -248,7 +248,7 @@ function EmailToggle({ userId, contact, onDelete }) {
               value: contact.value,
             })
               .then(() => {
-                return setIsNotifyToggle(!isNotify);
+                return setIsNotify(!isNotify);
               })
               .then(() => {
                 setIsNotify(!isNotify);
