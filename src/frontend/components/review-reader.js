@@ -278,7 +278,7 @@ export default function ReviewReader({
                     />
                   </div>
                   {allRapidReviews.map(review => (
-                    <>
+                    <div key={review.uuid}>
                       <div className={classes.vh}>
                         <Link
                           component="button"
@@ -302,7 +302,7 @@ export default function ReviewReader({
                         roleIds={highlightedRoleIds}
                         role={role}
                       />
-                    </>
+                    </div>
                   ))}
                   <Barplot
                     stats={getYesNoStats(allRapidReviews)}

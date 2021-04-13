@@ -35,6 +35,7 @@ import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
 import Chip from '@material-ui/core/Chip';
 import Container from '@material-ui/core/Container';
+import Dialog from '@material-ui/core/Dialog';
 import Grid from '@material-ui/core/Grid';
 import Hidden from '@material-ui/core/Hidden';
 import IconButton from '@material-ui/core/IconButton';
@@ -49,6 +50,7 @@ import Select from '@material-ui/core/Select';
 import Typography from '@material-ui/core/Typography';
 
 // icons
+import CloseIcon from '@material-ui/icons/Close';
 import SettingsIcon from '@material-ui/icons/Settings';
 import TwitterIcon from '@material-ui/icons/Twitter';
 
@@ -65,6 +67,7 @@ const useStyles = makeStyles(theme => ({
     marginLeft: 'auto',
     marginRight: 'auto',
     marginBottom: theme.spacing(2),
+    textDecoration: 'none !important',
   },
   banner: {
     background: 'rgba(255, 255, 255, 0.85)',
@@ -82,8 +85,13 @@ const useStyles = makeStyles(theme => ({
     },
   },
   button: {
-    color: '#197CF4',
     textTransform: 'none',
+  },
+  close: {
+    position: 'absolute',
+    right: 10,
+    top: 10,
+    width: 50,
   },
   contentMain: {
     marginTop: '2rem',
@@ -96,8 +104,11 @@ const useStyles = makeStyles(theme => ({
     paddingRight: 5,
   },
   link: {
-    color: '#000 !important',
-    textDecoration: 'none !important',
+    display: 'block',
+    marginBottom: 20,
+  },
+  linkDate: {
+    paddingRight: 10,
   },
   modal: {
     backgroundColor: theme.palette.background.paper,
@@ -445,7 +456,7 @@ function CommunityPersonas({
         <Box borderTop={'1px solid #DADADA'} mt={2} pt={2} textAlign="center">
           {title === 'Members' ? (
             <Button
-              color="secondary"
+              color="primary"
               className={classes.button}
               href={`/personas?communities=${community.slug}`}
             >
@@ -453,20 +464,24 @@ function CommunityPersonas({
             </Button>
           ) : (
             <Button
-              color="secondary"
+              color="primary"
               className={classes.button}
               onClick={handleOpen}
             >
               See All {title}
             </Button>
           )}
-          <Modal
-            open={open}
-            onClose={handleClose}
-            aria-labelledby="see-members-title"
-            aria-describedby="see-members-description"
-          >
-            <div className={classes.modal}>
+          <Dialog open={open} onClose={handleClose} aria-label="see-members">
+            <Box p={2}>
+              <IconButton
+                aria-label="close"
+                onClick={() => {
+                  handleClose(false);
+                }}
+                className={classes.close}
+              >
+                <CloseIcon />
+              </IconButton>
               {personas.map(persona => {
                 return (
                   <Link
@@ -495,8 +510,8 @@ function CommunityPersonas({
                   </Link>
                 );
               })}
-            </div>
-          </Modal>
+            </Box>
+          </Dialog>
         </Box>
       </Box>
     </section>
@@ -571,19 +586,28 @@ function CommunityEvents({ community, events }) {
         </Grid>
         <Box borderTop={'1px solid #DADADA'} mt={2} pt={2} textAlign="center">
           <Button
-            color="secondary"
+            color="primary"
             className={classes.button}
             onClick={handleOpen}
           >
             See All Events
           </Button>
-          <Modal
+          <Dialog
             open={open}
             onClose={handleClose}
-            aria-labelledby="see-members-title"
-            aria-describedby="see-members-description"
+            aria-label="see-events"
+            maxWidth="md"
           >
-            <div className={classes.modal}>
+            <Box p={2}>
+              <IconButton
+                aria-label="close"
+                onClick={() => {
+                  handleClose(false);
+                }}
+                className={classes.close}
+              >
+                <CloseIcon />
+              </IconButton>
               {events.map(event => {
                 return (
                   <Link
@@ -591,36 +615,31 @@ function CommunityEvents({ community, events }) {
                     href={`/events/${event.uuid}`}
                     className={classes.link}
                   >
-                    <Grid container spacing={2}>
-                      <Grid item xs={6} md={3}>
-                        <Typography
-                          color="primary"
-                          variant="h6"
-                          component="h4"
-                          gutterBottom={true}
-                        >
-                          {new Intl.DateTimeFormat(intl.locale, {
-                            month: 'short',
-                            day: 'numeric',
-                          }).format(Date.parse(event.start))}
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={6} md={9}>
-                        <Typography
-                          color="textPrimary"
-                          variant="h6"
-                          component="h4"
-                          gutterBottom={true}
-                        >
-                          {event.title}
-                        </Typography>
-                      </Grid>
-                    </Grid>
+                    <Typography
+                      color="primary"
+                      variant="h6"
+                      component="span"
+                      gutterBottom={true}
+                      className={classes.linkDate}
+                    >
+                      {new Intl.DateTimeFormat(intl.locale, {
+                        month: 'short',
+                        day: 'numeric',
+                      }).format(Date.parse(event.start))}
+                    </Typography>{' '}
+                    <Typography
+                      color="textPrimary"
+                      variant="h6"
+                      component="span"
+                      gutterBottom={true}
+                    >
+                      {event.title}
+                    </Typography>
                   </Link>
                 );
               })}
-            </div>
-          </Modal>
+            </Box>
+          </Dialog>
         </Box>
       </Box>
     </section>
@@ -781,7 +800,7 @@ function CommunityContent({ thisUser, community, params }) {
                     path={`/communities/${community.slug}/new`}
                     exact={true}
                   >
-                    <Modal
+                    <Dialog
                       open={true}
                       showCloseButton={true}
                       title="Add Entry"
@@ -789,7 +808,16 @@ function CommunityContent({ thisUser, community, params }) {
                         history.push(`/communities/${community.slug}`);
                       }}
                     >
-                      <div className={classes.modal}>
+                      <Box p={2}>
+                        <IconButton
+                          aria-label="close"
+                          onClick={() => {
+                            history.push(`/communities/${community.slug}`);
+                          }}
+                          className={classes.close}
+                        >
+                          <CloseIcon />
+                        </IconButton>
                         <Helmet>
                           <title>PREreview • Add entry</title>
                         </Helmet>
@@ -813,8 +841,8 @@ function CommunityContent({ thisUser, community, params }) {
                             );
                           }}
                         />
-                      </div>
-                    </Modal>
+                      </Box>
+                    </Dialog>
                   </PrivateRoute>
                   {loginModalOpenNext && (
                     <LoginRequiredModal
