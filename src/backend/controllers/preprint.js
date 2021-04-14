@@ -181,6 +181,7 @@ export default function controller(preprints, thisUser) {
         const populate = [
           'fullReviews',
           'fullReviews.authors',
+          'fullReviews.drafts',
           'rapidReviews',
           'rapidReviews.author',
           'requests',
