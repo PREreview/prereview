@@ -4,6 +4,11 @@ import { createMuiTheme } from '@material-ui/core/styles';
 // A custom theme for this app
 const theme = createMuiTheme({
   overrides: {
+    MuiAvatarGroup: {
+      avatar: {
+        border: 'none',
+      },
+    },
     MuiDialog: {
       paper: {
         borderRadius: 50,

@@ -23,6 +23,7 @@ import Controls from './controls';
 import HeaderBarReviews from './header-bar-reviews';
 import LoginRequiredModal from './login-required-modal';
 import PreprintPreview from './preprint-preview';
+import Reviewers from './role-list';
 import ReviewReader from './review-reader';
 import ReviewStepper from './review-stepper';
 
@@ -473,11 +474,20 @@ function ShellContentRequest({
   error,
   hasRequested,
   newRequest,
+  user,
 }) {
   const classes = useStyles();
 
   return (
     <div>
+      <Typography variant="h4" component="h4" gutterBottom>
+        Requesters
+      </Typography>
+      <Reviewers
+        preprintId={preprint.uuid}
+        allReviews={preprint.requests}
+        user={user}
+      />
       {hasRequested || newRequest ? (
         <Box mt={2} mb={2} className={classes.yellow}>
           <Typography component="div" variant="body2">
@@ -486,20 +496,17 @@ function ShellContentRequest({
         </Box>
       ) : (
         <Box>
-          <Typography component="h3" variant="body2">
-            Add a request for review
-          </Typography>
-
           <Controls error={error}>
             <Button
               color="primary"
               primary="true"
+              variant="contained"
               isWaiting={isPosting}
               onClick={() => {
                 onSubmit(preprint);
               }}
             >
-              Submit request
+              Add a request for review
             </Button>
           </Controls>
         </Box>
@@ -509,6 +516,7 @@ function ShellContentRequest({
 }
 ShellContentRequest.propTypes = {
   preprint: PropTypes.object.isRequired,
+  user: PropTypes.object.isRequired,
   onSubmit: PropTypes.func.isRequired,
   isPosting: PropTypes.bool,
   error: PropTypes.instanceOf(Error),

@@ -347,7 +347,7 @@ export default function controller(preprints, thisUser) {
           'fullReviews.drafts',
           'fullReviews.comments.author',
           'rapidReviews.author.identity',
-          'requests',
+          'requests.author',
           'tags',
         ]);
       } catch (err) {
