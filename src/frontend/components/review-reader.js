@@ -377,7 +377,7 @@ export default function ReviewReader({
                           review.drafts[review.drafts.length - 1];
                         return (
                           <div key={review.uuid}>
-                            <Accordion>
+                            <Accordion expanded={true}>
                               <AccordionSummary
                                 aria-controls={`review-content-${review.uuid}`}
                                 id={`review-header-${review.uuid}`}
