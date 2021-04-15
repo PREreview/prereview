@@ -20,6 +20,9 @@ export const processParams = search => {
     } else if (key.toLowerCase() === 'badges') {
       const badges = value ? value.split(',') : [];
       processed.append('badges', badges);
+    } else if (key.toLowerCase() === 'tags') {
+      const tags = value ? value.split(',') : [];
+      processed.append('tags', tags);
     } else if (key.toLowerCase() === 'communities') {
       const communities = value ? value.split(',') : [];
       processed.append('communities', communities);
