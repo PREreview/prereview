@@ -257,7 +257,9 @@ const LongformReviewReader = props => {
                   ) : null}
                 </Grid>
                 <Box border="1px solid #E5E5E5" mt={4} px={3} pb={2}>
-                  <Box>{ReactHtmlParser(reviewContent.contents, options)}</Box>
+                  <Typography component="div" variant="body1">
+                    {ReactHtmlParser(reviewContent.contents, options)}
+                  </Typography>
                   <Grid
                     container
                     alignItems="center"
