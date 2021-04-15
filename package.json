@@ -245,6 +245,7 @@
     "url-search-params-polyfill": "^8.1.0",
     "uuid": "^8.3.2",
     "uuid-apikey": "^1.5.1",
+    "validator": "^13.5.2",
     "xmldom": "^0.3.0",
     "y-quill": "^0.1.4",
     "y-webrtc": "^10.1.8",
