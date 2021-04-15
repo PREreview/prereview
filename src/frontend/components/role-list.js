@@ -5,7 +5,6 @@ import PropTypes from 'prop-types';
 // Material UI imports
 import { makeStyles } from '@material-ui/core/styles';
 import AvatarGroup from '@material-ui/lab/AvatarGroup';
-import ListItem from '@material-ui/core/ListItem';
 import Typography from '@material-ui/core/Typography';
 
 // components
@@ -83,11 +82,7 @@ export default function Reviewers({
       <AvatarGroup max={20} className={classes.list}>
         {authors.length
           ? authors.map(author => {
-              return (
-                <ListItem key={author.uuid} className={classes.listItem}>
-                  <RoleBadge user={author} />
-                </ListItem>
-              );
+              return <RoleBadge key={author.uuid} user={author} />;
             })
           : null}
       </AvatarGroup>
