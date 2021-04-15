@@ -100,6 +100,14 @@ const LongformReviewReader = props => {
     popperContent: {
       padding: 20,
     },
+    reviewBody: {
+      '& p': {
+        '& img': {
+          display: 'block',
+          width: '100%',
+        },
+      },
+    },
     yellow: {
       backgroundColor: '#FFFAEE',
       padding: 10,
@@ -257,7 +265,11 @@ const LongformReviewReader = props => {
                   ) : null}
                 </Grid>
                 <Box border="1px solid #E5E5E5" mt={4} px={3} pb={2}>
-                  <Typography component="div" variant="body1">
+                  <Typography
+                    component="div"
+                    variant="body1"
+                    className={classes.reviewBody}
+                  >
                     {ReactHtmlParser(reviewContent.contents, options)}
                   </Typography>
                   <Grid
