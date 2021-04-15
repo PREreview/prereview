@@ -62,7 +62,7 @@ const useStyles = makeStyles(theme => ({
     color: '#000',
   },
   headerBar: {
-    position: 'fixed',
+    position: 'absolute',
     top: 0,
     width: '36vw',
   },
