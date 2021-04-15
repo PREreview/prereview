@@ -177,6 +177,7 @@ export default function controller(preprints, thisUser) {
       let requestCount = 0;
       let rapidCount = 0;
       let fullCount = 0;
+      let query;
       try {
         const populate = [
           'fullReviews',
@@ -253,7 +254,6 @@ export default function controller(preprints, thisUser) {
         }
 
         if (queries.length > 0) {
-          let query;
           if (queries.length > 1) {
             query = { $and: queries };
           } else {
@@ -284,17 +284,21 @@ export default function controller(preprints, thisUser) {
       if (!foundPreprints || count <= 0) {
         ctx.status = 204;
       } else {
-        for (let preprint of foundPreprints) {
-          if (preprint.requests) {
-            requestCount = requestCount + preprint.requests.count();
-          }
-          if (preprint.rapidReviews) {
-            rapidCount = rapidCount + preprint.rapidReviews.count();
-          }
-          if (preprint.fullReviews) {
-            fullCount = fullCount + preprint.fullReviews.count();
-          }
-        }
+        requestCount =
+          requestCount +
+          (await preprints.em.count('Request', {
+            preprint: query,
+          }));
+        rapidCount =
+          rapidCount +
+          (await preprints.em.count('RapidReview', {
+            preprint: query,
+          }));
+        fullCount =
+          fullCount +
+          (await preprints.em.count('FullReview', {
+            preprint: query,
+          }));
       }
 
       ctx.body = {
