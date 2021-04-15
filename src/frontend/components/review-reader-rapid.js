@@ -35,6 +35,7 @@ const RapidReviewReader = props => {
     role,
     roleIds,
     user,
+    isReader = true,
   } = props;
 
   const useStyles = makeStyles(() => ({
@@ -65,7 +66,10 @@ const RapidReviewReader = props => {
       setButtonRefId(anchorEl.getAttribute('aria-describedby'));
     } else {
       setButtonRefId(null);
-      history.push(`${history.location.pathname.split('/rapid-reviews')[0]}`);
+      // This is in the review reader and not the search page
+      if (isReader) {
+        history.push(`${history.location.pathname.split('/rapid-reviews')[0]}`);
+      }
     }
   }, [anchorEl]);
 
@@ -112,6 +116,7 @@ RapidReviewReader.propTypes = {
   handleAnchor: PropTypes.func.isRequired,
   height: PropTypes.number,
   identifier: PropTypes.string,
+  isReader: PropTypes.bool,
   review: PropTypes.object.isRequired,
   role: PropTypes.object,
   roleIds: PropTypes.array,

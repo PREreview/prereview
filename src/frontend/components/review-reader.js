@@ -301,6 +301,7 @@ export default function ReviewReader({
                         identifier={preprint.handle}
                         roleIds={highlightedRoleIds}
                         role={role}
+                        isReader={false}
                       />
                     </>
                   ))}
