@@ -214,7 +214,7 @@ export default function Footer() {
                 href="https://mailchi.mp/97886570610a/prereview-newsletter-signup"
                 className={classes.signUp}
               >
-                Sign up
+                Sign up for our newsletter
                 <ArrowForwardIosIcon className={classes.signUpIcon} />
               </Link>
             </Typography>
