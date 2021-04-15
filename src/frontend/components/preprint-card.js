@@ -200,9 +200,11 @@ export default function PreprintCard({
         className={classes.gridMain}
       >
         <Grid item xs={12} sm={4}>
-          <Typography className={classes.date}>
-            {getFormattedDatePosted(preprint.datePosted)}
-          </Typography>
+          {preprint && preprint.datePosted && (
+            <Typography className={classes.date}>
+              {getFormattedDatePosted(preprint.datePosted)}
+            </Typography>
+          )}
         </Grid>
         <Grid item xs={12} sm={8}>
           <Typography>
