@@ -167,6 +167,11 @@ export default function HeaderBarReviews({ thisUser }) {
                   Preprint Review Platform
                 </MenuItem>
                 <MenuItem className={classes.nested}>
+                  <Link className={classes.mobileNavItem} href="/reviews">
+                    Go to platform
+                  </Link>
+                </MenuItem>
+                <MenuItem className={classes.nested}>
                   <Link
                     className={classes.mobileNavItem}
                     href="https://content.prereview.org/about-the-platform"
@@ -175,8 +180,13 @@ export default function HeaderBarReviews({ thisUser }) {
                   </Link>
                 </MenuItem>
                 <MenuItem className={classes.nested}>
-                  <Link className={classes.mobileNavItem} href="/reviews">
-                    Go to platform
+                  <Link className={classes.mobileNavItem} href="/prereviewers">
+                    PREreviewers
+                  </Link>
+                </MenuItem>
+                <MenuItem className={classes.nested}>
+                  <Link className={classes.mobileNavItem} href="/communities">
+                    Communities
                   </Link>
                 </MenuItem>
                 <MenuItem className={classes.mobileNavItem}>Programs</MenuItem>
@@ -219,11 +229,6 @@ export default function HeaderBarReviews({ thisUser }) {
                     href="https://github.com/PREreview/prereview"
                   >
                     GitHub
-                  </Link>
-                </MenuItem>
-                <MenuItem>
-                  <Link className={classes.mobileNavItem} href="/communities">
-                    Communities
                   </Link>
                 </MenuItem>
                 <MenuItem>

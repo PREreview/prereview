@@ -45,7 +45,7 @@ const useStyles = makeStyles(theme => ({
   },
   mobileNav: {
     marginLeft: 'auto',
-    [theme.breakpoints.up('lg')]: {
+    [theme.breakpoints.up('md')]: {
       display: 'none',
     },
   },
@@ -54,7 +54,7 @@ const useStyles = makeStyles(theme => ({
   },
   nav: {
     marginRight: '1rem',
-    [theme.breakpoints.down('md')]: {
+    [theme.breakpoints.down('sm')]: {
       display: 'none',
     },
   },
@@ -154,7 +154,7 @@ export default function HeaderBar({ thisUser }) {
 
       <Box className={classes.content}>
         <Grid container alignItems="center" justify="space-between" spacing={2}>
-          <Grid item xs={8} sm={10} md={2}>
+          <Grid item xs={8} sm={9} md={2}>
             <Box className={classes.logo}>
               <Typography component="h1" variant="srOnly">
                 <Link to="/" href={homeLink}>
@@ -176,7 +176,7 @@ export default function HeaderBar({ thisUser }) {
             justify="flex-end"
             spacing={1}
             xs={4}
-            sm={2}
+            sm={3}
             md={10}
           >
             <Grid item>
@@ -209,6 +209,11 @@ export default function HeaderBar({ thisUser }) {
                   Preprint Review Platform
                 </MenuItem>
                 <MenuItem className={classes.nested}>
+                  <Link className={classes.mobileNavItem} href="/reviews">
+                    Go to platform
+                  </Link>
+                </MenuItem>
+                <MenuItem className={classes.nested}>
                   <Link
                     className={classes.mobileNavItem}
                     href="https://content.prereview.org/about-the-platform"
@@ -217,8 +222,13 @@ export default function HeaderBar({ thisUser }) {
                   </Link>
                 </MenuItem>
                 <MenuItem className={classes.nested}>
-                  <Link className={classes.mobileNavItem} href="/reviews">
-                    Go to platform
+                  <Link className={classes.mobileNavItem} href="/prereviewers">
+                    PREreviewers
+                  </Link>
+                </MenuItem>
+                <MenuItem className={classes.nested}>
+                  <Link className={classes.mobileNavItem} href="/communities">
+                    Communities
                   </Link>
                 </MenuItem>
                 <MenuItem className={classes.mobileNavItem}>Programs</MenuItem>
@@ -261,11 +271,6 @@ export default function HeaderBar({ thisUser }) {
                     href="https://github.com/PREreview/prereview"
                   >
                     GitHub
-                  </Link>
-                </MenuItem>
-                <MenuItem>
-                  <Link className={classes.mobileNavItem} href="/communities">
-                    Communities
                   </Link>
                 </MenuItem>
                 <MenuItem>
@@ -382,6 +387,15 @@ export default function HeaderBar({ thisUser }) {
                       <Link
                         className={classes.subnavItem}
                         color="textPrimary"
+                        href="/reviews"
+                      >
+                        Go to platform
+                      </Link>
+                    </MenuItem>
+                    <MenuItem onClick={handleClickPlatform}>
+                      <Link
+                        className={classes.subnavItem}
+                        color="textPrimary"
                         href="https://content.prereview.org/about-the-platform"
                       >
                         How it works
@@ -391,9 +405,18 @@ export default function HeaderBar({ thisUser }) {
                       <Link
                         className={classes.subnavItem}
                         color="textPrimary"
-                        href="/reviews"
+                        href="/prereviewers"
                       >
-                        Go to platform
+                        PREreviewers
+                      </Link>
+                    </MenuItem>
+                    <MenuItem onClick={handleClickPlatform}>
+                      <Link
+                        className={classes.subnavItem}
+                        color="textPrimary"
+                        href="/communities"
+                      >
+                        Communities
                       </Link>
                     </MenuItem>
                   </Menu>
@@ -496,15 +519,6 @@ export default function HeaderBar({ thisUser }) {
                       </Link>
                     </MenuItem>
                   </Menu>
-                </Grid>
-                <Grid item>
-                  <Link
-                    className={classes.navItem}
-                    color="textPrimary"
-                    href="/communities"
-                  >
-                    Communities
-                  </Link>
                 </Grid>
                 <Grid item>
                   <Link
