@@ -4,6 +4,16 @@ import { createMuiTheme } from '@material-ui/core/styles';
 // A custom theme for this app
 const theme = createMuiTheme({
   overrides: {
+    MuiAccordionSummary: {
+      expandIcon: {
+        fontFamily: ['Open Sans', 'sans-serif'],
+      },
+    },
+    MuiAvatarGroup: {
+      avatar: {
+        border: 'none',
+      },
+    },
     MuiDialog: {
       paper: {
         borderRadius: 50,

@@ -71,7 +71,7 @@ const RoleBadge = React.forwardRef(function RoleBadge(
     <RoleBadgeUI
       ref={ref}
       tooltip={tooltip}
-      user={user}
+      roleUser={user}
       contacts={contacts}
       className={className}
       showNotice={showNotice}
@@ -98,7 +98,7 @@ export default RoleBadge;
  * Non hooked version (handy for story book and `UserBadge`)
  */
 const RoleBadgeUI = React.forwardRef(function RoleBadgeUI(
-  { user, contacts, children, tooltip, showNotice = false },
+  { roleUser, contacts, children, tooltip, showNotice = false },
   ref,
 ) {
   // ****  USER IN THIS COMPONENT IS ACTUALLY A PERSONA OBJECT **** //
@@ -106,6 +106,7 @@ const RoleBadgeUI = React.forwardRef(function RoleBadgeUI(
   const classes = useStyles();
   const history = useHistory();
   const [anchorEl, setAnchorEl] = useState(null);
+  const user = roleUser.defaultPersona ? roleUser.defaultPersona : roleUser;
   const handleClick = event => {
     setAnchorEl(event.currentTarget);
   };
@@ -116,7 +117,6 @@ const RoleBadgeUI = React.forwardRef(function RoleBadgeUI(
 
   const open = Boolean(anchorEl);
   const id = open ? 'user-menu' : undefined;
-
   return (
     <>
       <Box className={classes.box}>
@@ -129,7 +129,7 @@ const RoleBadgeUI = React.forwardRef(function RoleBadgeUI(
           <Typography variant="srOnly">Open</Typography>
           <Tooltipify tooltip={tooltip} user={user}>
             {/* this badge is only visible if a user's profile is incomplete */}
-            <MuiBadge badgeContent="!" color="primary" invisible={!showNotice}> 
+            <MuiBadge badgeContent="!" color="primary" invisible={!showNotice}>
               <Avatar
                 src={user.avatar}
                 ref={ref}
@@ -194,7 +194,7 @@ const RoleBadgeUI = React.forwardRef(function RoleBadgeUI(
 RoleBadgeUI.propTypes = {
   showNotice: PropTypes.bool,
   tooltip: PropTypes.bool,
-  user: PropTypes.shape({
+  roleUser: PropTypes.shape({
     defaultPersona: PropTypes.object,
     uuid: PropTypes.string,
     reviewUuid: PropTypes.string,

@@ -260,7 +260,7 @@ export default function ReviewReader({
                   <Typography variant="h4" component="h4" gutterBottom>
                     Reviewers
                   </Typography>
-                  <div className="review-reader__persona-selector">
+                  <div>
                     <Reviewers
                       preprintId={preprint.uuid}
                       allReviews={allRapidReviews}
@@ -278,7 +278,7 @@ export default function ReviewReader({
                     />
                   </div>
                   {allRapidReviews.map(review => (
-                    <>
+                    <div key={review.uuid}>
                       <div className={classes.vh}>
                         <Link
                           component="button"
@@ -303,7 +303,7 @@ export default function ReviewReader({
                         role={role}
                         isReader={false}
                       />
-                    </>
+                    </div>
                   ))}
                   <Barplot
                     stats={getYesNoStats(allRapidReviews)}
@@ -348,7 +348,7 @@ export default function ReviewReader({
                   <Typography variant="h4" component="h4" gutterBottom>
                     Reviewers
                   </Typography>
-                  <div className="review-reader__persona-selector">
+                  <div>
                     <Reviewers
                       preprintId={preprint.uuid}
                       role={role}
@@ -366,7 +366,7 @@ export default function ReviewReader({
                       }}
                     />
                   </div>
-                  <div className="text-answers">
+                  <div>
                     {publishedReviews.map(review => {
                       if (
                         review.isPublished &&
@@ -378,7 +378,7 @@ export default function ReviewReader({
                           review.drafts[review.drafts.length - 1];
                         return (
                           <div key={review.uuid}>
-                            <Accordion>
+                            <Accordion expanded={true}>
                               <AccordionSummary
                                 aria-controls={`review-content-${review.uuid}`}
                                 id={`review-header-${review.uuid}`}
@@ -390,20 +390,14 @@ export default function ReviewReader({
                                         review.authors
                                           .slice(0, 2)
                                           .map(author => (
-                                            <span
-                                              key={author.uuid}
-                                              className="review-reader__header-author"
-                                            >
+                                            <span key={author.uuid}>
                                               {author.defaultPersona
                                                 ? author.defaultPersona.name
                                                 : author.name}
                                             </span>
                                           ))
                                       ) : (
-                                        <span
-                                          key={review.authors[0].uuid}
-                                          className="review-reader__header-author"
-                                        >
+                                        <span key={review.authors[0].uuid}>
                                           {review.authors[0].defaultPersona
                                             ? review.authors[0].defaultPersona
                                                 .name
@@ -491,14 +485,9 @@ export default function ReviewReader({
                       }
                       if (typeof review === 'string') {
                         return (
-                          <div
-                            key={'new-review'}
-                            className="text-answers__long-response-row"
-                          >
-                            <div className="text-answers__question long">
-                              {'New user review'}
-                            </div>
-                            <div className="">
+                          <div key={'new-review'}>
+                            <div>{'New user review'}</div>
+                            <div>
                               <span key={user.uuid}>by {user.name}</span>
                             </div>
                             <Typography component="div">

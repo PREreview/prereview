@@ -93,7 +93,7 @@ export default function App({ user }) {
                 <Route exact={true} path="/reviews/:new(new)?">
                   <Reviews />
                 </Route>
-                <Route exact={true} path="/personas">
+                <Route exact={true} path="/prereviewers">
                   <Personas />
                 </Route>
                 <Route exact={true} path="/about/:id">

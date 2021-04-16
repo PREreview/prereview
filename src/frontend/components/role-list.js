@@ -11,10 +11,12 @@ import Typography from '@material-ui/core/Typography';
 import RoleBadge from './role-badge';
 
 const useStyles = makeStyles(() => ({
+  avatar: {
+    border: 'none',
+  },
   list: {
     display: 'flex',
     justifyContent: 'flex-start',
-    marginLeft: 30,
   },
   listItem: {
     marginLeft: '-30px',
@@ -74,8 +76,8 @@ export default function Reviewers({
   return (
     <>
       {!authors.length && (
-        <Typography variant="body1" component="div">
-          No reviewers.
+        <Typography variant="body1" component="div" gutterBottom>
+          None yet.
         </Typography>
       )}
 

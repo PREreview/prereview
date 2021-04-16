@@ -19,16 +19,12 @@ import Loading from './loading';
 import SearchBar from './search-bar';
 
 // Material-ui components
-import {
-  createMuiTheme,
-  makeStyles,
-  ThemeProvider,
-  withStyles,
-} from '@material-ui/core/styles';
+import { makeStyles, withStyles } from '@material-ui/core/styles';
 import Box from '@material-ui/core/Box';
-import MuiButton from '@material-ui/core/Button';
+import Chip from '@material-ui/core/Chip';
 import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
+import MuiButton from '@material-ui/core/Button';
 import Pagination from '@material-ui/lab/Pagination';
 import Typography from '@material-ui/core/Typography';
 
@@ -41,46 +37,28 @@ const Button = withStyles({
   },
 })(MuiButton);
 
-const prereviewTheme = createMuiTheme({
-  palette: {
-    primary: {
-      main: '#F77463',
-      contrastText: '#fff',
-    },
-    secondary: {
-      main: '#eaeaf0',
-    },
-  },
-  typography: {
-    fontFamily: ['Open Sans', 'sans-serif'].join(','),
-  },
-});
-
 const useStyles = makeStyles(theme => ({
   buttonTag: {
-    color: `${theme.palette.primary.main} !important`,
+    fontSize: '0.8rem',
+    fontWeight: 'normal',
     margin: '0.5rem',
     textTransform: 'none',
   },
   button: {
     color: `${theme.palette.primary.main}`,
-    marginTop: theme.spacing(1),
-    marginRight: theme.spacing(1),
   },
   buttonText: {
     fontSize: '1rem',
     textTransform: 'uppercase',
   },
+  center: {
+    textAlign: 'center',
+  },
   communities: {
     overflow: 'hidden',
   },
   container: {
-    marginBottom: '3rem',
-    marginTop: 72,
     overflow: 'hidden',
-  },
-  right: {
-    textAlign: 'right',
   },
   smallColumn: {
     marginTop: '2.5rem',
@@ -109,7 +87,7 @@ const Communities = () => {
     return <div>An error occurred: {error.message}</div>;
   } else {
     return (
-      <ThemeProvider theme={prereviewTheme}>
+      <>
         <div className={`${classes.communities} communities`}>
           <Helmet>
             <title>Communities • {ORG}</title>
@@ -118,31 +96,33 @@ const Communities = () => {
 
           <Container className={classes.container} maxWidth="lg">
             <Box m={4}>
-              <Grid
-                component="label"
-                container
-                alignItems="center"
-                justify="space-between"
-                spacing={8}
-              >
-                <Grid item>
-                  <Typography variant="h3" component="h1" gutterBottom={true}>
-                    Communities
-                  </Typography>
+              <Box mb={2}>
+                <Grid
+                  component="label"
+                  container
+                  alignItems="center"
+                  justify="space-between"
+                  spacing={8}
+                >
+                  <Grid item>
+                    <Typography variant="h3" component="h1" gutterBottom={true}>
+                      Communities
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={12} md={4} className={classes.center}>
+                    <Button
+                      type="button"
+                      color="primary"
+                      variant="outlined"
+                      href={`https://forms.gle/3dDeanAhQggRZTef6`}
+                    >
+                      <span className={classes.buttonText}>
+                        Start your own community
+                      </span>
+                    </Button>
+                  </Grid>
                 </Grid>
-                <Grid item xs={12} md={4} className={classes.right}>
-                  <Button
-                    type="button"
-                    color="primary"
-                    variant="outlined"
-                    href={`https://forms.gle/3dDeanAhQggRZTef6`}
-                  >
-                    <span className={classes.buttonText}>
-                      Start your own community
-                    </span>
-                  </Button>
-                </Grid>
-              </Grid>
+              </Box>
               <SearchBar
                 defaultValue={search}
                 placeholderValue="Search communities by name, description, members, events, or preprints"
@@ -206,18 +186,19 @@ const Communities = () => {
                 <Grid item xs={12} md={4} className={classes.smallColumn}>
                   <Typography variant="h5" component="h2" gutterBottom={true}>
                     Search communities by tag
-                    <Box mt={4}>
+                    <Box mt={2}>
                       {!loadingTags && tags && tags.data.length ? (
                         tags.data.map(tag => (
-                          <Button
+                          <Chip
                             key={tag.uuid}
-                            href={`/communities/?tags=${tag.name}`}
-                            variant="outlined"
+                            clickable
+                            onClick={() =>
+                              history.push(`/communities/?tags=${tag.name}`)
+                            }
                             color="primary"
                             className={classes.buttonTag}
-                          >
-                            {tag.name}
-                          </Button>
+                            label={tag.name}
+                          />
                         ))
                       ) : (
                         <div>No tags to display.</div>
@@ -229,7 +210,7 @@ const Communities = () => {
             </Box>
           </Container>
         </div>
-      </ThemeProvider>
+      </>
     );
   }
 };

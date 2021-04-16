@@ -190,7 +190,7 @@ export default function Personas() {
               </Grid>
             </Box>
             <Grid container spacing={3}>
-              <Grid item className={classes.formControl} xs spacing={2}>
+              <Grid item className={classes.formControl} xs>
                 <Typography component="h5" variant="h5">
                   Filter by:
                 </Typography>
