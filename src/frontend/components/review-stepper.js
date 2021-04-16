@@ -4,6 +4,7 @@ import { useHistory, useLocation, useParams } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import ReactHtmlParser, { convertNodeToElement } from 'react-html-parser';
 import clsx from 'clsx';
+import isURL from 'validator/lib/isURL';
 
 // material ui
 import {
@@ -339,10 +340,29 @@ export default function ReviewStepper({
 
   // handle submit functions
   const canSubmitRapid = answerMap => {
-    console.log(answerMap);
-    return QUESTIONS.filter(q => q.type == 'YesNoQuestion').every(
-      question => question.identifier in answerMap,
-    );
+    if (
+      !QUESTIONS.filter(q => q.type == 'YesNoQuestion').every(
+        question => question.identifier in answerMap,
+      )
+    ) {
+      alert(
+        'Please complete the required fields. All multiple choice questions are required.',
+      );
+      return false;
+    }
+
+    if (answerMap.ynAvailableData === 'yes' && !answerMap.linkToData) {
+      alert(
+        `If you indicated the data used in the preprint is available, you must include the link to available data.`,
+      );
+      return false;
+    }
+    if (answerMap.ynAvailableData === 'yes' && !isURL(answerMap.linkToData)) {
+      alert(`The link to available data must be a valid URL.`);
+      return false;
+    }
+
+    return true;
   };
 
   const canSubmitLong = content => {
@@ -361,11 +381,6 @@ export default function ReviewStepper({
             alert(`An error occurred: ${err.message}`);
             return false;
           });
-      } else {
-        alert(
-          'Please complete the required fields. All multiple choice questions are required.',
-        );
-        return false;
       }
       return;
     }
@@ -579,7 +594,7 @@ export default function ReviewStepper({
         ) : (
           <Box>
             <Tooltip
-              title={`A Rapid Review is a structured form with Yes/No/n.a./Not Sure answer options 
+              title={`A Rapid Review is a structured form with Yes/No/N.A./Not Sure answer options 
               designed for researchers with subject matter expertise to provide quick and accurate feedback to a preprint. 
               You'll be able to provide a longer, more in-depth review after you complete this rapid-review form.`}
             >

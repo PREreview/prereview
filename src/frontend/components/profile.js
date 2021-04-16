@@ -49,6 +49,7 @@ import SettingsNotifications from './settings-notifications';
 
 // icons
 import CloseIcon from '@material-ui/icons/Close';
+import InfoOutlinedIcon from '@material-ui/icons/InfoOutlined';
 
 // constants
 import { ORG } from '../constants';
@@ -80,6 +81,12 @@ const useStyles = makeStyles(theme => ({
   formControl: {
     margin: theme.spacing(1),
     minWidth: 120,
+  },
+  info: {
+    backgroundColor: '#FAB7B7',
+  },
+  infoIcon: {
+    paddingRight: 5,
   },
   input: {
     marginBottom: 20,
@@ -298,6 +305,31 @@ export default function Profile() {
             {ownProfile ? (
               <Box my={4}>
                 <Container>
+                  {thisUser.contacts.length === 0 ? (
+                    <Grid container alignItems="center" justify="space-between">
+                      <Grid item>
+                        <Box mb={4} p={2} className={classes.info}>
+                          <Typography component="div" variant="body1">
+                            <InfoOutlinedIcon className={classes.infoIcon} />
+                            We were not able to import your email address from
+                            your ORCID record.
+                            <p>
+                              In order to receive key notifications, e.g.,
+                              updates to our Privacy Policy, notification of
+                              activity on the platform in response to a review
+                              request, or other platform changes, please add a
+                              valid email address to your PREreview profile.{' '}
+                            </p>
+                            <p>
+                              You can opt out of website notifications as well
+                              as hide your email from the public. We will not
+                              share your contact information.
+                            </p>
+                          </Typography>
+                        </Box>
+                      </Grid>
+                    </Grid>
+                  ) : null}
                   <Grid
                     component="label"
                     container
@@ -635,7 +667,8 @@ export default function Profile() {
                           })
                         ) : (
                           <Typography>
-                            {displayedPersona.name} hasn't joined any PREreview communities yet.
+                            {displayedPersona.name} hasn't joined any PREreview
+                            communities yet.
                           </Typography>
                         )}
                       </Grid>
