@@ -1,5 +1,5 @@
 // base imports
-import React, { useContext, useState, forwardRef } from 'react';
+import React, { useContext, useEffect, useState, forwardRef } from 'react';
 import PropTypes from 'prop-types';
 import { Helmet } from 'react-helmet-async';
 import MaterialTable from 'material-table';
@@ -513,6 +513,46 @@ function RapidReviewsTab() {
 }
 
 function CommunitiesTab() {
+  const [users, setUsers] = useState(null);
+
+  const { data, loading } = useGetCommunities({
+    resolve: res => res.data,
+  });
+
+  const { data: usersData, loading: loadingUsers } = useGetUsers({
+    resolve: res => res.data,
+  });
+
+  // generated hooks don't allow dynamic path params
+  const { mutate: update } = useMutate({
+    verb: 'PUT',
+    path: ({ id }) => `/communities/${id}`,
+  });
+
+  const { mutate: remove } = useMutate({
+    verb: 'DELETE',
+    path: ({ id }) => `/communities/${id}`,
+  });
+
+  const { mutate: create } = useMutate({
+    verb: 'POST',
+    path: '/communities',
+  });
+
+  useEffect(() => {
+    if (!loadingUsers && usersData) {
+      console.log(usersData);
+      const lookup = {};
+      usersData.map(user => {
+        user.defaultPersona
+          ? (lookup[user.defaultPersona.uuid] = user.defaultPersona.name)
+          : (lookup[user.uuid] = user.name);
+      });
+      console.log(lookup);
+      setUsers(lookup);
+    }
+  }, [usersData]);
+
   const columns = [
     { title: 'UUID', field: 'uuid', hidden: true },
     {
@@ -536,6 +576,7 @@ function CommunitiesTab() {
     {
       title: 'Owners',
       field: 'owners',
+      lookup: users,
       render: row => (
         <AvatarGroup max={5}>
           {row.owners &&
@@ -568,27 +609,7 @@ function CommunitiesTab() {
     },
   ];
 
-  const { data, loading } = useGetCommunities({
-    resolve: res => res.data,
-  });
-
-  // generated hooks don't allow dynamic path params
-  const { mutate: update } = useMutate({
-    verb: 'PUT',
-    path: ({ id }) => `/communities/${id}`,
-  });
-
-  const { mutate: remove } = useMutate({
-    verb: 'DELETE',
-    path: ({ id }) => `/communities/${id}`,
-  });
-
-  const { mutate: create } = useMutate({
-    verb: 'POST',
-    path: '/communities',
-  });
-
-  if (loading) {
+  if (loading || loadingUsers) {
     return <Loading />;
   } else {
     return (
