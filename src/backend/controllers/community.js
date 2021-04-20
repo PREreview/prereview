@@ -9,17 +9,10 @@ const Joi = router.Joi;
 
 const communitySchema = Joi.object({
   name: Joi.string(),
+  slug: Joi.string(),
   description: Joi.string(),
   banner: Joi.string(),
   twitter: Joi.string().regex(/^[a-zA-Z0-9_]{1,15}$/),
-});
-
-const eventSchema = Joi.object({
-  title: Joi.string(),
-  description: Joi.string(),
-  start: Joi.string(),
-  end: Joi.string(),
-  isPrivate: Joi.boolean(),
 });
 
 const tagSchema = Joi.object({
@@ -702,7 +695,7 @@ export default function controller(
     method: 'POST',
     path: '/communities/:id/events',
     validate: {
-      body: eventSchema,
+      body: communitySchema,
       type: 'json',
       continueOnError: true,
     },
