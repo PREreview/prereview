@@ -64,7 +64,10 @@ const useStyles = makeStyles(theme => ({
   headerBar: {
     position: 'absolute',
     top: 0,
-    width: '36vw',
+    width: '80%',
+    [theme.breakpoints.up('sm')]: {
+      width: '36vw',
+    },
   },
   root: {
     flexGrow: 1,

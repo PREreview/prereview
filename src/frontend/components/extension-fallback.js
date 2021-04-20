@@ -1,8 +1,8 @@
 // base imports
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
-import clsx from 'clsx';
 import { Helmet } from 'react-helmet-async';
+import PropTypes from 'prop-types';
 
 // contexts
 import UserProvider from '../contexts/user-context';
@@ -16,18 +16,18 @@ import { getCanonicalUrl } from '../utils/preprints';
 
 // Material UI imports
 import { makeStyles, useTheme } from '@material-ui/core/styles';
+import { useMediaQuery } from '@material-ui/core';
 import AppBar from '@material-ui/core/AppBar';
 import Box from '@material-ui/core/Box';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Divider from '@material-ui/core/Divider';
-import Drawer from '@material-ui/core/Drawer';
 import IconButton from '@material-ui/core/IconButton';
 import MenuOpenIcon from '@material-ui/icons/MenuOpen';
+import MuiDrawer from '@material-ui/core/Drawer';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 
 // icons
-import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 
 // components
@@ -39,11 +39,14 @@ import ShellContent from './shell-content';
 // constants
 import { ORG } from '../constants';
 
+const drawerHeight = '20%';
 const drawerWidth = '40vw';
 
 const useStyles = makeStyles(theme => ({
   root: {
-    display: 'flex',
+    [theme.breakpoints.up('sm')]: {
+      display: 'flex',
+    },
   },
   appBar: {
     transition: theme.transitions.create(['width', 'margin'], {
@@ -52,6 +55,9 @@ const useStyles = makeStyles(theme => ({
     }),
     width: '100%',
     zIndex: theme.zIndex.drawer + 1,
+    [theme.breakpoints.down('sm')]: {
+      display: 'none',
+    },
   },
   appBarContent: {
     alignItems: 'center',
@@ -62,41 +68,73 @@ const useStyles = makeStyles(theme => ({
     width: '100%',
   },
   appBarShift: {
-    marginRight: drawerWidth,
+    marginRight: 0,
     transition: theme.transitions.create(['width', 'margin'], {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen,
     }),
-    width: `calc(100% - ${drawerWidth})`,
+    width: '100%',
+    [theme.breakpoints.up('sm')]: {
+      marginRight: drawerWidth,
+      width: `calc(100% - ${drawerWidth})`,
+    },
+  },
+  chevron: {
+    [theme.breakpoints.down('sm')]: {
+      transform: 'rotate(90deg)',
+    },
   },
   content: {
-    flexGrow: 1,
     padding: theme.spacing(3),
+    [theme.breakpoints.up('sm')]: {
+      flexGrow: 1,
+    },
   },
   drawer: {
-    flexShrink: 0,
-    width: drawerWidth,
+    width: '100%',
+    [theme.breakpoints.up('sm')]: {
+      flexShrink: 0,
+      width: drawerWidth,
+    },
   },
   drawerOpen: {
-    transition: theme.transitions.create('width', {
+    height: '60%',
+    transition: theme.transitions.create('height', {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen,
     }),
-    width: drawerWidth,
+    width: '100%',
+    [theme.breakpoints.up('sm')]: {
+      height: '100%',
+      width: drawerWidth,
+      transition: theme.transitions.create('width', {
+        easing: theme.transitions.easing.sharp,
+        duration: theme.transitions.duration.enteringScreen,
+      }),
+    },
   },
   drawerClose: {
+    height: drawerHeight,
     overflowX: 'hidden',
-    transition: theme.transitions.create('width', {
+    transition: theme.transitions.create('height', {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
     }),
-    width: theme.spacing(7) + 1,
+    width: '100%',
     [theme.breakpoints.up('sm')]: {
+      height: '100%',
+      transition: theme.transitions.create('width', {
+        easing: theme.transitions.easing.sharp,
+        duration: theme.transitions.duration.leavingScreen,
+      }),
       width: theme.spacing(9) + 1,
     },
   },
   headerBarFull: {
-    width: `calc(100% - 74px)`,
+    width: '100%',
+    [theme.breakpoints.up('sm')]: {
+      width: `calc(100% - 74px)`,
+    },
   },
   headerBarCondensed: {
     width: `100%`,
@@ -126,7 +164,6 @@ export default function ExtensionFallback() {
   const classes = useStyles();
   const { id, cid } = useParams();
   const location = useLocation(); // location.state can be {preprint, tab} with tab being `request` or `review` (so that we know on which tab the shell should be activated with
-  const theme = useTheme();
   const appBarElement = useRef(null);
 
   const [user] = useContext(UserProvider.context);
@@ -140,12 +177,34 @@ export default function ExtensionFallback() {
     { id: id },
   );
 
-  const handleDrawerOpen = () => {
-    setOpen(true);
+  function Drawer({ children }) {
+    const isSmallScreen = useMediaQuery(theme => theme.breakpoints.down('sm'));
+
+    const drawerProps = {
+      anchor: isSmallScreen ? 'bottom' : 'right',
+      variant: 'permanent',
+    };
+    return (
+      <MuiDrawer
+        classes={{
+          paper: open ? classes.drawerOpen : classes.drawerClose,
+        }}
+        className={`${classes.drawer} ${
+          open ? classes.drawerOpen : classes.drawerClose
+        }`}
+        {...drawerProps}
+      >
+        {children}
+      </MuiDrawer>
+    );
+  }
+
+  Drawer.propTypes = {
+    children: PropTypes.node,
   };
 
-  const handleDrawerClose = () => {
-    setOpen(false);
+  const handleDrawerToggle = () => {
+    setOpen(open => !open);
   };
 
   useExtension(preprint && id);
@@ -187,9 +246,7 @@ export default function ExtensionFallback() {
             ref={appBarElement}
             color="default"
             position="fixed"
-            className={clsx(classes.appBar, {
-              [classes.appBarShift]: open,
-            })}
+            className={`${classes.appBar} ${open ? classes.appBarShift : ''}`}
           >
             <Toolbar
               className={classes.appBarContent}
@@ -198,11 +255,9 @@ export default function ExtensionFallback() {
               <IconButton
                 color="inherit"
                 aria-label="open drawer"
-                onClick={handleDrawerOpen}
+                onClick={handleDrawerToggle}
                 edge="end"
-                className={clsx(classes.menuButton, {
-                  [classes.hide]: open,
-                })}
+                className={`${classes.menuButton} ${open ? classes.hide : ''}`}
               >
                 <MenuOpenIcon />
               </IconButton>
@@ -251,27 +306,14 @@ export default function ExtensionFallback() {
               </Box>
             </object>
           </main>
-          <Drawer
-            variant="permanent"
-            anchor="right"
-            className={clsx(classes.drawer, {
-              [classes.drawerOpen]: open,
-              [classes.drawerClose]: !open,
-            })}
-            classes={{
-              paper: clsx({
-                [classes.drawerOpen]: open,
-                [classes.drawerClose]: !open,
-              }),
-            }}
-          >
+          <Drawer>
             <div className={classes.toolbar}>
-              <IconButton onClick={handleDrawerClose}>
-                {theme.direction === 'ltr' ? (
-                  <ChevronRightIcon />
-                ) : (
-                  <ChevronLeftIcon />
-                )}
+              <IconButton
+                onClick={handleDrawerToggle}
+                className={classes.chevron}
+                style={!open ? { transform: 'rotate(270deg)' } : null}
+              >
+                <ChevronRightIcon />
               </IconButton>
             </div>
             <Divider />
