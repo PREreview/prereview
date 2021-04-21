@@ -197,6 +197,9 @@ export default function ReviewReader({
       );
       setLongformAnchorEl(reviewNode);
     }
+  }, []);
+
+  useEffect(() => {
     if (
       rapidContent &&
       Object.keys(rapidContent).length !== 0 &&

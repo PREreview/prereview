@@ -160,6 +160,26 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
+function Drawer({ children, classes, className }) {
+  const isSmallScreen = useMediaQuery(theme => theme.breakpoints.down('sm'));
+
+  const drawerProps = {
+    anchor: isSmallScreen ? 'bottom' : 'right',
+    variant: 'permanent',
+  };
+  return (
+    <MuiDrawer {...drawerProps} classes={classes} className={className}>
+      {children}
+    </MuiDrawer>
+  );
+}
+
+Drawer.propTypes = {
+  children: PropTypes.node,
+  classes: PropTypes.object,
+  className: PropTypes.string,
+};
+
 export default function ExtensionFallback() {
   const classes = useStyles();
   const { id, cid } = useParams();
@@ -176,32 +196,6 @@ export default function ExtensionFallback() {
   const { data: preprintData, loadingPreprint, errorPreprint } = useGetPreprint(
     { id: id },
   );
-
-  function Drawer({ children }) {
-    const isSmallScreen = useMediaQuery(theme => theme.breakpoints.down('sm'));
-
-    const drawerProps = {
-      anchor: isSmallScreen ? 'bottom' : 'right',
-      variant: 'permanent',
-    };
-    return (
-      <MuiDrawer
-        classes={{
-          paper: open ? classes.drawerOpen : classes.drawerClose,
-        }}
-        className={`${classes.drawer} ${
-          open ? classes.drawerOpen : classes.drawerClose
-        }`}
-        {...drawerProps}
-      >
-        {children}
-      </MuiDrawer>
-    );
-  }
-
-  Drawer.propTypes = {
-    children: PropTypes.node,
-  };
 
   const handleDrawerToggle = () => {
     setOpen(open => !open);
@@ -306,7 +300,14 @@ export default function ExtensionFallback() {
               </Box>
             </object>
           </main>
-          <Drawer>
+          <Drawer
+            classes={{
+              paper: open ? classes.drawerOpen : classes.drawerClose,
+            }}
+            className={`${classes.drawer} ${
+              open ? classes.drawerOpen : classes.drawerClose
+            }`}
+          >
             <div className={classes.toolbar}>
               <IconButton
                 onClick={handleDrawerToggle}
