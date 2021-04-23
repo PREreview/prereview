@@ -9,14 +9,25 @@ export default function controller(reqModel, preprintModel, thisUser) {
   const requestRouter = router();
 
   const getHandler = async ctx => {
-    let requests, pid; // pid = preprint ID
+    let requests, preprint; // pid = preprint ID
 
-    ctx.params.pid ? (pid = ctx.params.pid) : null;
+    if (ctx.params.pid) {
+      try {
+        preprint = await preprintModel.findOneByUuidOrHandle(ctx.params.pid);
+      } catch (err) {
+        log.error('HTTP 400 Error: Error fetching preprint');
+        ctx.throw(400, 'Error fetching preprint');
+      }
+      if (!preprint) {
+        log.error('HTTP 404 Error: Preprint not found');
+        ctx.throw(404, 'Preprint not found');
+      }
+    }
 
     try {
-      if (pid) {
-        log.debug(`Retriving requests made for preprint ${pid}`);
-        requests = await reqModel.find({ preprint: pid });
+      if (preprint) {
+        log.debug(`Retriving requests made for preprint ${ctx.params.pid}`);
+        requests = await reqModel.find({ preprint: preprint });
       } else {
         log.debug(`Retrieving all requests.`);
         requests = await reqModel.findAll();
@@ -38,19 +49,23 @@ export default function controller(reqModel, preprintModel, thisUser) {
     let request, preprint, authorPersona; // pid = preprint ID
 
     if (ctx.params.pid) {
-      preprint = await preprintModel.findOne({ uuid: ctx.params.pid });
+      preprint = await preprintModel.findOneByUuidOrHandle(ctx.params.pid);
     }
 
     if (!preprint) {
       log.error('HTTP 404 Error: Preprint not found');
-      ctx.throw(400, 'Preprint not found');
+      ctx.throw(404, 'Preprint not found');
     }
-    authorPersona = getActivePersona(ctx.state.user);
+    authorPersona = getActivePersona(await thisUser.getUser(ctx));
 
     log.debug(`Adding a request.`);
 
     let isPreprintAuthor = false;
-    if (ctx.query.isAuthor && ctx.isMemberOf('partners', authorPersona.uuid)) {
+    if (
+      ctx.query.isAuthor &&
+      (thisUser.isMemberOf('partners', authorPersona.uuid) ||
+        thisUser.isMemberOf('admins', authorPersona.uuid))
+    ) {
       isPreprintAuthor = true;
     }
 
