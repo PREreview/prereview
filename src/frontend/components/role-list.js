@@ -5,6 +5,8 @@ import PropTypes from 'prop-types';
 // Material UI imports
 import { makeStyles } from '@material-ui/core/styles';
 import AvatarGroup from '@material-ui/lab/AvatarGroup';
+import Badge from '@material-ui/core/Badge';
+import Book from '@material-ui/icons/Book';
 import Typography from '@material-ui/core/Typography';
 
 // components
@@ -15,6 +17,7 @@ const useStyles = makeStyles(() => ({
     border: 'none',
   },
   list: {
+    paddingTop: '4px',
     display: 'flex',
     justifyContent: 'flex-start',
   },
@@ -44,6 +47,7 @@ export default function Reviewers({
         newAuthor.reviewUuid = preprintId
           ? `/preprints/${preprintId}/rapid-reviews/${review.uuid}`
           : `/rapid-reviews/${review.uuid}`;
+        newAuthor.isPreprintAuthor = !!review.isPreprintAuthor;
         newAuthors = [...newAuthors, newAuthor];
       } else if (review.authors) {
         if (review.isPublished) {
@@ -52,6 +56,7 @@ export default function Reviewers({
             newAuthor.reviewUuid = preprintId
               ? `/preprints/${preprintId}/full-reviews/${review.uuid}`
               : `/full-reviews/${review.uuid}`;
+            newAuthor.isPreprintAuthor = !!review.isPreprintAuthor;
             newAuthors = [...newAuthors, newAuthor];
           });
         }
@@ -84,7 +89,17 @@ export default function Reviewers({
       <AvatarGroup max={20} className={classes.list}>
         {authors.length
           ? authors.map(author => {
-              return <RoleBadge key={author.uuid} user={author} />;
+              return (
+                <Badge
+                  key={`${author.uuid}-badge`}
+                  className={classes.badge}
+                  color="primary"
+                  badgeContent="Author"
+                  invisible={!author.isPreprintAuthor}
+                >
+                  <RoleBadge key={author.uuid} user={author} />
+                </Badge>
+              );
             })
           : null}
       </AvatarGroup>
