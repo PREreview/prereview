@@ -263,7 +263,9 @@ export default function controller(groupModel, userModel, thisUser) {
       if (user && group) {
         try {
           log.debug(
-            `Group ${group.id} found. Removing user ${user.orcid} from group.`,
+            `Group ${group.name} found. Removing user ${
+              user.orcid
+            } from group.`,
           );
           group.members.remove(user);
           await groupModel.persistAndFlush(group);
@@ -324,7 +326,9 @@ export default function controller(groupModel, userModel, thisUser) {
       }
 
       try {
-        log.debug(`Group ${group.id} found. Adding user ${user.id} to group.`);
+        log.debug(
+          `Group ${group.name} found. Adding user ${user.uuid} to group.`,
+        );
         group.members.add(user);
         await groupModel.persistAndFlush(group);
       } catch (err) {
