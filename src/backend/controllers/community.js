@@ -9,10 +9,14 @@ const Joi = router.Joi;
 
 const communitySchema = Joi.object({
   name: Joi.string(),
+  uuid: Joi.string(),
   slug: Joi.string(),
-  description: Joi.string(),
-  banner: Joi.string(),
-  twitter: Joi.string().regex(/^[a-zA-Z0-9_]{1,15}$/),
+  description: Joi.string().allow(null),
+  banner: Joi.string().allow(null),
+  twitter: Joi.string()
+    .regex(/^[a-zA-Z0-9_]{1,15}$/)
+    .allow(null),
+  owners: Joi.array(),
 });
 
 const tagSchema = Joi.object({
@@ -73,6 +77,8 @@ export default function controller(
         handleInvalid(ctx);
         return;
       }
+
+      log.debug('ctx.body /POST', ctx.request.body);
 
       log.debug(`Adding a new community`);
       let community;
@@ -312,6 +318,8 @@ export default function controller(
         handleInvalid(ctx);
         return;
       }
+
+      log.debug(`!!!!!!!!!`, ctx.request.body);
 
       log.debug(`Updating community with id ${ctx.params.id}.`);
       let community;

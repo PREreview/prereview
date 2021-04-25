@@ -160,6 +160,7 @@ function UsersTab() {
     {
       title: 'ORCiD',
       field: 'orcid',
+      editable: false,
       render: row => (
         <Link
           href={`https://orcid.org/${row.orcid}`}
@@ -225,6 +226,7 @@ function PersonasTab() {
     {
       title: 'Avatar',
       field: 'avatar',
+      editable: false,
       render: row => (
         <Link href={`/about/${row.uuid}`} target="_blank" rel="noopener">
           <Avatar src={row.avatar} alt={row.name} />
@@ -619,7 +621,14 @@ function CommunitiesTab() {
         data={data}
         editable={{
           onRowUpdate: newData =>
-            update(newData, { pathParams: { id: newData.uuid } }),
+            update(
+              {
+                name: newData.name,
+                slug: newData.slug,
+                owners: [newData.owners],
+              },
+              { pathParams: { id: newData.uuid } },
+            ),
           onRowDelete: newData => remove({ pathParams: { id: newData.uuid } }),
           onRowAdd: newData => create(newData),
         }}
