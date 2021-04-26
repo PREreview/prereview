@@ -91,6 +91,8 @@ export default function controller(
         ctx.throw(400, `Failed to parse community schema: ${err}`);
       }
 
+      log.debug("************************************* community after creation", community)
+
       ctx.body = {
         status: 201,
         message: 'created',
@@ -335,6 +337,8 @@ export default function controller(
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse community schema: ${err}`);
       }
+
+      log.debug("updatedCommunity, i think**************", community, community.owners.getItems())
 
       // if updated
       ctx.status = 204;

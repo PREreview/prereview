@@ -262,6 +262,8 @@ function PersonasTab() {
     resolve: res => res.data,
   });
 
+  console.log("...............personas", data)
+
   // generated hooks don't allow dynamic path params
   const { mutate: update } = useMutate({
     verb: 'PUT',
@@ -521,6 +523,8 @@ function CommunitiesTab() {
     resolve: res => res.data,
   });
 
+  console.log("communities***********", data)
+
   const { data: usersData, loading: loadingUsers } = useGetUsers({
     resolve: res => res.data,
   });
@@ -625,12 +629,20 @@ function CommunitiesTab() {
               {
                 name: newData.name,
                 slug: newData.slug,
-                owners: [newData.owners],
+                owners: Array.isArray(newData.owners)
+                  ? newData.owners
+                  : [newData.owners],
               },
               { pathParams: { id: newData.uuid } },
             ),
           onRowDelete: newData => remove({ pathParams: { id: newData.uuid } }),
-          onRowAdd: newData => create(newData),
+          onRowAdd: newData =>
+            create({
+              ...newData,
+              owners: Array.isArray(newData.owners)
+                ? newData.owners
+                : [newData.owners],
+            }),
         }}
       />
     );
