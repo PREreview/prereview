@@ -88,6 +88,7 @@ export default function ReviewReader({
   longContent,
   newRequest,
   height,
+  isReader = true,
 }) {
   const classes = useStyles();
   const history = useHistory();
@@ -138,7 +139,9 @@ export default function ReviewReader({
     setRapidAnchorEl(rapidAnchorEl ? null : event.currentTarget);
     if (!rapidAnchorEl) {
       history.push(
-        `${location.pathname}/rapid-reviews/${event.currentTarget.getAttribute(
+        `/preprints/${
+          preprint.uuid
+        }/rapid-reviews/${event.currentTarget.getAttribute(
           'aria-describedby',
         )}`,
       );
@@ -151,9 +154,9 @@ export default function ReviewReader({
     setLongformAnchorEl(longformAnchorEl ? null : event.currentTarget);
     if (!longformAnchorEl) {
       history.push(
-        `${location.pathname}/full-reviews/${event.currentTarget.getAttribute(
-          'aria-describedby',
-        )}`,
+        `/preprints/${
+          preprint.uuid
+        }/full-reviews/${event.currentTarget.getAttribute('aria-describedby')}`,
       );
     }
   };
@@ -304,7 +307,7 @@ export default function ReviewReader({
                         identifier={preprint.handle}
                         roleIds={highlightedRoleIds}
                         role={role}
-                        isReader={false}
+                        isReader={isReader}
                       />
                     </div>
                   ))}
@@ -471,6 +474,7 @@ export default function ReviewReader({
                                         height={height}
                                         review={review}
                                         user={user}
+                                        isReader={isReader}
                                       />
                                     </Grid>
                                     <Grid item>
@@ -533,4 +537,5 @@ ReviewReader.propTypes = {
   longContent: PropTypes.oneOfType([PropTypes.object, PropTypes.string]),
   newRequest: PropTypes.bool,
   height: PropTypes.number,
+  isReader: PropTypes.bool,
 };
