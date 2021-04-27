@@ -73,8 +73,9 @@ export function getCanonicalUrl(preprint = {}) {
  * Used to avoid converting date posted to user locale
  */
 export function getFormattedDatePosted(isoString) {
+  isoString = isoString ? isoString : new Date().toISOString();
   const [year, month, day] = isoString.substr(0, 10).split('-');
-  return format(new Date(year, month-1, day), 'yyyy/MM/dd');
+  return format(new Date(year, month - 1, day), 'yyyy/MM/dd');
 }
 
 /**
