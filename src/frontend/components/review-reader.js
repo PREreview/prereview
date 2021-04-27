@@ -88,6 +88,7 @@ export default function ReviewReader({
   longContent,
   newRequest,
   height,
+  isReader = true,
 }) {
   const classes = useStyles();
   const history = useHistory();
@@ -306,7 +307,7 @@ export default function ReviewReader({
                         identifier={preprint.handle}
                         roleIds={highlightedRoleIds}
                         role={role}
-                        isReader={false}
+                        isReader={isReader}
                       />
                     </div>
                   ))}
@@ -369,7 +370,6 @@ export default function ReviewReader({
                         onHighlighedRoleIdsChange(nextHighlightedRoleIds);
                         setHighlightedRoleIds(nextHighlightedRoleIds);
                       }}
-                      isReader={false}
                     />
                   </div>
                   <div>
@@ -474,6 +474,7 @@ export default function ReviewReader({
                                         height={height}
                                         review={review}
                                         user={user}
+                                        isReader={isReader}
                                       />
                                     </Grid>
                                     <Grid item>
@@ -536,4 +537,5 @@ ReviewReader.propTypes = {
   longContent: PropTypes.oneOfType([PropTypes.object, PropTypes.string]),
   newRequest: PropTypes.bool,
   height: PropTypes.number,
+  isReader: PropTypes.bool,
 };
