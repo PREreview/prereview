@@ -160,13 +160,7 @@ const RoleBadgeUI = React.forwardRef(function RoleBadgeUI(
         <div className={classes.popoverInner}>
           {user.reviewUuid ? (
             <Typography component="div">
-              <Link
-                href={user.reviewUuid}
-                onClick={event => {
-                  event.preventDefault();
-                  history.push(user.reviewUuid);
-                }}
-              >
+              <Link href={user.reviewUuid}>
                 {user && user.defaultPersona
                   ? `View ${user.defaultPersona.name}'s Review`
                   : `View ${user.name}'s Review`}

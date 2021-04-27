@@ -138,7 +138,9 @@ export default function ReviewReader({
     setRapidAnchorEl(rapidAnchorEl ? null : event.currentTarget);
     if (!rapidAnchorEl) {
       history.push(
-        `${location.pathname}/rapid-reviews/${event.currentTarget.getAttribute(
+        `/preprints/${
+          preprint.uuid
+        }/rapid-reviews/${event.currentTarget.getAttribute(
           'aria-describedby',
         )}`,
       );
@@ -151,9 +153,9 @@ export default function ReviewReader({
     setLongformAnchorEl(longformAnchorEl ? null : event.currentTarget);
     if (!longformAnchorEl) {
       history.push(
-        `${location.pathname}/full-reviews/${event.currentTarget.getAttribute(
-          'aria-describedby',
-        )}`,
+        `/preprints/${
+          preprint.uuid
+        }/full-reviews/${event.currentTarget.getAttribute('aria-describedby')}`,
       );
     }
   };
