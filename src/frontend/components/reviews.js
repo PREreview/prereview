@@ -261,7 +261,7 @@ export default function Reviews() {
                         setLoginModalOpenNext('/reviews/new');
                       }
                     }}
-                    disabled={location.pathname === '/reviews/new'}
+                    disabled={newPreprintOpen}
                   />
                   <PrivateRoute path="/reviews/new" exact={true}>
                     <Dialog
@@ -271,11 +271,12 @@ export default function Reviews() {
                       }}
                     >
                       <Helmet>
-                        <title>Rapid PREreview • Add entry</title>
+                        <title>PREreview • Add entry</title>
                       </Helmet>
                       <NewPreprint
                         user={thisUser}
                         onCancel={() => {
+                          setNewPreprintOpen(false);
                           history.push('/reviews');
                         }}
                         onSuccess={preprint => {
