@@ -77,6 +77,17 @@ async function scrapeUrl(
       ? highwirePress.date
       : undefined;
 
+    const publication = highwirePress.publisher
+      ? highwirePress.publisher
+      : undefined;
+
+    let preprintServer =
+      openGraph && openGraph.site_name ? openGraph.site_name : undefined;
+
+    if (!preprintServer && publication === 'Preprints') {
+      preprintServer = publication;
+    }
+
     const preprint: PreprintMetadata = {
       handle: `${handleType}:${handle}`,
       title: highwirePress.title ? highwirePress.title : undefined,
@@ -89,20 +100,13 @@ async function scrapeUrl(
           ? general.description
           : undefined,
       url: openGraph && openGraph.url ? openGraph.url : undefined,
-      preprintServer:
-        openGraph && openGraph.site_name
-          ? openGraph.site_name
-          : highwirePress.public_url
-          ? highwirePress.public_url
-          : undefined,
+      preprintServer: preprintServer,
       authors: authors.length > 0 ? authors : undefined,
       datePosted: datePosted
         ? new Date(datePosted as string).toISOString()
         : new Date().toISOString(),
       license: undefined,
-      publication: highwirePress.publisher
-        ? highwirePress.publisher
-        : undefined,
+      publication: publication,
       contentUrl: highwirePress.pdf_url ? highwirePress.pdf_url : undefined,
       contentEncoding: highwirePress.pdf_url ? 'application/pdf' : undefined,
     };
