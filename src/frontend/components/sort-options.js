@@ -6,8 +6,21 @@ import Tooltip from '@reach/tooltip';
 import { useIsMobile } from '../hooks/ui-hooks';
 
 // Material UI components
+import { makeStyles } from '@material-ui/core/styles';
+import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
+import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
+import Box from '@material-ui/core/Box';
 import Grid from '@material-ui/core/Grid';
+import Input from '@material-ui/core/Input';
+import InputLabel from '@material-ui/core/InputLabel';
 
+const useStyles = makeStyles(() => ({
+  sortOptions: {
+    alignItems: 'center',
+    borderBottom: '1px',
+    textTransform: 'uppercase',
+  },
+}));
 export default function SortOptions({
   sort,
   order,
@@ -15,8 +28,77 @@ export default function SortOptions({
   onMouseEnterSortOption,
   onMouseLeaveSortOption,
 }) {
+  const classes = useStyles();
+  const isMobile = useIsMobile();
+
   return (
-    <Grid container alignItems="center" justify="space-between" spacing={2} />
+    <Grid container item className={classes.sortOptions} alignItems="center">
+      {['recentRapid', 'recentFull', 'recentRequests', 'datePosted'].map(
+        name => (
+          <Grid container item xs key={name}>
+            <Box display="none">
+              <Input
+                type="radio"
+                id={`sort-options-${name}`}
+                name={name}
+                value={name}
+                display="none"
+                onClick={e => {
+                  const sortOption = e.target.value;
+                  onChange(sortOption, order === 'asc' ? 'desc' : 'asc');
+                }}
+              />
+            </Box>
+            <Grid item>
+              <Tooltip
+                label={`Sort by ${
+                  name === 'recentRapid'
+                    ? 'Date of latest Rapid Review'
+                    : name === 'recentFull'
+                    ? 'Date of latest Full Review'
+                    : name === 'recentRequests'
+                    ? 'Date of latest request for review'
+                    : 'date posted on preprint server'
+                }`}
+              >
+                <InputLabel
+                  htmlFor={`sort-options-${name}`}
+                  cursor={sort === name ? 'default' : 'pointer'}
+                  focus={sort === name}
+                >
+                  {name === 'recentRapid'
+                    ? isMobile
+                      ? 'Rapid Reviewed'
+                      : 'Recently Rapid Reviewed'
+                    : name === 'recentFull'
+                    ? isMobile
+                      ? 'Reviewed'
+                      : 'Recently Reviewed'
+                    : name === 'recentRequests'
+                    ? isMobile
+                      ? 'Requested'
+                      : 'Recently Requested'
+                    : isMobile
+                    ? 'Published'
+                    : 'Date Published'}
+                </InputLabel>
+              </Tooltip>
+            </Grid>
+            <Grid item>
+              {order === 'asc' ? (
+                <ArrowUpwardIcon
+                  visibility={sort === name ? 'visible' : 'hidden'}
+                />
+              ) : (
+                <ArrowDownwardIcon
+                  visibility={sort === name ? 'visible' : 'hidden'}
+                />
+              )}
+            </Grid>
+          </Grid>
+        ),
+      )}
+    </Grid>
   );
 }
 
@@ -31,6 +113,6 @@ SortOptions.propTypes = {
     '',
   ]),
   order: PropTypes.string,
-  onMouseEnterSortOption: PropTypes.func.isRequired,
-  onMouseLeaveSortOption: PropTypes.func.isRequired,
+  onMouseEnterSortOption: PropTypes.func,
+  onMouseLeaveSortOption: PropTypes.func,
 };
