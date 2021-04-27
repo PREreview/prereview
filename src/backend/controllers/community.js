@@ -348,7 +348,7 @@ export default function controller(
         return;
       }
 
-      let owner; 
+      let owner;
 
       if (ctx.request.body.owners.length) {
         try {
@@ -370,14 +370,14 @@ export default function controller(
           ctx.throw(404, `Community with ID ${ctx.params.id} doesn't exist`);
         }
         communityModel.assign(community, ctx.request.body);
-        community.owners.add(owner)
-        community.members.add(owner.defaultPersona)
+        community.owners.add(owner);
+        community.members.add(owner.defaultPersona);
         await communityModel.persistAndFlush(community);
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse community schema: ${err}`);
       }
-      
+
       // if updated
       ctx.status = 204;
     },
