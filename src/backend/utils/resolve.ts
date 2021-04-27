@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import doiRegex from 'doi-regex';
 import identifiersArxiv from 'identifiers-arxiv';
 import scrape from 'html-metadata';
@@ -34,6 +35,7 @@ async function scrapeUrl(
   handle: string,
   handleType: string,
 ): Promise<PreprintMetadata> {
+  log.debug('Attempting to scrape metadata from:', url);
   let res: ScrapeMetadata;
   try {
     res = await scrape({
@@ -45,6 +47,7 @@ async function scrapeUrl(
   }
 
   if (res) {
+    log.debug('Raw metadata scrape output:', res);
     const { general, openGraph, highwirePress } = res;
     const authors = [];
 
@@ -72,11 +75,11 @@ async function scrapeUrl(
       ? highwirePress.online_date
       : highwirePress.date
       ? highwirePress.date
-      : null;
+      : undefined;
 
     const preprint: PreprintMetadata = {
       handle: `${handleType}:${handle}`,
-      title: highwirePress.title ? highwirePress.title : null,
+      title: highwirePress.title ? highwirePress.title : undefined,
       abstractText:
         openGraph && openGraph.abstract
           ? openGraph.abstract
@@ -84,22 +87,24 @@ async function scrapeUrl(
           ? openGraph.description
           : general && general.description
           ? general.description
-          : null,
-      url: openGraph && openGraph.url ? openGraph.url : null,
+          : undefined,
+      url: openGraph && openGraph.url ? openGraph.url : undefined,
       preprintServer:
         openGraph && openGraph.site_name
           ? openGraph.site_name
           : highwirePress.public_url
           ? highwirePress.public_url
-          : null,
-      authors: authors,
+          : undefined,
+      authors: authors.length > 0 ? authors : undefined,
       datePosted: datePosted
         ? new Date(datePosted as string).toISOString()
         : new Date().toISOString(),
-      license: null,
-      publication: highwirePress.publisher ? highwirePress.publisher : null,
-      contentUrl: highwirePress.pdf_url ? highwirePress.pdf_url : null,
-      contentEncoding: highwirePress.pdf_url ? 'application/pdf' : null,
+      license: undefined,
+      publication: highwirePress.publisher
+        ? highwirePress.publisher
+        : undefined,
+      contentUrl: highwirePress.pdf_url ? highwirePress.pdf_url : undefined,
+      contentEncoding: highwirePress.pdf_url ? 'application/pdf' : undefined,
     };
 
     return preprint;
@@ -107,6 +112,7 @@ async function scrapeUrl(
 }
 
 async function searchGoogleScholar(handle: string): Promise<PreprintMetadata> {
+  log.debug('Attempting to scrape Google Scholar for handle:', handle);
   let res;
   try {
     res = await scholarSearch(handle);
@@ -118,17 +124,25 @@ async function searchGoogleScholar(handle: string): Promise<PreprintMetadata> {
     log.error(`Preprint ${handle} not found on Google Scholar.`);
     return;
   }
+  log.debug('Raw Google Scholar output:', res[0]);
   const contentEncoding =
-    res[0].pdf && res[0].pdf.endsWith('.pdf') ? 'application/pdf' : null;
+    res[0].pdf && res[0].pdf.endsWith('.pdf') ? 'application/pdf' : undefined;
+
+  let datePosted: string | undefined;
+  if (res[0].year) {
+    const date = new Date();
+    date.setFullYear(res[0].year);
+    datePosted = date.toISOString();
+  }
   const metadata = {
     handle: `doi:${handle}`,
     title: res[0].title,
     abstractText: res[0].description,
     url: res[0].url,
-    preprintServer: null,
+    preprintServer: undefined,
     authors: res[0].authors,
-    datePosted: new Date(res[0].year).toISOString(),
-    license: null,
+    datePosted: datePosted,
+    license: undefined,
     publication: res[0].publication,
     contentUrl: res[0].pdf,
     contentEncoding: contentEncoding,
@@ -137,6 +151,7 @@ async function searchGoogleScholar(handle: string): Promise<PreprintMetadata> {
 }
 
 function searchCrossRef(handle: string): Promise<PreprintMetadata> {
+  log.debug('Attempting to scrape Crossref for handle:', handle);
   return new Promise((resolve, reject) => {
     CrossRef.work(handle, (err, res) => {
       if (err) {
@@ -146,6 +161,7 @@ function searchCrossRef(handle: string): Promise<PreprintMetadata> {
           log.error(`Preprint ${handle} not found on CrossRef.`);
           reject();
         }
+        log.debug('Raw Crossref output:', res);
         const authors = [];
 
         if (res.author) {
@@ -156,21 +172,25 @@ function searchCrossRef(handle: string): Promise<PreprintMetadata> {
           title: res.title[0],
           abstractText: res.abstract,
           url: res.URL,
-          preprintServer: res.institution ? res.institution.name : null,
+          preprintServer: res.institution
+            ? res.institution.name
+            : res['group-title']
+            ? res['group-title']
+            : undefined,
           authors: authors,
           datePosted: new Date(res.created['date-time']).toISOString(),
-          license: null,
+          license: undefined,
           publication: res.publisher,
           contentUrl:
             Array.isArray(res.link) && res.link.length > 0
               ? res.link[0].URL
-              : null,
+              : undefined,
           contentEncoding:
             Array.isArray(res.link) &&
             res.link.length > 0 &&
             res.link[0]['content-type'] !== 'unspecified'
               ? res.link[0]['content-type']
-              : null,
+              : undefined,
         };
         resolve(metadata);
       }
@@ -181,8 +201,10 @@ function searchCrossRef(handle: string): Promise<PreprintMetadata> {
 export async function resolvePreprint(
   handle: string,
 ): Promise<PreprintMetadata> {
+  log.debug('Resolving preprint with handle:', handle);
   const isDoi = doiRegex().test(handle);
   const isArxiv = identifiersArxiv.extract(handle)[0];
+  const resolvers = [];
 
   const baseUrlArxivHtml = 'https://arxiv.org/abs/';
   const baseUrlDoi = 'https://doi.org/';
@@ -190,44 +212,43 @@ export async function resolvePreprint(
   // checks if the publication is DOI or arXiv
   let url: string, type: string;
   if (isDoi) {
+    log.debug('Resolving preprint with a DOI');
     url = `${baseUrlDoi}${handle}`;
     type = 'doi';
   } else if (isArxiv) {
+    log.debug('Resolving preprint with an arXivId');
     url = `${baseUrlArxivHtml}${handle}`;
     type = 'arxiv';
   }
 
-  // fetch data based on publication type (DOI / arXiv)
-  let metadata: PreprintMetadata;
-  if (isDoi || isArxiv) {
-    try {
-      metadata = await scrapeUrl(url, handle, type);
-    } catch (err) {
-      log.warn('No metadata found, failing over to next resolver: ', err);
-    }
-  }
+  // as a last resort check Google Scholar
+  resolvers.push(
+    searchGoogleScholar(handle).catch(err =>
+      log.error('Not found on Google Scholar: ', err),
+    ),
+  );
 
   // check crossref if nothing is found on official sites
-  if (isDoi && !metadata) {
-    try {
-      metadata = await searchCrossRef(handle);
-    } catch (err) {
-      log.warn('Not found on CrossRef, failing over to next resolver: ', err);
-    }
+  if (isDoi) {
+    resolvers.push(
+      searchCrossRef(handle).catch(err =>
+        log.warn('Not found on CrossRef: ', err),
+      ),
+    );
   }
 
-  // as a last resort check Google Scholar
-  if (!metadata) {
-    try {
-      metadata = await searchGoogleScholar(handle);
-    } catch (err) {
-      log.error(
-        'Not found on Google Scholar, no more resolvers available: ',
-        err,
-      );
-      throw new ChainError('Not found in any resolver.', err);
-    }
+  // fetch data based on publication type (DOI / arXiv)
+  if (isDoi || isArxiv) {
+    resolvers.push(
+      scrapeUrl(url, handle, type).catch(err =>
+        log.warn('No metadata found via scrape: ', err),
+      ),
+    );
   }
+
+  const results = await Promise.all(resolvers);
+  const metadata: PreprintMetadata = _.merge({}, ...results);
+  log.debug('Finalized preprint metadata:', metadata);
 
   return metadata;
 }
@@ -259,7 +280,7 @@ export async function resolveUser(handle: string): Promise<any> {
       persona.bio = person.biography['content'];
     }
 
-    const contacts = [];
+    let contacts = [];
     if (Array.isArray(person.emails.email) && person.emails.email.length > 0) {
       for (const e of person.emails.email) {
         contacts.push({
