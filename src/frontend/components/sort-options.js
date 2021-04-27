@@ -1,8 +1,6 @@
 // base imports
 import React from 'react';
 import PropTypes from 'prop-types';
-import { MdArrowUpward, MdArrowDownward } from 'react-icons/md';
-import Tooltip from '@reach/tooltip';
 import { useIsMobile } from '../hooks/ui-hooks';
 
 // Material UI components
@@ -13,6 +11,7 @@ import Box from '@material-ui/core/Box';
 import Grid from '@material-ui/core/Grid';
 import Input from '@material-ui/core/Input';
 import InputLabel from '@material-ui/core/InputLabel';
+import Tooltip from '@material-ui/core/Tooltip';
 
 const useStyles = makeStyles(() => ({
   sortOptions: {
@@ -51,14 +50,14 @@ export default function SortOptions({
             </Box>
             <Grid item>
               <Tooltip
-                label={`Sort by ${
+                title={`Sort by ${
                   name === 'recentRapid'
-                    ? 'Date of latest Rapid Review'
+                    ? 'Date of latest rapid review'
                     : name === 'recentFull'
-                    ? 'Date of latest Full Review'
+                    ? 'Date of latest full review'
                     : name === 'recentRequests'
                     ? 'Date of latest request for review'
-                    : 'date posted on preprint server'
+                    : 'Date posted on preprint server'
                 }`}
               >
                 <InputLabel
