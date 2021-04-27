@@ -367,6 +367,7 @@ export default function ReviewReader({
                         onHighlighedRoleIdsChange(nextHighlightedRoleIds);
                         setHighlightedRoleIds(nextHighlightedRoleIds);
                       }}
+                      isReader={false}
                     />
                   </div>
                   <div>
