@@ -95,7 +95,7 @@ async function scrapeUrl(
       authors: authors,
       datePosted: datePosted
         ? new Date(datePosted as string).toISOString()
-        : null,
+        : new Date().toISOString(),
       license: null,
       publication: highwirePress.publisher ? highwirePress.publisher : null,
       contentUrl: highwirePress.pdf_url ? highwirePress.pdf_url : null,
