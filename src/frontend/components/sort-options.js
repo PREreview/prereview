@@ -52,12 +52,12 @@ export default function SortOptions({
               <Tooltip
                 title={`Sort by ${
                   name === 'recentRapid'
-                    ? 'Date of latest rapid review'
+                    ? 'date of latest rapid review'
                     : name === 'recentFull'
-                    ? 'Date of latest full review'
+                    ? 'date of latest full review'
                     : name === 'recentRequests'
-                    ? 'Date of latest request for review'
-                    : 'Date posted on preprint server'
+                    ? 'date of latest request for review'
+                    : 'date posted on preprint server'
                 }`}
               >
                 <InputLabel
