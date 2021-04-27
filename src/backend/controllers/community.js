@@ -78,20 +78,47 @@ export default function controller(
         return;
       }
 
-      log.debug('ctx.body /POST', ctx.request.body);
+      let owner;
+      if (ctx.request.body.owners.length) {
+        try {
+          owner = await userModel.findOneByUuidOrOrcid(
+            ctx.request.body.owners[0],
+          );
+        } catch (err) {
+          log.error('HTTP 400 Error: ', err);
+          ctx.throw(400, `Failed to parse query: ${err}`);
+        }
+      }
 
       log.debug(`Adding a new community`);
       let community;
 
       try {
-        community = communityModel.create(ctx.request.body);
+        community = communityModel.create({
+          name: ctx.request.body.name,
+          slug: ctx.request.body.slug,
+        });
         await communityModel.persistAndFlush(community);
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse community schema: ${err}`);
       }
 
-      log.debug("************************************* community after creation", community)
+      if (owner) {
+        try {
+          log.debug(
+            `Adding ${owner.defaultPersona.name} as the owner of ${
+              community.name
+            }`,
+          );
+
+          community.owners.add(owner);
+          community.members.add(owner.defaultPersona);
+          await communityModel.persistAndFlush(community);
+        } catch (err) {
+          ctx.throw(400, err);
+        }
+      }
 
       ctx.body = {
         status: 201,
@@ -321,7 +348,18 @@ export default function controller(
         return;
       }
 
-      log.debug(`!!!!!!!!!`, ctx.request.body);
+      let owner; 
+
+      if (ctx.request.body.owners.length) {
+        try {
+          owner = await userModel.findOneByUuidOrOrcid(
+            ctx.request.body.owners[0],
+          );
+        } catch (err) {
+          log.error('HTTP 400 Error: ', err);
+          ctx.throw(400, `Failed to parse query: ${err}`);
+        }
+      }
 
       log.debug(`Updating community with id ${ctx.params.id}.`);
       let community;
@@ -332,14 +370,14 @@ export default function controller(
           ctx.throw(404, `Community with ID ${ctx.params.id} doesn't exist`);
         }
         communityModel.assign(community, ctx.request.body);
+        community.owners.add(owner)
+        community.members.add(owner.defaultPersona)
         await communityModel.persistAndFlush(community);
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse community schema: ${err}`);
       }
-
-      log.debug("updatedCommunity, i think**************", community, community.owners.getItems())
-
+      
       // if updated
       ctx.status = 204;
     },
