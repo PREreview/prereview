@@ -1,5 +1,5 @@
 // base imports
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { format } from 'date-fns';
 
 // Material UI components
@@ -8,6 +8,9 @@ import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import Link from '@material-ui/core/Link';
 import Typography from '@material-ui/core/Typography';
+
+// icons
+import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 
 const useStyles = makeStyles(theme => ({
   button: {
@@ -67,27 +70,67 @@ const useStyles = makeStyles(theme => ({
 export default function WorkCard({ work }) {
   const classes = useStyles();
 
-  const doi = work.handle && work.handle.split(':')[0] === 'doi';
+  const doiExists = work.handle && work.handle.split(':')[0] === 'doi';
+  let workDoi;
+  doiExists ? (workDoi = work.handle.split(':')[1]) : null;
 
   const getWorkUrl = () => {
     if (work.url) return work.url;
-    if (doi) return `https://doi.org/${work.handle.split(':')[1]}`;
+    if (workDoi) return `https://doi.org/${work.handle.split(':')[1]}`;
     return '';
   };
 
   return (
     <Card key={work.uuid}>
       <CardContent>
-        <Typography className={classes.title}>
-          <Link href={getWorkUrl()}>{work.title}</Link>
-        </Typography>
-        {doi ? <Typography>DOI: {doi}</Typography> : null}
-        {work.publisher ? (
-          <Typography classNames={classes.publication}>Published in: {work.publisher}</Typography>
-        ) : null}
-        <Typography>
-          Published on: {format(new Date(work.publicationDate), 'yyyy/MM/dd')}
-        </Typography>
+        <Grid
+          container
+          direction="row-reverse"
+          justifycontent="space-between"
+          spacing={0}
+          className={classes.gridMain}
+        >
+          <Grid item xs={12} sm={4}>
+            <Typography className={classes.date}>
+              {format(new Date(work.publicationDate), 'yyyy/MM/dd')}{' '}
+            </Typography>
+          </Grid>
+          <Grid item xs={12} sm={8}>
+            <Typography>
+              <Link
+                href={getWorkUrl()}
+                rel="noopener noreferrer"
+                target="_blank"
+                className={classes.title}
+              >
+                {work.title}
+              </Link>
+            </Typography>
+            {work.publisher ? (
+              <Typography>
+                <span className={classes.publication}>
+                  {work.publisher}
+                  <ChevronRightIcon className={classes.icon} />
+                </span>
+              </Typography>
+            ) : null}
+            {doiExists && workDoi ? (
+              <Typography className={classes.meta}>
+                <Link
+                  href={`https://doi.org/${workDoi}`}
+                  rel="noopener noreferrer"
+                  target="_blank"
+                >
+                  {workDoi}
+                </Link>
+              </Typography>
+            ) : (
+              <Typography>
+                <span className={classes.meta}>{work.handle}</span>
+              </Typography>
+            )}
+          </Grid>
+        </Grid>
       </CardContent>
     </Card>
   );
