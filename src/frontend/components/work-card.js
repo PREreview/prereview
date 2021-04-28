@@ -1,22 +1,13 @@
 // base imports
 import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
-import { formatDistanceStrict } from 'date-fns';
+import { format } from 'date-fns';
 
 // Material UI components
 import { makeStyles } from '@material-ui/core/styles';
-import Box from '@material-ui/core/Box';
-import Button from '@material-ui/core/Button';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
-import Grid from '@material-ui/core/Grid';
 import Link from '@material-ui/core/Link';
-import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
-
-// icons
-import ChevronRightIcon from '@material-ui/icons/ChevronRight';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 
 const useStyles = makeStyles(theme => ({
   button: {
@@ -57,7 +48,7 @@ const useStyles = makeStyles(theme => ({
     marginBottom: 10,
     width: '100%',
   },
-  preprintServer: {
+  publication: {
     color: theme.palette.primary.main,
     fontSize: '0.9rem',
     fontWeight: 700,
@@ -81,7 +72,7 @@ export default function WorkCard({ work }) {
   const getWorkUrl = () => {
     if (work.url) return work.url;
     if (doi) return `https://doi.org/${work.handle.split(':')[1]}`;
-    return ''
+    return '';
   };
 
   return (
@@ -92,7 +83,7 @@ export default function WorkCard({ work }) {
         </Typography>
         {doi ? <Typography>DOI: {doi}</Typography> : null}
         {work.publisher ? (
-          <Typography>Published in: {work.publisher}</Typography>
+          <Typography classNames={classes.publication}>Published in: {work.publisher}</Typography>
         ) : null}
         <Typography>
           Published on: {format(new Date(work.publicationDate), 'yyyy/MM/dd')}
@@ -101,27 +92,3 @@ export default function WorkCard({ work }) {
     </Card>
   );
 }
-
-PreprintCard.propTypes = {
-  user: PropTypes.object,
-  preprint: PropTypes.shape({
-    authors: PropTypes.string,
-    handle: PropTypes.string,
-    datePosted: PropTypes.string,
-    title: PropTypes.string.isRequired,
-    preprintServer: PropTypes.string.isRequired,
-    fullReviews: PropTypes.array,
-    rapidReviews: PropTypes.array,
-    requests: PropTypes.array,
-  }).isRequired,
-  onNewRequest: PropTypes.func.isRequired,
-  onNewReview: PropTypes.func.isRequired,
-  onNew: PropTypes.func.isRequired,
-  isNew: PropTypes.bool,
-  hoveredSortOption: PropTypes.oneOf([
-    'recentRequests',
-    'recentRapid',
-    'recentFull',
-    'datePosted',
-  ]),
-};

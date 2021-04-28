@@ -46,6 +46,7 @@ import Loading from './loading';
 import RoleActivity from './role-activity';
 import RoleEditor from './role-editor';
 import SettingsNotifications from './settings-notifications';
+import WorkCard from './work-card';
 
 // icons
 import CloseIcon from '@material-ui/icons/Close';
@@ -696,9 +697,7 @@ export default function Profile() {
                           {works.length > 0 ? (
                             works.map(work => {
                               console.log('work!', work);
-                              return (
-                                <WorkCard work={work}/>
-                              );
+                              return <WorkCard work={work} />;
                             })
                           ) : (
                             <Typography>
