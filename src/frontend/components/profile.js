@@ -488,16 +488,16 @@ export default function Profile() {
                             </Link>
                           </Typography>
                         </Box>
-                        <Box>
-                          <Typography
-                            component="div"
-                            variant="body1"
-                            gutterBottom
-                          >
-                            <b className={editMode ? classes.label : ''}>
-                              Contact information:{' '}
-                            </b>
-                            {contacts && contacts.length ? (
+                        {contacts && contacts.length ? (
+                          <Box>
+                            <Typography
+                              component="div"
+                              variant="body1"
+                              gutterBottom
+                            >
+                              <b className={editMode ? classes.label : ''}>
+                                Contact information:{' '}
+                              </b>
                               <List>
                                 {contacts.map(contact => (
                                   <ListItem key={contact.uuid}>
@@ -507,11 +507,9 @@ export default function Profile() {
                                   </ListItem>
                                 ))}
                               </List>
-                            ) : (
-                              `None provided.`
-                            )}
-                          </Typography>
-                        </Box>
+                            </Typography>
+                          </Box>
+                        ) : null}
                       </>
                     ) : null}
                     <Box>
@@ -697,6 +695,7 @@ export default function Profile() {
                         <Grid>
                           {works.length > 0 ? (
                             works.map(work => {
+                              console.log('work!', work);
                               return (
                                 <Card key={work.uuid}>
                                   <CardContent>
@@ -709,7 +708,10 @@ export default function Profile() {
                                     </Typography>
                                     <Typography>{work.publisher}</Typography>
                                     <Typography>
-                                      {work.publicationDate}
+                                      {format(
+                                        new Date(work.publicationDate),
+                                        'yyyy/MM/dd',
+                                      )}
                                     </Typography>
                                   </CardContent>
                                 </Card>
