@@ -697,24 +697,7 @@ export default function Profile() {
                             works.map(work => {
                               console.log('work!', work);
                               return (
-                                <Card key={work.uuid}>
-                                  <CardContent>
-                                    <Typography
-                                      variant="h6"
-                                      component="h2"
-                                      gutterBottom
-                                    >
-                                      {work.title}
-                                    </Typography>
-                                    <Typography>{work.publisher}</Typography>
-                                    <Typography>
-                                      {format(
-                                        new Date(work.publicationDate),
-                                        'yyyy/MM/dd',
-                                      )}
-                                    </Typography>
-                                  </CardContent>
-                                </Card>
+                                <WorkCard work={work}/>
                               );
                             })
                           ) : (
