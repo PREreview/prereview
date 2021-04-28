@@ -488,16 +488,16 @@ export default function Profile() {
                             </Link>
                           </Typography>
                         </Box>
-                        <Box>
-                          <Typography
-                            component="div"
-                            variant="body1"
-                            gutterBottom
-                          >
-                            <b className={editMode ? classes.label : ''}>
-                              Contact information:{' '}
-                            </b>
-                            {contacts && contacts.length ? (
+                        {contacts && contacts.length ? (
+                          <Box>
+                            <Typography
+                              component="div"
+                              variant="body1"
+                              gutterBottom
+                            >
+                              <b className={editMode ? classes.label : ''}>
+                                Contact information:{' '}
+                              </b>
                               <List>
                                 {contacts.map(contact => (
                                   <ListItem key={contact.uuid}>
@@ -507,11 +507,9 @@ export default function Profile() {
                                   </ListItem>
                                 ))}
                               </List>
-                            ) : (
-                              `None provided.`
-                            )}
-                          </Typography>
-                        </Box>
+                            </Typography>
+                          </Box>
+                        ) : null}
                       </>
                     ) : null}
                     <Box>
