@@ -695,6 +695,7 @@ export default function Profile() {
                         <Grid>
                           {works.length > 0 ? (
                             works.map(work => {
+                              console.log('work!', work);
                               return (
                                 <Card key={work.uuid}>
                                   <CardContent>
@@ -707,7 +708,10 @@ export default function Profile() {
                                     </Typography>
                                     <Typography>{work.publisher}</Typography>
                                     <Typography>
-                                      {work.publicationDate}
+                                      {format(
+                                        new Date(work.publicationDate),
+                                        'yyyy/MM/dd',
+                                      )}
                                     </Typography>
                                   </CardContent>
                                 </Card>
