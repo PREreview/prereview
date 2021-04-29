@@ -141,7 +141,7 @@ export default function ShellContent({ preprint, user, cid }) {
   };
 
   useEffect(() => {
-    if (location.state.tab) {
+    if (location.state && location.state.tab) {
       setTab(location.state.tab);
     }
 
@@ -497,6 +497,8 @@ function ShellContentRequest({
         preprintId={preprint.uuid}
         allReviews={preprint.requests}
         user={user}
+        hasReviewed={newRequest}
+        hasRequested
       />
       {hasRequested || newRequest ? (
         <Box mt={2} mb={2} className={classes.yellow}>

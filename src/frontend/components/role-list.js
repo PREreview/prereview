@@ -33,6 +33,7 @@ export default function Reviewers({
   user,
   allReviews,
   hasReviewed,
+  hasRequested,
   preprintId,
 }) {
   const classes = useStyles();
@@ -97,7 +98,11 @@ export default function Reviewers({
                   badgeContent="Author"
                   invisible={!author.isPreprintAuthor}
                 >
-                  <RoleBadge key={author.uuid} user={author} />
+                  <RoleBadge
+                    key={author.uuid}
+                    user={author}
+                    requestTab={hasRequested}
+                  />
                 </Badge>
               );
             })
@@ -112,6 +117,7 @@ Reviewers.propTypes = {
   user: PropTypes.object,
   allReviews: PropTypes.array.isRequired,
   roleIds: PropTypes.arrayOf(PropTypes.object),
+  hasRequested: PropTypes.bool,
   hasReviewed: PropTypes.oneOfType([
     PropTypes.object,
     PropTypes.bool,
