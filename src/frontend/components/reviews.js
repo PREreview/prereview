@@ -139,7 +139,7 @@ export default function Reviews() {
   const handleNewReview = preprintId => {
     if (thisUser) {
       history.push(`/preprints/${preprintId}`, {
-        tab: 'reviews',
+        tab: 1,
         isSingleStep: true,
       });
     } else {
@@ -150,7 +150,7 @@ export default function Reviews() {
   const handleNewRequest = preprintId => {
     if (thisUser) {
       history.push(`/preprints/${preprintId}`, {
-        tab: 'request',
+        tab: 2,
         isSingleStep: true,
       });
     } else {

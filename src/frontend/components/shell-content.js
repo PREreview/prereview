@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Helmet } from 'react-helmet-async';
+import { useLocation } from 'react-router-dom';
 
 // hooks
 import { usePostRequests } from '../hooks/api-hooks.tsx';
@@ -81,6 +82,8 @@ const useStyles = makeStyles(theme => ({
 
 export default function ShellContent({ preprint, user, cid }) {
   const classes = useStyles();
+  const location = useLocation();
+
   const [hasRapidReviewed, setHasRapidReviewed] = useState(false);
   const [hasLongReviewed, setHasLongReviewed] = useState(false);
   const [hasRequested, setHasRequested] = useState(false);
@@ -138,6 +141,10 @@ export default function ShellContent({ preprint, user, cid }) {
   };
 
   useEffect(() => {
+    if (location.state.tab) {
+      setTab(location.state.tab);
+    }
+
     if (user) {
       if (!hasLongReviewed && preprint.fullReviews.length) {
         // gets an array of the active user's persona IDs
