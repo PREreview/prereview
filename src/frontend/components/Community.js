@@ -43,7 +43,6 @@ import Input from '@material-ui/core/Input';
 import InputLabel from '@material-ui/core/InputLabel';
 import Link from '@material-ui/core/Link';
 import MenuItem from '@material-ui/core/MenuItem';
-import Modal from '@material-ui/core/Modal';
 import Paper from '@material-ui/core/Paper';
 import Pagination from '@material-ui/lab/Pagination';
 import Select from '@material-ui/core/Select';
@@ -132,6 +131,13 @@ const useStyles = makeStyles(theme => ({
     [theme.breakpoints.up('lg')]: {
       textAlign: 'left',
     },
+  },
+  request: {
+    display: 'block',
+    marginBottom: '2rem',
+    marginLeft: 'auto',
+    marginRight: 0,
+    width: 300,
   },
   search: {
     borderRadius: 24,
@@ -268,7 +274,18 @@ export default function Community(props) {
                       <span>Settings</span>
                     </Hidden>
                   </IconButton>
-                ) : null}
+                ) : (
+                  <Box className={classes.request}>
+                    <Button
+                      color="primary"
+                      variant="contained"
+                      className={classes.button}
+                      onClick={() => console.log('clicked!')}
+                    >
+                      Request to join community
+                    </Button>
+                  </Box>
+                )}
                 <Grid container spacing={4}>
                   <Grid item xs={12} md={8}>
                     <CommunityContent
