@@ -108,8 +108,8 @@ export default function WorkCard({ work }) {
               </Link>
             </Typography>
             {work.publisher ? (
-              <Typography>
-                <span className={classes.publication}>{work.publisher}</span>
+              <Typography className={classes.publication}>
+                {work.publisher}
               </Typography>
             ) : null}{' '}
             {doiExists && workDoi ? (
@@ -121,7 +121,7 @@ export default function WorkCard({ work }) {
                     rel="noopener noreferrer"
                     target="_blank"
                   >
-                    {workDoi}
+                    {work.handle}
                   </Link>
                 </Typography>
               </>
