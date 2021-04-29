@@ -78,7 +78,7 @@ export default function WorkCard({ work }) {
   const getWorkUrl = () => {
     if (work.url) return work.url;
     if (workDoi) return `https://doi.org/${work.handle.split(':')[1]}`;
-    return '';
+    return null;
   };
 
   return (
@@ -109,26 +109,29 @@ export default function WorkCard({ work }) {
             </Typography>
             {work.publisher ? (
               <Typography>
-                <span className={classes.publication}>
-                  {work.publisher}
-                  <ChevronRightIcon className={classes.icon} />
-                </span>
+                <span className={classes.publication}>{work.publisher}</span>
               </Typography>
-            ) : null}
+            ) : null}{' '}
             {doiExists && workDoi ? (
-              <Typography className={classes.meta}>
-                <Link
-                  href={`https://doi.org/${workDoi}`}
-                  rel="noopener noreferrer"
-                  target="_blank"
-                >
-                  {workDoi}
-                </Link>
-              </Typography>
+              <>
+                <ChevronRightIcon className={classes.icon} />
+                <Typography className={classes.meta}>
+                  <Link
+                    href={`https://doi.org/${workDoi}`}
+                    rel="noopener noreferrer"
+                    target="_blank"
+                  >
+                    {workDoi}
+                  </Link>
+                </Typography>
+              </>
             ) : (
-              <Typography>
-                <span className={classes.meta}>{work.handle}</span>
-              </Typography>
+              <>
+                <ChevronRightIcon className={classes.icon} />
+                <Typography>
+                  <span className={classes.meta}>{work.handle}</span>
+                </Typography>
+              </>
             )}
           </Grid>
         </Grid>
