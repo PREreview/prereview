@@ -276,7 +276,12 @@ export default function PreprintCard({
         </AccordionSummary>
         <AccordionDetails>
           <Box width="100%">
-            <ReviewReader user={user} identifier={id} preprint={preprint} />
+            <ReviewReader
+              user={user}
+              identifier={id}
+              preprint={preprint}
+              isReader={false}
+            />
             <Grid container alignItems="center" justify="flex-end" spacing={2}>
               <Grid item>
                 {!hasReviewed && (

@@ -43,6 +43,7 @@ const LongformReviewReader = props => {
     user,
     anchorEl,
     handleAnchor,
+    isReader = true,
   } = props;
 
   const useStyles = makeStyles(() => ({
@@ -166,7 +167,10 @@ const LongformReviewReader = props => {
       setButtonRefId(anchorEl.getAttribute('aria-describedby'));
     } else {
       setButtonRefId(null);
-      history.push(`${history.location.pathname.split('/full-reviews')[0]}`);
+      // This is in the review reader and not the search page
+      if (isReader) {
+        history.push(`${history.location.pathname.split('/full-reviews')[0]}`);
+      }
     }
   }, [anchorEl, content, commentTitle, publishedComment]);
 
@@ -483,9 +487,10 @@ LongformReviewReader.propTypes = {
   handleAnchor: PropTypes.func.isRequired,
   content: PropTypes.string,
   commentTitle: PropTypes.string,
-  publishedComment: PropTypes.string,
+  isReader: PropTypes.bool,
   onChange: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
+  publishedComment: PropTypes.string,
   review: PropTypes.object.isRequired,
   user: PropTypes.object,
 };
