@@ -180,7 +180,6 @@ const Search = ({
 
   // add users to a community if a community is present and isModerator is true
   const handleAddModerators = () => {
-    console.log(community);
     if (value.length) {
       value.map(user => {
         fetch(`/api/v2/communities/${community}/owners/${user.uuid}`, {
@@ -227,16 +226,12 @@ const Search = ({
 
   // send invites to users if being added to a review
   const handleInvite = () => {
-    console.log('mentor: ', isMentor);
-    console.log('invited: ', invitees);
-    console.log('value: ', value);
-
     postInvite({
       pid: value[0].uuid,
     })
       .then(() => {
         alert('Invites sent successfully.');
-        handleClose();
+        return handleClose();
       })
       .catch(err => {
         alert(`An error occurred: ${err.message}`);

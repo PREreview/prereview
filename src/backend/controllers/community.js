@@ -20,6 +20,14 @@ const tagSchema = Joi.object({
   color: Joi.string(),
 });
 
+const eventSchema = Joi.object({
+  title: Joi.string(),
+  start: Joi.date(),
+  end: Joi.date(),
+  isPrivate: Joi.boolean(),
+  description: Joi.string(),
+});
+
 const querySchema = Joi.object({
   limit: Joi.number()
     .integer()
@@ -695,7 +703,7 @@ export default function controller(
     method: 'POST',
     path: '/communities/:id/events',
     validate: {
-      body: communitySchema,
+      body: eventSchema,
       type: 'json',
       continueOnError: true,
     },
