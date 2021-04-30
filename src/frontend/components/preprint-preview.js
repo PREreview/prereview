@@ -101,8 +101,6 @@ export default function PreprintPreview({ preprint }) {
   const classes = useStyles();
   const history = useHistory();
 
-  console.log(preprint);
-
   const [elevation, setElevation] = useState(0);
   const preprintId = createPreprintId(preprint.handle);
   const publishedReviews = preprint.fullReviews.filter(

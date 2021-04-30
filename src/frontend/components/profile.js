@@ -696,8 +696,7 @@ export default function Profile() {
                         <Grid>
                           {works.length > 0 ? (
                             works.map(work => {
-                              console.log('work!', work);
-                              return <WorkCard work={work} />;
+                              return <WorkCard work={work} key={work.uuid} />;
                             })
                           ) : (
                             <Typography>

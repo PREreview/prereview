@@ -4,8 +4,6 @@ import { QUESTIONS } from '../constants';
 import { getId, unprefix, arrayify } from '../utils/jsonld';
 
 export function getAnswerMap(review = {}) {
-  console.log(review);
-
   return review.reduce((map, answer) => {
     const questionId = unprefix(getId(answer.parentItem));
     if (answer['@type'] === 'YesNoAnswer') {

@@ -541,14 +541,12 @@ function CommunitiesTab() {
 
   useEffect(() => {
     if (!loadingUsers && usersData) {
-      console.log(usersData);
       const lookup = {};
       usersData.map(user => {
         user.defaultPersona
           ? (lookup[user.defaultPersona.uuid] = user.defaultPersona.name)
           : (lookup[user.uuid] = user.name);
       });
-      console.log(lookup);
       setUsers(lookup);
     }
   }, [usersData]);
