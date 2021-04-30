@@ -260,7 +260,7 @@ export default function SettingsInvites({ user }) {
             </TableContainer>
           ) : (
             <Typography component="div" variant="body1">
-              No accepted invites to display.
+              No review drafts saved.
             </Typography>
           )}
         </Box>
