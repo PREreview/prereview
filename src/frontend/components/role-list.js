@@ -6,7 +6,6 @@ import PropTypes from 'prop-types';
 import { makeStyles } from '@material-ui/core/styles';
 import AvatarGroup from '@material-ui/lab/AvatarGroup';
 import Badge from '@material-ui/core/Badge';
-import Book from '@material-ui/icons/Book';
 import Typography from '@material-ui/core/Typography';
 
 // components
