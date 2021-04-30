@@ -32,7 +32,13 @@ import AppBar from '@material-ui/core/AppBar';
 import Avatar from '@material-ui/core/Avatar';
 import AvatarGroup from '@material-ui/lab/AvatarGroup';
 import Box from '@material-ui/core/Box';
+import Chip from '@material-ui/core/Chip';
+import FormControl from '@material-ui/core/FormControl';
+import Input from '@material-ui/core/Input';
+import InputLabel from '@material-ui/core/InputLabel';
 import Link from '@material-ui/core/Link';
+import MenuItem from '@material-ui/core/MenuItem';
+import Select from '@material-ui/core/Select';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 
@@ -220,11 +226,43 @@ function UsersTab() {
 }
 
 function PersonasTab() {
+  const [badges, setBadges] = useState(null);
+
+  const { data, loading } = useGetPersonas({
+    resolve: res => res.data,
+  });
+
+  const { badgesData, loadingBadges } = useGetBadges({
+    resolve: res => res.data,
+  });
+
+  // generated hooks don't allow dynamic path params
+  const { mutate: update } = useMutate({
+    verb: 'PUT',
+    path: ({ id }) => `/personas/${id}`,
+  });
+
+  const { mutate: remove } = useMutate({
+    verb: 'DELETE',
+    path: ({ id }) => `/personas/${id}`,
+  });
+
+  useEffect(() => {
+    if (!loadingBadges && badgesData) {
+      const lookup = {};
+      badgesData.map(badge => {
+        lookup[badge.uuid] = badge.name;
+      });
+      setBadges(lookup);
+    }
+  }, [badgesData]);
+
   const columns = [
     { title: 'UUID', field: 'uuid', hidden: true },
     {
       title: 'Avatar',
       field: 'avatar',
+      editable: 'never',
       render: row => (
         <Link href={`/about/${row.uuid}`} target="_blank" rel="noopener">
           <Avatar src={row.avatar} alt={row.name} />
@@ -239,6 +277,49 @@ function PersonasTab() {
           {row.name}
         </Link>
       ),
+    },
+    {
+      title: 'Badges',
+      field: 'badges',
+      lookup: badges,
+      editComponent: row => (
+        <FormControl>
+          <InputLabel id="badges-select-label">Badges</InputLabel>
+          <Select
+            labelId="badges-select-label"
+            id="badges-select"
+            multiple
+            value={''}
+            onChange={() => {
+              console.log('clicked');
+            }}
+            input={<Input id="badges-select-chip" />}
+            renderValue={(selected) => (
+              <div>
+                {selected.map((value) => (
+                  <Chip key={value} label={value} />
+                ))}
+              </div>
+            )}
+          >
+            {badges && badges.map(badge => (
+              <MenuItem key={badge.uuid} value={badge.uuid}>
+                {badge.name}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      ),
+      render: row =>
+        row.badges &&
+        row.badges.map(badge => (
+          <Chip
+            key={badge.uuid}
+            color="primary"
+            label={badge.name}
+            style={{ margin: 2 }}
+          />
+        )),
     },
     {
       title: 'Created At',
@@ -256,22 +337,7 @@ function PersonasTab() {
     },
   ];
 
-  const { data, loading } = useGetPersonas({
-    resolve: res => res.data,
-  });
-
-  // generated hooks don't allow dynamic path params
-  const { mutate: update } = useMutate({
-    verb: 'PUT',
-    path: ({ id }) => `/personas/${id}`,
-  });
-
-  const { mutate: remove } = useMutate({
-    verb: 'DELETE',
-    path: ({ id }) => `/personas/${id}`,
-  });
-
-  if (loading) {
+  if (loading || loadingBadges) {
     return <Loading />;
   } else {
     return (
