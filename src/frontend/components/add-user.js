@@ -13,6 +13,7 @@ import { useGetPersonas } from '../hooks/api-hooks.tsx';
 
 // components
 import Search from './search';
+import NotFound from './not-found';
 
 // icons
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
@@ -51,7 +52,7 @@ const AddUsers = ({ community, isModerator, addUser }) => {
 
   /* API calls */
   // fetch users from API
-  const { data: usersData, loading } = useGetPersonas();
+  const { data: usersData, loading, error: personasError } = useGetPersonas();
 
   // getModalStyle is not a pure function, we roll the style only on the first render
   const [open, setOpen] = useState(false);
@@ -75,6 +76,8 @@ const AddUsers = ({ community, isModerator, addUser }) => {
 
   if (loading) {
     return <CircularProgress className={classes.spinning} />;
+  } else if (personasError) {
+    return <NotFound />;
   } else {
     return (
       <div>
