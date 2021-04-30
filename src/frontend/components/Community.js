@@ -213,6 +213,7 @@ export default function Community(props) {
   const location = useLocation();
   const params = processParams(location.search);
   const [user] = useContext(UserProvider.context);
+  const [loginModalOpenNext, setLoginModalOpenNext] = useState(null);
 
   const { id } = props && props.id ? props : useParams();
   const { data: community, loading, error } = useGetCommunity({
@@ -228,6 +229,10 @@ export default function Community(props) {
     },
     id: id,
   });
+
+  const handleJoinRequest = () => {
+    user ? console.log('user here!') : setLoginModalOpenNext(location.pathname);
+  };
 
   if (loading) {
     return <Loading />;
@@ -280,11 +285,19 @@ export default function Community(props) {
                       color="primary"
                       variant="contained"
                       className={classes.button}
-                      onClick={() => console.log('clicked!')}
+                      onClick={handleJoinRequest}
                     >
                       Request to join community
                     </Button>
                   </Box>
+                )}
+                {loginModalOpenNext && (
+                  <LoginRequiredModal
+                    open={loginModalOpenNext}
+                    onClose={() => {
+                      setLoginModalOpenNext(null);
+                    }}
+                  />
                 )}
                 <Grid container spacing={4}>
                   <Grid item xs={12} md={8}>
