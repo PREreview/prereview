@@ -23,13 +23,17 @@ import UserProvider from '../contexts/user-context';
 // Material UI components
 import { makeStyles } from '@material-ui/core/styles';
 import Box from '@material-ui/core/Box';
+import Chip from '@material-ui/core/Chip';
 import Container from '@material-ui/core/Container';
 import Dialog from '@material-ui/core/Dialog';
 import Grid from '@material-ui/core/Grid';
+import Input from '@material-ui/core/Input';
 import Link from '@material-ui/core/Link';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
+import MenuItem from '@material-ui/core/MenuItem';
 import Pagination from '@material-ui/lab/Pagination';
+import Select from '@material-ui/core/Select';
 import Typography from '@material-ui/core/Typography';
 
 // components
@@ -70,6 +74,11 @@ export default function Dashboard() {
   // search
   const params = processParams(location.search);
   const [search, setSearch] = useState(params.get('search') || '');
+
+  const filtersParam = params.get('filters') || [];
+  const [selectedFilter, setSelectedFilter] = useState(
+    Array.isArray(filtersParam) ? filtersParam : [filtersParam],
+  );
 
   const { data: preprints, loading: loadingPreprints, error } = useGetPreprints(
     {
@@ -275,6 +284,80 @@ export default function Dashboard() {
             <Box mt={4}>
               <Grid container spacing={4}>
                 <Grid item xs={12} md={6}>
+                  {preprints ? (
+                    <Box mb={2}>
+                      <Grid
+                        container
+                        spacing={2}
+                        alignItems="center"
+                        justify="flex-start"
+                      >
+                        <Grid item xs={12} sm={2}>
+                          <Typography component="p" variant="h5">
+                            Filter by:
+                          </Typography>
+                        </Grid>
+                        <Grid item>
+                          <Select
+                            id="filter"
+                            value={selectedFilter}
+                            onChange={ev => {
+                              params.delete('filters');
+                              setSelectedFilter(ev.target.value);
+                              if (ev.target.value !== '') {
+                                params.set(
+                                  'filters',
+                                  ev.target.value.toString(),
+                                );
+                              }
+                              // uncomment and use this instead if multiple
+                              // if (
+                              //   Array.isArray(ev.target.value) &&
+                              //   ev.target.value.length > 0
+                              // ) {
+                              //   params.set(
+                              //     'filters',
+                              //     ev.target.value.toString(),
+                              //   );
+                              // }
+                              history.push({
+                                pathname: location.pathame,
+                                search: params.toString(),
+                              });
+                            }}
+                            input={<Input id="filter-select" />}
+                          >
+                            {/* uncomment following and add as props to select for multiple filters */}
+                            {/*multiple
+                              renderValue={() => (
+                              <div className={classes.chips}>
+                                {selectedFilter.map(value => (
+                                  <Chip
+                                    key={value}
+                                    label={value}
+                                    className={classes.chip}
+                                  />
+                                ))
+                              </div>
+                            )}}*/}
+                            <MenuItem value="" />
+                            <MenuItem value="ynPeerReview">
+                              Recommended for peer review
+                            </MenuItem>
+                            <MenuItem value="ynRecommend">
+                              Recommended to others
+                            </MenuItem>
+                            <MenuItem value="ynAvailableCode">
+                              Has available code
+                            </MenuItem>
+                            <MenuItem value="ynAvailableData">
+                              Has available data
+                            </MenuItem>
+                          </Select>
+                        </Grid>
+                      </Grid>
+                    </Box>
+                  ) : null}
                   <SortOptions
                     sort={params.get('sort') || ''}
                     order={params.get('asc') === 'true' ? 'asc' : 'desc'}

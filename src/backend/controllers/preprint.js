@@ -19,6 +19,12 @@ const querySchema = Joi.object({
   asc: Joi.boolean(),
   search: Joi.string().allow(''),
   communities: Joi.string().allow(''),
+  filters: Joi.string().allow(
+    'ynAvailableCode',
+    'ynAvailableData',
+    'ynPeerReview',
+    'ynRecommend',
+  ),
   tags: Joi.string().allow(''),
   sort: Joi.string().allow(
     'datePosted',
@@ -207,6 +213,21 @@ export default function controller(preprints, thisUser) {
           default:
             orderBy = { datePosted: order };
         }
+        let filterBy;
+        switch (ctx.query.filters) {
+          case 'ynAvailableCode':
+            filterBy = { rapidReviews: { ynAvailableCode: 'yes' } };
+            break;
+          case 'ynAvailableData':
+            filterBy = { rapidReviews: { ynAvailableData: 'yes' } };
+            break;
+          case 'ynPeerReview':
+            filterBy = { rapidReviews: { ynPeerReview: 'yes' } };
+            break;
+          case 'ynRecommend':
+            filterBy = { rapidReviews: { ynRecommend: 'yes' } };
+            break;
+        }
         const queries = [];
         queries.push({
           isPublished: { $eq: true },
@@ -265,6 +286,7 @@ export default function controller(preprints, thisUser) {
             query,
             populate,
             orderBy,
+            filterBy,
             ctx.query.limit,
             ctx.query.offset,
           );
@@ -272,6 +294,7 @@ export default function controller(preprints, thisUser) {
           foundPreprints = await preprints.findAll(
             populate,
             orderBy,
+            filterBy,
             ctx.query.limit,
             ctx.query.offset,
           );
