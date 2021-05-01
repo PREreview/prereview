@@ -272,6 +272,7 @@ function PersonasTab() {
     {
       title: 'Name',
       field: 'name',
+      editable: 'never',
       render: row => (
         <Link href={`/about/${row.uuid}`} target="_blank" rel="noopener">
           {row.name}
