@@ -170,12 +170,23 @@ export default function controller(
           );
           count = await personasModel.count();
         }
+        
+        let personasWithAvatar;
+
         if (foundPersonas) {
+          personasWithAvatar = foundPersonas.map(persona => {
+            if (persona.avatar && Buffer.isBuffer(persona.avatar)) {
+              return {...persona, avatar: persona.avatar.toString()};
+            } else {
+              return persona
+            }
+          });
+
           ctx.body = {
             statusCode: 200,
             status: 'ok',
             totalCount: count,
-            data: foundPersonas,
+            data: personasWithAvatar,
           };
         }
       } catch (err) {
