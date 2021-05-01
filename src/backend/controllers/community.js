@@ -9,10 +9,14 @@ const Joi = router.Joi;
 
 const communitySchema = Joi.object({
   name: Joi.string(),
+  uuid: Joi.string(),
   slug: Joi.string(),
-  description: Joi.string(),
-  banner: Joi.string(),
-  twitter: Joi.string().regex(/^[a-zA-Z0-9_]{1,15}$/),
+  description: Joi.string().allow(null),
+  banner: Joi.string().allow(null),
+  twitter: Joi.string()
+    .regex(/^[a-zA-Z0-9_]{1,15}$/)
+    .allow(null),
+  owners: Joi.array(),
 });
 
 const tagSchema = Joi.object({
@@ -82,15 +86,46 @@ export default function controller(
         return;
       }
 
+      let owner;
+      if (ctx.request.body.owners.length) {
+        try {
+          owner = await userModel.findOneByUuidOrOrcid(
+            ctx.request.body.owners[0],
+          );
+        } catch (err) {
+          log.error('HTTP 400 Error: ', err);
+          ctx.throw(400, `Failed to parse query: ${err}`);
+        }
+      }
+
       log.debug(`Adding a new community`);
       let community;
 
       try {
-        community = communityModel.create(ctx.request.body);
+        community = communityModel.create({
+          name: ctx.request.body.name,
+          slug: ctx.request.body.slug,
+        });
         await communityModel.persistAndFlush(community);
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse community schema: ${err}`);
+      }
+
+      if (owner) {
+        try {
+          log.debug(
+            `Adding ${owner.defaultPersona.name} as the owner of ${
+              community.name
+            }`,
+          );
+
+          community.owners.add(owner);
+          community.members.add(owner.defaultPersona);
+          await communityModel.persistAndFlush(community);
+        } catch (err) {
+          ctx.throw(400, err);
+        }
       }
 
       ctx.body = {
@@ -321,6 +356,19 @@ export default function controller(
         return;
       }
 
+      let owner;
+
+      if (ctx.request.body.owners.length) {
+        try {
+          owner = await userModel.findOneByUuidOrOrcid(
+            ctx.request.body.owners[0],
+          );
+        } catch (err) {
+          log.error('HTTP 400 Error: ', err);
+          ctx.throw(400, `Failed to parse query: ${err}`);
+        }
+      }
+
       log.debug(`Updating community with id ${ctx.params.id}.`);
       let community;
 
@@ -330,6 +378,8 @@ export default function controller(
           ctx.throw(404, `Community with ID ${ctx.params.id} doesn't exist`);
         }
         communityModel.assign(community, ctx.request.body);
+        community.owners.add(owner);
+        community.members.add(owner.defaultPersona);
         await communityModel.persistAndFlush(community);
       } catch (err) {
         log.error('HTTP 400 Error: ', err);

@@ -166,6 +166,7 @@ function UsersTab() {
     {
       title: 'ORCiD',
       field: 'orcid',
+      editable: false,
       render: row => (
         <Link
           href={`https://orcid.org/${row.orcid}`}
@@ -262,7 +263,7 @@ function PersonasTab() {
     {
       title: 'Avatar',
       field: 'avatar',
-      editable: 'never',
+      editable: false,
       render: row => (
         <Link href={`/about/${row.uuid}`} target="_blank" rel="noopener">
           <Avatar src={row.avatar} alt={row.name} />
@@ -609,11 +610,15 @@ function CommunitiesTab() {
   useEffect(() => {
     if (!loadingUsers && usersData) {
       const lookup = {};
+      // the key of the lookup object here needs to be the user uuid
+      // because on the backend, community owners are User entities
       usersData.map(user => {
         user.defaultPersona
-          ? (lookup[user.defaultPersona.uuid] = user.defaultPersona.name)
-          : (lookup[user.uuid] = user.name);
+          ? (lookup[user.uuid] = user.defaultPersona.name)
+          : (lookup[user.uuid] = user.orcid);
       });
+      // some names will be the user's ORCID if using seed data,
+      // because some seed users dont have default personas
       setUsers(lookup);
     }
   }, [usersData]);
@@ -674,6 +679,19 @@ function CommunitiesTab() {
     },
   ];
 
+  // workaround for the different data types
+  const processOwners = newData => {
+    if (!newData.owners) return [];
+    // on the frontend, sometimes the owner of a community is in the shape of a user object,
+    // in which case we only need to send back the object's uuid
+    if (newData.owners && Array.isArray(newData.owners) && newData.owners.uuid)
+      return newData.owners.uuid;
+    // sometimes the owners array is already just a uuid string, so we just return that
+    if (newData.owners && Array.isArray(newData.owners)) return newData.owners;
+
+    return [newData.owners];
+  };
+
   if (loading || loadingUsers) {
     return <Loading />;
   } else {
@@ -684,9 +702,20 @@ function CommunitiesTab() {
         data={data}
         editable={{
           onRowUpdate: newData =>
-            update(newData, { pathParams: { id: newData.uuid } }),
+            update(
+              {
+                name: newData.name,
+                slug: newData.slug,
+                owners: processOwners(newData),
+              },
+              { pathParams: { id: newData.uuid } },
+            ),
           onRowDelete: newData => remove({ pathParams: { id: newData.uuid } }),
-          onRowAdd: newData => create(newData),
+          onRowAdd: newData =>
+            create({
+              ...newData,
+              owners: processOwners(newData),
+            }),
         }}
       />
     );
