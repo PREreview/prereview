@@ -238,9 +238,10 @@ function EmailToggle({ userId, contact, onDelete }) {
       <TableCell>
         <ToggleSwitch
           id={`notify-switch-${contact.uuid}`}
-          disabled={loading}
+          name={`notify-switch-${contact.uuid}`}
           checked={isNotify}
           label="Turn on or off email notifications"
+          inputProps={{ 'aria-label': 'turn on or off email notification' }}
           onChange={() => {
             updateContact({
               isNotified: !isNotify,
@@ -251,7 +252,7 @@ function EmailToggle({ userId, contact, onDelete }) {
                 return setIsNotify(!isNotify);
               })
               .then(() => {
-                setIsNotify(!isNotify);
+                return setIsNotify(!isNotify);
               })
               .catch(err => alert(`An error occurred: ${err.message}`));
           }}
@@ -260,8 +261,9 @@ function EmailToggle({ userId, contact, onDelete }) {
       <TableCell>
         <ToggleSwitch
           id={`public-switch-${contact.uuid}`}
-          disabled={loading}
+          name={`public-switch-${contact.uuid}`}
           checked={isPublic}
+          inputProps={{ 'aria-label': 'display email on profile' }}
           onChange={() => {
             updateContact({
               isPublic: !isPublic,
@@ -269,7 +271,7 @@ function EmailToggle({ userId, contact, onDelete }) {
               value: contact.value,
             })
               .then(() => {
-                setIsPublic(!isPublic);
+                return setIsPublic(!isPublic);
               })
               .catch(err => alert(`An error occurred: ${err.message}`));
           }}
@@ -284,7 +286,7 @@ function EmailToggle({ userId, contact, onDelete }) {
               deleteContact()
                 .then(() => {
                   onDelete();
-                  alert('Contact info deleted successfully.');
+                  return alert('Contact info deleted successfully.');
                 })
                 .catch(err => alert(`An error occurred: ${err.message}`));
             }
@@ -296,3 +298,9 @@ function EmailToggle({ userId, contact, onDelete }) {
     </TableRow>
   );
 }
+
+EmailToggle.propTypes = {
+  userId: PropTypes.string,
+  contact: PropTypes.string,
+  onDelete: PropTypes.func,
+};
