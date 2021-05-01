@@ -50,7 +50,7 @@ export default function RoleActivity({ persona }) {
             Total number of rapid reviews: {persona.rapidReviews ? persona.rapidReviews.length || 0 : ''}
           </Typography>
           <Typography>
-            Total number of long-form reviews:{' '}
+            Total number of full reviews:{' '}
             {persona.fullReviews
                 ? persona.fullReviews.filter(review => review.isPublished)
                     .length || 0

@@ -550,7 +550,7 @@ export default function ReviewStepper({
   }
 
   function getSteps() {
-    return ['Rapid Review', 'Long-form Review', 'Submitted'];
+    return ['Rapid Review', 'Full Review', 'Submitted'];
   }
 
   useEffect(() => {
@@ -589,7 +589,7 @@ export default function ReviewStepper({
             </Box>
             <Box mt={2} mb={2} className={classes.yellow}>
               Congratulations! You have successfully submitted your rapid
-              review. Would you like to expand on your feedback with a long-form
+              review. Would you like to expand on your feedback with a full
               review?
             </Box>
           </>
@@ -653,14 +653,14 @@ export default function ReviewStepper({
         return (
           <Box mt={2}>
             <Tooltip
-              title={`A Longform Review is a space designed for researchers with subject matter expertise to provide longer,
+              title={`A Full Review is a space designed for researchers with subject matter expertise to provide longer,
               and more in-depth feedback to a preprint. It can be authored by one or more users.
               To add a co-reviewer, save your draft and click on + Add Co-Reviewer.
               To invite someone to edit your review before submitting, save your draft and click on + Add Mentor.
-              When submitted, the Longform Review is assigned a digital object identifier (DOI) via Zenodo.`}
+              When submitted, the Full Review is assigned a digital object identifier (DOI) via Zenodo.`}
             >
               <header className="shell-content-reviews__title">
-                Longform Review <HelpOutlineIcon />
+                Full Review <HelpOutlineIcon />
               </header>
             </Tooltip>
             <Box className={classes.red}>
@@ -673,8 +673,8 @@ export default function ReviewStepper({
                 <b>Instructions</b>
               </Typography>
               <Typography component="div" variant="body1" gutterBottom>
-                Use the space below to compose your long-form review. For
-                guidance, you can load one of our templates.
+                Use the space below to compose your full review. For guidance,
+                you can load one of our templates.
               </Typography>
               <Typography component="div" variant="body1" gutterBottom>
                 Please remember to be constructive and to abide by the{' '}

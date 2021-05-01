@@ -250,7 +250,7 @@ export default function PreprintCard({
                   <span className={classes.activityPop}>
                     {publishedReviews.length}
                   </span>{' '}
-                  longform reviews
+                  full reviews
                 </Typography>
               </Grid>
               <Grid item className={`${classes.activityItem} ${classes.meta}`}>

@@ -117,7 +117,7 @@ export default function ActivityCard({ activity }) {
 
   const getActivityText = activity => {
     if (activity.isLongReview) {
-      return 'published a longform review on '
+      return 'published a full review on '
     } else if (!!activity.ynAvailableCode) {
       return 'rapid reviewed on '
     } else {
@@ -212,7 +212,7 @@ export default function ActivityCard({ activity }) {
                     ? publishedReviews.length
                     : 0}
                 </span>{' '}
-                longform reviews
+                full reviews
               </Typography>
             </Grid>
             <Grid item className={`${classes.activityItem} ${classes.meta}`}>

@@ -187,7 +187,7 @@ export default function Templates({ community }) {
           <Typography component="div" variant="body1">
             <InfoOutlinedIcon className={classes.infoIcon} />
             Review templates are guides a user can choose from when starting
-            their long-form review.
+            their full review.
           </Typography>
         </Box>
         <Button

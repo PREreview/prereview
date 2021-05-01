@@ -243,7 +243,7 @@ export default function Reviews() {
                   <Grid item>
                     <Typography component="h4" variant="h4">
                       {preprints.totalCount} preprints with{' '}
-                      {preprints.totalFull} reviews, {preprints.totalRapid}{' '}
+                      {preprints.totalFull} full reviews, {preprints.totalRapid}{' '}
                       rapid reviews, and {preprints.totalRequests} requests for
                       reviews
                     </Typography>

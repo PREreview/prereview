@@ -174,7 +174,7 @@ export default function PreprintPreview({ preprint }) {
                   ? publishedReviews.length
                   : 0}
               </span>{' '}
-              longform reviews
+              full reviews
             </Typography>
           </Grid>
           <Grid item className={`${classes.activityItem} ${classes.meta}`}>

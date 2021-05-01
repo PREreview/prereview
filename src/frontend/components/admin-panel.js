@@ -119,7 +119,7 @@ export default function AdminPanel() {
           <Tab label="Users" />
           <Tab label="Personas" />
           <Tab label="Preprints" />
-          <Tab label="Long-form Reviews" />
+          <Tab label="Full Reviews" />
           <Tab label="Rapid Reviews" />
           <Tab label="Communities" />
           <Tab label="Badges" />
@@ -425,7 +425,7 @@ function FullReviewsTab() {
   } else {
     return (
       <MaterialTable
-        title="Long-form Reviews"
+        title="Full Reviews"
         columns={columns}
         data={data}
         editable={{

@@ -106,7 +106,7 @@ export default function ReviewReader({
   const [expandRapid, setExpandRapid] = useState(true);
   const [expandLong, setExpandLong] = useState(true);
 
-  // expand and collapse rapid and longform review sections
+  // expand and collapse rapid and full review sections
   const handleChangeRapid = panel => (event, newExpanded) => {
     setExpandRapid(newExpanded ? panel : false);
   };
@@ -345,7 +345,7 @@ export default function ReviewReader({
               id="longform-header"
             >
               <Typography variant="h3" component="h3">
-                Longform Reviews
+                Full Reviews
               </Typography>
             </AccordionSummary>
             <AccordionDetails>
@@ -508,7 +508,7 @@ export default function ReviewReader({
                 </div>
               ) : (
                 <Typography component="div" variant="body2">
-                  No longform reviews to display.
+                  No full reviews to display.
                 </Typography>
               )}
             </AccordionDetails>
