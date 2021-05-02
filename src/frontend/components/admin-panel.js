@@ -41,6 +41,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
+import Typography from '@material-ui/core/Typography';
 
 // icons
 import AddBox from '@material-ui/icons/AddBox';
@@ -164,7 +165,7 @@ function UsersTab() {
   const columns = [
     { title: 'UUID', field: 'uuid', hidden: true },
     {
-      title: 'ORCiD',
+      title: 'ORCID',
       field: 'orcid',
       editable: false,
       render: row => (
@@ -228,12 +229,13 @@ function UsersTab() {
 
 function PersonasTab() {
   const [badges, setBadges] = useState(null);
+  const [selectedBadges, setSelectedBadges] = useState([])
 
   const { data, loading } = useGetPersonas({
     resolve: res => res.data,
   });
 
-  const { badgesData, loadingBadges } = useGetBadges({
+  const { data: badgesData, loading: loadingBadges } = useGetBadges({
     resolve: res => res.data,
   });
 
@@ -248,11 +250,17 @@ function PersonasTab() {
     path: ({ id }) => `/personas/${id}`,
   });
 
+  const handleBadgeChange = (event, row) => {
+    console.log("event.target.value!", event.target.value)
+    console.log("row!", row)
+    setSelectedBadges(event.target.value)
+  }
+
   useEffect(() => {
     if (!loadingBadges && badgesData) {
       const lookup = {};
       badgesData.map(badge => {
-        lookup[badge.uuid] = badge.name;
+        lookup[badge.name] = badge.uuid;
       });
       setBadges(lookup);
     }
@@ -285,43 +293,44 @@ function PersonasTab() {
       field: 'badges',
       lookup: badges,
       editComponent: row => (
-        <FormControl>
+        <>
           <InputLabel id="badges-select-label">Badges</InputLabel>
           <Select
             labelId="badges-select-label"
             id="badges-select"
             multiple
-            value={''}
-            onChange={() => {
-              console.log('clicked');
-            }}
+            value={selectedBadges}
+            onChange={e => handleBadgeChange(e, row)}
             input={<Input id="badges-select-chip" />}
-            renderValue={(selected) => (
+            renderValue={selected => 
+              (
               <div>
-                {selected.map((value) => (
-                  <Chip key={value} label={value} />
+                {selected.map(value => (
+                  <Chip key={value.uuid} label={value.name} />
                 ))}
               </div>
             )}
           >
-            {badges && badges.map(badge => (
-              <MenuItem key={badge.uuid} value={badge.uuid}>
+            {badgesData.map(badge => (
+              <MenuItem key={badge.uuid} value={badge}>
                 {badge.name}
               </MenuItem>
             ))}
           </Select>
-        </FormControl>
+          </>
       ),
-      render: row =>
-        row.badges &&
-        row.badges.map(badge => (
-          <Chip
-            key={badge.uuid}
-            color="primary"
-            label={badge.name}
-            style={{ margin: 2 }}
-          />
-        )),
+      render: row => {
+        row.badges
+          ? row.badges.map(badge => (
+              <Chip
+                key={badge.uuid}
+                color="primary"
+                label={badge.name}
+                style={{ margin: 2 }}
+              />
+            ))
+          : null;
+      },
     },
     {
       title: 'Created At',
@@ -349,7 +358,7 @@ function PersonasTab() {
         data={data}
         editable={{
           onRowUpdate: newData =>
-            update(newData, { pathParams: { id: newData.uuid } }),
+            update({badges: selectedBadges}, { pathParams: { id: newData.uuid } }),
           onRowDelete: newData => remove({ pathParams: { id: newData.uuid } }),
         }}
       />
@@ -582,8 +591,9 @@ function RapidReviewsTab() {
 
 function CommunitiesTab() {
   const [users, setUsers] = useState(null);
+  const [communities, setCommunities] = useState(null);
 
-  const { data, loading } = useGetCommunities({
+  const { data: communitiesData, loading } = useGetCommunities({
     resolve: res => res.data,
   });
 
@@ -621,7 +631,11 @@ function CommunitiesTab() {
       // because some seed users dont have default personas
       setUsers(lookup);
     }
-  }, [usersData]);
+
+    if (!loading && communitiesData) {
+      setCommunities(communitiesData);
+    }
+  }, [usersData, communitiesData]);
 
   const columns = [
     { title: 'UUID', field: 'uuid', hidden: true },
@@ -649,17 +663,18 @@ function CommunitiesTab() {
       lookup: users,
       render: row => (
         <AvatarGroup max={5}>
-          {row.owners &&
-            row.owners.map(owner => (
-              <Link
-                key={owner.uuid}
-                href={`/about/${owner.uuid}`}
-                target="_blank"
-                rel="noopener"
-              >
-                <Avatar src={owner.avatar} alt={owner.name} />
-              </Link>
-            ))}
+          {row.owners
+            ? row.owners.map(owner => (
+                <Link
+                  key={owner.uuid}
+                  href={`/about/${owner.uuid}`}
+                  target="_blank"
+                  rel="noopener"
+                >
+                  <Avatar src={owner.avatar} alt={owner.name} />
+                </Link>
+              ))
+            : null}
         </AvatarGroup>
       ),
     },
@@ -684,11 +699,14 @@ function CommunitiesTab() {
     if (!newData.owners) return [];
     // on the frontend, sometimes the owner of a community is in the shape of a user object,
     // in which case we only need to send back the object's uuid
-    if (newData.owners && Array.isArray(newData.owners) && newData.owners.uuid)
-      return newData.owners.uuid;
+    if (
+      newData.owners &&
+      Array.isArray(newData.owners) &&
+      newData.owners[0].uuid
+    )
+      return [newData.owners.uuid];
     // sometimes the owners array is already just a uuid string, so we just return that
     if (newData.owners && Array.isArray(newData.owners)) return newData.owners;
-
     return [newData.owners];
   };
 
@@ -699,7 +717,7 @@ function CommunitiesTab() {
       <MaterialTable
         title="Communities"
         columns={columns}
-        data={data}
+        data={communities}
         editable={{
           onRowUpdate: newData =>
             update(
@@ -709,6 +727,13 @@ function CommunitiesTab() {
                 owners: processOwners(newData),
               },
               { pathParams: { id: newData.uuid } },
+              setCommunities(
+                communitiesData.map(comm =>
+                  comm.uuid === newData.uuid
+                    ? { ...newData, owners: processOwners(newData) }
+                    : comm,
+                ),
+              ),
             ),
           onRowDelete: newData => remove({ pathParams: { id: newData.uuid } }),
           onRowAdd: newData =>
@@ -751,6 +776,7 @@ function BadgesTab() {
       field: 'updatedAt',
       type: 'datetime',
       dateSetting: { locale: 'en-GB' },
+      render: row => <Typography>{row.updatedAt}</Typography>,
       editable: false,
     },
   ];

@@ -24,7 +24,7 @@ const querySchema = Joi.object({
   asc: Joi.boolean(),
   search: Joi.string().allow(''),
   communities: Joi.string().allow(''),
-  badges: Joi.string().allow(''),
+  badges: Joi.array().allow(''),
   expertises: Joi.array(),
   sort: Joi.string().allow(
     'name',
@@ -283,6 +283,7 @@ export default function controller(
         name: Joi.string(),
         avatar: Joi.string(),
         bio: Joi.string().allow(''),
+        badges: Joi.array().allow(''),
         expertises: Joi.array(),
         isLocked: Joi.boolean(),
       }),
@@ -327,6 +328,18 @@ export default function controller(
           delete ctx.request.body.expertises;
           log.debug('persona:', persona);
         }
+
+        const badges = ctx.request.body.badges || [];
+        if (badges.length > 0) {
+          for (let bdg of badges) {
+            log.debug("bdg", bdg, "*********", bdg.uuid)
+            const badge = await badgesModel.findOneOrFail({ uuid: bdg.uuid })
+            badge.personas.add(persona)
+            persona.badges.add(badge)
+          }
+        }
+        delete ctx.request.body.badges
+
         personasModel.assign(persona, ctx.request.body);
         log.debug('persona:', persona);
         await personasModel.persistAndFlush(persona);

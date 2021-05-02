@@ -356,16 +356,22 @@ export default function controller(
         return;
       }
 
+      log.debug('ctx.request.body **********************', ctx.request.body);
+
       let owner;
 
       if (ctx.request.body.owners.length) {
-        try {
-          owner = await userModel.findOneByUuidOrOrcid(
-            ctx.request.body.owners[0],
-          );
-        } catch (err) {
-          log.error('HTTP 400 Error: ', err);
-          ctx.throw(400, `Failed to parse query: ${err}`);
+        if (typeof ctx.request.body.owners[0] === 'object') {
+          owner = ctx.request.body.owners[0];
+        } else {
+          try {
+            owner = await userModel.findOneByUuidOrOrcid(
+              ctx.request.body.owners[0],
+            );
+          } catch (err) {
+            log.error('HTTP 400 Error: ', err);
+            ctx.throw(400, `Failed to parse query: ${err}`);
+          }
         }
       }
 
