@@ -15,7 +15,7 @@ import { useExtension } from '../hooks/extension-hooks';
 import { getCanonicalUrl } from '../utils/preprints';
 
 // Material UI imports
-import { makeStyles, useTheme } from '@material-ui/core/styles';
+import { makeStyles } from '@material-ui/core/styles';
 import { useMediaQuery } from '@material-ui/core';
 import AppBar from '@material-ui/core/AppBar';
 import Box from '@material-ui/core/Box';
@@ -101,6 +101,7 @@ const useStyles = makeStyles(theme => ({
   },
   drawerOpen: {
     height: '60%',
+    overflowX: 'hidden',
     transition: theme.transitions.create('height', {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen,

@@ -38,7 +38,7 @@ const RapidReviewReader = props => {
     isReader = true,
   } = props;
 
-  const useStyles = makeStyles(() => ({
+  const useStyles = makeStyles(theme => ({
     popper: {
       backgroundColor: '#fff',
       bottom: '0 !important',
@@ -48,8 +48,11 @@ const RapidReviewReader = props => {
       right: 0,
       top: height ? `${height + 20}px !important` : 0,
       transform: 'none !important',
-      width: '40vw',
+      width: '100%',
       zIndex: 10000,
+      [theme.breakpoints.up('sm')]: {
+        width: '40vw',
+      },
     },
   }));
 
