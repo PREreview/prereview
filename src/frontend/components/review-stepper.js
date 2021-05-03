@@ -701,7 +701,7 @@ export default function ReviewStepper({
                     <b>Review Authors</b>
                   </Typography>
                   <AvatarGroup max={10}>
-                    {review.authors
+                    {review && review.authors
                       ? review.authors.map(author => (
                           <Tooltip
                             key={author.uuid}
