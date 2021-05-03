@@ -194,6 +194,8 @@ function UsersTab() {
     },
   ];
 
+  const [users, setUsers] = useState(null)
+
   const { data, loading } = useGetUsers({
     resolve: res => res.data,
   });
@@ -204,10 +206,23 @@ function UsersTab() {
     path: ({ id }) => `/users/${id}`,
   });
 
-  const { mutate: remove } = useMutate({
-    verb: 'DELETE',
-    path: ({ id }) => `/users/${id}`,
-  });
+  // const { mutate: remove } = useMutate({
+  //   verb: 'DELETE',
+  //   path: ({ id }) => `/users/${id}`,
+  // });
+
+   const handleRemove = row => {
+     setUsers(users.filter(user => user.uuid !== row.uuid));
+     return fetch(`/api/v2/users/${row.uuid}`, {
+       method: 'DELETE',
+     }).then();
+   };
+
+   useEffect(() => {
+     if (!loading && data) {
+       setUsers(data)
+     }
+   }, [data])
 
   if (loading) {
     return <Loading />;
@@ -216,11 +231,11 @@ function UsersTab() {
       <MaterialTable
         title="Users"
         columns={columns}
-        data={data}
+        data={users}
         editable={{
           onRowUpdate: newData =>
             update(newData, { pathParams: { id: newData.uuid } }),
-          onRowDelete: newData => remove({ pathParams: { id: newData.uuid } }),
+          onRowDelete: row => handleRemove(row),
         }}
       />
     );
@@ -230,6 +245,7 @@ function UsersTab() {
 function PersonasTab() {
   const [badges, setBadges] = useState(null);
   const [selectedBadges, setSelectedBadges] = useState([]);
+  const [personas, setPersonas] = useState(null)
 
   const { data, loading } = useGetPersonas({
     resolve: res => res.data,
@@ -239,21 +255,27 @@ function PersonasTab() {
     resolve: res => res.data,
   });
 
-  console.log('personas data', data);
   // generated hooks don't allow dynamic path params
   const { mutate: update } = useMutate({
     verb: 'PUT',
     path: ({ id }) => `/personas/${id}`,
   });
 
-  const { mutate: remove } = useMutate({
-    verb: 'DELETE',
-    path: ({ id }) => `/personas/${id}`,
-  });
+  // const { mutate: remove } = useMutate({
+  //   verb: 'DELETE',
+  //   path: ({ id }) => `/personas/${id}`,
+  // });
 
   const handleBadgeChange = (event, row) => {
     setSelectedBadges(event.target.value);
   };
+
+  const handleRemove = async row => {
+   setPersonas(personas.filter(persona => persona.uuid !== row.uuid));
+   await fetch(`/api/v2/personas/${row.uuid}`, {
+     method: 'DELETE',
+   });
+ };  
 
   useEffect(() => {
     if (!loadingBadges && badgesData) {
@@ -263,7 +285,11 @@ function PersonasTab() {
       });
       setBadges(lookup);
     }
-  }, [badgesData]);
+
+    if (!loading, data) {
+      setPersonas(data)
+    }
+  }, [data, badgesData]);
 
   const columns = [
     { title: 'UUID', field: 'uuid', hidden: true },
@@ -350,12 +376,9 @@ function PersonasTab() {
       <MaterialTable
         title="Personas"
         columns={columns}
-        data={data}
+        data={personas}
         editable={{
-          onRowDelete: (oldData) => new Promise((resolve) => {
-            console.log("onRowDelete", oldData.uuid)
-            remove({ pathParams: {id: oldData.uuid}})
-          }),
+          onRowDelete: row => handleRemove(row),
           onRowUpdate: newData =>
             update(
               { badges: selectedBadges },
@@ -557,6 +580,8 @@ function RapidReviewsTab() {
     },
   ];
 
+  const [rapids, setRapids] = useState(null)
+
   const { data, loading } = useGetRapidReviews({
     resolve: res => res.data,
   });
@@ -567,10 +592,23 @@ function RapidReviewsTab() {
     path: ({ id }) => `/rapid-reviews/${id}`,
   });
 
-  const { mutate: remove } = useMutate({
-    verb: 'DELETE',
-    path: ({ id }) => `/rapid-reviews/${id}`,
-  });
+  // const { mutate: remove } = useMutate({
+  //   verb: 'DELETE',
+  //   path: ({ id }) => `/rapid-reviews/${id}`,
+  // });
+
+  const handleRemove = row => {
+    setRapids(rapids.filter(rapid => rapid.uuid !== row.uuid));
+    return fetch(`/api/v2/rapid-reviews/${row.uuid}`, {
+      method: 'DELETE',
+    }).then()
+  };
+
+  useEffect(() => {
+    if (!loading && data) {
+      setRapids(data);
+    }
+  }, [data])
 
   if (loading) {
     return <Loading />;
@@ -579,11 +617,11 @@ function RapidReviewsTab() {
       <MaterialTable
         title="Rapid Reviews"
         columns={columns}
-        data={data}
+        data={rapids}
         editable={{
           onRowUpdate: newData =>
             update(newData, { pathParams: { id: newData.uuid } }),
-          onRowDelete: newData => remove({ pathParams: { id: newData.uuid } }),
+          onRowDelete: row => handleRemove(row),
         }}
       />
     );
@@ -608,15 +646,23 @@ function CommunitiesTab() {
     path: ({ id }) => `/communities/${id}`,
   });
 
-  const { mutate: remove } = useMutate({
-    verb: 'DELETE',
-    path: ({ id }) => `/communities/${id}`,
-  });
+  // const { mutate: remove } = useMutate({
+  //   verb: 'DELETE',
+  //   path: ({ id }) => `/communities/${id}`,
+  // });
 
   const { mutate: create } = useMutate({
     verb: 'POST',
     path: '/communities',
   });
+
+  const handleRemove = row => {
+    setCommunities(communities.filter(comm => comm.uuid !== row.uuid));
+    return fetch(`/api/v2/communities/${row.uuid}`, {
+      method: 'DELETE'
+    })
+    .then()
+  }
 
   useEffect(() => {
     if (!loadingUsers && usersData) {
@@ -736,8 +782,7 @@ function CommunitiesTab() {
                 ),
               ),
             ),
-          onRowDelete: newData =>
-            remove({ pathParams: { id: newData.tableData.uuid } }),
+          onRowDelete: row => handleRemove(row),
           onRowAdd: newData =>
             create({
               ...newData,

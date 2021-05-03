@@ -197,6 +197,30 @@ export default function controller(
   });
 
   personaRouter.route({
+    method: 'DELETE',
+    path: '/personas/:id',
+    pre: thisUser.can('access admin pages'),
+    handler: async ctx => {
+      log.debug(`Deleting persona with id ${ctx.params.id}.`);
+      let persona;
+
+      try {
+        persona = await personasModel.findOne({ uuid: ctx.params.id });
+        if (!persona) {
+          ctx.throw(404, `Persona with ID ${ctx.params.id} doesn't exist`);
+        }
+        await personasModel.removeAndFlush(persona);
+      } catch (err) {
+        log.error('HTTP 400 Error: ', err);
+        ctx.throw(400, `Failed to parse community schema: ${err}`);
+      }
+
+      // if deleted
+      ctx.status = 204;
+    }
+  })
+
+  personaRouter.route({
     method: 'GET',
     path: '/personas/:id',
     // validate: {}
@@ -424,8 +448,20 @@ export default function controller(
 
   personaRouter.route({
     method: 'DELETE',
-    path: '/personas/:id/badges/:bid',
+    path: '/personas/:id/badges',
     pre: thisUser.can('access admin pages'),
+    validate: {
+      query: Joi.object({
+        bid: Joi.string(),
+      }),
+      params: {
+        id: Joi.string()
+          .description('Persona id')
+          .required(),
+      },
+      type: 'json',
+      continueOnError: true,
+    },
     handler: async ctx => {
       log.debug(
         `Removing badge ${ctx.params.bid} from persona ${ctx.params.id}.`,

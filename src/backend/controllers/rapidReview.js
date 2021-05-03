@@ -261,7 +261,6 @@ export default function controller(rapidReviews, preprints, thisUser) {
     method: 'delete',
     path: '/rapid-reviews/:id',
     pre: thisUser.can('access admin pages'),
-    // validate: {},
     handler: async ctx => {
       log.debug(`Updating rapid review ${ctx.params.id}`);
       let rapid;
