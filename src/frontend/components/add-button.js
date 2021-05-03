@@ -47,7 +47,7 @@ export default function AddButton({ ...buttonProps }) {
         component="span"
         className={`${classes.text} ${classes.border}`}
       >
-        Add Review
+        Add PREreview
       </Typography>
       <Typography component="span" className={classes.text}>
         Add Request

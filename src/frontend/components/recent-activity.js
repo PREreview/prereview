@@ -33,7 +33,8 @@ export default function RecentActivity({ activity }) {
         return (
           <Typography component="div" variant="body2">
             <Link href={`/about/${author.uuid}`}>{author.name}</Link> requested
-            reviews for <Link href={`/preprints/${preprintId}`}>{title}</Link>{' '}
+            PREreviews for{' '}
+            <Link href={`/preprints/${preprintId}`}>{title}</Link>{' '}
             {formatDistanceStrict(new Date(activity.createdAt), new Date()) +
               ` ago.`}
           </Typography>
@@ -42,7 +43,7 @@ export default function RecentActivity({ activity }) {
         return (
           <Typography component="div" variant="body2">
             <Link href={`/about/${author.uuid}`}>{author.name}</Link> rapid
-            reviewed <Link href={`/preprints/${preprintId}`}>{title}</Link>{' '}
+            PREreviewed <Link href={`/preprints/${preprintId}`}>{title}</Link>{' '}
             {formatDistanceStrict(new Date(activity.createdAt), new Date()) +
               ` ago.`}
           </Typography>
@@ -50,7 +51,7 @@ export default function RecentActivity({ activity }) {
       case 'long':
         return (
           <Typography component="div" variant="body2">
-            {multiAuthors()} reviewed{' '}
+            {multiAuthors()} full PREreviewed{' '}
             <Link href={`/preprints/${preprintId}`}>{title}</Link>{' '}
             {formatDistanceStrict(new Date(activity.createdAt), new Date()) +
               ` ago.`}

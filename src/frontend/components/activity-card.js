@@ -117,13 +117,13 @@ export default function ActivityCard({ activity }) {
 
   const getActivityText = activity => {
     if (activity.isLongReview) {
-      return 'published a full review on '
-    } else if (!!activity.ynAvailableCode) {
-      return 'rapid reviewed on '
+      return 'published a full PREreview on ';
+    } else if (activity.ynAvailableCode) {
+      return 'rapid PREreviewed on ';
     } else {
-      return 'requested reviews for this preprint on '
+      return 'requested PREreviews for this preprint on ';
     }
-  }
+  };
 
   useEffect(() => {
     if (!loadingPreprint) {
@@ -202,7 +202,7 @@ export default function ActivityCard({ activity }) {
                 <span className={classes.activityPop}>
                   {preprint.rapidReviews.length}
                 </span>{' '}
-                rapid reviews
+                rapid PREreviews
               </Typography>
             </Grid>
             <Grid item className={`${classes.activityItem} ${classes.meta}`}>
@@ -212,7 +212,7 @@ export default function ActivityCard({ activity }) {
                     ? publishedReviews.length
                     : 0}
                 </span>{' '}
-                full reviews
+                full PREreviews
               </Typography>
             </Grid>
             <Grid item className={`${classes.activityItem} ${classes.meta}`}>

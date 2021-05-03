@@ -119,8 +119,8 @@ export default function AdminPanel() {
           <Tab label="Users" />
           <Tab label="Personas" />
           <Tab label="Preprints" />
-          <Tab label="Full Reviews" />
-          <Tab label="Rapid Reviews" />
+          <Tab label="Full PREreviews" />
+          <Tab label="Rapid PREreviews" />
           <Tab label="Communities" />
           <Tab label="Badges" />
           <Tab label="Tags" />
@@ -425,7 +425,7 @@ function FullReviewsTab() {
   } else {
     return (
       <MaterialTable
-        title="Full Reviews"
+        title="Full PREreviews"
         columns={columns}
         data={data}
         editable={{
@@ -499,7 +499,7 @@ function RapidReviewsTab() {
   } else {
     return (
       <MaterialTable
-        title="Rapid Reviews"
+        title="Rapid PREreviews"
         columns={columns}
         data={data}
         editable={{

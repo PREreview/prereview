@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Value from './value';
 import RoleBadge from './role-badge';
 import { getTextAnswers } from '../utils/stats';
 
@@ -59,7 +58,7 @@ export default function TextAnswers({
                                   onModerate(author ? author.uuid : user.uuid);
                                 }}
                               >
-                                Report Review
+                                Report PREreview
                               </div>
                             )}
                           </RoleBadge>

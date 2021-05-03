@@ -200,9 +200,10 @@ export default function Reviews() {
                     <InfoOutlinedIcon className={classes.infoIcon} />
                     This is a platform for the crowdsourcing of preprint
                     reviews. Use the search bar below to find preprints that
-                    already have reviews or requests for reviews. To add your
-                    own review or request, use the Add Review | Request Review
-                    button, paste the preprint DOI and follow the instructions.
+                    already have PREreviews or requests for PREreviews. To add
+                    your own PREreview or request, use the Add PREreview |
+                    Request PREreview button, paste the preprint DOI and follow
+                    the instructions.
                   </Typography>
                 </Box>
               </Grid>
@@ -243,9 +244,9 @@ export default function Reviews() {
                   <Grid item>
                     <Typography component="h4" variant="h4">
                       {preprints.totalCount} preprints with{' '}
-                      {preprints.totalFull} full reviews, {preprints.totalRapid}{' '}
-                      rapid reviews, and {preprints.totalRequests} requests for
-                      reviews
+                      {preprints.totalFull} full PREreviews,{' '}
+                      {preprints.totalRapid} rapid PREreviews, and{' '}
+                      {preprints.totalRequests} requests for PREreviews
                     </Typography>
                   </Grid>
                 ) : null}

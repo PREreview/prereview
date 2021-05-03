@@ -98,7 +98,7 @@ const RapidReviewReader = props => {
             >
               Back
             </Button>
-            <Typography>{review.author.name}&apos;s Rapid Review</Typography>
+            <Typography>{review.author.name}&apos;s Rapid PREreview</Typography>
             <Barplot stats={getYesNoStats([review])} nReviews={1}>
               <ShareMenu identifier={identifier} roleIds={roleIds} />
             </Barplot>
