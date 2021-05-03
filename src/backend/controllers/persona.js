@@ -170,15 +170,15 @@ export default function controller(
           );
           count = await personasModel.count();
         }
-        
+
         let personasWithAvatar;
 
         if (foundPersonas) {
           personasWithAvatar = foundPersonas.map(persona => {
             if (persona.avatar && Buffer.isBuffer(persona.avatar)) {
-              return {...persona, avatar: persona.avatar.toString()};
+              return { ...persona, avatar: persona.avatar.toString() };
             } else {
-              return persona
+              return persona;
             }
           });
 
@@ -332,13 +332,13 @@ export default function controller(
         const badges = ctx.request.body.badges || [];
         if (badges.length > 0) {
           for (let bdg of badges) {
-            log.debug("bdg", bdg, "*********", bdg.uuid)
-            const badge = await badgesModel.findOneOrFail({ uuid: bdg.uuid })
-            badge.personas.add(persona)
-            persona.badges.add(badge)
+            log.debug('bdg', bdg, '*********', bdg.uuid);
+            const badge = await badgesModel.findOneOrFail({ uuid: bdg.uuid });
+            badge.personas.add(persona);
+            persona.badges.add(badge);
           }
         }
-        delete ctx.request.body.badges
+        delete ctx.request.body.badges;
 
         personasModel.assign(persona, ctx.request.body);
         log.debug('persona:', persona);

@@ -229,7 +229,7 @@ function UsersTab() {
 
 function PersonasTab() {
   const [badges, setBadges] = useState(null);
-  const [selectedBadges, setSelectedBadges] = useState([])
+  const [selectedBadges, setSelectedBadges] = useState([]);
 
   const { data, loading } = useGetPersonas({
     resolve: res => res.data,
@@ -239,6 +239,7 @@ function PersonasTab() {
     resolve: res => res.data,
   });
 
+  console.log('personas data', data);
   // generated hooks don't allow dynamic path params
   const { mutate: update } = useMutate({
     verb: 'PUT',
@@ -251,10 +252,8 @@ function PersonasTab() {
   });
 
   const handleBadgeChange = (event, row) => {
-    console.log("event.target.value!", event.target.value)
-    console.log("row!", row)
-    setSelectedBadges(event.target.value)
-  }
+    setSelectedBadges(event.target.value);
+  };
 
   useEffect(() => {
     if (!loadingBadges && badgesData) {
@@ -302,8 +301,7 @@ function PersonasTab() {
             value={selectedBadges}
             onChange={e => handleBadgeChange(e, row)}
             input={<Input id="badges-select-chip" />}
-            renderValue={selected => 
-              (
+            renderValue={selected => (
               <div>
                 {selected.map(value => (
                   <Chip key={value.uuid} label={value.name} />
@@ -317,21 +315,17 @@ function PersonasTab() {
               </MenuItem>
             ))}
           </Select>
-          </>
+        </>
       ),
       render: row => (
         <>
-        {row.badges
-          ? row.badges.map(badge => (
-              <Chip
-                key={badge.uuid}
-                color="primary"
-                label={badge.name}
-              />
-            ))
-          : null
-      }
-      </>),
+          {row.badges
+            ? row.badges.map(badge => (
+                <Chip key={badge.uuid} color="primary" label={badge.name} />
+              ))
+            : null}
+        </>
+      ),
     },
     {
       title: 'Created At',
@@ -358,9 +352,15 @@ function PersonasTab() {
         columns={columns}
         data={data}
         editable={{
+          onRowDelete: (oldData) => new Promise((resolve) => {
+            console.log("onRowDelete", oldData.uuid)
+            remove({ pathParams: {id: oldData.uuid}})
+          }),
           onRowUpdate: newData =>
-            update({badges: selectedBadges}, { pathParams: { id: newData.uuid } }),
-          onRowDelete: newData => remove({ pathParams: { id: newData.uuid } }),
+            update(
+              { badges: selectedBadges },
+              { pathParams: { id: newData.uuid } },
+            ),
         }}
       />
     );
@@ -736,7 +736,8 @@ function CommunitiesTab() {
                 ),
               ),
             ),
-          onRowDelete: newData => remove({ pathParams: { id: newData.uuid } }),
+          onRowDelete: newData =>
+            remove({ pathParams: { id: newData.tableData.uuid } }),
           onRowAdd: newData =>
             create({
               ...newData,

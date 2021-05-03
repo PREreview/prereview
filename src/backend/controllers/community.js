@@ -413,6 +413,7 @@ export default function controller(
         handleInvalid(ctx);
         return;
       }
+      log.debug("ctx.params", ctx.params)
 
       log.debug(`Deleting community with id ${ctx.params.id}.`);
       let community;
