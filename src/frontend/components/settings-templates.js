@@ -1,13 +1,11 @@
 // base imports
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { Helmet } from 'react-helmet-async';
 
 // material ui imports
 import { makeStyles, withStyles } from '@material-ui/core/styles';
 import Box from '@material-ui/core/Box';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import Container from '@material-ui/core/Container';
 import IconButton from '@material-ui/core/IconButton';
 import Modal from '@material-ui/core/Modal';
 import MuiButton from '@material-ui/core/Button';
@@ -27,19 +25,12 @@ import {
   usePostCommunityTemplates,
 } from '../hooks/api-hooks.tsx';
 
-// contexts
-import UserProvider from '../contexts/user-context';
-
 // components
 import EditTemplate from './edit-template';
-import HeaderBar from './header-bar';
 
 // icons
 import DeleteIcon from '@material-ui/icons/Delete';
 import InfoOutlinedIcon from '@material-ui/icons/InfoOutlined';
-
-// constants
-import { ORG } from '../constants';
 
 const Button = withStyles({
   root: {
@@ -331,6 +322,7 @@ function SettingsRow({ template, community, onDelete }) {
 }
 
 SettingsRow.propTypes = {
+  community: PropTypes.object,
   template: PropTypes.object,
   onDelete: PropTypes.func,
 };
