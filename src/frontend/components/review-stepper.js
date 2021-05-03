@@ -269,7 +269,7 @@ export default function ReviewStepper({
   const location = useLocation();
   const classes = useStyles();
   const { cid } = useParams();
-  const [thisUser, setThisUser] = useContext(UserProvider.context);
+  const [thisUser] = useContext(UserProvider.context);
   const [activeStep, setActiveStep] = useState(0);
   const [answerMap, setAnswerMap] = useState({});
   const [completed, setCompleted] = useState(new Set());
@@ -701,20 +701,30 @@ export default function ReviewStepper({
                     <b>Review Authors</b>
                   </Typography>
                   <AvatarGroup max={10}>
-                    {review && review.authors
-                      ? review.authors.map(author => (
-                          <Tooltip
-                            key={author.uuid}
-                            title={
-                              author.isMentor
-                                ? `${author.name} (mentor)`
-                                : `${author.name} (co-reviewer)`
-                            }
-                          >
-                            <Avatar alt={author.name} src={author.avatar} />
-                          </Tooltip>
-                        ))
-                      : null}
+                    {review && review.authors && review.authors.length == 1 ? (
+                      <Tooltip
+                        key={thisUser.defaultPersona.uuid}
+                        title={`${thisUser.defaultPersona.name} (co-reviewer)`}
+                      >
+                        <Avatar
+                          alt={thisUser.defaultPersona.name}
+                          src={thisUser.defaultPersona.avatar}
+                        />
+                      </Tooltip>
+                    ) : review && review.authors ? (
+                      review.authors.map(author => (
+                        <Tooltip
+                          key={author.uuid}
+                          title={
+                            author.isMentor
+                              ? `${author.name} (mentor)`
+                              : `${author.name} (co-reviewer)`
+                          }
+                        >
+                          <Avatar alt={author.name} src={author.avatar} />
+                        </Tooltip>
+                      ))
+                    ) : null}
                   </AvatarGroup>
                   <AddAuthors
                     reviewId={cid}
