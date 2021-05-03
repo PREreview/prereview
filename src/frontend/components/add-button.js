@@ -19,7 +19,7 @@ const useStyles = makeStyles(theme => ({
     borderRadius: 50,
     color: theme.palette.primary.contrastText,
     textTransform: 'none',
-    width: 300,
+    width: 330,
     '&:hover': {
       backgroundColor: theme.palette.primary.dark,
     },
