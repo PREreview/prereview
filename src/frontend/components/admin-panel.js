@@ -319,18 +319,19 @@ function PersonasTab() {
           </Select>
           </>
       ),
-      render: row => {
-        row.badges
+      render: row => (
+        <>
+        {row.badges
           ? row.badges.map(badge => (
               <Chip
                 key={badge.uuid}
                 color="primary"
                 label={badge.name}
-                style={{ margin: 2 }}
               />
             ))
-          : null;
-      },
+          : null
+      }
+      </>),
     },
     {
       title: 'Created At',
