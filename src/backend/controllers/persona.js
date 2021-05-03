@@ -217,8 +217,8 @@ export default function controller(
 
       // if deleted
       ctx.status = 204;
-    }
-  })
+    },
+  });
 
   personaRouter.route({
     method: 'GET',
