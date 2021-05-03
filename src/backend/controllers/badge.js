@@ -148,7 +148,7 @@ export default function controller(badgeModel, thisUser) {
         required: true,
       },
     },
-    method: 'delete',
+    method: 'DELETE',
     path: '/badges/:id',
     pre: thisUser.can('access admin pages'),
     // validate: {},

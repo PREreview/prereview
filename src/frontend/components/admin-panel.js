@@ -194,7 +194,7 @@ function UsersTab() {
     },
   ];
 
-  const [users, setUsers] = useState(null)
+  const [users, setUsers] = useState(null);
 
   const { data, loading } = useGetUsers({
     resolve: res => res.data,
@@ -211,18 +211,18 @@ function UsersTab() {
   //   path: ({ id }) => `/users/${id}`,
   // });
 
-   const handleRemove = row => {
-     setUsers(users.filter(user => user.uuid !== row.uuid));
-     return fetch(`/api/v2/users/${row.uuid}`, {
-       method: 'DELETE',
-     }).then();
-   };
+  const handleRemove = row => {
+    setUsers(users.filter(user => user.uuid !== row.uuid));
+    return fetch(`/api/v2/users/${row.uuid}`, {
+      method: 'DELETE',
+    }).then();
+  };
 
-   useEffect(() => {
-     if (!loading && data) {
-       setUsers(data)
-     }
-   }, [data])
+  useEffect(() => {
+    if (!loading && data) {
+      setUsers(data);
+    }
+  }, [data]);
 
   if (loading) {
     return <Loading />;
@@ -245,7 +245,7 @@ function UsersTab() {
 function PersonasTab() {
   const [badges, setBadges] = useState(null);
   const [selectedBadges, setSelectedBadges] = useState([]);
-  const [personas, setPersonas] = useState(null)
+  const [personas, setPersonas] = useState(null);
 
   const { data, loading } = useGetPersonas({
     resolve: res => res.data,
@@ -271,11 +271,11 @@ function PersonasTab() {
   };
 
   const handleRemove = async row => {
-   setPersonas(personas.filter(persona => persona.uuid !== row.uuid));
-   await fetch(`/api/v2/personas/${row.uuid}`, {
-     method: 'DELETE',
-   });
- };  
+    setPersonas(personas.filter(persona => persona.uuid !== row.uuid));
+    await fetch(`/api/v2/personas/${row.uuid}`, {
+      method: 'DELETE',
+    });
+  };
 
   useEffect(() => {
     if (!loadingBadges && badgesData) {
@@ -286,8 +286,8 @@ function PersonasTab() {
       setBadges(lookup);
     }
 
-    if (!loading, data) {
-      setPersonas(data)
+    if ((!loading, data)) {
+      setPersonas(data);
     }
   }, [data, badgesData]);
 
@@ -580,7 +580,7 @@ function RapidReviewsTab() {
     },
   ];
 
-  const [rapids, setRapids] = useState(null)
+  const [rapids, setRapids] = useState(null);
 
   const { data, loading } = useGetRapidReviews({
     resolve: res => res.data,
@@ -597,18 +597,18 @@ function RapidReviewsTab() {
   //   path: ({ id }) => `/rapid-reviews/${id}`,
   // });
 
-  const handleRemove = row => {
+  const handleRemove = async row => {
     setRapids(rapids.filter(rapid => rapid.uuid !== row.uuid));
-    return fetch(`/api/v2/rapid-reviews/${row.uuid}`, {
+    await fetch(`/api/v2/rapid-reviews/${row.uuid}`, {
       method: 'DELETE',
-    }).then()
+    });
   };
 
   useEffect(() => {
     if (!loading && data) {
       setRapids(data);
     }
-  }, [data])
+  }, [data]);
 
   if (loading) {
     return <Loading />;
@@ -656,13 +656,16 @@ function CommunitiesTab() {
     path: '/communities',
   });
 
-  const handleRemove = row => {
-    setCommunities(communities.filter(comm => comm.uuid !== row.uuid));
-    return fetch(`/api/v2/communities/${row.uuid}`, {
-      method: 'DELETE'
-    })
-    .then()
-  }
+  const handleRemove = async toDelete => {
+    try {
+      await fetch(`/api/v2/communities/${toDelete.uuid}`, {
+        method: 'DELETE',
+      });
+    } catch (err) {
+      alert(`Failed to remove community: ${err.mesage}`);
+    }
+    setCommunities(communities.filter(comm => comm.uuid !== toDelete.uuid));
+  };
 
   useEffect(() => {
     if (!loadingUsers && usersData) {
@@ -710,7 +713,7 @@ function CommunitiesTab() {
       lookup: users,
       render: row => (
         <AvatarGroup max={5}>
-          {row.owners
+          {row.owners && Array.isArray(row.owners)
             ? row.owners.map(owner => (
                 <Link
                   key={owner.uuid}
@@ -782,12 +785,15 @@ function CommunitiesTab() {
                 ),
               ),
             ),
-          onRowDelete: row => handleRemove(row),
+          onRowDelete: toDelete => handleRemove(toDelete),
           onRowAdd: newData =>
-            create({
-              ...newData,
-              owners: processOwners(newData),
-            }),
+            create(
+              {
+                ...newData,
+                owners: processOwners(newData),
+              },
+              setCommunities([...communities, newData]),
+            ),
         }}
       />
     );
@@ -828,6 +834,8 @@ function BadgesTab() {
     },
   ];
 
+  const [badges, setBadges] = useState(null);
+
   const { data, loading } = useGetBadges({
     resolve: res => res.data,
   });
@@ -838,15 +846,32 @@ function BadgesTab() {
     path: ({ id }) => `/badges/${id}`,
   });
 
-  const { mutate: remove } = useMutate({
-    verb: 'DELETE',
-    path: ({ id }) => `/badges/${id}`,
-  });
+  // const { mutate: remove } = useMutate({
+  //   verb: 'DELETE',
+  //   path: ({ id }) => `/badges/${id}`,
+  // });
 
   const { mutate: create } = useMutate({
     verb: 'POST',
     path: '/badges',
   });
+
+  const handleRemove = async badgeToDelete => {
+    try {
+      await fetch(`/api/v2/badges/${badgeToDelete.uuid}`, {
+        method: 'DELETE',
+      });
+    } catch (err) {
+      alert(`Failed to delete badge: ${err.message}`);
+    }
+    setBadges(badges.filter(badge => badge.uuid !== badgeToDelete.uuid));
+  };
+
+  useEffect(() => {
+    if (!loading && data) {
+      setBadges(data);
+    }
+  }, [data]);
 
   if (loading) {
     return <Loading />;
@@ -855,12 +880,12 @@ function BadgesTab() {
       <MaterialTable
         title="Badges"
         columns={columns}
-        data={data}
+        data={badges}
         editable={{
           onRowUpdate: newData =>
             update(newData, { pathParams: { id: newData.uuid } }),
-          onRowDelete: newData => remove({ pathParams: { id: newData.uuid } }),
-          onRowAdd: newData => create(newData),
+          onRowDelete: badgeToDelete => handleRemove(badgeToDelete),
+          onRowAdd: newData => create(newData).then(),
         }}
       />
     );
@@ -906,10 +931,20 @@ function TagsTab() {
     path: ({ id }) => `/tags/${id}`,
   });
 
-  const { mutate: remove } = useMutate({
-    verb: 'DELETE',
-    path: ({ id }) => `/tags/${id}`,
-  });
+  // const { mutate: remove } = useMutate({
+  //   verb: 'DELETE',
+  //   path: ({ id }) => `/tags/${id}`,
+  // });
+
+  const handleRemove = async toDelete => {
+    try {
+      await fetch(`/api/v2/tags/${toDelete.uuid}`, {
+        method: 'DELETE',
+      });
+    } catch (err) {
+      alert(`Failed to delete tag: ${err.message}`);
+    }
+  };
 
   const { mutate: create } = useMutate({
     verb: 'POST',
@@ -927,7 +962,7 @@ function TagsTab() {
         editable={{
           onRowUpdate: newData =>
             update(newData, { pathParams: { id: newData.uuid } }),
-          onRowDelete: newData => remove({ pathParams: { id: newData.uuid } }),
+          onRowDelete: toDelete => handleRemove(toDelete),
           onRowAdd: newData => create(newData),
         }}
       />
