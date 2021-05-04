@@ -307,6 +307,39 @@ export default function controller(
   });
 
   communities.route({
+    meta: {
+      swagger: {
+        operationId: 'PostCommunityRequest',
+        summary:
+          'Endpoint to request to join a community.',
+      },
+    },
+    method: 'POST',
+    path: '/communities/:id/join-request',
+    pre: thisUser.can('access private pages'),
+    handler: async ctx => {
+      log.debug(`Processing request to join community ${ctx.params.id}`);
+
+      let community;
+      let user = ctx.state.user.defaultPersona
+
+      log.debug("user!", user)
+
+      try {
+        community = await communityModel.findOne({ uuid: ctx.params.id }, ['owners'])
+        if (!community) {
+          ctx.throw(404, `Community with ID ${ctx.params.id} doesn't exist`)
+        }
+      } catch (err) {
+        log.error('HTTP 400 Error: ', err);
+      }
+
+      log.debug("community!", community)
+      log.debug("community owners!", community.owners)
+    },
+  });
+
+  communities.route({
     method: 'PUT',
     path: '/communities/:id',
     pre: thisUser.can('edit this community'),

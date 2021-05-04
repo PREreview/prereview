@@ -12,7 +12,11 @@ import { createPreprintId } from '../../common/utils/ids.js';
 import UserProvider from '../contexts/user-context';
 
 // hooks
-import { useGetCommunity, useGetPreprints } from '../hooks/api-hooks.tsx';
+import {
+  useGetCommunity,
+  useGetPreprints,
+  usePostCommunityRequest,
+} from '../hooks/api-hooks.tsx';
 import { useNewPreprints } from '../hooks/ui-hooks';
 
 // components
@@ -230,9 +234,14 @@ export default function Community(props) {
     id: id,
   });
 
-  const handleJoinRequest = () => {
-    user ? console.log('user here!') : setLoginModalOpenNext(location.pathname);
-  };
+   const { mutate: joinRequest } = usePostCommunityRequest({
+     id: community ? community.uuid : '',
+   });
+
+  const handleJoinRequest = community => {
+    joinRequest()
+    .then(()=>console.log("hey!"))
+  }
 
   if (loading) {
     return <Loading />;
