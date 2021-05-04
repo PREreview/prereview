@@ -35,8 +35,6 @@ export default function NewPreprint({ user, onCancel }) {
   const location = useLocation(); // location.state can be {preprint, tab, isSingleStep} with tab being `request` or `review` (so that we know on which tab the shell should be activated with
   const qs = new URLSearchParams(location.search);
 
-  const isSingleStep = location.state && location.state.isSingleStep;
-
   const [{ identifier, url }, setIdentifierAndUrl] = useState({
     identifier:
       qs.get('identifier') ||
@@ -182,7 +180,7 @@ function StepPreprint({
 
       {resolvePreprintStatus.loading && (
         <Typography component="div" variant="body1">
-          Checking for existing reviews or requests for reviews…
+          Checking for existing PREreviews or requests for PREreviews…
         </Typography>
       )}
 
@@ -199,24 +197,24 @@ function StepPreprint({
         <Button
           onClick={() => {
             history.push(`/preprints/${createPreprintId(preprint.handle)}`, {
-              tab: 'request',
+              tab: 2,
               isSingleStep: true,
             });
           }}
           disabled={!identifier || !preprint}
         >
-          Request reviews
+          Request PREreviews
         </Button>
         <Button
           onClick={() => {
             history.push(`/preprints/${createPreprintId(preprint.handle)}`, {
-              tab: 'reviews',
+              tab: 1,
               isSingleStep: true,
             });
           }}
           disabled={!identifier || !preprint}
         >
-          Add reviews
+          Add PREreviews
         </Button>
       </Controls>
     </Box>

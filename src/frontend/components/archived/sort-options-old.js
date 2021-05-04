@@ -39,9 +39,9 @@ export default function SortOptions({
             />
             <Tooltip
               label={`Sort by ${name === 'recentRapid'
-                ? 'Date of latest Rapid Review'
+                ? 'Date of latest Rapid PREreview'
                 : name === 'recentFull'
-                  ? 'Date of latest Full Review'
+                  ? 'Date of latest Full PREreview'
                   : name === 'recentRequests'
                     ? 'Date of latest request for review'
                     : 'date posted on preprint server'

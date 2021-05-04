@@ -13,6 +13,8 @@ import {
   makeStyles,
   withStyles,
 } from '@material-ui/core/styles';
+import Avatar from '@material-ui/core/Avatar';
+import AvatarGroup from '@material-ui/lab/AvatarGroup';
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
 import Check from '@material-ui/icons/Check';
@@ -267,7 +269,7 @@ export default function ReviewStepper({
   const location = useLocation();
   const classes = useStyles();
   const { cid } = useParams();
-  const [thisUser, setThisUser] = useContext(UserProvider.context);
+  const [thisUser] = useContext(UserProvider.context);
   const [activeStep, setActiveStep] = useState(0);
   const [answerMap, setAnswerMap] = useState({});
   const [completed, setCompleted] = useState(new Set());
@@ -548,7 +550,7 @@ export default function ReviewStepper({
   }
 
   function getSteps() {
-    return ['Rapid Review', 'Long-form Review', 'Submitted'];
+    return ['Rapid PREreview', 'Full PREreview', 'Submitted'];
   }
 
   useEffect(() => {
@@ -587,19 +589,19 @@ export default function ReviewStepper({
             </Box>
             <Box mt={2} mb={2} className={classes.yellow}>
               Congratulations! You have successfully submitted your rapid
-              review. Would you like to expand on your feedback with a long-form
-              review?
+              PREreview. Would you like to expand on your feedback with a full
+              PREreview?
             </Box>
           </>
         ) : (
           <Box>
             <Tooltip
-              title={`A Rapid Review is a structured form with Yes/No/N.A./Not Sure answer options 
-              designed for researchers with subject matter expertise to provide quick and accurate feedback to a preprint. 
-              You'll be able to provide a longer, more in-depth review after you complete this rapid-review form.`}
+              title={`A Rapid PREreview is a structured form with Yes/No/N.A./Not Sure answer options
+              designed for researchers with subject matter expertise to provide quick and accurate feedback to a preprint.
+              You'll be able to provide a longer, more in-depth review after you complete this rapid PREreview form.`}
             >
               <header className="shell-content-reviews__title">
-                Rapid Review <HelpOutlineIcon />
+                Rapid PREreview <HelpOutlineIcon />
               </header>
             </Tooltip>
             <form>
@@ -651,14 +653,14 @@ export default function ReviewStepper({
         return (
           <Box mt={2}>
             <Tooltip
-              title={`A Longform Review is a space designed for researchers with subject matter expertise to provide longer, 
-              and more in-depth feedback to a preprint. It can be authored by one or more users. 
-              To add a co-reviewer, save your draft and click on + Add Co-Reviewer. 
-              To invite someone to edit your review before submitting, save your draft and click on + Add Mentor. 
-              When submitted, the Longform Review is assigned a digital object identifier (DOI) via Zenodo.`}
+              title={`A Full PREreview is a space designed for researchers with subject matter expertise to provide longer,
+              and more in-depth feedback to a preprint. It can be authored by one or more users.
+              To add a co-reviewer, save your draft and click on + Add Co-Reviewer.
+              To invite someone to edit your review before submitting, save your draft and click on + Add Mentor.
+              When submitted, the Full PREreview is assigned a digital object identifier (DOI) via Zenodo.`}
             >
               <header className="shell-content-reviews__title">
-                Longform Review <HelpOutlineIcon />
+                Full PREreview <HelpOutlineIcon />
               </header>
             </Tooltip>
             <Box className={classes.red}>
@@ -671,7 +673,7 @@ export default function ReviewStepper({
                 <b>Instructions</b>
               </Typography>
               <Typography component="div" variant="body1" gutterBottom>
-                Use the space below to compose your long-form review. For
+                Use the space below to compose your full PREreview. For
                 guidance, you can load one of our templates.
               </Typography>
               <Typography component="div" variant="body1" gutterBottom>
@@ -695,6 +697,35 @@ export default function ReviewStepper({
                 spacing={2}
               >
                 <Grid item xs={12} sm={6}>
+                  <Typography component="div" variant="body2">
+                    <b>Review Authors</b>
+                  </Typography>
+                  <AvatarGroup max={10}>
+                    {review && review.authors && review.authors.length == 1 ? (
+                      <Tooltip
+                        key={thisUser.defaultPersona.uuid}
+                        title={`${thisUser.defaultPersona.name} (co-reviewer)`}
+                      >
+                        <Avatar
+                          alt={thisUser.defaultPersona.name}
+                          src={thisUser.defaultPersona.avatar}
+                        />
+                      </Tooltip>
+                    ) : review && review.authors ? (
+                      review.authors.map(author => (
+                        <Tooltip
+                          key={author.uuid}
+                          title={
+                            author.isMentor
+                              ? `${author.name} (mentor)`
+                              : `${author.name} (co-reviewer)`
+                          }
+                        >
+                          <Avatar alt={author.name} src={author.avatar} />
+                        </Tooltip>
+                      ))
+                    ) : null}
+                  </AvatarGroup>
                   <AddAuthors
                     reviewId={cid}
                     authors={review ? review.authors : null}

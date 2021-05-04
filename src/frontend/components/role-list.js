@@ -6,7 +6,6 @@ import PropTypes from 'prop-types';
 import { makeStyles } from '@material-ui/core/styles';
 import AvatarGroup from '@material-ui/lab/AvatarGroup';
 import Badge from '@material-ui/core/Badge';
-import Book from '@material-ui/icons/Book';
 import Typography from '@material-ui/core/Typography';
 
 // components
@@ -33,6 +32,7 @@ export default function Reviewers({
   user,
   allReviews,
   hasReviewed,
+  hasRequested,
   preprintId,
 }) {
   const classes = useStyles();
@@ -97,7 +97,11 @@ export default function Reviewers({
                   badgeContent="Author"
                   invisible={!author.isPreprintAuthor}
                 >
-                  <RoleBadge key={author.uuid} user={author} />
+                  <RoleBadge
+                    key={author.uuid}
+                    user={author}
+                    requestTab={hasRequested}
+                  />
                 </Badge>
               );
             })
@@ -112,6 +116,7 @@ Reviewers.propTypes = {
   user: PropTypes.object,
   allReviews: PropTypes.array.isRequired,
   roleIds: PropTypes.arrayOf(PropTypes.object),
+  hasRequested: PropTypes.bool,
   hasReviewed: PropTypes.oneOfType([
     PropTypes.object,
     PropTypes.bool,

@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Helmet } from 'react-helmet-async';
+import { useLocation } from 'react-router-dom';
 
 // hooks
 import { usePostRequests } from '../hooks/api-hooks.tsx';
@@ -81,6 +82,8 @@ const useStyles = makeStyles(theme => ({
 
 export default function ShellContent({ preprint, user, cid }) {
   const classes = useStyles();
+  const location = useLocation();
+
   const [hasRapidReviewed, setHasRapidReviewed] = useState(false);
   const [hasLongReviewed, setHasLongReviewed] = useState(false);
   const [hasRequested, setHasRequested] = useState(false);
@@ -138,6 +141,10 @@ export default function ShellContent({ preprint, user, cid }) {
   };
 
   useEffect(() => {
+    if (location.state && location.state.tab) {
+      setTab(location.state.tab);
+    }
+
     if (user) {
       if (!hasLongReviewed && preprint.fullReviews.length) {
         // gets an array of the active user's persona IDs
@@ -282,8 +289,8 @@ export default function ShellContent({ preprint, user, cid }) {
             onChange={handleChange}
             aria-label="Reviews and requests"
           >
-            <Tab label="Read Reviews" {...a11yProps(0)} />
-            <Tab label="Add Review(s)" {...a11yProps(1)} />
+            <Tab label="Read PREreviews" {...a11yProps(0)} />
+            <Tab label="Add PREreview(s)" {...a11yProps(1)} />
             <Tab label="Add Request" {...a11yProps(2)} />
           </Tabs>
         </AppBar>
@@ -440,7 +447,7 @@ function ShellContentReviews({
       />
     ) : (
       <Typography component="div" variant="body2">
-        Sorry, you are not authorized to contribute to this review.
+        Sorry, you are not authorized to contribute to this PREreview.
       </Typography>
     )
   ) : (
@@ -490,6 +497,8 @@ function ShellContentRequest({
         preprintId={preprint.uuid}
         allReviews={preprint.requests}
         user={user}
+        hasReviewed={newRequest}
+        hasRequested
       />
       {hasRequested || newRequest ? (
         <Box mt={2} mb={2} className={classes.yellow}>
@@ -509,7 +518,7 @@ function ShellContentRequest({
                 onSubmit(preprint);
               }}
             >
-              Add a request for review
+              Add a request for PREreview
             </Button>
           </Controls>
         </Box>

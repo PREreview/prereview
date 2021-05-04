@@ -714,10 +714,10 @@ function CommunityContent({ thisUser, community, params }) {
                 <InfoOutlinedIcon className={classes.infoIcon} />
                 This is a platform for the crowdsourcing of preprint reviews.
                 Use the search bar below to find preprints in this community
-                that already have reviews or requests for reviews. To add your
-                own review or request to this community, use the Add Review |
-                Request Review button, paste the preprint DOI and follow the
-                instructions.
+                that already have PREreviews or requests for PREreviews. To add
+                your own PREreview or request to this community, use the Add
+                PREreview | Request PREreview button, paste the preprint DOI and
+                follow the instructions.
               </Typography>
             </Box>
           </Grid>
@@ -765,7 +765,7 @@ function CommunityContent({ thisUser, community, params }) {
                   align="left"
                   gutterBottom
                 >
-                  Preprints with reviews or requests for reviews
+                  Preprints with PREreviews or requests for PREreviews
                 </Typography>
               </Grid>
               <Grid item xs={12} sm={6}>

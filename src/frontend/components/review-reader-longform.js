@@ -43,9 +43,10 @@ const LongformReviewReader = props => {
     user,
     anchorEl,
     handleAnchor,
+    isReader = true,
   } = props;
 
-  const useStyles = makeStyles(() => ({
+  const useStyles = makeStyles(theme => ({
     authors: {
       fontSize: '1.25rem',
       fontWeight: '600',
@@ -94,8 +95,11 @@ const LongformReviewReader = props => {
       right: 0,
       top: 0,
       transform: 'none !important',
-      width: '40vw',
+      width: '100%',
       zIndex: 10000,
+      [theme.breakpoints.up('sm')]: {
+        width: '40vw',
+      },
     },
     popperContent: {
       padding: 20,
@@ -166,7 +170,10 @@ const LongformReviewReader = props => {
       setButtonRefId(anchorEl.getAttribute('aria-describedby'));
     } else {
       setButtonRefId(null);
-      history.push(`${history.location.pathname.split('/full-reviews')[0]}`);
+      // This is in the review reader and not the search page
+      if (isReader) {
+        history.push(`${history.location.pathname.split('/full-reviews')[0]}`);
+      }
     }
   }, [anchorEl, content, commentTitle, publishedComment]);
 
@@ -483,9 +490,10 @@ LongformReviewReader.propTypes = {
   handleAnchor: PropTypes.func.isRequired,
   content: PropTypes.string,
   commentTitle: PropTypes.string,
-  publishedComment: PropTypes.string,
+  isReader: PropTypes.bool,
   onChange: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
+  publishedComment: PropTypes.string,
   review: PropTypes.object.isRequired,
   user: PropTypes.object,
 };

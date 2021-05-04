@@ -242,7 +242,7 @@ export default function PreprintCard({
                   <span className={classes.activityPop}>
                     {preprint.rapidReviews.length}
                   </span>{' '}
-                  rapid reviews
+                  rapid PREreviews
                 </Typography>
               </Grid>
               <Grid item className={`${classes.activityItem} ${classes.meta}`}>
@@ -250,7 +250,7 @@ export default function PreprintCard({
                   <span className={classes.activityPop}>
                     {publishedReviews.length}
                   </span>{' '}
-                  longform reviews
+                  full PREreviews
                 </Typography>
               </Grid>
               <Grid item className={`${classes.activityItem} ${classes.meta}`}>
@@ -276,7 +276,12 @@ export default function PreprintCard({
         </AccordionSummary>
         <AccordionDetails>
           <Box width="100%">
-            <ReviewReader user={user} identifier={id} preprint={preprint} />
+            <ReviewReader
+              user={user}
+              identifier={id}
+              preprint={preprint}
+              isReader={false}
+            />
             <Grid container alignItems="center" justify="flex-end" spacing={2}>
               <Grid item>
                 {!hasReviewed && (
@@ -286,7 +291,7 @@ export default function PreprintCard({
                       onNewReview(preprintId);
                     }}
                   >
-                    Add Review
+                    Add PREreview
                   </Button>
                 )}
               </Grid>
@@ -298,7 +303,7 @@ export default function PreprintCard({
                       onNewRequest(preprintId);
                     }}
                   >
-                    Request Review
+                    Request PREreview
                   </Button>
                 )}
               </Grid>

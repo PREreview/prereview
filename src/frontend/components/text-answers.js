@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Value from './value';
 import RoleBadge from './role-badge';
 import { getTextAnswers } from '../utils/stats';
 
@@ -49,20 +48,9 @@ export default function TextAnswers({
                 if (text && text.length) {
                   return (
                     <ListItem>
-                      <Grid container>
+                      <Grid container alignItems="center">
                         <Grid item key={author ? author.uuid : user.uuid}>
-                          <RoleBadge user={author ? author : user}>
-                            {isLoggedIn && (
-                              <div
-                                disabled={isModerationInProgress}
-                                onSelect={() => {
-                                  onModerate(author ? author.uuid : user.uuid);
-                                }}
-                              >
-                                Report Review
-                              </div>
-                            )}
-                          </RoleBadge>
+                          <RoleBadge user={author ? author : user} />
                         </Grid>
                         <Grid item>
                           <Typography>{text}</Typography>

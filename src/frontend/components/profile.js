@@ -46,6 +46,7 @@ import Loading from './loading';
 import RoleActivity from './role-activity';
 import RoleEditor from './role-editor';
 import SettingsNotifications from './settings-notifications';
+import WorkCard from './work-card';
 
 // icons
 import CloseIcon from '@material-ui/icons/Close';
@@ -488,16 +489,16 @@ export default function Profile() {
                             </Link>
                           </Typography>
                         </Box>
-                        <Box>
-                          <Typography
-                            component="div"
-                            variant="body1"
-                            gutterBottom
-                          >
-                            <b className={editMode ? classes.label : ''}>
-                              Contact information:{' '}
-                            </b>
-                            {contacts && contacts.length ? (
+                        {contacts && contacts.length ? (
+                          <Box>
+                            <Typography
+                              component="div"
+                              variant="body1"
+                              gutterBottom
+                            >
+                              <b className={editMode ? classes.label : ''}>
+                                Contact information:{' '}
+                              </b>
                               <List>
                                 {contacts.map(contact => (
                                   <ListItem key={contact.uuid}>
@@ -507,11 +508,9 @@ export default function Profile() {
                                   </ListItem>
                                 ))}
                               </List>
-                            ) : (
-                              `None provided.`
-                            )}
-                          </Typography>
-                        </Box>
+                            </Typography>
+                          </Box>
+                        ) : null}
                       </>
                     ) : null}
                     <Box>
@@ -697,23 +696,7 @@ export default function Profile() {
                         <Grid>
                           {works.length > 0 ? (
                             works.map(work => {
-                              return (
-                                <Card key={work.uuid}>
-                                  <CardContent>
-                                    <Typography
-                                      variant="h6"
-                                      component="h2"
-                                      gutterBottom
-                                    >
-                                      {work.title}
-                                    </Typography>
-                                    <Typography>{work.publisher}</Typography>
-                                    <Typography>
-                                      {work.publicationDate}
-                                    </Typography>
-                                  </CardContent>
-                                </Card>
-                              );
+                              return <WorkCard work={work} key={work.uuid} />;
                             })
                           ) : (
                             <Typography>

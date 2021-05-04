@@ -40,7 +40,7 @@ export function createPreprintId(
     );
   }
 
-  return `${vendor}-${unprefix(id).replace('/', '-')}`;
+  return `${vendor}-${unprefix(id).replace(/\//g, '-')}`;
 }
 
 export function decodePreprintId(value) {
@@ -62,7 +62,7 @@ export function decodePreprintId(value) {
   }
 
   return {
-    id: `${value.slice(value.indexOf('-') + 1).replace('-', '/')}`,
+    id: `${value.slice(value.indexOf('-') + 1).replace(/-/g, '/')}`,
     scheme: scheme,
   };
 }

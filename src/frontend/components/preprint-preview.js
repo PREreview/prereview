@@ -1,6 +1,7 @@
 // base imports
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
+import { useHistory } from 'react-router-dom';
 
 // utils
 import { getFormattedDatePosted } from '../utils/preprints';
@@ -98,6 +99,8 @@ const useStyles = makeStyles(theme => ({
 
 export default function PreprintPreview({ preprint }) {
   const classes = useStyles();
+  const history = useHistory();
+
   const [elevation, setElevation] = useState(0);
   const preprintId = createPreprintId(preprint.handle);
   const publishedReviews = preprint.fullReviews.filter(
@@ -135,7 +138,7 @@ export default function PreprintPreview({ preprint }) {
         </Grid>
         <Grid item xs={12} sm={8}>
           <Typography>
-            <Link href={`/preprints/${preprintId}`} className={classes.title}>
+            <Link href={preprint.url} className={classes.title}>
               {preprint.title}
             </Link>
           </Typography>
@@ -144,7 +147,9 @@ export default function PreprintPreview({ preprint }) {
               {preprint.preprintServer}
               <ChevronRightIcon className={classes.icon} />
             </span>
-            <span className={classes.meta}>{preprint.handle}</span>
+            <Link href={preprint.url} className={classes.meta}>
+              {preprint.handle}
+            </Link>
           </Typography>
         </Grid>
       </Grid>
@@ -159,7 +164,7 @@ export default function PreprintPreview({ preprint }) {
               <span className={classes.activityPop}>
                 {preprint.rapidReviews.length}
               </span>{' '}
-              rapid reviews
+              rapid PREreviews
             </Typography>
           </Grid>
           <Grid item className={`${classes.activityItem} ${classes.meta}`}>
@@ -169,7 +174,7 @@ export default function PreprintPreview({ preprint }) {
                   ? publishedReviews.length
                   : 0}
               </span>{' '}
-              longform reviews
+              full PREreviews
             </Typography>
           </Grid>
           <Grid item className={`${classes.activityItem} ${classes.meta}`}>

@@ -14,9 +14,6 @@ import MuiAvatar from '@material-ui/core/Avatar';
 import Popover from '@material-ui/core/Popover';
 import Typography from '@material-ui/core/Typography';
 
-// icons
-import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
-
 const Avatar = withStyles({
   root: {
     height: 28,
@@ -64,7 +61,16 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const RoleBadge = React.forwardRef(function RoleBadge(
-  { children, className, tooltip, showNotice, disabled, user, contacts },
+  {
+    children,
+    className,
+    tooltip,
+    showNotice,
+    disabled,
+    user,
+    contacts,
+    requestTab,
+  },
   ref,
 ) {
   return (
@@ -76,6 +82,7 @@ const RoleBadge = React.forwardRef(function RoleBadge(
       className={className}
       showNotice={showNotice}
       disabled={disabled}
+      requestTab={requestTab}
     >
       {children}
     </RoleBadgeUI>
@@ -90,6 +97,7 @@ RoleBadge.propTypes = {
   contacts: PropTypes.any,
   showNotice: PropTypes.bool,
   disabled: PropTypes.bool,
+  requestTab: PropTypes.bool,
 };
 
 export default RoleBadge;
@@ -98,13 +106,12 @@ export default RoleBadge;
  * Non hooked version (handy for story book and `UserBadge`)
  */
 const RoleBadgeUI = React.forwardRef(function RoleBadgeUI(
-  { roleUser, contacts, children, tooltip, showNotice = false },
+  { requestTab, roleUser, children, tooltip, showNotice = false },
   ref,
 ) {
   // ****  USER IN THIS COMPONENT IS ACTUALLY A PERSONA OBJECT **** //
 
   const classes = useStyles();
-  const history = useHistory();
   const [anchorEl, setAnchorEl] = useState(null);
   const user = roleUser.defaultPersona ? roleUser.defaultPersona : roleUser;
   const handleClick = event => {
@@ -158,18 +165,12 @@ const RoleBadgeUI = React.forwardRef(function RoleBadgeUI(
         className={classes.popover}
       >
         <div className={classes.popoverInner}>
-          {user.reviewUuid ? (
+          {!requestTab && user.reviewUuid ? (
             <Typography component="div">
-              <Link
-                href={user.reviewUuid}
-                onClick={event => {
-                  event.preventDefault();
-                  history.push(user.reviewUuid);
-                }}
-              >
+              <Link href={user.reviewUuid}>
                 {user && user.defaultPersona
-                  ? `View ${user.defaultPersona.name}'s Review`
-                  : `View ${user.name}'s Review`}
+                  ? `View ${user.defaultPersona.name}'s PREreview`
+                  : `View ${user.name}'s PREreview`}
               </Link>
             </Typography>
           ) : null}
@@ -194,6 +195,7 @@ const RoleBadgeUI = React.forwardRef(function RoleBadgeUI(
 RoleBadgeUI.propTypes = {
   showNotice: PropTypes.bool,
   tooltip: PropTypes.bool,
+  requestTab: PropTypes.bool,
   roleUser: PropTypes.shape({
     defaultPersona: PropTypes.object,
     uuid: PropTypes.string,

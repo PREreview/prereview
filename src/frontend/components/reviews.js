@@ -7,8 +7,6 @@ import Tooltip from '@reach/tooltip';
 
 // Material UI imports
 import { makeStyles } from '@material-ui/core/styles';
-import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
-import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
 import Box from '@material-ui/core/Box';
 import Chip from '@material-ui/core/Chip';
 import Container from '@material-ui/core/Container';
@@ -54,7 +52,7 @@ import NotFound from './not-found';
 import PreprintCard from './preprint-card';
 import PrivateRoute from './private-route';
 import SearchBar from './search-bar';
-//import SortOptions from './sort-options';
+import SortOptions from './sort-options';
 import WelcomeModal from './welcome-modal';
 
 // constants
@@ -141,7 +139,7 @@ export default function Reviews() {
   const handleNewReview = preprintId => {
     if (thisUser) {
       history.push(`/preprints/${preprintId}`, {
-        tab: 'reviews',
+        tab: 1,
         isSingleStep: true,
       });
     } else {
@@ -152,7 +150,7 @@ export default function Reviews() {
   const handleNewRequest = preprintId => {
     if (thisUser) {
       history.push(`/preprints/${preprintId}`, {
-        tab: 'request',
+        tab: 2,
         isSingleStep: true,
       });
     } else {
@@ -202,9 +200,10 @@ export default function Reviews() {
                     <InfoOutlinedIcon className={classes.infoIcon} />
                     This is a platform for the crowdsourcing of preprint
                     reviews. Use the search bar below to find preprints that
-                    already have reviews or requests for reviews. To add your
-                    own review or request, use the Add Review | Request Review
-                    button, paste the preprint DOI and follow the instructions.
+                    already have PREreviews or requests for PREreviews. To add
+                    your own PREreview or request, use the Add PREreview |
+                    Request PREreview button, paste the preprint DOI and follow
+                    the instructions.
                   </Typography>
                 </Box>
               </Grid>
@@ -245,9 +244,9 @@ export default function Reviews() {
                   <Grid item>
                     <Typography component="h4" variant="h4">
                       {preprints.totalCount} preprints with{' '}
-                      {preprints.totalFull} reviews, {preprints.totalRapid}{' '}
-                      rapid reviews, and {preprints.totalRequests} requests for
-                      reviews
+                      {preprints.totalFull} full PREreviews,{' '}
+                      {preprints.totalRapid} rapid PREreviews, and{' '}
+                      {preprints.totalRequests} requests for PREreviews
                     </Typography>
                   </Grid>
                 ) : null}
@@ -261,7 +260,7 @@ export default function Reviews() {
                         setLoginModalOpenNext('/reviews/new');
                       }
                     }}
-                    disabled={location.pathname === '/reviews/new'}
+                    disabled={newPreprintOpen}
                   />
                   <PrivateRoute path="/reviews/new" exact={true}>
                     <Dialog
@@ -271,11 +270,12 @@ export default function Reviews() {
                       }}
                     >
                       <Helmet>
-                        <title>Rapid PREreview • Add entry</title>
+                        <title>PREreview • Add entry</title>
                       </Helmet>
                       <NewPreprint
                         user={thisUser}
                         onCancel={() => {
+                          setNewPreprintOpen(false);
                           history.push('/reviews');
                         }}
                         onSuccess={preprint => {
@@ -562,90 +562,3 @@ export default function Reviews() {
     );
   }
 }
-
-function SortOptions({ sort, order, onChange }) {
-  const classes = useStyles();
-  const isMobile = useIsMobile();
-
-  return (
-    <Grid container item className={classes.sortOptions} alignItems="center">
-      {['recentRapid', 'recentFull', 'recentRequests', 'datePosted'].map(
-        name => (
-          <Grid container item xs key={name}>
-            <Box display="none">
-              <Input
-                type="radio"
-                id={`sort-options-${name}`}
-                name={name}
-                value={name}
-                display="none"
-                onClick={e => {
-                  const sortOption = e.target.value;
-                  onChange(sortOption, order === 'asc' ? 'desc' : 'asc');
-                }}
-              />
-            </Box>
-            <Grid item>
-              <Tooltip
-                label={`Sort by ${
-                  name === 'recentRapid'
-                    ? 'Date of latest Rapid Review'
-                    : name === 'recentFull'
-                    ? 'Date of latest Full Review'
-                    : name === 'recentRequests'
-                    ? 'Date of latest request for review'
-                    : 'date posted on preprint server'
-                }`}
-              >
-                <InputLabel
-                  htmlFor={`sort-options-${name}`}
-                  cursor={sort === name ? 'default' : 'pointer'}
-                  focus={sort === name}
-                >
-                  {name === 'recentRapid'
-                    ? isMobile
-                      ? 'Rapid Reviewed'
-                      : 'Recently Rapid Reviewed'
-                    : name === 'recentFull'
-                    ? isMobile
-                      ? 'Reviewed'
-                      : 'Recently Reviewed'
-                    : name === 'recentRequests'
-                    ? isMobile
-                      ? 'Requested'
-                      : 'Recently Requested'
-                    : isMobile
-                    ? 'Published'
-                    : 'Date Published'}
-                </InputLabel>
-              </Tooltip>
-            </Grid>
-            <Grid item>
-              {order === 'asc' ? (
-                <ArrowUpwardIcon
-                  visibility={sort === name ? 'visible' : 'hidden'}
-                />
-              ) : (
-                <ArrowDownwardIcon
-                  visibility={sort === name ? 'visible' : 'hidden'}
-                />
-              )}
-            </Grid>
-          </Grid>
-        ),
-      )}
-    </Grid>
-  );
-}
-
-SortOptions.propTypes = {
-  onChange: PropTypes.func.isRequired,
-  sort: PropTypes.oneOf([
-    'recentRapid',
-    'recentFull',
-    'recentRequests',
-    'datePosted',
-    '',
-  ]),
-  order: PropTypes.string,
-};
