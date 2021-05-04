@@ -247,7 +247,8 @@ export default function Community(props) {
               }! The owners have been notified of your request.`,
             );
           }
-        )
+        
+          )
       : setLoginModalOpenNext(location.pathname);
   }
 
