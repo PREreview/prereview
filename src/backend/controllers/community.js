@@ -320,10 +320,10 @@ export default function controller(
       log.debug(`Processing request to join community ${ctx.params.id}`);
 
       let community;
-      let user;
+      let persona;
 
       try {
-        user = await personaModel.findOne(ctx.state.user.defaultPersona);
+        persona = await personaModel.findOne(ctx.state.user.defaultPersona);
       } catch (err) {
         log.error(`Error finding user persona: `, err);
       }
@@ -342,29 +342,37 @@ export default function controller(
 
       log.debug('community.owners************', community.owners.getItems());
 
-      // returns an array of just the contact information of community owners
-      let ownersContacts = community.owners.getItems().map(owner =>
-        owner.contacts
-          .getItems()
-          .flat()
-      );
+      // returns an array of an array of just the contact information of community owners
+      let ownersContacts = community.owners
+        .getItems()
+        .map(owner => owner.contacts.getItems());
 
-
+      // flatten array of array of contacts
+      let flattened = ownersContacts.length ? ownersContacts.flat(2) : [];
 
       // send mail to community owners
-      if (ownersContacts.length) {
-        log.debug('owners filter', ownersContacts.filter(contacts => contacts.length >= 1));
-        // log.debug('ownersContacts.length', ownersContacts.length)
-        // owners.map(owner => {
-        //   await ctx.mail.send({
-        //     template: 'verifyEmail',
-        //     message: {
-        //       to:
-        //     }
-        //   })
-
-        // })
+      if (flattened.length > 0) {
+        flattened.map(async contact => {
+          try {
+            await ctx.mail.send({
+              template: 'requestToJoin',
+              message: {
+                to: contact.value,
+              },
+              locals: {
+                community: community.name,
+                userName: persona.name,
+                userUuid: persona.uuid,
+              },
+            });
+          } catch (err) {
+            log.error('HTTP 400 Error: ', err);
+            ctx.throw(400, `Failed to parse contact schema: ${err}`);
+          }
+        });
       }
+
+      ctx.status = 201;
     },
   });
 
