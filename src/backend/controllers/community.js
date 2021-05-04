@@ -310,8 +310,7 @@ export default function controller(
     meta: {
       swagger: {
         operationId: 'PostCommunityRequest',
-        summary:
-          'Endpoint to request to join a community.',
+        summary: 'Endpoint to request to join a community.',
       },
     },
     method: 'POST',
@@ -321,21 +320,51 @@ export default function controller(
       log.debug(`Processing request to join community ${ctx.params.id}`);
 
       let community;
-      let user = ctx.state.user.defaultPersona
-
-      log.debug("user!", user)
+      let user;
 
       try {
-        community = await communityModel.findOne({ uuid: ctx.params.id }, ['owners'])
+        user = await personaModel.findOne(ctx.state.user.defaultPersona);
+      } catch (err) {
+        log.error(`Error finding user persona: `, err);
+      }
+
+      try {
+        community = await communityModel.findOne({ uuid: ctx.params.id }, [
+          'owners',
+          'owners.contacts',
+        ]);
         if (!community) {
-          ctx.throw(404, `Community with ID ${ctx.params.id} doesn't exist`)
+          ctx.throw(404, `Community with ID ${ctx.params.id} doesn't exist`);
         }
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
       }
 
-      log.debug("community!", community)
-      log.debug("community owners!", community.owners)
+      log.debug('community.owners************', community.owners.getItems());
+
+      // returns an array of just the contact information of community owners
+      let ownersContacts = community.owners.getItems().map(owner =>
+        owner.contacts
+          .getItems()
+          .flat()
+      );
+
+
+
+      // send mail to community owners
+      if (ownersContacts.length) {
+        log.debug('owners filter', ownersContacts.filter(contacts => contacts.length >= 1));
+        // log.debug('ownersContacts.length', ownersContacts.length)
+        // owners.map(owner => {
+        //   await ctx.mail.send({
+        //     template: 'verifyEmail',
+        //     message: {
+        //       to:
+        //     }
+        //   })
+
+        // })
+      }
     },
   });
 
