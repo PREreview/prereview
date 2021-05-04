@@ -238,9 +238,17 @@ export default function Community(props) {
      id: community ? community.uuid : '',
    });
 
-  const handleJoinRequest = community => {
-    joinRequest()
-    .then(()=>console.log("hey!"))
+  const handleJoinRequest = () => {
+    user
+      ? joinRequest().then( () => {
+            alert(
+              `Thanks for your request to join ${
+                community.name
+              }! The owners have been notified of your request.`,
+            );
+          }
+        )
+      : setLoginModalOpenNext(location.pathname);
   }
 
   if (loading) {
