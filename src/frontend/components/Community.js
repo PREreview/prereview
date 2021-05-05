@@ -12,7 +12,11 @@ import { createPreprintId } from '../../common/utils/ids.js';
 import UserProvider from '../contexts/user-context';
 
 // hooks
-import { useGetCommunity, useGetPreprints } from '../hooks/api-hooks.tsx';
+import {
+  useGetCommunity,
+  useGetPreprints,
+  usePostCommunityRequest,
+} from '../hooks/api-hooks.tsx';
 import { useNewPreprints } from '../hooks/ui-hooks';
 
 // components
@@ -43,7 +47,6 @@ import Input from '@material-ui/core/Input';
 import InputLabel from '@material-ui/core/InputLabel';
 import Link from '@material-ui/core/Link';
 import MenuItem from '@material-ui/core/MenuItem';
-import Modal from '@material-ui/core/Modal';
 import Paper from '@material-ui/core/Paper';
 import Pagination from '@material-ui/lab/Pagination';
 import Select from '@material-ui/core/Select';
@@ -133,6 +136,13 @@ const useStyles = makeStyles(theme => ({
       textAlign: 'left',
     },
   },
+  request: {
+    display: 'block',
+    marginBottom: '2rem',
+    marginLeft: 'auto',
+    marginRight: 0,
+    width: 300,
+  },
   search: {
     borderRadius: 24,
     paddingLeft: 10,
@@ -207,6 +217,7 @@ export default function Community(props) {
   const location = useLocation();
   const params = processParams(location.search);
   const [user] = useContext(UserProvider.context);
+  const [loginModalOpenNext, setLoginModalOpenNext] = useState(null);
 
   const { id } = props && props.id ? props : useParams();
   const { data: community, loading, error } = useGetCommunity({
@@ -222,6 +233,24 @@ export default function Community(props) {
     },
     id: id,
   });
+
+   const { mutate: joinRequest } = usePostCommunityRequest({
+     id: community ? community.uuid : '',
+   });
+
+  const handleJoinRequest = () => {
+    user
+      ? joinRequest().then( () => {
+            alert(
+              `Thanks for your request to join ${
+                community.name
+              }! The owners have been notified of your request.`,
+            );
+          }
+        
+          )
+      : setLoginModalOpenNext(location.pathname);
+  }
 
   if (loading) {
     return <Loading />;
@@ -268,7 +297,26 @@ export default function Community(props) {
                       <span>Settings</span>
                     </Hidden>
                   </IconButton>
-                ) : null}
+                ) : (
+                  <Box className={classes.request}>
+                    <Button
+                      color="primary"
+                      variant="contained"
+                      className={classes.button}
+                      onClick={handleJoinRequest}
+                    >
+                      Request to join community
+                    </Button>
+                  </Box>
+                )}
+                {loginModalOpenNext && (
+                  <LoginRequiredModal
+                    open={loginModalOpenNext}
+                    onClose={() => {
+                      setLoginModalOpenNext(null);
+                    }}
+                  />
+                )}
                 <Grid container spacing={4}>
                   <Grid item xs={12} md={8}>
                     <CommunityContent
