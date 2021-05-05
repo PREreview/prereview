@@ -91,6 +91,7 @@ export default function controller(
         try {
           owner = await userModel.findOneByUuidOrOrcid(
             ctx.request.body.owners[0],
+            ['defaultPersona'],
           );
         } catch (err) {
           log.error('HTTP 400 Error: ', err);
@@ -766,7 +767,6 @@ export default function controller(
     pre: thisUser.can('edit this community'),
     handler: async ctx => {
       if (ctx.invalid) {
-        console.log('***invalid!***');
         handleInvalid(ctx);
         return;
       }
