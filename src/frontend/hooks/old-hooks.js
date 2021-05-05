@@ -4,7 +4,7 @@ import { createError } from '../utils/errors';
 import { unprefix, getId, arrayify } from '../utils/jsonld';
 import { createPreprintId } from '../utils/ids';
 import { useStores } from '../contexts/store-context';
-import { UserProvider } from '../contexts/user-context';
+import UserProvider from '../contexts/user-context';
 
 const DEFAULT_SEARCH_RESULTS = {
   bookmark: null,

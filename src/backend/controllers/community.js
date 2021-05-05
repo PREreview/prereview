@@ -3,6 +3,7 @@ import { QueryOrder, wrap } from '@mikro-orm/core';
 import { PostgreSqlConnection } from '@mikro-orm/postgresql';
 import { getLogger } from '../log.js';
 import { getErrorMessages } from '../utils/errors';
+import { getFields } from '../utils/getFields.ts';
 
 const log = getLogger('backend:controller:community');
 const Joi = router.Joi;
@@ -42,6 +43,7 @@ const querySchema = Joi.object({
     .integer()
     .positive(),
   asc: Joi.boolean(),
+  include_images: Joi.string().allow(''),
   sort_by: Joi.string(),
   from: Joi.string(),
   to: Joi.string(),
@@ -125,13 +127,6 @@ export default function controller(
       log.debug(`Retrieving communities.`);
 
       try {
-        const populate = [
-          'members',
-          'preprints',
-          'owners.defaultPersona',
-          'tags',
-          'events',
-        ];
         let foundCommunities, count;
         const order = ctx.query.asc
           ? QueryOrder.ASC_NULLS_LAST
@@ -164,6 +159,24 @@ export default function controller(
             });
           }
         }
+        const options = {
+          fields: getFields(
+            'Community',
+            ctx.query.include_images
+              ? ctx.query.include_images.split(',')
+              : undefined,
+          ),
+          populate: [
+            'members',
+            'preprints',
+            'owners.defaultPersona',
+            'tags',
+            'events',
+          ],
+          orderBy: orderBy,
+          limit: ctx.query.limit,
+          offset: ctx.query.offset,
+        };
 
         if (ctx.query.tags) {
           const tags = ctx.query.tags.split(',');
@@ -185,18 +198,10 @@ export default function controller(
           log.debug('Querying communities:', query);
           [foundCommunities, count] = await communityModel.findAndCount(
             query,
-            populate,
-            orderBy,
-            ctx.query.limit,
-            ctx.query.offset,
+            options,
           );
         } else {
-          foundCommunities = await communityModel.findAll(
-            populate,
-            orderBy,
-            ctx.query.limit,
-            ctx.query.offset,
-          );
+          foundCommunities = await communityModel.findAll(options);
           count = await communityModel.count();
         }
 
@@ -259,11 +264,27 @@ export default function controller(
       let community;
 
       try {
+        const options = {
+          fields: getFields(
+            'Community',
+            ctx.query.include_images
+              ? ctx.query.include_images.split(',')
+              : undefined,
+          ),
+          populate: [
+            'members',
+            'preprints',
+            'owners.defaultPersona',
+            'tags',
+            'events',
+            'templates',
+          ],
+        };
         community = await communityModel.findOne(
           {
             $or: [{ uuid: ctx.params.id }, { slug: ctx.params.id }],
           },
-          ['members', 'preprints', 'owners', 'tags', 'events', 'templates'],
+          options,
         );
         if (!community) {
           ctx.throw(404, `Community with ID ${ctx.params.id} doesn't exist`);

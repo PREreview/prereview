@@ -30,7 +30,11 @@ export default function BlockPanel() {
   const [lockedPersonas, setLockedPersonas] = useState([]);
   const [personaToUnlock, setPersonaToUnlock] = useState(null);
 
-  const { data: personas, loadingPersonas } = useGetPersonas();
+  const { data: personas, loadingPersonas } = useGetPersonas({
+    queryParams: {
+      include_images: 'avatar',
+    },
+  });
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 

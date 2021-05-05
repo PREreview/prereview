@@ -105,6 +105,9 @@ export default function ActivityCard({ activity }) {
     error,
   } = useGetPreprint({
     id: createPreprintId(activity.preprint.handle),
+    queryParams: {
+      include_images: 'avatar',
+    },
   });
 
   const handleHover = () => {
@@ -117,13 +120,13 @@ export default function ActivityCard({ activity }) {
 
   const getActivityText = activity => {
     if (activity.isLongReview) {
-      return 'published a full review on '
-    } else if (!!activity.ynAvailableCode) {
-      return 'rapid reviewed on '
+      return 'published a full review on ';
+    } else if (activity.ynAvailableCode) {
+      return 'rapid reviewed on ';
     } else {
-      return 'requested reviews for this preprint on '
+      return 'requested reviews for this preprint on ';
     }
-  }
+  };
 
   useEffect(() => {
     if (!loadingPreprint) {

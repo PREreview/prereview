@@ -91,7 +91,10 @@ export default function Personas() {
     loading: loadingPersonas,
     error: personaError,
   } = useGetPersonas({
-    queryParams: searchParamsToObject(params),
+    queryParams: {
+      ...searchParamsToObject(params),
+      include_images: 'avatar',
+    },
   });
 
   const {
