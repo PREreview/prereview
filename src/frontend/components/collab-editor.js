@@ -22,7 +22,18 @@ const CollabEditor = ({ initialContent, handleContentChange, reviewId }) => {
   const [provider, setProvider] = useState(null);
 
   useEffect(() => {
-    setProvider(new WebrtcProvider(`prereview-${reviewId}`, ydoc));
+    setProvider(
+      new WebrtcProvider(
+        `prereview-${
+          reviewId
+            ? reviewId
+            : Math.random()
+                .toString(36)
+                .replace(/[^a-z]+/g, '')
+        }`,
+        ydoc,
+      ),
+    );
   }, [reviewId]);
 
   // quill options

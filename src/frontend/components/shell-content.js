@@ -234,9 +234,9 @@ export default function ShellContent({ preprint, user, cid }) {
           review.author.uuid
             ? (authorID = review.author.uuid)
             : (authorID = review.author);
-          setHasRapidReviewed(
-            user.personas.some(persona => persona.uuid === authorID),
-          );
+          if (user.defaultPersona.uuid === authorID) {
+            setHasRapidReviewed(user.defaultPersona.uuid === authorID);
+          }
         });
       }
 
