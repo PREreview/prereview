@@ -274,7 +274,7 @@ class Config extends Command {
 const program = new Config(process.env.npm_package_name);
 
 export default program
-  .description(process.env.npm_package_description)
+  .description("A platform for reviewing preprints.")
   .version(process.env.npm_package_version)
   .option(
     '--admin-users <OrcIDs>',

@@ -298,12 +298,12 @@ const CommunityPanel = () => {
                   onChange={handleInputChange}
                 />
                 <Typography variant="h4" component="h2" gutterBottom={true}>
-                  Twitter Handle
+                  Twitter
                 </Typography>
                 <TextField
                   id="twitter"
                   name="twitter"
-                  label="Enter a Twitter handle for this community"
+                  label="Enter a Twitter handle or hashtag for this community"
                   rows={1}
                   defaultValue={community.twitter || ''}
                   variant="outlined"

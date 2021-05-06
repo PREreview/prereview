@@ -29,7 +29,9 @@
   ],
   "watch": {
     "build:backend:dev": {
-      "patterns": ["src/backend"],
+      "patterns": [
+        "src/backend"
+      ],
       "extensions": "js,ts,json",
       "runOnChangeOnly": true
     }
@@ -43,7 +45,7 @@
     "build:backend": "parcel build --target=backend --no-optimize src/backend/index.js && npm run build:templates",
     "build:backend:dev": "parcel build --target=backend --no-optimize src/backend/index.js && npm run build:templates",
     "watch:backend:dev": "npm-watch build:backend:dev",
-    "build:frontend": "npm run build:hooks && parcel build --target=frontend src/frontend/index.html",
+    "build:frontend": "npm run build:hooks && parcel build --no-scope-hoist --target=frontend src/frontend/index.html",
     "build:frontend:dev": "npm run build:hooks && parcel build --target=frontend src/frontend/index.html",
     "build:scripts:import": "parcel build --target=import-script src/backend/scripts/dbImport.js",
     "build:scripts:migrations": "npm run scan:migrations && parcel build --target=migrations-script src/backend/scripts/dbMigrations.ts",
@@ -191,7 +193,7 @@
     "koa-session": "^5.13.1",
     "koa-static": "^5.0.0",
     "koa2-swagger-ui": "^5.0.3",
-    "lodash": "^4.17.19",
+    "lodash": "^4.17.21",
     "lodash.merge": "^4.6.2",
     "log4js": "^6.3.0",
     "lru-cache": "^6.0.0",
@@ -247,7 +249,7 @@
     "styled-components": "^5.2.1",
     "twitter-text": "^3.1.0",
     "typescript-chained-error": "^1.6.0",
-    "underscore": "^1.12.0",
+    "underscore": "^1.13.1",
     "url": "^0.11.0",
     "url-search-params-polyfill": "^8.1.0",
     "uuid": "^8.3.2",
