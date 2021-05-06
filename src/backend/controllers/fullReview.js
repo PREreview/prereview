@@ -2,6 +2,7 @@ import router from 'koa-joi-router';
 import { QueryOrder } from '@mikro-orm/core';
 import { getLogger } from '../log.js';
 import generateDOI from '../utils/generateDOI.js';
+import { getFields } from '../utils/getFields.ts';
 
 const log = getLogger('backend:controllers:fullReviews');
 const Joi = router.Joi;
@@ -16,6 +17,7 @@ const querySchema = Joi.object({
   asc: Joi.boolean(),
   is_published: Joi.boolean(),
   can_edit: Joi.string(),
+  include_images: Joi.string().allow(''),
 });
 
 export default function controller(
@@ -69,6 +71,18 @@ export default function controller(
         ? QueryOrder.ASC_NULLS_LAST
         : QueryOrder.DESC_NULLS_LAST;
 
+      const options = {
+        fields: getFields(
+          'FullReview',
+          ctx.query.include_images
+            ? ctx.query.include_images.split(',')
+            : undefined,
+        ),
+        populate: ['authors', 'comments', 'drafts', 'preprint', 'statements'],
+        orderBy: { updatedAt: order },
+        limit: ctx.query.limit,
+        offset: ctx.query.offset,
+      };
       if (queries.length > 0) {
         let query;
         if (queries.length > 1) {
@@ -77,20 +91,9 @@ export default function controller(
           query = queries[0];
         }
         log.debug('Querying preprints:', query);
-        [allReviews, count] = await reviewModel.findAndCount(
-          query,
-          ['authors', 'comments', 'drafts', 'preprint', 'statements'],
-          { updatedAt: order },
-          ctx.query.limit,
-          ctx.query.offset,
-        );
+        [allReviews, count] = await reviewModel.findAndCount(query, options);
       } else {
-        allReviews = await reviewModel.findAll(
-          ['authors', 'comments', 'drafts', 'preprint', 'statements'],
-          { updatedAt: order },
-          ctx.query.limit,
-          ctx.query.offset,
-        );
+        allReviews = await reviewModel.findAll(options);
         count = await reviewModel.count();
       }
     } catch (err) {

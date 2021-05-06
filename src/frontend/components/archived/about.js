@@ -16,17 +16,17 @@ export default function About() {
           <strong>
             <Org />
           </strong>
-          {` `}is a web application for open, rapid reviews of outbreak-related
-          preprints.
+          {` `}is a web application for open, rapid PREreviews of
+          outbreak-related preprints.
         </p>
         <p>On this platform you can:</p>
         <ul>
-          <li>Find rapid reviews of existing preprints;</li>
+          <li>Find rapid PREreviews of existing preprints;</li>
           <li>
-            Request reviews of preprints (your own, or preprints you are
+            Request PREreviews of preprints (your own, or preprints you are
             interested in);
           </li>
-          <li>Review preprints.</li>
+          <li>PREreview preprints.</li>
         </ul>
         <p>
           This open project is funded by the Wellcome Trust as a collaboration

@@ -12,7 +12,11 @@ import { createPreprintId } from '../../common/utils/ids.js';
 import UserProvider from '../contexts/user-context';
 
 // hooks
-import { useGetCommunity, useGetPreprints } from '../hooks/api-hooks.tsx';
+import {
+  useGetCommunity,
+  useGetPreprints,
+  usePostCommunityRequest,
+} from '../hooks/api-hooks.tsx';
 import { useNewPreprints } from '../hooks/ui-hooks';
 
 // components
@@ -43,7 +47,6 @@ import Input from '@material-ui/core/Input';
 import InputLabel from '@material-ui/core/InputLabel';
 import Link from '@material-ui/core/Link';
 import MenuItem from '@material-ui/core/MenuItem';
-import Modal from '@material-ui/core/Modal';
 import Paper from '@material-ui/core/Paper';
 import Pagination from '@material-ui/lab/Pagination';
 import Select from '@material-ui/core/Select';
@@ -133,6 +136,13 @@ const useStyles = makeStyles(theme => ({
       textAlign: 'left',
     },
   },
+  request: {
+    display: 'block',
+    marginBottom: '2rem',
+    marginLeft: 'auto',
+    marginRight: 0,
+    width: 300,
+  },
   search: {
     borderRadius: 24,
     paddingLeft: 10,
@@ -207,9 +217,14 @@ export default function Community(props) {
   const location = useLocation();
   const params = processParams(location.search);
   const [user] = useContext(UserProvider.context);
+  const [loginModalOpenNext, setLoginModalOpenNext] = useState(null);
+  const [isOwner, setIsOwner] = useState(false);
 
   const { id } = props && props.id ? props : useParams();
   const { data: community, loading, error } = useGetCommunity({
+    queryParams: {
+      include_images: 'banner,avatar',
+    },
     resolve: community => {
       if (
         community &&
@@ -222,6 +237,33 @@ export default function Community(props) {
     },
     id: id,
   });
+
+  const { mutate: joinRequest } = usePostCommunityRequest({
+    id: community ? community.uuid : '',
+  });
+
+  const handleJoinRequest = () => {
+    user
+      ? joinRequest().then(() => {
+          alert(
+            `Thanks for your request to join ${
+              community.name
+            }! The owners have been notified of your request.`,
+          );
+        })
+      : setLoginModalOpenNext(location.pathname);
+  };
+
+  useEffect(() => {
+    if (!loading && user) {
+      setIsOwner(
+        user.isAdmin ||
+          community.owners.some(owner =>
+            user.personas.some(persona => persona.uuid === owner.uuid),
+          ),
+      );
+    }
+  }, [community]);
 
   if (loading) {
     return <Loading />;
@@ -251,11 +293,7 @@ export default function Community(props) {
           <Box bgcolor="rgba(229, 229, 229, 0.35)">
             <Container>
               <Box p={4}>
-                {(user &&
-                  community.owners.some(owner =>
-                    user.personas.some(persona => persona.uuid === owner.uuid),
-                  )) ||
-                (user && user.isAdmin) ? (
+                {isOwner ? (
                   <IconButton
                     href={`/community-settings/${community.uuid}`}
                     className={classes.settings}
@@ -268,7 +306,26 @@ export default function Community(props) {
                       <span>Settings</span>
                     </Hidden>
                   </IconButton>
-                ) : null}
+                ) : (
+                  <Box className={classes.request}>
+                    <Button
+                      color="primary"
+                      variant="contained"
+                      className={classes.button}
+                      onClick={handleJoinRequest}
+                    >
+                      Request to join community
+                    </Button>
+                  </Box>
+                )}
+                {loginModalOpenNext && (
+                  <LoginRequiredModal
+                    open={loginModalOpenNext}
+                    onClose={() => {
+                      setLoginModalOpenNext(null);
+                    }}
+                  />
+                )}
                 <Grid container spacing={4}>
                   <Grid item xs={12} md={8}>
                     <CommunityContent
@@ -378,11 +435,20 @@ function CommunityHeader({
             </Typography>
             {twitter && (
               <Typography component="div" variant="body1">
-                <Link href={`https://twitter.com/${twitter}`}>
-                  <TwitterIcon />
-                  {twitter.charAt(0) !== '@' ? '@' : ''}
-                  {twitter}
-                </Link>
+                {twitter.charAt(0) === '#' ? (
+                  <Link
+                    href={`https://twitter.com/hashtag/${twitter.slice(1)}`}
+                  >
+                    <TwitterIcon />
+                    {twitter}
+                  </Link>
+                ) : (
+                  <Link href={`https://twitter.com/${twitter}`}>
+                    <TwitterIcon />
+                    {twitter.charAt(0) !== '@' ? '@' : ''}
+                    {twitter}
+                  </Link>
+                )}
               </Typography>
             )}
           </Box>
@@ -398,6 +464,7 @@ CommunityHeader.propTypes = {
   description: PropTypes.string,
   members: PropTypes.array,
   membersLimit: PropTypes.number.isRequired,
+  twitter: PropTypes.string,
 };
 
 function CommunityPersonas({
@@ -714,10 +781,10 @@ function CommunityContent({ thisUser, community, params }) {
                 <InfoOutlinedIcon className={classes.infoIcon} />
                 This is a platform for the crowdsourcing of preprint reviews.
                 Use the search bar below to find preprints in this community
-                that already have reviews or requests for reviews. To add your
-                own review or request to this community, use the Add Review |
-                Request Review button, paste the preprint DOI and follow the
-                instructions.
+                that already have PREreviews or requests for PREreviews. To add
+                your own PREreview or request to this community, use the Add
+                PREreview | Request PREreview button, paste the preprint DOI and
+                follow the instructions.
               </Typography>
             </Box>
           </Grid>
@@ -765,7 +832,7 @@ function CommunityContent({ thisUser, community, params }) {
                   align="left"
                   gutterBottom
                 >
-                  Preprints with reviews or requests for reviews
+                  Preprints with PREreviews or requests for PREreviews
                 </Typography>
               </Grid>
               <Grid item xs={12} sm={6}>

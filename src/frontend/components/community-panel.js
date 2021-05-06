@@ -20,7 +20,7 @@ import {
 
 // components
 import AddEvent from './add-event';
-import AddTag from './add-tag';
+//import AddTag from './add-tag';
 import AddUser from './add-user';
 import HeaderBar from './header-bar';
 import Loading from './loading';
@@ -67,6 +67,11 @@ const useStyles = makeStyles(theme => ({
     marginRight: 10,
     textTransform: 'none',
   },
+  scrollBox: {
+    maxHeight: 360,
+    overflowX: 'hidden',
+    overflowY: 'scroll',
+  },
   textField: {
     marginBottom: '3rem',
     width: '100%',
@@ -92,7 +97,11 @@ const CommunityPanel = () => {
     data: communityData,
     loadingCommunity,
     errorCommunity,
-  } = useGetCommunity({ id: id, resolve: community => community.data[0] });
+  } = useGetCommunity({
+    id: id,
+    resolve: community => community.data[0],
+    queryParams: { include_images: 'avatar,banner' },
+  });
 
   // update community info
   // delete member from community
@@ -348,19 +357,32 @@ const CommunityPanel = () => {
                   Users
                 </Typography>
                 <AddUser community={community} addUser={handleAddUser} />
-                {community.members && community.members.length
-                  ? community.members.map(member => {
-                      return (
-                        <DeleteCommunityMember
-                          key={member.uuid}
-                          communityId={community.uuid}
-                          member={member}
-                          deleteMember={handleDeleteMember}
-                          isOwner={false}
-                        />
-                      );
-                    })
-                  : null}
+                {community.members && community.members.length ? (
+                  <Box
+                    p={2}
+                    mt={1}
+                    border="1px solid #ccc"
+                    className={classes.scrollBox}
+                  >
+                    {community.members
+                      .sort((a, b) =>
+                        a.defaultPersona && b.defaultPersona
+                          ? a.defaultPersona.name > b.defaultPersona.name
+                          : a.name > b.name,
+                      )
+                      .map(member => {
+                        return (
+                          <DeleteCommunityMember
+                            key={member.uuid}
+                            communityId={community.uuid}
+                            member={member}
+                            deleteMember={handleDeleteMember}
+                            isOwner={false}
+                          />
+                        );
+                      })}
+                  </Box>
+                ) : null}
               </Box>
               <Box mb={4}>
                 <Typography variant="h4" component="h2" gutterBottom={true}>
@@ -383,6 +405,7 @@ const CommunityPanel = () => {
                     })
                   : null}
               </Box>
+              {/*
               <Box mb={4}>
                 <Typography variant="h4" component="h2" gutterBottom={true}>
                   Tags
@@ -401,6 +424,7 @@ const CommunityPanel = () => {
                     })
                   : null}
               </Box>
+                */}
               <Box mb={4}>
                 <Typography variant="h4" component="h2" gutterBottom={true}>
                   Templates
@@ -466,29 +490,27 @@ function DeleteCommunityMember({ communityId, member, deleteMember, isOwner }) {
   };
 
   return (
-    <>
-      <Box key={member.uuid} mt={2}>
-        <Grid container alignItems="center" spacing={2}>
-          <Grid item>
-            <Avatar
-              alt={member.name}
-              src={member.avatar}
-              className={classes.avatar}
-            />
-          </Grid>
-          <Grid item>
-            <Typography variant="h6" component="h4" gutterBottom={true}>
-              {member.name}
-            </Typography>
-          </Grid>
-          <Grid item>
-            <IconButton onClick={() => handleDeleteMember(member)}>
-              <ClearIcon />
-            </IconButton>
-          </Grid>
+    <Box key={member.uuid} mt={2}>
+      <Grid container alignItems="center" spacing={2}>
+        <Grid item>
+          <Avatar
+            alt={member.name}
+            src={member.avatar}
+            className={classes.avatar}
+          />
         </Grid>
-      </Box>
-    </>
+        <Grid item>
+          <Typography variant="h6" component="h4" gutterBottom={true}>
+            {member.name}
+          </Typography>
+        </Grid>
+        <Grid item>
+          <IconButton onClick={() => handleDeleteMember(member)}>
+            <ClearIcon />
+          </IconButton>
+        </Grid>
+      </Grid>
+    </Box>
   );
 }
 

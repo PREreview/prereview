@@ -126,8 +126,8 @@ export default function AdminPanel() {
           <Tab label="Users" />
           <Tab label="Personas" />
           <Tab label="Preprints" />
-          <Tab label="Long-form Reviews" />
-          <Tab label="Rapid Reviews" />
+          <Tab label="Full PREreviews" />
+          <Tab label="Rapid PREreviews" />
           <Tab label="Communities" />
           <Tab label="Badges" />
           <Tab label="Tags" />
@@ -244,11 +244,13 @@ function UsersTab() {
 
 function PersonasTab() {
   const [badges, setBadges] = useState(null);
-  const [selectedBadges, setSelectedBadges] = useState([]);
   const [personas, setPersonas] = useState(null);
 
   const { data, loading } = useGetPersonas({
     resolve: res => res.data,
+    queryParams: {
+      include_images: 'avatar',
+    },
   });
 
   const { data: badgesData, loading: loadingBadges } = useGetBadges({
@@ -367,7 +369,7 @@ function PersonasTab() {
     },
   ];
 
-  if (loading || loadingBadges) {
+  if (loading) {
     return <Loading />;
   } else {
     return (
@@ -524,7 +526,7 @@ function FullReviewsTab() {
   } else {
     return (
       <MaterialTable
-        title="Long-form Reviews"
+        title="Full PREreviews"
         columns={columns}
         data={data}
         editable={{
@@ -613,7 +615,7 @@ function RapidReviewsTab() {
   } else {
     return (
       <MaterialTable
-        title="Rapid Reviews"
+        title="Rapid PREreviews"
         columns={columns}
         data={rapids}
         editable={{

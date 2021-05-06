@@ -260,7 +260,7 @@ export default function SettingsInvites({ user }) {
             </TableContainer>
           ) : (
             <Typography component="div" variant="body1">
-              No review drafts saved.
+              No PREreview drafts saved.
             </Typography>
           )}
         </Box>
