@@ -125,9 +125,11 @@ const AddEvent = ({ community, addEvent }) => {
   const handleAddEvent = () => {
     if (canSubmit()) {
       addCommunityEvent(inputs)
-        .then(addEvent(inputs))
-        .then(() => {
+        .then(resp => {
+          addEvent({...inputs, uuid: resp.data.uuid});
           handleClose();
+        })
+        .then(() => {
           alert(`Event added successfully.`);
           return;
         })

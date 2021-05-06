@@ -180,7 +180,7 @@ function StepPreprint({
 
       {resolvePreprintStatus.loading && (
         <Typography component="div" variant="body1">
-          Checking for existing reviews or requests for reviews…
+          Checking for existing PREreviews or requests for PREreviews…
         </Typography>
       )}
 
@@ -203,7 +203,7 @@ function StepPreprint({
           }}
           disabled={!identifier || !preprint}
         >
-          Request reviews
+          Request PREreviews
         </Button>
         <Button
           onClick={() => {
@@ -214,7 +214,7 @@ function StepPreprint({
           }}
           disabled={!identifier || !preprint}
         >
-          Add reviews
+          Add PREreviews
         </Button>
       </Controls>
     </Box>

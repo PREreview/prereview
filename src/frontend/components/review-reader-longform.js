@@ -46,7 +46,7 @@ const LongformReviewReader = props => {
     isReader = true,
   } = props;
 
-  const useStyles = makeStyles(() => ({
+  const useStyles = makeStyles(theme => ({
     authors: {
       fontSize: '1.25rem',
       fontWeight: '600',
@@ -95,8 +95,11 @@ const LongformReviewReader = props => {
       right: 0,
       top: 0,
       transform: 'none !important',
-      width: '40vw',
+      width: '100%',
       zIndex: 10000,
+      [theme.breakpoints.up('sm')]: {
+        width: '40vw',
+      },
     },
     popperContent: {
       padding: 20,

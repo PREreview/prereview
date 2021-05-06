@@ -94,7 +94,7 @@ export default function SettingsNotifications({ user }) {
     <>
       <Typography variant="h3" component="h2">
         Email settings and enabling notifications
-        <Tooltip title="Enabling notifications ensures that you receive an email every time a review is added to a preprint for which you requested reviews. The email provided will only be used for notifications and will never be shared.">
+        <Tooltip title="Enabling notifications ensures that you receive an email every time a PREreview is added to a preprint for which you requested PREreviews. The email provided will only be used for notifications and will never be shared.">
           <IconButton>
             <HelpOutlineIcon />
           </IconButton>

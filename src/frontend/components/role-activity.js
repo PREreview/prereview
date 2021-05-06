@@ -44,23 +44,28 @@ export default function RoleActivity({ persona }) {
       {activity && activity.length ? (
         <Box className={classes.box}>
           <Typography>
-            Total number of requests: {persona.requests ? persona.requests.length || 0 : ''}
+            Total number of requests:{' '}
+            {persona.requests ? persona.requests.length || 0 : ''}
           </Typography>
           <Typography>
-            Total number of rapid reviews: {persona.rapidReviews ? persona.rapidReviews.length || 0 : ''}
+            Total number of rapid PREreviews:{' '}
+            {persona.rapidReviews ? persona.rapidReviews.length || 0 : ''}
           </Typography>
           <Typography>
-            Total number of full reviews:{' '}
+            Total number of full PREreviews:{' '}
             {persona.fullReviews
-                ? persona.fullReviews.filter(review => review.isPublished)
-                    .length || 0
-                : ''}
+              ? persona.fullReviews.filter(review => review.isPublished)
+                  .length || 0
+              : ''}
           </Typography>
         </Box>
       ) : null}
 
       {!activity || !activity.length ? (
-        <Typography>{persona.name} hasn't yet reviewed or requested reviews for preprints.</Typography>
+        <Typography>
+          {persona.name} hasn&apos;t yet PREreviewed or requested PREreviews for
+          preprints.
+        </Typography>
       ) : (
         <Box mt={4}>
           <List>
