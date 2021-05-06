@@ -1,6 +1,7 @@
 import router from 'koa-joi-router';
 import { QueryOrder } from '@mikro-orm/core';
 import { getLogger } from '../log.js';
+import { getFields } from '../utils/getFields.ts';
 
 const log = getLogger('backend:controllers:rapidReview');
 const Joi = router.Joi;
@@ -14,6 +15,7 @@ const querySchema = Joi.object({
     .greater(-1),
   asc: Joi.boolean(),
   is_published: Joi.boolean(),
+  include_images: Joi.string().allow(''),
 });
 
 export default function controller(rapidReviews, preprints, thisUser) {
@@ -48,6 +50,19 @@ export default function controller(rapidReviews, preprints, thisUser) {
         ? QueryOrder.ASC_NULLS_LAST
         : QueryOrder.DESC_NULLS_LAST;
 
+      const options = {
+        fields: getFields(
+          'RapidReview',
+          ctx.query.include_images
+            ? ctx.query.include_images.split(',')
+            : undefined,
+        ),
+        populate: ['author', 'preprint'],
+        orderBy: { updatedAt: order },
+        limit: ctx.query.limit,
+        offset: ctx.query.offset,
+      };
+
       if (queries.length > 0) {
         let query;
         if (queries.length > 1) {
@@ -56,20 +71,9 @@ export default function controller(rapidReviews, preprints, thisUser) {
           query = queries[0];
         }
         log.debug('Querying rapid reviews:', query);
-        [data, count] = await rapidReviews.findAndCount(
-          query,
-          ['author', 'preprint'],
-          { createdAt: order },
-          ctx.query.limit,
-          ctx.query.offset,
-        );
+        [data, count] = await rapidReviews.findAndCount(query, options);
       } else {
-        data = await rapidReviews.findAll(
-          ['author', 'preprint'],
-          { createdAt: order },
-          ctx.query.limit,
-          ctx.query.offset,
-        );
+        data = await rapidReviews.findAll(options);
         count = await rapidReviews.count();
       }
     } catch (err) {

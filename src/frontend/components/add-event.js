@@ -1,6 +1,7 @@
 // base imports
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
+import isURL from 'validator/lib/isURL';
 
 // material ui imports
 import { makeStyles, withStyles } from '@material-ui/core/styles';
@@ -115,9 +116,13 @@ const AddEvent = ({ community, addEvent }) => {
   /* validation */
   const canSubmit = () => {
     if (inputs.title && inputs.description && inputs.start) {
+      if (inputs.url && !isURL(inputs.url)) {
+        alert('The event link must be a valid URL.');
+        return false;
+      }
       return true;
     } else {
-      alert('All fields are required.');
+      alert('Please fill out required fields.');
       return false;
     }
   };
@@ -126,7 +131,7 @@ const AddEvent = ({ community, addEvent }) => {
     if (canSubmit()) {
       addCommunityEvent(inputs)
         .then(resp => {
-          addEvent({...inputs, uuid: resp.data.uuid});
+          addEvent({ ...inputs, uuid: resp.data.uuid });
           handleClose();
         })
         .then(() => {
@@ -186,6 +191,14 @@ const AddEvent = ({ community, addEvent }) => {
               variant="outlined"
               multiline
               rows={4}
+              className={classes.textField}
+              onChange={handleInputChange}
+            />
+            <TextField
+              id="url"
+              name="url"
+              label="Link"
+              variant="outlined"
               className={classes.textField}
               onChange={handleInputChange}
             />
