@@ -404,7 +404,7 @@ export default function Home() {
                     </Link>
                   </Typography>
                   <Typography variant="body2" component="div" gutterBottom>
-                    <b>Read, request, and write</b> rapid and long-form preprint
+                    <b>Read, request, and write</b> rapid and full preprint
                     reviews
                   </Typography>
                   <Typography variant="body2" component="div" gutterBottom>

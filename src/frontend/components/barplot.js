@@ -91,7 +91,7 @@ export default function Barplot({ stats, nReviews, children }) {
             variant="button"
             className={classes.title}
           >
-            Showing {nReviews} Reviews
+            Showing {nReviews} PREreviews
           </Typography>
           <Grid container spacing={2} justify="space-between">
             <Grid item>
@@ -186,7 +186,7 @@ export default function Barplot({ stats, nReviews, children }) {
           )
         ) : (
           <Typography component="div" variant="body2">
-            No rapid reviews. Would you like to leave one?
+            No rapid PREreviews. Would you like to leave one?
           </Typography>
         )}
       </List>

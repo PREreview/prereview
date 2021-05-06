@@ -3,6 +3,7 @@ import { QueryOrder, wrap } from '@mikro-orm/core';
 import { PostgreSqlConnection } from '@mikro-orm/postgresql';
 import { getLogger } from '../log.js';
 import { getErrorMessages } from '../utils/errors';
+import { getFields } from '../utils/getFields.ts';
 
 const log = getLogger('backend:controller:community');
 const Joi = router.Joi;
@@ -42,6 +43,7 @@ const querySchema = Joi.object({
     .integer()
     .positive(),
   asc: Joi.boolean(),
+  include_images: Joi.string().allow(''),
   sort_by: Joi.string(),
   from: Joi.string(),
   to: Joi.string(),
@@ -125,13 +127,6 @@ export default function controller(
       log.debug(`Retrieving communities.`);
 
       try {
-        const populate = [
-          'members',
-          'preprints',
-          'owners.defaultPersona',
-          'tags',
-          'events',
-        ];
         let foundCommunities, count;
         const order = ctx.query.asc
           ? QueryOrder.ASC_NULLS_LAST
@@ -164,6 +159,24 @@ export default function controller(
             });
           }
         }
+        const options = {
+          fields: getFields(
+            'Community',
+            ctx.query.include_images
+              ? ctx.query.include_images.split(',')
+              : undefined,
+          ),
+          populate: [
+            'members',
+            'preprints',
+            'owners.defaultPersona',
+            'tags',
+            'events',
+          ],
+          orderBy: orderBy,
+          limit: ctx.query.limit,
+          offset: ctx.query.offset,
+        };
 
         if (ctx.query.tags) {
           const tags = ctx.query.tags.split(',');
@@ -185,18 +198,10 @@ export default function controller(
           log.debug('Querying communities:', query);
           [foundCommunities, count] = await communityModel.findAndCount(
             query,
-            populate,
-            orderBy,
-            ctx.query.limit,
-            ctx.query.offset,
+            options,
           );
         } else {
-          foundCommunities = await communityModel.findAll(
-            populate,
-            orderBy,
-            ctx.query.limit,
-            ctx.query.offset,
-          );
+          foundCommunities = await communityModel.findAll(options);
           count = await communityModel.count();
         }
 
@@ -259,11 +264,27 @@ export default function controller(
       let community;
 
       try {
+        const options = {
+          fields: getFields(
+            'Community',
+            ctx.query.include_images
+              ? ctx.query.include_images.split(',')
+              : undefined,
+          ),
+          populate: [
+            'members',
+            'preprints',
+            'owners.defaultPersona',
+            'tags',
+            'events',
+            'templates',
+          ],
+        };
         community = await communityModel.findOne(
           {
             $or: [{ uuid: ctx.params.id }, { slug: ctx.params.id }],
           },
-          ['members', 'preprints', 'owners', 'tags', 'events', 'templates'],
+          options,
         );
         if (!community) {
           ctx.throw(404, `Community with ID ${ctx.params.id} doesn't exist`);
@@ -303,6 +324,76 @@ export default function controller(
         summary:
           'Endpoint to GET info on a community registered on PREreview, along with its associated members and preprints.',
       },
+    },
+  });
+
+  communities.route({
+    meta: {
+      swagger: {
+        operationId: 'PostCommunityRequest',
+        summary: 'Endpoint to request to join a community.',
+      },
+    },
+    method: 'POST',
+    path: '/communities/:id/join-request',
+    pre: thisUser.can('access private pages'),
+    handler: async ctx => {
+      log.debug(`Processing request to join community ${ctx.params.id}`);
+
+      let community;
+      let persona;
+
+      try {
+        persona = await personaModel.findOne(ctx.state.user.defaultPersona);
+      } catch (err) {
+        log.error(`Error finding user persona: `, err);
+      }
+
+      try {
+        community = await communityModel.findOne({ uuid: ctx.params.id }, [
+          'owners',
+          'owners.contacts',
+        ]);
+        if (!community) {
+          ctx.throw(404, `Community with ID ${ctx.params.id} doesn't exist`);
+        }
+      } catch (err) {
+        log.error('HTTP 400 Error: ', err);
+      }
+
+      log.debug('community.owners************', community.owners.getItems());
+
+      // returns an array of an array of just the contact information of community owners
+      let ownersContacts = community.owners
+        .getItems()
+        .map(owner => owner.contacts.getItems());
+
+      // flatten array of array of contacts
+      let flattened = ownersContacts.length ? ownersContacts.flat(2) : [];
+
+      // send mail to community owners
+      if (flattened.length > 0) {
+        flattened.map(async contact => {
+          try {
+            await ctx.mail.send({
+              template: 'requestToJoin',
+              message: {
+                to: contact.value,
+              },
+              locals: {
+                community: community.name,
+                userName: persona.name,
+                userUuid: persona.uuid,
+              },
+            });
+          } catch (err) {
+            log.error('HTTP 400 Error: ', err);
+            ctx.throw(400, `Failed to parse contact schema: ${err}`);
+          }
+        });
+      }
+
+      ctx.status = 201;
     },
   });
 

@@ -136,8 +136,8 @@ const RoleBadgeUI = React.forwardRef(function RoleBadgeUI(
               }
             >
               {user && user.defaultPersona
-                ? `View ${user.defaultPersona.name}'s Rapid Review`
-                : `View ${user.name}'s Rapid Review`}
+                ? `View ${user.defaultPersona.name}'s Rapid PREreview`
+                : `View ${user.name}'s Rapid PREreview`}
             </XLink>
           ) : null}
           <XLink

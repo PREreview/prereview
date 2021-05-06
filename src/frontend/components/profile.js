@@ -127,6 +127,9 @@ export default function Profile() {
   const { data: persona, loading: loadingPersona } = useGetPersona({
     id: id,
     resolve: persona => persona.data[0],
+    queryParams: {
+      include_images: 'avatar',
+    },
   });
 
   const { mutate: updateUser } = usePutUser({
@@ -696,8 +699,7 @@ export default function Profile() {
                         <Grid>
                           {works.length > 0 ? (
                             works.map(work => {
-                              console.log('work!', work);
-                              return <WorkCard work={work} />;
+                              return <WorkCard work={work} key={work.uuid} />;
                             })
                           ) : (
                             <Typography>

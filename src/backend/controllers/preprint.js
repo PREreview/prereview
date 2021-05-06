@@ -1,10 +1,12 @@
 import router from 'koa-joi-router';
+import 'reflect-metadata';
 import { QueryOrder } from '@mikro-orm/core';
 import { PostgreSqlConnection } from '@mikro-orm/postgresql';
 import { getLogger } from '../log.js';
 import { resolvePreprint } from '../utils/resolve.ts';
 import { createPreprintId } from '../../common/utils/ids';
 import { getErrorMessages } from '../utils/errors';
+import { getFields } from '../utils/getFields.ts';
 
 const log = getLogger('backend:controllers:preprint');
 const Joi = router.Joi;
@@ -20,6 +22,7 @@ const querySchema = Joi.object({
   search: Joi.string().allow(''),
   communities: Joi.string().allow(''),
   tags: Joi.string().allow(''),
+  include_images: Joi.string().allow(''),
   sort: Joi.string().allow(
     'datePosted',
     'recentRequests',
@@ -179,17 +182,6 @@ export default function controller(preprints, thisUser) {
       let fullCount = 0;
       let query;
       try {
-        const populate = [
-          'fullReviews',
-          'fullReviews.authors',
-          'fullReviews.drafts',
-          'rapidReviews',
-          'rapidReviews.author',
-          'requests',
-          'requests.author',
-          'communities',
-          'tags',
-        ];
         const order = ctx.query.asc
           ? QueryOrder.ASC_NULLS_LAST
           : QueryOrder.DESC_NULLS_LAST;
@@ -207,6 +199,25 @@ export default function controller(preprints, thisUser) {
           default:
             orderBy = { datePosted: order };
         }
+        const options = {
+          fields: getFields(
+            'Preprint',
+            ctx.query.include_images
+              ? ctx.query.include_images.split(',')
+              : undefined,
+          ),
+          populate: [
+            'communities',
+            'tags',
+            'requests.author',
+            'rapidReviews.author',
+            'fullReviews.drafts',
+            'fullReviews.authors',
+          ],
+          orderBy: orderBy,
+          limit: ctx.query.limit,
+          offset: ctx.query.offset,
+        };
         const queries = [];
         queries.push({
           isPublished: { $eq: true },
@@ -261,21 +272,14 @@ export default function controller(preprints, thisUser) {
             query = queries[0];
           }
           log.debug('Querying preprints:', query);
+          log.debug('Querying preprints:', options);
           [foundPreprints, count] = await preprints.findAndCount(
             query,
-            populate,
-            orderBy,
-            ctx.query.limit,
-            ctx.query.offset,
+            options,
           );
         } else {
-          foundPreprints = await preprints.findAll(
-            populate,
-            orderBy,
-            ctx.query.limit,
-            ctx.query.offset,
-          );
-          count = await preprints.count();
+          foundPreprints = await preprints.findAll(options);
+          count = foundPreprints.length;
         }
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
@@ -330,10 +334,6 @@ export default function controller(preprints, thisUser) {
         id: Joi.string()
           .description('Preprint ID')
           .required(),
-        //id: Joi.alternatives()
-        //  .try(Joi.number().integer(), Joi.string())
-        //  .description('Preprint ID')
-        //  .required(),
       },
       continueOnError: true,
     },
@@ -347,14 +347,26 @@ export default function controller(preprints, thisUser) {
       let preprint;
 
       try {
-        preprint = await preprints.findOneByUuidOrHandle(ctx.params.id, [
-          'fullReviews.authors.identity',
-          'fullReviews.drafts',
-          'fullReviews.comments.author',
-          'rapidReviews.author.identity',
-          'requests.author',
-          'tags',
-        ]);
+        const options = {
+          fields: getFields(
+            'Preprint',
+            ctx.query.include_images
+              ? ctx.query.include_images.split(',')
+              : undefined,
+          ),
+          populate: [
+            'communities',
+            'tags',
+            'requests.author',
+            'rapidReviews.author',
+            'fullReviews.drafts',
+            'fullReviews.authors',
+          ],
+        };
+        preprint = await preprints.findOneByUuidOrHandle(
+          ctx.params.id,
+          options,
+        );
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, err);
@@ -396,10 +408,6 @@ export default function controller(preprints, thisUser) {
         id: Joi.string()
           .description('Preprint ID')
           .required(),
-        //id: Joi.alternatives()
-        //  .try(Joi.number().integer(), Joi.string())
-        //  .description('Preprint ID')
-        //  .required(),
       },
       body: {
         data: preprintSchema,

@@ -63,7 +63,11 @@ const AddAuthors = ({ isMentor, reviewId, members, membersLimit = 5 }) => {
   const classes = useStyles();
 
   // fetch users from API
-  const { data: users, loading: loading, error: personasError } = useGetPersonas();
+  const { data: users, loading: loading } = useGetPersonas({
+    queryParams: {
+      include_images: 'avatar',
+    },
+  });
 
   // getModalStyle is not a pure function, we roll the style only on the first render
   const [open, setOpen] = useState(false);
@@ -92,8 +96,8 @@ const AddAuthors = ({ isMentor, reviewId, members, membersLimit = 5 }) => {
         <Tooltip
           title={
             isMentor
-              ? `A mentor is a person you wish to invite to give you feedback and/or edit your review. They will not be authors of the review, but they will be recognized as having helped you write it. A mentor can be a PREreview user or a prospective PREreview user. In order to invite a mentor, you first need to SAVE the draft of your review.`
-              : `A co-reviewer is a person you wish to invite to write this review with you. They can be a PREreview user or a prospective PREreview user. In order to invite one or more co-reviewer(s), you first need to SAVE the draft of your review.`
+              ? `A mentor is a person you wish to invite to give you feedback and/or edit your PREreview. They will not be authors of the PREreview, but they will be recognized as having helped you write it. A mentor can be a PREreview user or a prospective PREreview user. In order to invite a mentor, you first need to SAVE the draft of your PREreview.`
+              : `A co-reviewer is a person you wish to invite to write this PREreview with you. They can be a PREreview user or a prospective PREreview user. In order to invite one or more co-reviewer(s), you first need to SAVE the draft of your PREreview.`
           }
         >
           <IconButton type="button" className={classes.button}>

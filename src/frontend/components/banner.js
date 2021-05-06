@@ -32,15 +32,15 @@ export default function Banner() {
       <Box className={classes.announcement}>
         <Container>
           <Typography component="div">
-            Get involved with rapidly reviewing COVID-19 preprints and then view
-            our{' '}
+            Get involved with rapidly PREreviewing COVID-19 preprints and then
+            view our{' '}
             <Link
               className={classes.link}
               href={`/dashboard?limit=10&offset=0&search=covid-19`}
             >
               COVID-19 Dashboard
             </Link>{' '}
-            of review activities and recommendations.
+            of PREreview activities and recommendations.
           </Typography>
         </Container>
       </Box>

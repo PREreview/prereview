@@ -119,8 +119,8 @@ export default function AdminPanel() {
           <Tab label="Users" />
           <Tab label="Personas" />
           <Tab label="Preprints" />
-          <Tab label="Long-form Reviews" />
-          <Tab label="Rapid Reviews" />
+          <Tab label="Full PREreviews" />
+          <Tab label="Rapid PREreviews" />
           <Tab label="Communities" />
           <Tab label="Badges" />
           <Tab label="Tags" />
@@ -258,6 +258,9 @@ function PersonasTab() {
 
   const { data, loading } = useGetPersonas({
     resolve: res => res.data,
+    queryParams: {
+      include_images: 'avatar',
+    },
   });
 
   // generated hooks don't allow dynamic path params
@@ -425,7 +428,7 @@ function FullReviewsTab() {
   } else {
     return (
       <MaterialTable
-        title="Long-form Reviews"
+        title="Full PREreviews"
         columns={columns}
         data={data}
         editable={{
@@ -499,7 +502,7 @@ function RapidReviewsTab() {
   } else {
     return (
       <MaterialTable
-        title="Rapid Reviews"
+        title="Rapid PREreviews"
         columns={columns}
         data={data}
         editable={{
@@ -541,14 +544,12 @@ function CommunitiesTab() {
 
   useEffect(() => {
     if (!loadingUsers && usersData) {
-      console.log(usersData);
       const lookup = {};
       usersData.map(user => {
         user.defaultPersona
           ? (lookup[user.defaultPersona.uuid] = user.defaultPersona.name)
           : (lookup[user.uuid] = user.name);
       });
-      console.log(lookup);
       setUsers(lookup);
     }
   }, [usersData]);

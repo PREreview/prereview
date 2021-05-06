@@ -171,7 +171,6 @@ const Search = ({
   });
 
   const [disabledSubmit, setDisabledSubmit] = useState(true);
-  const [invitees, setInvitees] = useState(null);
 
   const { mutate: postInvite } = usePostFullReviewInvite({
     id: reviewId,

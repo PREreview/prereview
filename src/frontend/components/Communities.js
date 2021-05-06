@@ -75,7 +75,10 @@ const Communities = () => {
   const [search, setSearch] = useState(params.get('search') || '');
 
   const { data: communities, loading: loading, error } = useGetCommunities({
-    queryParams: searchParamsToObject(params),
+    queryParams: {
+      ...searchParamsToObject(params),
+      include_images: 'banner,avatar',
+    },
   });
 
   const { data: tags, loading: loadingTags } = useGetTags();

@@ -106,7 +106,7 @@ export default function ReviewReader({
   const [expandRapid, setExpandRapid] = useState(true);
   const [expandLong, setExpandLong] = useState(true);
 
-  // expand and collapse rapid and longform review sections
+  // expand and collapse rapid and full review sections
   const handleChangeRapid = panel => (event, newExpanded) => {
     setExpandRapid(newExpanded ? panel : false);
   };
@@ -257,7 +257,7 @@ export default function ReviewReader({
               id="rapid-reviews-header"
             >
               <Typography variant="h3" component="h3">
-                Rapid Reviews
+                Rapid PREreviews
               </Typography>
             </AccordionSummary>
             <AccordionDetails>
@@ -330,7 +330,7 @@ export default function ReviewReader({
                   />
                 </div>
               ) : (
-                <div>No rapid reviews yet.</div>
+                <div>No rapid PREreviews yet.</div>
               )}
             </AccordionDetails>
           </Accordion>
@@ -345,7 +345,7 @@ export default function ReviewReader({
               id="longform-header"
             >
               <Typography variant="h3" component="h3">
-                Longform Reviews
+                Full PREreviews
               </Typography>
             </AccordionSummary>
             <AccordionDetails>
@@ -493,7 +493,7 @@ export default function ReviewReader({
                       if (typeof review === 'string') {
                         return (
                           <div key={'new-review'}>
-                            <div>{'New user review'}</div>
+                            <div>{'New user PREreview'}</div>
                             <div>
                               <span key={user.uuid}>by {user.name}</span>
                             </div>
@@ -508,7 +508,7 @@ export default function ReviewReader({
                 </div>
               ) : (
                 <Typography component="div" variant="body2">
-                  No longform reviews to display.
+                  No full PREreviews to display.
                 </Typography>
               )}
             </AccordionDetails>
@@ -516,9 +516,9 @@ export default function ReviewReader({
         </div>
       ) : (
         <Typography component="div" variant="body2">
-          There are no reviews on this preprint yet. To add your review, click
-          on &quot;Add Review(s)&quot;. To request reviews, click on &quot;Add
-          Request&quot; in the menu above.
+          There are no PREreviews on this preprint yet. To add your review,
+          click on &quot;Add PREReview(s)&quot;. To request reviews, click on
+          &quot;Add Request&quot; in the menu above.
         </Typography>
       )}
     </div>

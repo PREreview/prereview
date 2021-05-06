@@ -19,7 +19,7 @@ const useStyles = makeStyles(theme => ({
     borderRadius: 50,
     color: theme.palette.primary.contrastText,
     textTransform: 'none',
-    width: 300,
+    width: 330,
     '&:hover': {
       backgroundColor: theme.palette.primary.dark,
     },
@@ -47,7 +47,7 @@ export default function AddButton({ ...buttonProps }) {
         component="span"
         className={`${classes.text} ${classes.border}`}
       >
-        Add Review
+        Add PREreview
       </Typography>
       <Typography component="span" className={classes.text}>
         Add Request
