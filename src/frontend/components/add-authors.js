@@ -12,11 +12,14 @@ import Modal from '@material-ui/core/Modal';
 import MuiButton from '@material-ui/core/Button';
 import MuiTooltip from '@material-ui/core/Tooltip';
 
+
 // hooks
 import { useGetPersonas } from '../hooks/api-hooks.tsx';
 
 // components
 import Search from './search';
+import NotFound from './not-found';
+
 
 // icons
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
@@ -79,6 +82,8 @@ const AddAuthors = ({ isMentor, reviewId, members, membersLimit = 5 }) => {
 
   if (loading) {
     return <CircularProgress className={classes.spinning} />;
+  } else if (personasError) {
+    return <NotFound />
   } else {
     return (
       <div>
