@@ -73,7 +73,10 @@ export default function Dashboard() {
 
   const { data: preprints, loading: loadingPreprints, error } = useGetPreprints(
     {
-      queryParams: searchParamsToObject(params),
+      queryParams: {
+        ...searchParamsToObject(params),
+        include_images: 'avatar',
+      },
     },
   );
 

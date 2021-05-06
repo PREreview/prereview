@@ -111,7 +111,10 @@ export default function Reviews() {
     loading: loadingPreprints,
     error: preprintError,
   } = useGetPreprints({
-    queryParams: searchParamsToObject(params),
+    queryParams: {
+      ...searchParamsToObject(params),
+      include_images: 'avatar',
+    },
   });
 
   const {

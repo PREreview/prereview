@@ -221,6 +221,9 @@ export default function Community(props) {
 
   const { id } = props && props.id ? props : useParams();
   const { data: community, loading, error } = useGetCommunity({
+    queryParams: {
+      include_images: 'banner,avatar',
+    },
     resolve: community => {
       if (
         community &&
@@ -446,6 +449,7 @@ CommunityHeader.propTypes = {
   description: PropTypes.string,
   members: PropTypes.array,
   membersLimit: PropTypes.number.isRequired,
+  twitter: PropTypes.string,
 };
 
 function CommunityPersonas({

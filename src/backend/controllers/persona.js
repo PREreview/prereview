@@ -3,6 +3,7 @@ import { QueryOrder } from '@mikro-orm/core';
 import { PostgreSqlConnection } from '@mikro-orm/postgresql';
 import { getLogger } from '../log.js';
 import { getErrorMessages } from '../utils/errors';
+import { getFields } from '../utils/getFields.ts';
 
 const log = getLogger('backend:controllers:persona');
 const Joi = router.Joi;
@@ -26,6 +27,7 @@ const querySchema = Joi.object({
   communities: Joi.string().allow(''),
   badges: Joi.string().allow(''),
   expertises: Joi.array(),
+  include_images: Joi.string().allow(''),
   sort: Joi.string().allow(
     'name',
     'dateJoined',
@@ -71,14 +73,6 @@ export default function controller(
       log.debug(`Retrieving personas.`);
 
       try {
-        const populate = [
-          'communities',
-          'fullReviews',
-          'rapidReviews',
-          'requests',
-          'badges',
-          'expertises',
-        ];
         let foundPersonas, count;
         const order = ctx.query.asc
           ? QueryOrder.ASC_NULLS_LAST
@@ -105,6 +99,25 @@ export default function controller(
                   : QueryOrder.ASC_NULLS_LAST,
             };
         }
+        const options = {
+          fields: getFields(
+            'Persona',
+            ctx.query.include_images
+              ? ctx.query.include_images.split(',')
+              : undefined,
+          ),
+          populate: [
+            'communities',
+            'fullReviews',
+            'rapidReviews',
+            'requests',
+            'badges',
+            'expertises',
+          ],
+          orderBy: orderBy,
+          limit: ctx.query.limit,
+          offset: ctx.query.offset,
+        };
         let queries = [];
         if (ctx.query.search && ctx.query.search !== '') {
           const connection = personasModel.em.getConnection();
@@ -156,18 +169,10 @@ export default function controller(
           log.debug('Querying personas:', query);
           [foundPersonas, count] = await personasModel.findAndCount(
             query,
-            populate,
-            orderBy,
-            ctx.query.limit,
-            ctx.query.offset,
+            options,
           );
         } else {
-          foundPersonas = await personasModel.findAll(
-            populate,
-            orderBy,
-            ctx.query.limit,
-            ctx.query.offset,
-          );
+          foundPersonas = await personasModel.findAll(options);
           count = await personasModel.count();
         }
         if (foundPersonas) {
@@ -194,15 +199,24 @@ export default function controller(
       let persona;
 
       try {
-        persona = await personasModel.findOne({ uuid: ctx.params.id }, [
-          'requests',
-          'fullReviews.preprint',
-          'rapidReviews.preprint',
-          'requests.preprint',
-          'badges',
-          'expertises',
-          'communities',
-        ]);
+        const options = {
+          fields: getFields(
+            'Persona',
+            ctx.query.include_images
+              ? ctx.query.include_images.split(',')
+              : undefined,
+          ),
+          populate: [
+            'requests',
+            'fullReviews.preprint',
+            'rapidReviews.preprint',
+            'requests.preprint',
+            'badges',
+            'expertises',
+            'communities',
+          ],
+        };
+        persona = await personasModel.findOne({ uuid: ctx.params.id }, options);
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse schema: ${err}`);

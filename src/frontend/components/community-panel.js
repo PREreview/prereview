@@ -97,7 +97,11 @@ const CommunityPanel = () => {
     data: communityData,
     loadingCommunity,
     errorCommunity,
-  } = useGetCommunity({ id: id, resolve: community => community.data[0] });
+  } = useGetCommunity({
+    id: id,
+    resolve: community => community.data[0],
+    queryParams: { include_images: 'avatar,banner' },
+  });
 
   // update community info
   // delete member from community

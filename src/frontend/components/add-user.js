@@ -51,7 +51,11 @@ const AddUsers = ({ community, isModerator, addUser }) => {
 
   /* API calls */
   // fetch users from API
-  const { data: usersData, loading } = useGetPersonas();
+  const { data: usersData, loading } = useGetPersonas({
+    queryParams: {
+      include_images: 'avatar',
+    },
+  });
 
   // getModalStyle is not a pure function, we roll the style only on the first render
   const [open, setOpen] = useState(false);

@@ -258,6 +258,9 @@ function PersonasTab() {
 
   const { data, loading } = useGetPersonas({
     resolve: res => res.data,
+    queryParams: {
+      include_images: 'avatar',
+    },
   });
 
   // generated hooks don't allow dynamic path params

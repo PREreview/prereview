@@ -60,7 +60,11 @@ const AddAuthors = ({ isMentor, reviewId, members, membersLimit = 5 }) => {
   const classes = useStyles();
 
   // fetch users from API
-  const { data: users, loading: loading } = useGetPersonas();
+  const { data: users, loading: loading } = useGetPersonas({
+    queryParams: {
+      include_images: 'avatar',
+    },
+  });
 
   // getModalStyle is not a pure function, we roll the style only on the first render
   const [open, setOpen] = useState(false);
