@@ -266,10 +266,6 @@ function PersonasTab() {
   //   path: ({ id }) => `/personas/${id}`,
   // });
 
-  const handleBadgeChange = (event, row) => {
-    setSelectedBadges(event.target.value);
-  };
-
   const handleRemove = async row => {
     setPersonas(personas.filter(persona => persona.uuid !== row.uuid));
     await fetch(`/api/v2/personas/${row.uuid}`, {
@@ -317,32 +313,34 @@ function PersonasTab() {
       title: 'Badges',
       field: 'badges',
       lookup: badges,
-      editComponent: row => (
-        <>
-          <InputLabel id="badges-select-label">Badges</InputLabel>
-          <Select
-            labelId="badges-select-label"
-            id="badges-select"
-            multiple
-            value={selectedBadges}
-            onChange={e => handleBadgeChange(e, row)}
-            input={<Input id="badges-select-chip" />}
-            renderValue={selected => (
-              <div>
-                {selected.map(value => (
-                  <Chip key={value.uuid} label={value.name} />
-                ))}
-              </div>
-            )}
-          >
-            {badgesData.map(badge => (
-              <MenuItem key={badge.uuid} value={badge}>
-                {badge.name}
-              </MenuItem>
-            ))}
-          </Select>
-        </>
-      ),
+      editComponent: props => {
+        return (
+          <FormControl>
+            <Select
+              labelId="badges-select-label"
+              id="badges-select"
+              multiple
+              value={!props.value ? [] : props.value}
+              onChange={e => props.onChange(e.target.value)}
+              input={<Input id="badges-select-chip" />}
+              renderValue={selected => (
+                <div>
+                  {selected.map(value => (
+                    <Chip key={value.uuid} label={value.name} />
+                  ))}
+                </div>
+              )}
+            >
+              {badgesData.map(badge => (
+                <MenuItem key={badge.uuid} value={badge}>
+                  {badge.name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        );
+      },
+
       render: row => (
         <>
           {row.badges
@@ -381,7 +379,7 @@ function PersonasTab() {
           onRowDelete: row => handleRemove(row),
           onRowUpdate: newData =>
             update(
-              { badges: selectedBadges },
+              { badges: newData.badges },
               { pathParams: { id: newData.uuid } },
             ),
         }}

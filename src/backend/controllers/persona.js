@@ -197,6 +197,11 @@ export default function controller(
   });
 
   personaRouter.route({
+    meta: {
+      swagger: {
+        operationId: 'DeletePersonas',
+      },
+    },
     method: 'DELETE',
     path: '/personas/:id',
     pre: thisUser.can('access admin pages'),
