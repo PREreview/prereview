@@ -71,20 +71,9 @@ export default function controller(rapidReviews, preprints, thisUser) {
           query = queries[0];
         }
         log.debug('Querying rapid reviews:', query);
-        [data, count] = await rapidReviews.findAndCount(
-          query,
-          ['author', 'preprint'],
-          { createdAt: order },
-          ctx.query.limit,
-          ctx.query.offset,
-        );
+        [data, count] = await rapidReviews.findAndCount(query, options);
       } else {
-        data = await rapidReviews.findAll(
-          ['author', 'preprint'],
-          { createdAt: order },
-          ctx.query.limit,
-          ctx.query.offset,
-        );
+        data = await rapidReviews.findAll(options);
         count = await rapidReviews.count();
       }
     } catch (err) {
