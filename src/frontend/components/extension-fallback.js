@@ -264,7 +264,11 @@ export default function ExtensionFallback() {
             <div className={classes.toolbar} />
             <object
               key={pdfUrl}
-              data={pdfUrl && preprint.contentEncoding == 'application/pdf'}
+              data={
+                pdfUrl && preprint.contentEncoding === 'application/pdf'
+                  ? pdfUrl
+                  : ''
+              }
               className={classes.object}
               // type="application/pdf" commented out as it seems to break pdf loading in safari
               // typemustmatch="true" commented out as it doesn't seem to be currently supported by react
