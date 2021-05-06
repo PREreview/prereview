@@ -164,10 +164,12 @@ const Search = ({
     defaultValue: [],
     multiple: true,
     options: users,
-    getOptionLabel: option =>
-      option.defaultPersona
+    getOptionLabel: option => {
+      const label = option.defaultPersona
         ? option.defaultPersona.name || option.defaultPersona.orcid
-        : option.name || option.orcid,
+        : option.name || option.orcid;
+      return label ? label : 'Unknown';
+    },
   });
 
   const [disabledSubmit, setDisabledSubmit] = useState(true);
@@ -190,8 +192,8 @@ const Search = ({
             }
             throw new Error(response.message);
           })
-          .then(result => {
-            handleClose(result.data);
+          .then(() => {
+            handleClose(user);
             alert('Moderator(s) successfully added to community.');
             return;
           })
@@ -252,7 +254,7 @@ const Search = ({
               <Tag
                 key={`tag-${index}`}
                 label={
-                  option.defaultPersona
+                  option.defaultPersona && option.defaultPersona.name
                     ? option.defaultPersona.name
                     : option.name
                     ? option.name
@@ -273,7 +275,7 @@ const Search = ({
                 {...getOptionProps({ option, index })}
               >
                 <span>
-                  {option.defaultPersona
+                  {option.defaultPersona && option.defaultPersona.name
                     ? option.defaultPersona.name
                     : option.name
                     ? option.name

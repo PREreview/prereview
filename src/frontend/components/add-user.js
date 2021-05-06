@@ -48,14 +48,13 @@ const useStyles = makeStyles(theme => ({
 const AddUsers = ({ community, isModerator, addUser }) => {
   const classes = useStyles();
 
-  const [users, setUsers] = useState(null);
-
   /* API calls */
   // fetch users from API
-  const { data: usersData, loading } = useGetPersonas({
-    queryParams: {
-      include_images: 'avatar',
-    },
+  const { data: users, loading, error } = useGetPersonas({
+    resolve: res =>
+      res.data.filter(
+        value => !community.members.some(member => member.uuid === value.uuid),
+      ),
   });
 
   // getModalStyle is not a pure function, we roll the style only on the first render
@@ -70,17 +69,9 @@ const AddUsers = ({ community, isModerator, addUser }) => {
     setOpen(false);
   };
 
-  useEffect(() => {
-    if (!loading) {
-      if (usersData) {
-        setUsers(usersData.data);
-      }
-    }
-  }, [usersData, loading]);
-
   if (loading) {
     return <CircularProgress className={classes.spinning} />;
-  } else if (personasError) {
+  } else if (error) {
     return <NotFound />;
   } else {
     return (

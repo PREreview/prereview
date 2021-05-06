@@ -34,6 +34,10 @@ export class Event extends BaseEntity {
   @Property({ columnType: 'text', nullable: true })
   description?: string;
 
+  @Fixture(faker => faker.internet.url())
+  @Property({ columnType: 'text', nullable: true })
+  url?: string;
+
   @ManyToOne({ entity: () => Community, nullable: true })
   community?: Community;
 

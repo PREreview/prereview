@@ -218,6 +218,7 @@ export default function Community(props) {
   const params = processParams(location.search);
   const [user] = useContext(UserProvider.context);
   const [loginModalOpenNext, setLoginModalOpenNext] = useState(null);
+  const [isOwner, setIsOwner] = useState(false);
 
   const { id } = props && props.id ? props : useParams();
   const { data: community, loading, error } = useGetCommunity({
@@ -237,23 +238,32 @@ export default function Community(props) {
     id: id,
   });
 
-   const { mutate: joinRequest } = usePostCommunityRequest({
-     id: community ? community.uuid : '',
-   });
+  const { mutate: joinRequest } = usePostCommunityRequest({
+    id: community ? community.uuid : '',
+  });
 
   const handleJoinRequest = () => {
     user
-      ? joinRequest().then( () => {
-            alert(
-              `Thanks for your request to join ${
-                community.name
-              }! The owners have been notified of your request.`,
-            );
-          }
-        
-          )
+      ? joinRequest().then(() => {
+          alert(
+            `Thanks for your request to join ${
+              community.name
+            }! The owners have been notified of your request.`,
+          );
+        })
       : setLoginModalOpenNext(location.pathname);
-  }
+  };
+
+  useEffect(() => {
+    if (!loading && user) {
+      setIsOwner(
+        user.isAdmin ||
+          community.owners.some(owner =>
+            user.personas.some(persona => persona.uuid === owner.uuid),
+          ),
+      );
+    }
+  }, [community]);
 
   if (loading) {
     return <Loading />;
@@ -283,11 +293,7 @@ export default function Community(props) {
           <Box bgcolor="rgba(229, 229, 229, 0.35)">
             <Container>
               <Box p={4}>
-                {(user &&
-                  community.owners.some(owner =>
-                    user.personas.some(persona => persona.uuid === owner.uuid),
-                  )) ||
-                (user && user.isAdmin) ? (
+                {isOwner ? (
                   <IconButton
                     href={`/community-settings/${community.uuid}`}
                     className={classes.settings}
@@ -429,11 +435,20 @@ function CommunityHeader({
             </Typography>
             {twitter && (
               <Typography component="div" variant="body1">
-                <Link href={`https://twitter.com/${twitter}`}>
-                  <TwitterIcon />
-                  {twitter.charAt(0) !== '@' ? '@' : ''}
-                  {twitter}
-                </Link>
+                {twitter.charAt(0) === '#' ? (
+                  <Link
+                    href={`https://twitter.com/hashtag/${twitter.slice(1)}`}
+                  >
+                    <TwitterIcon />
+                    {twitter}
+                  </Link>
+                ) : (
+                  <Link href={`https://twitter.com/${twitter}`}>
+                    <TwitterIcon />
+                    {twitter.charAt(0) !== '@' ? '@' : ''}
+                    {twitter}
+                  </Link>
+                )}
               </Typography>
             )}
           </Box>
