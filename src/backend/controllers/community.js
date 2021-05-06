@@ -13,7 +13,7 @@ const communitySchema = Joi.object({
   slug: Joi.string(),
   description: Joi.string(),
   banner: Joi.string(),
-  twitter: Joi.string().regex(/^[a-zA-Z0-9_]{1,15}$/),
+  twitter: Joi.string().regex(/^#?[a-zA-Z0-9_]{1,15}$/),
 });
 
 const tagSchema = Joi.object({
@@ -27,6 +27,7 @@ const eventSchema = Joi.object({
   end: Joi.date(),
   isPrivate: Joi.boolean(),
   description: Joi.string(),
+  url: Joi.string().uri(),
 });
 
 const querySchema = Joi.object({
@@ -166,13 +167,7 @@ export default function controller(
               ? ctx.query.include_images.split(',')
               : undefined,
           ),
-          populate: [
-            'members',
-            'preprints',
-            'owners.defaultPersona',
-            'tags',
-            'events',
-          ],
+          populate: ['members', 'preprints', 'owners.defaultPersona', 'tags'],
           orderBy: orderBy,
           limit: ctx.query.limit,
           offset: ctx.query.offset,
@@ -310,6 +305,19 @@ export default function controller(
           }
           return acc;
         }, []);
+
+      const user = await thisUser.getUser(ctx);
+      if (
+        !user ||
+        !(
+          (await thisUser.isMemberOfCommunity(community.uuid, user.orcid)) ||
+          (await thisUser.isMemberOf('admins', user.orcid))
+        )
+      ) {
+        community.events = await community.events
+          .getItems()
+          .filter(event => !event.isPrivate);
+      }
 
       ctx.body = {
         status: 200,
@@ -619,7 +627,9 @@ export default function controller(
       let community, user;
 
       try {
-        community = await communityModel.findOne({ uuid: ctx.params.id });
+        community = await communityModel.findOne({ uuid: ctx.params.id }, [
+          'owners',
+        ]);
         user = await userModel.findOneByPersona(ctx.params.uid);
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
@@ -637,8 +647,10 @@ export default function controller(
             user.uuid
           } to community.`,
         );
-        community.owners.add(user);
-        await communityModel.persistAndFlush(community);
+        if (!community.owners.contains(user)) {
+          community.owners.add(user);
+          await communityModel.persistAndFlush(community);
+        }
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to add user to community: ${err}`);
@@ -801,7 +813,6 @@ export default function controller(
     pre: thisUser.can('edit this community'),
     handler: async ctx => {
       if (ctx.invalid) {
-        console.log('***invalid!***');
         handleInvalid(ctx);
         return;
       }

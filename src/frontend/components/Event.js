@@ -16,9 +16,9 @@ import Loading from './loading';
 import NotFound from './not-found';
 
 // Material-ui components
-import { makeStyles } from '@material-ui/core/styles';
 import Box from '@material-ui/core/Box';
 import Container from '@material-ui/core/Container';
+import Link from '@material-ui/core/Link';
 import Typography from '@material-ui/core/Typography';
 
 // constants
@@ -73,6 +73,11 @@ const Event = () => {
                   }).format(Date.parse(evt.start))
                 : ''}
             </Typography>
+            {evt && evt.url && (
+              <Typography variant="body1" component="div">
+                <Link href={evt.url}>{evt.url}</Link>
+              </Typography>
+            )}
             <Typography variant="body1" component="div">
               {evt ? evt.description : ''}
             </Typography>

@@ -1,6 +1,7 @@
 import router from 'koa-joi-router';
 import { QueryOrder } from '@mikro-orm/core';
 import { getLogger } from '../log.js';
+import { getFields } from '../utils/getFields.ts';
 
 const log = getLogger('backend:controllers:rapidReview');
 const Joi = router.Joi;
@@ -14,6 +15,7 @@ const querySchema = Joi.object({
     .greater(-1),
   asc: Joi.boolean(),
   is_published: Joi.boolean(),
+  include_images: Joi.string().allow(''),
 });
 
 export default function controller(rapidReviews, preprints, thisUser) {
@@ -47,6 +49,19 @@ export default function controller(rapidReviews, preprints, thisUser) {
       const order = ctx.query.asc
         ? QueryOrder.ASC_NULLS_LAST
         : QueryOrder.DESC_NULLS_LAST;
+
+      const options = {
+        fields: getFields(
+          'RapidReview',
+          ctx.query.include_images
+            ? ctx.query.include_images.split(',')
+            : undefined,
+        ),
+        populate: ['author', 'preprint'],
+        orderBy: { updatedAt: order },
+        limit: ctx.query.limit,
+        offset: ctx.query.offset,
+      };
 
       if (queries.length > 0) {
         let query;

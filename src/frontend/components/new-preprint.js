@@ -31,7 +31,7 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-export default function NewPreprint({ user, onCancel }) {
+export default function NewPreprint({ user, onCancel, community }) {
   const location = useLocation(); // location.state can be {preprint, tab, isSingleStep} with tab being `request` or `review` (so that we know on which tab the shell should be activated with
   const qs = new URLSearchParams(location.search);
 
@@ -56,6 +56,7 @@ export default function NewPreprint({ user, onCancel }) {
     identifier,
     location.state && location.state.preprint,
     url,
+    community,
   );
 
   return (
