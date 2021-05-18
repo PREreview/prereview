@@ -348,14 +348,15 @@ export default function controller(
       let persona;
 
       try {
-        persona = await personasModel.findOne({ uuid: ctx.params.id });
+        persona = await personasModel.findOne({ uuid: ctx.params.id }, [
+          'badges',
+        ]);
         if (!persona) {
           ctx.throw(
             404,
             `That persona with ID ${ctx.params.id} does not exist.`,
           );
         }
-        log.debug('ctx.request.body:', ctx.request.body);
         const expertises = ctx.request.body.expertises || [];
         const newExpertises = [];
         if (expertises.length > 0) {
@@ -365,20 +366,23 @@ export default function controller(
             newExpertises.push(exp);
           }
         }
-        log.debug('newExpertises:', newExpertises);
+
         if (newExpertises.length) {
           persona.expertises.set(newExpertises);
           delete ctx.request.body.expertises;
-          log.debug('persona:', persona);
         }
 
         const badges = ctx.request.body.badges || [];
         if (badges.length > 0) {
           for (let bdg of badges) {
-            log.debug('bdg', bdg, '*********', bdg.uuid);
-            const badge = await badgesModel.findOneOrFail({ uuid: bdg.uuid });
-            badge.personas.add(persona);
-            persona.badges.add(badge);
+            const badge = await badgesModel.findOneOrFail({ uuid: bdg.uuid }, [
+              'personas',
+            ]);
+            !badge.personas.contains(persona)
+              ? badge.personas.add(persona)
+              : null;
+            !persona.badges.contains(badge) ? persona.badges.add(badge) : null;
+            await badgesModel.persistAndFlush(badge);
           }
         }
         delete ctx.request.body.badges;
