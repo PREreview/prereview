@@ -205,6 +205,7 @@ export default function controller(preprints, thisUser) {
             ctx.query.include_images
               ? ctx.query.include_images.split(',')
               : undefined,
+            3,
           ),
           populate: [
             'communities',
@@ -353,6 +354,7 @@ export default function controller(preprints, thisUser) {
             ctx.query.include_images
               ? ctx.query.include_images.split(',')
               : undefined,
+            3,
           ),
           populate: [
             'communities',
