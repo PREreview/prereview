@@ -182,6 +182,7 @@ export default function controller(
         if (foundPersonas) {
           personasWithAvatar = foundPersonas.map(persona => {
             if (persona.avatar && Buffer.isBuffer(persona.avatar)) {
+              // eslint-disable-next-line no-unused-vars
               const { id, ...personaRest } = persona;
               return { ...personaRest, avatar: persona.avatar.toString() };
             } else {
