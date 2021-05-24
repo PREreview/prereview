@@ -14,6 +14,7 @@ const communitySchema = Joi.object({
   slug: Joi.string(),
   description: Joi.string(),
   banner: Joi.string(),
+  owners: Joi.array().allow(''),
   twitter: Joi.string().regex(/^#?[a-zA-Z0-9_]{1,15}$/),
 });
 

@@ -25,7 +25,7 @@ const querySchema = Joi.object({
   asc: Joi.boolean(),
   search: Joi.string().allow(''),
   communities: Joi.string().allow(''),
-  badges: Joi.array().allow(''),
+  badges: Joi.string().allow(''),
   expertises: Joi.array(),
   include_images: Joi.string().allow(''),
   sort: Joi.string().allow(
@@ -118,6 +118,7 @@ export default function controller(
           limit: ctx.query.limit,
           offset: ctx.query.offset,
         };
+        console.log('***options***:', options);
         let queries = [];
         if (ctx.query.search && ctx.query.search !== '') {
           const connection = personasModel.em.getConnection();
@@ -181,7 +182,8 @@ export default function controller(
         if (foundPersonas) {
           personasWithAvatar = foundPersonas.map(persona => {
             if (persona.avatar && Buffer.isBuffer(persona.avatar)) {
-              return { ...persona, avatar: persona.avatar.toString() };
+              const { id, ...personaRest } = persona;
+              return { ...personaRest, avatar: persona.avatar.toString() };
             } else {
               return persona;
             }
@@ -327,8 +329,10 @@ export default function controller(
         avatar: Joi.string(),
         bio: Joi.string().allow(''),
         badges: Joi.array().allow(''),
-        expertises: Joi.array(),
+        //expertises: Joi.array().allow(''),
         isLocked: Joi.boolean(),
+      }).options({
+        stripUnknown: true,
       }),
       type: 'json',
       params: {
@@ -361,7 +365,7 @@ export default function controller(
         const newExpertises = [];
         if (expertises.length > 0) {
           for (let p of expertises) {
-            const exp = await expertisesModel.findOneOrFail({ uuid: p });
+            const exp = await expertisesModel.findOneOrFail({ uuid: p.uuid });
             exp.personas.add(persona);
             newExpertises.push(exp);
           }

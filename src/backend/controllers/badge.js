@@ -157,7 +157,7 @@ export default function controller(badgeModel, thisUser) {
       let badge;
 
       try {
-        badge = await badgeModel.findOne({ name: ctx.params.id });
+        badge = await badgeModel.findOne({ uuid: ctx.params.id });
         if (!badge) {
           ctx.throw(404, `Badge with ID ${ctx.params.id} doesn't exist`);
         }
