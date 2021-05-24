@@ -32,7 +32,12 @@ import AppBar from '@material-ui/core/AppBar';
 import Avatar from '@material-ui/core/Avatar';
 import AvatarGroup from '@material-ui/lab/AvatarGroup';
 import Box from '@material-ui/core/Box';
+import Chip from '@material-ui/core/Chip';
+import FormControl from '@material-ui/core/FormControl';
+import Input from '@material-ui/core/Input';
 import Link from '@material-ui/core/Link';
+import MenuItem from '@material-ui/core/MenuItem';
+import Select from '@material-ui/core/Select';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 
@@ -158,8 +163,9 @@ function UsersTab() {
   const columns = [
     { title: 'UUID', field: 'uuid', hidden: true },
     {
-      title: 'ORCiD',
+      title: 'ORCID',
       field: 'orcid',
+      editable: false,
       render: row => (
         <Link
           href={`https://orcid.org/${row.orcid}`}
@@ -186,6 +192,8 @@ function UsersTab() {
     },
   ];
 
+  const [users, setUsers] = useState(null);
+
   const { data, loading } = useGetUsers({
     resolve: res => res.data,
   });
@@ -201,6 +209,49 @@ function UsersTab() {
     path: ({ id }) => `/users/${id}`,
   });
 
+  const { mutate: create } = useMutate({
+    verb: 'POST',
+    path: '/users',
+  });
+
+  const handleUpdate = async userToUpdate => {
+    try {
+      await update(userToUpdate, {
+        pathParams: { id: userToUpdate.uuid },
+      });
+    } catch (err) {
+      alert(`Failed to update user: ${err.message}`);
+    }
+    setUsers([
+      ...users.filter(user => user.uuid !== userToUpdate.uuid),
+      userToUpdate,
+    ]);
+  };
+
+  const handleRemove = async userToDelete => {
+    try {
+      await remove({}, { pathParams: { id: userToDelete.uuid } });
+    } catch (err) {
+      alert(`Failed to delete user: ${err.message}`);
+    }
+    setUsers(users.filter(user => user.uuid !== userToDelete.uuid));
+  };
+
+  const handleCreate = async userToCreate => {
+    try {
+      await create(userToCreate);
+    } catch (err) {
+      alert(`Failed to create user: ${err.message}`);
+    }
+    setUsers([...users, userToCreate]);
+  };
+
+  useEffect(() => {
+    if (!loading && data) {
+      setUsers(data);
+    }
+  }, [data]);
+
   if (loading) {
     return <Loading />;
   } else {
@@ -208,11 +259,11 @@ function UsersTab() {
       <MaterialTable
         title="Users"
         columns={columns}
-        data={data}
+        data={users}
         editable={{
-          onRowUpdate: newData =>
-            update(newData, { pathParams: { id: newData.uuid } }),
-          onRowDelete: newData => remove({ pathParams: { id: newData.uuid } }),
+          onRowUpdate: data => handleUpdate(data),
+          onRowDelete: data => handleRemove(data),
+          onRowAdd: data => handleCreate(data),
         }}
       />
     );
@@ -225,6 +276,7 @@ function PersonasTab() {
     {
       title: 'Avatar',
       field: 'avatar',
+      editable: false,
       render: row => (
         <Link href={`/about/${row.uuid}`} target="_blank" rel="noopener">
           <Avatar src={row.avatar} alt={row.name} />
@@ -234,10 +286,56 @@ function PersonasTab() {
     {
       title: 'Name',
       field: 'name',
+      editable: 'never',
       render: row => (
         <Link href={`/about/${row.uuid}`} target="_blank" rel="noopener">
           {row.name}
         </Link>
+      ),
+    },
+    {
+      title: 'Badges',
+      field: 'badges',
+      lookup: badges,
+      editComponent: props => {
+        console.log('***props.value***:', props.value);
+        return (
+          <FormControl>
+            <Select
+              labelId="badges-select-label"
+              id="badges-select"
+              multiple
+              value={props.value ? props.value : []}
+              onChange={e => props.onChange(e.target.value)}
+              input={<Input id="badges-select-chip" />}
+              renderValue={selected => {
+                console.log('***selected***:', selected);
+                return (
+                  <div>
+                    {selected.map(value => (
+                      <Chip key={value.uuid} label={value.name} />
+                    ))}
+                  </div>
+                );
+              }}
+            >
+              {badgesData.map(badge => (
+                <MenuItem key={badge.uuid} value={badge} name={badge.name}>
+                  {badge.name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        );
+      },
+      render: row => (
+        <>
+          {row.badges
+            ? row.badges.map(badge => (
+                <Chip key={badge.uuid} color="primary" label={badge.name} />
+              ))
+            : null}
+        </>
       ),
     },
     {
@@ -256,11 +354,22 @@ function PersonasTab() {
     },
   ];
 
+  const [badges, setBadges] = useState(null);
+  const [personas, setPersonas] = useState(null);
+
   const { data, loading } = useGetPersonas({
     resolve: res => res.data,
     queryParams: {
       include_images: 'avatar',
     },
+  });
+
+  const { data: badgesData, loading: loadingBadges } = useGetBadges({
+    resolve: res =>
+      res.data.map(badge => {
+        const { personas, ...value } = badge;
+        return value;
+      }),
   });
 
   // generated hooks don't allow dynamic path params
@@ -274,6 +383,59 @@ function PersonasTab() {
     path: ({ id }) => `/personas/${id}`,
   });
 
+  const { mutate: create } = useMutate({
+    verb: 'POST',
+    path: '/personas',
+  });
+
+  const handleUpdate = async personaToUpdate => {
+    try {
+      await update(personaToUpdate, {
+        pathParams: { id: personaToUpdate.uuid },
+      });
+    } catch (err) {
+      alert(`Failed to update persona: ${err.message}`);
+    }
+    setPersonas([
+      ...personas.filter(persona => persona.uuid !== personaToUpdate.uuid),
+      personaToUpdate,
+    ]);
+  };
+
+  const handleRemove = async personaToDelete => {
+    try {
+      await remove({}, { pathParams: { id: personaToDelete.uuid } });
+    } catch (err) {
+      alert(`Failed to delete persona: ${err.message}`);
+    }
+    setPersonas(
+      personas.filter(persona => persona.uuid !== personaToDelete.uuid),
+    );
+  };
+
+  const handleCreate = async personaToCreate => {
+    try {
+      await create(personaToCreate);
+    } catch (err) {
+      alert(`Failed to create persona: ${err.message}`);
+    }
+    setPersonas([...personas, personaToCreate]);
+  };
+
+  useEffect(() => {
+    if (!loadingBadges && badgesData) {
+      const lookup = {};
+      badgesData.map(badge => {
+        lookup[badge.name] = badge.uuid;
+      });
+      setBadges(lookup);
+    }
+
+    if ((!loading, data)) {
+      setPersonas(data);
+    }
+  }, [data, badgesData]);
+
   if (loading) {
     return <Loading />;
   } else {
@@ -281,11 +443,11 @@ function PersonasTab() {
       <MaterialTable
         title="Personas"
         columns={columns}
-        data={data}
+        data={personas}
         editable={{
-          onRowUpdate: newData =>
-            update(newData, { pathParams: { id: newData.uuid } }),
-          onRowDelete: newData => remove({ pathParams: { id: newData.uuid } }),
+          onRowUpdate: data => handleUpdate(data),
+          onRowDelete: data => handleRemove(data),
+          onRowAdd: data => handleCreate(data),
         }}
       />
     );
@@ -324,6 +486,8 @@ function PreprintsTab() {
     },
   ];
 
+  const [preprints, setPreprints] = useState(null);
+
   const { data, loading } = useGetPreprints({
     resolve: res => res.data,
   });
@@ -339,6 +503,51 @@ function PreprintsTab() {
     path: ({ id }) => `/preprints/${id}`,
   });
 
+  const { mutate: create } = useMutate({
+    verb: 'POST',
+    path: '/preprints',
+  });
+
+  const handleUpdate = async preprintToUpdate => {
+    try {
+      await update(preprintToUpdate, {
+        pathParams: { id: preprintToUpdate.uuid },
+      });
+    } catch (err) {
+      alert(`Failed to update preprint: ${err.message}`);
+    }
+    setPreprints([
+      ...preprints.filter(preprint => preprint.uuid !== preprintToUpdate.uuid),
+      preprintToUpdate,
+    ]);
+  };
+
+  const handleRemove = async preprintToDelete => {
+    try {
+      await remove({}, { pathParams: { id: preprintToDelete.uuid } });
+    } catch (err) {
+      alert(`Failed to delete preprint: ${err.message}`);
+    }
+    setPreprints(
+      preprints.filter(preprint => preprint.uuid !== preprintToDelete.uuid),
+    );
+  };
+
+  const handleCreate = async preprintToCreate => {
+    try {
+      await create(preprintToCreate);
+    } catch (err) {
+      alert(`Failed to create preprint: ${err.message}`);
+    }
+    setPreprints([...preprints, preprintToCreate]);
+  };
+
+  useEffect(() => {
+    if (!loading && data) {
+      setPreprints(data);
+    }
+  }, [data]);
+
   if (loading) {
     return <Loading />;
   } else {
@@ -346,11 +555,11 @@ function PreprintsTab() {
       <MaterialTable
         title="Preprints"
         columns={columns}
-        data={data}
+        data={preprints}
         editable={{
-          onRowUpdate: newData =>
-            update(newData, { pathParams: { id: newData.uuid } }),
-          onRowDelete: newData => remove({ pathParams: { id: newData.uuid } }),
+          onRowUpdate: data => handleUpdate(data),
+          onRowDelete: data => handleRemove(data),
+          onRowAdd: data => handleCreate(data),
         }}
       />
     );
@@ -408,6 +617,8 @@ function FullReviewsTab() {
     },
   ];
 
+  const [fulls, setFulls] = useState(null);
+
   const { data, loading } = useGetFullReviews({
     resolve: res => res.data,
   });
@@ -423,6 +634,47 @@ function FullReviewsTab() {
     path: ({ id }) => `/full-reviews/${id}`,
   });
 
+  const { mutate: create } = useMutate({
+    verb: 'POST',
+    path: '/full-reviews',
+  });
+
+  const handleUpdate = async fullToUpdate => {
+    try {
+      await update(fullToUpdate, { pathParams: { id: fullToUpdate.uuid } });
+    } catch (err) {
+      alert(`Failed to update full-review: ${err.message}`);
+    }
+    setFulls([
+      ...fulls.filter(full => full.uuid !== fullToUpdate.uuid),
+      fullToUpdate,
+    ]);
+  };
+
+  const handleRemove = async fullToDelete => {
+    try {
+      await remove({}, { pathParams: { id: fullToDelete.uuid } });
+    } catch (err) {
+      alert(`Failed to delete full-review: ${err.message}`);
+    }
+    setFulls(fulls.filter(full => full.uuid !== fullToDelete.uuid));
+  };
+
+  const handleCreate = async fullToCreate => {
+    try {
+      await create(fullToCreate);
+    } catch (err) {
+      alert(`Failed to create full-review: ${err.message}`);
+    }
+    setFulls([...fulls, fullToCreate]);
+  };
+
+  useEffect(() => {
+    if (!loading && data) {
+      setFulls(data);
+    }
+  }, [data]);
+
   if (loading) {
     return <Loading />;
   } else {
@@ -430,11 +682,11 @@ function FullReviewsTab() {
       <MaterialTable
         title="Full PREreviews"
         columns={columns}
-        data={data}
+        data={fulls}
         editable={{
-          onRowUpdate: newData =>
-            update(newData, { pathParams: { id: newData.uuid } }),
-          onRowDelete: newData => remove({ pathParams: { id: newData.uuid } }),
+          onRowUpdate: data => handleUpdate(data),
+          onRowDelete: data => handleRemove(data),
+          onRowAdd: data => handleCreate(data),
         }}
       />
     );
@@ -482,6 +734,8 @@ function RapidReviewsTab() {
     },
   ];
 
+  const [rapids, setRapids] = useState(null);
+
   const { data, loading } = useGetRapidReviews({
     resolve: res => res.data,
   });
@@ -497,6 +751,47 @@ function RapidReviewsTab() {
     path: ({ id }) => `/rapid-reviews/${id}`,
   });
 
+  const { mutate: create } = useMutate({
+    verb: 'POST',
+    path: '/rapid-reviews',
+  });
+
+  const handleUpdate = async rapidToUpdate => {
+    try {
+      await update(rapidToUpdate, { pathParams: { id: rapidToUpdate.uuid } });
+    } catch (err) {
+      alert(`Failed to update rapid: ${err.message}`);
+    }
+    setRapids([
+      ...rapids.filter(rapid => rapid.uuid !== rapidToUpdate.uuid),
+      rapidToUpdate,
+    ]);
+  };
+
+  const handleRemove = async rapidToDelete => {
+    try {
+      await remove({}, { pathParams: { id: rapidToDelete.uuid } });
+    } catch (err) {
+      alert(`Failed to delete rapid: ${err.message}`);
+    }
+    setRapids(rapids.filter(rapid => rapid.uuid !== rapidToDelete.uuid));
+  };
+
+  const handleCreate = async rapidToCreate => {
+    try {
+      await create(rapidToCreate);
+    } catch (err) {
+      alert(`Failed to create rapid: ${err.message}`);
+    }
+    setRapids([...rapids, rapidToCreate]);
+  };
+
+  useEffect(() => {
+    if (!loading && data) {
+      setRapids(data);
+    }
+  }, [data]);
+
   if (loading) {
     return <Loading />;
   } else {
@@ -504,11 +799,11 @@ function RapidReviewsTab() {
       <MaterialTable
         title="Rapid PREreviews"
         columns={columns}
-        data={data}
+        data={rapids}
         editable={{
-          onRowUpdate: newData =>
-            update(newData, { pathParams: { id: newData.uuid } }),
-          onRowDelete: newData => remove({ pathParams: { id: newData.uuid } }),
+          onRowUpdate: data => handleUpdate(data),
+          onRowDelete: data => handleRemove(data),
+          onRowAdd: data => handleCreate(data),
         }}
       />
     );
@@ -516,44 +811,6 @@ function RapidReviewsTab() {
 }
 
 function CommunitiesTab() {
-  const [users, setUsers] = useState(null);
-
-  const { data, loading } = useGetCommunities({
-    resolve: res => res.data,
-  });
-
-  const { data: usersData, loading: loadingUsers } = useGetUsers({
-    resolve: res => res.data,
-  });
-
-  // generated hooks don't allow dynamic path params
-  const { mutate: update } = useMutate({
-    verb: 'PUT',
-    path: ({ id }) => `/communities/${id}`,
-  });
-
-  const { mutate: remove } = useMutate({
-    verb: 'DELETE',
-    path: ({ id }) => `/communities/${id}`,
-  });
-
-  const { mutate: create } = useMutate({
-    verb: 'POST',
-    path: '/communities',
-  });
-
-  useEffect(() => {
-    if (!loadingUsers && usersData) {
-      const lookup = {};
-      usersData.map(user => {
-        user.defaultPersona
-          ? (lookup[user.defaultPersona.uuid] = user.defaultPersona.name)
-          : (lookup[user.uuid] = user.name);
-      });
-      setUsers(lookup);
-    }
-  }, [usersData]);
-
   const columns = [
     { title: 'UUID', field: 'uuid', hidden: true },
     {
@@ -580,17 +837,18 @@ function CommunitiesTab() {
       lookup: users,
       render: row => (
         <AvatarGroup max={5}>
-          {row.owners &&
-            row.owners.map(owner => (
-              <Link
-                key={owner.uuid}
-                href={`/about/${owner.uuid}`}
-                target="_blank"
-                rel="noopener"
-              >
-                <Avatar src={owner.avatar} alt={owner.name} />
-              </Link>
-            ))}
+          {row.owners && Array.isArray(row.owners)
+            ? row.owners.map(owner => (
+                <Link
+                  key={owner.uuid}
+                  href={`/about/${owner.uuid}`}
+                  target="_blank"
+                  rel="noopener"
+                >
+                  <Avatar src={owner.avatar} alt={owner.name} />
+                </Link>
+              ))
+            : null}
         </AvatarGroup>
       ),
     },
@@ -610,6 +868,111 @@ function CommunitiesTab() {
     },
   ];
 
+  const [users, setUsers] = useState(null);
+  const [communities, setCommunities] = useState(null);
+
+  const { data: communitiesData, loading } = useGetCommunities({
+    resolve: res => res.data,
+  });
+
+  const { data: usersData, loading: loadingUsers } = useGetUsers({
+    resolve: res => res.data,
+  });
+
+  // generated hooks don't allow dynamic path params
+  const { mutate: update } = useMutate({
+    verb: 'PUT',
+    path: ({ id }) => `/communities/${id}`,
+  });
+
+  const { mutate: remove } = useMutate({
+    verb: 'DELETE',
+    path: ({ id }) => `/communities/${id}`,
+  });
+
+  const { mutate: create } = useMutate({
+    verb: 'POST',
+    path: '/communities',
+  });
+
+  const handleUpdate = async communityToUpdate => {
+    try {
+      await update(communityToUpdate, {
+        pathParams: { id: communityToUpdate.uuid },
+      });
+    } catch (err) {
+      alert(`Failed to update community: ${err.message}`);
+    }
+    setCommunities(
+      communitiesData.map(comm =>
+        comm.uuid === communityToUpdate.uuid
+          ? { ...communityToUpdate, owners: processOwners(communityToUpdate) }
+          : comm,
+      ),
+    );
+  };
+
+  const handleRemove = async communityToDelete => {
+    try {
+      await remove({}, { pathParams: { id: communityToDelete.uuid } });
+    } catch (err) {
+      alert(`Failed to delete community: ${err.message}`);
+    }
+    setCommunities(
+      communities.filter(
+        community => community.uuid !== communityToDelete.uuid,
+      ),
+    );
+  };
+
+  const handleCreate = async communityToCreate => {
+    try {
+      await create({
+        ...communityToCreate,
+        owners: processOwners(communityToCreate),
+      });
+    } catch (err) {
+      alert(`Failed to create community: ${err.message}`);
+    }
+    setCommunities([...communities, communityToCreate]);
+  };
+
+  useEffect(() => {
+    if (!loadingUsers && usersData) {
+      const lookup = {};
+      // the key of the lookup object here needs to be the user uuid
+      // because on the backend, community owners are User entities
+      usersData.map(user => {
+        user.defaultPersona
+          ? (lookup[user.uuid] = user.defaultPersona.name)
+          : (lookup[user.uuid] = user.orcid);
+      });
+      // some names will be the user's ORCID if using seed data,
+      // because some seed users dont have default personas
+      setUsers(lookup);
+    }
+
+    if (!loading && communitiesData) {
+      setCommunities(communitiesData);
+    }
+  }, [usersData, communitiesData]);
+
+  // workaround for the different data types
+  const processOwners = newData => {
+    if (!newData.owners) return [];
+    // on the frontend, sometimes the owner of a community is in the shape of a user object,
+    // in which case we only need to send back the object's uuid
+    if (
+      newData.owners &&
+      Array.isArray(newData.owners) &&
+      newData.owners[0].uuid
+    )
+      return [newData.owners.uuid];
+    // sometimes the owners array is already just a uuid string, so we just return that
+    if (newData.owners && Array.isArray(newData.owners)) return newData.owners;
+    return [newData.owners];
+  };
+
   if (loading || loadingUsers) {
     return <Loading />;
   } else {
@@ -617,12 +980,11 @@ function CommunitiesTab() {
       <MaterialTable
         title="Communities"
         columns={columns}
-        data={data}
+        data={communities}
         editable={{
-          onRowUpdate: newData =>
-            update(newData, { pathParams: { id: newData.uuid } }),
-          onRowDelete: newData => remove({ pathParams: { id: newData.uuid } }),
-          onRowAdd: newData => create(newData),
+          onRowUpdate: data => handleUpdate(data),
+          onRowDelete: data => handleRemove(data),
+          onRowAdd: data => handleCreate(data),
         }}
       />
     );
@@ -662,6 +1024,8 @@ function BadgesTab() {
     },
   ];
 
+  const [badges, setBadges] = useState(null);
+
   const { data, loading } = useGetBadges({
     resolve: res => res.data,
   });
@@ -682,6 +1046,42 @@ function BadgesTab() {
     path: '/badges',
   });
 
+  const handleUpdate = async badgeToUpdate => {
+    try {
+      await update(badgeToUpdate, { pathParams: { id: badgeToUpdate.uuid } });
+    } catch (err) {
+      alert(`Failed to update badge: ${err.message}`);
+    }
+    setBadges([
+      ...badges.filter(badge => badge.uuid !== badgeToUpdate.uuid),
+      badgeToUpdate,
+    ]);
+  };
+
+  const handleRemove = async badgeToDelete => {
+    try {
+      await remove({}, { pathParams: { id: badgeToDelete.uuid } });
+    } catch (err) {
+      alert(`Failed to delete badge: ${err.message}`);
+    }
+    setBadges(badges.filter(badge => badge.uuid !== badgeToDelete.uuid));
+  };
+
+  const handleCreate = async badgeToCreate => {
+    try {
+      await create(badgeToCreate);
+    } catch (err) {
+      alert(`Failed to create badge: ${err.message}`);
+    }
+    setBadges([...badges, badgeToCreate]);
+  };
+
+  useEffect(() => {
+    if (!loading && data) {
+      setBadges(data);
+    }
+  }, [data]);
+
   if (loading) {
     return <Loading />;
   } else {
@@ -689,12 +1089,11 @@ function BadgesTab() {
       <MaterialTable
         title="Badges"
         columns={columns}
-        data={data}
+        data={badges}
         editable={{
-          onRowUpdate: newData =>
-            update(newData, { pathParams: { id: newData.uuid } }),
-          onRowDelete: newData => remove({ pathParams: { id: newData.uuid } }),
-          onRowAdd: newData => create(newData),
+          onRowUpdate: data => handleUpdate(data),
+          onRowDelete: data => handleRemove(data),
+          onRowAdd: data => handleCreate(data),
         }}
       />
     );
@@ -730,6 +1129,8 @@ function TagsTab() {
     },
   ];
 
+  const [tags, setTags] = useState(null);
+
   const { data, loading } = useGetTags({
     resolve: res => res.data,
   });
@@ -750,6 +1151,42 @@ function TagsTab() {
     path: '/tags',
   });
 
+  const handleUpdate = async tagToUpdate => {
+    try {
+      await update(tagToUpdate, { pathParams: { id: tagToUpdate.uuid } });
+    } catch (err) {
+      alert(`Failed to update tag: ${err.message}`);
+    }
+    setTags([
+      ...tags.filter(tag => tag.uuid !== tagToUpdate.uuid),
+      tagToUpdate,
+    ]);
+  };
+
+  const handleRemove = async tagToDelete => {
+    try {
+      await remove({}, { pathParams: { id: tagToDelete.uuid } });
+    } catch (err) {
+      alert(`Failed to delete tag: ${err.message}`);
+    }
+    setTags(tags.filter(tag => tag.uuid !== tagToDelete.uuid));
+  };
+
+  const handleCreate = async tagToCreate => {
+    try {
+      await create(tagToCreate);
+    } catch (err) {
+      alert(`Failed to create tag: ${err.message}`);
+    }
+    setTags([...tags, tagToCreate]);
+  };
+
+  useEffect(() => {
+    if (!loading && data) {
+      setTags(data);
+    }
+  }, [data]);
+
   if (loading) {
     return <Loading />;
   } else {
@@ -757,12 +1194,11 @@ function TagsTab() {
       <MaterialTable
         title="Tags"
         columns={columns}
-        data={data}
+        data={tags}
         editable={{
-          onRowUpdate: newData =>
-            update(newData, { pathParams: { id: newData.uuid } }),
-          onRowDelete: newData => remove({ pathParams: { id: newData.uuid } }),
-          onRowAdd: newData => create(newData),
+          onRowUpdate: data => handleUpdate(data),
+          onRowDelete: data => handleRemove(data),
+          onRowAdd: data => handleCreate(data),
         }}
       />
     );

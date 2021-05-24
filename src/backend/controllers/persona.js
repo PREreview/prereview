@@ -118,6 +118,7 @@ export default function controller(
           limit: ctx.query.limit,
           offset: ctx.query.offset,
         };
+        console.log('***options***:', options);
         let queries = [];
         if (ctx.query.search && ctx.query.search !== '') {
           const connection = personasModel.em.getConnection();
@@ -175,18 +176,60 @@ export default function controller(
           foundPersonas = await personasModel.findAll(options);
           count = await personasModel.count();
         }
+
+        let personasWithAvatar;
+
         if (foundPersonas) {
+          personasWithAvatar = foundPersonas.map(persona => {
+            if (persona.avatar && Buffer.isBuffer(persona.avatar)) {
+              // eslint-disable-next-line no-unused-vars
+              const { id, ...personaRest } = persona;
+              return { ...personaRest, avatar: persona.avatar.toString() };
+            } else {
+              return persona;
+            }
+          });
+
           ctx.body = {
             statusCode: 200,
             status: 'ok',
             totalCount: count,
-            data: foundPersonas,
+            data: personasWithAvatar,
           };
         }
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, `Failed to parse query: ${err}`);
       }
+    },
+  });
+
+  personaRouter.route({
+    meta: {
+      swagger: {
+        operationId: 'DeletePersonas',
+      },
+    },
+    method: 'DELETE',
+    path: '/personas/:id',
+    pre: thisUser.can('access admin pages'),
+    handler: async ctx => {
+      log.debug(`Deleting persona with id ${ctx.params.id}.`);
+      let persona;
+
+      try {
+        persona = await personasModel.findOne({ uuid: ctx.params.id });
+        if (!persona) {
+          ctx.throw(404, `Persona with ID ${ctx.params.id} doesn't exist`);
+        }
+        await personasModel.removeAndFlush(persona);
+      } catch (err) {
+        log.error('HTTP 400 Error: ', err);
+        ctx.throw(400, `Failed to parse community schema: ${err}`);
+      }
+
+      // if deleted
+      ctx.status = 204;
     },
   });
 
@@ -286,8 +329,11 @@ export default function controller(
         name: Joi.string(),
         avatar: Joi.string(),
         bio: Joi.string().allow(''),
-        expertises: Joi.array(),
+        badges: Joi.array().allow(''),
+        //expertises: Joi.array().allow(''),
         isLocked: Joi.boolean(),
+      }).options({
+        stripUnknown: true,
       }),
       type: 'json',
       params: {
@@ -307,29 +353,45 @@ export default function controller(
       let persona;
 
       try {
-        persona = await personasModel.findOne({ uuid: ctx.params.id });
+        persona = await personasModel.findOne({ uuid: ctx.params.id }, [
+          'badges',
+        ]);
         if (!persona) {
           ctx.throw(
             404,
             `That persona with ID ${ctx.params.id} does not exist.`,
           );
         }
-        log.debug('ctx.request.body:', ctx.request.body);
         const expertises = ctx.request.body.expertises || [];
         const newExpertises = [];
         if (expertises.length > 0) {
           for (let p of expertises) {
-            const exp = await expertisesModel.findOneOrFail({ uuid: p });
+            const exp = await expertisesModel.findOneOrFail({ uuid: p.uuid });
             exp.personas.add(persona);
             newExpertises.push(exp);
           }
         }
-        log.debug('newExpertises:', newExpertises);
+
         if (newExpertises.length) {
           persona.expertises.set(newExpertises);
           delete ctx.request.body.expertises;
-          log.debug('persona:', persona);
         }
+
+        const badges = ctx.request.body.badges || [];
+        if (badges.length > 0) {
+          for (let bdg of badges) {
+            const badge = await badgesModel.findOneOrFail({ uuid: bdg.uuid }, [
+              'personas',
+            ]);
+            !badge.personas.contains(persona)
+              ? badge.personas.add(persona)
+              : null;
+            !persona.badges.contains(badge) ? persona.badges.add(badge) : null;
+            await badgesModel.persistAndFlush(badge);
+          }
+        }
+        delete ctx.request.body.badges;
+
         personasModel.assign(persona, ctx.request.body);
         log.debug('persona:', persona);
         await personasModel.persistAndFlush(persona);
@@ -414,8 +476,20 @@ export default function controller(
 
   personaRouter.route({
     method: 'DELETE',
-    path: '/personas/:id/badges/:bid',
+    path: '/personas/:id/badges',
     pre: thisUser.can('access admin pages'),
+    validate: {
+      query: Joi.object({
+        bid: Joi.string(),
+      }),
+      params: {
+        id: Joi.string()
+          .description('Persona id')
+          .required(),
+      },
+      type: 'json',
+      continueOnError: true,
+    },
     handler: async ctx => {
       log.debug(
         `Removing badge ${ctx.params.bid} from persona ${ctx.params.id}.`,

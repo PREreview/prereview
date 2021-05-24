@@ -319,7 +319,7 @@ export default function Reviews() {
                 justify="flex-start"
               >
                 {preprints ? (
-                  <Grid item className={classes.formControl} xs={12} sm={2}>
+                  <Grid item xs={12} sm={2}>
                     <Typography component="p" variant="h5">
                       Filter by:
                     </Typography>
@@ -330,7 +330,6 @@ export default function Reviews() {
                     container
                     item
                     spacing={1}
-                    className={classes.formControl}
                     alignItems="center"
                     xs={12}
                     sm={4}
@@ -387,7 +386,6 @@ export default function Reviews() {
                     container
                     item
                     spacing={1}
-                    className={classes.formControl}
                     alignItems="center"
                     xs={12}
                     sm={4}

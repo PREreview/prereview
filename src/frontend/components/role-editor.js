@@ -59,7 +59,7 @@ export default function RoleEditor({ persona, onCancel, onSaved }) {
         .then(file => setImage(file))
         .catch(err => alert(`An error occurred: ${err.message}`));
     }
-    return () => ac.abort()
+    return () => ac.abort();
   }, [persona]);
 
   const onDrop = useCallback(acceptedFiles => {
@@ -202,7 +202,7 @@ export default function RoleEditor({ persona, onCancel, onSaved }) {
               onClick={() => {
                 const data = {};
                 if (hasNewAvatar) {
-                  const canvas = editorRef.current.getImage();
+                  const canvas = editorRef.current.getImageScaledToCanvas();
 
                   // We need to keep the base64 string small to avoid hitting the
                   // size limit on JSON documents for Cloudant

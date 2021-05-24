@@ -4,7 +4,7 @@ import * as entities from '../models/entities';
 export function getFields(type: string, includes?: string[], recurse = 2): any {
   return Object.values(entities[type].prototype.__meta.properties).reduce(
     (props: any[], prop: any) => {
-      if (!prop.hidden) {
+      if (!(prop.hidden === true)) {
         if (prop.reference === 'scalar') {
           if (
             prop.type !== 'BlobType' ||
