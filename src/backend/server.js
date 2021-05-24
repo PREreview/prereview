@@ -5,6 +5,7 @@ import path from 'path';
 import Koa from 'koa';
 import bodyParser from 'koa-body';
 import compose from 'koa-compose';
+import compress from 'koa-compress';
 import cors from '@koa/cors';
 import log4js from 'koa-log4';
 import mount from 'koa-mount';
@@ -262,6 +263,7 @@ export default async function configServer(config) {
     .use(mount('/api/v2', apiV2Router))
     .use(mount('/api', apiDocs.middleware()))
     .use(koa404Handler)
+    .use(compress())
     .use(serveStatic(STATIC_DIR))
     .use(
       async (ctx, next) =>

@@ -178,7 +178,7 @@
     "koa-better-response-time": "^1.1.0",
     "koa-body": "^4.1.1",
     "koa-compose": "^4.1.0",
-    "koa-compress": "3.0.0",
+    "koa-compress": "^3.0.0",
     "koa-error": "^3.2.0",
     "koa-helmet": "4.1.0",
     "koa-http-request": "^2.2.1",
