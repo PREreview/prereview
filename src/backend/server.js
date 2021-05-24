@@ -254,6 +254,7 @@ export default async function configServer(config) {
   const sessionOpts = config.isProd ? { domain: 'prereview.org' } : {};
 
   server
+    .use(compress())
     .use(bodyParser({ multipart: true, jsonLimit: '50mb' }))
     .use(session(sessionOpts, server))
     .use(passport.initialize())
@@ -263,7 +264,6 @@ export default async function configServer(config) {
     .use(mount('/api/v2', apiV2Router))
     .use(mount('/api', apiDocs.middleware()))
     .use(koa404Handler)
-    .use(compress())
     .use(serveStatic(STATIC_DIR))
     .use(
       async (ctx, next) =>
