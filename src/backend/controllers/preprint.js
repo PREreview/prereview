@@ -1,10 +1,12 @@
 import router from 'koa-joi-router';
+import 'reflect-metadata';
 import { QueryOrder } from '@mikro-orm/core';
 import { PostgreSqlConnection } from '@mikro-orm/postgresql';
 import { getLogger } from '../log.js';
 import { resolvePreprint } from '../utils/resolve.ts';
 import { createPreprintId } from '../../common/utils/ids';
 import { getErrorMessages } from '../utils/errors';
+import { getFields } from '../utils/getFields.ts';
 
 const log = getLogger('backend:controllers:preprint');
 const Joi = router.Joi;
@@ -26,6 +28,7 @@ const querySchema = Joi.object({
     'ynRecommend',
   ),
   tags: Joi.string().allow(''),
+  include_images: Joi.string().allow(''),
   sort: Joi.string().allow(
     'datePosted',
     'recentRequests',
@@ -185,17 +188,6 @@ export default function controller(preprints, thisUser) {
       let fullCount = 0;
       let query;
       try {
-        const populate = [
-          'fullReviews',
-          'fullReviews.authors',
-          'fullReviews.drafts',
-          'rapidReviews',
-          'rapidReviews.author',
-          'requests',
-          'requests.author',
-          'communities',
-          'tags',
-        ];
         const order = ctx.query.asc
           ? QueryOrder.ASC_NULLS_LAST
           : QueryOrder.DESC_NULLS_LAST;
@@ -213,21 +205,26 @@ export default function controller(preprints, thisUser) {
           default:
             orderBy = { datePosted: order };
         }
-        let filterBy;
-        switch (ctx.query.filters) {
-          case 'ynAvailableCode':
-            filterBy = { rapidReviews: { ynAvailableCode: 'yes' } };
-            break;
-          case 'ynAvailableData':
-            filterBy = { rapidReviews: { ynAvailableData: 'yes' } };
-            break;
-          case 'ynPeerReview':
-            filterBy = { rapidReviews: { ynPeerReview: 'yes' } };
-            break;
-          case 'ynRecommend':
-            filterBy = { rapidReviews: { ynRecommend: 'yes' } };
-            break;
-        }
+        const options = {
+          fields: getFields(
+            'Preprint',
+            ctx.query.include_images
+              ? ctx.query.include_images.split(',')
+              : undefined,
+            3,
+          ),
+          populate: [
+            'communities',
+            'tags',
+            'requests.author',
+            'rapidReviews.author',
+            'fullReviews.drafts',
+            'fullReviews.authors',
+          ],
+          orderBy: orderBy,
+          limit: ctx.query.limit,
+          offset: ctx.query.offset,
+        };
         const queries = [];
         queries.push({
           isPublished: { $eq: true },
@@ -275,6 +272,21 @@ export default function controller(preprints, thisUser) {
           });
         }
 
+        switch (ctx.query.filters) {
+          case 'ynAvailableCode':
+            queries.push({ rapidReviews: { ynAvailableCode: 'yes' } });
+            break;
+          case 'ynAvailableData':
+            queries.push({ rapidReviews: { ynAvailableData: 'yes' } });
+            break;
+          case 'ynPeerReview':
+            queries.push({ rapidReviews: { ynPeerReview: 'yes' } });
+            break;
+          case 'ynRecommend':
+            queries.push({ rapidReviews: { ynRecommend: 'yes' } });
+            break;
+        }
+
         if (queries.length > 0) {
           if (queries.length > 1) {
             query = { $and: queries };
@@ -284,20 +296,10 @@ export default function controller(preprints, thisUser) {
           log.debug('Querying preprints:', query);
           [foundPreprints, count] = await preprints.findAndCount(
             query,
-            populate,
-            orderBy,
-            filterBy,
-            ctx.query.limit,
-            ctx.query.offset,
+            options,
           );
         } else {
-          foundPreprints = await preprints.findAll(
-            populate,
-            orderBy,
-            filterBy,
-            ctx.query.limit,
-            ctx.query.offset,
-          );
+          foundPreprints = await preprints.findAll(options);
           count = await preprints.count();
         }
       } catch (err) {
@@ -353,10 +355,6 @@ export default function controller(preprints, thisUser) {
         id: Joi.string()
           .description('Preprint ID')
           .required(),
-        //id: Joi.alternatives()
-        //  .try(Joi.number().integer(), Joi.string())
-        //  .description('Preprint ID')
-        //  .required(),
       },
       continueOnError: true,
     },
@@ -370,14 +368,27 @@ export default function controller(preprints, thisUser) {
       let preprint;
 
       try {
-        preprint = await preprints.findOneByUuidOrHandle(ctx.params.id, [
-          'fullReviews.authors.identity',
-          'fullReviews.drafts',
-          'fullReviews.comments.author',
-          'rapidReviews.author.identity',
-          'requests.author',
-          'tags',
-        ]);
+        const options = {
+          fields: getFields(
+            'Preprint',
+            ctx.query.include_images
+              ? ctx.query.include_images.split(',')
+              : undefined,
+            3,
+          ),
+          populate: [
+            'communities',
+            'tags',
+            'requests.author',
+            'rapidReviews.author',
+            'fullReviews.drafts',
+            'fullReviews.authors',
+          ],
+        };
+        preprint = await preprints.findOneByUuidOrHandle(
+          ctx.params.id,
+          options,
+        );
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
         ctx.throw(400, err);
@@ -419,10 +430,6 @@ export default function controller(preprints, thisUser) {
         id: Joi.string()
           .description('Preprint ID')
           .required(),
-        //id: Joi.alternatives()
-        //  .try(Joi.number().integer(), Joi.string())
-        //  .description('Preprint ID')
-        //  .required(),
       },
       body: {
         data: preprintSchema,

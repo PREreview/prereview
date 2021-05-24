@@ -9,3 +9,4 @@ export * from "./Migration20210324135635";
 export * from "./Migration20210328223715";
 export * from "./Migration20210330003233";
 export * from "./Migration20210409140433";
+export * from "./Migration20210506132046";

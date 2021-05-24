@@ -169,8 +169,8 @@ const RoleBadgeUI = React.forwardRef(function RoleBadgeUI(
             <Typography component="div">
               <Link href={user.reviewUuid}>
                 {user && user.defaultPersona
-                  ? `View ${user.defaultPersona.name}'s Review`
-                  : `View ${user.name}'s Review`}
+                  ? `View ${user.defaultPersona.name}'s PREreview`
+                  : `View ${user.name}'s PREreview`}
               </Link>
             </Typography>
           ) : null}

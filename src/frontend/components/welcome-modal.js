@@ -85,7 +85,7 @@ export default function WelcomeModal(props) {
           <Typography variant="body1" component="div" paragraph gutterBottom>
             On this platform, you can:
             <ol>
-              <li>Read rapid and long-form reviews of existing preprints.</li>
+              <li>Read rapid and full PREreviews of existing preprints.</li>
               <li>
                 Request reviews of preprints (your own, or preprints in which
                 you are interested in seeing community feedback).

@@ -31,7 +31,7 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-export default function NewPreprint({ user, onCancel }) {
+export default function NewPreprint({ user, onCancel, community }) {
   const location = useLocation(); // location.state can be {preprint, tab, isSingleStep} with tab being `request` or `review` (so that we know on which tab the shell should be activated with
   const qs = new URLSearchParams(location.search);
 
@@ -56,6 +56,7 @@ export default function NewPreprint({ user, onCancel }) {
     identifier,
     location.state && location.state.preprint,
     url,
+    community,
   );
 
   return (
@@ -180,7 +181,7 @@ function StepPreprint({
 
       {resolvePreprintStatus.loading && (
         <Typography component="div" variant="body1">
-          Checking for existing reviews or requests for reviews…
+          Checking for existing PREreviews or requests for PREreviews…
         </Typography>
       )}
 
@@ -203,7 +204,7 @@ function StepPreprint({
           }}
           disabled={!identifier || !preprint}
         >
-          Request reviews
+          Request PREreviews
         </Button>
         <Button
           onClick={() => {
@@ -214,7 +215,7 @@ function StepPreprint({
           }}
           disabled={!identifier || !preprint}
         >
-          Add reviews
+          Add PREreviews
         </Button>
       </Controls>
     </Box>

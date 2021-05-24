@@ -91,7 +91,10 @@ export default function Personas() {
     loading: loadingPersonas,
     error: personaError,
   } = useGetPersonas({
-    queryParams: searchParamsToObject(params),
+    queryParams: {
+      ...searchParamsToObject(params),
+      include_images: 'avatar',
+    },
   });
 
   const {
@@ -375,11 +378,11 @@ function PersonaSortOptions({ sort, order, onChange }) {
             <Tooltip
               label={`Sort by ${
                 name === 'recentRapid'
-                  ? 'Date of latest Rapid Review'
+                  ? 'Date of latest Rapid PREreview'
                   : name === 'recentFull'
-                  ? 'Date of latest Full Review'
+                  ? 'Date of latest Full PREreview'
                   : name === 'recentRequests'
-                  ? 'Date of latest request for review'
+                  ? 'Date of latest request for PREreview'
                   : 'Name'
               }`}
             >
@@ -390,12 +393,12 @@ function PersonaSortOptions({ sort, order, onChange }) {
               >
                 {name === 'recentRapid'
                   ? isMobile
-                    ? 'Rapid Reviewed'
-                    : 'Recently Rapid Reviewed'
+                    ? 'Rapid PREreviewed'
+                    : 'Recently Rapid PREreviewed'
                   : name === 'recentFull'
                   ? isMobile
                     ? 'Reviewed'
-                    : 'Recently Reviewed'
+                    : 'Recently Full PREreviewed'
                   : name === 'recentRequests'
                   ? isMobile
                     ? 'Requested'

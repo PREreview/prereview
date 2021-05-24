@@ -75,7 +75,10 @@ const Communities = () => {
   const [search, setSearch] = useState(params.get('search') || '');
 
   const { data: communities, loading: loading, error } = useGetCommunities({
-    queryParams: searchParamsToObject(params),
+    queryParams: {
+      ...searchParamsToObject(params),
+      include_images: 'banner,avatar',
+    },
   });
 
   const { data: tags, loading: loadingTags } = useGetTags();
@@ -150,7 +153,7 @@ const Communities = () => {
               />
 
               <Grid container spacing={4}>
-                <Grid item xs={12} md={8}>
+                <Grid item xs={12} md={12}>
                   {communities && communities.totalCount === 0 && !loading ? (
                     <div>No communities found.</div>
                   ) : (
@@ -183,6 +186,7 @@ const Communities = () => {
                     </div>
                   )}
                 </Grid>
+                {/*
                 <Grid item xs={12} md={4} className={classes.smallColumn}>
                   <Typography variant="h5" component="h2" gutterBottom={true}>
                     Search communities by tag
@@ -206,6 +210,7 @@ const Communities = () => {
                     </Box>
                   </Typography>
                 </Grid>
+                  */}
               </Grid>
             </Box>
           </Container>

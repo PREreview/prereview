@@ -33,8 +33,10 @@ export class HttpError extends ChainError {
       properties && properties.cleanStack ? properties.cleanStack : true;
     super(`HTTP Error ${status}: ${message}`, cause, cleanStack);
     this.status = status;
-    this.expose = properties.expose ? properties.expose : status < 500;
-    this.headers = properties.headers;
+    this.expose =
+      properties && properties.expose ? properties.expose : status < 500;
+    this.headers =
+      properties && properties.headers ? properties.headers : undefined;
   }
 
   get statusCode(): number {

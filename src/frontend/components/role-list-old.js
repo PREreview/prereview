@@ -215,7 +215,7 @@ export function HighlightedRoles({
         {roleIds.length ? (
           <span>Selected Reviewers</span>
         ) : (
-          <span>Viewing all reviews</span>
+          <span>Viewing all PREreviews</span>
         )}
       </p>
       <ul className="role-list__list">
@@ -249,7 +249,7 @@ export function HighlightedRoles({
                           onModerate(reviewer);
                         }}
                       >
-                        Report Review
+                        Report PREreview
                       </div>
                     )}
                   </DraggableRoleBadge>

@@ -164,7 +164,7 @@ export default function PreprintPreview({ preprint }) {
               <span className={classes.activityPop}>
                 {preprint.rapidReviews.length}
               </span>{' '}
-              rapid reviews
+              rapid PREreviews
             </Typography>
           </Grid>
           <Grid item className={`${classes.activityItem} ${classes.meta}`}>
@@ -174,7 +174,7 @@ export default function PreprintPreview({ preprint }) {
                   ? publishedReviews.length
                   : 0}
               </span>{' '}
-              longform reviews
+              full PREreviews
             </Typography>
           </Grid>
           <Grid item className={`${classes.activityItem} ${classes.meta}`}>

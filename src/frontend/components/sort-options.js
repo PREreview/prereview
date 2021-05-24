@@ -52,11 +52,11 @@ export default function SortOptions({
               <Tooltip
                 title={`Sort by ${
                   name === 'recentRapid'
-                    ? 'date of latest rapid review'
+                    ? 'date of latest rapid PREreview'
                     : name === 'recentFull'
-                    ? 'date of latest full review'
+                    ? 'date of latest full PREreview'
                     : name === 'recentRequests'
-                    ? 'date of latest request for review'
+                    ? 'date of latest request for PREreview'
                     : 'date posted on preprint server'
                 }`}
               >
@@ -67,12 +67,12 @@ export default function SortOptions({
                 >
                   {name === 'recentRapid'
                     ? isMobile
-                      ? 'Rapid Reviewed'
-                      : 'Recently Rapid Reviewed'
+                      ? 'Rapid PREreviewed'
+                      : 'Recently Rapid PREreviewed'
                     : name === 'recentFull'
                     ? isMobile
-                      ? 'Reviewed'
-                      : 'Recently Reviewed'
+                      ? 'Full PREreviewed'
+                      : 'Recently Full PREreviewed'
                     : name === 'recentRequests'
                     ? isMobile
                       ? 'Requested'

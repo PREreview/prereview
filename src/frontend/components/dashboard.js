@@ -82,7 +82,10 @@ export default function Dashboard() {
 
   const { data: preprints, loading: loadingPreprints, error } = useGetPreprints(
     {
-      queryParams: searchParamsToObject(params),
+      queryParams: {
+        ...searchParamsToObject(params),
+        include_images: 'avatar',
+      },
     },
   );
 
@@ -394,7 +397,7 @@ export default function Dashboard() {
                           }
                         }}
                       >
-                        Review or request a review of a Preprint to add it to
+                        Review or request a review of a preprint to add it to
                         the site.
                       </Link>
                     </div>

@@ -234,9 +234,9 @@ export default function ShellContent({ preprint, user, cid }) {
           review.author.uuid
             ? (authorID = review.author.uuid)
             : (authorID = review.author);
-          setHasRapidReviewed(
-            user.personas.some(persona => persona.uuid === authorID),
-          );
+          if (user.defaultPersona.uuid === authorID) {
+            setHasRapidReviewed(user.defaultPersona.uuid === authorID);
+          }
         });
       }
 
@@ -289,8 +289,8 @@ export default function ShellContent({ preprint, user, cid }) {
             onChange={handleChange}
             aria-label="Reviews and requests"
           >
-            <Tab label="Read Reviews" {...a11yProps(0)} />
-            <Tab label="Add Review(s)" {...a11yProps(1)} />
+            <Tab label="Read PREreviews" {...a11yProps(0)} />
+            <Tab label="Add PREreview(s)" {...a11yProps(1)} />
             <Tab label="Add Request" {...a11yProps(2)} />
           </Tabs>
         </AppBar>
@@ -447,7 +447,7 @@ function ShellContentReviews({
       />
     ) : (
       <Typography component="div" variant="body2">
-        Sorry, you are not authorized to contribute to this review.
+        Sorry, you are not authorized to contribute to this PREreview.
       </Typography>
     )
   ) : (
@@ -518,7 +518,7 @@ function ShellContentRequest({
                 onSubmit(preprint);
               }}
             >
-              Add a request for review
+              Add a request for PREreview
             </Button>
           </Controls>
         </Box>
