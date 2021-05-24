@@ -21,6 +21,12 @@ const querySchema = Joi.object({
   asc: Joi.boolean(),
   search: Joi.string().allow(''),
   communities: Joi.string().allow(''),
+  filters: Joi.string().allow(
+    'ynAvailableCode',
+    'ynAvailableData',
+    'ynPeerReview',
+    'ynRecommend',
+  ),
   tags: Joi.string().allow(''),
   include_images: Joi.string().allow(''),
   sort: Joi.string().allow(
@@ -266,6 +272,21 @@ export default function controller(preprints, thisUser) {
           });
         }
 
+        switch (ctx.query.filters) {
+          case 'ynAvailableCode':
+            queries.push({ rapidReviews: { ynAvailableCode: 'yes' } });
+            break;
+          case 'ynAvailableData':
+            queries.push({ rapidReviews: { ynAvailableData: 'yes' } });
+            break;
+          case 'ynPeerReview':
+            queries.push({ rapidReviews: { ynPeerReview: 'yes' } });
+            break;
+          case 'ynRecommend':
+            queries.push({ rapidReviews: { ynRecommend: 'yes' } });
+            break;
+        }
+
         if (queries.length > 0) {
           if (queries.length > 1) {
             query = { $and: queries };
@@ -273,14 +294,13 @@ export default function controller(preprints, thisUser) {
             query = queries[0];
           }
           log.debug('Querying preprints:', query);
-          log.debug('Querying preprints:', options);
           [foundPreprints, count] = await preprints.findAndCount(
             query,
             options,
           );
         } else {
           foundPreprints = await preprints.findAll(options);
-          count = foundPreprints.length;
+          count = await preprints.count();
         }
       } catch (err) {
         log.error('HTTP 400 Error: ', err);

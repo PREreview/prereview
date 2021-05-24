@@ -26,6 +26,9 @@ export const processParams = search => {
     } else if (key.toLowerCase() === 'communities') {
       const communities = value ? value.split(',') : [];
       processed.append('communities', communities);
+    } else if (key.toLowerCase() === 'filters') {
+      const filters = value ? value.split(',') : [];
+      processed.append('filters', filters);
     }
   }
 
