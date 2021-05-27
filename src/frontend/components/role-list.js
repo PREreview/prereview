@@ -64,9 +64,9 @@ export default function Reviewers({
       return newAuthors;
     });
 
-    if (hasReviewed) {
-      newAuthors = [...newAuthors, user];
-    }
+    // if (hasReviewed) {
+    //   newAuthors = [...newAuthors, user];
+    // }
 
     const filteredAuthors = newAuthors.filter(
       (author, i, authors) =>
