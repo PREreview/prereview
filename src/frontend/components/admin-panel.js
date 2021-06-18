@@ -271,6 +271,9 @@ function UsersTab() {
 }
 
 function PersonasTab() {
+  const [badges, setBadges] = useState(null);
+  const [personas, setPersonas] = useState(null);
+
   const columns = [
     { title: 'UUID', field: 'uuid', hidden: true },
     {
@@ -353,9 +356,6 @@ function PersonasTab() {
       editable: false,
     },
   ];
-
-  const [badges, setBadges] = useState(null);
-  const [personas, setPersonas] = useState(null);
 
   const { data, loading } = useGetPersonas({
     resolve: res => res.data,
