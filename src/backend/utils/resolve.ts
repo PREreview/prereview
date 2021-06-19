@@ -57,14 +57,14 @@ async function scrapeUrl(
       highwirePress.author instanceof Array
     ) {
       highwirePress.author.forEach(author => {
-        if (author.includes(',')) {
+        if (author && author.includes(',')) {
           authors.push(author.replace(',', ''));
         } else {
           authors.push(author);
         }
       });
     } else {
-      if (highwirePress.author.includes(',')) {
+      if (highwirePress.author && highwirePress.author.includes(',')) {
         authors.push(highwirePress.author.replace(',', ''));
       } else {
         authors.push(highwirePress.author);

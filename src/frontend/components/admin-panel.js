@@ -842,6 +842,50 @@ function CommunitiesTab() {
       title: 'Owners',
       field: 'owners',
       lookup: users,
+      editComponent: props => {
+        return (
+          <FormControl>
+            <Select
+              labelId="owners-select-label"
+              id="owners-select"
+              multiple
+              value={props.value ? props.value : []}
+              onChange={e => props.onChange(e.target.value)}
+              input={<Input id="owners-select-chip" />}
+              renderValue={selected => {
+                console.log('***selected***:', selected);
+                return (
+                  <AvatarGroup max={5}>
+                    {selected.map(value => (
+                      <Avatar key={value.uuid} src={value.avatar} alt={value.name}>
+                        {value.name}
+                      </Avatar>
+                    ))}
+                  </AvatarGroup>
+                );
+              }}
+            >
+              {usersData.map(member => {
+                if (member.defaultPersona && member.defaultPersona.name) {
+                  const selected = Array.isArray(props.value) ? props.value.find(value => value.uuid === member.uuid) : undefined;
+                  if (selected) {
+                    return (
+                      <MenuItem key={selected.uuid} value={selected} name={selected.defaultPersona.name}>
+                        {selected.defaultPersona.name}
+                      </MenuItem>
+                    );
+                  }
+                  return (
+                    <MenuItem key={member.uuid} value={member} name={member.defaultPersona.name}>
+                      {member.defaultPersona.name}
+                    </MenuItem>
+                  );
+                }
+              })}
+            </Select>
+          </FormControl>
+        );
+      },
       render: row => (
         <AvatarGroup max={5}>
           {row.owners && Array.isArray(row.owners)
@@ -852,7 +896,7 @@ function CommunitiesTab() {
                   target="_blank"
                   rel="noopener"
                 >
-                  <Avatar src={owner.avatar} alt={owner.name} />
+                  <Avatar src={owner.defaultPersona.avatar} alt={owner.defaultPersona.name} />
                 </Link>
               ))
             : null}

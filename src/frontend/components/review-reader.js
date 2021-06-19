@@ -267,62 +267,45 @@ export default function ReviewReader({
 
   useEffect(() => {
     if (communitiesData) {
-      let filteredCommunities = [];
-      communitiesData.filter(community => {
-        return (
-          allReviews.length &&
-          allReviews.filter(review => {
-            if (community.members.length) {
-              community.members.map(member => {
-                if (review.author) {
-                  if (review.author.uuid === member.uuid) {
-                    filteredCommunities.push({
+      const filteredCommunities = communitiesData.reduce((filtered, community) => {
+        allReviews.length &&
+        allReviews.filter(review => {
+          if (community.members.length) {
+            community.members.map(member => {
+              if (review.author) {
+                if (review.author.uuid === member.uuid) {
+                  if (filtered[community.uuid]) {
+                    filtered[community.uuid].members.push(member.uuid);
+                  } else {
+                    filtered[community.uuid] = {
                       name: community.name,
                       uuid: community.uuid,
-                      member: member.uuid,
-                    });
+                      members: [member.uuid],
+                    };
                   }
-                } else if (review.authors) {
-                  review.authors.map(author => {
-                    if (author.uuid === member.uuid) {
-                      filteredCommunities.push({
+                }
+              } else if (review.authors) {
+                review.authors.map(author => {
+                  if (author.uuid === member.uuid) {
+                    if (filtered[community.uuid]) {
+                      filtered[community.uuid].members.push(member.uuid);
+                    } else {
+                      filtered[community.uuid] = {
                         name: community.name,
                         uuid: community.uuid,
-                        member: member.uuid,
-                      });
+                        members: [member.uuid],
+                      };
                     }
-                  });
-                }
-              });
-            }
-            if (community.owners.length) {
-              community.owners.map(member => {
-                if (review.author) {
-                  if (review.author.uuid === member.uuid) {
-                    filteredCommunities.push({
-                      name: community.name,
-                      uuid: community.uuid,
-                      member: member.uuid,
-                    });
                   }
-                } else if (review.authors) {
-                  review.authors.map(author => {
-                    if (author.uuid === member.uuid) {
-                      filteredCommunities.push({
-                        name: community.name,
-                        uuid: community.uuid,
-                        member: member.uuid,
-                      });
-                    }
-                  });
-                }
-              });
-            }
-          })
-        );
-      });
+                });
+              }
+            });
+          }
+        })
+        return filtered;
+      }, {});
 
-      setCommunities(filteredCommunities);
+      setCommunities(Object.values(filteredCommunities));
     }
   }, [
     allReviews,
@@ -336,19 +319,17 @@ export default function ReviewReader({
   ]);
 
   useEffect(() => {
-    console.log(filteredRapid);
-    console.log(filteredPublished);
     if (selectedCommunities.length) {
       const rapid = allRapidReviews.filter(rapidReview => {
         return communities.some(
-          community => rapidReview.author.uuid === community.member,
+          community => community.members.includes(rapidReview.author.uuid),
         );
       });
 
       const published = publishedReviews.filter(publishedReview => {
         return publishedReview.authors.some(author => {
           return communities.some(
-            community => author.uuid === community.member,
+            community => community.members.includes(author.uuid),
           );
         });
       });
