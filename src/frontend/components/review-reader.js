@@ -111,9 +111,9 @@ export default function ReviewReader({
   const [publishedReviews, setPublishedReviews] = useState(
     preprint.fullReviews.filter(review => review.isPublished),
   );
-  const [filteredRapid, setFilteredRapid] = useState(allRapidReviews);
   const [filteredPublished, setFilteredPublished] = useState(publishedReviews);
   const [allRapidReviews, setAllRapidReviews] = useState(preprint.rapidReviews);
+  const [filteredRapid, setFilteredRapid] = useState(allRapidReviews);
   const [allReviews] = useState(publishedReviews.concat(allRapidReviews));
   const [filteredReviews, setFilteredReviews] = useState(allReviews);
 
