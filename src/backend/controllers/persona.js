@@ -118,7 +118,6 @@ export default function controller(
           limit: ctx.query.limit,
           offset: ctx.query.offset,
         };
-        console.log('***options***:', options);
         let queries = [];
         if (ctx.query.search && ctx.query.search !== '') {
           const connection = personasModel.em.getConnection();
@@ -377,23 +376,28 @@ export default function controller(
           delete ctx.request.body.expertises;
         }
 
-        const badges = ctx.request.body.badges || [];
-        if (badges.length > 0) {
-          for (let bdg of badges) {
-            const badge = await badgesModel.findOneOrFail({ uuid: bdg.uuid }, [
+        const badges = ctx.request.body.badges;
+        const user = await thisUser.getUser(ctx);
+        const isAdmin = user ? await thisUser.isMemberOf('admins', user.orcid) : false;
+        if (Array.isArray(badges) && isAdmin) {
+          log.debug('Updating badges');
+          for (let oldBadge of persona.badges.getItems()) {
+            if (!badges.some(b => oldBadge.uuid === b.uuid)) {
+              await oldBadge.personas.loadItems()
+              oldBadge.personas.remove(persona);
+            }
+          }
+          for (let newBadge of badges) {
+            const badge = await badgesModel.findOneOrFail({ uuid: newBadge.uuid }, [
               'personas',
             ]);
-            !badge.personas.contains(persona)
-              ? badge.personas.add(persona)
-              : null;
-            !persona.badges.contains(badge) ? persona.badges.add(badge) : null;
-            await badgesModel.persistAndFlush(badge);
+            badge.personas.add(persona);
           }
         }
+        badgesModel.em.flush();
         delete ctx.request.body.badges;
 
         personasModel.assign(persona, ctx.request.body);
-        log.debug('persona:', persona);
         await personasModel.persistAndFlush(persona);
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
