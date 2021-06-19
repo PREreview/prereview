@@ -301,7 +301,6 @@ function PersonasTab() {
       field: 'badges',
       lookup: badges,
       editComponent: props => {
-        console.log('***props.value***:', props.value);
         return (
           <FormControl>
             <Select
@@ -312,7 +311,6 @@ function PersonasTab() {
               onChange={e => props.onChange(e.target.value)}
               input={<Input id="badges-select-chip" />}
               renderValue={selected => {
-                console.log('***selected***:', selected);
                 return (
                   <div>
                     {selected.map(value => (
@@ -322,11 +320,21 @@ function PersonasTab() {
                 );
               }}
             >
-              {badgesData.map(badge => (
-                <MenuItem key={badge.uuid} value={badge} name={badge.name}>
-                  {badge.name}
-                </MenuItem>
-              ))}
+              {badgesData.map(badge => {
+                const selected = Array.isArray(props.value) ? props.value.find(value => value.uuid === badge.uuid) : undefined;
+                if (selected) {
+                  return (
+                    <MenuItem key={selected.uuid} value={selected} name={selected.name}>
+                      {selected.name}
+                    </MenuItem>
+                  );
+                }
+                return (
+                  <MenuItem key={badge.uuid} value={badge} name={badge.name}>
+                    {badge.name}
+                  </MenuItem>
+                );
+              })}
             </Select>
           </FormControl>
         );
@@ -396,10 +404,9 @@ function PersonasTab() {
     } catch (err) {
       alert(`Failed to update persona: ${err.message}`);
     }
-    setPersonas([
-      ...personas.filter(persona => persona.uuid !== personaToUpdate.uuid),
-      personaToUpdate,
-    ]);
+    const idx = personas.findIndex(persona => persona.uuid === personaToUpdate.uuid);
+    personas.splice(idx, 1, personaToUpdate);
+    setPersonas(personas);
   };
 
   const handleRemove = async personaToDelete => {
@@ -445,7 +452,7 @@ function PersonasTab() {
         columns={columns}
         data={personas}
         editable={{
-          onRowUpdate: data => handleUpdate(data),
+          onRowUpdate: newData => handleUpdate(newData),
           onRowDelete: data => handleRemove(data),
           onRowAdd: data => handleCreate(data),
         }}
