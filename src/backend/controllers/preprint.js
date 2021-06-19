@@ -4,7 +4,7 @@ import { QueryOrder } from '@mikro-orm/core';
 import { PostgreSqlConnection } from '@mikro-orm/postgresql';
 import { getLogger } from '../log.js';
 import { resolvePreprint } from '../utils/resolve.ts';
-import { createPreprintId, createPreprintHandle } from '../../common/utils/ids';
+import { createPreprintId } from '../../common/utils/ids';
 import { getErrorMessages } from '../utils/errors';
 import { getFields } from '../utils/getFields.ts';
 
