@@ -67,21 +67,21 @@ export function decodePreprintId(value) {
   };
 }
 
-export function createPreprintHandle(
-  value, // preprint or identifer (arXivId or DOI, unprefixed)
-) {
-  if (!value) {
-    throw new ChainError('invalid value for createPreprintHandle');
-  }
-
-  if (doiRegex().test(value)) {
-    return `doi:${value}`;
-  } else if (identifiersArxiv.extract(value)[0]) {
-    return `arXiv:${value}`;
-  } else {
-    throw new ChainError('invalid value for createPreprintHandle');
-  }
-}
+//export function createPreprintHandle(
+//  value, // preprint or identifer (arXivId or DOI, unprefixed)
+//) {
+//  if (!value) {
+//    throw new ChainError('invalid value for createPreprintHandle');
+//  }
+//
+//  if (doiRegex().test(value)) {
+//    return `doi:${value}`;
+//  } else if (identifiersArxiv.extract(value)[0]) {
+//    return `arXiv:${value}`;
+//  } else {
+//    throw new ChainError('invalid value for createPreprintHandle');
+//  }
+//}
 
 export function createPreprintIdentifierCurie(
   value, // preprint or identifer (arXivId or DOI, unprefixed)
