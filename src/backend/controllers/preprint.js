@@ -4,7 +4,7 @@ import { QueryOrder } from '@mikro-orm/core';
 import { PostgreSqlConnection } from '@mikro-orm/postgresql';
 import { getLogger } from '../log.js';
 import { resolvePreprint } from '../utils/resolve.ts';
-import { createPreprintId } from '../../common/utils/ids';
+import { createPreprintId, createPreprintHandle } from '../../common/utils/ids';
 import { getErrorMessages } from '../utils/errors';
 import { getFields } from '../utils/getFields.ts';
 
@@ -104,6 +104,7 @@ export default function controller(preprints, thisUser) {
             ...data,
             authors: data.authors.join(', '), // process authors array into string, the data type the db expects
           };
+
           preprint = preprints.create(data);
           if (belongsTo) {
             log.debug(`Adding new preprint to community ${belongsTo.name}`);

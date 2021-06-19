@@ -40,7 +40,7 @@ export function createPreprintId(
     );
   }
 
-  return `${vendor}-${unprefix(id).replace(/\//g, '-')}`;
+  return `${vendor}-${unprefix(id).replace(/-/g, '+').replace(/\//g, '-')}`;
 }
 
 export function decodePreprintId(value) {
@@ -62,9 +62,25 @@ export function decodePreprintId(value) {
   }
 
   return {
-    id: `${value.slice(value.indexOf('-') + 1).replace(/-/g, '/')}`,
+    id: `${value.slice(value.indexOf('-') + 1).replace(/-/g, '/').replace(/\+/g, '-')}`,
     scheme: scheme,
   };
+}
+
+export function createPreprintHandle(
+  value, // preprint or identifer (arXivId or DOI, unprefixed)
+) {
+  if (!value) {
+    throw new ChainError('invalid value for createPreprintHandle');
+  }
+
+  if (doiRegex().test(value)) {
+    return `doi:${value}`;
+  } else if (identifiersArxiv.extract(value)[0]) {
+    return `arXiv:${value}`;
+  } else {
+    throw new ChainError('invalid value for createPreprintHandle');
+  }
 }
 
 export function createPreprintIdentifierCurie(
@@ -85,9 +101,9 @@ export function createPreprintIdentifierCurie(
     }
 
     if (doiRegex().test(id)) {
-      return `doi:${value.doi}`;
+      return `doi:${id}`;
     } else if (identifiersArxiv.extract(id)[0]) {
-      return `arXiv:${value.arXivId}`;
+      return `arXiv:${id}`;
     } else {
       throw new ChainError('invalid value for createIdentifierCurie');
     }
