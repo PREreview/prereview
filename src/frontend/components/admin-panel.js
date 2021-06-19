@@ -818,107 +818,6 @@ function RapidReviewsTab() {
 }
 
 function CommunitiesTab() {
-  const columns = [
-    { title: 'UUID', field: 'uuid', hidden: true },
-    {
-      title: 'Name',
-      field: 'name',
-      render: row => (
-        <Link href={`/communities/${row.slug}`} target="_blank" rel="noopener">
-          {row.name}
-        </Link>
-      ),
-    },
-    {
-      title: 'Slug',
-      field: 'slug',
-      render: row => (
-        <Link href={`/communities/${row.slug}`} target="_blank" rel="noopener">
-          {row.slug}
-        </Link>
-      ),
-    },
-    {
-      title: 'Owners',
-      field: 'owners',
-      lookup: users,
-      editComponent: props => {
-        return (
-          <FormControl>
-            <Select
-              labelId="owners-select-label"
-              id="owners-select"
-              multiple
-              value={props.value ? props.value : []}
-              onChange={e => props.onChange(e.target.value)}
-              input={<Input id="owners-select-chip" />}
-              renderValue={selected => {
-                console.log('***selected***:', selected);
-                return (
-                  <AvatarGroup max={5}>
-                    {selected.map(value => (
-                      <Avatar key={value.uuid} src={value.avatar} alt={value.name}>
-                        {value.name}
-                      </Avatar>
-                    ))}
-                  </AvatarGroup>
-                );
-              }}
-            >
-              {usersData.map(member => {
-                if (member.defaultPersona && member.defaultPersona.name) {
-                  const selected = Array.isArray(props.value) ? props.value.find(value => value.uuid === member.uuid) : undefined;
-                  if (selected) {
-                    return (
-                      <MenuItem key={selected.uuid} value={selected} name={selected.defaultPersona.name}>
-                        {selected.defaultPersona.name}
-                      </MenuItem>
-                    );
-                  }
-                  return (
-                    <MenuItem key={member.uuid} value={member} name={member.defaultPersona.name}>
-                      {member.defaultPersona.name}
-                    </MenuItem>
-                  );
-                }
-              })}
-            </Select>
-          </FormControl>
-        );
-      },
-      render: row => (
-        <AvatarGroup max={5}>
-          {row.owners && Array.isArray(row.owners)
-            ? row.owners.map(owner => (
-                <Link
-                  key={owner.uuid}
-                  href={`/about/${owner.uuid}`}
-                  target="_blank"
-                  rel="noopener"
-                >
-                  <Avatar src={owner.defaultPersona.avatar} alt={owner.defaultPersona.name} />
-                </Link>
-              ))
-            : null}
-        </AvatarGroup>
-      ),
-    },
-    {
-      title: 'Created At',
-      field: 'createdAt',
-      type: 'datetime',
-      dateSetting: { locale: 'en-GB' },
-      editable: false,
-    },
-    {
-      title: 'Updated At',
-      field: 'updatedAt',
-      type: 'datetime',
-      dateSetting: { locale: 'en-GB' },
-      editable: false,
-    },
-  ];
-
   const [users, setUsers] = useState(null);
   const [communities, setCommunities] = useState(null);
 
@@ -1023,6 +922,107 @@ function CommunitiesTab() {
     if (newData.owners && Array.isArray(newData.owners)) return newData.owners;
     return [newData.owners];
   };
+
+  const columns = [
+    { title: 'UUID', field: 'uuid', hidden: true },
+    {
+      title: 'Name',
+      field: 'name',
+      render: row => (
+        <Link href={`/communities/${row.slug}`} target="_blank" rel="noopener">
+          {row.name}
+        </Link>
+      ),
+    },
+    {
+      title: 'Slug',
+      field: 'slug',
+      render: row => (
+        <Link href={`/communities/${row.slug}`} target="_blank" rel="noopener">
+          {row.slug}
+        </Link>
+      ),
+    },
+    {
+      title: 'Owners',
+      field: 'owners',
+      lookup: users,
+      editComponent: props => {
+        return (
+          <FormControl>
+            <Select
+              labelId="owners-select-label"
+              id="owners-select"
+              multiple
+              value={props.value ? props.value : []}
+              onChange={e => props.onChange(e.target.value)}
+              input={<Input id="owners-select-chip" />}
+              renderValue={selected => {
+                console.log('***selected***:', selected);
+                return (
+                  <AvatarGroup max={5}>
+                    {selected.map(value => (
+                      <Avatar key={value.uuid} src={value.avatar} alt={value.name}>
+                        {value.name}
+                      </Avatar>
+                    ))}
+                  </AvatarGroup>
+                );
+              }}
+            >
+              {usersData.map(member => {
+                if (member.defaultPersona && member.defaultPersona.name) {
+                  const selected = Array.isArray(props.value) ? props.value.find(value => value.uuid === member.uuid) : undefined;
+                  if (selected) {
+                    return (
+                      <MenuItem key={selected.uuid} value={selected} name={selected.defaultPersona.name}>
+                        {selected.defaultPersona.name}
+                      </MenuItem>
+                    );
+                  }
+                  return (
+                    <MenuItem key={member.uuid} value={member} name={member.defaultPersona.name}>
+                      {member.defaultPersona.name}
+                    </MenuItem>
+                  );
+                }
+              })}
+            </Select>
+          </FormControl>
+        );
+      },
+      render: row => (
+        <AvatarGroup max={5}>
+          {row.owners && Array.isArray(row.owners)
+            ? row.owners.map(owner => (
+                <Link
+                  key={owner.uuid}
+                  href={`/about/${owner.uuid}`}
+                  target="_blank"
+                  rel="noopener"
+                >
+                  <Avatar src={owner.defaultPersona.avatar} alt={owner.defaultPersona.name} />
+                </Link>
+              ))
+            : null}
+        </AvatarGroup>
+      ),
+    },
+    {
+      title: 'Created At',
+      field: 'createdAt',
+      type: 'datetime',
+      dateSetting: { locale: 'en-GB' },
+      editable: false,
+    },
+    {
+      title: 'Updated At',
+      field: 'updatedAt',
+      type: 'datetime',
+      dateSetting: { locale: 'en-GB' },
+      editable: false,
+    },
+  ];
 
   if (loading || loadingUsers) {
     return <Loading />;

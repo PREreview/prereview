@@ -45,7 +45,7 @@
     "build:backend": "parcel build --target=backend --no-optimize src/backend/index.js && npm run build:templates",
     "build:backend:dev": "parcel build --target=backend --no-optimize src/backend/index.js && npm run build:templates",
     "watch:backend:dev": "npm-watch build:backend:dev",
-    "build:frontend": "npm run build:hooks && parcel build --no-scope-hoist --target=frontend src/frontend/index.html",
+    "build:frontend": "npm run build:hooks && parcel build --target=frontend src/frontend/index.html",
     "build:frontend:dev": "npm run build:hooks && parcel build --target=frontend src/frontend/index.html",
     "build:scripts:import": "parcel build --target=import-script src/backend/scripts/dbImport.js",
     "build:scripts:migrations": "npm run scan:migrations && parcel build --target=migrations-script src/backend/scripts/dbMigrations.ts",
