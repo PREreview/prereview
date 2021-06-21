@@ -454,11 +454,9 @@ export default function controller(
         return;
       }
 
-      log.debug('ctx.request.body **********************', ctx.request.body);
-
       let owner;
 
-      if (ctx.request.body.owners.length) {
+      if (ctx.request.body.owners && ctx.request.body.owners.length && ctx.request.body.owners.length > 0) {
         if (typeof ctx.request.body.owners[0] === 'object') {
           owner = ctx.request.body.owners[0];
         } else {
@@ -482,8 +480,11 @@ export default function controller(
           ctx.throw(404, `Community with ID ${ctx.params.id} doesn't exist`);
         }
         communityModel.assign(community, ctx.request.body);
-        community.owners.add(owner);
-        community.members.add(owner.defaultPersona);
+
+        if (owner && owner.defaultPersona) {
+          community.owners.add(owner);
+          community.members.add(owner.defaultPersona);
+        }
         await communityModel.persistAndFlush(community);
       } catch (err) {
         log.error('HTTP 400 Error: ', err);
