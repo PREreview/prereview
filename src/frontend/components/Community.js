@@ -525,7 +525,7 @@ function CommunityPersonas({
             <Button
               color="primary"
               className={classes.button}
-              href={`/personas?communities=${community.slug}`}
+              href={`/prereviewers?communities=${community.slug}`}
             >
               See All {title}
             </Button>

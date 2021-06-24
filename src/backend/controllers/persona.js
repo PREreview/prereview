@@ -325,8 +325,8 @@ export default function controller(
     path: '/personas/:id',
     validate: {
       body: Joi.object({
-        name: Joi.string(),
-        avatar: Joi.string(),
+        name: Joi.string().allow(''),
+        avatar: Joi.string().allow(''),
         bio: Joi.string().allow(''),
         badges: Joi.array().allow(''),
         //expertises: Joi.array().allow(''),

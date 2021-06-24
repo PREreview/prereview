@@ -82,6 +82,10 @@ const tableIcons = {
   ViewColumn: forwardRef((props, ref) => <ViewColumn {...props} ref={ref} />),
 };
 
+function removeEmpty(obj) {
+  return Object.fromEntries(Object.entries(obj).filter(([_, v]) => v != null));
+}
+
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
 
@@ -452,7 +456,7 @@ function PersonasTab() {
         columns={columns}
         data={personas}
         editable={{
-          onRowUpdate: newData => handleUpdate(newData),
+          onRowUpdate: newData => handleUpdate(removeEmpty(newData)),
           onRowDelete: data => handleRemove(data),
           onRowAdd: data => handleCreate(data),
         }}
