@@ -148,7 +148,7 @@ export default function Footer() {
                 <Link
                   className={classes.footerNavItem}
                   color="textPrimary"
-                  href="https://content.prereview.org/contact"
+                  href="mailto:contact@prereview.org"
                 >
                   Contact
                 </Link>
