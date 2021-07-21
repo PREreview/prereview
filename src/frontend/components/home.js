@@ -669,7 +669,7 @@ export default function Home() {
                 className={classes.gridContent}
                 gutterBottom
               >
-                - Juan Manuel Vazquez, PREreview Open Reviewer 2021
+                —&#8202;Juan Manuel Vazquez, PREreview Open Reviewer 2021
               </Typography>
             </Box>
             <Box>
@@ -687,7 +687,7 @@ export default function Home() {
                 className={classes.gridContent}
                 gutterBottom
               >
-                - Kishore Wary, PREreview Open Reviewer Mentor 2021
+                —&#8202;Kishore Wary, PREreview Open Reviewer Mentor 2021
               </Typography>
             </Box>
             <Box>
@@ -714,7 +714,7 @@ export default function Home() {
                 className={classes.gridContent}
                 gutterBottom
               >
-                - Joel Encarnacion-Rosado, PREreview Open Reviewer 2021
+                —&#8202;Joel Encarnacion-Rosado, PREreview Open Reviewer 2021
               </Typography>
             </Box>
             <Box>
@@ -735,7 +735,7 @@ export default function Home() {
                 className={classes.gridContent}
                 gutterBottom
               >
-                - Natalia Torres, PREreview Open Reviewer 2021
+                —&#8202;Natalia Torres, PREreview Open Reviewer 2021
               </Typography>
             </Box>
             <Box>
@@ -758,7 +758,7 @@ export default function Home() {
                 className={classes.gridContent}
                 gutterBottom
               >
-                - Sergio Redondo, PREreview Open Reviewer 2021
+                —&#8202;Sergio Redondo, PREreview Open Reviewer 2021
               </Typography>
             </Box>
             <Box>
@@ -779,7 +779,7 @@ export default function Home() {
                 className={classes.gridContent}
                 gutterBottom
               >
-                - PREreview Open Reviewer 2021
+                —&#8202;PREreview Open Reviewer 2021
               </Typography>
             </Box>
           </Slider>
