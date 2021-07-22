@@ -10,6 +10,7 @@ on:
 
 env:
   DOCKER_BUILDKIT: 1
+  IMAGE_TAG: ${{ github.sha }}
 
 jobs:
   build-and-deploy:
@@ -32,14 +33,14 @@ jobs:
         password: ${{ secrets.REGISTRY_PASSWORD }}
 
     - name: 'Build image'
-      run: docker build . -t prereview.azurecr.io/prereview:${{ github.sha }}
+      run: docker-compose build prereview
 
     - name: 'Tag image'
-      run: docker tag prereview.azurecr.io/prereview:${{ github.sha }} prereview.azurecr.io/prereview:develop
+      run: docker tag prereview.azurecr.io/prereview:${IMAGE_TAG} prereview.azurecr.io/prereview:develop
 
     - name: 'Push image'
       run: |
-        docker push prereview.azurecr.io/prereview:${{ github.sha }}
+        docker push prereview.azurecr.io/prereview:${IMAGE_TAG}
         docker push prereview.azurecr.io/prereview:develop
 
     - uses: azure/webapps-deploy@v2
