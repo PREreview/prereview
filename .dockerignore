@@ -1,0 +1,7 @@
+/.github/
+/.parcel-cache/
+/coverage/
+/deploy/
+/dist/
+/node_modules/
+/*.sqlite3
