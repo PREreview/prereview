@@ -22,6 +22,7 @@ services:
       PREREVIEW_DB_USER: ${PREREVIEW_DB_USER:-prereview}
       PREREVIEW_DB_PASS: ${PREREVIEW_DB_PASS:-prereview}
       PREREVIEW_DB_NAME: ${PREREVIEW_DB_NAME:-prereview}
+      PREREVIEW_ORCID_CLIENT_ID: ${PREREVIEW_ORCID_CLIENT_ID:-orcid-client-id}
 
   prereview-db:
     image: postgres:12-alpine
