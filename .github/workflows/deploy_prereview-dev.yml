@@ -31,9 +31,14 @@ jobs:
         username: ${{ secrets.REGISTRY_USERNAME }}
         password: ${{ secrets.REGISTRY_PASSWORD }}
 
-    - run: |
-        docker build . -t prereview.azurecr.io/prereview:${{ github.sha }}
-        docker tag prereview.azurecr.io/prereview:${{ github.sha }} prereview.azurecr.io/prereview:develop
+    - name: 'Build image'
+      run: docker build . -t prereview.azurecr.io/prereview:${{ github.sha }}
+
+    - name: 'Tag image'
+      run: docker tag prereview.azurecr.io/prereview:${{ github.sha }} prereview.azurecr.io/prereview:develop
+
+    - name: 'Push image'
+      run: |
         docker push prereview.azurecr.io/prereview:${{ github.sha }}
         docker push prereview.azurecr.io/prereview:develop
 
