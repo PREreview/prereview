@@ -35,6 +35,9 @@ jobs:
     - name: 'Build image'
       run: docker-compose build prereview
 
+    - name: 'Smoke test'
+      run: .github/smoke-test.sh
+
     - name: 'Tag image'
       run: docker tag prereview.azurecr.io/prereview:${IMAGE_TAG} prereview.azurecr.io/prereview:latest
 
