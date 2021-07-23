@@ -19,7 +19,6 @@ services:
       PREREVIEW_DB_PORT: 5432
       PREREVIEW_DB_USER: prereview
       PREREVIEW_DB_NAME: prereview
-      PREREVIEW_ORCID_SANDBOX: true
 
   prereview-db:
     image: postgres:12-alpine
