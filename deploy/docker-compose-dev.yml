@@ -22,18 +22,12 @@ services:
 
   prereview-db:
     image: postgres:12-alpine
-    volumes:
-      - prereview-db_data:/var/lib/postgresql/data
     networks:
       - prereview-private
     environment:
-      PGDATA: /var/lib/postgresql/data/pgdata
       POSTGRES_USER: prereview
       POSTGRES_PASSWORD: ${PREREVIEW_DB_PASS}
       POSTGRES_DB: prereview
-
-volumes:
-  prereview-db_data: {}
 
 networks:
   prereview-private:
