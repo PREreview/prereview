@@ -23,6 +23,12 @@ jobs:
     - name: 'Build dev image'
       run: docker-compose --file docker-compose.yml --file docker-compose.dev.yml build prereview
 
+    - name: 'Lint'
+      run: docker-compose --file docker-compose.yml --file docker-compose.dev.yml run --entrypoint "npm run" prereview lint
+
+    - name: 'Test'
+      run: docker-compose --file docker-compose.yml --file docker-compose.dev.yml run --entrypoint "npm run" prereview test
+
     - name: 'Login via Azure CLI'
       uses: azure/login@v1
       with:

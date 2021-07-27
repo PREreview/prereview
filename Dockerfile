@@ -18,9 +18,6 @@ RUN npm ci
 
 COPY . .
 
-RUN npm run lint
-RUN npm run test
-
 ENV NODE_ENV=production
 
 # Avoid lscpu warning on Alpine
