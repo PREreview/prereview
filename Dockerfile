@@ -16,12 +16,15 @@ COPY ./package* ./
 
 RUN npm ci
 
-COPY . .
-
-ENV NODE_ENV=production
-
-# Avoid lscpu warning on Alpine
-#ENV PARCEL_WORKERS=1
+COPY \
+  .parcelrc \
+  .prettierignore \
+  .prettierrc \
+  .sassrc \
+  .terserrc \
+  tsconfig.json \
+  ./
+COPY src/ src/
 
 RUN npm run build
 
@@ -32,6 +35,12 @@ RUN npm run build
 #
 FROM build AS dev
 ENV NODE_ENV=development
+
+COPY \
+  .gitignore \
+  .proxyrc \
+  docker-entrypoint.sh \
+  ./
 
 ENTRYPOINT ["./docker-entrypoint.sh"]
 CMD ["start:dev"]
