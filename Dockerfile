@@ -1,20 +1,34 @@
-# Build layer
-FROM node:14-alpine AS build
+FROM node:14-alpine AS node
+WORKDIR /app
 
-RUN apk add --no-cache \
-    build-base \
-    python \
+RUN \
+  apk add --no-cache \
+    netcat-openbsd \
+    postgresql-client
+
+COPY \
+  package.json \
+  package-lock.json \
+  ./
+
+
+
+#
+# Stage: Build
+#
+FROM node AS build
+
+RUN \
+  apk add --no-cache --virtual .build-deps \
     g++ \
     git \
-    openssh \
-    cairo-dev \
-    jpeg-dev \
-    pango-dev \
-    giflib-dev
-WORKDIR /src
-COPY ./package* ./
-
-RUN npm ci
+    make \
+    musl-dev \
+    python \
+  && npm ci \
+  && npm cache clean --force \
+  && rm -rf ~/.node-gyp \
+  && apk del --no-cache .build-deps
 
 COPY \
   .parcelrc \
@@ -26,7 +40,9 @@ COPY \
   ./
 COPY src/ src/
 
-RUN npm run build
+RUN \
+  npm run build \
+  && rm -rf .parcel-cache
 
 
 
@@ -50,20 +66,26 @@ CMD ["start:dev"]
 #
 # Stage: Production
 #
-FROM node:14-alpine AS prod
-
-RUN npm prune --production
+FROM node AS prod
 
 RUN apk add --update --no-cache \
-    curl \
-    netcat-openbsd \
-    postgresql-client
+    curl
 
 EXPOSE 3000
 
-WORKDIR /app
+RUN \
+  apk add --no-cache --virtual .build-deps \
+    g++ \
+    git \
+    make \
+    musl-dev \
+    python \
+  && npm ci --production \
+  && npm cache clean --force \
+  && rm -rf ~/.node-gyp \
+  && apk del --no-cache .build-deps
 
-COPY --from=build /src .
+COPY --from=build /app/dist/ dist/
 COPY ./docker-entrypoint.sh .
 
 HEALTHCHECK --interval=5s \
