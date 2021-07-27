@@ -20,6 +20,9 @@ jobs:
     - name: 'Checkout Github Action'
       uses: actions/checkout@master
 
+    - name: 'Build dev image'
+      run: docker-compose --file docker-compose.yml --file docker-compose.dev.yml build prereview
+
     - name: 'Login via Azure CLI'
       uses: azure/login@v1
       with:
@@ -32,7 +35,7 @@ jobs:
         username: ${{ secrets.REGISTRY_USERNAME }}
         password: ${{ secrets.REGISTRY_PASSWORD }}
 
-    - name: 'Build image'
+    - name: 'Build prod image'
       run: docker-compose build prereview
 
     - name: 'Smoke test'

@@ -28,10 +28,25 @@ ENV NODE_ENV=production
 
 RUN npm run build
 
-RUN npm prune --production
 
-# Main layer
-FROM node:14-alpine
+
+#
+# Stage: Development
+#
+FROM build AS dev
+ENV NODE_ENV=development
+
+ENTRYPOINT ["./docker-entrypoint.sh"]
+CMD ["start:dev"]
+
+
+
+#
+# Stage: Production
+#
+FROM node:14-alpine AS prod
+
+RUN npm prune --production
 
 RUN apk add --update --no-cache \
     curl \

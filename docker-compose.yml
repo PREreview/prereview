@@ -3,7 +3,9 @@ services:
   prereview:
     container_name: prereview
     image: prereview.azurecr.io/prereview:${IMAGE_TAG:-local}
-    build: .
+    build:
+      context: .
+      target: prod
     depends_on:
       - prereview-db
     networks:
