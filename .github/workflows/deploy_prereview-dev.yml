@@ -47,6 +47,12 @@ jobs:
     - name: 'Smoke test'
       run: .github/smoke-test.sh
 
+    - name: 'Build integration test image'
+      run: docker-compose --file docker-compose.yml --file docker-compose.integration.yml build playwright
+
+    - name: 'Run integration tests'
+      run: docker-compose --file docker-compose.yml --file docker-compose.integration.yml run playwright
+
     - name: 'Tag image'
       run: docker tag prereview.azurecr.io/prereview:${IMAGE_TAG} prereview.azurecr.io/prereview:develop
 

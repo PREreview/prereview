@@ -1,0 +1,14 @@
+version: "3"
+services:
+  playwright:
+    build:
+      context: integration
+    depends_on:
+      - prereview
+    networks:
+      - prereview-private
+      - prereview-public
+    volumes:
+      - './integration/playwright.config.ts:/app/playwright.config.ts'
+      - './integration/src:/app/src'
+      - './integration/results:/app/test-results'
