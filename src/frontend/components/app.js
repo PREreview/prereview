@@ -38,6 +38,7 @@ import SettingsAPI from './settings-api';
 import SettingsDrafts from './settings-drafts';
 import Personas from './Personas';
 import Validate from './Validate';
+import * as Fathom from 'fathom-client';
 
 //const Moderate = React.lazy(() => import('./moderate'));
 
@@ -47,6 +48,12 @@ import Validate from './Validate';
 export default function App({ user }) {
   const [loading, setLoading] = useState(true);
   const [subdomain, setSubdomain] = useState(null);
+
+  if (process.env.FATHOM_SITEID) {
+    useEffect(() => {
+      Fathom.load(process.env.FATHOM_SITEID, { spa: 'auto' });
+    }, []);
+  }
 
   useEffect(() => {
     const host = window.location.host;
