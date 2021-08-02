@@ -55,6 +55,13 @@ jobs:
     - name: 'Run integration tests'
       run: docker-compose --file docker-compose.yml --file docker-compose.integration.yml run playwright
 
+    - name: 'Store integration test results'
+      if: ${{ failure() }}
+      uses: actions/upload-artifact@v2
+      with:
+        name: integration-tests-results
+        path: integration/results
+
     - name: 'Tag image'
       run: docker tag prereview.azurecr.io/prereview:${IMAGE_TAG} prereview.azurecr.io/prereview:develop
 
