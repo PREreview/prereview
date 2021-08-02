@@ -6,6 +6,7 @@ const config: PlaywrightTestConfig = {
     headless: true,
     screenshot: 'only-on-failure',
   },
+  retries: 3,
   projects: [
     {
       name: 'Desktop Chrome',
