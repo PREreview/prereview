@@ -49,9 +49,9 @@ export default function App({ user }) {
   const [loading, setLoading] = useState(true);
   const [subdomain, setSubdomain] = useState(null);
 
-  if (process.env.FATHOM_SITEID) {
+  if (window.env.FATHOM_SITEID) {
     useEffect(() => {
-      Fathom.load(process.env.FATHOM_SITEID, { spa: 'auto' });
+      Fathom.load(window.env.FATHOM_SITEID, { spa: 'auto' });
     }, []);
   }
 

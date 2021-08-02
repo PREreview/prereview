@@ -19,6 +19,8 @@ import errorHandler from 'koa-better-error-handler';
 import xRequestId from 'koa-better-request-id';
 import xResponseTime from 'koa-better-response-time';
 import requestReceived from 'request-received';
+import replaceStream from 'replacestream';
+import serialize from 'serialize-javascript';
 
 // Our modules
 import { createError } from '../common/errors.ts';
@@ -264,13 +266,21 @@ export default async function configServer(config) {
     .use(mount('/api/v2', apiV2Router))
     .use(mount('/api', apiDocs.middleware()))
     .use(koa404Handler)
+    .use(async (ctx, next) => {
+      await next();
+      if (ctx.path === '/') {
+        ctx.body = ctx.body.pipe(
+          replaceStream(
+            '__FATHOM_SITEID__',
+            serialize(process.env.FATHOM_SITEID),
+          ),
+        );
+      }
+    })
     .use(serveStatic(STATIC_DIR))
     .use(
       async (ctx, next) =>
-        await serveStatic(STATIC_DIR)(
-          Object.assign(ctx, { path: 'index.html' }),
-          next,
-        ),
+        await serveStatic(STATIC_DIR)(Object.assign(ctx, { path: '/' }), next),
     );
 
   return server.callback();
