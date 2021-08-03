@@ -1,6 +1,12 @@
 {
   "private": true,
   "dependencies": {
-    "@playwright/test": "^1.13.0"
+    "@playwright/test": "^1.13.0",
+    "glur": "^1.1.2",
+    "pngjs": "^6.0.0"
+  },
+  "devDependencies": {
+    "@types/glur": "^1.1.1",
+    "@types/pngjs": "^6.0.1"
   }
 }

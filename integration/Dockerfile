@@ -10,7 +10,7 @@ COPY \
   ./
 
 RUN \
-  npm ci \
+  npm ci --production \
   && npm cache clean --force
 
 ENTRYPOINT ["wait-for-it", "prereview:3000", "--strict", "--"]
