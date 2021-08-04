@@ -16,6 +16,16 @@ test.describe('requesting a review', () => {
 
     expect(await dialog.innerText()).toContain('You must be logged in');
 
+    await page.addStyleTag({
+      content: `
+        *,
+        *::before,
+        *::after {
+          transition: none !important;
+        }
+      `,
+    });
+
     const screenshot = await page.screenshot().then(blur);
 
     expect(screenshot).toMatchSnapshot('log-in.png');
