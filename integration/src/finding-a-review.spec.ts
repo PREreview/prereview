@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { blur } from './utils';
+import { screenshot } from './utils';
 
 test.describe('finding a review', () => {
   test('might not find anything', async ({ page }) => {
@@ -18,12 +18,9 @@ test.describe('finding a review', () => {
     const content = await page.waitForSelector(
       '.MuiContainer-root:has([placeholder*="Search preprints"])',
     );
-    await content.scrollIntoViewIfNeeded();
 
     expect(await content.innerText()).toContain('No preprints about');
 
-    const screenshot = await page.screenshot().then(blur);
-
-    expect(screenshot).toMatchSnapshot('empty-list.png');
+    expect(await screenshot(page, content)).toMatchSnapshot('empty-list.png');
   });
 });

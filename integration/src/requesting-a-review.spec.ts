@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { blur } from './utils';
+import { screenshot } from './utils';
 
 test.describe('requesting a review', () => {
   test('have to log in with ORCID', async ({ page }) => {
@@ -12,22 +12,9 @@ test.describe('requesting a review', () => {
     await page.click(':text("Add Request")');
 
     const dialog = await page.waitForSelector('[role="dialog"]');
-    await dialog.scrollIntoViewIfNeeded();
 
     expect(await dialog.innerText()).toContain('You must be logged in');
 
-    await page.addStyleTag({
-      content: `
-        *,
-        *::before,
-        *::after {
-          transition: none !important;
-        }
-      `,
-    });
-
-    const screenshot = await page.screenshot().then(blur);
-
-    expect(screenshot).toMatchSnapshot('log-in.png');
+    expect(await screenshot(page, dialog)).toMatchSnapshot('log-in.png');
   });
 });
