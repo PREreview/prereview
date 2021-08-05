@@ -4,9 +4,6 @@ import { screenshot } from './utils';
 test.describe('requesting a review', () => {
   test('have to log in with ORCID', async ({ page }) => {
     await page.goto('/reviews');
-    await page.route(/https?:\/\/(?:.+\.)?twitter.com(?:$|\/|\?|#)/, route =>
-      route.abort(),
-    );
     await page.click(':text("Get started")');
 
     await page.click(':text("Add Request")');

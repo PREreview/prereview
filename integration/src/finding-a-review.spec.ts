@@ -4,9 +4,6 @@ import { screenshot } from './utils';
 test.describe('finding a review', () => {
   test('might not find anything', async ({ page }) => {
     await page.goto('/');
-    await page.route(/https?:\/\/(?:.+\.)?twitter.com(?:$|\/|\?|#)/, route =>
-      route.abort(),
-    );
     await page.click(':text("Get started")');
 
     await page.fill(

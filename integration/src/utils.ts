@@ -10,7 +10,11 @@ export async function screenshot(
     focus = await page.waitForSelector(focus);
   }
 
-  await Promise.all([resetCarousels(page), removeTransitions(page)]);
+  await Promise.all([
+    hideTwitterTimelines(page),
+    resetCarousels(page),
+    removeTransitions(page),
+  ]);
 
   if (focus) {
     await focus.scrollIntoViewIfNeeded();
@@ -31,6 +35,16 @@ function blur(image: Buffer) {
   glur(png.data, png.width, png.height, 5);
 
   return PNG.sync.write(png, { filterType: 4 });
+}
+
+async function hideTwitterTimelines(page: Page) {
+  await page.addStyleTag({
+    content: `
+      .twitter-timeline {
+        visibility: hidden !important;
+      }
+    `,
+  });
 }
 
 async function resetCarousels(page: Page) {
