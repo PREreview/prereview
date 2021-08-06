@@ -5,6 +5,8 @@ const config: PlaywrightTestConfig = {
     baseURL: 'http://prereview:3000',
     headless: true,
     screenshot: 'only-on-failure',
+    trace: 'retain-on-failure',
+    video: 'retain-on-failure',
   },
   retries: 3,
   projects: [
