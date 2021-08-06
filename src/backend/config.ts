@@ -56,14 +56,13 @@ const defaults = {
   admin_user: 'admin',
   db_name:
     defaultEnv !== 'production'
-      ? `${process.env.npm_package_name.toLowerCase()}-${defaultEnv.toLowerCase()}.sqlite3`
+      ? `${process.env.npm_package_name.toLowerCase()}-${defaultEnv.toLowerCase()}`
       : `${process.env.npm_package_name.toLowerCase()}`,
   db_host: 'localhost',
   db_pool_min: '0',
   db_pool_max: '10',
   db_port: '5432',
   db_timeout: '0',
-  db_type: defaultEnv === 'production' ? 'postgresql' : 'sqlite',
   db_user: process.env.npm_package_name.toLowerCase(),
   db_tls: 'false',
   log_level: 'error',
@@ -147,12 +146,6 @@ function validateEmail(value: string, previous: string): string {
 function validateToken(value: string, previous: string): string {
   const token = value ? value : previous;
   Joi.assert(token, Joi.string());
-  return token;
-}
-
-function validateDbtype(value: string, previous: string): string {
-  const token = value ? value : previous;
-  Joi.assert(token, Joi.string().valid('postgresql', 'sqlite'));
   return token;
 }
 
@@ -243,12 +236,6 @@ class Config extends Command {
         'If using Cloudflare Access both the URL and the Audience must be specified.',
       );
     }
-
-    if (this.dbType === 'postgresql' && !this.dbPass) {
-      throw new ServerError(
-        'If using Postgres you need to specify a password.',
-      );
-    }
   }
 
   get dbUrl() {
@@ -317,12 +304,6 @@ export default program
     'Database port',
     validatePort,
     getEnvOrDefault('db_port').asPortNumber(),
-  )
-  .option(
-    '--db-type <driver>',
-    'Database driver (postgresql or sqlite)',
-    validateDbtype,
-    getEnvOrDefault('db_type').asString(),
   )
   .option(
     '--db-pool-min <connections>',

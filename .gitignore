@@ -120,10 +120,5 @@ openapi.json
 # Junk
 .DS_Store
 
-# development sqlite database
-/prereview
-prereview
-/*.sqlite3
-
 # generated hooks
 src/frontend/hooks/api-hooks.tsx

@@ -4,4 +4,3 @@
 /deploy/
 /dist/
 /node_modules/
-/*.sqlite3

@@ -20,11 +20,7 @@ FROM node AS build
 
 RUN \
   apk add --no-cache --virtual .build-deps \
-    g++ \
     git \
-    make \
-    musl-dev \
-    python \
   && npm ci \
   && npm cache clean --force \
   && rm -rf ~/.node-gyp \
@@ -75,11 +71,7 @@ EXPOSE 3000
 
 RUN \
   apk add --no-cache --virtual .build-deps \
-    g++ \
     git \
-    make \
-    musl-dev \
-    python \
   && npm ci --production \
   && npm cache clean --force \
   && rm -rf ~/.node-gyp \

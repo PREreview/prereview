@@ -24,10 +24,6 @@ import {
 } from './models/entities';
 import config from './config';
 
-type DbDrivers = 'postgresql' | 'sqlite' | 'mongo' | 'mysql' | 'mariadb';
-
-const dbType: DbDrivers = config.dbType;
-
 const authString =
   config.dbUser && config.dbPass ? `${config.dbUser}:${config.dbPass}@` : '';
 const portString = config.dbPort ? `:${config.dbPort}` : '';
@@ -56,10 +52,9 @@ const options: Options = {
     User,
     Work,
   ],
-  type: dbType,
+  type: 'postgresql',
   debug: config.logLevel === 'trace',
-  clientUrl: `
-  ${dbType}://${authString}${config.dbHost}${portString}/${config.dbName}`,
+  clientUrl: `postgresql://${authString}${config.dbHost}${portString}/${config.dbName}`,
   cache: {
     pretty: true,
     options: {
@@ -68,11 +63,11 @@ const options: Options = {
   },
   migrations: {
     disableForeignKeys: false,
-    path: `src/backend/db/migrations/${config.dbType}`,
+    path: 'src/backend/db/migrations/postgresql',
   },
 };
 
-if (config.dbType === 'postgresql' && config.dbTls) {
+if (config.dbTls) {
   options.driverOptions = { connection: { ssl: true } };
 }
 

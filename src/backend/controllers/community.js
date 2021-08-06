@@ -1,6 +1,5 @@
 import router from 'koa-joi-router';
 import { QueryOrder, wrap } from '@mikro-orm/core';
-import { PostgreSqlConnection } from '@mikro-orm/postgresql';
 import { getLogger } from '../log.js';
 import { getErrorMessages } from '../utils/errors';
 import { getFields } from '../utils/getFields.ts';
@@ -169,30 +168,16 @@ export default function controller(
         const orderBy = { name: order };
         const queries = [];
         if (ctx.query.search && ctx.query.search !== '') {
-          const connection = communityModel.em.getConnection();
-          if (connection instanceof PostgreSqlConnection) {
-            queries.push({
-              $or: [
-                { name: { $ilike: `%${ctx.query.search}%` } },
-                { description: { $ilike: `%${ctx.query.search}%` } },
-                { members: { $ilike: `%${ctx.query.search}%` } },
-                { owners: { $ilike: `%${ctx.query.search}%` } },
-                { events: { $ilike: `%${ctx.query.search}%` } },
-                { preprints: { $ilike: `%${ctx.query.search}%` } },
-              ],
-            });
-          } else {
-            queries.push({
-              $or: [
-                { name: { $like: `%${ctx.query.search}%` } },
-                { description: { $like: `%${ctx.query.search}%` } },
-                { members: { $like: `%${ctx.query.search}%` } },
-                { owners: { $like: `%${ctx.query.search}%` } },
-                { events: { $like: `%${ctx.query.search}%` } },
-                { preprints: { $like: `%${ctx.query.search}%` } },
-              ],
-            });
-          }
+          queries.push({
+            $or: [
+              { name: { $ilike: `%${ctx.query.search}%` } },
+              { description: { $ilike: `%${ctx.query.search}%` } },
+              { members: { $ilike: `%${ctx.query.search}%` } },
+              { owners: { $ilike: `%${ctx.query.search}%` } },
+              { events: { $ilike: `%${ctx.query.search}%` } },
+              { preprints: { $ilike: `%${ctx.query.search}%` } },
+            ],
+          });
         }
         const options = {
           fields: getFields(

@@ -9,7 +9,6 @@ services:
     environment:
       PREREVIEW_HOST: 0.0.0.0
       PREREVIEW_PORT: 3000
-      PREREVIEW_DB_TYPE: postgresql
       PREREVIEW_DB_PORT: 5432
       PREREVIEW_DB_USER: prereview
 

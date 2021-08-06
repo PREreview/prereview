@@ -1,6 +1,5 @@
 import router from 'koa-joi-router';
 import { QueryOrder } from '@mikro-orm/core';
-import { PostgreSqlConnection } from '@mikro-orm/postgresql';
 import { getLogger } from '../log.js';
 import { getErrorMessages } from '../utils/errors';
 import { getFields } from '../utils/getFields.ts';
@@ -120,22 +119,12 @@ export default function controller(
         };
         let queries = [];
         if (ctx.query.search && ctx.query.search !== '') {
-          const connection = personasModel.em.getConnection();
-          if (connection instanceof PostgreSqlConnection) {
-            queries.push({
-              $or: [
-                { name: { $ilike: `%${ctx.query.search}%` } },
-                { bio: { $ilike: `%${ctx.query.search}%` } },
-              ],
-            });
-          } else {
-            queries.push({
-              $or: [
-                { name: { $like: `%${ctx.query.search}%` } },
-                { bio: { $like: `%${ctx.query.search}%` } },
-              ],
-            });
-          }
+          queries.push({
+            $or: [
+              { name: { $ilike: `%${ctx.query.search}%` } },
+              { bio: { $ilike: `%${ctx.query.search}%` } },
+            ],
+          });
         }
 
         if (ctx.query.badges) {

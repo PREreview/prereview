@@ -1,7 +1,6 @@
 import router from 'koa-joi-router';
 import 'reflect-metadata';
 import { QueryOrder } from '@mikro-orm/core';
-import { PostgreSqlConnection } from '@mikro-orm/postgresql';
 import { getLogger } from '../log.js';
 import { resolvePreprint } from '../utils/resolve.ts';
 import { createPreprintId } from '../../common/utils/ids';
@@ -231,26 +230,14 @@ export default function controller(preprints, thisUser) {
           isPublished: { $eq: true },
         });
         if (ctx.query.search && ctx.query.search !== '') {
-          const connection = preprints.em.getConnection();
-          if (connection instanceof PostgreSqlConnection) {
-            queries.push({
-              $or: [
-                { title: { $ilike: `%${ctx.query.search}%` } },
-                { handle: { $ilike: `%${ctx.query.search}%` } },
-                { abstract_text: { $ilike: `%${ctx.query.search}%` } },
-                { authors: { $ilike: `%${ctx.query.search}%` } },
-              ],
-            });
-          } else {
-            queries.push({
-              $or: [
-                { title: { $like: `%${ctx.query.search}%` } },
-                { handle: { $like: `%${ctx.query.search}%` } },
-                { abstract_text: { $like: `%${ctx.query.search}%` } },
-                { authors: { $like: `%${ctx.query.search}%` } },
-              ],
-            });
-          }
+          queries.push({
+            $or: [
+              { title: { $ilike: `%${ctx.query.search}%` } },
+              { handle: { $ilike: `%${ctx.query.search}%` } },
+              { abstract_text: { $ilike: `%${ctx.query.search}%` } },
+              { authors: { $ilike: `%${ctx.query.search}%` } },
+            ],
+          });
         }
 
         if (ctx.query.tags) {
