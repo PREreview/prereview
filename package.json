@@ -268,6 +268,7 @@
     "@babel/preset-typescript": "^7.12.1",
     "@mikro-orm/cli": "^4.5.4",
     "@mikro-resources/fixtures": "git+https://github.com/throneless-tech/mikro-resources.git#just-fixtures",
+    "@parcel/transformer-image": "2.0.0-beta.2",
     "@parcel/transformer-sass": "2.0.0-beta.2",
     "@parcel/transformer-typescript-tsc": "2.0.0-beta.2",
     "@parcel/validator-typescript": "2.0.0-beta.2",

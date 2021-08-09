@@ -41,25 +41,25 @@ import HeroImg from '../assets/images/home/hero.svg';
 import Card1 from '../assets/images/home/card-1.svg';
 import Card2 from '../assets/images/home/card-2.svg';
 import Card3 from '../assets/images/home/card-3.svg';
-import CommunitiesImg from '../assets/images/home/communities.jpg';
+import CommunitiesImg from '../assets/images/home/communities.jpg?width=800';
 
 // sponsor logos
-import APSImg from '../assets/images/sponsors/aps-foundation.png';
-import ElifeImg from '../assets/images/sponsors/elife.jpg';
-import IOIImg from '../assets/images/sponsors/ioi.png';
-import MozillaImg from '../assets/images/sponsors/mozilla.png';
-import WellcomeImg from '../assets/images/sponsors/wellcome.jpg';
+import APSImg from '../assets/images/sponsors/aps-foundation.png?width=300';
+import ElifeImg from '../assets/images/sponsors/elife.jpg?width=300';
+import IOIImg from '../assets/images/sponsors/ioi.png?height=140';
+import MozillaImg from '../assets/images/sponsors/mozilla.png?width=300';
+import WellcomeImg from '../assets/images/sponsors/wellcome.jpg?height=140';
 
 // press and awards images
-import ASAPbioImg from '../assets/images/press-awards/ASAPbio.jpg';
-import Bio2040Img from '../assets/images/press-awards/bio2040.jpg';
-import JROSTImg from '../assets/images/press-awards/JROST.png';
-import NatureOSrPREImg from '../assets/images/press-awards/nature-comm-OSrPRE.png';
-import NatureIndexImg from '../assets/images/press-awards/nature-index.jpg';
-import NoManifestoImg from '../assets/images/press-awards/no-manifesto.png';
-import SCMornPostImg from '../assets/images/press-awards/sc-morning-post.jpg';
-import SPARCImg from '../assets/images/press-awards/sparc.jpg';
-import LancetImg from '../assets/images/press-awards/the-lancet.jpg';
+import ASAPbioImg from '../assets/images/press-awards/ASAPbio.jpg?width=475';
+import Bio2040Img from '../assets/images/press-awards/bio2040.jpg?width=475';
+import JROSTImg from '../assets/images/press-awards/JROST.png?width=475&as=jpg';
+import NatureOSrPREImg from '../assets/images/press-awards/nature-comm-OSrPRE.png?width=475&as=jpg';
+import NatureIndexImg from '../assets/images/press-awards/nature-index.jpg?width=475';
+import NoManifestoImg from '../assets/images/press-awards/no-manifesto.png?width=475&as=jpg';
+import SCMornPostImg from '../assets/images/press-awards/sc-morning-post.jpg?width=475';
+import SPARCImg from '../assets/images/press-awards/sparc.jpg?width=475';
+import LancetImg from '../assets/images/press-awards/the-lancet.jpg?width=475';
 
 // constants
 import { ORG } from '../constants';
