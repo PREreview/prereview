@@ -277,7 +277,15 @@ export default async function configServer(config) {
         );
       }
     })
-    .use(serveStatic(STATIC_DIR))
+    .use(
+      serveStatic(STATIC_DIR, {
+        setHeaders: (res, path) => {
+          if (path.match(/\.[a-z0-9]{8}\.[A-z0-9]+(?:\.map)?$/)) {
+            res.setHeader('Cache-Control', 'public, max-age=60, immutable');
+          }
+        },
+      }),
+    )
     .use(
       async (ctx, next) =>
         await serveStatic(STATIC_DIR)(Object.assign(ctx, { path: '/' }), next),
