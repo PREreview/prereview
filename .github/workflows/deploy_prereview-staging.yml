@@ -67,7 +67,7 @@ jobs:
 
     steps:
       - name: 'Tag as latest'
-        uses: tinact/docker.image-retag@v1
+        uses: tinact/docker.image-retag@1.0.3
         with:
           image_name: 'prereview'
           image_old_tag: ${{ env.IMAGE_TAG }}
