@@ -8,6 +8,7 @@ on:
 env:
   DOCKER_BUILDKIT: 1
   IMAGE_TAG: ${{ github.sha }}
+  REGISTRY_USERNAME: prereview
 
 jobs:
 
@@ -55,7 +56,7 @@ jobs:
         uses: azure/docker-login@v1
         with:
           login-server: prereview.azurecr.io
-          username: ${{ secrets.REGISTRY_USERNAME }}
+          username: ${{ env.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
 
       - name: 'Push image'
