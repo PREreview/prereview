@@ -63,7 +63,7 @@ jobs:
           password: ${{ secrets.REGISTRY_PASSWORD }}
 
       - name: 'Push image'
-        run: docker push prereview.azurecr.io/prereview:${{ IMAGE_TAG }}
+        run: docker push prereview.azurecr.io/prereview:${{ env.IMAGE_TAG }}
 
   deploy:
     runs-on: ubuntu-20.04
@@ -98,5 +98,5 @@ jobs:
           image_old_tag: ${{ env.IMAGE_TAG }}
           image_new_tag: 'develop'
           registry: 'prereview.azurecr.io'
-          registry_username: ${{ secrets.REGISTRY_USERNAME }}
+          registry_username: ${{ env.REGISTRY_USERNAME }}
           registry_password: ${{ secrets.REGISTRY_PASSWORD }}
