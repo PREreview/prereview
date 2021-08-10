@@ -367,19 +367,22 @@ export default function controller(
 
         const badges = ctx.request.body.badges;
         const user = await thisUser.getUser(ctx);
-        const isAdmin = user ? await thisUser.isMemberOf('admins', user.orcid) : false;
+        const isAdmin = user
+          ? await thisUser.isMemberOf('admins', user.orcid)
+          : false;
         if (Array.isArray(badges) && isAdmin) {
           log.debug('Updating badges');
           for (let oldBadge of persona.badges.getItems()) {
             if (!badges.some(b => oldBadge.uuid === b.uuid)) {
-              await oldBadge.personas.loadItems()
+              await oldBadge.personas.loadItems();
               oldBadge.personas.remove(persona);
             }
           }
           for (let newBadge of badges) {
-            const badge = await badgesModel.findOneOrFail({ uuid: newBadge.uuid }, [
-              'personas',
-            ]);
+            const badge = await badgesModel.findOneOrFail(
+              { uuid: newBadge.uuid },
+              ['personas'],
+            );
             badge.personas.add(persona);
           }
         }

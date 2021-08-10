@@ -441,7 +441,11 @@ export default function controller(
 
       let owner;
 
-      if (ctx.request.body.owners && ctx.request.body.owners.length && ctx.request.body.owners.length > 0) {
+      if (
+        ctx.request.body.owners &&
+        ctx.request.body.owners.length &&
+        ctx.request.body.owners.length > 0
+      ) {
         if (typeof ctx.request.body.owners[0] === 'object') {
           owner = ctx.request.body.owners[0];
         } else {
