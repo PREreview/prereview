@@ -29,9 +29,6 @@ jobs:
       - name: 'Smoke test'
         run: .github/smoke-test.sh
 
-      - name: 'Tag image'
-        run: docker tag prereview.azurecr.io/prereview:${IMAGE_TAG} prereview.azurecr.io/prereview:latest
-
       - name: 'Log in to registry'
         uses: azure/docker-login@v1
         with:
@@ -40,9 +37,7 @@ jobs:
           password: ${{ secrets.REGISTRY_PASSWORD }}
 
       - name: 'Push image'
-        run: |
-          docker push prereview.azurecr.io/prereview:${IMAGE_TAG}
-          docker push prereview.azurecr.io/prereview:latest
+        run: docker push prereview.azurecr.io/prereview:${IMAGE_TAG}
 
   deploy:
     runs-on: ubuntu-20.04
@@ -64,3 +59,19 @@ jobs:
           slot-name: 'staging'
           images: prereview.azurecr.io/prereview:${{ env.IMAGE_TAG }}
           configuration-file: './deploy/docker-compose.yml'
+
+  tag:
+    runs-on: ubuntu-20.04
+    needs: deploy
+    continue-on-error: true
+
+    steps:
+      - name: 'Tag as latest'
+        uses: tinact/docker.image-retag@v1
+        with:
+          image_name: 'prereview'
+          image_old_tag: ${{ env.IMAGE_TAG }}
+          image_new_tag: 'latest'
+          registry: 'prereview.azurecr.io'
+          registry_username: ${{ secrets.REGISTRY_USERNAME }}
+          registry_password: ${{ secrets.REGISTRY_PASSWORD }}
