@@ -1,7 +1,4 @@
-# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
-# More GitHub Actions for Azure: https://github.com/Azure/actions
-
-name: Build and deploy Node.js app to Azure Web App - prereview2-dev
+name: Build and deploy to dev
 
 on:
   push:
@@ -13,64 +10,74 @@ env:
   IMAGE_TAG: ${{ github.sha }}
 
 jobs:
-  build-and-deploy:
-    runs-on: ubuntu-latest
+
+  build:
+    runs-on: ubuntu-20.04
+
     steps:
-    # checkout the repo
-    - name: 'Checkout Github Action'
-      uses: actions/checkout@master
-      with:
-        lfs: true
+      - name: 'Checkout code'
+        uses: actions/checkout@v2
+        with:
+          lfs: true
 
-    - name: 'Build dev image'
-      run: docker-compose --file docker-compose.yml --file docker-compose.dev.yml build prereview
+      - name: 'Build dev image'
+        run: docker-compose --file docker-compose.yml --file docker-compose.dev.yml build prereview
 
-    - name: 'Lint'
-      run: docker-compose --file docker-compose.yml --file docker-compose.dev.yml run --entrypoint "npm run" prereview lint
+      - name: 'Lint'
+        run: docker-compose --file docker-compose.yml --file docker-compose.dev.yml run --entrypoint "npm run" prereview lint
 
-    - name: 'Test'
-      run: docker-compose --file docker-compose.yml --file docker-compose.dev.yml run --entrypoint "npm run" prereview test
+      - name: 'Test'
+        run: docker-compose --file docker-compose.yml --file docker-compose.dev.yml run --entrypoint "npm run" prereview test
 
-    - name: 'Login via Azure CLI'
-      uses: azure/login@v1
-      with:
-        creds: ${{ secrets.AZURE_CREDENTIALS }}
+      - name: 'Build image'
+        run: docker-compose build prereview
 
-    - name: 'Login to private registry'
-      uses: azure/docker-login@v1
-      with:
-        login-server: prereview.azurecr.io
-        username: ${{ secrets.REGISTRY_USERNAME }}
-        password: ${{ secrets.REGISTRY_PASSWORD }}
+      - name: 'Smoke test'
+        run: .github/smoke-test.sh
 
-    - name: 'Build prod image'
-      run: docker-compose build prereview
+      - name: 'Build integration test image'
+        run: docker-compose --file docker-compose.yml --file docker-compose.integration.yml build playwright
 
-    - name: 'Smoke test'
-      run: .github/smoke-test.sh
+      - name: 'Run integration tests'
+        run: docker-compose --file docker-compose.yml --file docker-compose.integration.yml run playwright
 
-    - name: 'Build integration test image'
-      run: docker-compose --file docker-compose.yml --file docker-compose.integration.yml build playwright
+      - name: 'Store integration test results'
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: integration-tests-results
+          path: integration/results
 
-    - name: 'Run integration tests'
-      run: docker-compose --file docker-compose.yml --file docker-compose.integration.yml run playwright
+      - name: 'Tag image'
+        run: docker tag prereview.azurecr.io/prereview:${IMAGE_TAG} prereview.azurecr.io/prereview:develop
 
-    - name: 'Store integration test results'
-      if: ${{ failure() }}
-      uses: actions/upload-artifact@v2
-      with:
-        name: integration-tests-results
-        path: integration/results
+      - name: 'Log in to registry'
+        uses: azure/docker-login@v1
+        with:
+          login-server: prereview.azurecr.io
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
 
-    - name: 'Tag image'
-      run: docker tag prereview.azurecr.io/prereview:${IMAGE_TAG} prereview.azurecr.io/prereview:develop
+      - name: 'Push image'
+        run: |
+          docker push prereview.azurecr.io/prereview:${IMAGE_TAG}
+          docker push prereview.azurecr.io/prereview:develop
 
-    - name: 'Push image'
-      run: |
-        docker push prereview.azurecr.io/prereview:${IMAGE_TAG}
-        docker push prereview.azurecr.io/prereview:develop
+  deploy:
+    runs-on: ubuntu-20.04
+    needs: build
 
-    - uses: azure/webapps-deploy@v2
-      with:
-        app-name: 'prereview-dev'
-        configuration-file: './deploy/docker-compose-dev.yml'
+    steps:
+      - name: 'Checkout code'
+        uses: actions/checkout@v2
+
+      - name: 'Log in to Azure'
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: 'Deploy app'
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: 'prereview-dev'
+          configuration-file: './deploy/docker-compose-dev.yml'

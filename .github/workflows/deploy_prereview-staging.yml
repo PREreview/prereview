@@ -1,7 +1,4 @@
-# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
-# More GitHub Actions for Azure: https://github.com/Azure/actions
-
-name: Build and deploy Node.js app to Azure Web App - prereview2-dev
+name: Build and deploy to staging
 
 on:
   push:
@@ -13,43 +10,53 @@ env:
   IMAGE_TAG: ${{ github.sha }}
 
 jobs:
-  build-and-deploy:
-    runs-on: ubuntu-latest
+
+  build:
+    runs-on: ubuntu-20.04
+
     steps:
-    # checkout the repo
-    - name: 'Checkout Github Action'
-      uses: actions/checkout@master
-      with:
-        lfs: true
+      - name: 'Checkout code'
+        uses: actions/checkout@v2
+        with:
+          lfs: true
 
-    - name: 'Login via Azure CLI'
-      uses: azure/login@v1
-      with:
-        creds: ${{ secrets.AZURE_CREDENTIALS }}
+      - name: 'Build image'
+        run: docker-compose build prereview
 
-    - name: 'Login to private registry'
-      uses: azure/docker-login@v1
-      with:
-        login-server: prereview.azurecr.io
-        username: ${{ secrets.REGISTRY_USERNAME }}
-        password: ${{ secrets.REGISTRY_PASSWORD }}
+      - name: 'Smoke test'
+        run: .github/smoke-test.sh
 
-    - name: 'Build image'
-      run: docker-compose build prereview
+      - name: 'Tag image'
+        run: docker tag prereview.azurecr.io/prereview:${IMAGE_TAG} prereview.azurecr.io/prereview:latest
 
-    - name: 'Smoke test'
-      run: .github/smoke-test.sh
+      - name: 'Log in to registry'
+        uses: azure/docker-login@v1
+        with:
+          login-server: prereview.azurecr.io
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
 
-    - name: 'Tag image'
-      run: docker tag prereview.azurecr.io/prereview:${IMAGE_TAG} prereview.azurecr.io/prereview:latest
+      - name: 'Push image'
+        run: |
+          docker push prereview.azurecr.io/prereview:${IMAGE_TAG}
+          docker push prereview.azurecr.io/prereview:latest
 
-    - name: 'Push image'
-      run: |
-        docker push prereview.azurecr.io/prereview:${IMAGE_TAG}
-        docker push prereview.azurecr.io/prereview:latest
+  deploy:
+    runs-on: ubuntu-20.04
+    needs: build
 
-    - uses: azure/webapps-deploy@v2
-      with:
-        app-name: 'prereview2'
-        slot-name: 'staging'
-        configuration-file: './deploy/docker-compose.yml'
+    steps:
+      - name: 'Checkout code'
+        uses: actions/checkout@v2
+
+      - name: 'Log in to Azure'
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: 'Deploy app'
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: 'prereview2'
+          slot-name: 'staging'
+          configuration-file: './deploy/docker-compose.yml'
