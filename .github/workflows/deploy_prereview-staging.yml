@@ -1,4 +1,4 @@
-name: Build and deploy to staging
+name: Deploy to staging
 
 on:
   push:
@@ -6,42 +6,13 @@ on:
       - main
 
 env:
-  DOCKER_BUILDKIT: 1
   IMAGE_TAG: ${{ github.sha }}
   REGISTRY_USERNAME: prereview
 
 jobs:
 
-  build:
-    runs-on: ubuntu-20.04
-
-    steps:
-      - name: 'Checkout code'
-        uses: actions/checkout@v2
-        with:
-          lfs: true
-
-      - name: 'Build image'
-        run: make build
-        env:
-          TARGET: 'prod'
-
-      - name: 'Smoke test'
-        run: .github/smoke-test.sh
-
-      - name: 'Log in to registry'
-        uses: azure/docker-login@v1
-        with:
-          login-server: prereview.azurecr.io
-          username: ${{ env.REGISTRY_USERNAME }}
-          password: ${{ secrets.REGISTRY_PASSWORD }}
-
-      - name: 'Push image'
-        run: docker push prereview.azurecr.io/prereview:${{ env.IMAGE_TAG }}
-
   deploy:
     runs-on: ubuntu-20.04
-    needs: build
 
     steps:
       - name: 'Checkout code'
