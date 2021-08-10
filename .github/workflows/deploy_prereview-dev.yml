@@ -80,4 +80,5 @@ jobs:
         uses: azure/webapps-deploy@v2
         with:
           app-name: 'prereview-dev'
+          images: prereview.azurecr.io/prereview:${IMAGE_TAG}
           configuration-file: './deploy/docker-compose-dev.yml'

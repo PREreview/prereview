@@ -59,4 +59,5 @@ jobs:
         with:
           app-name: 'prereview2'
           slot-name: 'staging'
+          images: prereview.azurecr.io/prereview:${IMAGE_TAG}
           configuration-file: './deploy/docker-compose.yml'
