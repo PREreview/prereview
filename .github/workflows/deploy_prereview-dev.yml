@@ -22,25 +22,31 @@ jobs:
           lfs: true
 
       - name: 'Build dev image'
-        run: docker-compose --file docker-compose.yml --file docker-compose.dev.yml build prereview
+        run: make build
+        env:
+          TARGET: 'dev'
 
       - name: 'Lint'
-        run: docker-compose --file docker-compose.yml --file docker-compose.dev.yml run --entrypoint "npm run" prereview lint
+        run: make lint
 
       - name: 'Test'
-        run: docker-compose --file docker-compose.yml --file docker-compose.dev.yml run --entrypoint "npm run" prereview test
+        run: make test
 
       - name: 'Build image'
-        run: docker-compose build prereview
+        run: make build
+        env:
+          TARGET: 'prod'
 
       - name: 'Smoke test'
-        run: .github/smoke-test.sh
+        run: make smoke-test
 
       - name: 'Build integration test image'
-        run: docker-compose --file docker-compose.yml --file docker-compose.integration.yml build playwright
+        run: make build
+        env:
+          TARGET: 'integration'
 
       - name: 'Run integration tests'
-        run: docker-compose --file docker-compose.yml --file docker-compose.integration.yml run playwright
+        run: make integration-test
 
       - name: 'Store integration test results'
         if: ${{ failure() }}

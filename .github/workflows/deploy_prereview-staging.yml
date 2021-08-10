@@ -22,7 +22,9 @@ jobs:
           lfs: true
 
       - name: 'Build image'
-        run: docker-compose build prereview
+        run: make build
+        env:
+          TARGET: 'prod'
 
       - name: 'Smoke test'
         run: .github/smoke-test.sh

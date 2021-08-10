@@ -2,7 +2,6 @@ version: "3"
 services:
   prereview:
     container_name: prereview
-    image: prereview.azurecr.io/prereview:${IMAGE_TAG:-local}
     build:
       context: .
       target: prod
