@@ -7,6 +7,7 @@ RUN \
     postgresql-client
 
 COPY \
+  .npmrc \
   package.json \
   package-lock.json \
   ./
