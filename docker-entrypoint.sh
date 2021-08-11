@@ -49,12 +49,7 @@ init_db() {
   npm run db:init
 }
 
-if [ $NODE_ENV == "staging" -o $NODE_ENV == "development" ] && [ $IMPORT_CLEAR_DB == "true" ]; then
-  echo "Clearing database"
-  clear_db
-fi
-
-if [ $NODE_ENV == "staging" ] && [ -z $IMPORT_SOURCES ]; then
+if [ $NODE_ENV == "staging" ]; then
   echo "Copying existing database $FROM_NAME to staging"
   echo "Dumping $FROM_NAME database"
   env -i PGPASSWORD="$FROM_PASS" /usr/bin/pg_dump -U "$FROM_USER" -d "$FROM_NAME" -h "$FROM_HOST" -p "$FROM_PORT" -f /tmp/import.sql
@@ -72,11 +67,7 @@ else
   
   result=$?
   if [ $result -ne 0 ]; then
-    if [ $NODE_ENV == "staging" ]; then
-      echo "Import legacy data"
-      init_db
-      npm run db:import &
-    elif [ $NODE_ENV == "development" ]; then
+    if [ $NODE_ENV == "development" ]; then
       echo "Generate seeds"
       init_db
       npm run db:seeds &
