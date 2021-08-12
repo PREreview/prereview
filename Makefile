@@ -6,6 +6,7 @@ TARGET := dev
 endif
 
 DOCKER_COMPOSE = docker-compose --file docker-compose.yml --file docker-compose.$(TARGET).yml
+STOP = exit=$$?; $(MAKE) stop; exit $$exit
 
 help: ## Display this help text
 	@grep -E '^[a-zA-Z_\\:-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | sed 's/\\:/:/g' | awk 'BEGIN {FS = ":[^:]*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
@@ -17,7 +18,7 @@ build:
 	$(DOCKER_COMPOSE) build
 
 run: .env build
-	${DOCKER_COMPOSE} up --abort-on-container-exit --exit-code-from prereview
+	${DOCKER_COMPOSE} up --abort-on-container-exit --exit-code-from prereview; ${STOP}
 
 dev: export TARGET = dev
 dev: run ## Run the dev image
