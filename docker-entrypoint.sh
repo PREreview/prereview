@@ -67,9 +67,9 @@ else
   
   result=$?
   if [ $result -ne 0 ]; then
+    init_db
     if [ $NODE_ENV == "development" ]; then
       echo "Generate seeds"
-      init_db
       npm run db:seeds &
     fi
   else
@@ -81,3 +81,4 @@ fi
 echo "Running => npm run $@"
 
 npm run "$@"
+

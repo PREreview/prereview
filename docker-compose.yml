@@ -13,7 +13,6 @@ services:
     ports:
       - "3000:3000"
     environment:
-      NODE_ENV: ${NODE_ENV:-development}
       PREREVIEW_LOG_LEVEL: ${PREREVIEW_LOG_LEVEL:-debug}
       PREREVIEW_HOST: ${PREREVIEW_HOST:-0.0.0.0}
       PREREVIEW_PORT: ${PREREVIEW_PORT:-3000}
