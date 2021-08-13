@@ -7,6 +7,7 @@ endif
 
 DOCKER_COMPOSE = docker-compose --file docker-compose.yml --file docker-compose.$(TARGET).yml
 STOP = exit=$$?; $(MAKE) stop; exit $$exit
+LOGS = exit=$$?; $(MAKE) logs; exit $$exit
 
 help: ## Display this help text
 	@grep -E '^[a-zA-Z_\\:-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | sed 's/\\:/:/g' | awk 'BEGIN {FS = ":[^:]*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
@@ -31,7 +32,11 @@ start:
 	${DOCKER_COMPOSE} up --detach
 
 logs:
+ifeq (${LOG_FILE},)
 	${DOCKER_COMPOSE} logs
+else
+	${DOCKER_COMPOSE} logs --no-color > ${LOG_FILE}
+endif
 
 stop:
 	${DOCKER_COMPOSE} down
@@ -48,9 +53,10 @@ test: build ## Run the tests
 	${DOCKER_COMPOSE} run --rm --no-deps --entrypoint "npm run" prereview test
 
 integration-test: export TARGET = integration
+integration-test: export LOG_FILE = integration/results/docker.log
 integration-test: build ## Run the integration tests
 	rm -rf integration/results
-	${DOCKER_COMPOSE} run --rm playwright
+	${DOCKER_COMPOSE} run --rm playwright; ${LOGS}
 
 smoke-test: build ## Run the smoke tests
 	.scripts/smoke-test.sh
