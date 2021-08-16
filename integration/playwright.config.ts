@@ -8,6 +8,7 @@ const config: PlaywrightTestConfig = {
     trace: 'retain-on-failure',
     video: 'retain-on-failure',
   },
+  globalSetup: require.resolve('./src/global-setup'),
   retries: 3,
   projects: [
     {
