@@ -61,6 +61,16 @@ CMD ["start:dev"]
 
 
 #
+# Stage: Integration
+#
+FROM dev AS integration
+ENV NODE_ENV=integration
+
+CMD ["start"]
+
+
+
+#
 # Stage: Production
 #
 FROM node AS prod

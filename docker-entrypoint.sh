@@ -62,9 +62,14 @@ if [ $NODE_ENV == "staging" ]; then
 
   echo "Updating database schema"
   npm run db:migrations
+elif [ $NODE_ENV == "integration" ]; then
+  echo "Resetting database"
+  clear_db
+  init_db
+  npm run db:apiKey
 else
   env -i PGPASSWORD="$PASS" /usr/bin/psql -U "$USER" -d "$NAME" -h "$HOST" -p "$PORT" -tAc "SELECT to_regclass('public.user')" | grep -q user
-  
+
   result=$?
   if [ $result -ne 0 ]; then
     init_db

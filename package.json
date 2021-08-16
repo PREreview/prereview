@@ -59,6 +59,7 @@
     "build:templates": "copyfiles -u 2 src/backend/templates/email/**/*.hbs dist/backend",
     "db": "mikro-orm",
     "db:migrations": "node dist/scripts/dbMigrations.js",
+    "db:apiKey": "ts-node src/backend/scripts/dbApiKey.ts",
     "db:seeds": "ts-node src/backend/scripts/dbSeeds.ts",
     "db:init": "node dist/scripts/dbInit.js",
     "scan:migrations": "barrelsby --delete -l below -d src/backend/db/migrations",

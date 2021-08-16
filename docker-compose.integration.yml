@@ -1,5 +1,14 @@
-version: "3"
+version: "3.4"
 services:
+  prereview:
+    build:
+      target: integration
+    environment:
+      PREREVIEW_ADMIN_USERS: '0000-0002-7498-6197'
+      TEST_ADMIN_USER_ORCID: '0000-0002-7498-6197'
+      TEST_ADMIN_USER_API_APP: 'playwright'
+      TEST_ADMIN_USER_API_KEY: 'not-a-secret'
+
   playwright:
     build:
       context: integration
@@ -12,3 +21,6 @@ services:
       - './integration/playwright.config.ts:/app/playwright.config.ts'
       - './integration/src:/app/src'
       - './integration/results:/app/test-results'
+    environment:
+      TEST_ADMIN_USER_API_APP: 'playwright'
+      TEST_ADMIN_USER_API_KEY: 'not-a-secret'
