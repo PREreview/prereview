@@ -6,7 +6,7 @@ export async function screenshot(
   page: Page,
   focus?: ElementHandle | string,
 ): Promise<Buffer> {
-  await page.waitForLoadState();
+  await Promise.all(page.frames().map(frame => frame.waitForLoadState()));
 
   if (typeof focus === 'string') {
     focus = await page.waitForSelector(focus);
