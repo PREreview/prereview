@@ -1,5 +1,4 @@
-import { ChainedErrorFactory } from 'typescript-chained-error';
-import { ChainError } from '../../common/errors';
+import ChainedError, { ChainedErrorFactory } from 'typescript-chained-error';
 
 interface HttpErrorProps {
   expose?: boolean;
@@ -7,7 +6,7 @@ interface HttpErrorProps {
   cleanStack?: boolean;
 }
 
-class HttpError extends ChainError {
+class HttpError extends ChainedError {
   readonly expose: boolean;
   readonly headers?: Record<string, string>;
   readonly status: number;
@@ -24,7 +23,7 @@ class HttpError extends ChainError {
     }
     const cleanStack =
       properties && properties.cleanStack ? properties.cleanStack : true;
-    super(`HTTP Error ${status}: ${message}`, cause, cleanStack);
+    super(`HTTP Error ${status}: ${message}`, cause, { cleanStack });
     this.status = status;
     this.expose =
       properties && properties.expose ? properties.expose : status < 500;

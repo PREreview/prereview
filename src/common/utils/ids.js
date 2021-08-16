@@ -1,6 +1,6 @@
 import doiRegex from 'doi-regex';
 import identifiersArxiv from 'identifiers-arxiv';
-import { ChainError } from '../errors.ts';
+import ChainedError from 'typescript-chained-error';
 
 export function createPreprintId(
   value, // doi or arXiv (prefixed or not) or preprint
@@ -13,7 +13,7 @@ export function createPreprintId(
       id = value.doi || value.arXivId;
     }
     if (!id) {
-      throw new ChainError('Invalid identifier for create preprint id');
+      throw new ChainedError('Invalid identifier for create preprint id');
     }
   }
 
@@ -33,7 +33,7 @@ export function createPreprintId(
   }
 
   if (!vendor) {
-    throw new ChainError(
+    throw new ChainedError(
       'Invalid identifier for create preprint id (could not extract vendor)',
     );
   }
@@ -43,7 +43,7 @@ export function createPreprintId(
 
 export function decodePreprintId(value) {
   if (!value) {
-    throw new ChainError('You must provide a preprintId to decode');
+    throw new ChainedError('You must provide a preprintId to decode');
   }
 
   let scheme;
@@ -54,7 +54,7 @@ export function decodePreprintId(value) {
   }
 
   if (!scheme) {
-    throw new ChainError(
+    throw new ChainedError(
       'String is not an encoded preprint ID (could not extract scheme)',
     );
   }

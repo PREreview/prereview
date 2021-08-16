@@ -5,7 +5,7 @@ import scrape from 'html-metadata';
 import { search as scholarSearch } from 'scholarly';
 import CrossRef from 'crossref';
 import { getOrcidPerson } from './orcid.js';
-import { ChainError } from '../../common/errors';
+import ChainedError from 'typescript-chained-error';
 import { getLogger } from '../log.js';
 
 const log = getLogger('backend:utils:resolve');
@@ -43,7 +43,7 @@ async function scrapeUrl(
       headers: { 'User-Agent': 'webscraper' },
     });
   } catch (err) {
-    throw new ChainError('Failed to scrape metadata:', err);
+    throw new ChainedError('Failed to scrape metadata:', err);
   }
 
   if (res) {
@@ -121,7 +121,7 @@ async function searchGoogleScholar(handle: string): Promise<PreprintMetadata> {
   try {
     res = await scholarSearch(handle);
   } catch (err) {
-    throw new ChainError('Failed to search Google Scholar:', err);
+    throw new ChainedError('Failed to search Google Scholar:', err);
   }
 
   if (res.length < 1) {
@@ -159,7 +159,7 @@ function searchCrossRef(handle: string): Promise<PreprintMetadata> {
   return new Promise((resolve, reject) => {
     CrossRef.work(handle, (err, res) => {
       if (err) {
-        reject(new ChainError('Failed to search CrossRef:', err));
+        reject(new ChainedError('Failed to search CrossRef:', err));
       } else {
         if (!res) {
           log.error(`Preprint ${handle} not found on CrossRef.`);

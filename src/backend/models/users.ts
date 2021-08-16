@@ -2,7 +2,7 @@ import { EntityRepository, MikroORM, Repository } from '@mikro-orm/core';
 import orcidUtils from 'orcid-utils';
 import { validate as uuidValidate } from 'uuid';
 import { User } from './entities';
-import { ChainError } from '../../common/errors';
+import ChainedError from 'typescript-chained-error';
 
 @Repository(User)
 export class UserModel extends EntityRepository<User> {
@@ -13,7 +13,7 @@ export class UserModel extends EntityRepository<User> {
       }
       return this.findOne({ uuid: value }, params);
     } catch (err) {
-      throw new ChainError('Failed to parse ORCID for user.', err);
+      throw new ChainedError('Failed to parse ORCID for user.', err);
     }
   }
 
@@ -24,7 +24,7 @@ export class UserModel extends EntityRepository<User> {
       }
       return this.findOne({ personas: { uuid: value } }, params);
     } catch (err) {
-      throw new ChainError(`Failed to find user for persona ${value}.`, err);
+      throw new ChainedError(`Failed to find user for persona ${value}.`, err);
     }
   }
 
@@ -36,7 +36,7 @@ export class UserModel extends EntityRepository<User> {
         params,
       );
     } catch (err) {
-      throw new ChainError(`Failed to find user for API appId ${app}.`, err);
+      throw new ChainedError(`Failed to find user for API appId ${app}.`, err);
     }
   }
 }
