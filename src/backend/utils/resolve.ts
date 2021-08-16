@@ -186,7 +186,9 @@ function searchCrossRef(handle: string): Promise<PreprintMetadata> {
           license: undefined,
           publication: res.publisher,
           contentUrl:
-            Array.isArray(res.link) && res.link.length > 0
+            Array.isArray(res.link) &&
+            res.link.length > 0 &&
+            res.link[0]['content-type'] !== 'unspecified'
               ? res.link[0].URL
               : undefined,
           contentEncoding:
