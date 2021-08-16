@@ -1,6 +1,6 @@
 import orcidUtils from 'orcid-utils';
 import fetch from 'node-fetch';
-import { createError } from '../../frontend/utils/errors';
+import { createError } from '../utils/http-errors.ts';
 import config from '../config.ts';
 import { Work } from '../models/entities/index.ts';
 const ORCID_API_VERSION = 'v3.0';
