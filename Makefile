@@ -55,7 +55,7 @@ test: build ## Run the tests
 integration-test: export TARGET = integration
 integration-test: export LOG_FILE = integration/results/docker.log
 integration-test: build ## Run the integration tests
-	mkdir -p integration/results && rm -r integration/results/*
+	mkdir -p integration/results && rm -rf integration/results/*
 	${DOCKER_COMPOSE} run --rm playwright; ${LOGS}
 
 smoke-test: build ## Run the smoke tests
