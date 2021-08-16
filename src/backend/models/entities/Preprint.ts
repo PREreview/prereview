@@ -16,7 +16,7 @@ import { FullReview } from './FullReview';
 import { RapidReview } from './RapidReview';
 import { Request } from './Request';
 import { Tag } from './Tag';
-import { createRandomDoi } from '../../../common/utils/ids';
+import { createRandomDoi } from '../../utils/ids';
 
 @Entity()
 @Index({ properties: ['rapidReviews'] })

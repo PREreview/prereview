@@ -9,7 +9,7 @@ import { Fixture } from 'class-fixtures-factory';
 import { WorkModel } from '../works';
 import { BaseEntity } from './BaseEntity';
 import { User } from './User';
-import { createRandomDoi } from '../../../common/utils/ids';
+import { createRandomDoi } from '../../utils/ids';
 
 @Entity()
 @Index({ properties: ['author'] })

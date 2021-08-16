@@ -1,7 +1,7 @@
 import Roles from 'koa-roles';
 import orcidUtils from 'orcid-utils';
 import config from '../config.ts';
-import { isString } from '../../common/utils/strings';
+import { isString } from '../utils/strings';
 import { getLogger } from '../log.js';
 
 const log = getLogger('backend:middleware:auth');

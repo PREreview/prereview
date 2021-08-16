@@ -18,7 +18,7 @@ import { Group } from './Group';
 import { Persona } from './Persona';
 import { Work } from './Work';
 import { Key } from './Key';
-import { createRandomOrcid } from '../../../common/utils/orcid.js';
+import { createRandomOrcid } from '../../utils/orcid';
 
 @Entity()
 @Index({ properties: ['defaultPersona'] })

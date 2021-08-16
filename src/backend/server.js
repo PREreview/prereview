@@ -23,7 +23,7 @@ import replaceStream from 'replacestream';
 import serialize from 'serialize-javascript';
 
 // Our modules
-import { createError } from '../common/errors.ts';
+import { createError } from './utils/http-errors.ts';
 import { dbWrapper } from './db.ts';
 
 // Our middlewares

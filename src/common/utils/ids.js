@@ -1,6 +1,5 @@
 import doiRegex from 'doi-regex';
 import identifiersArxiv from 'identifiers-arxiv';
-import { getId, unprefix } from './jsonld';
 import { ChainError } from '../errors.ts';
 
 export function createPreprintId(
@@ -66,25 +65,11 @@ export function decodePreprintId(value) {
   };
 }
 
-/**
- * biorXiv adds some vX suffix to doi but do not register them with doi.org
- * => here we remove the vX part
- */
-export function unversionDoi(doi = '') {
-  const doiMatch = doi.match(doiRegex());
-  if (doiMatch) {
-    const doi = doiMatch[0];
-    return doi.replace(/v\d+$/, '');
-  }
-
-  return null;
+function getId(doc) {
+  if (!doc) return doc;
+  return typeof doc === 'string' || doc === 'number' ? doc : doc['@id'];
 }
 
-export function createRandomDoi() {
-  return (
-    '10.' +
-    (Math.floor(Math.random() * 10000) + 10000).toString().substring(1) +
-    '/' +
-    (Math.floor(Math.random() * 1000) + 1000).toString().substring(1)
-  );
+function unprefix(uri = '') {
+  return uri.replace(/^.*:/, '');
 }

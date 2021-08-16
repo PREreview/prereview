@@ -4,8 +4,8 @@ import { from } from 'env-var';
 import { Joi } from 'koa-joi-router';
 import orcidUtils from 'orcid-utils';
 import log4js from 'koa-log4';
-import { isString } from '../common/utils';
-import { ServerError } from '../common/errors';
+import { isString } from './utils/strings';
+import { ServerError } from './utils/http-errors';
 
 // Configure logging
 

@@ -17,7 +17,7 @@ import { FullReviewDraft } from './FullReviewDraft';
 import { Persona } from './Persona';
 import { Preprint } from './Preprint';
 import { Statement } from './Statement';
-import { createRandomDoi } from '../../../common/utils/ids';
+import { createRandomDoi } from '../../utils/ids';
 
 @Entity()
 @Index({ properties: ['drafts'] })
