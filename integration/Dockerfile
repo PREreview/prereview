@@ -13,5 +13,5 @@ RUN \
   npm ci --production \
   && npm cache clean --force
 
-ENTRYPOINT ["wait-for-it", "prereview:3000", "--strict", "--"]
+ENTRYPOINT ["wait-for-it", "prereview:3000", "--timeout=20", "--strict", "--"]
 CMD ["npx", "playwright", "test"]
