@@ -1,6 +1,4 @@
 import orcidUtils from 'orcid-utils';
-import fetch from 'node-fetch';
-import { HttpError } from '../errors.ts';
 
 /**
  * See https://support.orcid.org/hc/en-us/articles/360006897674-Structure-of-the-ORCID-Identifier
@@ -21,22 +19,4 @@ export function createRandomOrcid(nTry = 0) {
   }
 
   return orcidUtils.toDashFormat(orcid);
-}
-
-/**
- * See https://members.orcid.org/api/tutorial/read-orcid-records
- */
-export async function getOrcidProfile(orcid, token) {
-  const r = await fetch(`https://pub.orcid.org/v2.1/${orcid}/person`, {
-    headers: {
-      Accept: 'application/json',
-      Authorization: `${token.tokenType} ${token.accessToken}`,
-    },
-  });
-
-  if (r.ok) {
-    return await r.json();
-  } else {
-    throw new HttpError(r.status, `Failed to fetch profile for ORCID ${orcid}`);
-  }
 }

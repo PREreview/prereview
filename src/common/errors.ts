@@ -44,36 +44,6 @@ export class HttpError extends ChainError {
   }
 }
 
-export class BadRequestError extends HttpError {
-  constructor(message: string, cause?: Error) {
-    super(400, message, cause);
-  }
-}
-
-export class UnauthorizedError extends HttpError {
-  constructor(message: string, cause?: Error) {
-    super(401, message, cause);
-  }
-}
-
-export class ForbiddenError extends HttpError {
-  constructor(message: string, cause?: Error) {
-    super(403, message, cause);
-  }
-}
-
-export class NotFoundError extends HttpError {
-  constructor(message: string, cause?: Error) {
-    super(404, message, cause);
-  }
-}
-
-export class UnprocessableError extends HttpError {
-  constructor(message: string, cause?: Error) {
-    super(422, message, cause);
-  }
-}
-
 export class ServerError extends HttpError {
   constructor(message: string, cause?: Error) {
     super(500, message, cause);

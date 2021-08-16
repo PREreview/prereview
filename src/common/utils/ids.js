@@ -1,4 +1,3 @@
-import orcidUtils from 'orcid-utils';
 import doiRegex from 'doi-regex';
 import identifiersArxiv from 'identifiers-arxiv';
 import { getId, unprefix } from './jsonld';
@@ -67,57 +66,6 @@ export function decodePreprintId(value) {
   };
 }
 
-//export function createPreprintHandle(
-//  value, // preprint or identifer (arXivId or DOI, unprefixed)
-//) {
-//  if (!value) {
-//    throw new ChainError('invalid value for createPreprintHandle');
-//  }
-//
-//  if (doiRegex().test(value)) {
-//    return `doi:${value}`;
-//  } else if (identifiersArxiv.extract(value)[0]) {
-//    return `arXiv:${value}`;
-//  } else {
-//    throw new ChainError('invalid value for createPreprintHandle');
-//  }
-//}
-
-export function createPreprintIdentifierCurie(
-  value, // preprint or identifer (arXivId or DOI, unprefixed)
-) {
-  if (!value) {
-    throw new ChainError('invalid value for createIdentifierCurie');
-  }
-
-  if (value.doi) {
-    return `doi:${value.doi}`;
-  } else if (value.arXivId) {
-    return `arXiv:${value.arXivId}`;
-  } else {
-    const id = getId(value);
-    if (!id) {
-      throw new ChainError('invalid value for createIdentifierCurie');
-    }
-
-    if (doiRegex().test(id)) {
-      return `doi:${id}`;
-    } else if (identifiersArxiv.extract(id)[0]) {
-      return `arXiv:${id}`;
-    } else {
-      throw new ChainError('invalid value for createIdentifierCurie');
-    }
-  }
-}
-
-export function getCanonicalDoiUrl(doi) {
-  return `https://doi.org/${unprefix(doi)}`;
-}
-
-export function getCanonicalArxivUrl(arXivId) {
-  return `https://arxiv.org/abs/${unprefix(arXivId)}`;
-}
-
 /**
  * biorXiv adds some vX suffix to doi but do not register them with doi.org
  * => here we remove the vX part
@@ -132,27 +80,11 @@ export function unversionDoi(doi = '') {
   return null;
 }
 
-export function createUserId(orcid) {
-  return `${orcidUtils.toDashFormat(unprefix(orcid))}`;
-}
-
 export function createRandomDoi() {
   return (
     '10.' +
     (Math.floor(Math.random() * 10000) + 10000).toString().substring(1) +
     '/' +
     (Math.floor(Math.random() * 1000) + 1000).toString().substring(1)
-  );
-}
-
-export function createRandomArxivId() {
-  return (
-    'arXiv:' +
-    String(Math.floor(Math.random() * 93) + 7).padStart(2, '0') +
-    String(Math.floor(Math.random() * 12) + 1).padStart(2, '0') +
-    '.' +
-    (Math.floor(Math.random() * 10000) + 10000).toString().substring(1) +
-    'v' +
-    String(Math.floor(Math.random() * 9) + 1)
   );
 }
