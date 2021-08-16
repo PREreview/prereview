@@ -29,8 +29,6 @@ RUN \
 
 COPY \
   .parcelrc \
-  .prettierignore \
-  .prettierrc \
   .sassrc \
   .terserrc \
   tsconfig.json \
@@ -51,6 +49,8 @@ ENV NODE_ENV=development
 
 COPY \
   .gitignore \
+  .prettierignore \
+  .prettierrc \
   .proxyrc \
   docker-entrypoint.sh \
   ./
