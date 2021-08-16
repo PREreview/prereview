@@ -1,7 +1,6 @@
 import { QUESTIONS } from '../constants';
 import { arrayify } from './jsonld';
 import { checkIfIsModerated } from './actions';
-import { useGetPersonas } from '../hooks/api-hooks.tsx';
 
 function isYes(textOrAnswer) {
   const text =

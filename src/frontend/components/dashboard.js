@@ -23,7 +23,6 @@ import UserProvider from '../contexts/user-context';
 // Material UI components
 import { makeStyles } from '@material-ui/core/styles';
 import Box from '@material-ui/core/Box';
-import Chip from '@material-ui/core/Chip';
 import Container from '@material-ui/core/Container';
 import Dialog from '@material-ui/core/Dialog';
 import Grid from '@material-ui/core/Grid';

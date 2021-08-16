@@ -2,8 +2,6 @@
 import React, { useContext, useState } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import PropTypes from 'prop-types';
-import Tooltip from '@reach/tooltip';
 
 // Material UI imports
 import { makeStyles } from '@material-ui/core/styles';

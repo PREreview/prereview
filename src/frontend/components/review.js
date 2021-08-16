@@ -1,11 +1,9 @@
 // base imports
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
-// import { unprefix } from '../utils/jsonld';
 import { ORG } from '../constants';
 
 // module imports
-// import { EditorWrapper } from './editor';
 import CollabEditor from './collab-editor';
 
 export default function Review() {

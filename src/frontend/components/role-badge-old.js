@@ -11,7 +11,6 @@ import MuiAvatar from '@material-ui/core/Avatar';
 import Popover from '@material-ui/core/Popover';
 
 // components
-//import Avatar from './avatar';
 import NoticeBadge from './notice-badge';
 import XLink from './xlink';
 

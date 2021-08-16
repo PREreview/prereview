@@ -20,7 +20,6 @@ import {
 
 // components
 import AddEvent from './add-event';
-//import AddTag from './add-tag';
 import AddUser from './add-user';
 import HeaderBar from './header-bar';
 import Loading from './loading';

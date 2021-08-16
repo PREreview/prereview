@@ -1,5 +1,5 @@
 // base imports
-import React, { Suspense, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { DndProvider } from 'react-dnd';
 import { HelmetProvider } from 'react-helmet-async';
@@ -7,7 +7,6 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import mobile from 'is-mobile';
 import { Switch, Route } from 'react-router-dom';
 import { TouchBackend } from 'react-dnd-touch-backend';
-//import smoothscroll from 'smoothscroll-polyfill';
 import 'url-search-params-polyfill'; /* pollyfill for IE / Edge */
 import { IntlProvider } from 'react-intl';
 
@@ -17,19 +16,15 @@ import { StoresProvider } from '../contexts/store-context';
 
 // components
 import AdminPanel from './admin-panel';
-//import BlockPanel from './block-panel';
 import Community from './Community';
 import Communities from './Communities';
 import CommunityPanel from './community-panel';
 import Dashboard from './dashboard';
 import Event from './Event';
 import ExtensionFallback from './extension-fallback';
-//import ExtensionSplash from './extension-splash';
 import Home from './home';
-import Loading from './loading';
 import Login from './login';
 import Logout from './logout';
-import ModeratorRoute from './moderator-route';
 import NotFound from './not-found';
 import PrivateRoute, { AdminRoute } from './private-route';
 import Profile from './profile';

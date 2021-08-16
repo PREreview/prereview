@@ -2,7 +2,6 @@ import path from 'path';
 import Email from 'email-templates';
 import nodemailer from 'nodemailer';
 import sendgridTransport from 'nodemailer-sendgrid';
-//import { getLogger } from '../log.js';
 
 //const log = getLogger('backend:middleware:mail');
 

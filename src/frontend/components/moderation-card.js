@@ -1,12 +1,11 @@
 // base imports
-import React, { Fragment, useEffect, useState, useRef } from 'react';
+import React, { Fragment, useState, useRef } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { format } from 'date-fns';
 
 // utils
 import { getId, unprefix } from '../utils/jsonld';
-import { getTextAnswers, getActiveReports } from '../utils/stats';
 
 // hooks
 import {
@@ -21,11 +20,7 @@ import Controls from './controls';
 import IconButton from './icon-button';
 import Modal from './modal';
 import PreprintPreview from './preprint-preview';
-import RoleBadge from './role-badge';
 import Value from './value';
-
-// materialUI components
-import CircularProgress from '@material-ui/core/CircularProgress';
 
 // icons
 import { MdExpandLess, MdExpandMore, MdLock } from 'react-icons/md';

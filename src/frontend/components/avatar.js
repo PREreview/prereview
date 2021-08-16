@@ -3,7 +3,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { default as MuiAvatar } from '@material-ui/core/Avatar';
-import { makeStyles } from '@material-ui/core/styles';
 import gravatar from 'gravatar';
 
 //const useStyles = makeStyles(() => ({

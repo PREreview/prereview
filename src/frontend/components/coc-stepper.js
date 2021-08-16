@@ -1,6 +1,5 @@
 // base imports
 import React, { Fragment } from 'react';
-import PropTypes from 'prop-types';
 
 // material ui
 import { makeStyles } from '@material-ui/core/styles';

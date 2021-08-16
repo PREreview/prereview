@@ -1,5 +1,4 @@
 import {
-  ArrayType,
   Collection,
   Entity,
   EntityRepositoryType,

@@ -3,7 +3,6 @@ import { Helmet } from 'react-helmet-async';
 import HeaderBar from './header-bar';
 import Banner from './banner';
 import Button from './button';
-// import LabelStyle from './label-style';
 import { CONTACT_EMAIL_HREF, ORG } from '../constants';
 import Org from './org';
 import preview from '../assets/images/extension-preview.png';
