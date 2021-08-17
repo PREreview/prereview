@@ -29,7 +29,6 @@ RUN \
 
 COPY \
   .parcelrc \
-  .sassrc \
   .terserrc \
   tsconfig.json \
   ./
