@@ -1,10 +1,12 @@
+@import url('quill/dist/quill.snow.css');
+
 .ql-editor {
   background-color: #fff;
+}
 
-  p {
-    font-size: 1rem;
-    margin-bottom: 1em !important;
-  }
+.ql-editor p {
+  font-size: 1rem;
+  margin-bottom: 1em;
 }
 
 .ql-hidden {

@@ -1,7 +1,7 @@
 // base imports
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import './collab-editor.scss';
+import './collab-editor.css';
 
 // yjs imports
 import * as Y from 'yjs';
@@ -11,8 +11,6 @@ import { WebrtcProvider } from 'y-webrtc';
 import { QuillBinding } from 'y-quill';
 import QuillCursors from 'quill-cursors';
 import { useQuill } from 'react-quilljs';
-import 'quill/dist/quill.snow.css'; // Add css for snow theme
-// or import 'quill/dist/quill.bubble.css'; // Add css for bubble theme
 
 // FIXME too collaborative!
 const ydoc = new Y.Doc();
