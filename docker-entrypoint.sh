@@ -1,4 +1,5 @@
 #!/bin/sh
+set -e
 
 TRIES=30
 DELAY=4
@@ -18,9 +19,11 @@ FROM_NAME=${IMPORT_FROM_NAME:-production}
 wait_for() {
   echo "Waiting for service => HOST: $HOST, PORT: $PORT"
   for i in $(seq $TRIES); do
+    set +e
     nc -z "$HOST" "$PORT" >/dev/null 2>&1
-
     result=$?
+    set -e
+
     if [ $result -eq 0 ]; then
       echo "Service is up!"
       return 0
@@ -68,9 +71,11 @@ elif [ $NODE_ENV == "integration" ]; then
   init_db
   npm run db:apiKey
 else
+  set +e
   env -i PGPASSWORD="$PASS" /usr/bin/psql -U "$USER" -d "$NAME" -h "$HOST" -p "$PORT" -tAc "SELECT to_regclass('public.user')" | grep -q user
-
   result=$?
+  set -e
+
   if [ $result -ne 0 ]; then
     init_db
     if [ $NODE_ENV == "development" ]; then
