@@ -73,7 +73,6 @@ COPY src/common/ src/common/
 COPY src/frontend/ src/frontend/
 
 RUN \
-  ls -la dist/scripts && \
   npm run build:frontend \
   && rm -rf .parcel-cache
 
