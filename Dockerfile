@@ -15,9 +15,9 @@ COPY \
 
 
 #
-# Stage: Build
+# Stage: Builder
 #
-FROM node AS build
+FROM node AS builder
 
 RUN \
   apk add --no-cache --virtual .build-deps \
@@ -33,10 +33,49 @@ COPY \
   .terserrc \
   tsconfig.json \
   ./
-COPY src/ src/
+
+
+
+#
+# Stage: Scripts build
+#
+FROM builder AS scripts
+
+COPY src/common/ src/common/
+COPY src/backend/ src/backend/
 
 RUN \
-  npm run build \
+  npm run build:scripts \
+  && rm -rf .parcel-cache
+
+
+
+#
+# Stage: Backend build
+#
+FROM builder AS backend
+
+COPY src/common/ src/common/
+COPY src/backend/ src/backend/
+
+RUN \
+  npm run build:backend \
+  && rm -rf .parcel-cache
+
+
+
+#
+# Stage: Frontend build
+#
+FROM builder AS frontend
+
+COPY --from=scripts /app/dist/scripts/ dist/scripts/
+COPY src/common/ src/common/
+COPY src/frontend/ src/frontend/
+
+RUN \
+  ls -la dist/scripts && \
+  npm run build:frontend \
   && rm -rf .parcel-cache
 
 
@@ -44,7 +83,7 @@ RUN \
 #
 # Stage: Development
 #
-FROM build AS dev
+FROM builder AS dev
 ENV NODE_ENV=development
 
 COPY \
@@ -54,6 +93,9 @@ COPY \
   .proxyrc \
   docker-entrypoint.sh \
   ./
+
+COPY --from=scripts /app/dist/scripts/ dist/scripts/
+COPY --from=backend /app/dist/backend/ dist/backend/
 
 ENTRYPOINT ["./docker-entrypoint.sh"]
 CMD ["start:dev"]
@@ -65,6 +107,9 @@ CMD ["start:dev"]
 #
 FROM dev AS integration
 ENV NODE_ENV=integration
+
+COPY --from=backend /app/src/ src/
+COPY --from=frontend /app/dist/frontend/ dist/frontend/
 
 CMD ["start"]
 
@@ -88,7 +133,9 @@ RUN \
   && rm -rf ~/.node-gyp \
   && apk del --no-cache .build-deps
 
-COPY --from=build /app/dist/ dist/
+COPY --from=scripts /app/dist/scripts/ dist/scripts/
+COPY --from=backend /app/dist/backend/ dist/backend/
+COPY --from=frontend /app/dist/frontend/ dist/frontend/
 COPY ./docker-entrypoint.sh .
 
 HEALTHCHECK --interval=5s \
