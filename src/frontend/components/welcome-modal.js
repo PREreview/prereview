@@ -9,7 +9,7 @@ import MuiButton from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 
 // icons
-import preReviewLogo from '../svgs/prereview-logo.svg';
+import preReviewLogo from '../assets/images/prereview-logo.svg';
 
 const Button = withStyles({
   root: {

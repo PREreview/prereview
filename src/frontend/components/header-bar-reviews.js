@@ -22,7 +22,7 @@ import { checkIfProfileNeedsUpdate } from '../utils/roles';
 // icons
 import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
 import MenuIcon from '@material-ui/icons/Menu';
-import preReviewLogo from '../svgs/prereview-logo.svg';
+import preReviewLogo from '../assets/images/prereview-logo.svg';
 
 const useStyles = makeStyles(theme => ({
   content: {

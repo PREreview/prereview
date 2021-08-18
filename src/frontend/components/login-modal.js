@@ -23,7 +23,7 @@ import CoCStepper from './coc-stepper';
 
 // icons
 import CloseIcon from '@material-ui/icons/Close';
-import preReviewLogo from '../svgs/prereview-logo.svg';
+import preReviewLogo from '../assets/images/prereview-logo.svg';
 
 const useStyles = makeStyles(theme => ({
   root: {

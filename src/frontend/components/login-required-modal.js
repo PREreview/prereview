@@ -15,7 +15,7 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import CloseIcon from '@material-ui/icons/Close';
 import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
-import preReviewLogo from '../svgs/prereview-logo.svg';
+import preReviewLogo from '../assets/images/prereview-logo.svg';
 
 const useStyles = makeStyles(theme => ({
   close: {

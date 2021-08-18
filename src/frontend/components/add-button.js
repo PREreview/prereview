@@ -7,7 +7,7 @@ import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 
 // icons
-import icon from '../svgs/add_prereview_icon.svg';
+import icon from '../assets/images/add_prereview_icon.svg';
 
 const useStyles = makeStyles(theme => ({
   border: {

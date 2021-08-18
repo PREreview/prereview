@@ -10,7 +10,7 @@ import Link from '@material-ui/core/Link';
 import Typography from '@material-ui/core/Typography';
 
 // site logo
-import preReviewLogo from '../svgs/prereview-logo.svg';
+import preReviewLogo from '../assets/images/prereview-logo.svg';
 
 // icons
 import ArrowForwardIosIcon from '@material-ui/icons/ArrowForwardIos';
