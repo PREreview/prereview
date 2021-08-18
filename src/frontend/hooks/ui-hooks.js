@@ -1,49 +1,5 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useStores } from '../contexts/store-context';
-
-/**
- * This is used for the Rapid PREreview form:
- * Persists data for `key` in local storage and take care of reseting the value
- * when needed (if called with a different `roleId` or `preprintId`)
- */
-export function useLocalState(key, roleId, preprintId, initialValue) {
-  const [state, setState] = useState(initialValue);
-
-  useEffect(() => {
-    let value = localStorage.getItem(key);
-
-    if (value) {
-      try {
-        value = JSON.parse(value);
-        if (value.roleId === roleId && value.preprintId === preprintId) {
-          initialValue = value.data;
-        } else {
-          localStorage.removeItem(key);
-        }
-      } catch (err) {
-        localStorage.removeItem(key);
-      }
-    }
-
-    function localSetState(value) {
-      if (typeof value === 'function') {
-        value = value(state);
-      }
-
-      localStorage.setItem(
-        key,
-        JSON.stringify({
-          data: value,
-          roleId,
-          preprintId,
-        }),
-      );
-      setState(value);
-    }
-
-    return [state, localSetState];
-  });
-}
 
 /**
  * Assess if the visitor lands on rapid PREreview for the first time
@@ -59,31 +15,6 @@ export function useIsNewVisitor() {
   }, []);
 
   return isNewVisitor;
-}
-
-export function useIsFirstTimeOnSettings() {
-  const [isFirstTimeOnSettings] = useState(
-    localStorage.getItem('isFirstTimeOnSettings') !== 'false',
-  );
-
-  useEffect(() => {
-    localStorage.setItem('isFirstTimeOnSettings', 'false');
-  }, []);
-
-  return isFirstTimeOnSettings;
-}
-
-export function useHasAgreedCoC() {
-  const [hasAgreed, setHasAgreed] = useState(
-    localStorage.getItem('hasAgreedCoC') === 'true',
-  );
-
-  const localSet = useCallback(bool => {
-    localStorage.setItem('hasAgreedCoC', bool.toString());
-    setHasAgreed(bool);
-  }, []);
-
-  return [hasAgreed, localSet];
 }
 
 export function useIsMobile() {
@@ -136,18 +67,4 @@ export function useNewPreprints() {
   }
 
   return [newPreprints, setNewPreprints];
-}
-
-export function usePrevious(value) {
-  // The ref object is a generic container whose current property is mutable ...
-  // ... and can hold any value, similar to an instance property on a class
-  const ref = useRef();
-
-  // Store current value in ref
-  useEffect(() => {
-    ref.current = value;
-  }, [value]); // Only re-run if value changes
-
-  // Return previous value (happens before update in useEffect above)
-  return ref.current;
 }

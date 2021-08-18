@@ -9,11 +9,11 @@ import { ThemeProvider } from '@material-ui/core/styles';
 import theme from './theme.js';
 import App from './components/app.js';
 
-export const hydrate = (app, element) => () => {
+const hydrate = (app, element) => () => {
   ReactDOM.hydrate(app, element);
 };
 
-export const start = ({ isProduction, document, module, hydrate }) => {
+const start = ({ isProduction, document, module, hydrate }) => {
   const element = document.getElementById('root');
   const app = (
     <HelmetProvider>

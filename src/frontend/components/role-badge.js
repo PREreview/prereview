@@ -208,8 +208,6 @@ RoleBadgeUI.propTypes = {
   disabled: PropTypes.bool,
 };
 
-export { RoleBadgeUI };
-
 function Tooltipify({ tooltip, user, children }) {
   return tooltip ? (
     <Tooltip

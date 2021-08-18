@@ -96,7 +96,7 @@ export function getTags(preprint) {
 
 export function getUsersRank(activities) {
   /**
-   * 
+   *
    * TODO need to clarify in comments what actions are getting passed here */
   const reviewerCount = {};
 
@@ -104,15 +104,15 @@ export function getUsersRank(activities) {
     let author = activity.author
 
       if (author) {
-        `${author.uuid}, ${author.name}` in reviewerCount ? 
-          reviewerCount[`${author.uuid}, ${author.name}`] += 1 
+        `${author.uuid}, ${author.name}` in reviewerCount ?
+          reviewerCount[`${author.uuid}, ${author.name}`] += 1
           : reviewerCount[`${author.uuid}, ${author.name}`] = 1
       }
 
       if (activity.authors) {
         activity.authors.map( author => (
-          `${author.uuid}, ${author.name}` in reviewerCount ? 
-          reviewerCount[`${author.uuid}, ${author.name}`] += 1 
+          `${author.uuid}, ${author.name}` in reviewerCount ?
+          reviewerCount[`${author.uuid}, ${author.name}`] += 1
           : reviewerCount[`${author.uuid}, ${author.name}`] = 1
         ))
       }
@@ -161,26 +161,6 @@ export function getTextAnswers(reviews = []) {
       })
     };
   });
-}
-
-export function getActiveReports(
-  action, // a `RapidPREreviewAction`
-) {
-  // moderation action are sorted so we get all the report untill the previous
-  // `ModerateRapidPREreviewAction` or `IgnoreRapidPREreviewAction` action
-  const moderationActions = arrayify(action.moderationAction);
-
-  const reports = [];
-  for (let i = moderationActions.length - 1; i >= 0; i--) {
-    const moderationAction = moderationActions[i];
-    if (moderationAction['@type'] === 'ReportRapidPREreviewAction') {
-      reports.push(moderationAction);
-    } else {
-      break;
-    }
-  }
-
-  return reports;
 }
 
 export function getCounts(actions) {
