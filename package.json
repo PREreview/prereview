@@ -126,7 +126,6 @@
     "@mikro-orm/postgresql": "^4.5.4",
     "@reach/tooltip": "^0.10.5",
     "anonymus": "^2.0.0",
-    "babel-polyfill": "^6.26.0",
     "class-fixtures-factory": "git+https://github.com/throneless-tech/class-fixtures-factory.git",
     "clipboard-copy": "^3.1.0",
     "combined-stream": "^1.0.8",
@@ -241,16 +240,6 @@
   },
   "jest": {
     "verbose": true
-  },
-  "babel": {
-    "plugins": [
-      [
-        "@babel/plugin-transform-react-jsx"
-      ]
-    ],
-    "presets": [
-      "@parcel/babel-preset-env"
-    ]
   },
   "prettier": {
     "printWidth": 80,
