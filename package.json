@@ -210,7 +210,6 @@
     "yjs": "^13.4.12"
   },
   "devDependencies": {
-    "@babel/preset-typescript": "^7.12.1",
     "@mikro-orm/cli": "^4.5.4",
     "@mikro-resources/fixtures": "git+https://github.com/throneless-tech/mikro-resources.git#just-fixtures",
     "@parcel/transformer-image": "2.0.0-beta.2",
@@ -250,8 +249,7 @@
       ]
     ],
     "presets": [
-      "@parcel/babel-preset-env",
-      "@babel/preset-typescript"
+      "@parcel/babel-preset-env"
     ]
   },
   "prettier": {
