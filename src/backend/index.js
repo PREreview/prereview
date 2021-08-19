@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-import figlet from 'figlet';
 import { createServer } from 'http';
 import config from './config.ts';
 import configServer from './server.js';
@@ -18,26 +17,9 @@ async function bootstrap() {
 }
 
 bootstrap()
-  .then(async server => {
-    figlet.text(
-      process.env.npm_package_name,
-      {
-        font: 'Sub-Zero',
-      },
-      function(err, bigName) {
-        if (err) {
-          console.error('Something went wrong...');
-          console.error(err);
-          return;
-        }
-        console.log(`
-${bigName}
-🚀 Server listening on port ${server.address().port}!`);
-        return;
-      },
-    );
-    return;
-  })
+  .then(server =>
+    console.log(`🚀 Server listening on port ${server.address().port}!`),
+  )
   .catch(err => {
     setImmediate(() => {
       console.error(`Encountered error while running the app: ${err}`);
