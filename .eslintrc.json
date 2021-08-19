@@ -1,0 +1,76 @@
+{
+  "parserOptions": {
+    "ecmaVersion": 2020,
+    "sourceType": "module",
+    "ecmaFeatures": {
+      "jsx": true
+    }
+  },
+  "env": {
+    "es2017": true,
+    "browser": true,
+    "node": true,
+    "jest/globals": true
+  },
+  "settings": {
+    "react": {
+      "version": "detect"
+    }
+  },
+  "overrides": [
+    {
+      "files": [
+        "**/*.js",
+        "**/*.jsx"
+      ],
+      "extends": [
+        "eslint:recommended",
+        "plugin:import/errors",
+        "plugin:import/warnings",
+        "plugin:jest/recommended",
+        "plugin:node/recommended-module",
+        "plugin:prettier/recommended",
+        "plugin:promise/recommended",
+        "plugin:react/recommended"
+      ]
+    },
+    {
+      "files": [
+        "**/*.ts",
+        "**/*.tsx"
+      ],
+      "parser": "@typescript-eslint/typescript-estree",
+      "parserOptions": {
+        "sourceType": "module",
+        "project": "./tsconfig.json",
+        "allowImportExportEverywhere": true
+      },
+      "extends": [
+        "plugin:react/recommended",
+        "plugin:prettier/recommended",
+        "plugin:@typescript-eslint/recommended"
+      ]
+    }
+  ],
+  "rules": {
+    "node/no-extraneous-import": [
+      "error",
+      {
+        "allowModules": [
+          "lodash"
+        ]
+      }
+    ],
+    "node/shebang": [
+      "error",
+      {
+        "convertPath": {
+          "src/**/*.js": [
+            "^src/(.+?)\\.js$",
+            "dist/$1.js"
+          ]
+        }
+      }
+    ]
+  }
+}

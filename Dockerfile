@@ -85,11 +85,13 @@ FROM builder AS dev
 ENV NODE_ENV=development
 
 COPY \
+  .eslintrc.json \
   .gitignore \
   .prettierignore \
   .prettierrc \
   .proxyrc \
   docker-entrypoint.sh \
+  jest.config.js \
   ./
 
 COPY --from=scripts /app/dist/scripts/ dist/scripts/
