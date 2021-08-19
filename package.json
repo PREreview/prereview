@@ -211,9 +211,6 @@
     "yjs": "^13.4.12"
   },
   "devDependencies": {
-    "@babel/plugin-proposal-class-properties": "^7.12.1",
-    "@babel/plugin-proposal-decorators": "^7.12.1",
-    "@babel/plugin-proposal-private-property-in-object": "^7.14.0",
     "@babel/preset-typescript": "^7.12.1",
     "@mikro-orm/cli": "^4.5.4",
     "@mikro-resources/fixtures": "git+https://github.com/throneless-tech/mikro-resources.git#just-fixtures",
@@ -223,7 +220,6 @@
     "@typescript-eslint/eslint-plugin": "^4.5.0",
     "@typescript-eslint/parser": "^4.5.0",
     "babel-plugin-transform-inline-environment-variables": "^0.4.3",
-    "babel-plugin-transform-typescript-metadata": "^0.3.1",
     "barrelsby": "^2.2.0",
     "concurrently": "^5.3.0",
     "copyfiles": "^2.4.1",
@@ -251,31 +247,6 @@
   },
   "babel": {
     "plugins": [
-      "babel-plugin-transform-typescript-metadata",
-      [
-        "@babel/plugin-proposal-decorators",
-        {
-          "legacy": true
-        }
-      ],
-      [
-        "@babel/plugin-proposal-class-properties",
-        {
-          "loose": true
-        }
-      ],
-      [
-        "@babel/plugin-proposal-private-property-in-object",
-        {
-          "loose": true
-        }
-      ],
-      [
-        "@babel/plugin-proposal-private-methods",
-        {
-          "loose": true
-        }
-      ],
       [
         "@babel/plugin-transform-react-jsx"
       ],
