@@ -1,32 +1,5 @@
 {
-  "name": "prereview",
-  "version": "0.1.0",
-  "description": "A platform for reviewing preprints.",
-  "license": "AGPL-3.0-or-later",
-  "contributors": [
-    "Harum Helmy <harum@throneless.tech",
-    "Josh King <josh@throneless.tech",
-    "Rae Gaines <rae@throneless.tech"
-  ],
-  "keywords": [
-    "preprint",
-    "orcid",
-    "doi"
-  ],
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/throneless-tech/prereview.git"
-  },
-  "bugs": {
-    "url": "https://github.com/throneless-tech/prereview/issues"
-  },
-  "homepage": "https://github.com/throneless-tech/prereview#readme",
-  "bin": {
-    "prereview": "./dist/backend/index.js"
-  },
-  "files": [
-    "/dist"
-  ],
+  "private": true,
   "watch": {
     "build:backend:dev": {
       "patterns": [

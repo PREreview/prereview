@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 import { createServer } from 'http';
 import config from './config.ts';
 import configServer from './server.js';
