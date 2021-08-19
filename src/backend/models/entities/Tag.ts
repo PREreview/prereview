@@ -17,7 +17,6 @@ import { Preprint } from './Preprint';
 @Index({ properties: ['preprints'] })
 @Index({ properties: ['communities'] })
 export class Tag extends BaseEntity {
-  //eslint-disable-next-line
   [EntityRepositoryType]?: TagModel;
 
   @Fixture(faker => `${faker.commerce.color()} ${faker.random.word()}`)

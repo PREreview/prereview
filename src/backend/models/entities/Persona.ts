@@ -31,7 +31,6 @@ import { User } from './User';
 @Index({ properties: ['badges'] })
 @Index({ properties: ['expertises'] })
 export class Persona extends BaseEntity {
-  //eslint-disable-next-line
   [EntityRepositoryType]?: PersonaModel;
 
   @Fixture(faker => faker.name.findName())
@@ -45,12 +44,10 @@ export class Persona extends BaseEntity {
   @Property()
   isAnonymous!: boolean;
 
-  //eslint-disable-next-line
   @Fixture(() => false)
   @Property()
   isLocked: boolean = false;
 
-  //eslint-disable-next-line
   @Fixture(() => false)
   @Property()
   isFlagged: boolean = false;

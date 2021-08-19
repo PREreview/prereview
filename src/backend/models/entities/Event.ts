@@ -11,7 +11,6 @@ import { Community } from './Community';
 
 @Entity()
 export class Event extends BaseEntity {
-  //eslint-disable-next-line
   [EntityRepositoryType]?: EventModel;
 
   @Fixture(faker => `${faker.commerce.color()} ${faker.random.word()}`)
@@ -26,7 +25,6 @@ export class Event extends BaseEntity {
   @Property({ nullable: true })
   end?: Date;
 
-  //eslint-disable-next-line
   @Property()
   isPrivate: boolean = false;
 

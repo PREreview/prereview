@@ -2,10 +2,7 @@ import router from 'koa-joi-router';
 import { getLogger } from '../log.js';
 
 const log = getLogger('backend:controllers:fullReviewDrafts');
-// eslint-disable-next-line no-unused-vars
-const Joi = router.Joi;
 
-// eslint-disable-next-line no-unused-vars
 export default function controller(draftModel, thisUser) {
   const draftsRouter = router();
 

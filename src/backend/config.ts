@@ -183,7 +183,6 @@ function validateLoglevel(value: string, previous: string): string {
   return level;
 }
 
-// eslint-disable-next-line no-unused-vars
 function validateHost(value: string, previous: string): string {
   const host = value ? value : previous;
   Joi.assert(host, Joi.string().required());

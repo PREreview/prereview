@@ -12,7 +12,6 @@ import { User } from './User';
 
 @Entity()
 export class Key extends BaseEntity {
-  //eslint-disable-next-line
   [EntityRepositoryType]?: KeyModel;
 
   @ManyToOne({ entity: () => User })

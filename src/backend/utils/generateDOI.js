@@ -1,6 +1,5 @@
 import fetch from 'node-fetch';
 import { getLogger } from '../log.js';
-// eslint-disable-next-line node/no-extraneous-import
 import FormData from 'form-data';
 import config from '../config.ts';
 

@@ -13,7 +13,6 @@ import { Persona } from './Persona';
 
 @Entity()
 export class Expertise extends BaseEntity {
-  //eslint-disable-next-line
   [EntityRepositoryType]?: ExpertiseModel;
 
   @Fixture(faker => `${faker.commerce.color()} ${faker.random.word()}`)

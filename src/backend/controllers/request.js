@@ -4,7 +4,6 @@ import getActivePersona from '../utils/persona.js';
 
 const log = getLogger('backend:controllers:requests');
 
-// eslint-disable-next-line no-unused-vars
 export default function controller(reqModel, preprintModel, thisUser) {
   const requestRouter = router();
 

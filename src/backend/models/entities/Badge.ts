@@ -15,7 +15,6 @@ import { Persona } from './Persona';
 @Entity()
 @Index({ properties: ['personas'] })
 export class Badge extends BaseEntity {
-  //eslint-disable-next-line
   [EntityRepositoryType]?: BadgeModel;
 
   @Fixture(faker => `${faker.commerce.color()} ${faker.random.word()}`)

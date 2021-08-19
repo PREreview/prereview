@@ -7,22 +7,6 @@ import { getLogger } from '../log.js';
 const log = getLogger('backend:controllers:user');
 const Joi = router.Joi;
 
-// eslint-disable-next-line no-unused-vars
-const querySchema = Joi.object({
-  start: Joi.number()
-    .integer()
-    .greater(-1),
-  end: Joi.number()
-    .integer()
-    .positive(),
-  asc: Joi.boolean(),
-  sort_by: Joi.string(),
-  from: Joi.string(),
-  to: Joi.string(),
-  group: Joi.string(),
-});
-
-// eslint-disable-next-line no-unused-vars
 export default function controller(users, contacts, keys, thisUser) {
   const userRouter = router();
 

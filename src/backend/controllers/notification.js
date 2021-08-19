@@ -2,27 +2,8 @@ import router from 'koa-joi-router';
 import { getLogger } from '../log.js';
 
 const log = getLogger('backend:controllers:notifications');
-const Joi = router.Joi;
 
-// eslint-disable-next-line no-unused-vars
-const querySchema = Joi.object({
-  start: Joi.number()
-    .integer()
-    .greater(-1),
-  end: Joi.number()
-    .integer()
-    .positive(),
-  asc: Joi.boolean(),
-  sort_by: Joi.string(),
-  from: Joi.string(),
-  to: Joi.string(),
-});
-
-export default function controller(
-  userModel,
-  // eslint-disable-next-line no-unused-vars
-  thisUser,
-) {
+export default function controller(userModel, thisUser) {
   const notificationsRouter = router();
 
   // handler for GET multiple reviews methods

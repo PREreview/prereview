@@ -15,14 +15,12 @@ import { Persona } from './Persona';
 @Index({ properties: ['author'] })
 @Index({ properties: ['parent'] })
 export class Statement extends BaseEntity {
-  //eslint-disable-next-line
   [EntityRepositoryType]?: StatementModel;
 
   @Fixture(faker => faker.lorem.sentences())
   @Property({ columnType: 'text' })
   contents!: string;
 
-  //eslint-disable-next-line
   @Property()
   isFlagged: boolean = false;
 

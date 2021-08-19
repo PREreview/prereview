@@ -15,7 +15,6 @@ import { Preprint } from './Preprint';
 @Index({ properties: ['author'] })
 @Index({ properties: ['preprint'] })
 export class Request extends BaseEntity {
-  //eslint-disable-next-line
   [EntityRepositoryType]?: RequestModel;
 
   @ManyToOne({ entity: () => Persona })
@@ -24,7 +23,6 @@ export class Request extends BaseEntity {
   @ManyToOne({ entity: () => Preprint })
   preprint!: Preprint;
 
-  //eslint-disable-next-line
   @Fixture(() => false)
   @Property()
   isPreprintAuthor: boolean = false;

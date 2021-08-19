@@ -15,7 +15,6 @@ import { User } from './User';
 @Entity()
 @Index({ properties: ['members'] })
 export class Group extends BaseEntity {
-  //eslint-disable-next-line
   [EntityRepositoryType]?: GroupModel;
 
   @Fixture(faker => `${faker.commerce.color()} ${faker.random.word()}`)

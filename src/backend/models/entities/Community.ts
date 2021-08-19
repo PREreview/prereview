@@ -26,7 +26,6 @@ import { User } from './User';
 @Index({ properties: ['tags'] })
 @Index({ properties: ['templates'] })
 export class Community extends BaseEntity {
-  //eslint-disable-next-line
   [EntityRepositoryType]?: CommunityModel;
 
   @Fixture(faker => `${faker.commerce.color()} ${faker.random.word()}`)

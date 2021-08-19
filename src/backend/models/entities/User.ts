@@ -29,7 +29,6 @@ import { createRandomOrcid } from '../../utils/orcid';
 @Index({ properties: ['works'] })
 @Index({ properties: ['keys'] })
 export class User extends BaseEntity {
-  //eslint-disable-next-line
   [EntityRepositoryType]?: UserModel;
 
   @Fixture(() => createRandomOrcid())

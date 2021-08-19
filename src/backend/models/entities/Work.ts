@@ -14,7 +14,6 @@ import { createRandomDoi } from '../../utils/ids';
 @Entity()
 @Index({ properties: ['author'] })
 export class Work extends BaseEntity {
-  //eslint-disable-next-line
   [EntityRepositoryType]?: WorkModel;
 
   @Fixture(faker => `${faker.commerce.color()} ${faker.random.word()}`)

@@ -164,7 +164,7 @@ export default function ShellContent({ preprint, user, cid }) {
 
         // get a user's drafts of the correct review if cid is present, or latest if not
         let ownDrafts,
-          latestDraft = [];
+          latestDraft;
         if (cid) {
           ownDrafts = ownReviews.length
             ? ownReviews.find(

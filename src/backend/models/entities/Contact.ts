@@ -13,7 +13,6 @@ import { User } from './User';
 @Entity()
 @Index({ properties: ['identity'] })
 export class Contact extends BaseEntity {
-  //eslint-disable-next-line
   [EntityRepositoryType]?: ContactModel;
 
   @Fixture(() => 'mailto')

@@ -26,7 +26,6 @@ export default function controller(
   personaModel,
   preprintModel,
   statementModel,
-  // eslint-disable-next-line no-unused-vars
   thisUser,
 ) {
   const reviewsRouter = router();

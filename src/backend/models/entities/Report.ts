@@ -14,7 +14,6 @@ import { Persona } from './Persona';
 @Entity()
 @Index({ properties: ['author'] })
 export class Report extends BaseEntity {
-  //eslint-disable-next-line
   [EntityRepositoryType]?: ReportModel;
 
   @Fixture(faker => faker.lorem.sentences())

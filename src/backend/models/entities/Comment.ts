@@ -15,18 +15,15 @@ import { Persona } from './Persona';
 @Index({ properties: ['author'] })
 @Index({ properties: ['parent'] })
 export class Comment extends BaseEntity {
-  //eslint-disable-next-line
   [EntityRepositoryType]?: CommentModel;
 
   @Fixture(faker => faker.lorem.sentences())
   @Property({ columnType: 'text' })
   contents!: string;
 
-  //eslint-disable-next-line
   @Property()
   isPublished: boolean = false;
 
-  //eslint-disable-next-line
   @Property()
   isFlagged: boolean = false;
 

@@ -29,18 +29,14 @@ import { createRandomDoi } from '../../utils/ids';
 @Index({ properties: ['comments'] })
 @Index({ properties: ['statements'] })
 export class FullReview extends BaseEntity {
-  //eslint-disable-next-line
   [EntityRepositoryType]?: FullReviewModel;
 
-  //eslint-disable-next-line
   @Property()
   isPublished: boolean = false;
 
-  //eslint-disable-next-line
   @Property()
   isFlagged: boolean = false;
 
-  //eslint-disable-next-line
   @Fixture({ get: () => createRandomDoi(), optional: true })
   @Property({ nullable: true })
   @Unique()

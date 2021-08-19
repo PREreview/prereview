@@ -27,7 +27,6 @@ const handleInvalid = ctx => {
   ctx.message = getErrorMessages(ctx.invalid);
 };
 
-// eslint-disable-next-line no-unused-vars
 export default function controller(templateModel, communityModel, thisUser) {
   const templatesRouter = router();
 

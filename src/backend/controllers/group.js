@@ -43,7 +43,6 @@ const handleInvalid = ctx => {
  * @returns {Object} Auth controller Koa router
  */
 
-// eslint-disable-next-line no-unused-vars
 export default function controller(groupModel, userModel, thisUser) {
   const groupsRouter = router();
 

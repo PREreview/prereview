@@ -4,7 +4,6 @@ import { getLogger } from '../log.js';
 const log = getLogger('backend:controllers:events');
 // const Joi = router.Joi;
 
-// eslint-disable-next-line no-unused-vars
 export default function controller(eventModel, thisUser) {
   const eventsRouter = router();
 

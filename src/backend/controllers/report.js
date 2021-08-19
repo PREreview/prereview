@@ -17,12 +17,6 @@ const querySchema = Joi.object({
   types: Joi.string().allow(''),
 });
 
-// eslint-disable-next-line no-unused-vars
-const reportSchema = Joi.object({
-  reason: Joi.string(),
-  isLocked: Joi.boolean(),
-});
-
 const reportedSchema = Joi.object({
   title: Joi.string().allow(''),
   type: Joi.string().allow(''),
@@ -35,7 +29,6 @@ const handleInvalid = ctx => {
   ctx.message = getErrorMessages(ctx.invalid);
 };
 
-// eslint-disable-next-line no-unused-vars
 export default function controller(
   reportModel,
   commentModel,

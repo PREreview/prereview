@@ -50,7 +50,7 @@ const start = ({ isProduction, document, module, hydrate }) => {
 const options = {
   isProduction: process.env.NODE_ENV === 'production',
   document: document,
-  module: module, // eslint-disable-line no-undef
+  module: module,
   hydrate,
 };
 

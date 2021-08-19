@@ -25,7 +25,6 @@ import { createRandomDoi } from '../../utils/ids';
 @Index({ properties: ['communities'] })
 @Index({ properties: ['tags'] })
 export class Preprint extends BaseEntity {
-  //eslint-disable-next-line
   [EntityRepositoryType]?: PreprintModel;
 
   @Fixture({ get: () => `doi:${createRandomDoi()}` })
