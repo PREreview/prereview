@@ -10,9 +10,7 @@ import { ServerError } from './utils/http-errors';
 // Configure logging
 
 dotenv.config();
-const logLevel =
-  process.env[`${process.env.npm_package_name.toUpperCase()}_LOG_LEVEL`] ||
-  'error';
+const logLevel = process.env['PREREVIEW_LOG_LEVEL'] || 'error';
 
 log4js.configure({
   appenders: { console: { type: 'stdout', layout: { type: 'colored' } } },
@@ -37,13 +35,13 @@ function getEnv(postfix: string, fallback?: string) {
   if (fallback) {
     return env
       .get(
-        `${process.env.npm_package_name.toUpperCase()}_${postfix.toUpperCase()}`,
+        `PREREVIEW_${postfix.toUpperCase()}`,
       )
       .default(fallback);
   }
 
   return env.get(
-    `${process.env.npm_package_name.toUpperCase()}_${postfix.toUpperCase()}`,
+    `PREREVIEW_${postfix.toUpperCase()}`,
   );
 }
 
@@ -56,14 +54,14 @@ const defaults = {
   admin_user: 'admin',
   db_name:
     defaultEnv !== 'production'
-      ? `${process.env.npm_package_name.toLowerCase()}-${defaultEnv.toLowerCase()}`
-      : `${process.env.npm_package_name.toLowerCase()}`,
+      ? `prereview-${defaultEnv.toLowerCase()}`
+      : `prereview`,
   db_host: 'localhost',
   db_pool_min: '0',
   db_pool_max: '10',
   db_port: '5432',
   db_timeout: '0',
-  db_user: process.env.npm_package_name.toLowerCase(),
+  db_user: 'prereview',
   db_tls: 'false',
   log_level: 'error',
   no_proxy: 'false',
@@ -216,8 +214,8 @@ interface ParseOptions {
 }
 
 class Config extends Command {
-  constructor(args: string) {
-    super(args);
+  constructor() {
+    super('prereview');
     this.env = process.env.NODE_ENV ? process.env.NODE_ENV : 'development';
     Joi.string()
       .allow('development', 'production', 'test')
@@ -257,11 +255,10 @@ class Config extends Command {
   }
 }
 
-const program = new Config(process.env.npm_package_name);
+const program = new Config();
 
 export default program
   .description("A platform for reviewing preprints.")
-  .version(process.env.npm_package_version)
   .option(
     '--admin-users <OrcIDs>',
     'Admin OrcIDs',

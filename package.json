@@ -218,7 +218,6 @@
     "@parcel/validator-typescript": "2.0.0-beta.2",
     "@typescript-eslint/eslint-plugin": "^4.5.0",
     "@typescript-eslint/parser": "^4.5.0",
-    "babel-plugin-transform-inline-environment-variables": "^0.4.3",
     "barrelsby": "^2.2.0",
     "concurrently": "^5.3.0",
     "copyfiles": "^2.4.1",
@@ -248,16 +247,6 @@
     "plugins": [
       [
         "@babel/plugin-transform-react-jsx"
-      ],
-      [
-        "transform-inline-environment-variables",
-        {
-          "include": [
-            "npm_package_name",
-            "npm_package_version",
-            "npm_package_description"
-          ]
-        }
       ]
     ],
     "presets": [
