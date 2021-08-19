@@ -41,12 +41,6 @@
     "start:frontend:dev": "parcel serve -p 3000 src/frontend/index.html",
     "start:dev": "concurrently -k -p \"[{name}]\" -n \"BACKEND,FRONTEND,WATCH\" -c \"bgBlue.bold,bgMagenta.bold,bgGreen.bold\" \"npm run start:backend:dev\" \"npm run start:frontend:dev\" \"npm run watch:backend:dev\""
   },
-  "backend": "dist/backend/index.js",
-  "frontend": "dist/frontend/index.html",
-  "migrations-script": "dist/scripts/dbMigrations.js",
-  "seeds-script": "dist/scripts/dbSeeds.js",
-  "init-script": "dist/scripts/dbInit.js",
-  "spec-script": "dist/scripts/genSpec.js",
   "targets": {
     "backend": {
       "context": "node",
