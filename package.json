@@ -21,10 +21,8 @@
     "build:frontend": "parcel build --no-scope-hoist --target=frontend src/frontend/index.html",
     "build:frontend:dev": "parcel build --target=frontend src/frontend/index.html",
     "build:scripts:migrations": "npm run scan:migrations && parcel build --target=migrations-script src/backend/scripts/dbMigrations.ts",
-    "build:scripts:seeds": "parcel build --target=seeds-script src/backend/scripts/dbSeeds.ts",
     "build:scripts:init": "parcel build --target=init-script --no-optimize src/backend/scripts/dbInit.ts",
-    "build:scripts:spec": "parcel build --target=spec-script src/backend/scripts/genSpec.js",
-    "build:scripts": "rimraf dist/scripts && npm run build:scripts:migrations && npm run build:scripts:init && npm run build:scripts:spec",
+    "build:scripts": "rimraf dist/scripts && npm run build:scripts:migrations && npm run build:scripts:init",
     "build:hooks:spec": "ts-node --transpile-only src/backend/scripts/genSpec.js > ./dist/openapi.json",
     "build:hooks:import": "restful-react import --file ./dist/openapi.json --output ./src/frontend/hooks/api-hooks.tsx",
     "build:hooks": "npm run build:hooks:spec && npm run build:hooks:import && rimraf dist/openapi.json",
@@ -55,15 +53,7 @@
       "context": "node",
       "distDir": "dist/scripts"
     },
-    "seeds-script": {
-      "context": "node",
-      "distDir": "dist/scripts"
-    },
     "init-script": {
-      "context": "node",
-      "distDir": "dist/scripts"
-    },
-    "spec-script": {
       "context": "node",
       "distDir": "dist/scripts"
     }
