@@ -1,5 +1,3 @@
-import fs from 'fs';
-import path from 'path';
 import { SwaggerAPI } from 'koa-joi-router-docs';
 import preprintRoutes from '../controllers/preprint.js';
 import authWrapper from '../middleware/auth.js';
@@ -18,9 +16,6 @@ import requestRoutes from '../controllers/request.js';
 import tagRoutes from '../controllers/tag.js';
 import templateRoutes from '../controllers/template.js';
 import notificationRoutes from '../controllers/notification.js';
-
-const __dirname = path.resolve();
-const OUT_FILE = path.resolve(__dirname, 'dist', 'openapi.json');
 
 function docs() {
   const generator = new SwaggerAPI();
@@ -65,7 +60,7 @@ function docs() {
   );
 
   const specJson = JSON.stringify(spec, null, 2);
-  fs.writeFileSync(OUT_FILE, specJson);
+  process.stdout.write(specJson);
 }
 
 docs();

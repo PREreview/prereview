@@ -64,6 +64,21 @@ RUN \
 
 
 #
+# Stage: Frontend hooks build
+#
+FROM builder AS frontend-hooks
+
+COPY src/common/ src/common/
+COPY src/backend/ src/backend/
+
+RUN \
+  mkdir --parents dist src/frontend/hooks \
+  && npm run build:hooks \
+  && rm -rf .parcel-cache
+
+
+
+#
 # Stage: Frontend build
 #
 FROM builder AS frontend
@@ -71,6 +86,7 @@ FROM builder AS frontend
 COPY --from=scripts /app/dist/scripts/ dist/scripts/
 COPY src/common/ src/common/
 COPY src/frontend/ src/frontend/
+COPY --from=frontend-hooks /app/src/frontend/hooks/ src/frontend/hooks/
 
 RUN \
   npm run build:frontend \
