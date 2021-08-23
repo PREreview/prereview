@@ -253,7 +253,7 @@ export default async function configServer(config) {
   }
 
   // Manual override of domain to allow for outbreaksci.* subdomain
-  const sessionOpts = config.isProd ? { domain: 'prereview.org' } : {};
+  const sessionOpts = { domain: new URL(config.orcidCallbackUrl).hostname };
 
   server
     .use(compress())
