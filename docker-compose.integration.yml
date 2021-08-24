@@ -24,5 +24,6 @@ services:
       - './integration/state:/app/state'
     environment:
       BASE_URL: 'http://prereview:3000'
+      RETRIES:
       TEST_ADMIN_USER_API_APP: 'playwright'
       TEST_ADMIN_USER_API_KEY: 'not-a-secret'

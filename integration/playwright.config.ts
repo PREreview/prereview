@@ -9,7 +9,7 @@ const config: PlaywrightTestConfig = {
     video: 'retain-on-failure',
   },
   globalSetup: require.resolve('./src/global-setup'),
-  retries: 3,
+  retries: parseInt(process.env.RETRIES) || 0,
   projects: [
     {
       name: 'Desktop Chrome',

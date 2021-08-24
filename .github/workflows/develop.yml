@@ -47,6 +47,8 @@ jobs:
 
       - name: 'Run integration tests'
         run: make integration-test
+        env:
+          RETRIES: '3'
 
       - name: 'Store integration test results'
         if: ${{ failure() }}
