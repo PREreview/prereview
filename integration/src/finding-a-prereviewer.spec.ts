@@ -10,12 +10,10 @@ test.asAReturningUser('might not find anyone', async ({ page }) => {
   );
   await page.keyboard.press('Enter');
 
-  await expect(page.locator('h2')).toContainText('0 PREreviewers');
+  const content = page.locator(
+    '.MuiContainer-root:has([placeholder*="Search users"])',
+  );
 
-  expect(
-    await screenshot(
-      page,
-      '.MuiContainer-root:has([placeholder*="Search users"])',
-    ),
-  ).toMatchSnapshot('empty-list.png');
+  await expect(content.locator('h2')).toContainText('0 PREreviewers');
+  expect(await screenshot(page, content)).toMatchSnapshot('empty-list.png');
 });
