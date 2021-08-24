@@ -21,6 +21,8 @@ services:
       - './integration/playwright.config.ts:/app/playwright.config.ts'
       - './integration/src:/app/src'
       - './integration/results:/app/test-results'
+      - './integration/state:/app/state'
     environment:
+      BASE_URL: 'http://prereview:3000'
       TEST_ADMIN_USER_API_APP: 'playwright'
       TEST_ADMIN_USER_API_KEY: 'not-a-secret'

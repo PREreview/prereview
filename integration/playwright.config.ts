@@ -2,7 +2,7 @@ import { devices, PlaywrightTestConfig } from '@playwright/test';
 
 const config: PlaywrightTestConfig = {
   use: {
-    baseURL: 'http://prereview:3000',
+    baseURL: process.env.BASE_URL,
     headless: true,
     screenshot: 'only-on-failure',
     trace: 'retain-on-failure',
