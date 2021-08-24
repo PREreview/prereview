@@ -1,7 +1,7 @@
 {
   "private": true,
   "dependencies": {
-    "@playwright/test": "^1.13.0",
+    "@playwright/test": "^1.14.0",
     "glur": "^1.1.2",
     "node-fetch": "^2.6.1",
     "pngjs": "^6.0.0"

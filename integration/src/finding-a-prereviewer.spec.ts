@@ -10,7 +10,7 @@ test.asAReturningUser('might not find anyone', async ({ page }) => {
   );
   await page.keyboard.press('Enter');
 
-  expect(await page.textContent('h2')).toBe('0 PREreviewers');
+  await expect(page.locator('h2')).toContainText('0 PREreviewers');
 
   expect(
     await screenshot(

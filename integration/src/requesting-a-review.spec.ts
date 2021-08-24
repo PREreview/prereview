@@ -6,9 +6,8 @@ test.asAReturningUser('have to log in with ORCID', async ({ page }) => {
 
   await page.click(':text("Add Request")');
 
-  const dialog = await page.waitForSelector('[role="dialog"]');
+  const dialog = page.locator('[role="dialog"]');
 
-  expect(await dialog.innerText()).toContain('You must be logged in');
-
+  await expect(dialog).toContainText('You must be logged in');
   expect(await screenshot(page, dialog)).toMatchSnapshot('log-in.png');
 });

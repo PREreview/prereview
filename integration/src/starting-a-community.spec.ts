@@ -7,6 +7,6 @@ test.asAReturningUser(
 
     await page.click(':text("Start your own community")');
 
-    expect(await page.textContent('form')).toContain('Request to start');
+    await expect(page.locator('form')).toContainText('Request to start');
   },
 );

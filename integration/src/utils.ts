@@ -1,15 +1,15 @@
-import { ElementHandle, Page, PageScreenshotOptions } from '@playwright/test';
+import { ElementHandle, Locator, Page, PageScreenshotOptions } from '@playwright/test';
 import glur from 'glur';
 import { PNG } from 'pngjs';
 
 export async function screenshot(
   page: Page,
-  focus?: ElementHandle | string,
+  focus?: Locator | string,
 ): Promise<Buffer> {
   await Promise.all(page.frames().map(frame => frame.waitForLoadState()));
 
   if (typeof focus === 'string') {
-    focus = await page.waitForSelector(focus);
+    focus = page.locator(focus);
   }
 
   await Promise.all([
