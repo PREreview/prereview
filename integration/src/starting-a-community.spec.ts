@@ -1,11 +1,12 @@
-import { test, expect } from '@playwright/test';
+import { expect, test } from './test';
 
-test.describe('starting a community', () => {
-  test('goes to a form', async ({ page }) => {
+test.asAReturningUser(
+  'starting a community goes to a form',
+  async ({ page }) => {
     await page.goto('/communities');
 
     await page.click(':text("Start your own community")');
 
     expect(await page.textContent('form')).toContain('Request to start');
-  });
-});
+  },
+);
