@@ -52,7 +52,13 @@ async function hideTwitterTimelines(page: Page) {
 async function resetCarousels(page: Page) {
   const carouselControls = await page.$$('.slick-dots :text("1")');
 
-  await Promise.all(carouselControls.map(controls => controls.click()));
+  await Promise.all(
+    carouselControls.map(async controls => {
+      if (await isIntersectingViewport(controls)) {
+        await controls.click();
+      }
+    }),
+  );
 }
 
 async function removeTransitions(page: Page) {
@@ -64,5 +70,28 @@ async function removeTransitions(page: Page) {
           transition: none !important;
         }
       `,
+  });
+}
+
+async function isIntersectingViewport(element: ElementHandle<Element>) {
+  const visibleRatio = await getVisibleRatio(element);
+
+  return visibleRatio > 0;
+}
+
+async function getVisibleRatio(element: ElementHandle<Element>) {
+  return await element.evaluate(async element => {
+    return await new Promise<number>(resolve => {
+      const observer = new IntersectionObserver(entries => {
+        resolve(entries[0].intersectionRatio);
+        observer.disconnect();
+      });
+
+      observer.observe(element);
+
+      requestAnimationFrame(() => {
+        // Do nothing
+      });
+    });
   });
 }
