@@ -49,6 +49,8 @@ jobs:
         run: make integration-test
         env:
           RETRIES: '3'
+          PREREVIEW_ORCID_CLIENT_ID: ${{ secrets.ORCID_SANDBOX_CLIENT_ID }}
+          PREREVIEW_ORCID_CLIENT_SECRET: ${{ secrets.ORCID_SANDBOX_CLIENT_SECRET }}
 
       - name: 'Store integration test results'
         if: ${{ failure() }}
