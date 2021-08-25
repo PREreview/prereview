@@ -5,6 +5,7 @@ services:
       target: integration
     environment:
       PREREVIEW_ADMIN_USERS: '0000-0002-7498-6197'
+      PREREVIEW_ORCID_CALLBACK_URL: 'http://prereview:3000/api/v2/orcid/callback'
       TEST_ADMIN_USER_ORCID: '0000-0002-7498-6197'
       TEST_ADMIN_USER_API_APP: 'playwright'
       TEST_ADMIN_USER_API_KEY: 'not-a-secret'
@@ -27,3 +28,5 @@ services:
       RETRIES:
       TEST_ADMIN_USER_API_APP: 'playwright'
       TEST_ADMIN_USER_API_KEY: 'not-a-secret'
+      TEST_USER_ORCID: '0000-0002-7498-6197'
+      TEST_USER_ORCID_PASSWORD: 'this-is-a-secure-passw0rd!'

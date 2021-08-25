@@ -11,12 +11,21 @@ async function loadData() {
 
 async function captureState() {
   const browser = await chromium.launch();
-  const page = await browser.newPage();
+  const page = await browser.newPage({ baseURL: process.env.BASE_URL });
 
-  await page.goto(process.env.BASE_URL);
+  await page.goto('/');
   await page.click(':text("Get started")');
 
   await page.context().storageState({ path: 'state/returning-user.json' });
+
+  await page.goto('/api/v2/orcid/login');
+
+  await page.fill('#username', process.env.TEST_USER_ORCID);
+  await page.fill('#password', process.env.TEST_USER_ORCID_PASSWORD);
+  await page.click('#signin-button');
+  await page.waitForRequest('/');
+
+  await page.context().storageState({ path: 'state/logged-in-user.json' });
 
   await browser.close();
 }

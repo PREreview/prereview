@@ -16,3 +16,9 @@ test.asAReturningUser('looks correct', async ({ page }) => {
 
   expect(await screenshot(page)).toMatchSnapshot('home.png');
 });
+
+test.asALoggedInUser('looks correct when logged in', async ({ page }) => {
+  await page.goto('/');
+
+  expect(await screenshot(page, 'body')).toMatchSnapshot('home-logged-in.png');
+});

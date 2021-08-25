@@ -8,6 +8,12 @@ const asAReturningUser = baseTest.extend({
   },
 });
 
-export const test = { asANewUser, asAReturningUser };
+const asALoggedInUser = baseTest.extend({
+  storageState: async ({}, use) => {
+    await use('state/logged-in-user.json');
+  },
+});
+
+export const test = { asANewUser, asAReturningUser, asALoggedInUser };
 
 export { expect } from '@playwright/test';
