@@ -2,10 +2,21 @@ import { ElementHandle, Locator, Page, PageScreenshotOptions } from '@playwright
 import glur from 'glur';
 import { PNG } from 'pngjs';
 
+type LocatorScreenshotOptions = Parameters<Locator['screenshot']>[0];
+
+export async function screenshot(item: Locator): Promise<Buffer>;
 export async function screenshot(
-  page: Page,
+  item: Page,
+  focus?: Locator | string,
+): Promise<Buffer>;
+export async function screenshot(
+  page: Page | Locator,
   focus?: Locator | string,
 ): Promise<Buffer> {
+  if (isLocator(page)) {
+    return safeScreenshot(page);
+  }
+
   await Promise.all(page.frames().map(frame => frame.waitForLoadState()));
 
   if (typeof focus === 'string') {
@@ -27,8 +38,16 @@ export async function screenshot(
   return safeScreenshot(page, { fullPage: true });
 }
 
-async function safeScreenshot(page: Page, options: PageScreenshotOptions = {}) {
-  return await page.screenshot(options).then(blur);
+async function safeScreenshot(
+  item: Locator,
+  options?: LocatorScreenshotOptions,
+): Promise<Buffer>;
+async function safeScreenshot(
+  item: Page,
+  options?: PageScreenshotOptions,
+): Promise<Buffer>;
+async function safeScreenshot(item: Locator | Page, options = {}) {
+  return await item.screenshot(options).then(blur);
 }
 
 function blur(image: Buffer) {
@@ -94,4 +113,8 @@ async function getVisibleRatio(element: ElementHandle<Element>) {
       });
     });
   });
+}
+
+function isLocator(item: unknown): item is Locator {
+  return typeof item === 'object' && 'elementHandle' in item;
 }

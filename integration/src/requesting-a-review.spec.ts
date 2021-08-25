@@ -9,5 +9,5 @@ test.asAReturningUser('have to log in with ORCID', async ({ page }) => {
   const dialog = page.locator('[role="dialog"]');
 
   await expect(dialog).toContainText('You must be logged in');
-  expect(await screenshot(page, dialog)).toMatchSnapshot('log-in.png');
+  expect(await screenshot(dialog)).toMatchSnapshot('log-in.png');
 });
