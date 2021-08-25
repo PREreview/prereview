@@ -15,10 +15,10 @@ help: ## Display this help text
 	cp env.example .env
 
 build:
-	$(DOCKER_COMPOSE) build
+	@$(DOCKER_COMPOSE) build
 
 run: .env build
-	${DOCKER_COMPOSE} up --abort-on-container-exit --exit-code-from prereview; ${STOP}
+	@${DOCKER_COMPOSE} up --abort-on-container-exit --exit-code-from prereview; ${STOP}
 
 dev: export TARGET = dev
 dev: run ## Run the dev image
@@ -28,37 +28,37 @@ prod: run ## Run the prod image
 
 start: .env build
 start:
-	${DOCKER_COMPOSE} up --detach
+	@${DOCKER_COMPOSE} up --detach
 
 logs:
 ifeq (${LOG_FILE},)
-	${DOCKER_COMPOSE} logs
+	@${DOCKER_COMPOSE} logs
 else
-	${DOCKER_COMPOSE} logs --no-color > ${LOG_FILE}
+	@${DOCKER_COMPOSE} logs --no-color > ${LOG_FILE}
 endif
 
 stop:
 ifneq (${LOG_FILE},)
-	$(MAKE) logs
+	@$(MAKE) logs
 endif
-	${DOCKER_COMPOSE} down
+	@${DOCKER_COMPOSE} down
 
 wait-healthy: ## Wait for the app to be healthy
-	.scripts/wait-healthy.sh prereview
+	@.scripts/wait-healthy.sh prereview
 
 lint: export TARGET = dev
 lint: build ## Run the linter
-	${DOCKER_COMPOSE} run --rm --no-deps --entrypoint "npm run" prereview lint
+	@${DOCKER_COMPOSE} run --rm --no-deps --entrypoint "npm run" prereview lint
 
 test: export TARGET = dev
 test: build ## Run the tests
-	${DOCKER_COMPOSE} run --rm --no-deps --entrypoint "npm run" prereview test
+	@${DOCKER_COMPOSE} run --rm --no-deps --entrypoint "npm run" prereview test
 
 integration-test: export TARGET = integration
 integration-test: export LOG_FILE = integration/results/docker.log
 integration-test: build ## Run the integration tests
-	mkdir -p integration/results && rm -rf integration/results/*
-	${DOCKER_COMPOSE} run playwright; ${STOP}
+	@mkdir -p integration/results && rm -rf integration/results/*
+	@${DOCKER_COMPOSE} run playwright; ${STOP}
 
 smoke-test: build ## Run the smoke tests
-	.scripts/smoke-test.sh
+	@.scripts/smoke-test.sh
