@@ -7,7 +7,6 @@ endif
 
 DOCKER_COMPOSE = docker-compose --file docker-compose.yml --file docker-compose.$(TARGET).yml
 STOP = exit=$$?; $(MAKE) stop; exit $$exit
-LOGS = exit=$$?; $(MAKE) logs; exit $$exit
 
 help: ## Display this help text
 	@grep -E '^[a-zA-Z_\\:-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | sed 's/\\:/:/g' | awk 'BEGIN {FS = ":[^:]*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
@@ -39,6 +38,9 @@ else
 endif
 
 stop:
+ifneq (${LOG_FILE},)
+	$(MAKE) logs
+endif
 	${DOCKER_COMPOSE} down
 
 wait-healthy: ## Wait for the app to be healthy
@@ -56,7 +58,7 @@ integration-test: export TARGET = integration
 integration-test: export LOG_FILE = integration/results/docker.log
 integration-test: build ## Run the integration tests
 	mkdir -p integration/results && rm -rf integration/results/*
-	${DOCKER_COMPOSE} run --rm playwright; ${LOGS}
+	${DOCKER_COMPOSE} run playwright; ${STOP}
 
 smoke-test: build ## Run the smoke tests
 	.scripts/smoke-test.sh
