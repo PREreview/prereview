@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/playwright:v1.14.0-focal
+FROM mcr.microsoft.com/playwright:v1.14.1-focal
 WORKDIR /app
 
 RUN apt-get install --yes --no-install-recommends \
