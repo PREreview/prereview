@@ -10,6 +10,7 @@ const config: PlaywrightTestConfig = {
   },
   globalSetup: require.resolve('./src/global-setup'),
   retries: parseInt(process.env.RETRIES) || 0,
+  timeout: 60000,
   preserveOutput: 'failures-only',
   projects: [
     {
