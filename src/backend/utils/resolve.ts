@@ -4,7 +4,6 @@ import identifiersArxiv from 'identifiers-arxiv';
 import scrape from 'html-metadata';
 import { search as scholarSearch } from 'scholarly';
 import CrossRef from 'crossref';
-import { getOrcidPerson } from './orcid.js';
 import ChainedError from 'typescript-chained-error';
 import { getLogger } from '../log.js';
 
@@ -257,47 +256,4 @@ export async function resolvePreprint(
   log.debug('Finalized preprint metadata:', metadata);
 
   return metadata;
-}
-
-export async function resolveUser(handle: string): Promise<any> {
-  const person = await getOrcidPerson(handle);
-
-  // Process the deep JSON structure for a given ORCID user
-  if (person) {
-    const persona = {};
-    if (person.name) {
-      if (person.name['credit-name'] && person.name['credit-name'].value) {
-        persona.name = person.name['credit-name'].value;
-      } else {
-        persona.name =
-          person.name['given-names'] && person.name['given-names'].value
-            ? person.name['given-names'].value
-            : '';
-        if (person.name['family-name'] && person.name['family-name'].value) {
-          persona.name = persona.name.concat(
-            ' ',
-            person.name['family-name'].value,
-          );
-        }
-      }
-    }
-
-    if (person.biography && person.biography['content']) {
-      persona.bio = person.biography['content'];
-    }
-
-    let contacts = [];
-    if (Array.isArray(person.emails.email) && person.emails.email.length > 0) {
-      for (const e of person.emails.email) {
-        contacts.push({
-          schema: 'mailto',
-          value: e.email,
-          verified: !!e.verified,
-        });
-      }
-    }
-    if (contacts.length > 0) {
-      contacts = [...new Set(contacts)];
-    }
-  }
 }
