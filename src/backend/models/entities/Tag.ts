@@ -24,7 +24,6 @@ export class Tag extends BaseEntity {
   @Unique()
   name!: string;
 
-  //@Fixture({ get: faker => faker.internet.color(), optional: true })
   @Fixture(faker => faker.internet.color())
   @Property()
   color?: string;

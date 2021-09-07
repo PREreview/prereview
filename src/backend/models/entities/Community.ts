@@ -38,12 +38,10 @@ export class Community extends BaseEntity {
   @Unique()
   slug!: string;
 
-  //@Fixture({ get: faker => faker.lorem.paragraph(), optional: true })
   @Fixture(faker => faker.lorem.sentences())
   @Property({ columnType: 'text', nullable: true })
   description?: string;
 
-  //@Fixture({ get: faker => faker.image.abstract(), optional: true })
   @Fixture(faker => faker.image.abstract())
   @Property({ nullable: true })
   banner?: Buffer;

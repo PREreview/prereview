@@ -31,7 +31,7 @@ export class Work extends BaseEntity {
   @Property({ nullable: true })
   type?: string;
 
-  @Fixture({ get: () => `doi:${createRandomDoi()}`, optional: true })
+  @Fixture({ get: () => `doi:${createRandomDoi()}` })
   @Property({ nullable: true })
   handle?: string;
 

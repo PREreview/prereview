@@ -37,7 +37,7 @@ export class FullReview extends BaseEntity {
   @Property()
   isFlagged: boolean = false;
 
-  @Fixture({ get: () => createRandomDoi(), optional: true })
+  @Fixture({ get: () => createRandomDoi() })
   @Property({ nullable: true })
   @Unique()
   doi?: string;
