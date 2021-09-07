@@ -1,7 +1,11 @@
 import 'reflect-metadata';
 import * as entities from '../models/entities';
 
-export function getFields(type: string, includes?: string[], recurse = 2): any {
+export function getFields(
+  type: keyof typeof entities,
+  includes?: string[],
+  recurse = 2,
+): unknown {
   return Object.values(entities[type].prototype.__meta.properties).reduce(
     (props: any[], prop: any) => {
       if (!(prop.hidden === true)) {

@@ -2,9 +2,9 @@ import { Command } from 'commander';
 import dotenv from 'dotenv';
 import { from } from 'env-var';
 import { Joi } from 'koa-joi-router';
+import { isString } from 'lodash';
 import { ORCID as orcidUtils } from 'orcid-utils';
 import log4js from 'koa-log4';
-import { isString } from './utils/strings';
 import { ServerError } from './utils/http-errors';
 
 // Configure logging
@@ -29,9 +29,6 @@ const env = from(process.env, {}, (varname, str) =>
 );
 
 function getEnv(postfix: string, fallback?: string) {
-  if (!isString(postfix)) {
-    throw new ServerError('Must specify an environment variable to fetch.');
-  }
   if (fallback) {
     return env
       .get(
@@ -50,7 +47,7 @@ const defaultEnv = isString(process.env.NODE_ENV)
   : 'development';
 const defaultPort = isString(process.env.PORT) ? process.env.PORT : '3000';
 
-const defaults = {
+const defaults: Partial<Record<string, string>> = {
   admin_user: 'admin',
   db_name:
     defaultEnv !== 'production'
@@ -71,9 +68,6 @@ const defaults = {
 };
 
 function getEnvOrDefault(postfix: string) {
-  if (!isString(postfix)) {
-    throw new ServerError('Must specify an environment variable to fetch.');
-  }
   const defaultValue = defaults[postfix.toLowerCase()];
 
   if (defaultValue) {

@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import router from 'koa-joi-router';
+import { isString } from 'lodash';
 import { Key } from '../models/entities/index.ts';
-import { isString } from '../utils/strings';
 import { getLogger } from '../log.js';
 
 const log = getLogger('backend:controllers:user');

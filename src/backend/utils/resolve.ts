@@ -214,18 +214,6 @@ export async function resolvePreprint(
   const baseUrlArxivHtml = 'https://arxiv.org/abs/';
   const baseUrlDoi = 'https://doi.org/';
 
-  // checks if the publication is DOI or arXiv
-  let url: string, type: string;
-  if (isDoi) {
-    log.debug('Resolving preprint with a DOI');
-    url = `${baseUrlDoi}${handle}`;
-    type = 'doi';
-  } else if (isArxiv) {
-    log.debug('Resolving preprint with an arXivId');
-    url = `${baseUrlArxivHtml}${handle}`;
-    type = 'arxiv';
-  }
-
   // as a last resort check Google Scholar
   resolvers.push(
     searchGoogleScholar(handle).catch(err =>
@@ -244,6 +232,18 @@ export async function resolvePreprint(
 
   // fetch data based on publication type (DOI / arXiv)
   if (isDoi || isArxiv) {
+    // checks if the publication is DOI or arXiv
+    let url: string, type: string;
+    if (isDoi) {
+      log.debug('Resolving preprint with a DOI');
+      url = `${baseUrlDoi}${handle}`;
+      type = 'doi';
+    } else {
+      log.debug('Resolving preprint with an arXivId');
+      url = `${baseUrlArxivHtml}${handle}`;
+      type = 'arxiv';
+    }
+
     resolvers.push(
       scrapeUrl(url, handle, type).catch(err =>
         log.warn('No metadata found via scrape: ', err),

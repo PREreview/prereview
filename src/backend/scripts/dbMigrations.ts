@@ -5,10 +5,12 @@ import { SearchPostgresql } from '../db/migrations/searchIndexes';
 
 async function main() {
   try {
-    const migrationsList = Object.keys(migrations).map(migrationName => ({
-      name: migrationName,
-      class: migrations[migrationName],
-    }));
+    const migrationsList = Object.entries(migrations).map(
+      ([migrationName, migrationClass]) => ({
+        name: migrationName,
+        class: migrationClass,
+      }),
+    );
 
     migrationsList.splice(1, 0, {
       name: 'SearchPostgresql',
