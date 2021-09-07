@@ -1,4 +1,4 @@
-import orcidUtils from 'orcid-utils';
+import { ORCID as orcidUtils } from 'orcid-utils';
 import fetch from 'node-fetch';
 import { createError } from '../utils/http-errors.ts';
 import config from '../config.ts';

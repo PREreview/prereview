@@ -1,5 +1,5 @@
 import { EntityRepository, MikroORM, Repository } from '@mikro-orm/core';
-import orcidUtils from 'orcid-utils';
+import { ORCID as orcidUtils } from 'orcid-utils';
 import { validate as uuidValidate } from 'uuid';
 import { User } from './entities';
 import ChainedError from 'typescript-chained-error';

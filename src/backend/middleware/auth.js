@@ -1,5 +1,5 @@
 import Roles from 'koa-roles';
-import orcidUtils from 'orcid-utils';
+import { ORCID as orcidUtils } from 'orcid-utils';
 import config from '../config.ts';
 import { isString } from '../utils/strings';
 import { getLogger } from '../log.js';

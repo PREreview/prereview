@@ -1,5 +1,5 @@
 import { EntityRepository, MikroORM, Repository } from '@mikro-orm/core';
-import orcidUtils from 'orcid-utils';
+import { ORCID as orcidUtils } from 'orcid-utils';
 import { validate as uuidValidate } from 'uuid';
 import { Group } from './entities';
 import { User } from './entities';
