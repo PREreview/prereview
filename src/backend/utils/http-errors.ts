@@ -36,12 +36,6 @@ class HttpError extends ChainedError {
   }
 }
 
-export class ServerError extends HttpError {
-  constructor(message: string, cause?: Error) {
-    super(500, message, cause);
-  }
-}
-
 // Adapted from https://github.com/jshttp/http-errors
 export function createError(...args: any[]): HttpError {
   let err: Error;

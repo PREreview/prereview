@@ -27,7 +27,6 @@ import { createError } from './utils/http-errors.ts';
 import { dbWrapper } from './db.ts';
 
 // Our middlewares
-import cloudflareAccess from './middleware/cloudflare.js';
 import authWrapper from './middleware/auth.js'; // authorization/user roles
 import currentCommunity from './middleware/community.js';
 import currentPersona from './middleware/persona.js';
@@ -231,26 +230,6 @@ export default async function configServer(config) {
   server.context.createError = createError;
   server.context.onerror = errorHandler('koa.sess', logger);
   server.context.api = true;
-
-  // If we're running behind Cloudflare, set the access parameters.
-  if (config.cfaccessUrl) {
-    server.use(async (ctx, next) => {
-      let cfa = cloudflareAccess();
-      await cfa(ctx, next);
-    });
-    server.use(async (ctx, next) => {
-      let email = ctx.request.header['cf-access-authenticated-user-email'];
-      if (!email) {
-        if (!config.isDev && !config.isTest) {
-          ctx.throw(401, 'Missing header cf-access-authenticated-user-email');
-        } else {
-          email = 'foo@example.com';
-        }
-      }
-      ctx.state.email = email;
-      await next();
-    });
-  }
 
   // Manual override of domain to allow for outbreaksci.* subdomain
   const sessionOpts = { domain: new URL(config.orcidCallbackUrl).hostname };

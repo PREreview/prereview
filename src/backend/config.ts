@@ -5,7 +5,6 @@ import { Joi } from 'koa-joi-router';
 import { isString } from 'lodash';
 import { ORCID as orcidUtils } from 'orcid-utils';
 import log4js from 'koa-log4';
-import { ServerError } from './utils/http-errors';
 
 // Configure logging
 
@@ -220,15 +219,6 @@ class Config extends Command {
     this.isProd = this.env === 'production';
   }
 
-  parse(argv?: string[], options?: ParseOptions): any {
-    super.parse(argv, options);
-    if (!this.cfaccessUrl != !this.cfaccessAudience) {
-      throw new ServerError(
-        'If using Cloudflare Access both the URL and the Audience must be specified.',
-      );
-    }
-  }
-
   get dbUrl() {
     let userpass: string;
     if (this.dbPass) {
@@ -336,18 +326,6 @@ export default program
     'Use TLS to connect to the Postgres database',
     validateBool,
     getEnvOrDefault('db_tls').asBool(),
-  )
-  .option(
-    '--cfaccess-url <url>',
-    'Cloudflare Access URL',
-    validateUrl,
-    getEnvOrDefault('cfaccess_url').asString(),
-  )
-  .option(
-    '--cfaccess-audience <token>',
-    'Cloudflare Access Audience',
-    validateToken,
-    getEnvOrDefault('cfaccess_audience').asString(),
   )
   .option(
     '--email-address <email>',
