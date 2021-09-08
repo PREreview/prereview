@@ -16,7 +16,7 @@ export class GroupModel extends EntityRepository<Group> {
       return false;
     }
 
-    let user: any;
+    let user: User | null = null;
 
     if (orcidUtils.isValid(userId)) {
       user = await this.em.findOne(User, { orcid: userId as string });

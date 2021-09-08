@@ -9,7 +9,7 @@ const log = getLogger('backend:models:personas');
 @Repository(Persona)
 export class PersonaModel extends EntityRepository<Persona> {
   async isIdentityOf(personaId: string, userId: string): Promise<boolean> {
-    let persona: any;
+    let persona: Persona | null = null;
     if (uuidValidate(personaId)) {
       persona = await this.findOne({ uuid: personaId });
     }
@@ -19,7 +19,7 @@ export class PersonaModel extends EntityRepository<Persona> {
       return false;
     }
 
-    let user: any;
+    let user: User | null = null;
     if (orcidUtils.isValid(userId)) {
       user = await this.em.findOne(User, { orcid: userId as string }, ['personas']);
     } else if (uuidValidate(userId)) {

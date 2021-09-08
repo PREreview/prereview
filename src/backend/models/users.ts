@@ -6,7 +6,7 @@ import ChainedError from 'typescript-chained-error';
 
 @Repository(User)
 export class UserModel extends EntityRepository<User> {
-  findOneByUuidOrOrcid(value: string, params: string[]): any {
+  findOneByUuidOrOrcid(value: string, params: string[]): Promise<User | null> {
     try {
       if (orcidUtils.isValid(value)) {
         return this.findOne({ orcid: value }, params);
@@ -17,7 +17,7 @@ export class UserModel extends EntityRepository<User> {
     }
   }
 
-  findOneByPersona(value: string, params: string[]): any {
+  findOneByPersona(value: string, params: string[]): Promise<User | null> {
     try {
       if (!uuidValidate(value)) {
         throw new Error(`Not a valid uuid: ${value}`);
@@ -28,7 +28,11 @@ export class UserModel extends EntityRepository<User> {
     }
   }
 
-  findOneByKey(app: string, secret: string, params: string[]): any {
+  findOneByKey(
+    app: string,
+    secret: string,
+    params: string[],
+  ): Promise<User | null> {
     try {
       return this.em.findOne(
         User,

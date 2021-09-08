@@ -9,7 +9,7 @@ const log = getLogger('backend:models:communities');
 @Repository(Community)
 export class CommunityModel extends EntityRepository<Community> {
   async isMemberOf(communityId: string, userId: string): Promise<boolean> {
-    let user: any;
+    let user: User | null = null;
     if (orcidUtils.isValid(userId)) {
       user = await this.em.findOne(User, { orcid: userId as string }, [
         'personas',
@@ -29,7 +29,7 @@ export class CommunityModel extends EntityRepository<Community> {
       .getItems()
       .map(persona => persona.uuid);
 
-    let community: any;
+    let community: Community | null;
     if (uuidValidate(communityId)) {
       community = await this.findOne(
         {
@@ -56,7 +56,7 @@ export class CommunityModel extends EntityRepository<Community> {
   }
 
   async isOwnerOf(communityId: string, userId: string): Promise<boolean> {
-    let community: any;
+    let community: Community | null;
     if (uuidValidate(communityId)) {
       community = await this.findOne({ uuid: communityId }, ['owners']);
     } else {
@@ -68,7 +68,7 @@ export class CommunityModel extends EntityRepository<Community> {
       return false;
     }
 
-    let user: any;
+    let user: User | null = null;
     if (orcidUtils.isValid(userId)) {
       user = await this.em.findOne(User, { orcid: userId as string });
     } else if (uuidValidate(userId)) {
