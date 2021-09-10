@@ -13,6 +13,7 @@ services:
     ports:
       - "3000:3000"
     environment:
+      PREREVIEW_ADMIN_USERS:
       PREREVIEW_LOG_LEVEL: ${PREREVIEW_LOG_LEVEL:-debug}
       PREREVIEW_HOST: ${PREREVIEW_HOST:-0.0.0.0}
       PREREVIEW_PORT: ${PREREVIEW_PORT:-3000}
