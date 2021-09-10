@@ -169,6 +169,7 @@
     "@parcel/validator-typescript": "2.0.0-beta.2",
     "@types/koa-joi-router": "^8.0.1",
     "@types/koa-log4": "^2.3.3",
+    "@types/parcel-env": "^0.0.1",
     "@types/quill": "^1.3.10",
     "@types/uuid": "^8.3.1",
     "@typescript-eslint/eslint-plugin": "^4.5.0",

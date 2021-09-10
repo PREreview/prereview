@@ -1,11 +1,17 @@
+import { ThemeProvider } from '@material-ui/core';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import { BrowserRouter } from 'react-router-dom';
 import { RestfulProvider } from 'restful-react';
-import { ThemeProvider } from '@material-ui/core/styles';
-import theme from './theme.js';
-import App from './components/app.js';
+import App from './components/app';
+import theme from './theme';
+
+declare global {
+  interface Window {
+    env: NodeJS.ProcessEnv;
+  }
+}
 
 ReactDOM.render(
   <HelmetProvider>
