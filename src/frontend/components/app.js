@@ -67,7 +67,7 @@ export default function App({ user }) {
 
   return (
     <HelmetProvider>
-      <IntlProvider>
+      <IntlProvider locale="en">
         <DndProvider
           backend={mobile({ tablet: true }) ? TouchBackend : HTML5Backend}
         >
