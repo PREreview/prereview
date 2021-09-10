@@ -138,7 +138,6 @@
     "react-dropzone": "^11.0.2",
     "react-helmet-async": "^1.0.6",
     "react-html-parser": "^2.0.2",
-    "react-imported-component": "^6.2.1",
     "react-intl": "^5.11.0",
     "react-quilljs": "^1.2.12",
     "react-router-dom": "^5.1.2",
