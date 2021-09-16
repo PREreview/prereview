@@ -99,7 +99,7 @@ const CommunityPanel = () => {
   } = useGetCommunity({
     id: id,
     resolve: community => community.data[0],
-    queryParams: { include_images: 'avatar,banner' },
+    queryParams: { include_images: 'banner' },
   });
 
   // update community info

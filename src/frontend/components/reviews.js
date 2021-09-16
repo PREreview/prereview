@@ -111,7 +111,6 @@ export default function Reviews() {
   } = useGetPreprints({
     queryParams: {
       ...searchParamsToObject(params),
-      include_images: 'avatar',
     },
   });
 

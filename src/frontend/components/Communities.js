@@ -76,7 +76,7 @@ const Communities = () => {
   const { data: communities, loading: loading, error } = useGetCommunities({
     queryParams: {
       ...searchParamsToObject(params),
-      include_images: 'banner,avatar',
+      include_images: 'banner',
     },
   });
 

@@ -105,9 +105,6 @@ export default function ActivityCard({ activity }) {
     error,
   } = useGetPreprint({
     id: createPreprintId(activity.preprint.handle),
-    queryParams: {
-      include_images: 'avatar',
-    },
   });
 
   const handleHover = () => {

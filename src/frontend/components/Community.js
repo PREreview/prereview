@@ -223,7 +223,7 @@ export default function Community(props) {
   const { id } = props && props.id ? props : useParams();
   const { data: community, loading, error } = useGetCommunity({
     queryParams: {
-      include_images: 'banner,avatar',
+      include_images: 'banner',
     },
     resolve: community => {
       if (
