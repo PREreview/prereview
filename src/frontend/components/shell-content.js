@@ -390,6 +390,7 @@ function ShellContentRead({
         rapidContent={rapidContent}
         longContent={longContent}
         newRequest={newRequest}
+        filterByCommunities={true}
       />
       {/*
       {!!moderatedReviewId && (

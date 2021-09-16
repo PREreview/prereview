@@ -99,6 +99,7 @@ export default function ReviewReader({
   newRequest,
   height,
   isReader = true,
+  filterByCommunities = false,
 }) {
   const classes = useStyles();
   const history = useHistory();
@@ -124,17 +125,23 @@ export default function ReviewReader({
   const [communities, setCommunities] = useState(null);
   const [selectedCommunities, setSelectedCommunities] = useState([]);
 
-  const {
-    data: communitiesData,
-    loading: loadingCommunities,
-    error: communityError,
-  } = useGetCommunities({
-    resolve: communities => {
-      if (communities.data && Array.isArray(communities.data)) {
-        return communities.data;
-      }
-    },
-  });
+  let communitiesData = null;
+  let loadingCommunities = false;
+  let communityError = null;
+
+  if (filterByCommunities) {
+    const communities = useGetCommunities({
+      resolve: communities => {
+        if (communities.data && Array.isArray(communities.data)) {
+          return communities.data;
+        }
+      },
+    });
+
+    communitiesData = communities.data;
+    loadingCommunities = communities.loading;
+    communityError = communities.error;
+  }
 
   // expand and collapse rapid and full review sections
   const handleChangeRapid = panel => (event, newExpanded) => {
@@ -671,4 +678,5 @@ ReviewReader.propTypes = {
   newRequest: PropTypes.bool,
   height: PropTypes.number,
   isReader: PropTypes.bool,
+  filterByCommunities: PropTypes.bool,
 };
