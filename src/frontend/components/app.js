@@ -1,4 +1,5 @@
 // base imports
+import loadable from '@loadable/component';
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { HelmetProvider } from 'react-helmet-async';
@@ -10,27 +11,27 @@ import UserProvider from '../contexts/user-context';
 import { StoresProvider } from '../contexts/store-context';
 
 // components
-import AdminPanel from './admin-panel';
-import Community from './Community';
-import Communities from './Communities';
-import CommunityPanel from './community-panel';
-import Dashboard from './dashboard';
-import Event from './Event';
-import ExtensionFallback from './extension-fallback';
-import Home from './home';
-import Login from './login';
-import Logout from './logout';
-import NotFound from './not-found';
 import PrivateRoute, { AdminRoute } from './private-route';
-import Profile from './profile';
-import Reviews from './reviews';
-import SettingsAPI from './settings-api';
-import SettingsDrafts from './settings-drafts';
-import Personas from './Personas';
-import Validate from './Validate';
 import * as Fathom from 'fathom-client';
 
 //const Moderate = React.lazy(() => import('./moderate'));
+const AdminPanel = loadable(() => import('./admin-panel'));
+const Community = loadable(() => import('./Community'));
+const Communities = loadable(() => import('./Communities'));
+const CommunityPanel = loadable(() => import('./community-panel'));
+const Event = loadable(() => import('./Event'));
+const ExtensionFallback = loadable(() => import('./extension-fallback'));
+const Home = loadable(() => import('./home'));
+const Login = loadable(() => import('./login'));
+const Logout = loadable(() => import('./logout'));
+const NotFound = loadable(() => import('./not-found'));
+const Profile = loadable(() => import('./profile'));
+const Reviews = loadable(() => import('./reviews'));
+const Personas = loadable(() => import('./Personas'));
+const Validate = loadable(() => import('./Validate'));
+const Dashboard = loadable(() => import('./dashboard'));
+const SettingsAPI = loadable(() => import('./settings-api'));
+const SettingsDrafts = loadable(() => import('./settings-drafts'));
 
 export default function App({ user }) {
   const [loading, setLoading] = useState(true);
