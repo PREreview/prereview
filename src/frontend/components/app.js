@@ -1,12 +1,8 @@
 // base imports
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { DndProvider } from 'react-dnd';
 import { HelmetProvider } from 'react-helmet-async';
-import { HTML5Backend } from 'react-dnd-html5-backend';
-import mobile from 'is-mobile';
 import { Switch, Route } from 'react-router-dom';
-import { TouchBackend } from 'react-dnd-touch-backend';
 import 'url-search-params-polyfill'; /* pollyfill for IE / Edge */
 import { IntlProvider } from 'react-intl';
 
@@ -68,112 +64,108 @@ export default function App({ user }) {
   return (
     <HelmetProvider>
       <IntlProvider locale="en">
-        <DndProvider
-          backend={mobile({ tablet: true }) ? TouchBackend : HTML5Backend}
-        >
-          <StoresProvider>
-            <UserProvider user={user}>
-              <Switch>
-                <Route path="/" exact={true}>
-                  {subdomain && subdomain === 'outbreaksci' ? (
-                    <Community id="outbreaksci" />
-                  ) : (
-                    <Home />
-                  )}
-                </Route>
-                <Route exact={true} path="/login">
-                  <Login />
-                </Route>
-                <Route exact={true} path="/logout">
-                  <Logout />
-                </Route>
+        <StoresProvider>
+          <UserProvider user={user}>
+            <Switch>
+              <Route path="/" exact={true}>
+                {subdomain && subdomain === 'outbreaksci' ? (
+                  <Community id="outbreaksci" />
+                ) : (
+                  <Home />
+                )}
+              </Route>
+              <Route exact={true} path="/login">
+                <Login />
+              </Route>
+              <Route exact={true} path="/logout">
+                <Logout />
+              </Route>
 
-                <Route exact={true} path="/dashboard/:new(new)?">
-                  <Dashboard />
-                </Route>
+              <Route exact={true} path="/dashboard/:new(new)?">
+                <Dashboard />
+              </Route>
 
-                <Route exact={true} path="/reviews/:new(new)?">
-                  <Reviews />
-                </Route>
-                <Route exact={true} path="/prereviewers">
-                  <Personas />
-                </Route>
-                <Route exact={true} path="/about/:id">
-                  <Profile />
-                </Route>
-                {/*
-                <Route exact={true} path="/extension">
-                  <ExtensionSplash />
-                </Route>
+              <Route exact={true} path="/reviews/:new(new)?">
+                <Reviews />
+              </Route>
+              <Route exact={true} path="/prereviewers">
+                <Personas />
+              </Route>
+              <Route exact={true} path="/about/:id">
+                <Profile />
+              </Route>
+              {/*
+              <Route exact={true} path="/extension">
+                <ExtensionSplash />
+              </Route>
       */}
-                <PrivateRoute exact={true} path="/settings/api">
-                  <SettingsAPI />
-                </PrivateRoute>
-                <PrivateRoute exact={true} path="/settings/drafts">
-                  <SettingsDrafts />
-                </PrivateRoute>
-                <AdminRoute exact={true} path="/admin">
-                  <AdminPanel />
-                </AdminRoute>
-                {/*
+              <PrivateRoute exact={true} path="/settings/api">
+                <SettingsAPI />
+              </PrivateRoute>
+              <PrivateRoute exact={true} path="/settings/drafts">
+                <SettingsDrafts />
+              </PrivateRoute>
+              <AdminRoute exact={true} path="/admin">
+                <AdminPanel />
+              </AdminRoute>
+              {/*
               <AdminRoute exact={true} path="/block">
                 <BlockPanel />
               </AdminRoute>
       */}
-                <Route exact={true} path="/community-settings/:id">
-                  <CommunityPanel />
-                </Route>
-                {/*
+              <Route exact={true} path="/community-settings/:id">
+                <CommunityPanel />
+              </Route>
+              {/*
               <ModeratorRoute exact={true} path="/moderate">
                 <Suspense fallback={<SuspenseLoading>Loading</SuspenseLoading>}>
                   <Moderate />
                 </Suspense>
               </ModeratorRoute>
       */}
-                <Route exact={true} path="/preprints/:id">
-                  <ExtensionFallback />
-                </Route>
-                <Route exact={true} path="/communities/">
-                  <Communities />
-                </Route>
-                <Route exact={true} path="/communities/:id/:new(new)?">
-                  <Community />
-                </Route>
+              <Route exact={true} path="/preprints/:id">
+                <ExtensionFallback />
+              </Route>
+              <Route exact={true} path="/communities/">
+                <Communities />
+              </Route>
+              <Route exact={true} path="/communities/:id/:new(new)?">
+                <Community />
+              </Route>
 
-                <Route exact={true} path="/events/:id">
-                  <Event />
-                </Route>
+              <Route exact={true} path="/events/:id">
+                <Event />
+              </Route>
 
-                <Route exact={true} path="/preprints/:id/reviews/:cid?">
-                  <ExtensionFallback />
-                </Route>
-                <Route exact={true} path="/validate/:token">
-                  <Validate />
-                </Route>
+              <Route exact={true} path="/preprints/:id/reviews/:cid?">
+                <ExtensionFallback />
+              </Route>
+              <Route exact={true} path="/validate/:token">
+                <Validate />
+              </Route>
 
-                <Route exact={true} path="/preprints/:id/drafts/:cid?">
-                  <ExtensionFallback />
-                </Route>
-                <Route exact={true} path="/preprints/:id/full-reviews/:cid">
-                  <ExtensionFallback />
-                </Route>
-                <Route exact={true} path="/preprints/:id/reviews/:cid">
-                  <ExtensionFallback />
-                </Route>
-                <Route exact={true} path="/preprints/:id/rapid-reviews/:cid">
-                  <ExtensionFallback />
-                </Route>
-                <Route exact={true} path="/validate/:token">
-                  <Validate />
-                </Route>
+              <Route exact={true} path="/preprints/:id/drafts/:cid?">
+                <ExtensionFallback />
+              </Route>
+              <Route exact={true} path="/preprints/:id/full-reviews/:cid">
+                <ExtensionFallback />
+              </Route>
+              <Route exact={true} path="/preprints/:id/reviews/:cid">
+                <ExtensionFallback />
+              </Route>
+              <Route exact={true} path="/preprints/:id/rapid-reviews/:cid">
+                <ExtensionFallback />
+              </Route>
+              <Route exact={true} path="/validate/:token">
+                <Validate />
+              </Route>
 
-                <Route>
-                  <NotFound />
-                </Route>
-              </Switch>
-            </UserProvider>
-          </StoresProvider>
-        </DndProvider>
+              <Route>
+                <NotFound />
+              </Route>
+            </Switch>
+          </UserProvider>
+        </StoresProvider>
       </IntlProvider>
     </HelmetProvider>
   );
