@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { HelmetProvider } from 'react-helmet-async';
 import { Switch, Route } from 'react-router-dom';
-import 'url-search-params-polyfill'; /* pollyfill for IE / Edge */
 import { IntlProvider } from 'react-intl';
 
 // contexts
@@ -32,9 +31,6 @@ import Validate from './Validate';
 import * as Fathom from 'fathom-client';
 
 //const Moderate = React.lazy(() => import('./moderate'));
-
-// kick off the polyfill!
-//smoothscroll.polyfill();
 
 export default function App({ user }) {
   const [loading, setLoading] = useState(true);
