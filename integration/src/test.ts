@@ -3,18 +3,28 @@ import crc32 from 'crc-32';
 import faker from 'faker';
 import { ensurePreprint, Preprint } from './api';
 
-type DataFixtures = {
+type FakerFixtures = {
   seed: number;
+  faker: typeof faker;
+};
+
+type DataFixtures = {
   preprint: Preprint;
 };
 
-const dataTest = baseTest.extend<DataFixtures>({
+const fakerTest = baseTest.extend<FakerFixtures>({
   seed: async ({}, use, testInfo) => {
     await use(crc32.str(testInfo.snapshotPath(testInfo.title)));
   },
-  preprint: async ({ seed }, use) => {
+  faker: async ({ seed }, use) => {
     faker.seed(seed);
 
+    await use(faker);
+  },
+});
+
+const dataTest = fakerTest.extend<DataFixtures>({
+  preprint: async ({ faker }, use) => {
     const preprint: Preprint = {
       doi: `10.5555/${faker.datatype.uuid()}`,
       title: faker.lorem.sentence(),
