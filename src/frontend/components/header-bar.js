@@ -293,6 +293,14 @@ export default function HeaderBar({ thisUser }) {
                 <MenuItem className={classes.nested}>
                   <Link
                     className={classes.mobileNavItem}
+                    href="https://content.prereview.org/equity-diversity-inclusion"
+                  >
+                    EDI Statement
+                  </Link>
+                </MenuItem>
+                <MenuItem className={classes.nested}>
+                  <Link
+                    className={classes.mobileNavItem}
                     href="https://content.prereview.org/people"
                   >
                     People
@@ -561,6 +569,15 @@ export default function HeaderBar({ thisUser }) {
                         href="https://content.prereview.org/mission"
                       >
                         Mission
+                      </Link>
+                    </MenuItem>
+                    <MenuItem onClick={handleClickAbout}>
+                      <Link
+                        className={classes.subnavItem}
+                        color="textPrimary"
+                        href="https://content.prereview.org/equity-diversity-inclusion"
+                      >
+                        EDI Statement
                       </Link>
                     </MenuItem>
                     <MenuItem onClick={handleClickAbout}>
