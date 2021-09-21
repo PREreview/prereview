@@ -251,7 +251,7 @@ export default function HeaderBarReviews({ thisUser }) {
                  <MenuItem className={classes.nested}>
                   <Link
                     className={classes.mobileNavItem}
-                    href="https://content.prereview.org/equity-diversity-inclusion"
+                    href="https://content.prereview.org/edi"
                   >
                     EDI Statement
                   </Link>
