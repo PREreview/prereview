@@ -293,7 +293,7 @@ export default function HeaderBar({ thisUser }) {
                 <MenuItem className={classes.nested}>
                   <Link
                     className={classes.mobileNavItem}
-                    href="https://content.prereview.org/equity-diversity-inclusion"
+                    href="https://content.prereview.org/edi"
                   >
                     EDI Statement
                   </Link>
@@ -575,7 +575,7 @@ export default function HeaderBar({ thisUser }) {
                       <Link
                         className={classes.subnavItem}
                         color="textPrimary"
-                        href="https://content.prereview.org/equity-diversity-inclusion"
+                        href="https://content.prereview.org/edi"
                       >
                         EDI Statement
                       </Link>
