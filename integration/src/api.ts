@@ -1,5 +1,15 @@
 import fetch, { RequestInit, Response } from 'node-fetch';
 import nullthrows from 'nullthrows';
+import { z, ZodTypeAny } from 'zod';
+
+const preprintSchema = z.object({
+  uuid: z.string(),
+});
+
+const dataSchema = <T extends ZodTypeAny>(data: T) =>
+  z.object({
+    data,
+  });
 
 export type Preprint = {
   doi: string;
@@ -8,30 +18,33 @@ export type Preprint = {
 };
 
 export async function ensurePreprint(data: Preprint | string): Promise<string> {
-  let response: Response;
-
   if (typeof data === 'string') {
-    response = await send(`/resolve?identifier=${data}`);
-  } else {
-    response = await send(`/preprints`, {
-      method: 'POST',
-      body: JSON.stringify({
-        handle: `doi:${data.doi}`,
-        title: data.title,
-        abstractText: data.abstract,
-      }),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
+    return await send(`/resolve?identifier=${data}`)
+      .then(response => response.json())
+      .then(preprintSchema.parse)
+      .then(preprint => preprint.uuid);
   }
 
-  return await response.json().then(preprint => preprint.uuid);
+  return await send(`/preprints`, {
+    method: 'POST',
+    body: JSON.stringify({
+      handle: `doi:${data.doi}`,
+      title: data.title,
+      abstractText: data.abstract,
+    }),
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  })
+    .then(response => response.json())
+    .then(dataSchema(preprintSchema).parse)
+    .then(preprint => preprint.data.uuid);
 }
 
 export async function ensureRequest(preprint: string): Promise<unknown> {
   const requests = await send(`/preprints/${preprint}/requests`)
     .then(response => response.json())
+    .then(dataSchema(z.array(z.unknown())).parse)
     .then(response => response.data);
 
   if (requests.length > 0) {
