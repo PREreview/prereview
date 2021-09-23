@@ -1,4 +1,9 @@
-import { ElementHandle, Locator, Page, PageScreenshotOptions } from '@playwright/test';
+import {
+  ElementHandle,
+  Locator,
+  Page,
+  PageScreenshotOptions,
+} from '@playwright/test';
 import glur from 'glur';
 import { PNG } from 'pngjs';
 
@@ -116,5 +121,5 @@ async function getVisibleRatio(element: ElementHandle<Element>) {
 }
 
 function isLocator(item: unknown): item is Locator {
-  return typeof item === 'object' && 'elementHandle' in item;
+  return typeof item === 'object' && item !== null && 'elementHandle' in item;
 }

@@ -1,4 +1,5 @@
 import { chromium } from '@playwright/test';
+import nullthrows from 'nullthrows';
 import { ensurePreprint, ensureRequest } from './api';
 
 export default async function globalSetup(): Promise<void> {
@@ -20,8 +21,11 @@ async function captureState() {
 
   await page.goto('/api/v2/orcid/login');
 
-  await page.fill('#username', process.env.TEST_USER_ORCID);
-  await page.fill('#password', process.env.TEST_USER_ORCID_PASSWORD);
+  await page.fill('#username', nullthrows(process.env.TEST_USER_ORCID));
+  await page.fill(
+    '#password',
+    nullthrows(process.env.TEST_USER_ORCID_PASSWORD),
+  );
   await page.click('#signin-button');
   await page.waitForRequest('/');
 

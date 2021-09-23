@@ -1,4 +1,5 @@
 import fetch, { RequestInit, Response } from 'node-fetch';
+import nullthrows from 'nullthrows';
 
 export type Preprint = {
   doi: string;
@@ -51,8 +52,8 @@ async function send(path: string, init: RequestInit = {}): Promise<Response> {
     ...init,
     headers: {
       ...init.headers,
-      'X-API-App': process.env.TEST_ADMIN_USER_API_APP,
-      'X-API-Key': process.env.TEST_ADMIN_USER_API_KEY,
+      'X-API-App': nullthrows(process.env.TEST_ADMIN_USER_API_APP),
+      'X-API-Key': nullthrows(process.env.TEST_ADMIN_USER_API_KEY),
     },
   });
 }
