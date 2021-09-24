@@ -1,6 +1,11 @@
-import fetch, { RequestInit, Response } from 'node-fetch';
 import nullthrows from 'nullthrows';
 import { z, ZodTypeAny } from 'zod';
+import { Fetch, HeadersInit } from './fetch';
+
+const adminHeaders: HeadersInit = {
+  'X-API-App': nullthrows(process.env.TEST_ADMIN_USER_API_APP),
+  'X-API-Key': nullthrows(process.env.TEST_ADMIN_USER_API_KEY),
+};
 
 const preprintSchema = z.object({
   uuid: z.string(),
@@ -17,15 +22,20 @@ export type Preprint = {
   abstract: string;
 };
 
-export async function ensurePreprint(data: Preprint | string): Promise<string> {
+export async function ensurePreprint(
+  fetch: Fetch,
+  data: Preprint | string,
+): Promise<string> {
   if (typeof data === 'string') {
-    return await send(`/resolve?identifier=${data}`)
+    return await fetch(`/api/v2/resolve?identifier=${data}`, {
+      headers: adminHeaders,
+    })
       .then(response => response.json())
       .then(preprintSchema.parse)
       .then(preprint => preprint.uuid);
   }
 
-  return await send(`/preprints`, {
+  return await fetch(`/api/v2/preprints`, {
     method: 'POST',
     body: JSON.stringify({
       handle: `doi:${data.doi}`,
@@ -34,6 +44,7 @@ export async function ensurePreprint(data: Preprint | string): Promise<string> {
     }),
     headers: {
       'Content-Type': 'application/json',
+      ...adminHeaders,
     },
   })
     .then(response => response.json())
@@ -41,8 +52,13 @@ export async function ensurePreprint(data: Preprint | string): Promise<string> {
     .then(preprint => preprint.data.uuid);
 }
 
-export async function ensureRequest(preprint: string): Promise<unknown> {
-  const requests = await send(`/preprints/${preprint}/requests`)
+export async function ensureRequest(
+  fetch: Fetch,
+  preprint: string,
+): Promise<unknown> {
+  const requests = await fetch(`/api/v2/preprints/${preprint}/requests`, {
+    headers: adminHeaders,
+  })
     .then(response => response.json())
     .then(dataSchema(z.array(z.unknown())).parse)
     .then(response => response.data);
@@ -51,22 +67,12 @@ export async function ensureRequest(preprint: string): Promise<unknown> {
     return;
   }
 
-  return await send(`/preprints/${preprint}/requests`, {
+  return await fetch(`/api/v2/preprints/${preprint}/requests`, {
     method: 'POST',
     body: JSON.stringify({ preprint }),
     headers: {
       'Content-Type': 'application/json',
-    },
-  });
-}
-
-async function send(path: string, init: RequestInit = {}): Promise<Response> {
-  return await fetch(`http://prereview:3000/api/v2${path}`, {
-    ...init,
-    headers: {
-      ...init.headers,
-      'X-API-App': nullthrows(process.env.TEST_ADMIN_USER_API_APP),
-      'X-API-Key': nullthrows(process.env.TEST_ADMIN_USER_API_KEY),
+      ...adminHeaders,
     },
   });
 }

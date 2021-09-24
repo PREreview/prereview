@@ -1,7 +1,10 @@
 import { test as baseTest } from '@playwright/test';
-import { dataFixtures, fakerFixtures } from './fixtures';
+import { dataFixtures, fakerFixtures, httpFixtures } from './fixtures';
 
-const dataTest = baseTest.extend(fakerFixtures).extend(dataFixtures);
+const dataTest = baseTest
+  .extend(fakerFixtures)
+  .extend(httpFixtures)
+  .extend(dataFixtures);
 
 const asANewUser = dataTest;
 
