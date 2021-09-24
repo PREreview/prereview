@@ -1,41 +1,7 @@
 import { test as baseTest } from '@playwright/test';
-import crc32 from 'crc-32';
-import faker from 'faker';
-import { ensurePreprint, Preprint } from './api';
+import { dataFixtures, fakerFixtures } from './fixtures';
 
-type FakerFixtures = {
-  seed: number;
-  faker: typeof faker;
-};
-
-type DataFixtures = {
-  preprint: Preprint;
-};
-
-const fakerTest = baseTest.extend<FakerFixtures>({
-  seed: async ({}, use, testInfo) => {
-    await use(crc32.str(testInfo.snapshotPath(testInfo.title)));
-  },
-  faker: async ({ seed }, use) => {
-    faker.seed(seed);
-
-    await use(faker);
-  },
-});
-
-const dataTest = fakerTest.extend<DataFixtures>({
-  preprint: async ({ faker }, use) => {
-    const preprint: Preprint = {
-      doi: `10.5555/${faker.datatype.uuid()}`,
-      title: faker.lorem.sentence(),
-      abstract: faker.lorem.sentences(),
-    };
-
-    await ensurePreprint(preprint);
-
-    await use(preprint);
-  },
-});
+const dataTest = baseTest.extend(fakerFixtures).extend(dataFixtures);
 
 const asANewUser = dataTest;
 
