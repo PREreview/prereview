@@ -1,5 +1,5 @@
 import { test as baseTest } from '@playwright/test';
-import { dataFixtures, fakerFixtures, httpFixtures } from './fixtures';
+import { dataFixtures, fakerFixtures, httpFixtures } from '../fixtures';
 
 const dataTest = baseTest
   .extend(fakerFixtures)

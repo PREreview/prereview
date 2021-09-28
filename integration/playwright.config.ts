@@ -15,6 +15,7 @@ const config: PlaywrightTestConfig = {
   projects: [
     {
       name: 'Desktop Chrome',
+      testDir: 'src/browser',
       use: {
         browserName: 'chromium',
         ...devices['Desktop Chrome'],
@@ -22,6 +23,7 @@ const config: PlaywrightTestConfig = {
     },
     {
       name: 'iPhone 11',
+      testDir: 'src/browser',
       use: {
         browserName: 'webkit',
         ...devices['iPhone 11'],
