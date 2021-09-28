@@ -2,6 +2,7 @@
   "private": true,
   "dependencies": {
     "@playwright/test": "^1.14.1",
+    "agent-base": "^6.0.2",
     "crc-32": "^1.2.0",
     "faker": "^5.5.3",
     "glur": "^1.1.2",

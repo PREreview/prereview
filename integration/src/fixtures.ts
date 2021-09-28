@@ -1,8 +1,11 @@
 import { Fixtures, PlaywrightTestOptions } from '@playwright/test';
 import crc32 from 'crc-32';
 import faker from 'faker';
+import fs from 'fs';
+import { Agent } from 'http';
 import { ensurePreprint, Preprint } from './api';
 import { Fetch, fetch } from './fetch';
+import { loggingAgent } from './http';
 
 type FakerFixtures = {
   seed: number;
@@ -10,6 +13,7 @@ type FakerFixtures = {
 };
 
 type HttpFixtures = {
+  agent: Agent;
   fetch: Fetch;
 };
 
@@ -29,12 +33,19 @@ export const fakerFixtures: Fixtures<FakerFixtures> = {
 };
 
 export const httpFixtures: Fixtures<HttpFixtures, {}, PlaywrightTestOptions> = {
+  agent: async ({}, use, { outputPath }) => {
+    const log = fs.createWriteStream(outputPath('http.txt'));
+
+    await use(loggingAgent(log));
+
+    log.close();
+  },
   fetch: async (
     // Types needed due to https://github.com/microsoft/playwright/issues/9125
-    { baseURL }: PlaywrightTestOptions,
+    { agent, baseURL }: PlaywrightTestOptions & HttpFixtures,
     use: (r: Fetch) => Promise<void>,
   ) => {
-    await use(fetch(baseURL));
+    await use(fetch(baseURL, agent));
   },
 };
 
