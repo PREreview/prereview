@@ -32,7 +32,7 @@ async function captureState() {
     nullthrows(process.env.TEST_USER_ORCID_PASSWORD),
   );
   await page.click('#signin-button');
-  await page.waitForRequest('/');
+  await page.waitForRequest(`/api/v2/users/${process.env.TEST_USER_ORCID}`);
 
   await page.context().storageState({ path: 'state/logged-in-user.json' });
 
