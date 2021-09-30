@@ -1,7 +1,7 @@
 import { chromium } from '@playwright/test';
 import nullthrows from 'nullthrows';
 import { fetch } from './fetch';
-import { ensurePreprint, ensureRequest } from './api';
+import { ensureCommunity, ensurePreprint, ensureRequest } from './api';
 
 const apiFetch = fetch(process.env.BASE_URL);
 
@@ -10,9 +10,15 @@ export default async function globalSetup(): Promise<void> {
 }
 
 async function loadData() {
-  await ensurePreprint(apiFetch, '10.5555/12345678').then(id =>
-    ensureRequest(apiFetch, id),
-  );
+  await Promise.all([
+    ensurePreprint(apiFetch, '10.5555/12345678').then(id =>
+      ensureRequest(apiFetch, id),
+    ),
+    ensureCommunity(apiFetch, {
+      name: 'Some Community',
+      slug: 'some-community',
+    }),
+  ]);
 }
 
 async function captureState() {

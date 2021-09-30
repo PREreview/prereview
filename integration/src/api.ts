@@ -11,6 +11,12 @@ const preprintSchema = z.object({
   uuid: z.string(),
 });
 
+const communitySchema = z.object({
+  uuid: z.string(),
+  name: z.string(),
+  slug: z.string(),
+});
+
 const dataSchema = <T extends ZodTypeAny>(data: T) =>
   z.object({
     data,
@@ -21,6 +27,8 @@ export type Preprint = {
   title: string;
   abstract: string;
 };
+
+export type Community = z.infer<typeof communitySchema>;
 
 export async function ensurePreprint(
   fetch: Fetch,
@@ -76,4 +84,43 @@ export async function ensureRequest(
       ...adminHeaders,
     },
   }).then(ensureSuccess);
+}
+
+export async function ensureCommunity(
+  fetch: Fetch,
+  community: Omit<Community, 'uuid'>,
+): Promise<Community> {
+  const foundCommunity = await findCommunity(fetch, community.slug);
+
+  if (foundCommunity) {
+    return foundCommunity;
+  }
+
+  return await fetch(`/api/v2/communities`, {
+    method: 'POST',
+    body: JSON.stringify({
+      ...community,
+      owners: [],
+    }),
+    headers: {
+      'Content-Type': 'application/json',
+      ...adminHeaders,
+    },
+  })
+    .then(ensureSuccess)
+    .then(response => response.json())
+    .then(dataSchema(z.array(communitySchema)).parse)
+    .then(response => response.data[0]);
+}
+
+export async function findCommunity(
+  fetch: Fetch,
+  slug: string,
+): Promise<Community | undefined> {
+  return await fetch(`/api/v2/communities`, {
+    headers: adminHeaders,
+  })
+    .then(response => response.json())
+    .then(dataSchema(z.array(communitySchema)).parse)
+    .then(response => response.data.find(community => community.slug === slug));
 }
