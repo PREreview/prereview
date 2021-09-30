@@ -17,6 +17,22 @@ const communitySchema = z.object({
   slug: z.string(),
 });
 
+const personaSchema = z.object({
+  uuid: z.string(),
+});
+
+const templateSchema = z.object({
+  uuid: z.string(),
+  title: z.string(),
+  contents: z.string(),
+});
+
+const userSchema = z.object({
+  uuid: z.string(),
+  orcid: z.string(),
+  defaultPersona: personaSchema,
+});
+
 const dataSchema = <T extends ZodTypeAny>(data: T) =>
   z.object({
     data,
@@ -29,6 +45,10 @@ export type Preprint = {
 };
 
 export type Community = z.infer<typeof communitySchema>;
+
+export type Template = z.infer<typeof templateSchema>;
+
+export type User = z.infer<typeof userSchema>;
 
 export async function ensurePreprint(
   fetch: Fetch,
@@ -113,6 +133,55 @@ export async function ensureCommunity(
     .then(response => response.data[0]);
 }
 
+export async function ensureCommunityMember(
+  fetch: Fetch,
+  community: string,
+  persona: string,
+): Promise<unknown> {
+  return await fetch(`/api/v2/communities/${community}/members/${persona}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      ...adminHeaders,
+    },
+  }).then(ensureSuccess);
+}
+
+export async function ensureCommunityModerator(
+  fetch: Fetch,
+  community: string,
+  persona: string,
+): Promise<unknown> {
+  await ensureCommunityMember(fetch, community, persona);
+
+  return await fetch(`/api/v2/communities/${community}/owners/${persona}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      ...adminHeaders,
+    },
+  }).then(ensureSuccess);
+}
+
+export async function ensureTemplate(
+  fetch: Fetch,
+  community: string,
+  template: Omit<Template, 'uuid'>,
+): Promise<Template> {
+  return await fetch(`/api/v2/communities/${community}/templates`, {
+    method: 'POST',
+    body: JSON.stringify(template),
+    headers: {
+      'Content-Type': 'application/json',
+      ...adminHeaders,
+    },
+  })
+    .then(ensureSuccess)
+    .then(response => response.json())
+    .then(dataSchema(templateSchema).parse)
+    .then(response => response.data);
+}
+
 export async function findCommunity(
   fetch: Fetch,
   slug: string,
@@ -123,4 +192,16 @@ export async function findCommunity(
     .then(response => response.json())
     .then(dataSchema(z.array(communitySchema)).parse)
     .then(response => response.data.find(community => community.slug === slug));
+}
+
+export async function findUser(
+  fetch: Fetch,
+  orcid: string,
+): Promise<User | undefined> {
+  return await fetch(`/api/v2/users`, {
+    headers: adminHeaders,
+  })
+    .then(response => response.json())
+    .then(dataSchema(z.array(userSchema)).parse)
+    .then(response => response.data.find(user => user.orcid === orcid));
 }

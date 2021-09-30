@@ -424,7 +424,7 @@ const CommunityPanel = () => {
                   : null}
               </Box>
                 */}
-              <Box mb={4}>
+              <Box mb={4} id="templates">
                 <Typography variant="h4" component="h2" gutterBottom={true}>
                   Templates
                 </Typography>

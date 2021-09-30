@@ -30,3 +30,5 @@ services:
       TEST_ADMIN_USER_API_KEY: 'not-a-secret'
       TEST_USER_ORCID: '0000-0002-7498-6197'
       TEST_USER_ORCID_PASSWORD: 'this-is-a-secure-passw0rd!'
+      TEST_COMMUNITY_MODERATOR_ORCID: '0000-0002-4045-3747'
+      TEST_COMMUNITY_MODERATOR_ORCID_PASSWORD: 'this-is-a-secure-passw0rd!'

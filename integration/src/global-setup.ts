@@ -1,4 +1,4 @@
-import { chromium } from '@playwright/test';
+import { Browser, chromium } from '@playwright/test';
 import nullthrows from 'nullthrows';
 import { fetch } from './fetch';
 import { ensureCommunity, ensurePreprint, ensureRequest } from './api';
@@ -23,24 +23,59 @@ async function loadData() {
 
 async function captureState() {
   const browser = await chromium.launch();
-  const page = await browser.newPage({ baseURL: process.env.BASE_URL });
+
+
+  await Promise.all([
+    captureReturningUserState(browser, 'state/returning-user.json'),
+    captureLoggedInUserState(
+      browser,
+      nullthrows(process.env.TEST_USER_ORCID),
+      nullthrows(process.env.TEST_USER_ORCID_PASSWORD),
+      'state/logged-in-user.json',
+    ),
+    captureLoggedInUserState(
+      browser,
+      nullthrows(process.env.TEST_COMMUNITY_MODERATOR_ORCID),
+      nullthrows(process.env.TEST_COMMUNITY_MODERATOR_ORCID_PASSWORD),
+      'state/logged-in-community-moderator.json',
+    ),
+  ]);
+
+  await browser.close();
+}
+
+async function captureReturningUserState(browser: Browser, path: string) {
+  const context = await browser.newContext({ baseURL: process.env.BASE_URL });
+  const page = await context.newPage();
 
   await page.goto('/');
   await page.click(':text("Get started")');
 
-  await page.context().storageState({ path: 'state/returning-user.json' });
+  await page.context().storageState({ path });
+
+  await context.close();
+}
+
+async function captureLoggedInUserState(
+  browser: Browser,
+  username: string,
+  password: string,
+  path: string,
+) {
+  const context = await browser.newContext({ baseURL: process.env.BASE_URL });
+  const page = await context.newPage();
+
+  await page.goto('/');
+  await page.click(':text("Get started")');
 
   await page.goto('/api/v2/orcid/login');
 
-  await page.fill('#username', nullthrows(process.env.TEST_USER_ORCID));
-  await page.fill(
-    '#password',
-    nullthrows(process.env.TEST_USER_ORCID_PASSWORD),
-  );
+  await page.fill('#username', username);
+  await page.fill('#password', password);
   await page.click('#signin-button');
-  await page.waitForRequest(`/api/v2/users/${process.env.TEST_USER_ORCID}`);
+  await page.waitForRequest(`/api/v2/users/${username}`);
 
-  await page.context().storageState({ path: 'state/logged-in-user.json' });
+  await page.context().storageState({ path });
 
-  await browser.close();
+  await context.close();
 }
