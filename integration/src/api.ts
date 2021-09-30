@@ -1,6 +1,6 @@
 import nullthrows from 'nullthrows';
 import { z, ZodTypeAny } from 'zod';
-import { Fetch, HeadersInit } from './fetch';
+import { Fetch, HeadersInit, ensureSuccess } from './fetch';
 
 const adminHeaders: HeadersInit = {
   'X-API-App': nullthrows(process.env.TEST_ADMIN_USER_API_APP),
@@ -47,6 +47,7 @@ export async function ensurePreprint(
       ...adminHeaders,
     },
   })
+    .then(ensureSuccess)
     .then(response => response.json())
     .then(dataSchema(preprintSchema).parse)
     .then(preprint => preprint.data.uuid);
@@ -74,5 +75,5 @@ export async function ensureRequest(
       'Content-Type': 'application/json',
       ...adminHeaders,
     },
-  });
+  }).then(ensureSuccess);
 }

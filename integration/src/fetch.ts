@@ -9,3 +9,11 @@ export const fetch = (baseURL?: string, agent?: Agent): Fetch => (
   path,
   init?,
 ) => nodeFetch(`${baseURL}${path}`, { agent, ...init });
+
+export function ensureSuccess<T extends Response>(response: T): T {
+  if (!response.ok) {
+    throw new Error(`${response.status} ${response.statusText}`);
+  }
+
+  return response;
+}
