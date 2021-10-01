@@ -11,7 +11,7 @@ test.asALoggedInUser('submit a rapid review', async ({ page, preprint }) => {
   await expect(dialog).toContainText('Search for a preprint');
   expect(await screenshot(dialog)).toMatchSnapshot('search.png');
 
-  await dialog.locator('input').fill(preprint.doi);
+  await dialog.locator('input').fill(preprint.handle.replace(/^doi:/, ''));
   await dialog.locator(':text("Add PREreview")').click();
   await page.click(':text("Add PREreview")');
 
@@ -85,7 +85,7 @@ test.asALoggedInUser('must complete the form', async ({ page, preprint }) => {
 
   await expect(dialog).toContainText('Search for a preprint');
 
-  await dialog.locator('input').fill(preprint.doi);
+  await dialog.locator('input').fill(preprint.handle.replace(/^doi:/, ''));
   await dialog.locator(':text("Add PREreview")').click();
   await page.click(':text("Add PREreview")');
 

@@ -82,13 +82,11 @@ export const dataFixtures: Fixtures<
     await use(community);
   },
   preprint: async ({ faker, fetch }, use) => {
-    const preprint: Preprint = {
-      doi: `10.5555/${faker.datatype.uuid()}`,
+    const preprint = await ensurePreprint(fetch, {
+      handle: `doi:10.5555/${faker.datatype.uuid()}`,
       title: faker.lorem.sentence(),
-      abstract: faker.lorem.sentences(),
-    };
-
-    await ensurePreprint(fetch, preprint);
+      abstractText: faker.lorem.sentences(),
+    });
 
     await use(preprint);
   },

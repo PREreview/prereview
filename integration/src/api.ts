@@ -7,10 +7,6 @@ const adminHeaders: HeadersInit = {
   'X-API-Key': nullthrows(process.env.TEST_ADMIN_USER_API_KEY),
 };
 
-const preprintSchema = z.object({
-  uuid: z.string(),
-});
-
 const communitySchema = z.object({
   uuid: z.string(),
   name: z.string(),
@@ -19,6 +15,13 @@ const communitySchema = z.object({
 
 const personaSchema = z.object({
   uuid: z.string(),
+});
+
+const preprintSchema = z.object({
+  uuid: z.string(),
+  handle: z.string(),
+  title: z.string(),
+  abstractText: z.string(),
 });
 
 const templateSchema = z.object({
@@ -38,13 +41,9 @@ const dataSchema = <T extends ZodTypeAny>(data: T) =>
     data,
   });
 
-export type Preprint = {
-  doi: string;
-  title: string;
-  abstract: string;
-};
-
 export type Community = z.infer<typeof communitySchema>;
+
+export type Preprint = z.infer<typeof preprintSchema>;
 
 export type Template = z.infer<typeof templateSchema>;
 
@@ -52,24 +51,19 @@ export type User = z.infer<typeof userSchema>;
 
 export async function ensurePreprint(
   fetch: Fetch,
-  data: Preprint | string,
-): Promise<string> {
+  data: Omit<Preprint, 'uuid'> | string,
+): Promise<Preprint> {
   if (typeof data === 'string') {
     return await fetch(`/api/v2/resolve?identifier=${data}`, {
       headers: adminHeaders,
     })
       .then(response => response.json())
-      .then(preprintSchema.parse)
-      .then(preprint => preprint.uuid);
+      .then(preprintSchema.parse);
   }
 
   return await fetch(`/api/v2/preprints`, {
     method: 'POST',
-    body: JSON.stringify({
-      handle: `doi:${data.doi}`,
-      title: data.title,
-      abstractText: data.abstract,
-    }),
+    body: JSON.stringify(data),
     headers: {
       'Content-Type': 'application/json',
       ...adminHeaders,
@@ -78,7 +72,7 @@ export async function ensurePreprint(
     .then(ensureSuccess)
     .then(response => response.json())
     .then(dataSchema(preprintSchema).parse)
-    .then(preprint => preprint.data.uuid);
+    .then(response => response.data);
 }
 
 export async function ensureRequest(

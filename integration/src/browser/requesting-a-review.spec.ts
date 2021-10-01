@@ -11,7 +11,7 @@ test.asALoggedInUser('requesting a review', async ({ page, preprint }) => {
   await expect(dialog).toContainText('Search for a preprint');
   expect(await screenshot(dialog)).toMatchSnapshot('search.png');
 
-  await dialog.locator('input').fill(preprint.doi);
+  await dialog.locator('input').fill(preprint.handle.replace(/^doi:/, ''));
   await page.click(':text("Request PREreviews")');
   await page.click(':text("Add Request")');
 

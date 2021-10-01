@@ -11,8 +11,8 @@ export default async function globalSetup(): Promise<void> {
 
 async function loadData() {
   await Promise.all([
-    ensurePreprint(apiFetch, '10.5555/12345678').then(id =>
-      ensureRequest(apiFetch, id),
+    ensurePreprint(apiFetch, '10.5555/12345678').then(preprint =>
+      ensureRequest(apiFetch, preprint.uuid),
     ),
     ensureCommunity(apiFetch, {
       name: 'Some Community',
@@ -23,7 +23,6 @@ async function loadData() {
 
 async function captureState() {
   const browser = await chromium.launch();
-
 
   await Promise.all([
     captureReturningUserState(browser, 'state/returning-user.json'),
