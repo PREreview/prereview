@@ -72,7 +72,9 @@ async function captureLoggedInUserState(
   await page.fill('#username', username);
   await page.fill('#password', password);
   await page.click('#signin-button');
-  await page.waitForRequest(`/api/v2/users/${username}`);
+
+  await page.click('.MuiSelect-select');
+  await page.click('li:has-text("Public persona")');
 
   await page.context().storageState({ path });
 
