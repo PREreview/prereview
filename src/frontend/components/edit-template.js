@@ -11,7 +11,7 @@ import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 
 // utils
-import { usePutTemplate } from '../hooks/api-hooks.tsx';
+import { usePutCommunityTemplate } from '../hooks/api-hooks.tsx';
 
 //icons
 import EditOutlinedIcon from '@material-ui/icons/EditOutlined';
@@ -52,6 +52,7 @@ const useStyles = makeStyles(theme => ({
 
 const EditTemplate = ({
   template,
+  community,
   title,
   content,
   handleContentChange,
@@ -61,7 +62,12 @@ const EditTemplate = ({
   const classes = useStyles();
 
   // update templates by sending data through the API
-  const { mutate: putTemplate } = usePutTemplate({ id: template.uuid });
+  const { mutate: putTemplate } = usePutCommunityTemplate({
+    cid: community.uuid,
+    queryParams: {
+      id: template.uuid,
+    },
+  });
 
   // handle open and close of edit template modal
   const [openEdit, setOpenEdit] = useState(false);
@@ -181,6 +187,7 @@ const EditTemplate = ({
 
 EditTemplate.propTypes = {
   template: PropTypes.object.isRequired,
+  community: PropTypes.object.isRequired,
   title: PropTypes.string.isRequired,
   content: PropTypes.string.isRequired,
   handleContentChange: PropTypes.func.isRequired,

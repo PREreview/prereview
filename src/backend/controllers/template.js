@@ -307,6 +307,90 @@ export default function controller(templateModel, communityModel, thisUser) {
   templatesRouter.route({
     meta: {
       swagger: {
+        operationId: 'PutCommunityTemplate',
+        summary: 'Endpoint to PUT changes on a specific community template.',
+      },
+    },
+    method: 'PUT',
+    path: '/communities/:cid/templates',
+    pre: thisUser.can('edit this community'),
+    validate: {
+      query: {
+        id: Joi.string()
+          .description('Template id')
+          .required(),
+      },
+      params: {
+        cid: Joi.string()
+          .description('Community id')
+          .required(),
+      },
+      type: 'json',
+      continueOnError: true,
+    },
+    handler: async ctx => {
+      if (ctx.invalid) {
+        handleInvalid(ctx);
+        return;
+      }
+
+      log.debug(`Updating template ${ctx.params.id}.`);
+      let community, template;
+
+      try {
+        community = await communityModel.findOne({ uuid: ctx.params.cid });
+
+        if (!community) {
+          ctx.throw(404, `A community with ID ${ctx.params.cid} doesn't exist`);
+        }
+      } catch (err) {
+        log.error('HTTP 400 Error: ', err);
+        ctx.throw(400, `Failed to parse template schema: ${err}`);
+      }
+
+      try {
+        template = await templateModel.findOne({
+          $and: [
+            { uuid: ctx.query.id },
+            {
+              $or: [
+                { community: { name: ctx.params.cid } },
+                { community: { uuid: ctx.params.cid } },
+                { community: { slug: ctx.params.cid } },
+              ],
+            },
+          ],
+        });
+
+        if (!template) {
+          ctx.throw(
+            404,
+            `A template with ID ${
+              ctx.query.id
+            } doesn't exist in this community`,
+          );
+        }
+
+        templateModel.assign(template, ctx.request.body);
+        await templateModel.persistAndFlush(template);
+      } catch (err) {
+        log.error('HTTP 400 Error: ', err);
+        ctx.throw(400, `Failed to parse template schema: ${err}`);
+      }
+
+      // if updated
+      ctx.body = {
+        status: 204,
+        message: 'updated',
+        data: template,
+      };
+      ctx.status = 204;
+    },
+  });
+
+  templatesRouter.route({
+    meta: {
+      swagger: {
         operationId: 'DeleteCommunityTemplates',
         summary: 'Endpoint to DELETE a template from a community.',
       },

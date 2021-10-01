@@ -35,7 +35,7 @@ test.asACommunityModerator(
 
 test.asACommunityModerator(
   'can edit a template',
-  async ({ community, page, template }, { fixme }) => {
+  async ({ community, page, template }) => {
     const newTitle = `Updated ${template.title}`;
     await page.goto(`/community-settings/${community.slug}`);
 
@@ -57,7 +57,6 @@ test.asACommunityModerator(
       editForm.locator('button:has-text("Submit")').click(),
     ]);
 
-    fixme(true, "Community moderators don't have permission to edit templates");
     expect(editedDialog.message()).toContain('Template updated successfully');
 
     await page.reload();

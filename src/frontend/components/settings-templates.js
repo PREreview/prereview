@@ -294,6 +294,7 @@ function SettingsRow({ template, community, onDelete }) {
           title={title}
           content={content}
           template={template}
+          community={community}
           handleTitleChange={newTitle => setTitle(newTitle)}
           handleContentChange={newContent => setContent(newContent)}
         />
