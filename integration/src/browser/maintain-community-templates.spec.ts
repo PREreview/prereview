@@ -69,7 +69,7 @@ test.asACommunityModerator(
 
 test.asACommunityModerator(
   'can delete a template',
-  async ({ community, page, template }, { fixme }) => {
+  async ({ community, page, template }) => {
     await page.goto(`/community-settings/${community.slug}`);
 
     const templates = page.locator('#templates');
@@ -85,10 +85,6 @@ test.asACommunityModerator(
 
     expect(deleteConfirmation.message()).toContain(
       'Are you sure you want to delete this template?',
-    );
-    fixme(
-      true,
-      "Community moderators don't have permission to delete templates",
     );
     expect(deleteDialog.message()).toContain('Template deleted successfully');
 

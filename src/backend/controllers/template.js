@@ -313,7 +313,7 @@ export default function controller(templateModel, communityModel, thisUser) {
     },
     method: 'DELETE',
     path: '/communities/:cid/templates',
-    pre: thisUser.can('access admin pages'),
+    pre: thisUser.can('edit this community'),
     validate: {
       query: {
         id: Joi.string()
