@@ -27,6 +27,8 @@ services:
       PREREVIEW_ORCID_CLIENT_SECRET: ${PREREVIEW_ORCID_CLIENT_SECRET:-orcid-client-secret}
       PREREVIEW_ORCID_CALLBACK_URL: http://localhost:3000/api/v2/orcid/callback
       PREREVIEW_ORCID_SANDBOX: 'true'
+      PREREVIEW_ZENODO_SANDBOX: 'true'
+      PREREVIEW_ZENODO_TOKEN: ${PREREVIEW_ZENODO_TOKEN:-zenodo-token}
 
   prereview-db:
     image: postgres:12-alpine
