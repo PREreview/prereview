@@ -4,6 +4,7 @@ import {
   dataFixtures,
   fakerFixtures,
   httpFixtures,
+  userDataFixtures,
   userFixtures,
 } from '../fixtures';
 
@@ -20,11 +21,14 @@ const asAReturningUser = asANewUser.extend({
   },
 });
 
-const asALoggedInUser = asAReturningUser.extend(userFixtures).extend({
-  storageState: async ({}, use) => {
-    await use('state/logged-in-user.json');
-  },
-});
+const asALoggedInUser = asAReturningUser
+  .extend(userFixtures)
+  .extend(userDataFixtures)
+  .extend({
+    storageState: async ({}, use) => {
+      await use('state/logged-in-user.json');
+    },
+  });
 
 const asACommunityModerator = asALoggedInUser.extend({
   community: async ({ community, fetch, user }, use) => {

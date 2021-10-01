@@ -8,12 +8,17 @@ import faker from 'faker';
 import fs from 'fs';
 import { Agent } from 'http';
 import {
+  AuthHeaders,
+  ApiKey,
   Community,
+  ensureRapidReview,
+  ensureApiKey,
   ensureCommunity,
   ensurePreprint,
   ensureTemplate,
   findUser,
   Preprint,
+  RapidReview,
   Template,
   User,
 } from './api';
@@ -37,7 +42,13 @@ type DataFixtures = {
 };
 
 type UserFixtures = {
+  apiHeaders: AuthHeaders;
+  apiKey: ApiKey;
   user: User;
+};
+
+type UserDataFixtures = {
+  rapidReview: RapidReview;
 };
 
 export const fakerFixtures: Fixtures<FakerFixtures> = {
@@ -105,6 +116,17 @@ export const userFixtures: Fixtures<
   {},
   HttpFixtures & PlaywrightTestArgs & PlaywrightTestOptions
 > = {
+  apiHeaders: async ({ apiKey }, use) => {
+    await use({
+      'X-API-App': apiKey.app,
+      'X-API-Key': apiKey.secret,
+    });
+  },
+  apiKey: async ({ fetch, user }, use) => {
+    const apiKey = await ensureApiKey(fetch, user.uuid);
+
+    await use(apiKey);
+  },
   user: async ({ baseURL, context, fetch }, use) => {
     const cookie = await context
       .cookies(baseURL)
@@ -121,5 +143,21 @@ export const userFixtures: Fixtures<
     }
 
     await use(user);
+  },
+};
+
+export const userDataFixtures: Fixtures<
+  UserDataFixtures,
+  {},
+  DataFixtures & HttpFixtures & UserFixtures
+> = {
+  rapidReview: async ({ apiHeaders, fetch, preprint }, use) => {
+    const rapidReview = await ensureRapidReview(
+      fetch,
+      preprint.uuid,
+      apiHeaders,
+    );
+
+    await use(rapidReview);
   },
 };

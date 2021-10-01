@@ -1,11 +1,21 @@
 import nullthrows from 'nullthrows';
 import { z, ZodTypeAny } from 'zod';
-import { Fetch, HeadersInit, ensureSuccess } from './fetch';
+import { Fetch, ensureSuccess } from './fetch';
 
-const adminHeaders: HeadersInit = {
+export type AuthHeaders = {
+  'X-API-App': string;
+  'X-API-Key': string;
+};
+
+const adminHeaders: AuthHeaders = {
   'X-API-App': nullthrows(process.env.TEST_ADMIN_USER_API_APP),
   'X-API-Key': nullthrows(process.env.TEST_ADMIN_USER_API_KEY),
 };
+
+const apiKeySchema = z.object({
+  app: z.string(),
+  secret: z.string(),
+});
 
 const communitySchema = z.object({
   uuid: z.string(),
@@ -22,6 +32,10 @@ const preprintSchema = z.object({
   handle: z.string(),
   title: z.string(),
   abstractText: z.string(),
+});
+
+const rapidReviewSchema = z.object({
+  uuid: z.string(),
 });
 
 const templateSchema = z.object({
@@ -41,9 +55,13 @@ const dataSchema = <T extends ZodTypeAny>(data: T) =>
     data,
   });
 
+export type ApiKey = z.infer<typeof apiKeySchema>;
+
 export type Community = z.infer<typeof communitySchema>;
 
 export type Preprint = z.infer<typeof preprintSchema>;
+
+export type RapidReview = z.infer<typeof rapidReviewSchema>;
 
 export type Template = z.infer<typeof templateSchema>;
 
@@ -98,6 +116,39 @@ export async function ensureRequest(
       ...adminHeaders,
     },
   }).then(ensureSuccess);
+}
+
+export async function ensureRapidReview(
+  fetch: Fetch,
+  preprint: string,
+  authHeaders?: AuthHeaders,
+): Promise<RapidReview> {
+  return await fetch(`/api/v2/rapid-reviews`, {
+    method: 'POST',
+    body: JSON.stringify({
+      preprint,
+      ynNovel: 'N/A',
+      ynFuture: 'N/A',
+      ynReproducibility: 'N/A',
+      ynMethods: 'N/A',
+      ynCoherent: 'N/A',
+      ynLimitations: 'N/A',
+      ynEthics: 'N/A',
+      ynNewData: 'N/A',
+      ynAvailableData: 'N/A',
+      ynAvailableCode: 'N/A',
+      ynRecommend: 'N/A',
+      ynPeerReview: 'N/A',
+    }),
+    headers: {
+      'Content-Type': 'application/json',
+      ...(authHeaders || adminHeaders),
+    },
+  })
+    .then(ensureSuccess)
+    .then(response => response.json())
+    .then(dataSchema(z.array(rapidReviewSchema)).parse)
+    .then(response => response.data[0]);
 }
 
 export async function ensureCommunity(
@@ -173,6 +224,35 @@ export async function ensureTemplate(
     .then(ensureSuccess)
     .then(response => response.json())
     .then(dataSchema(templateSchema).parse)
+    .then(response => response.data);
+}
+
+export async function ensureApiKey(
+  fetch: Fetch,
+  user: string,
+): Promise<ApiKey> {
+  const keys = await fetch(`/api/v2/users/${user}`, {
+    headers: adminHeaders,
+  })
+    .then(response => response.json())
+    .then(dataSchema(z.object({ keys: z.array(apiKeySchema) })).parse)
+    .then(response => response.data.keys);
+
+  if (keys.length > 0) {
+    return keys[0];
+  }
+
+  return await fetch(`/api/v2/users/${user}/keys`, {
+    method: 'POST',
+    body: JSON.stringify({ app: 'My App' }),
+    headers: {
+      'Content-Type': 'application/json',
+      ...adminHeaders,
+    },
+  })
+    .then(ensureSuccess)
+    .then(response => response.json())
+    .then(dataSchema(apiKeySchema).parse)
     .then(response => response.data);
 }
 
