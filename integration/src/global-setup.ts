@@ -34,6 +34,12 @@ async function captureState() {
     ),
     captureLoggedInUserState(
       browser,
+      nullthrows(process.env.TEST_COMMUNITY_MEMBER_ORCID),
+      nullthrows(process.env.TEST_COMMUNITY_MEMBER_ORCID_PASSWORD),
+      'state/logged-in-community-member.json',
+    ),
+    captureLoggedInUserState(
+      browser,
       nullthrows(process.env.TEST_COMMUNITY_MODERATOR_ORCID),
       nullthrows(process.env.TEST_COMMUNITY_MODERATOR_ORCID_PASSWORD),
       'state/logged-in-community-moderator.json',

@@ -50,3 +50,50 @@ test.asALoggedInUser(
     expect(await screenshot(reviews)).toMatchSnapshot('reviews.png');
   },
 );
+
+test.asACommunityMember(
+  'can load a template',
+  async ({ page, preprint, rapidReview, template }, { fixme }) => {
+    await page.goto(
+      `preprints/${preprint.uuid}/rapid-reviews/${rapidReview.uuid}`,
+    );
+    await page.click('button:has-text("Add PREreview")');
+    await page.click('button:has-text("Yes")');
+
+    await page.click('button:has-text("Load templates")');
+
+    const templateForm = page.locator(
+      '[tabindex="-1"]:has-text("Choose a template")',
+    );
+
+    expect(await screenshot(templateForm)).toMatchSnapshot('template-form.png');
+
+    await page.click('#templates-select');
+    await page.click(`li:has-text("${template.title}")`);
+
+    await expect(templateForm).toContainText(template.contents);
+    expect(await screenshot(templateForm)).toMatchSnapshot(
+      'template-selected.png',
+    );
+
+    await page.click('button:has-text("Copy")');
+
+    fixme(
+      true,
+      "Clipboard access doesn't yet work, see https://github.com/microsoft/playwright/issues/8114",
+    );
+
+    const message = await page.locator('[role="alert"]');
+
+    await expect(message).toContainText('Template copied');
+    expect(await screenshot(page, message)).toMatchSnapshot(
+      'template-copied.png',
+    );
+
+    const copied = await page.evaluate(
+      async () => await navigator.clipboard.readText(),
+    );
+
+    expect(copied).toEqual(template.contents);
+  },
+);

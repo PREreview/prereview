@@ -1,5 +1,5 @@
 import { test as baseTest } from '@playwright/test';
-import { ensureCommunityModerator } from '../api';
+import { ensureCommunityMember, ensureCommunityModerator } from '../api';
 import {
   dataFixtures,
   fakerFixtures,
@@ -30,6 +30,21 @@ const asALoggedInUser = asAReturningUser
     },
   });
 
+const asACommunityMember = asALoggedInUser.extend({
+  community: async ({ community, fetch, user }, use) => {
+    await ensureCommunityMember(
+      fetch,
+      community.uuid,
+      user.defaultPersona.uuid,
+    );
+
+    await use(community);
+  },
+  storageState: async ({}, use) => {
+    await use('state/logged-in-community-member.json');
+  },
+});
+
 const asACommunityModerator = asALoggedInUser.extend({
   community: async ({ community, fetch, user }, use) => {
     await ensureCommunityModerator(
@@ -49,6 +64,7 @@ export const test = {
   asANewUser,
   asAReturningUser,
   asALoggedInUser,
+  asACommunityMember,
   asACommunityModerator,
 };
 
