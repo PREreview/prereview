@@ -29,6 +29,10 @@ const config: PlaywrightTestConfig = {
         ...devices['iPhone 11'],
       },
     },
+    {
+      name: 'API',
+      testDir: 'src/api',
+    },
   ],
 };
 

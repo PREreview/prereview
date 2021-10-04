@@ -42,6 +42,7 @@ type DataFixtures = {
 };
 
 type UserFixtures = {
+  apiFetch: Fetch;
   apiHeaders: AuthHeaders;
   apiKey: ApiKey;
   user: User;
@@ -116,6 +117,15 @@ export const userFixtures: Fixtures<
   {},
   HttpFixtures & PlaywrightTestArgs & PlaywrightTestOptions
 > = {
+  apiFetch: async (
+    // Types needed due to https://github.com/microsoft/playwright/issues/9125
+    { apiHeaders, fetch }: PlaywrightTestOptions & HttpFixtures & UserFixtures,
+    use: (r: Fetch) => Promise<void>,
+  ) => {
+    await use((url, init = {}) =>
+      fetch(url, { ...init, headers: { ...apiHeaders, ...init.headers } }),
+    );
+  },
   apiHeaders: async ({ apiKey }, use) => {
     await use({
       'X-API-App': apiKey.app,
