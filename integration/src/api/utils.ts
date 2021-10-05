@@ -6,8 +6,23 @@ export async function jsonBody<T extends Body>(message: T): Promise<Buffer> {
   );
 }
 
-function jsonReplacer(key: string, value: unknown) {
-  if (['author', 'createdAt', 'preprint', 'updatedAt', 'uuid'].includes(key)) {
+function jsonReplacer(key: string, value: unknown): unknown {
+  if (
+    [
+      'author',
+      'authors',
+      'createdAt',
+      'doi',
+      'drafts',
+      'preprint',
+      'updatedAt',
+      'uuid',
+    ].includes(key)
+  ) {
+    if (Array.isArray(value)) {
+      return value.map(current => jsonReplacer(key, current));
+    }
+
     switch (typeof value) {
       case 'number':
         return 0;

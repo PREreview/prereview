@@ -1,0 +1,24 @@
+{
+  "status": 201,
+  "message": "created",
+  "body": {
+    "uuid": "...",
+    "createdAt": "...",
+    "updatedAt": "...",
+    "isPublished": true,
+    "isFlagged": false,
+    "drafts": [
+      0
+    ],
+    "mentorInvites": [],
+    "mentors": [],
+    "authorInvites": [],
+    "authors": [
+      0
+    ],
+    "comments": [],
+    "statements": [],
+    "preprint": 0,
+    "doi": "..."
+  }
+}

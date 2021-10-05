@@ -34,6 +34,11 @@ const preprintSchema = z.object({
   abstractText: z.string(),
 });
 
+const fullReviewSchema = z.object({
+  uuid: z.string(),
+  doi: z.string(),
+});
+
 const rapidReviewSchema = z.object({
   uuid: z.string(),
 });
@@ -55,9 +60,16 @@ const dataSchema = <T extends ZodTypeAny>(data: T) =>
     data,
   });
 
+const bodySchema = <T extends ZodTypeAny>(body: T) =>
+  z.object({
+    body,
+  });
+
 export type ApiKey = z.infer<typeof apiKeySchema>;
 
 export type Community = z.infer<typeof communitySchema>;
+
+export type FullReview = z.infer<typeof fullReviewSchema>;
 
 export type Preprint = z.infer<typeof preprintSchema>;
 
@@ -116,6 +128,30 @@ export async function ensureRequest(
       ...adminHeaders,
     },
   }).then(ensureSuccess);
+}
+
+export async function ensureFullReview(
+  fetch: Fetch,
+  preprint: string,
+  authHeaders?: AuthHeaders,
+): Promise<FullReview> {
+  return await fetch(`/api/v2/full-reviews`, {
+    method: 'POST',
+    body: JSON.stringify({
+      preprint,
+      contents: 'This is a full review.',
+      isPublished: true,
+      authors: null,
+    }),
+    headers: {
+      'Content-Type': 'application/json',
+      ...(authHeaders || adminHeaders),
+    },
+  })
+    .then(ensureSuccess)
+    .then(response => response.json())
+    .then(bodySchema(fullReviewSchema).parse)
+    .then(response => response.body);
 }
 
 export async function ensureRapidReview(

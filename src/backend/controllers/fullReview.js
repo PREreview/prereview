@@ -3,6 +3,7 @@ import { QueryOrder } from '@mikro-orm/core';
 import { getLogger } from '../log.js';
 import generateDOI from '../utils/generateDOI.js';
 import { getFields } from '../utils/getFields.ts';
+import getActivePersona from '../utils/persona';
 
 const log = getLogger('backend:controllers:fullReviews');
 const Joi = router.Joi;
@@ -143,9 +144,8 @@ export default function controller(
           review.authors.add(authorPersona);
         }
       } else {
-        authorPersona = await personaModel.findOne(
-          ctx.state.user.defaultPersona,
-        );
+        const user = await thisUser.getUser(ctx);
+        authorPersona = await personaModel.findOne(getActivePersona(user));
         // ensuring anonymous reviewers stay anonymous
         authorPersona.isAnonymous
           ? creators.push({
@@ -153,7 +153,7 @@ export default function controller(
             })
           : creators.push({
               name: authorPersona.name,
-              orcid: ctx.state.user.orcid,
+              orcid: user.orcid,
             });
         review.authors.add(authorPersona);
       }

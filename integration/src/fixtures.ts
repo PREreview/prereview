@@ -14,9 +14,11 @@ import {
   ensureRapidReview,
   ensureApiKey,
   ensureCommunity,
+  ensureFullReview,
   ensurePreprint,
   ensureTemplate,
   findUser,
+  FullReview,
   Preprint,
   RapidReview,
   Template,
@@ -37,6 +39,7 @@ type HttpFixtures = {
 
 type DataFixtures = {
   community: Community;
+  fullReview: FullReview;
   preprint: Preprint;
   template: Template;
 };
@@ -49,6 +52,7 @@ type UserFixtures = {
 };
 
 type UserDataFixtures = {
+  fullReview: FullReview;
   rapidReview: RapidReview;
 };
 
@@ -92,6 +96,11 @@ export const dataFixtures: Fixtures<
     });
 
     await use(community);
+  },
+  fullReview: async ({ fetch, preprint }, use) => {
+    const fullReview = await ensureFullReview(fetch, preprint.uuid);
+
+    await use(fullReview);
   },
   preprint: async ({ faker, fetch }, use) => {
     const preprint = await ensurePreprint(fetch, {
@@ -161,6 +170,11 @@ export const userDataFixtures: Fixtures<
   {},
   DataFixtures & HttpFixtures & UserFixtures
 > = {
+  fullReview: async ({ apiHeaders, fetch, preprint }, use) => {
+    const fullReview = await ensureFullReview(fetch, preprint.uuid, apiHeaders);
+
+    await use(fullReview);
+  },
   rapidReview: async ({ apiHeaders, fetch, preprint }, use) => {
     const rapidReview = await ensureRapidReview(
       fetch,
