@@ -60,6 +60,11 @@ jobs:
           name: integration-tests-results
           path: integration/results
 
+      - name: 'Check migrations'
+        run: |
+          make create-migration
+          git ls-files --others --exclude-standard -z | xargs -0 -n 1 git --no-pager diff /dev/null
+
       - name: 'Log in to registry'
         uses: azure/docker-login@v1
         with:

@@ -62,3 +62,7 @@ integration-test: build ## Run the integration tests
 
 smoke-test: build ## Run the smoke tests
 	@.scripts/smoke-test.sh
+
+create-migration: export TARGET = dev
+create-migration: build ## Create a migration file
+	@${DOCKER_COMPOSE} run --rm prereview db -- migration:create; ${STOP}
