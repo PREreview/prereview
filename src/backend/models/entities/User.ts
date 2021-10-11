@@ -2,7 +2,6 @@ import {
   Collection,
   Entity,
   EntityRepositoryType,
-  Index,
   ManyToMany,
   OneToMany,
   OneToOne,
@@ -21,13 +20,6 @@ import { Key } from './Key';
 import { createRandomOrcid } from '../../utils/orcid';
 
 @Entity()
-@Index({ properties: ['defaultPersona'] })
-@Index({ properties: ['groups'] })
-@Index({ properties: ['owned'] })
-@Index({ properties: ['personas'] })
-@Index({ properties: ['contacts'] })
-@Index({ properties: ['works'] })
-@Index({ properties: ['keys'] })
 export class User extends BaseEntity {
   [EntityRepositoryType]?: UserModel;
 

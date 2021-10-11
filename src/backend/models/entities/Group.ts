@@ -2,7 +2,6 @@ import {
   Collection,
   Entity,
   EntityRepositoryType,
-  Index,
   ManyToMany,
   Property,
   Unique,
@@ -13,7 +12,6 @@ import { BaseEntity } from './BaseEntity';
 import { User } from './User';
 
 @Entity()
-@Index({ properties: ['members'] })
 export class Group extends BaseEntity {
   [EntityRepositoryType]?: GroupModel;
 

@@ -19,11 +19,10 @@ import { Tag } from './Tag';
 import { createRandomDoi } from '../../utils/ids';
 
 @Entity()
-@Index({ properties: ['rapidReviews'] })
-@Index({ properties: ['fullReviews'] })
-@Index({ properties: ['requests'] })
-@Index({ properties: ['communities'] })
-@Index({ properties: ['tags'] })
+@Index({
+  name: 'preprint_trgm',
+  properties: ['title', 'handle', 'abstractText', 'authors'],
+})
 export class Preprint extends BaseEntity {
   [EntityRepositoryType]?: PreprintModel;
 

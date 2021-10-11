@@ -2,7 +2,6 @@ import {
   Collection,
   Entity,
   EntityRepositoryType,
-  Index,
   ManyToMany,
   Property,
   Unique,
@@ -13,7 +12,6 @@ import { BaseEntity } from './BaseEntity';
 import { Persona } from './Persona';
 
 @Entity()
-@Index({ properties: ['personas'] })
 export class Badge extends BaseEntity {
   [EntityRepositoryType]?: BadgeModel;
 

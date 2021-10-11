@@ -20,16 +20,7 @@ import { Request } from './Request';
 import { User } from './User';
 
 @Entity()
-@Index({ properties: ['identity'] })
-@Index({ properties: ['communities'] })
-@Index({ properties: ['rapidReviews'] })
-@Index({ properties: ['fullReviews'] })
-@Index({ properties: ['invitedToAuthor'] })
-@Index({ properties: ['mentoring'] })
-@Index({ properties: ['invitedToMentor'] })
-@Index({ properties: ['requests'] })
-@Index({ properties: ['badges'] })
-@Index({ properties: ['expertises'] })
+@Index({ name: 'persona_trgm', properties: ['name', 'bio'] })
 export class Persona extends BaseEntity {
   [EntityRepositoryType]?: PersonaModel;
 

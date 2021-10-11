@@ -2,7 +2,6 @@ import {
   Collection,
   Entity,
   EntityRepositoryType,
-  Index,
   ManyToMany,
   ManyToOne,
   OneToMany,
@@ -20,14 +19,6 @@ import { Statement } from './Statement';
 import { createRandomDoi } from '../../utils/ids';
 
 @Entity()
-@Index({ properties: ['drafts'] })
-@Index({ properties: ['mentorInvites'] })
-@Index({ properties: ['mentors'] })
-@Index({ properties: ['authorInvites'] })
-@Index({ properties: ['authors'] })
-@Index({ properties: ['preprint'] })
-@Index({ properties: ['comments'] })
-@Index({ properties: ['statements'] })
 export class FullReview extends BaseEntity {
   [EntityRepositoryType]?: FullReviewModel;
 
