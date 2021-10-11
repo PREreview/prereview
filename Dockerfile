@@ -124,6 +124,10 @@ CMD ["start:dev"]
 FROM dev AS integration
 ENV NODE_ENV=integration
 
+COPY --from=trajano/alpine-libfaketime /faketime.so /lib/faketime.so
+ENV LD_PRELOAD=/lib/faketime.so
+ENV DONT_FAKE_MONOTONIC=1
+
 COPY --from=backend /app/src/ src/
 COPY --from=frontend /app/dist/frontend/ dist/frontend/
 
