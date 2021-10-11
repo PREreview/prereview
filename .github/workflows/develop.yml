@@ -63,7 +63,7 @@ jobs:
       - name: 'Check migrations'
         run: |
           make create-migration
-          git ls-files --others --exclude-standard -z | xargs -0 -n 1 git --no-pager diff /dev/null
+          git ls-files --others --exclude-standard -z | xargs --no-run-if-empty -0 -n 1 git --no-pager diff /dev/null
 
       - name: 'Log in to registry'
         uses: azure/docker-login@v1
