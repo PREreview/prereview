@@ -5,14 +5,7 @@ import sendgridTransport from 'nodemailer-sendgrid';
 
 //const log = getLogger('backend:middleware:mail');
 
-const __dirname = path.resolve();
-const TEMPLATE_DIR = path.resolve(
-  __dirname,
-  'dist',
-  'backend',
-  'templates',
-  'email',
-);
+const TEMPLATE_DIR = path.resolve('dist', 'backend', 'templates', 'email');
 
 export const mailWrapper = config => {
   const transport = nodemailer.createTransport(

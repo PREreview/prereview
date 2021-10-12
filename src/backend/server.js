@@ -77,8 +77,7 @@ import DocsController from './controllers/docs.js';
 import EventController from './controllers/event.js';
 import NotificationController from './controllers/notification.js';
 
-const __dirname = path.resolve();
-const STATIC_DIR = path.resolve(__dirname, 'dist', 'frontend');
+const STATIC_DIR = path.resolve('dist', 'frontend');
 
 const startAt = Symbol.for('request-received.startAt');
 const startTime = Symbol.for('request-received.startTime');
