@@ -76,12 +76,6 @@ Create the database:
 npm run db:migrations
 ```
 
-and to optionally populate it with test data:
-
-```
-npm run db:seeds
-```
-
 And start the running processes (with necessary environment variables if not
 defined in `.env`):
 
@@ -114,12 +108,6 @@ database migrations to initialize the database:
 
 ```
 docker-compose run prereview npm run db:migrations
-```
-
-and then optionally seed the database with a default admin user:
-
-```
-docker-compose run prereview npm run db:seeds
 ```
 
 By default, it runs on [http://localhost:3000](http://localhost:3000), but you

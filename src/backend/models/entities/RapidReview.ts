@@ -6,7 +6,6 @@ import {
   ManyToOne,
   Property,
 } from '@mikro-orm/core';
-import { Fixture } from 'class-fixtures-factory';
 import { RapidReviewModel } from '../rapidReviews';
 import { BaseEntity } from './BaseEntity';
 import { Persona } from './Persona';
@@ -37,59 +36,45 @@ export class RapidReview extends BaseEntity {
   @Property()
   isFlagged: boolean = false;
 
-  @Fixture({ enum: Checkboxes })
   @Enum(() => Checkboxes)
   ynNovel = Checkboxes.na;
 
-  @Fixture({ enum: Checkboxes })
   @Enum(() => Checkboxes)
   ynFuture = Checkboxes.na;
 
-  @Fixture({ enum: Checkboxes })
   @Enum(() => Checkboxes)
   ynReproducibility = Checkboxes.na;
 
-  @Fixture({ enum: Checkboxes })
   @Enum(() => Checkboxes)
   ynMethods = Checkboxes.na;
 
-  @Fixture({ enum: Checkboxes })
   @Enum(() => Checkboxes)
   ynCoherent = Checkboxes.na;
 
-  @Fixture({ enum: Checkboxes })
   @Enum(() => Checkboxes)
   ynLimitations = Checkboxes.na;
 
-  @Fixture({ enum: Checkboxes })
   @Enum(() => Checkboxes)
   ynEthics = Checkboxes.na;
 
-  @Fixture({ enum: Checkboxes })
   @Enum(() => Checkboxes)
   ynNewData = Checkboxes.na;
 
-  @Fixture({ enum: Checkboxes })
   @Enum(() => Checkboxes)
   ynRecommend = Checkboxes.na;
 
-  @Fixture({ enum: Checkboxes })
   @Enum(() => Checkboxes)
   ynPeerReview = Checkboxes.na;
 
-  @Fixture({ enum: Checkboxes })
   @Enum(() => Checkboxes)
   ynAvailableCode = Checkboxes.na;
 
-  @Fixture({ enum: Checkboxes })
   @Enum(() => Checkboxes)
   ynAvailableData = Checkboxes.na;
 
-  @Fixture(faker => faker.lorem.sentence())
   @Property({ columnType: 'text', nullable: true })
   linkToData?: string;
 
-  @Fixture(faker => faker.lorem.sentence())
   @Property({ columnType: 'text', nullable: true })
   coi?: string;
 

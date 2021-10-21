@@ -5,7 +5,6 @@ import {
   ManyToOne,
   Property,
 } from '@mikro-orm/core';
-import { Fixture } from 'class-fixtures-factory';
 import { RequestModel } from '../requests';
 import { BaseEntity } from './BaseEntity';
 import { Persona } from './Persona';
@@ -23,7 +22,6 @@ export class Request extends BaseEntity {
   @ManyToOne({ entity: () => Preprint })
   preprint!: Preprint;
 
-  @Fixture(() => false)
   @Property()
   isPreprintAuthor: boolean = false;
 

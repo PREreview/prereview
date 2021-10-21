@@ -4,7 +4,6 @@ import {
   ManyToOne,
   Property,
 } from '@mikro-orm/core';
-import { Fixture } from 'class-fixtures-factory';
 import { EventModel } from '../events';
 import { BaseEntity } from './BaseEntity';
 import { Community } from './Community';
@@ -13,26 +12,21 @@ import { Community } from './Community';
 export class Event extends BaseEntity {
   [EntityRepositoryType]?: EventModel;
 
-  @Fixture(faker => `${faker.commerce.color()} ${faker.random.word()}`)
   @Property()
   title!: string;
 
-  @Fixture(() => new Date())
   @Property()
   start!: Date;
 
-  @Fixture(() => new Date())
   @Property({ nullable: true })
   end?: Date;
 
   @Property()
   isPrivate: boolean = false;
 
-  @Fixture(faker => faker.lorem.sentences())
   @Property({ columnType: 'text', nullable: true })
   description?: string;
 
-  @Fixture(faker => faker.internet.url())
   @Property({ columnType: 'text', nullable: true })
   url?: string;
 

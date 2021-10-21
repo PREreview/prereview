@@ -7,7 +7,6 @@ import {
   Property,
   Unique,
 } from '@mikro-orm/core';
-import { Fixture } from 'class-fixtures-factory';
 import { CommunityModel } from '../communities';
 import { BaseEntity } from './BaseEntity';
 import { Event } from './Event';
@@ -21,29 +20,23 @@ import { User } from './User';
 export class Community extends BaseEntity {
   [EntityRepositoryType]?: CommunityModel;
 
-  @Fixture(faker => `${faker.commerce.color()} ${faker.random.word()}`)
   @Property()
   @Unique()
   name!: string;
 
-  @Fixture(faker => `${faker.commerce.color()}-${faker.random.word()}`)
   @Property()
   @Unique()
   slug!: string;
 
-  @Fixture(faker => faker.lorem.sentences())
   @Property({ columnType: 'text', nullable: true })
   description?: string;
 
-  @Fixture(faker => faker.image.abstract())
   @Property({ nullable: true })
   banner?: Buffer;
 
-  @Fixture(faker => faker.image.abstract())
   @Property({ nullable: true })
   logo?: Buffer;
 
-  @Fixture(faker => faker.internet.userName())
   @Property({ nullable: true })
   twitter?: string;
 

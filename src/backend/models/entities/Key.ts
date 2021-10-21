@@ -4,7 +4,6 @@ import {
   ManyToOne,
   Property,
 } from '@mikro-orm/core';
-import { Fixture } from 'class-fixtures-factory';
 import uuidApiKey from 'uuid-apikey';
 import { KeyModel } from '../keys';
 import { BaseEntity } from './BaseEntity';
@@ -17,11 +16,9 @@ export class Key extends BaseEntity {
   @ManyToOne({ entity: () => User })
   owner!: User;
 
-  @Fixture(faker => faker.random.alphaNumeric(16))
   @Property()
   app!: string;
 
-  @Fixture(faker => faker.random.alphaNumeric(16))
   @Property()
   secret!: string;
 

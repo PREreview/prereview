@@ -5,40 +5,33 @@ import {
   ManyToOne,
   Property,
 } from '@mikro-orm/core';
-import { Fixture } from 'class-fixtures-factory';
 import { WorkModel } from '../works';
 import { BaseEntity } from './BaseEntity';
 import { User } from './User';
-import { createRandomDoi } from '../../utils/ids';
 
 @Entity()
 @Index({ properties: ['author'] })
 export class Work extends BaseEntity {
   [EntityRepositoryType]?: WorkModel;
 
-  @Fixture(faker => `${faker.commerce.color()} ${faker.random.word()}`)
   @Property({ columnType: 'text', nullable: true })
   title?: string;
 
   @ManyToOne({ entity: () => User })
   author!: User;
 
-  @Fixture(faker => faker.internet.url())
   @Property({ columnType: 'text', nullable: true })
   url?: string;
 
-  @Fixture(faker => faker.random.word())
   @Property({ nullable: true })
   type?: string;
 
-  @Fixture({ get: () => `doi:${createRandomDoi()}` })
   @Property({ nullable: true })
   handle?: string;
 
   @Property({ nullable: true })
   publicationDate?: Date;
 
-  @Fixture(faker => faker.random.word())
   @Property({ columnType: 'text', nullable: true })
   publisher?: string;
 

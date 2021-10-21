@@ -6,7 +6,6 @@ import {
   Property,
   Unique,
 } from '@mikro-orm/core';
-import { Fixture } from 'class-fixtures-factory';
 import { TemplateModel } from '../templates';
 import { BaseEntity } from './BaseEntity';
 import { Community } from './Community';
@@ -16,12 +15,10 @@ import { Community } from './Community';
 export class Template extends BaseEntity {
   [EntityRepositoryType]?: TemplateModel;
 
-  @Fixture(faker => `${faker.commerce.color()} ${faker.random.word()}`)
   @Property()
   @Unique()
   title!: string;
 
-  @Fixture(faker => faker.lorem.sentences())
   @Property({ columnType: 'text' })
   contents!: string;
 

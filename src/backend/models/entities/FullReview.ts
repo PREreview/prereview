@@ -8,7 +8,6 @@ import {
   Property,
   Unique,
 } from '@mikro-orm/core';
-import { Fixture } from 'class-fixtures-factory';
 import { FullReviewModel } from '../fullReviews';
 import { BaseEntity } from './BaseEntity';
 import { Comment } from './Comment';
@@ -16,7 +15,6 @@ import { FullReviewDraft } from './FullReviewDraft';
 import { Persona } from './Persona';
 import { Preprint } from './Preprint';
 import { Statement } from './Statement';
-import { createRandomDoi } from '../../utils/ids';
 
 @Entity()
 export class FullReview extends BaseEntity {
@@ -28,7 +26,6 @@ export class FullReview extends BaseEntity {
   @Property()
   isFlagged: boolean = false;
 
-  @Fixture({ get: () => createRandomDoi() })
   @Property({ nullable: true })
   @Unique()
   doi?: string;

@@ -5,7 +5,6 @@ import {
   ManyToOne,
   Property,
 } from '@mikro-orm/core';
-import { Fixture } from 'class-fixtures-factory';
 import { ContactModel } from '../contacts';
 import { BaseEntity } from './BaseEntity';
 import { User } from './User';
@@ -15,30 +14,24 @@ import { User } from './User';
 export class Contact extends BaseEntity {
   [EntityRepositoryType]?: ContactModel;
 
-  @Fixture(() => 'mailto')
   @Property()
   schema!: string;
 
-  @Fixture(faker => faker.internet.email())
   @Property()
   value!: string;
 
   @ManyToOne({ entity: () => User })
   identity!: User;
 
-  @Fixture(() => false)
   @Property()
   isVerified: boolean;
 
-  @Fixture(() => false)
   @Property()
   isNotified: boolean;
 
-  @Fixture(() => false)
   @Property()
   isPublic: boolean;
 
-  @Fixture(faker => faker.random.alphaNumeric(16))
   @Property({ nullable: true })
   token?: string;
 

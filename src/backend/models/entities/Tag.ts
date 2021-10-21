@@ -6,7 +6,6 @@ import {
   Property,
   Unique,
 } from '@mikro-orm/core';
-import { Fixture } from 'class-fixtures-factory';
 import { TagModel } from '../tags';
 import { BaseEntity } from './BaseEntity';
 import { Community } from './Community';
@@ -16,12 +15,10 @@ import { Preprint } from './Preprint';
 export class Tag extends BaseEntity {
   [EntityRepositoryType]?: TagModel;
 
-  @Fixture(faker => `${faker.commerce.color()} ${faker.random.word()}`)
   @Property()
   @Unique()
   name!: string;
 
-  @Fixture(faker => faker.internet.color())
   @Property()
   color?: string;
 

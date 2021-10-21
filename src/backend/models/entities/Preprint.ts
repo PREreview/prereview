@@ -8,7 +8,6 @@ import {
   Property,
   Unique,
 } from '@mikro-orm/core';
-import { Fixture } from 'class-fixtures-factory';
 import { PreprintModel } from '../preprints';
 import { BaseEntity } from './BaseEntity';
 import { Community } from './Community';
@@ -16,7 +15,6 @@ import { FullReview } from './FullReview';
 import { RapidReview } from './RapidReview';
 import { Request } from './Request';
 import { Tag } from './Tag';
-import { createRandomDoi } from '../../utils/ids';
 
 @Entity()
 @Index({
@@ -26,70 +24,53 @@ import { createRandomDoi } from '../../utils/ids';
 export class Preprint extends BaseEntity {
   [EntityRepositoryType]?: PreprintModel;
 
-  @Fixture({ get: () => `doi:${createRandomDoi()}` })
   @Property()
   @Unique()
   handle!: string;
 
-  @Fixture(faker => `${faker.commerce.color()} ${faker.random.word()}`)
   @Property({ columnType: 'text' })
   title!: string;
 
-  @Fixture(faker => faker.name.findName())
   @Property({ columnType: 'text', nullable: true })
   authors?: string;
 
-  @Fixture(() => true)
   @Property()
   isPublished!: boolean;
 
-  @Fixture(faker => faker.lorem.paragraph())
   @Property({ columnType: 'text', nullable: true })
   abstractText?: string;
 
-  @Fixture(faker => faker.random.arrayElement(['arxiv', 'biorxiv', 'medrxiv']))
   @Property({ nullable: true })
   preprintServer?: string;
 
   @Property({ nullable: true })
   datePosted?: Date;
 
-  @Fixture(faker => faker.random.word())
   @Property({ nullable: true })
   license?: string;
 
-  @Fixture(faker => faker.random.word())
   @Property({ nullable: true })
   publication?: string;
 
-  @Fixture(faker => faker.internet.url())
   @Property({ nullable: true })
   url?: string;
 
-  @Fixture(() => 'application/pdf')
   @Property({ nullable: true })
   contentEncoding?: string;
 
-  @Fixture(
-    () =>
-      'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf',
-  )
   @Property({ nullable: true })
   contentUrl?: string;
 
-  //@Fixture({ ignore: true })
   //@Property({ persist: false })
   //get fullReviewCount(): number {
   //  return this.fullReviews.count();
   //}
 
-  //@Fixture({ ignore: true })
   //@Property({ persist: false })
   //get rapidReviewCount(): number {
   //  return this.rapidReviews.count();
   //}
 
-  //@Fixture({ ignore: true })
   //@Property({ persist: false })
   //get requestCount(): number {
   //  return this.requests.count();

@@ -6,7 +6,6 @@ import {
   Property,
   Unique,
 } from '@mikro-orm/core';
-import { Fixture } from 'class-fixtures-factory';
 import { GroupModel } from '../groups';
 import { BaseEntity } from './BaseEntity';
 import { User } from './User';
@@ -15,7 +14,6 @@ import { User } from './User';
 export class Group extends BaseEntity {
   [EntityRepositoryType]?: GroupModel;
 
-  @Fixture(faker => `${faker.commerce.color()} ${faker.random.word()}`)
   @Property()
   @Unique()
   name!: string;

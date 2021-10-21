@@ -6,7 +6,6 @@ import {
   Property,
   Unique,
 } from '@mikro-orm/core';
-import { Fixture } from 'class-fixtures-factory';
 import { ExpertiseModel } from '../expertises';
 import { BaseEntity } from './BaseEntity';
 import { Persona } from './Persona';
@@ -15,7 +14,6 @@ import { Persona } from './Persona';
 export class Expertise extends BaseEntity {
   [EntityRepositoryType]?: ExpertiseModel;
 
-  @Fixture(faker => `${faker.commerce.color()} ${faker.random.word()}`)
   @Property()
   @Unique()
   name!: string;

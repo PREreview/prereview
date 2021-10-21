@@ -5,7 +5,6 @@ import {
   ManyToOne,
   Property,
 } from '@mikro-orm/core';
-import { Fixture } from 'class-fixtures-factory';
 import { FullReviewDraftModel } from '../fullReviewDrafts';
 import { BaseEntity } from './BaseEntity';
 import { FullReview } from './FullReview';
@@ -18,7 +17,6 @@ export class FullReviewDraft extends BaseEntity {
   @ManyToOne({ entity: () => FullReview })
   parent!: FullReview;
 
-  @Fixture(faker => faker.lorem.paragraph())
   @Property({ columnType: 'text' })
   contents!: string;
 

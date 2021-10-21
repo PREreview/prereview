@@ -8,7 +8,6 @@ import {
   Property,
   Unique,
 } from '@mikro-orm/core';
-import { Fixture } from 'class-fixtures-factory';
 import { UserModel } from '../users';
 import { BaseEntity } from './BaseEntity';
 import { Community } from './Community';
@@ -17,13 +16,11 @@ import { Group } from './Group';
 import { Persona } from './Persona';
 import { Work } from './Work';
 import { Key } from './Key';
-import { createRandomOrcid } from '../../utils/orcid';
 
 @Entity()
 export class User extends BaseEntity {
   [EntityRepositoryType]?: UserModel;
 
-  @Fixture(() => createRandomOrcid())
   @Unique()
   @Property()
   orcid!: string;
@@ -31,7 +28,6 @@ export class User extends BaseEntity {
   @OneToOne({ entity: () => Persona, nullable: true })
   defaultPersona?: Persona;
 
-  @Fixture(() => false)
   @Property()
   isPrivate?: boolean;
 

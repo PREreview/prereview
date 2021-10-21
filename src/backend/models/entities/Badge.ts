@@ -6,7 +6,6 @@ import {
   Property,
   Unique,
 } from '@mikro-orm/core';
-import { Fixture } from 'class-fixtures-factory';
 import { BadgeModel } from '../badges';
 import { BaseEntity } from './BaseEntity';
 import { Persona } from './Persona';
@@ -15,12 +14,10 @@ import { Persona } from './Persona';
 export class Badge extends BaseEntity {
   [EntityRepositoryType]?: BadgeModel;
 
-  @Fixture(faker => `${faker.commerce.color()} ${faker.random.word()}`)
   @Property()
   @Unique()
   name!: string;
 
-  @Fixture(faker => faker.internet.color())
   @Property()
   color?: string;
 

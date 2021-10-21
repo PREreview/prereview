@@ -5,7 +5,6 @@ import {
   ManyToOne,
   Property,
 } from '@mikro-orm/core';
-import { Fixture } from 'class-fixtures-factory';
 import { CommentModel } from '../comments';
 import { BaseEntity } from './BaseEntity';
 import { FullReview } from './FullReview';
@@ -17,7 +16,6 @@ import { Persona } from './Persona';
 export class Comment extends BaseEntity {
   [EntityRepositoryType]?: CommentModel;
 
-  @Fixture(faker => faker.lorem.sentences())
   @Property({ columnType: 'text' })
   contents!: string;
 

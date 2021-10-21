@@ -5,7 +5,6 @@ import {
   ManyToOne,
   Property,
 } from '@mikro-orm/core';
-import { Fixture } from 'class-fixtures-factory';
 import { StatementModel } from '../statements';
 import { BaseEntity } from './BaseEntity';
 import { FullReview } from './FullReview';
@@ -17,7 +16,6 @@ import { Persona } from './Persona';
 export class Statement extends BaseEntity {
   [EntityRepositoryType]?: StatementModel;
 
-  @Fixture(faker => faker.lorem.sentences())
   @Property({ columnType: 'text' })
   contents!: string;
 

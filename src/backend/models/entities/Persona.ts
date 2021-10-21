@@ -8,7 +8,6 @@ import {
   OneToMany,
   Property,
 } from '@mikro-orm/core';
-import { Fixture } from 'class-fixtures-factory';
 import { PersonaModel } from '../personas';
 import { BaseEntity } from './BaseEntity';
 import { Badge } from './Badge';
@@ -24,34 +23,27 @@ import { User } from './User';
 export class Persona extends BaseEntity {
   [EntityRepositoryType]?: PersonaModel;
 
-  @Fixture(faker => faker.name.findName())
   @Property()
   name!: string;
 
   @ManyToOne({ entity: () => User, nullable: true, hidden: true })
   identity?: User;
 
-  @Fixture(() => false)
   @Property()
   isAnonymous!: boolean;
 
-  @Fixture(() => false)
   @Property()
   isLocked: boolean = false;
 
-  @Fixture(() => false)
   @Property()
   isFlagged: boolean = false;
 
-  @Fixture(faker => faker.lorem.paragraph())
   @Property({ columnType: 'text', nullable: true })
   bio?: string;
 
-  @Fixture(() => 'wT17FWtRIPTQGkGhi0UMSYZhVbQyfms1')
   @Property({ nullable: true })
   avatar?: Buffer;
 
-  @Fixture(() => 'image/jpeg')
   @Property({ nullable: true })
   avatar_encoding?: string;
 

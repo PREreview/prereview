@@ -78,10 +78,6 @@ else
 
   if [ $result -ne 0 ]; then
     init_db
-    if [ $NODE_ENV == "development" ]; then
-      echo "Generate seeds"
-      npm run db:seeds &
-    fi
   else
     echo "Updating database schema"
     npm run db:migrations
