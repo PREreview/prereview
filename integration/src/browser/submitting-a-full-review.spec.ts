@@ -3,7 +3,7 @@ import { screenshot } from './utils';
 
 test.asALoggedInUser(
   'submit a full review',
-  async ({ page, preprint, rapidReview }) => {
+  async ({ page, preprint, rapidReview }, { timeout }) => {
     await page.goto(
       `preprints/${preprint.uuid}/rapid-reviews/${rapidReview.uuid}`,
     );
@@ -35,7 +35,9 @@ test.asALoggedInUser(
       'Are you sure you want to publish this review?',
     );
 
-    await expect(paper).toContainText('Congratulations');
+    await expect(paper).toContainText('Congratulations', {
+      timeout: timeout * 2,
+    });
     expect(await screenshot(paper)).toMatchSnapshot('submitted.png');
 
     await page.reload();
