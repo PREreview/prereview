@@ -6,3 +6,4 @@ services:
       target: dev
     volumes:
       - './src:/app/src'
+      - './test:/app/test'
