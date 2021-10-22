@@ -246,7 +246,7 @@ export default async function configServer(config) {
     .use(koa404Handler)
     .use(async (ctx, next) => {
       await next();
-      if (ctx.path === '/') {
+      if (ctx.path === '/' && ctx.body && 'pipe' in ctx.body) {
         ctx.body = ctx.body.pipe(
           replaceStream(
             '__FATHOM_SITEID__',
