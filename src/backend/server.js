@@ -85,15 +85,6 @@ const startTime = Symbol.for('request-received.startTime');
 export default async function configServer(config) {
   // Initialize our application server
   const server = new Koa();
-  server.use(requestReceived);
-  server.use((ctx, next) => {
-    console.log('startAt', ctx[startAt]);
-    console.log('startTime', ctx[startTime]);
-    return next();
-  });
-  server.use(xResponseTime());
-  server.use(xRequestId());
-
   // Configure logging
   log4js.configure({
     appenders: { console: { type: 'stdout', layout: { type: 'colored' } } },
@@ -102,11 +93,15 @@ export default async function configServer(config) {
     },
   });
   const logger = log4js.getLogger('http');
+  server.use(requestReceived);
   server.use(log4js.koaLogger(logger, { level: 'auto' }));
-  //server.use(async (ctx, next) => {
-  //  ctx.logger = logger;
-  //  await next();
-  //});
+  server.use((ctx, next) => {
+    logger.info('startAt', ctx[startAt]);
+    logger.info('startTime', ctx[startTime]);
+    return next();
+  });
+  server.use(xResponseTime());
+  server.use(xRequestId());
 
   // Initialize database
   const [db, dbMiddleware] = await dbWrapper();

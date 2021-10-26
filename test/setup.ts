@@ -3,7 +3,7 @@ import configServer from '../src/backend/server';
 
 export async function createServer(config = {}): Promise<RequestListener> {
   return await configServer({
-    logLevel: 'debug',
+    logLevel: 'off',
     orcidCallbackUrl: 'http://localhost/',
     orcidClientId: 'orcid-client-id',
     ...config,
