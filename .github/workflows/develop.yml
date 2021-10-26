@@ -46,6 +46,7 @@ jobs:
           TARGET: 'integration'
 
       - name: 'Run integration tests'
+        id: integration-test
         run: make integration-test
         env:
           RETRIES: '3'
@@ -54,7 +55,7 @@ jobs:
           PREREVIEW_ZENODO_TOKEN: ${{ secrets.ZENODO_TOKEN }}
 
       - name: 'Store integration test results'
-        if: ${{ failure() }}
+        if: ${{ failure() && steps.integration-test.outcome == 'failure' }}
         uses: actions/upload-artifact@v2
         with:
           name: integration-tests-results
