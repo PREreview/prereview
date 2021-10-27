@@ -1,4 +1,5 @@
 // Node modules
+import { RequestListener } from 'http';
 import path from 'path';
 
 // Koa modules
@@ -23,8 +24,8 @@ import replaceStream from 'replacestream';
 import serialize from 'serialize-javascript';
 
 // Our modules
-import { createError } from './utils/http-errors.ts';
-import { dbWrapper } from './db.ts';
+import { createError } from './utils/http-errors';
+import { dbWrapper } from './db';
 
 // Our middlewares
 import authWrapper from './middleware/auth.js'; // authorization/user roles
@@ -54,7 +55,7 @@ import {
   tagModelWrapper,
   templateModelWrapper,
   userModelWrapper,
-} from './models/index.ts';
+} from './models';
 
 // Our controllers
 import AuthController from './controllers/auth.js'; // authentication/logins
@@ -77,12 +78,18 @@ import DocsController from './controllers/docs.js';
 import EventController from './controllers/event.js';
 import NotificationController from './controllers/notification.js';
 
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+
 const STATIC_DIR = path.resolve('dist', 'frontend');
 
 const startAt = Symbol.for('request-received.startAt');
 const startTime = Symbol.for('request-received.startTime');
 
-export default async function configServer(config) {
+type Config = Record<string, string>; // TODO add correct type
+
+export default async function configServer(
+  config: Config,
+): Promise<RequestListener> {
   // Initialize our application server
   const server = new Koa();
   // Configure logging
@@ -96,7 +103,9 @@ export default async function configServer(config) {
   server.use(requestReceived);
   server.use(log4js.koaLogger(logger, { level: 'auto' }));
   server.use((ctx, next) => {
+    // @ts-ignore Fixed in TypeScript 4.4 (https://www.typescriptlang.org/docs/handbook/release-notes/typescript-4-4.html#symbol-and-template-string-pattern-index-signatures)
     logger.info('startAt', ctx[startAt]);
+    // @ts-ignore
     logger.info('startTime', ctx[startTime]);
     return next();
   });
