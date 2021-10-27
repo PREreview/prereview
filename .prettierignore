@@ -4,4 +4,7 @@ dist
 node_modules
 coverage
 build
+/integration/src/**/*-snapshots/
+/src/backend/db/migrations/
 /src/frontend/hooks/api-hooks.tsx
+*.hbs
