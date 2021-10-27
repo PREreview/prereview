@@ -2,7 +2,7 @@ import { EntityRepository, MikroORM, Repository } from '@mikro-orm/core';
 import { Preprint } from './entities';
 import { decodePreprintId } from '../../common/utils/ids';
 import ChainedError from 'typescript-chained-error';
-import { getLogger } from '../log.js';
+import { getLogger } from '../log';
 
 const log = getLogger('backend:model:preprints');
 

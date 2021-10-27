@@ -1,5 +1,5 @@
 import router from 'koa-joi-router';
-import { getLogger } from '../log.js';
+import { getLogger } from '../log.ts';
 import { getErrorMessages } from '../utils/errors';
 
 const log = getLogger('backend:controller:template');

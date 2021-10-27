@@ -3,7 +3,7 @@ import { ORCID as orcidUtils } from 'orcid-utils';
 import { validate as uuidValidate } from 'uuid';
 import { Group } from './entities';
 import { User } from './entities';
-import { getLogger } from '../log.js';
+import { getLogger } from '../log';
 
 const log = getLogger('backend:models:groups');
 

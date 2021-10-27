@@ -1,5 +1,5 @@
 import fetch from 'node-fetch';
-import { getLogger } from '../log.js';
+import { getLogger } from '../log.ts';
 import FormData from 'form-data';
 import config from '../config.ts';
 

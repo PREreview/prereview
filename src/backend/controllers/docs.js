@@ -1,7 +1,7 @@
 import { koaSwagger } from 'koa2-swagger-ui';
 import { SwaggerAPI } from 'koa-joi-router-docs';
 import preprintRoutes from '../controllers/preprint.js';
-import { getLogger } from '../log.js';
+import { getLogger } from '../log.ts';
 import router from 'koa-joi-router';
 import userRoutes from './user.js';
 import fullReviewRoutes from './fullReview.js';

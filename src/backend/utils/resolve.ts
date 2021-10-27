@@ -5,7 +5,7 @@ import scrape from 'html-metadata';
 import { search as scholarSearch } from 'scholarly';
 import CrossRef from 'crossref';
 import ChainedError from 'typescript-chained-error';
-import { getLogger } from '../log.js';
+import { getLogger } from '../log';
 
 const log = getLogger('backend:utils:resolve');
 

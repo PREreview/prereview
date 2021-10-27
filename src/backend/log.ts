@@ -1,7 +1,7 @@
-import log4js from 'koa-log4';
-import config from './config.ts';
+import log4js, { Logger } from 'koa-log4';
+import config from './config';
 
-export function getLogger(namespace) {
+export function getLogger(namespace: string): Logger {
   // Configure logging
   log4js.configure({
     appenders: { console: { type: 'stdout', layout: { type: 'colored' } } },
