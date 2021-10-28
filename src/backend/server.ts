@@ -1,4 +1,5 @@
 // Node modules
+import { MikroORM, RequestContext } from '@mikro-orm/core';
 import { RequestListener } from 'http';
 import path from 'path';
 
@@ -25,7 +26,6 @@ import serialize from 'serialize-javascript';
 
 // Our modules
 import { createError } from './utils/http-errors';
-import { dbWrapper } from './db';
 
 // Our middlewares
 import authWrapper from './middleware/auth.js'; // authorization/user roles
@@ -88,6 +88,7 @@ const startTime = Symbol.for('request-received.startTime');
 type Config = Record<string, string>; // TODO add correct type
 
 export default async function configServer(
+  db: MikroORM,
   config: Config,
 ): Promise<RequestListener> {
   // Initialize our application server
@@ -113,8 +114,7 @@ export default async function configServer(
   server.use(xRequestId());
 
   // Initialize database
-  const [db, dbMiddleware] = await dbWrapper();
-  server.use(dbMiddleware);
+  server.use((_, next) => RequestContext.createAsync(db.em, next));
 
   // Setup auth handlers
   const userModel = userModelWrapper(db);

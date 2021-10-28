@@ -1,5 +1,7 @@
+import { MikroORM } from '@mikro-orm/core';
 import { createServer } from 'http';
 import config from './config';
+import ormConfig from './mikro-orm.config';
 import configServer from './server';
 
 /**
@@ -12,7 +14,8 @@ async function bootstrap() {
    * await sequelize.authenticate()
    */
   config.parse(process.argv);
-  return createServer(await configServer(config)).listen(config.port);
+  const orm = await MikroORM.init(ormConfig);
+  return createServer(await configServer(orm, config)).listen(config.port);
 }
 
 bootstrap()

@@ -1,9 +1,10 @@
-import { dbWrapper } from '../db';
+import { MikroORM } from '@mikro-orm/core';
+import dbConfig from '../mikro-orm.config';
 import { groupModelWrapper } from '../models';
 
 async function main() {
   try {
-    const [db] = await dbWrapper();
+    const db = await MikroORM.init(dbConfig);
     const groups = groupModelWrapper(db);
     const adminGroup = groups.create({ name: 'admins' });
     console.log('Created admins group:', adminGroup);
