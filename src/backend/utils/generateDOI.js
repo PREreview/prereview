@@ -41,7 +41,6 @@ export default async function generateDOI(prereviewData) {
 
   // Check if we have a valid deposition id
   if (!depositionData.id) {
-    console.error(depositionData);
     throw new Error('Missing Zenodo deposition id');
   }
 
