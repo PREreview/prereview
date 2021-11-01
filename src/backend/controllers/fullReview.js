@@ -1,7 +1,7 @@
 import router from 'koa-joi-router';
 import { QueryOrder } from '@mikro-orm/core';
 import { getLogger } from '../log.ts';
-import generateDOI from '../utils/generateDOI.js';
+import generateDOI from '../utils/generateDOI.ts';
 import { getFields } from '../utils/getFields.ts';
 import getActivePersona from '../utils/persona';
 

@@ -1,7 +1,7 @@
 import fetch from 'node-fetch';
-import { getLogger } from '../log.ts';
+import { getLogger } from '../log';
 import FormData from 'form-data';
-import config from '../config.ts';
+import config from '../config';
 
 const log = getLogger('backend:utils:generateDOI');
 
@@ -20,7 +20,20 @@ const zenodoPayload = (body = {}, headers = {}) => ({
   headers: { 'content-type': 'application/json', ...headers },
 });
 
-export default async function generateDOI(prereviewData) {
+type Creator = {
+  name: string;
+  orcid?: string;
+};
+
+type PrereviewData = {
+  title: string;
+  content: string;
+  creators: Array<Creator>;
+};
+
+export default async function generateDOI(
+  prereviewData: PrereviewData,
+): Promise<string> {
   // shaping required metadata as
   // laid out in https://developers.zenodo.org/#depositions
   const data = {
@@ -52,7 +65,6 @@ export default async function generateDOI(prereviewData) {
   const buffer = Buffer.from(prereviewData.content, 'utf8');
   formData.append('file', buffer, {
     contentType: 'text/html',
-    name: 'file',
     filename: `${fileName}_${Date.now()}.html`,
   });
 
