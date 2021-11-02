@@ -39,11 +39,9 @@
         "**/*.ts",
         "**/*.tsx"
       ],
-      "parser": "@typescript-eslint/typescript-estree",
+      "parser": "@typescript-eslint/parser",
       "parserOptions": {
-        "sourceType": "module",
-        "project": "./tsconfig.json",
-        "allowImportExportEverywhere": true
+        "project": "./tsconfig.dev.json"
       },
       "extends": [
         "plugin:react/recommended",

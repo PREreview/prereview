@@ -108,6 +108,7 @@ COPY \
   .proxyrc \
   docker-entrypoint.sh \
   jest.config.ts \
+  tsconfig.dev.json \
   ./
 
 COPY --from=scripts /app/dist/scripts/ dist/scripts/
