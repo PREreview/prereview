@@ -1,4 +1,6 @@
-const config = {
+import type { Config } from '@jest/types';
+
+const config: Config.InitialOptions = {
   globals: {
     'ts-jest': {
       diagnostics: false,
@@ -10,4 +12,4 @@ const config = {
   verbose: true,
 };
 
-module.exports = config;
+export default config;
