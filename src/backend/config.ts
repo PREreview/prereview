@@ -202,10 +202,6 @@ function validateArray(value: string, previous: Array<string>): Array<string> {
   return array;
 }
 
-interface ParseOptions {
-  from: 'node' | 'electron' | 'user';
-}
-
 class Config extends Command {
   constructor() {
     super('prereview');
