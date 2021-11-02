@@ -3,7 +3,7 @@ import { FullReviewDraft } from './entities';
 
 @Repository(FullReviewDraft)
 export class FullReviewDraftModel extends EntityRepository<FullReviewDraft> {
-  async search(query: string): Promise<any> {
+  async search(query: string): Promise<unknown> {
     const connection = this.em.getConnection();
 
     return await connection.execute(

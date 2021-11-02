@@ -37,7 +37,7 @@ class HttpError extends ChainedError {
 }
 
 // Adapted from https://github.com/jshttp/http-errors
-export function createError(...args: any[]): HttpError {
+export function createError(...args: unknown[]): HttpError {
   let err: Error;
   let msg: string;
   let status = 500;

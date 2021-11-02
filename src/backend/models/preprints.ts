@@ -8,7 +8,7 @@ const log = getLogger('backend:model:preprints');
 
 @Repository(Preprint)
 export class PreprintModel extends EntityRepository<Preprint> {
-  async findOneByUuidOrHandle(value: string, params: string[]): Promise<any> {
+  async findOneByUuidOrHandle(value: string, params: string[]): Promise<Preprint> {
     try {
       const { id, scheme } = decodePreprintId(value);
       return this.findOne({ handle: `${scheme}:${id}` }, params);
