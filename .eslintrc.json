@@ -48,6 +48,14 @@
         "plugin:@typescript-eslint/recommended",
         "prettier"
       ]
+    },
+    {
+      "files": [
+        "src/backend/models/entities/**"
+      ],
+      "rules": {
+        "@typescript-eslint/no-inferrable-types": "off"
+      }
     }
   ],
   "rules": {
