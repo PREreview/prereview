@@ -69,6 +69,18 @@
       "rules": {
         "@typescript-eslint/no-inferrable-types": "off"
       }
+    },
+    {
+      "files": [
+        "integration/**"
+      ],
+      "parserOptions": {
+        "project": "./integration/tsconfig.json"
+      },
+      "rules": {
+        "@typescript-eslint/no-unused-vars": "off",
+        "no-empty-pattern": "off"
+      }
     }
   ],
   "rules": {

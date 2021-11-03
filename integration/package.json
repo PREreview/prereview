@@ -1,5 +1,8 @@
 {
   "private": true,
+  "engines": {
+    "node": "16"
+  },
   "dependencies": {
     "@playwright/test": "^1.14.1",
     "agent-base": "^6.0.2",

@@ -67,7 +67,11 @@ export const fakerFixtures: Fixtures<FakerFixtures> = {
   },
 };
 
-export const httpFixtures: Fixtures<HttpFixtures, {}, PlaywrightTestOptions> = {
+export const httpFixtures: Fixtures<
+  HttpFixtures,
+  Record<never, never>,
+  PlaywrightTestOptions
+> = {
   agent: async ({}, use, { outputPath }) => {
     const log = fs.createWriteStream(outputPath('http.txt'));
 
@@ -86,7 +90,7 @@ export const httpFixtures: Fixtures<HttpFixtures, {}, PlaywrightTestOptions> = {
 
 export const dataFixtures: Fixtures<
   DataFixtures,
-  {},
+  Record<never, never>,
   FakerFixtures & HttpFixtures
 > = {
   community: async ({ faker, fetch }, use) => {
@@ -123,7 +127,7 @@ export const dataFixtures: Fixtures<
 
 export const userFixtures: Fixtures<
   UserFixtures,
-  {},
+  Record<never, never>,
   HttpFixtures & PlaywrightTestArgs & PlaywrightTestOptions
 > = {
   apiFetch: async (
@@ -167,7 +171,7 @@ export const userFixtures: Fixtures<
 
 export const userDataFixtures: Fixtures<
   UserDataFixtures,
-  {},
+  Record<never, never>,
   DataFixtures & HttpFixtures & UserFixtures
 > = {
   fullReview: async ({ apiHeaders, fetch, preprint }, use) => {
