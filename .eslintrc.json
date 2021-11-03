@@ -57,7 +57,9 @@
         "import/namespace": ["error", {
           "allowComputed": true
         }],
-        "node/no-missing-import": "off"
+        "jest/no-disabled-tests": "off",
+        "node/no-missing-import": "off",
+        "node/no-unpublished-import": "off"
       }
     },
     {
