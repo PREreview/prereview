@@ -1,8 +1,7 @@
 import { EntityRepository, MikroORM, Repository } from '@mikro-orm/core';
 import { ORCID as orcidUtils } from 'orcid-utils';
 import { validate as uuidValidate } from 'uuid';
-import { Group } from './entities';
-import { User } from './entities';
+import { Group, User } from './entities';
 import { getLogger } from '../log';
 
 const log = getLogger('backend:models:groups');
