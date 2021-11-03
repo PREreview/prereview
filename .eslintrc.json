@@ -74,6 +74,7 @@
       "error",
       {
         "allowModules": [
+          "@jest/types",
           "lodash"
         ]
       }
