@@ -101,6 +101,7 @@ FROM builder AS dev
 ENV NODE_ENV=development
 
 COPY \
+  .eslintignore \
   .eslintrc.json \
   .gitignore \
   .prettierignore \

@@ -1,0 +1,5 @@
+/dist/
+/integration/
+/src/frontend/
+/test/
+/jest.config.ts

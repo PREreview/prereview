@@ -11,7 +11,7 @@
   },
   "scripts": {
     "format": "prettier --ignore-unknown --check '**'",
-    "lint": "eslint --ext .js,.jsx,.ts,.tsx --ignore-path .gitignore ./src/backend",
+    "lint": "eslint --ext .js,.jsx,.ts,.tsx .",
     "test": "jest",
     "build": "rimraf dist && npm run build:scripts && npm run build:backend && npm run build:hooks && npm run build:frontend",
     "build:dev": "rimraf dist && npm run build:scripts && npm run build:backend:dev && npm run build:hooks && npm run build:frontend:dev",
