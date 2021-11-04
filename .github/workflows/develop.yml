@@ -26,6 +26,10 @@ jobs:
         env:
           TARGET: 'dev'
 
+      - name: 'Typecheck'
+        run: make typecheck
+        continue-on-error: true
+
       - name: 'Lint'
         run: make lint
 

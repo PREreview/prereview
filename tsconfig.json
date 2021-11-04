@@ -3,7 +3,7 @@
     "module": "commonjs",
     "declaration": true,
     "isolatedModules": true,
-    "noImplicitAny": false,
+    "strict": true,
     "removeComments": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,

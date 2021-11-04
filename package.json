@@ -13,6 +13,7 @@
     "format": "prettier --ignore-unknown --check '**'",
     "lint": "eslint --ext .js,.jsx,.ts,.tsx .",
     "test": "jest",
+    "typecheck": "tsc --noEmit --project tsconfig.dev.json",
     "build": "rimraf dist && npm run build:scripts && npm run build:backend && npm run build:hooks && npm run build:frontend",
     "build:dev": "rimraf dist && npm run build:scripts && npm run build:backend:dev && npm run build:hooks && npm run build:frontend:dev",
     "build:backend": "parcel build --target=backend --no-optimize src/backend/index.ts && npm run build:templates",

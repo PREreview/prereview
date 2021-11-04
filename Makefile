@@ -1,5 +1,5 @@
 .DEFAULT_GOAL: help
-.PHONY: help build run dev prod start logs stop wait-healthy lint format test integration-test smoke-test
+.PHONY: help build run dev prod start logs stop wait-healthy typecheck lint format test integration-test smoke-test
 
 ifeq (${TARGET},)
 TARGET := dev
@@ -45,6 +45,10 @@ endif
 
 wait-healthy: ## Wait for the app to be healthy
 	@.scripts/wait-healthy.sh prereview
+
+typecheck: export TARGET = dev
+typecheck: build ## Run the typechecker
+	@${DOCKER_COMPOSE} run --rm --no-deps --entrypoint "npm run" prereview typecheck
 
 lint: export TARGET = dev
 lint: build ## Run the linter
