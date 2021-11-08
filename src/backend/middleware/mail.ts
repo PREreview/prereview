@@ -1,3 +1,4 @@
+import { DefaultState, Middleware } from 'koa';
 import path from 'path';
 import Email from 'email-templates';
 import nodemailer from 'nodemailer';
@@ -7,7 +8,16 @@ import sendgridTransport from 'nodemailer-sendgrid';
 
 const TEMPLATE_DIR = path.resolve('dist', 'backend', 'templates', 'email');
 
-export const mailWrapper = config => {
+type Config = {
+  emailAddress: string,
+  emailSendgridKey: string,
+}
+
+type Mailer = {
+  mail: Email;
+}
+
+export const mailWrapper = (config: Config): Middleware<DefaultState, Mailer> => {
   const transport = nodemailer.createTransport(
     sendgridTransport({
       apiKey: config.emailSendgridKey,

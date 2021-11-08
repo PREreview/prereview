@@ -29,10 +29,10 @@ import { createError } from './utils/http-errors';
 
 // Our middlewares
 import authWrapper from './middleware/auth.js'; // authorization/user roles
-import currentCommunity from './middleware/community.js';
-import currentPersona from './middleware/persona.js';
-import currentUser from './middleware/user.js';
-import { mailWrapper } from './middleware/mail.js';
+import currentCommunity from './middleware/community';
+import currentPersona from './middleware/persona';
+import currentUser from './middleware/user';
+import { mailWrapper } from './middleware/mail';
 
 // Our models
 import {
