@@ -1,4 +1,4 @@
-FROM node:14-alpine AS node
+FROM node:14-alpine3.12 AS node
 WORKDIR /app
 
 RUN \
