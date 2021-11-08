@@ -2,7 +2,6 @@ import router from 'koa-joi-router';
 import { QueryOrder } from '@mikro-orm/core';
 import { getLogger } from '../log.ts';
 import { getFields } from '../utils/getFields.ts';
-import getActivePersona from '../utils/persona';
 
 const log = getLogger('backend:controllers:rapidReview');
 const Joi = router.Joi;
@@ -110,7 +109,7 @@ export default function controller(rapidReviews, preprints, thisUser) {
       let rapidReview, authorPersona, preprint;
 
       try {
-        authorPersona = getActivePersona(await thisUser.getUser(ctx));
+        authorPersona = await thisUser.getUser(ctx).then(user => user.defaultPersona);
       } catch (err) {
         log.error('Failed to load user personas.');
         ctx.throw(400, err);

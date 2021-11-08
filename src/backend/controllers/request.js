@@ -1,6 +1,5 @@
 import router from 'koa-joi-router';
 import { getLogger } from '../log.ts';
-import getActivePersona from '../utils/persona.js';
 
 const log = getLogger('backend:controllers:requests');
 
@@ -55,7 +54,7 @@ export default function controller(reqModel, preprintModel, thisUser) {
       log.error('HTTP 404 Error: Preprint not found');
       ctx.throw(404, 'Preprint not found');
     }
-    authorPersona = getActivePersona(await thisUser.getUser(ctx));
+    authorPersona = await thisUser.getUser(ctx).then(user => user.defaultPersona);
 
     log.debug(`Adding a request.`);
 

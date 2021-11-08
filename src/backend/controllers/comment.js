@@ -1,7 +1,6 @@
 import router from 'koa-joi-router';
 import { getLogger } from '../log.ts';
 import { getErrorMessages } from '../utils/errors';
-import getActivePersona from '../utils/persona.js';
 
 const log = getLogger('backend:controller:comment');
 const Joi = router.Joi;
@@ -70,7 +69,7 @@ export default function controller(commentModel, fullReviewModel, thisUser) {
 
     ctx.params.fid ? (fid = ctx.params.fid) : null;
 
-    authorPersona = getActivePersona(ctx.state.user);
+    authorPersona = ctx.state.user.defaultPersona;
 
     try {
       if (fid) {
