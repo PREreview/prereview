@@ -222,7 +222,7 @@ class Config extends Command {
     } else {
       userpass = this.dbUser;
     }
-    const uri =
+    return (
       'postgresql://' +
       userpass +
       '@' +
@@ -230,8 +230,8 @@ class Config extends Command {
       ':' +
       this.dbPort +
       '/' +
-      this.dbDatabase;
-    return uri;
+      this.dbDatabase
+    );
   }
 }
 

@@ -23,6 +23,9 @@
         "**/*.js",
         "**/*.jsx"
       ],
+      "plugins": [
+        "no-useless-assign"
+      ],
       "extends": [
         "eslint:recommended",
         "plugin:import/recommended",
@@ -42,6 +45,9 @@
       "parserOptions": {
         "project": "./tsconfig.dev.json"
       },
+      "plugins": [
+        "no-useless-assign"
+      ],
       "extends": [
         "eslint:recommended",
         "plugin:@typescript-eslint/recommended",
@@ -58,6 +64,7 @@
           "allowComputed": true
         }],
         "jest/no-disabled-tests": "off",
+        "no-useless-assign/no-useless-assign": "warn",
         "node/no-missing-import": "off",
         "node/no-unpublished-import": "off"
       }
@@ -79,7 +86,8 @@
       },
       "rules": {
         "@typescript-eslint/no-unused-vars": "off",
-        "no-empty-pattern": "off"
+        "no-empty-pattern": "off",
+        "no-useless-assign/no-useless-assign": "warn"
       }
     }
   ],

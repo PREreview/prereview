@@ -2,8 +2,7 @@
 
 function getErrorTypes(errorObject) {
   //
-  const keys = Object.keys(errorObject);
-  return keys; // e.g. returns such an array as ['params', 'body']
+  return Object.keys(errorObject); // e.g. returns such an array as ['params', 'body']
 }
 
 export function getErrorMessages(errorObject) {

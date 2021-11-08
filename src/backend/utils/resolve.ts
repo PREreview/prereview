@@ -87,7 +87,7 @@ async function scrapeUrl(
       preprintServer = publication;
     }
 
-    const preprint: PreprintMetadata = {
+    return {
       handle: `${handleType}:${handle}`,
       title: highwirePress.title ? highwirePress.title : undefined,
       abstractText:
@@ -109,8 +109,6 @@ async function scrapeUrl(
       contentUrl: highwirePress.pdf_url ? highwirePress.pdf_url : undefined,
       contentEncoding: highwirePress.pdf_url ? 'application/pdf' : undefined,
     };
-
-    return preprint;
   }
 }
 
@@ -137,7 +135,7 @@ async function searchGoogleScholar(handle: string): Promise<PreprintMetadata> {
     date.setFullYear(res[0].year);
     datePosted = date.toISOString();
   }
-  const metadata = {
+  return {
     handle: `doi:${handle}`,
     title: res[0].title,
     abstractText: res[0].description,
@@ -150,7 +148,6 @@ async function searchGoogleScholar(handle: string): Promise<PreprintMetadata> {
     contentUrl: res[0].pdf,
     contentEncoding: contentEncoding,
   };
-  return metadata;
 }
 
 function searchCrossRef(handle: string): Promise<PreprintMetadata> {

@@ -45,11 +45,10 @@ export default function RoleEditor({ persona, onCancel, onSaved }) {
 
   const dataUrlToFile = async dataURL => {
     const blob = await (await fetch(dataURL)).blob();
-    const file = new File([blob], 'fileName.jpg', {
+    return new File([blob], 'fileName.jpg', {
       type: 'image/jpeg',
       lastModified: new Date(),
     });
-    return file;
   };
 
   useEffect(() => {
