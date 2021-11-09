@@ -122,3 +122,5 @@ openapi.json
 
 # generated hooks
 src/frontend/hooks/api-hooks.tsx
+
+/.lfs-assets-id
