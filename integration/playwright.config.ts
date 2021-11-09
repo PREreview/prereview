@@ -9,7 +9,7 @@ const config: PlaywrightTestConfig = {
     video: 'retain-on-failure',
   },
   globalSetup: require.resolve('./src/global-setup'),
-  retries: parseInt(process.env.RETRIES) || 0,
+  retries: process.env.RETRIES ? parseInt(process.env.RETRIES) : 0,
   timeout: 60000,
   preserveOutput: 'failures-only',
   projects: [
