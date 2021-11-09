@@ -5,6 +5,7 @@ RUN apt-get install --yes --no-install-recommends \
   wait-for-it
 
 COPY \
+  .npmrc \
   package.json \
   package-lock.json \
   ./

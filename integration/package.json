@@ -1,7 +1,8 @@
 {
   "private": true,
   "engines": {
-    "node": "16"
+    "node": "16",
+    "npm": "8"
   },
   "dependencies": {
     "@playwright/test": "^1.14.1",
