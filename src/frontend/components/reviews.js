@@ -36,7 +36,7 @@ import {
 } from '../hooks/ui-hooks';
 
 // utils
-import { createPreprintId } from '../../common/utils/ids.js';
+import { createPreprintId } from '../../common/utils/ids';
 import { processParams, searchParamsToObject } from '../utils/search';
 
 // components

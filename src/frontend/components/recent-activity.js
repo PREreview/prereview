@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 
 //utils
 import { formatDistanceStrict } from 'date-fns';
-import { createPreprintId } from '../../common/utils/ids.js';
+import { createPreprintId } from '../../common/utils/ids';
 
 //material ui
 import Link from '@material-ui/core/Link';

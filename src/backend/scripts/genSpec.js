@@ -1,21 +1,21 @@
 import { SwaggerAPI } from 'koa-joi-router-docs';
-import preprintRoutes from '../controllers/preprint.js';
-import authWrapper from '../middleware/auth.js';
-import userRoutes from '../controllers/user.js';
-import fullReviewRoutes from '../controllers/fullReview.js';
-import commentRoutes from '../controllers/comment.js';
-import badgeRoutes from '../controllers/badge.js';
-import expertiseRoutes from '../controllers/expertise.js';
-import communityRoutes from '../controllers/community.js';
-import eventRoutes from '../controllers/event.js';
-import groupRoutes from '../controllers/group.js';
-import personaRoutes from '../controllers/persona.js';
-import rapidReviewRoutes from '../controllers/rapidReview.js';
-import reportRoutes from '../controllers/report.js';
-import requestRoutes from '../controllers/request.js';
-import tagRoutes from '../controllers/tag.js';
-import templateRoutes from '../controllers/template.js';
-import notificationRoutes from '../controllers/notification.js';
+import preprintRoutes from '../controllers/preprint';
+import authWrapper from '../middleware/auth';
+import userRoutes from '../controllers/user';
+import fullReviewRoutes from '../controllers/fullReview';
+import commentRoutes from '../controllers/comment';
+import badgeRoutes from '../controllers/badge';
+import expertiseRoutes from '../controllers/expertise';
+import communityRoutes from '../controllers/community';
+import eventRoutes from '../controllers/event';
+import groupRoutes from '../controllers/group';
+import personaRoutes from '../controllers/persona';
+import rapidReviewRoutes from '../controllers/rapidReview';
+import reportRoutes from '../controllers/report';
+import requestRoutes from '../controllers/request';
+import tagRoutes from '../controllers/tag';
+import templateRoutes from '../controllers/template';
+import notificationRoutes from '../controllers/notification';
 
 function docs() {
   const generator = new SwaggerAPI();

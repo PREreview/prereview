@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 
 // utils
 import { getFormattedDatePosted } from '../utils/preprints';
-import { createPreprintId } from '../../common/utils/ids.js';
+import { createPreprintId } from '../../common/utils/ids';
 
 // hooks
 import { useGetPreprint } from '../hooks/api-hooks.tsx';

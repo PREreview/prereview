@@ -4,7 +4,7 @@ import router from 'koa-joi-router';
 import anonymus from 'anonymus';
 import merge from 'lodash.merge';
 import { getLogger } from '../log.ts';
-import { getOrcidPerson, getOrcidWorks, processWorks } from '../utils/orcid.js';
+import { getOrcidPerson, getOrcidWorks, processWorks } from '../utils/orcid';
 
 const log = getLogger('backend:controllers:auth');
 

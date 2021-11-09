@@ -13,7 +13,7 @@ import { useGetCommunities, useGetTags } from '../hooks/api-hooks.tsx';
 import { processParams, searchParamsToObject } from '../utils/search';
 
 // components
-import CommunityCard from './CommunityCard.js';
+import CommunityCard from './CommunityCard';
 import HeaderBar from './header-bar';
 import Loading from './loading';
 import SearchBar from './search-bar';

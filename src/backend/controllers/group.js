@@ -1,6 +1,6 @@
 import router from 'koa-joi-router';
 import { getLogger } from '../log.ts';
-import { getErrorMessages } from '../utils/errors.js';
+import { getErrorMessages } from '../utils/errors';
 
 const Joi = router.Joi;
 const log = getLogger('backend:controllers:group');

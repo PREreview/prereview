@@ -5,7 +5,7 @@ import { subDays } from 'date-fns';
 import { useHistory, useLocation } from 'react-router-dom';
 
 // utils
-import { createPreprintId } from '../../common/utils/ids.js';
+import { createPreprintId } from '../../common/utils/ids';
 
 import { ORG } from '../constants';
 

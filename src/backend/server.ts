@@ -28,7 +28,7 @@ import serialize from 'serialize-javascript';
 import { createError } from './utils/http-errors';
 
 // Our middlewares
-import authWrapper from './middleware/auth.js'; // authorization/user roles
+import authWrapper from './middleware/auth'; // authorization/user roles
 import currentCommunity from './middleware/community';
 import currentPersona from './middleware/persona';
 import currentUser from './middleware/user';
@@ -58,25 +58,25 @@ import {
 } from './models';
 
 // Our controllers
-import AuthController from './controllers/auth.js'; // authentication/logins
-import BadgeController from './controllers/badge.js';
-import CommentController from './controllers/comment.js';
-import CommunityController from './controllers/community.js';
-import ExpertiseController from './controllers/expertise.js';
-import FullReviewController from './controllers/fullReview.js';
-import DraftController from './controllers/fullReviewDraft.js';
-import GroupController from './controllers/group.js';
-import UserController from './controllers/user.js';
-import PersonaController from './controllers/persona.js';
-import PreprintController from './controllers/preprint.js';
-import RapidController from './controllers/rapidReview.js';
-import ReportController from './controllers/report.js';
-import RequestController from './controllers/request.js';
-import TagController from './controllers/tag.js';
-import TemplateController from './controllers/template.js';
-import DocsController from './controllers/docs.js';
-import EventController from './controllers/event.js';
-import NotificationController from './controllers/notification.js';
+import AuthController from './controllers/auth'; // authentication/logins
+import BadgeController from './controllers/badge';
+import CommentController from './controllers/comment';
+import CommunityController from './controllers/community';
+import ExpertiseController from './controllers/expertise';
+import FullReviewController from './controllers/fullReview';
+import DraftController from './controllers/fullReviewDraft';
+import GroupController from './controllers/group';
+import UserController from './controllers/user';
+import PersonaController from './controllers/persona';
+import PreprintController from './controllers/preprint';
+import RapidController from './controllers/rapidReview';
+import ReportController from './controllers/report';
+import RequestController from './controllers/request';
+import TagController from './controllers/tag';
+import TemplateController from './controllers/template';
+import DocsController from './controllers/docs';
+import EventController from './controllers/event';
+import NotificationController from './controllers/notification';
 
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 

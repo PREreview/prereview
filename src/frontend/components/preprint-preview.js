@@ -5,7 +5,7 @@ import { useHistory } from 'react-router-dom';
 
 // utils
 import { getFormattedDatePosted } from '../utils/preprints';
-import { createPreprintId } from '../../common/utils/ids.js';
+import { createPreprintId } from '../../common/utils/ids';
 
 // Material UI components
 import { makeStyles } from '@material-ui/core/styles';

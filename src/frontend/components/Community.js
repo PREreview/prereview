@@ -6,7 +6,7 @@ import { Helmet } from 'react-helmet-async';
 import MuiSearchBar from 'material-ui-search-bar';
 import { useIntl } from 'react-intl';
 
-import { createPreprintId } from '../../common/utils/ids.js';
+import { createPreprintId } from '../../common/utils/ids';
 
 // contexts
 import UserProvider from '../contexts/user-context';

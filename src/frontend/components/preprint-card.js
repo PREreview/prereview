@@ -7,7 +7,7 @@ import { formatDistanceStrict } from 'date-fns';
 // utils
 import { getTags } from '../utils/stats';
 import { getFormattedDatePosted } from '../utils/preprints';
-import { createPreprintId, decodePreprintId } from '../../common/utils/ids.js';
+import { createPreprintId, decodePreprintId } from '../../common/utils/ids';
 
 // hooks
 import { useAnimatedScore } from '../hooks/score-hooks';

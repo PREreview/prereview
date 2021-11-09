@@ -34,7 +34,10 @@
         "plugin:promise/recommended",
         "plugin:react/recommended",
         "prettier"
-      ]
+      ],
+      "rules": {
+        "import/extensions": "error"
+      }
     },
     {
       "files": [
@@ -60,9 +63,13 @@
         "prettier"
       ],
       "rules": {
-        "import/namespace": ["error", {
-          "allowComputed": true
-        }],
+        "import/extensions": "error",
+        "import/namespace": [
+          "error",
+          {
+            "allowComputed": true
+          }
+        ],
         "jest/no-disabled-tests": "off",
         "no-useless-assign/no-useless-assign": "warn",
         "node/no-missing-import": "off",

@@ -8,7 +8,7 @@ import { useLocation } from 'react-router-dom';
 import { usePostRequests } from '../hooks/api-hooks.tsx';
 
 // utils
-import { createPreprintId } from '../../common/utils/ids.js';
+import { createPreprintId } from '../../common/utils/ids';
 
 // Material UI imports
 import { makeStyles } from '@material-ui/core/styles';
