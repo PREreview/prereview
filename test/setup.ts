@@ -1,4 +1,4 @@
-import { MikroORM, Reference, wrap } from '@mikro-orm/core';
+import { MikroORM } from '@mikro-orm/core';
 import { PostgreSqlDriver } from '@mikro-orm/postgresql';
 import faker from 'faker';
 import { RequestListener } from 'http';
@@ -16,11 +16,8 @@ import { Group, Key, Preprint, User } from '../src/backend/models/entities';
 import configServer from '../src/backend/server';
 import { fakeDoi } from './utils';
 
-type Groups = Record<'admins' | 'partners', Reference<Group>>;
-
 let orm: MikroORM<PostgreSqlDriver>;
 let backup: IBackup;
-let groups: Groups;
 
 global.beforeAll(async () => {
   nock.enableNetConnect('127.0.0.1');
@@ -30,16 +27,6 @@ global.beforeAll(async () => {
   const generator = orm.getSchemaGenerator();
 
   await generator.createSchema();
-
-  const groupWrapper = groupModelWrapper(orm);
-  const admins = groupWrapper.create({ name: 'admins' });
-  const partners = groupWrapper.create({ name: 'partners' });
-  await groupWrapper.persistAndFlush([admins, partners]);
-
-  groups = {
-    admins: wrap(admins).toReference(),
-    partners: wrap(partners).toReference(),
-  };
 
   backup = db.backup();
 });
@@ -69,7 +56,17 @@ export async function createPreprint(): Promise<Preprint> {
   return preprint;
 }
 
-export async function createUser(group?: keyof Groups): Promise<User> {
+export async function createGroup(name: string): Promise<Group> {
+  const groups = groupModelWrapper(orm);
+
+  const group = groups.create({ name });
+
+  await groups.persistAndFlush(group);
+
+  return group;
+}
+
+export async function createUser(group?: Group): Promise<User> {
   const users = userModelWrapper(orm);
   const personas = personaModelWrapper(orm);
 
@@ -81,7 +78,7 @@ export async function createUser(group?: keyof Groups): Promise<User> {
   });
   user.defaultPersona = publicPersona;
   if (group) {
-    user.groups.add(groups[group]);
+    user.groups.add(group);
   }
 
   await users.persistAndFlush(user);

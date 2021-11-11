@@ -2,6 +2,7 @@ import { StatusCodes } from 'http-status-codes';
 import request from 'supertest';
 import {
   createApiKey,
+  createGroup,
   createPreprint,
   createServer,
   createUser,
@@ -64,7 +65,8 @@ describe('requests', () => {
 
 describe('author requests', () => {
   it.skip('are ignored when not a partner', async () => {
-    const user = await createUser();
+    const group = await createGroup('not-partners');
+    const user = await createUser(group);
     const apiKey = await createApiKey(user);
     const preprint = await createPreprint();
     const server = await createServer();
@@ -95,8 +97,9 @@ describe('author requests', () => {
     });
   });
 
-  it.skip('can be created', async () => {
-    const user = await createUser('partners');
+  it.skip('can be created by a partner', async () => {
+    const group = await createGroup('partners');
+    const user = await createUser(group);
     const apiKey = await createApiKey(user);
     const preprint = await createPreprint();
     const server = await createServer();
