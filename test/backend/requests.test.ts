@@ -64,7 +64,7 @@ describe('requests', () => {
 });
 
 describe('author requests', () => {
-  it.skip('are ignored when not a partner', async () => {
+  it('are ignored when not a partner', async () => {
     const group = await createGroup('not-partners');
     const user = await createUser(group);
     const apiKey = await createApiKey(user);
@@ -97,7 +97,7 @@ describe('author requests', () => {
     });
   });
 
-  it.skip('can be created by a partner', async () => {
+  it('can be created by a partner', async () => {
     const group = await createGroup('partners');
     const user = await createUser(group);
     const apiKey = await createApiKey(user);

@@ -44,7 +44,7 @@ export default function controller(reqModel, preprintModel, thisUser) {
   };
 
   const postHandler = async ctx => {
-    let request, preprint, authorPersona; // pid = preprint ID
+    let request, preprint; // pid = preprint ID
 
     if (ctx.params.pid) {
       preprint = await preprintModel.findOneByUuidOrHandle(ctx.params.pid);
@@ -54,15 +54,15 @@ export default function controller(reqModel, preprintModel, thisUser) {
       log.error('HTTP 404 Error: Preprint not found');
       ctx.throw(404, 'Preprint not found');
     }
-    authorPersona = await thisUser.getUser(ctx).then(user => user.defaultPersona);
+    const user = await thisUser.getUser(ctx);
 
     log.debug(`Adding a request.`);
 
     let isPreprintAuthor = false;
     if (
       ctx.query.isAuthor &&
-      (await thisUser.isMemberOf('partners', authorPersona.uuid) ||
-        await thisUser.isMemberOf('admins', authorPersona.uuid))
+      (await thisUser.isMemberOf('partners', user.orcid) ||
+        await thisUser.isMemberOf('admins', user.orcid))
     ) {
       isPreprintAuthor = true;
     }
@@ -71,7 +71,7 @@ export default function controller(reqModel, preprintModel, thisUser) {
       preprint.isPublished = true;
       request = reqModel.create({
         preprint,
-        author: authorPersona,
+        author: user.defaultPersona,
         isPreprintAuthor,
       });
       await reqModel.persistAndFlush(request);
