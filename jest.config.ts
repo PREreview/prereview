@@ -8,6 +8,7 @@ const config: Config.InitialOptions = {
     },
   },
   preset: 'ts-jest/presets/js-with-ts',
+  rootDir: 'test',
   testTimeout: 30 * 1000,
   verbose: true,
 };
