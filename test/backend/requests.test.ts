@@ -61,3 +61,69 @@ describe('requests', () => {
     });
   });
 });
+
+describe('author requests', () => {
+  it.skip('are ignored when not a partner', async () => {
+    const user = await createUser();
+    const apiKey = await createApiKey(user);
+    const preprint = await createPreprint();
+    const server = await createServer();
+
+    const response = await request(server)
+      .post(`/api/v2/preprints/${preprint.uuid}/requests?isAuthor=true`)
+      .set({
+        'X-API-App': apiKey.app,
+        'X-API-Key': apiKey.secret,
+      })
+      .send({});
+
+    expect(response.status).toBe(StatusCodes.CREATED);
+    expect(response.type).toBe('application/json');
+    expect(response.body).toStrictEqual({
+      message: 'created',
+      status: StatusCodes.CREATED,
+    });
+
+    const listResponse = await request(server).get(
+      `/api/v2/preprints/${preprint.uuid}/requests`,
+    );
+
+    expect(listResponse.status).toBe(StatusCodes.OK);
+    expect(listResponse.type).toBe('application/json');
+    expect(listResponse.body).toMatchObject({
+      data: [{ isPreprintAuthor: false }],
+    });
+  });
+
+  it.skip('can be created', async () => {
+    const user = await createUser('partners');
+    const apiKey = await createApiKey(user);
+    const preprint = await createPreprint();
+    const server = await createServer();
+
+    const response = await request(server)
+      .post(`/api/v2/preprints/${preprint.uuid}/requests?isAuthor=true`)
+      .set({
+        'X-API-App': apiKey.app,
+        'X-API-Key': apiKey.secret,
+      })
+      .send({});
+
+    expect(response.status).toBe(StatusCodes.CREATED);
+    expect(response.type).toBe('application/json');
+    expect(response.body).toStrictEqual({
+      message: 'created',
+      status: StatusCodes.CREATED,
+    });
+
+    const listResponse = await request(server).get(
+      `/api/v2/preprints/${preprint.uuid}/requests`,
+    );
+
+    expect(listResponse.status).toBe(StatusCodes.OK);
+    expect(listResponse.type).toBe('application/json');
+    expect(listResponse.body).toMatchObject({
+      data: [{ isPreprintAuthor: true }],
+    });
+  });
+});
