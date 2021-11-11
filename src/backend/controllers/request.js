@@ -61,8 +61,8 @@ export default function controller(reqModel, preprintModel, thisUser) {
     let isPreprintAuthor = false;
     if (
       ctx.query.isAuthor &&
-      (thisUser.isMemberOf('partners', authorPersona.uuid) ||
-        thisUser.isMemberOf('admins', authorPersona.uuid))
+      (await thisUser.isMemberOf('partners', authorPersona.uuid) ||
+        await thisUser.isMemberOf('admins', authorPersona.uuid))
     ) {
       isPreprintAuthor = true;
     }
