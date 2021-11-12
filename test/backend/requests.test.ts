@@ -43,22 +43,11 @@ describe('requests', () => {
     expect(response.body).toStrictEqual({
       message: 'created',
       status: StatusCodes.CREATED,
-    });
-
-    const listResponse = await request(server).get(
-      `/api/v2/preprints/${preprint.uuid}/requests`,
-    );
-
-    expect(listResponse.status).toBe(StatusCodes.OK);
-    expect(listResponse.type).toBe('application/json');
-    expect(listResponse.body).toMatchObject({
-      data: [
-        {
-          author: user.id,
-          isPreprintAuthor: false,
-          preprint: preprint.id,
-        },
-      ],
+      data: expect.objectContaining({
+        author: user.id,
+        isPreprintAuthor: false,
+        preprint: preprint.id,
+      }),
     });
   });
 });
@@ -84,16 +73,11 @@ describe('author requests', () => {
     expect(response.body).toStrictEqual({
       message: 'created',
       status: StatusCodes.CREATED,
-    });
-
-    const listResponse = await request(server).get(
-      `/api/v2/preprints/${preprint.uuid}/requests`,
-    );
-
-    expect(listResponse.status).toBe(StatusCodes.OK);
-    expect(listResponse.type).toBe('application/json');
-    expect(listResponse.body).toMatchObject({
-      data: [{ isPreprintAuthor: false }],
+      data: expect.objectContaining({
+        author: user.id,
+        isPreprintAuthor: false,
+        preprint: preprint.id,
+      }),
     });
   });
 
@@ -117,16 +101,11 @@ describe('author requests', () => {
     expect(response.body).toStrictEqual({
       message: 'created',
       status: StatusCodes.CREATED,
-    });
-
-    const listResponse = await request(server).get(
-      `/api/v2/preprints/${preprint.uuid}/requests`,
-    );
-
-    expect(listResponse.status).toBe(StatusCodes.OK);
-    expect(listResponse.type).toBe('application/json');
-    expect(listResponse.body).toMatchObject({
-      data: [{ isPreprintAuthor: true }],
+      data: expect.objectContaining({
+        author: user.id,
+        isPreprintAuthor: true,
+        preprint: preprint.id,
+      }),
     });
   });
 });

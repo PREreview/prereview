@@ -43,6 +43,10 @@ const rapidReviewSchema = z.object({
   uuid: z.string(),
 });
 
+const requestSchema = z.object({
+  uuid: z.string(),
+})
+
 const templateSchema = z.object({
   uuid: z.string(),
   title: z.string(),
@@ -74,6 +78,8 @@ export type FullReview = z.infer<typeof fullReviewSchema>;
 export type Preprint = z.infer<typeof preprintSchema>;
 
 export type RapidReview = z.infer<typeof rapidReviewSchema>;
+
+export type Request = z.infer<typeof requestSchema>;
 
 export type Template = z.infer<typeof templateSchema>;
 
@@ -108,16 +114,16 @@ export async function ensurePreprint(
 export async function ensureRequest(
   fetch: Fetch,
   preprint: string,
-): Promise<unknown> {
+): Promise<Request> {
   const requests = await fetch(`/api/v2/preprints/${preprint}/requests`, {
     headers: adminHeaders,
   })
     .then(response => response.json())
-    .then(dataSchema(z.array(z.unknown())).parse)
+    .then(dataSchema(z.array(requestSchema)).parse)
     .then(response => response.data);
 
   if (requests.length > 0) {
-    return;
+    return requests[0];
   }
 
   return await fetch(`/api/v2/preprints/${preprint}/requests`, {
@@ -127,7 +133,11 @@ export async function ensureRequest(
       'Content-Type': 'application/json',
       ...adminHeaders,
     },
-  }).then(ensureSuccess);
+  })
+    .then(ensureSuccess)
+    .then(response => response.json())
+    .then(dataSchema(requestSchema).parse)
+    .then(response => response.data);
 }
 
 export async function ensureFullReview(

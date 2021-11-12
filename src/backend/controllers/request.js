@@ -83,6 +83,7 @@ export default function controller(reqModel, preprintModel, thisUser) {
     ctx.body = {
       status: 201,
       message: 'created',
+      data: request,
     };
     ctx.status = 201;
   };
