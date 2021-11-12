@@ -16,11 +16,13 @@ import {
   ensureCommunity,
   ensureFullReview,
   ensurePreprint,
+  ensureRequestByAuthor,
   ensureTemplate,
   findUser,
   FullReview,
   Preprint,
   RapidReview,
+  Request,
   Template,
   User,
 } from './api';
@@ -41,6 +43,7 @@ type DataFixtures = {
   community: Community;
   fullReview: FullReview;
   preprint: Preprint;
+  requestByAuthor: Request;
   template: Template;
 };
 
@@ -114,6 +117,11 @@ export const dataFixtures: Fixtures<
     });
 
     await use(preprint);
+  },
+  requestByAuthor: async ({ fetch, preprint }, use) => {
+    const requestByAuthor = await ensureRequestByAuthor(fetch, preprint.uuid);
+
+    await use(requestByAuthor);
   },
   template: async ({ community, faker, fetch }, use) => {
     const template = await ensureTemplate(fetch, community.uuid, {

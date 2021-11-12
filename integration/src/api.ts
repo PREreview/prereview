@@ -45,6 +45,7 @@ const rapidReviewSchema = z.object({
 
 const requestSchema = z.object({
   uuid: z.string(),
+  isPreprintAuthor: z.boolean(),
 })
 
 const templateSchema = z.object({
@@ -127,6 +128,36 @@ export async function ensureRequest(
   }
 
   return await fetch(`/api/v2/preprints/${preprint}/requests`, {
+    method: 'POST',
+    body: JSON.stringify({ preprint }),
+    headers: {
+      'Content-Type': 'application/json',
+      ...adminHeaders,
+    },
+  })
+    .then(ensureSuccess)
+    .then(response => response.json())
+    .then(dataSchema(requestSchema).parse)
+    .then(response => response.data);
+}
+
+export async function ensureRequestByAuthor(
+  fetch: Fetch,
+  preprint: string,
+): Promise<Request> {
+  const request = await fetch(`/api/v2/preprints/${preprint}/requests`, {
+    headers: adminHeaders,
+  })
+    .then(response => response.json())
+    .then(dataSchema(z.array(requestSchema)).parse)
+    .then(response => response.data)
+    .then(requests => requests.find(request => request.isPreprintAuthor));
+
+  if (request) {
+    return request;
+  }
+
+  return await fetch(`/api/v2/preprints/${preprint}/requests?isAuthor=true`, {
     method: 'POST',
     body: JSON.stringify({ preprint }),
     headers: {
