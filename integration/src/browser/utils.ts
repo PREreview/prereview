@@ -1,5 +1,6 @@
 import {
   ElementHandle,
+  Frame,
   Locator,
   Page,
   PageScreenshotOptions,
@@ -15,32 +16,32 @@ export async function screenshot(
   focus?: Locator | string,
 ): Promise<Buffer>;
 export async function screenshot(
-  page: Page | Locator,
+  item: Page | Locator,
   focus?: Locator | string,
 ): Promise<Buffer> {
-  if (isLocator(page)) {
-    return safeScreenshot(page);
+  if (isPage(item)) {
+    await Promise.all(item.frames().map((frame) => frame.waitForLoadState()));
   }
 
-  await Promise.all(page.frames().map(frame => frame.waitForLoadState()));
-
-  if (typeof focus === 'string') {
-    focus = page.locator(focus);
-  }
+  const frame = await getFrame(item);
 
   await Promise.all([
-    hideTwitterTimelines(page),
-    resetCarousels(page),
-    removeTransitions(page),
+    hideTwitterTimelines(frame),
+    resetCarousels(frame),
+    removeTransitions(frame),
   ]);
 
-  if (focus) {
-    await focus.scrollIntoViewIfNeeded();
-
-    return safeScreenshot(page);
+  if (isLocator(item)) {
+    return safeScreenshot(item);
   }
 
-  return safeScreenshot(page, { fullPage: true });
+  if (focus) {
+    await toLocator(item, focus).scrollIntoViewIfNeeded();
+
+    return safeScreenshot(item);
+  }
+
+  return safeScreenshot(item, { fullPage: true });
 }
 
 async function safeScreenshot(
@@ -63,8 +64,8 @@ function blur(image: Buffer) {
   return PNG.sync.write(png, { filterType: 4 });
 }
 
-async function hideTwitterTimelines(page: Page) {
-  await page.addStyleTag({
+async function hideTwitterTimelines(frame: Frame) {
+  await frame.addStyleTag({
     content: `
       .twitter-timeline {
         visibility: hidden !important;
@@ -73,8 +74,8 @@ async function hideTwitterTimelines(page: Page) {
   });
 }
 
-async function resetCarousels(page: Page) {
-  const carouselControls = await page.$$('.slick-dots :text("1")');
+async function resetCarousels(frame: Frame) {
+  const carouselControls = await frame.$$('.slick-dots :text("1")');
 
   await Promise.all(
     carouselControls.map(async controls => {
@@ -85,8 +86,8 @@ async function resetCarousels(page: Page) {
   );
 }
 
-async function removeTransitions(page: Page) {
-  await page.addStyleTag({
+async function removeTransitions(frame: Frame) {
+  await frame.addStyleTag({
     content: `
         *,
         *::before,
@@ -120,6 +121,46 @@ async function getVisibleRatio(element: ElementHandle<Element>) {
   });
 }
 
+async function getFrame(item: ElementHandle | Page | Locator): Promise<Frame> {
+  if (isLocator(item)) {
+    const handle = await item.elementHandle();
+
+    if (!handle) {
+      throw new Error('Unable to find a handle');
+    }
+
+    return getFrame(handle);
+  }
+
+  if (isElementHandle(item)) {
+    const frame = await item.ownerFrame();
+
+    if (!frame) {
+      throw new Error('Unable to find a frame');
+    }
+
+    return frame;
+  }
+
+  return item.mainFrame();
+}
+
+function toLocator(page: Page, locator: string | Locator) {
+  if (isLocator(locator)) {
+    return locator;
+  }
+
+  return page.locator(locator);
+}
+
+function isElementHandle(item: unknown): item is ElementHandle {
+  return typeof item === 'object' && item !== null && 'contentFrame' in item;
+}
+
 function isLocator(item: unknown): item is Locator {
   return typeof item === 'object' && item !== null && 'elementHandle' in item;
+}
+
+function isPage(item: unknown): item is Page {
+  return typeof item === 'object' && item !== null && 'mainFrame' in item;
 }
