@@ -98,6 +98,18 @@ export async function ensurePreprint(
       .then(preprintSchema.parse);
   }
 
+  const preprints = await fetch(`/api/v2/preprints/${encodeHandle(data.handle)}`, {
+    headers: adminHeaders,
+  })
+    .then(response => response.json())
+    .then(dataSchema(z.array(preprintSchema)).parse)
+    .then(response => response.data)
+    .catch(() => []);
+
+  if (preprints.length > 0) {
+    return preprints[0];
+  }
+
   return await fetch(`/api/v2/preprints`, {
     method: 'POST',
     body: JSON.stringify(data),
@@ -355,4 +367,8 @@ export async function findUser(
     .then(response => response.json())
     .then(dataSchema(z.array(userSchema)).parse)
     .then(response => response.data.find(user => user.orcid === orcid));
+}
+
+function encodeHandle(handle: string): string {
+  return handle.replace(/-/g, '+').replace(/[:/]/g, '-');
 }
