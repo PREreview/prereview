@@ -28,7 +28,7 @@ export async function screenshot(
   await Promise.all([
     hideTwitterTimelines(frame),
     resetCarousels(frame),
-    removeTransitions(frame),
+    removeAnimations(frame),
   ]);
 
   if (isLocator(item)) {
@@ -86,15 +86,18 @@ async function resetCarousels(frame: Frame) {
   );
 }
 
-async function removeTransitions(frame: Frame) {
+async function removeAnimations(frame: Frame) {
   await frame.addStyleTag({
     content: `
-        *,
-        *::before,
-        *::after {
-          transition: none !important;
-        }
-      `,
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+      }
+    `,
   });
 }
 
