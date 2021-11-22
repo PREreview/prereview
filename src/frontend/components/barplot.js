@@ -147,7 +147,7 @@ export default function Barplot({ stats, nReviews, children }) {
                       style={{ width: `${(yes.length / nReviews) * 100}%` }}
                     >
                       <Typography className={classes.responseText}>
-                        {`${(yes.length / nReviews) * 100}%`}
+                        {`${Math.round((yes.length / nReviews) * 100)}%`}
                       </Typography>
                     </Grid>
                     <Grid
@@ -158,7 +158,7 @@ export default function Barplot({ stats, nReviews, children }) {
                       style={{ width: `${(unsure.length / nReviews) * 100}%` }}
                     >
                       <Typography className={classes.responseText}>
-                        {`${(unsure.length / nReviews) * 100}%`}
+                        {`${Math.round((unsure.length / nReviews) * 100)}%`}
                       </Typography>
                     </Grid>
                     <Grid
@@ -167,7 +167,7 @@ export default function Barplot({ stats, nReviews, children }) {
                       style={{ width: `${(na.length / nReviews) * 100}%` }}
                     >
                       <Typography className={classes.responseText}>
-                        {`${(na.length / nReviews) * 100}%`}
+                        {`${Math.round((na.length / nReviews) * 100)}%`}
                       </Typography>
                     </Grid>
                     <Grid
@@ -176,7 +176,7 @@ export default function Barplot({ stats, nReviews, children }) {
                       style={{ width: `${(no.length / nReviews) * 100}%` }}
                     >
                       <Typography className={classes.responseText}>
-                        {`${(no.length / nReviews) * 100}%`}
+                        {`${Math.round((no.length / nReviews) * 100)}%`}
                       </Typography>
                     </Grid>
                   </Grid>

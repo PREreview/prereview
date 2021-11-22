@@ -76,7 +76,7 @@ describe('<Barplot />', () => {
 
     it('displays the stats', async () => {
       expect(container.querySelector('li:nth-child(1)')).toHaveTextContent(
-        'Question 166.66666666666666%0%0%33.33333333333333%',
+        'Question 167%0%0%33%',
       );
       expect(container.querySelector('li:nth-child(2)')).toHaveTextContent(
         'Question 20%50%50%0%',
