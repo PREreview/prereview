@@ -53,6 +53,7 @@ export default function controller(rapidReviews, preprints, thisUser) {
       const options = {
         fields: getFields(
           'RapidReview',
+          rapidReviews.em.getMetadata(),
           ctx.query.include_images
             ? ctx.query.include_images.split(',')
             : undefined,

@@ -207,6 +207,7 @@ export default function controller(preprints, thisUser) {
         const options = {
           fields: getFields(
             'Preprint',
+            preprints.em.getMetadata(),
             ctx.query.include_images
               ? ctx.query.include_images.split(',')
               : undefined,
@@ -358,6 +359,7 @@ export default function controller(preprints, thisUser) {
         const options = {
           fields: getFields(
             'Preprint',
+            preprints.em.getMetadata(),
             ctx.query.include_images
               ? ctx.query.include_images.split(',')
               : undefined,

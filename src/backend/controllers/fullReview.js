@@ -73,6 +73,7 @@ export default function controller(
       const options = {
         fields: getFields(
           'FullReview',
+          reviewModel.em.getMetadata(),
           ctx.query.include_images
             ? ctx.query.include_images.split(',')
             : undefined,

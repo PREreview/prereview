@@ -181,6 +181,7 @@ export default function controller(
         const options = {
           fields: getFields(
             'Community',
+            communityModel.em.getMetadata(),
             ctx.query.include_images
               ? ctx.query.include_images.split(',')
               : undefined,
@@ -280,6 +281,7 @@ export default function controller(
         const options = {
           fields: getFields(
             'Community',
+            communityModel.em.getMetadata(),
             ctx.query.include_images
               ? ctx.query.include_images.split(',')
               : undefined,
