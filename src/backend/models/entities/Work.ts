@@ -1,38 +1,15 @@
-import {
-  Entity,
-  EntityRepositoryType,
-  Index,
-  ManyToOne,
-  Property,
-} from '@mikro-orm/core';
+import { EntitySchema } from '@mikro-orm/core';
 import { WorkModel } from '../works';
 import { BaseEntity } from './BaseEntity';
 import { User } from './User';
 
-@Entity()
-@Index({ properties: ['author'] })
 export class Work extends BaseEntity {
-  [EntityRepositoryType]?: WorkModel;
-
-  @Property({ columnType: 'text', nullable: true })
   title?: string;
-
-  @ManyToOne({ entity: () => User })
   author!: User;
-
-  @Property({ columnType: 'text', nullable: true })
   url?: string;
-
-  @Property({ nullable: true })
   type?: string;
-
-  @Property({ nullable: true })
   handle?: string;
-
-  @Property({ nullable: true })
   publicationDate?: Date;
-
-  @Property({ columnType: 'text', nullable: true })
   publisher?: string;
 
   constructor(
@@ -54,3 +31,18 @@ export class Work extends BaseEntity {
     this.publisher = publisher;
   }
 }
+
+export const workSchema = new EntitySchema<Work, BaseEntity>({
+  class: Work,
+  customRepository: () => WorkModel,
+  indexes: [{ properties: ['author'] }],
+  properties: {
+    title: { type: 'string', columnType: 'text', nullable: true },
+    author: { reference: 'm:1', entity: () => User },
+    url: { type: 'string', columnType: 'text', nullable: true },
+    type: { type: 'string', nullable: true },
+    handle: { type: 'string', nullable: true },
+    publicationDate: { type: 'Date', nullable: true },
+    publisher: { type: 'string', columnType: 'text', nullable: true },
+  },
+});

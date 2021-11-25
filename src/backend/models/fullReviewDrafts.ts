@@ -1,7 +1,6 @@
-import { EntityRepository, MikroORM, Repository } from '@mikro-orm/core';
+import { EntityRepository, MikroORM } from '@mikro-orm/core';
 import { FullReviewDraft } from './entities';
 
-@Repository(FullReviewDraft)
 export class FullReviewDraftModel extends EntityRepository<FullReviewDraft> {
   async search(query: string): Promise<unknown> {
     const connection = this.em.getConnection();

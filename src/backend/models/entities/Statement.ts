@@ -1,31 +1,13 @@
-import {
-  Entity,
-  EntityRepositoryType,
-  Index,
-  ManyToOne,
-  Property,
-} from '@mikro-orm/core';
+import { EntitySchema } from '@mikro-orm/core';
 import { StatementModel } from '../statements';
 import { BaseEntity } from './BaseEntity';
 import { FullReview } from './FullReview';
 import { Persona } from './Persona';
 
-@Entity()
-@Index({ properties: ['author'] })
-@Index({ properties: ['parent'] })
 export class Statement extends BaseEntity {
-  [EntityRepositoryType]?: StatementModel;
-
-  @Property({ columnType: 'text' })
   contents!: string;
-
-  @Property()
   isFlagged: boolean = false;
-
-  @ManyToOne({ entity: () => Persona })
   author!: Persona;
-
-  @ManyToOne({ entity: () => FullReview })
   parent!: FullReview;
 
   constructor(contents: string, author: Persona, parent: FullReview) {
@@ -35,3 +17,15 @@ export class Statement extends BaseEntity {
     this.parent = parent;
   }
 }
+
+export const statementSchema = new EntitySchema<Statement, BaseEntity>({
+  class: Statement,
+  customRepository: () => StatementModel,
+  indexes: [{ properties: ['author'] }, { properties: ['parent'] }],
+  properties: {
+    contents: { type: 'string', columnType: 'text' },
+    isFlagged: { type: 'boolean' },
+    author: { reference: 'm:1', entity: () => Persona },
+    parent: { reference: 'm:1', entity: () => FullReview },
+  },
+});

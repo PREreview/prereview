@@ -1,38 +1,15 @@
-import {
-  Entity,
-  EntityRepositoryType,
-  Index,
-  ManyToOne,
-  Property,
-} from '@mikro-orm/core';
+import { EntitySchema } from '@mikro-orm/core';
 import { ContactModel } from '../contacts';
 import { BaseEntity } from './BaseEntity';
 import { User } from './User';
 
-@Entity()
-@Index({ properties: ['identity'] })
 export class Contact extends BaseEntity {
-  [EntityRepositoryType]?: ContactModel;
-
-  @Property()
   schema!: string;
-
-  @Property()
   value!: string;
-
-  @ManyToOne({ entity: () => User })
   identity!: User;
-
-  @Property()
   isVerified: boolean;
-
-  @Property()
   isNotified: boolean;
-
-  @Property()
   isPublic: boolean;
-
-  @Property({ nullable: true })
   token?: string;
 
   constructor(
@@ -52,3 +29,18 @@ export class Contact extends BaseEntity {
     this.isPublic = isPublic;
   }
 }
+
+export const contactSchema = new EntitySchema<Contact, BaseEntity>({
+  class: Contact,
+  customRepository: () => ContactModel,
+  indexes: [{ properties: 'identity' }],
+  properties: {
+    schema: { type: 'string' },
+    value: { type: 'string' },
+    identity: { reference: 'm:1', entity: () => User },
+    isVerified: { type: 'boolean' },
+    isNotified: { type: 'boolean' },
+    isPublic: { type: 'boolean' },
+    token: { type: 'string', nullable: true },
+  },
+});

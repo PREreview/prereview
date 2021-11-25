@@ -1,5 +1,4 @@
 import router from 'koa-joi-router';
-import 'reflect-metadata';
 import { QueryOrder } from '@mikro-orm/core';
 import { getLogger } from '../log.ts';
 import { resolvePreprint } from '../utils/resolve.ts';

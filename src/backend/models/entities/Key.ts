@@ -1,25 +1,12 @@
-import {
-  Entity,
-  EntityRepositoryType,
-  ManyToOne,
-  Property,
-} from '@mikro-orm/core';
+import { EntitySchema } from '@mikro-orm/core';
 import uuidApiKey from 'uuid-apikey';
 import { KeyModel } from '../keys';
 import { BaseEntity } from './BaseEntity';
 import { User } from './User';
 
-@Entity()
 export class Key extends BaseEntity {
-  [EntityRepositoryType]?: KeyModel;
-
-  @ManyToOne({ entity: () => User })
   owner!: User;
-
-  @Property()
   app!: string;
-
-  @Property()
   secret!: string;
 
   constructor(owner: User, app: string) {
@@ -29,3 +16,13 @@ export class Key extends BaseEntity {
     this.secret = uuidApiKey.create().apiKey;
   }
 }
+
+export const keySchema = new EntitySchema<Key, BaseEntity>({
+  class: Key,
+  customRepository: () => KeyModel,
+  properties: {
+    owner: { reference: 'm:1', entity: () => User },
+    app: { type: 'string' },
+    secret: { type: 'string' },
+  },
+});

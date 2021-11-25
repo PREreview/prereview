@@ -1,12 +1,4 @@
-import {
-  Collection,
-  Entity,
-  EntityRepositoryType,
-  ManyToMany,
-  OneToMany,
-  Property,
-  Unique,
-} from '@mikro-orm/core';
+import { Collection, EntitySchema } from '@mikro-orm/core';
 import { CommunityModel } from '../communities';
 import { BaseEntity } from './BaseEntity';
 import { Event } from './Event';
@@ -16,46 +8,18 @@ import { Tag } from './Tag';
 import { Template } from './Template';
 import { User } from './User';
 
-@Entity()
 export class Community extends BaseEntity {
-  [EntityRepositoryType]?: CommunityModel;
-
-  @Property()
-  @Unique()
   name!: string;
-
-  @Property()
-  @Unique()
   slug!: string;
-
-  @Property({ columnType: 'text', nullable: true })
   description?: string;
-
-  @Property({ nullable: true })
   banner?: Buffer;
-
-  @Property({ nullable: true })
   logo?: Buffer;
-
-  @Property({ nullable: true })
   twitter?: string;
-
-  @ManyToMany({ entity: () => Persona, inversedBy: 'communities' })
   members: Collection<Persona> = new Collection<Persona>(this);
-
-  @ManyToMany({ entity: () => User, inversedBy: 'owned' })
   owners: Collection<User> = new Collection<User>(this);
-
-  @ManyToMany({ entity: () => Preprint, inversedBy: 'communities' })
   preprints: Collection<Preprint> = new Collection<Preprint>(this);
-
-  @OneToMany({ entity: () => Event, mappedBy: 'community' })
   events: Collection<Event> = new Collection<Event>(this);
-
-  @ManyToMany({ entity: () => Tag, inversedBy: 'communities' })
   tags: Collection<Tag> = new Collection<Tag>(this);
-
-  @OneToMany({ entity: () => Template, mappedBy: 'community' })
   templates: Collection<Template> = new Collection<Template>(this);
 
   constructor(
@@ -71,3 +35,46 @@ export class Community extends BaseEntity {
     this.twitter = twitter;
   }
 }
+
+export const communitySchema = new EntitySchema<Community, BaseEntity>({
+  class: Community,
+  customRepository: () => CommunityModel,
+  properties: {
+    name: { type: 'string', unique: true },
+    slug: { type: 'string', unique: true },
+    description: { type: 'string', columnType: 'text', nullable: true },
+    banner: { type: 'Buffer', nullable: true },
+    logo: { type: 'Buffer', nullable: true },
+    twitter: { type: 'string', nullable: true },
+    members: {
+      reference: 'm:n',
+      entity: () => Persona,
+      inversedBy: (persona) => persona.communities,
+    },
+    owners: {
+      reference: 'm:n',
+      entity: () => User,
+      inversedBy: (user) => user.owned,
+    },
+    preprints: {
+      reference: 'm:n',
+      entity: () => Preprint,
+      inversedBy: (preprint) => preprint.communities,
+    },
+    events: {
+      reference: '1:m',
+      entity: () => Event,
+      mappedBy: (event) => event.community,
+    },
+    tags: {
+      reference: 'm:n',
+      entity: () => Tag,
+      inversedBy: (tag) => tag.communities,
+    },
+    templates: {
+      reference: '1:m',
+      entity: () => Template,
+      mappedBy: (template) => template.community,
+    },
+  },
+});

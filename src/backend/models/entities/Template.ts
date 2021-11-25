@@ -1,28 +1,11 @@
-import {
-  Entity,
-  EntityRepositoryType,
-  Index,
-  ManyToOne,
-  Property,
-  Unique,
-} from '@mikro-orm/core';
+import { EntitySchema } from '@mikro-orm/core';
 import { TemplateModel } from '../templates';
 import { BaseEntity } from './BaseEntity';
 import { Community } from './Community';
 
-@Entity()
-@Index({ properties: ['community'] })
 export class Template extends BaseEntity {
-  [EntityRepositoryType]?: TemplateModel;
-
-  @Property()
-  @Unique()
   title!: string;
-
-  @Property({ columnType: 'text' })
   contents!: string;
-
-  @ManyToOne({ entity: () => Community, nullable: true })
   community?: Community;
 
   constructor(title: string, contents: string, community?: Community) {
@@ -32,3 +15,14 @@ export class Template extends BaseEntity {
     this.community = community;
   }
 }
+
+export const templateSchema = new EntitySchema<Template, BaseEntity>({
+  class: Template,
+  customRepository: () => TemplateModel,
+  indexes: [{ properties: ['community'] }],
+  properties: {
+    title: { type: 'string', unique: true },
+    contents: { type: 'string', columnType: 'text' },
+    community: { reference: 'm:1', entity: () => Community, nullable: true },
+  },
+});

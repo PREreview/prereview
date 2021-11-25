@@ -1,4 +1,4 @@
-import { EntityRepository, MikroORM, Repository } from '@mikro-orm/core';
+import { EntityRepository, MikroORM } from '@mikro-orm/core';
 import { ORCID as orcidUtils } from 'orcid-utils';
 import { validate as uuidValidate } from 'uuid';
 import { Group, User } from './entities';
@@ -6,7 +6,6 @@ import { getLogger } from '../log';
 
 const log = getLogger('backend:models:groups');
 
-@Repository(Group)
 export class GroupModel extends EntityRepository<Group> {
   async isMemberOf(groupName: string, userId: string): Promise<boolean> {
     const group = await this.findOne({ name: groupName }, ['members']);

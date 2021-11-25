@@ -1,10 +1,9 @@
-import { EntityRepository, MikroORM, Repository } from '@mikro-orm/core';
+import { EntityRepository, MikroORM } from '@mikro-orm/core';
 import { ORCID as orcidUtils } from 'orcid-utils';
 import { validate as uuidValidate } from 'uuid';
 import { User } from './entities';
 import ChainedError from 'typescript-chained-error';
 
-@Repository(User)
 export class UserModel extends EntityRepository<User> {
   findOneByUuidOrOrcid(value: string, params: string[]): Promise<User | null> {
     try {

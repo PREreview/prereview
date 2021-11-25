@@ -1,31 +1,13 @@
-import {
-  Collection,
-  Entity,
-  EntityRepositoryType,
-  ManyToMany,
-  Property,
-  Unique,
-} from '@mikro-orm/core';
+import { Collection, EntitySchema } from '@mikro-orm/core';
 import { TagModel } from '../tags';
 import { BaseEntity } from './BaseEntity';
 import { Community } from './Community';
 import { Preprint } from './Preprint';
 
-@Entity()
 export class Tag extends BaseEntity {
-  [EntityRepositoryType]?: TagModel;
-
-  @Property()
-  @Unique()
   name!: string;
-
-  @Property()
   color?: string;
-
-  @ManyToMany({ entity: () => Preprint, inversedBy: 'tags' })
   preprints: Collection<Preprint> = new Collection<Preprint>(this);
-
-  @ManyToMany({ entity: () => Community, mappedBy: 'tags' })
   communities: Collection<Community> = new Collection<Community>(this);
 
   constructor(name: string, color = '#FF0000') {
@@ -34,3 +16,22 @@ export class Tag extends BaseEntity {
     this.color = color;
   }
 }
+
+export const tagSchema = new EntitySchema<Tag, BaseEntity>({
+  class: Tag,
+  customRepository: () => TagModel,
+  properties: {
+    name: { type: 'string', unique: true },
+    color: { type: 'string' },
+    preprints: {
+      reference: 'm:n',
+      entity: () => Preprint,
+      inversedBy: (preprint) => preprint.tags,
+    },
+    communities: {
+      reference: 'm:n',
+      entity: () => Community,
+      mappedBy: (community) => community.tags,
+    },
+  },
+});

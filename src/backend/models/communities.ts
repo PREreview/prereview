@@ -1,4 +1,4 @@
-import { EntityRepository, MikroORM, Repository } from '@mikro-orm/core';
+import { EntityRepository, MikroORM } from '@mikro-orm/core';
 import { ORCID as orcidUtils } from 'orcid-utils';
 import { validate as uuidValidate } from 'uuid';
 import { Community, User } from './entities';
@@ -6,7 +6,6 @@ import { getLogger } from '../log';
 
 const log = getLogger('backend:models:communities');
 
-@Repository(Community)
 export class CommunityModel extends EntityRepository<Community> {
   async isMemberOf(communityId: string, userId: string): Promise<boolean> {
     let user: User | null = null;

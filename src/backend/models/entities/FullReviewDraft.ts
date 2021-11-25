@@ -1,23 +1,10 @@
-import {
-  Entity,
-  EntityRepositoryType,
-  Index,
-  ManyToOne,
-  Property,
-} from '@mikro-orm/core';
+import { EntitySchema } from '@mikro-orm/core';
 import { FullReviewDraftModel } from '../fullReviewDrafts';
 import { BaseEntity } from './BaseEntity';
 import { FullReview } from './FullReview';
 
-@Entity()
-@Index({ properties: ['parent'] })
 export class FullReviewDraft extends BaseEntity {
-  [EntityRepositoryType]: FullReviewDraftModel;
-
-  @ManyToOne({ entity: () => FullReview })
   parent!: FullReview;
-
-  @Property({ columnType: 'text' })
   contents!: string;
 
   constructor(parent: FullReview, contents: string) {
@@ -26,3 +13,16 @@ export class FullReviewDraft extends BaseEntity {
     this.contents = contents;
   }
 }
+
+export const fullReviewDraftSchema = new EntitySchema<
+  FullReviewDraft,
+  BaseEntity
+>({
+  class: FullReviewDraft,
+  customRepository: () => FullReviewDraftModel,
+  indexes: [{ properties: ['parent'] }],
+  properties: {
+    parent: { reference: 'm:1', entity: () => FullReview },
+    contents: { type: 'string', columnType: 'text' },
+  },
+});

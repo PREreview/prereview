@@ -1,4 +1,4 @@
-import { EntityRepository, MikroORM, Repository } from '@mikro-orm/core';
+import { EntityRepository, MikroORM } from '@mikro-orm/core';
 import { ORCID as orcidUtils } from 'orcid-utils';
 import { validate as uuidValidate } from 'uuid';
 import { Persona, User } from './entities';
@@ -6,7 +6,6 @@ import { getLogger } from '../log';
 
 const log = getLogger('backend:models:personas');
 
-@Repository(Persona)
 export class PersonaModel extends EntityRepository<Persona> {
   async isIdentityOf(personaId: string, userId: string): Promise<boolean> {
     let persona: Persona | null = null;

@@ -1,34 +1,14 @@
-import {
-  Entity,
-  EntityRepositoryType,
-  Index,
-  ManyToOne,
-  Property,
-} from '@mikro-orm/core';
+import { EntitySchema } from '@mikro-orm/core';
 import { CommentModel } from '../comments';
 import { BaseEntity } from './BaseEntity';
 import { FullReview } from './FullReview';
 import { Persona } from './Persona';
 
-@Entity()
-@Index({ properties: ['author'] })
-@Index({ properties: ['parent'] })
 export class Comment extends BaseEntity {
-  [EntityRepositoryType]?: CommentModel;
-
-  @Property({ columnType: 'text' })
   contents!: string;
-
-  @Property()
   isPublished: boolean = false;
-
-  @Property()
   isFlagged: boolean = false;
-
-  @ManyToOne({ entity: () => Persona })
   author!: Persona;
-
-  @ManyToOne({ entity: () => FullReview })
   parent!: FullReview;
 
   constructor(contents: string, author: Persona, parent: FullReview) {
@@ -38,3 +18,16 @@ export class Comment extends BaseEntity {
     this.parent = parent;
   }
 }
+
+export const commentSchema = new EntitySchema<Comment, BaseEntity>({
+  class: Comment,
+  customRepository: () => CommentModel,
+  indexes: [{ properties: 'author' }, { properties: 'parent' }],
+  properties: {
+    contents: { type: 'string', columnType: 'text' },
+    isPublished: { type: 'boolean' },
+    isFlagged: { type: 'boolean' },
+    author: { reference: 'm:1', entity: () => Persona },
+    parent: { reference: 'm:1', entity: () => FullReview },
+  },
+});

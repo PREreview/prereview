@@ -43,7 +43,8 @@
     "backend": {
       "context": "node",
       "distDir": "dist/backend",
-      "optimize": false
+      "optimize": false,
+      "scopeHoist": false
     },
     "frontend": {
       "context": "browser",
@@ -53,12 +54,14 @@
     "migrations-script": {
       "context": "node",
       "distDir": "dist/scripts",
-      "optimize": false
+      "optimize": false,
+      "scopeHoist": false
     },
     "init-script": {
       "context": "node",
       "distDir": "dist/scripts",
-      "optimize": false
+      "optimize": false,
+      "scopeHoist": false
     }
   },
   "engines": {
@@ -143,7 +146,6 @@
     "react-router-dom": "^5.1.2",
     "react-slick": "^0.28.1",
     "react-twitter-embed": "^3.0.3",
-    "reflect-metadata": "^0.1.13",
     "replacestream": "^4.0.3",
     "request-received": "0.0.3",
     "restful-react": "^15.2.0",

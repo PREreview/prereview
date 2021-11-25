@@ -1,28 +1,12 @@
-import {
-  Entity,
-  EntityRepositoryType,
-  Index,
-  ManyToOne,
-  Property,
-} from '@mikro-orm/core';
+import { EntitySchema } from '@mikro-orm/core';
 import { RequestModel } from '../requests';
 import { BaseEntity } from './BaseEntity';
 import { Persona } from './Persona';
 import { Preprint } from './Preprint';
 
-@Entity()
-@Index({ properties: ['author'] })
-@Index({ properties: ['preprint'] })
 export class Request extends BaseEntity {
-  [EntityRepositoryType]?: RequestModel;
-
-  @ManyToOne({ entity: () => Persona })
   author!: Persona;
-
-  @ManyToOne({ entity: () => Preprint })
   preprint!: Preprint;
-
-  @Property()
   isPreprintAuthor: boolean = false;
 
   constructor(author: Persona, preprint: Preprint, isPreprintAuthor = false) {
@@ -32,3 +16,14 @@ export class Request extends BaseEntity {
     this.isPreprintAuthor = isPreprintAuthor;
   }
 }
+
+export const requestSchema = new EntitySchema<Request, BaseEntity>({
+  class: Request,
+  customRepository: () => RequestModel,
+  indexes: [{ properties: ['author'] }, { properties: ['preprint'] }],
+  properties: {
+    author: { reference: 'm:1', entity: () => Persona },
+    preprint: { reference: 'm:1', entity: () => Preprint },
+    isPreprintAuthor: { type: 'boolean' },
+  },
+});

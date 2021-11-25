@@ -1,13 +1,4 @@
-import {
-  Collection,
-  Entity,
-  EntityRepositoryType,
-  ManyToMany,
-  ManyToOne,
-  OneToMany,
-  Property,
-  Unique,
-} from '@mikro-orm/core';
+import { Collection, EntitySchema } from '@mikro-orm/core';
 import { FullReviewModel } from '../fullReviews';
 import { BaseEntity } from './BaseEntity';
 import { Comment } from './Comment';
@@ -16,42 +7,17 @@ import { Persona } from './Persona';
 import { Preprint } from './Preprint';
 import { Statement } from './Statement';
 
-@Entity()
 export class FullReview extends BaseEntity {
-  [EntityRepositoryType]?: FullReviewModel;
-
-  @Property()
   isPublished: boolean = false;
-
-  @Property()
   isFlagged: boolean = false;
-
-  @Property({ nullable: true })
-  @Unique()
   doi?: string;
-
-  @OneToMany({ entity: () => FullReviewDraft, mappedBy: 'parent' })
   drafts: Collection<FullReviewDraft> = new Collection<FullReviewDraft>(this);
-
-  @ManyToMany({ entity: () => Persona, inversedBy: 'invitedToMentor' })
   mentorInvites: Collection<Persona> = new Collection<Persona>(this);
-
-  @ManyToMany({ entity: () => Persona, inversedBy: 'mentoring' })
   mentors: Collection<Persona> = new Collection<Persona>(this);
-
-  @ManyToMany({ entity: () => Persona, inversedBy: 'invitedToAuthor' })
   authorInvites: Collection<Persona> = new Collection<Persona>(this);
-
-  @ManyToMany({ entity: () => Persona, inversedBy: 'fullReviews' })
   authors: Collection<Persona> = new Collection<Persona>(this);
-
-  @ManyToOne({ entity: () => Preprint })
   preprint!: Preprint;
-
-  @OneToMany({ entity: () => Comment, mappedBy: 'parent' })
   comments: Collection<Comment> = new Collection<Comment>(this);
-
-  @OneToMany({ entity: () => Comment, mappedBy: 'parent' })
   statements: Collection<Statement> = new Collection<Statement>(this);
 
   constructor(preprint: Preprint, isPublished = false, doi?: string) {
@@ -61,3 +27,49 @@ export class FullReview extends BaseEntity {
     this.doi = doi;
   }
 }
+
+export const fullReviewSchema = new EntitySchema<FullReview, BaseEntity>({
+  class: FullReview,
+  customRepository: () => FullReviewModel,
+  properties: {
+    isPublished: { type: 'boolean' },
+    isFlagged: { type: 'boolean' },
+    doi: { type: 'string', nullable: true, unique: true },
+    drafts: {
+      reference: '1:m',
+      entity: () => FullReviewDraft,
+      mappedBy: (draft) => draft.parent,
+    },
+    mentorInvites: {
+      reference: 'm:n',
+      entity: () => Persona,
+      inversedBy: (persona) => persona.invitedToMentor,
+    },
+    mentors: {
+      reference: 'm:n',
+      entity: () => Persona,
+      inversedBy: (persona) => persona.mentoring,
+    },
+    authorInvites: {
+      reference: 'm:n',
+      entity: () => Persona,
+      inversedBy: (persona) => persona.invitedToAuthor,
+    },
+    authors: {
+      reference: 'm:n',
+      entity: () => Persona,
+      inversedBy: (persona) => persona.fullReviews,
+    },
+    preprint: { reference: 'm:1', entity: () => Preprint },
+    comments: {
+      reference: '1:m',
+      entity: () => Comment,
+      mappedBy: (comment) => comment.parent,
+    },
+    statements: {
+      reference: '1:m',
+      entity: () => Statement,
+      mappedBy: (statement) => statement.parent,
+    },
+  },
+});

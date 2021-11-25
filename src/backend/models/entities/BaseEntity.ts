@@ -1,17 +1,20 @@
+import { EntitySchema } from '@mikro-orm/core';
 import { v4 as uuidv4 } from 'uuid';
-import { PrimaryKey, Property, Unique } from '@mikro-orm/core';
 
 export abstract class BaseEntity {
-  @PrimaryKey({ hidden: true })
   id!: number;
-
-  @Property({ type: 'string' })
-  @Unique()
   uuid = uuidv4();
-
-  @Property()
   createdAt: Date = new Date();
-
-  @Property({ onUpdate: () => new Date() })
   updatedAt: Date = new Date();
 }
+
+export const baseEntitySchema = new EntitySchema<BaseEntity>({
+  name: 'BaseEntity',
+  abstract: true,
+  properties: {
+    id: { type: 'number', hidden: true, primary: true },
+    uuid: { type: 'string', unique: true },
+    createdAt: { type: 'Date' },
+    updatedAt: { type: 'Date', onUpdate: () => new Date() },
+  },
+});

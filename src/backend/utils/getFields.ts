@@ -1,4 +1,3 @@
-import 'reflect-metadata';
 import { FindOptions, MetadataStorage } from '@mikro-orm/core';
 import * as entities from '../models/entities';
 

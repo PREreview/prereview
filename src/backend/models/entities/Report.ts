@@ -1,32 +1,13 @@
-import {
-  Entity,
-  EntityRepositoryType,
-  Index,
-  ManyToOne,
-  Property,
-} from '@mikro-orm/core';
+import { EntitySchema } from '@mikro-orm/core';
 import { ReportModel } from '../reports';
 import { BaseEntity } from './BaseEntity';
 import { Persona } from './Persona';
 
-@Entity()
-@Index({ properties: ['author'] })
 export class Report extends BaseEntity {
-  [EntityRepositoryType]?: ReportModel;
-
-  @Property({ columnType: 'text', nullable: true })
   reason?: string;
-
-  @Property({ columnType: 'text', nullable: true })
   title?: string;
-
-  @ManyToOne({ entity: () => Persona })
   author!: Persona;
-
-  @Property()
   subject!: string;
-
-  @Property()
   subjectType!: string;
 
   constructor(
@@ -44,3 +25,16 @@ export class Report extends BaseEntity {
     this.title = title;
   }
 }
+
+export const reportSchema = new EntitySchema<Report, BaseEntity>({
+  class: Report,
+  customRepository: () => ReportModel,
+  indexes: [{ properties: ['author'] }],
+  properties: {
+    reason: { type: 'string', columnType: 'text', nullable: true },
+    title: { type: 'string', columnType: 'text', nullable: true },
+    author: { reference: 'm:1', entity: () => Persona },
+    subject: { type: 'string' },
+    subjectType: { type: 'string' },
+  },
+});

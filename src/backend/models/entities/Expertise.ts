@@ -1,24 +1,10 @@
-import {
-  Collection,
-  Entity,
-  EntityRepositoryType,
-  ManyToMany,
-  Property,
-  Unique,
-} from '@mikro-orm/core';
+import { Collection, EntitySchema } from '@mikro-orm/core';
 import { ExpertiseModel } from '../expertises';
 import { BaseEntity } from './BaseEntity';
 import { Persona } from './Persona';
 
-@Entity()
 export class Expertise extends BaseEntity {
-  [EntityRepositoryType]?: ExpertiseModel;
-
-  @Property()
-  @Unique()
   name!: string;
-
-  @ManyToMany({ entity: () => Persona, inversedBy: 'expertises' })
   personas: Collection<Persona> = new Collection<Persona>(this);
 
   constructor(name: string) {
@@ -26,3 +12,16 @@ export class Expertise extends BaseEntity {
     this.name = name;
   }
 }
+
+export const expertiseSchema = new EntitySchema<Expertise, BaseEntity>({
+  class: Expertise,
+  customRepository: () => ExpertiseModel,
+  properties: {
+    name: { type: 'string', unique: true },
+    personas: {
+      reference: 'm:n',
+      entity: () => Persona,
+      inversedBy: (persona) => persona.expertises,
+    },
+  },
+});

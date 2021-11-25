@@ -1,11 +1,4 @@
-import {
-  Entity,
-  EntityRepositoryType,
-  Enum,
-  Index,
-  ManyToOne,
-  Property,
-} from '@mikro-orm/core';
+import { EntitySchema } from '@mikro-orm/core';
 import { RapidReviewModel } from '../rapidReviews';
 import { BaseEntity } from './BaseEntity';
 import { Persona } from './Persona';
@@ -18,64 +11,24 @@ enum Checkboxes {
   unsure = 'unsure',
 }
 
-@Entity()
-@Index({ properties: ['author'] })
-@Index({ properties: ['preprint'] })
 export class RapidReview extends BaseEntity {
-  [EntityRepositoryType]?: RapidReviewModel;
-
-  @ManyToOne({ entity: () => Persona })
   author!: Persona;
-
-  @ManyToOne({ entity: () => Preprint })
   preprint!: Preprint;
-
-  @Property()
   isPublished: boolean = false;
-
-  @Property()
   isFlagged: boolean = false;
-
-  @Enum(() => Checkboxes)
   ynNovel = Checkboxes.na;
-
-  @Enum(() => Checkboxes)
   ynFuture = Checkboxes.na;
-
-  @Enum(() => Checkboxes)
   ynReproducibility = Checkboxes.na;
-
-  @Enum(() => Checkboxes)
   ynMethods = Checkboxes.na;
-
-  @Enum(() => Checkboxes)
   ynCoherent = Checkboxes.na;
-
-  @Enum(() => Checkboxes)
   ynLimitations = Checkboxes.na;
-
-  @Enum(() => Checkboxes)
   ynEthics = Checkboxes.na;
-
-  @Enum(() => Checkboxes)
   ynNewData = Checkboxes.na;
-
-  @Enum(() => Checkboxes)
   ynRecommend = Checkboxes.na;
-
-  @Enum(() => Checkboxes)
   ynPeerReview = Checkboxes.na;
-
-  @Enum(() => Checkboxes)
   ynAvailableCode = Checkboxes.na;
-
-  @Enum(() => Checkboxes)
   ynAvailableData = Checkboxes.na;
-
-  @Property({ columnType: 'text', nullable: true })
   linkToData?: string;
-
-  @Property({ columnType: 'text', nullable: true })
   coi?: string;
 
   constructor(author: Persona, preprint: Preprint) {
@@ -84,3 +37,29 @@ export class RapidReview extends BaseEntity {
     this.preprint = preprint;
   }
 }
+
+export const rapidReviewSchema = new EntitySchema<RapidReview, BaseEntity>({
+  class: RapidReview,
+  customRepository: () => RapidReviewModel,
+  indexes: [{ properties: ['author'] }, { properties: ['preprint'] }],
+  properties: {
+    author: { reference: 'm:1', entity: () => Persona },
+    preprint: { reference: 'm:1', entity: () => Preprint },
+    isPublished: { type: 'boolean' },
+    isFlagged: { type: 'boolean' },
+    ynNovel: { enum: true, items: () => Checkboxes },
+    ynFuture: { enum: true, items: () => Checkboxes },
+    ynReproducibility: { enum: true, items: () => Checkboxes },
+    ynMethods: { enum: true, items: () => Checkboxes },
+    ynCoherent: { enum: true, items: () => Checkboxes },
+    ynLimitations: { enum: true, items: () => Checkboxes },
+    ynEthics: { enum: true, items: () => Checkboxes },
+    ynNewData: { enum: true, items: () => Checkboxes },
+    ynRecommend: { enum: true, items: () => Checkboxes },
+    ynPeerReview: { enum: true, items: () => Checkboxes },
+    ynAvailableCode: { enum: true, items: () => Checkboxes },
+    ynAvailableData: { enum: true, items: () => Checkboxes },
+    linkToData: { type: 'string', columnType: 'text', nullable: true },
+    coi: { type: 'string', columnType: 'text', nullable: true },
+  },
+});
