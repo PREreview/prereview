@@ -16,13 +16,13 @@
     "typecheck": "tsc --noEmit --project tsconfig.dev.json",
     "build": "rimraf dist && npm run build:scripts && npm run build:backend && npm run build:hooks && npm run build:frontend",
     "build:dev": "rimraf dist && npm run build:scripts && npm run build:backend:dev && npm run build:hooks && npm run build:frontend:dev",
-    "build:backend": "parcel build --target=backend --no-optimize src/backend/index.ts && npm run build:templates",
-    "build:backend:dev": "parcel build --target=backend --no-optimize src/backend/index.ts && npm run build:templates",
+    "build:backend": "parcel build --target=backend src/backend/index.ts && npm run build:templates",
+    "build:backend:dev": "parcel build --target=backend src/backend/index.ts && npm run build:templates",
     "watch:backend:dev": "npm-watch build:backend:dev",
-    "build:frontend": "parcel build --no-scope-hoist --target=frontend src/frontend/index.html",
+    "build:frontend": "parcel build --target=frontend src/frontend/index.html",
     "build:frontend:dev": "parcel build --target=frontend src/frontend/index.html",
     "build:scripts:migrations": "npm run scan:migrations && parcel build --target=migrations-script src/backend/scripts/dbMigrations.ts",
-    "build:scripts:init": "parcel build --target=init-script --no-optimize src/backend/scripts/dbInit.ts",
+    "build:scripts:init": "parcel build --target=init-script src/backend/scripts/dbInit.ts",
     "build:scripts": "rimraf dist/scripts && npm run build:scripts:migrations && npm run build:scripts:init",
     "build:hooks:spec": "ts-node --transpile-only src/backend/scripts/genSpec.js > ./dist/openapi.json",
     "build:hooks:import": "restful-react import --file ./dist/openapi.json --output ./src/frontend/hooks/api-hooks.tsx",
@@ -47,15 +47,18 @@
     },
     "frontend": {
       "context": "browser",
-      "distDir": "dist/frontend"
+      "distDir": "dist/frontend",
+      "scopeHoist": false
     },
     "migrations-script": {
       "context": "node",
-      "distDir": "dist/scripts"
+      "distDir": "dist/scripts",
+      "optimize": false
     },
     "init-script": {
       "context": "node",
-      "distDir": "dist/scripts"
+      "distDir": "dist/scripts",
+      "optimize": false
     }
   },
   "engines": {
