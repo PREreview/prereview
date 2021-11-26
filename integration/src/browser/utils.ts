@@ -26,6 +26,7 @@ export async function screenshot(
   const frame = await getFrame(item);
 
   await Promise.all([
+    frame.waitForTimeout(300),
     hideTwitterTimelines(frame),
     resetCarousels(frame),
     removeAnimations(frame),
