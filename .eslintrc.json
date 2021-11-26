@@ -93,6 +93,7 @@
       },
       "rules": {
         "@typescript-eslint/no-unused-vars": "off",
+        "jest/no-standalone-expect": "off",
         "no-empty-pattern": "off",
         "no-useless-assign/no-useless-assign": "warn"
       }
