@@ -1,4 +1,4 @@
-@import url('quill/dist/quill.snow.css');
+@import url('npm:quill/dist/quill.snow.css');
 
 .ql-editor {
   background-color: #fff;

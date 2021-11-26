@@ -164,8 +164,7 @@
   },
   "devDependencies": {
     "@mikro-orm/cli": "^4.5.4",
-    "@parcel/transformer-image": "2.0.0-beta.2",
-    "@parcel/transformer-typescript-tsc": "2.0.0-beta.2",
+    "@parcel/transformer-typescript-tsc": "^2.0.1",
     "@testing-library/jest-dom": "^5.15.0",
     "@testing-library/react": "^12.1.2",
     "@types/doi-regex": "^0.1.0",
@@ -213,7 +212,7 @@
     "nock": "^13.1.4",
     "nodemon": "^2.0.6",
     "npm-watch": "^0.9.0",
-    "parcel": "2.0.0-beta.2",
+    "parcel": "^2.0.1",
     "pg-mem": "^2.1.7",
     "prettier": "^2.4.1",
     "rimraf": "^3.0.2",
