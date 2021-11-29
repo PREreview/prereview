@@ -1,23 +1,16 @@
 {
   "compilerOptions": {
     "module": "commonjs",
-    "declaration": true,
     "isolatedModules": true,
     "strict": true,
-    "removeComments": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "noLib": false,
     "lib": ["es2017", "dom"],
     "target": "es6",
-    "sourceMap": true,
     "allowJs": true,
-    "outDir": "./dist",
     "jsx": "react",
-    "baseUrl": "./src",
-    "paths": {
-      "~*": ["./*"]
-    }
+    "noEmit": true
   },
   "include": ["src/**/*.ts", "src/**/*.tsx"],
   "exclude": ["node_modules", "**/*.spec.ts"]
