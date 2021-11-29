@@ -16,7 +16,7 @@
     "typecheck": "tsc --noEmit --project tsconfig.dev.json",
     "build": "rimraf dist && npm run build:scripts && npm run build:backend && npm run build:hooks && npm run build:frontend",
     "build:dev": "rimraf dist && npm run build:scripts && npm run build:backend:dev && npm run build:hooks && npm run build:frontend:dev",
-    "build:backend": "parcel build --target=backend src/backend/index.ts && npm run build:templates",
+    "build:backend": "parcel build --target=backend src/backend/index.ts src/backend/mikro-orm.config.ts && npm run build:templates",
     "build:backend:dev": "parcel build --target=backend src/backend/index.ts && npm run build:templates",
     "watch:backend:dev": "npm-watch build:backend:dev",
     "build:frontend": "parcel build --target=frontend src/frontend/index.html",
@@ -211,13 +211,11 @@
     "sharp": "^0.29.3",
     "supertest": "^6.1.6",
     "ts-jest": "^27.0.5",
-    "ts-node": "^9.0.0",
     "typescript": "^4.0.5"
   },
   "mikro-orm": {
-    "useTsNode": true,
     "configPaths": [
-      "./src/backend/mikro-orm.config.ts"
+      "./dist/backend/mikro-orm.config.js"
     ]
   }
 }
