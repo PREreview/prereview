@@ -107,23 +107,6 @@ CMD ["start:dev"]
 
 
 #
-# Stage: Integration
-#
-FROM dev AS integration
-ENV NODE_ENV=integration
-
-COPY --from=trajano/alpine-libfaketime /faketime.so /lib/faketime.so
-ENV LD_PRELOAD=/lib/faketime.so
-ENV DONT_FAKE_MONOTONIC=1
-
-COPY --from=backend /app/src/ src/
-COPY --from=frontend /app/dist/frontend/ dist/frontend/
-
-CMD ["start"]
-
-
-
-#
 # Stage: Production
 #
 FROM node AS prod
@@ -157,3 +140,15 @@ USER node
 
 ENTRYPOINT ["./docker-entrypoint.sh"]
 CMD ["start"]
+
+
+
+#
+# Stage: Integration
+#
+FROM prod AS integration
+ENV NODE_ENV=integration
+
+COPY --from=trajano/alpine-libfaketime /faketime.so /lib/faketime.so
+ENV LD_PRELOAD=/lib/faketime.so
+ENV DONT_FAKE_MONOTONIC=1
