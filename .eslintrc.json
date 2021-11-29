@@ -78,14 +78,6 @@
     },
     {
       "files": [
-        "src/backend/models/entities/**"
-      ],
-      "rules": {
-        "@typescript-eslint/no-inferrable-types": "off"
-      }
-    },
-    {
-      "files": [
         "integration/**"
       ],
       "parserOptions": {

@@ -8,8 +8,8 @@ import { Preprint } from './Preprint';
 import { Statement } from './Statement';
 
 export class FullReview extends BaseEntity {
-  isPublished: boolean = false;
-  isFlagged: boolean = false;
+  isPublished = false;
+  isFlagged = false;
   doi?: string;
   drafts: Collection<FullReviewDraft> = new Collection<FullReviewDraft>(this);
   mentorInvites: Collection<Persona> = new Collection<Persona>(this);

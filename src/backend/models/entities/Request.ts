@@ -7,7 +7,7 @@ import { Preprint } from './Preprint';
 export class Request extends BaseEntity {
   author!: Persona;
   preprint!: Preprint;
-  isPreprintAuthor: boolean = false;
+  isPreprintAuthor = false;
 
   constructor(author: Persona, preprint: Preprint, isPreprintAuthor = false) {
     super();

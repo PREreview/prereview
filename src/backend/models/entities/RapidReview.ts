@@ -14,8 +14,8 @@ enum Checkboxes {
 export class RapidReview extends BaseEntity {
   author!: Persona;
   preprint!: Preprint;
-  isPublished: boolean = false;
-  isFlagged: boolean = false;
+  isPublished = false;
+  isFlagged = false;
   ynNovel = Checkboxes.na;
   ynFuture = Checkboxes.na;
   ynReproducibility = Checkboxes.na;

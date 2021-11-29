@@ -7,7 +7,7 @@ export class Event extends BaseEntity {
   title!: string;
   start!: Date;
   end?: Date;
-  isPrivate: boolean = false;
+  isPrivate = false;
   description?: string;
   url?: string;
   community?: Community;

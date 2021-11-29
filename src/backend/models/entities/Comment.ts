@@ -6,8 +6,8 @@ import { Persona } from './Persona';
 
 export class Comment extends BaseEntity {
   contents!: string;
-  isPublished: boolean = false;
-  isFlagged: boolean = false;
+  isPublished = false;
+  isFlagged = false;
   author!: Persona;
   parent!: FullReview;
 

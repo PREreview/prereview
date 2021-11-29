@@ -13,8 +13,8 @@ export class Persona extends BaseEntity {
   name!: string;
   identity?: User;
   isAnonymous!: boolean;
-  isLocked: boolean = false;
-  isFlagged: boolean = false;
+  isLocked = false;
+  isFlagged = false;
   bio?: string;
   avatar?: Buffer;
   avatar_encoding?: string;

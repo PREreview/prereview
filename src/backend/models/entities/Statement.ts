@@ -6,7 +6,7 @@ import { Persona } from './Persona';
 
 export class Statement extends BaseEntity {
   contents!: string;
-  isFlagged: boolean = false;
+  isFlagged = false;
   author!: Persona;
   parent!: FullReview;
 
