@@ -726,7 +726,7 @@ export default function ReviewStepper({
                       ))
                     ) : null}
                   </AvatarGroup>
-                  <AddAuthors
+                  {/*<AddAuthors
                     reviewId={cid}
                     authors={review ? review.authors : null}
                   />
@@ -734,7 +734,7 @@ export default function ReviewStepper({
                     isMentor={true}
                     reviewId={cid}
                     authors={review ? review.mentors : null}
-                  />
+                  />*/}
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <Box textAlign="right" mr={2}>
