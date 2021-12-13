@@ -1,7 +1,7 @@
 import { expect, test } from './test';
 import { screenshot } from './utils';
 
-test.asACommunityModerator(
+test.asACommunityMember(
   'can add a request to a community',
   async ({ community, page, preprint }, { fixme }) => {
     await page.goto(`/communities/${community.slug}`);
@@ -11,7 +11,7 @@ test.asACommunityModerator(
       '.MuiPaper-root:has-text("Preprints with PREreviews or requests for PREreviews")',
     );
 
-    fixme(true, '"Add Request" button is not shown for moderators');
+    fixme(true, '"Add Request" button is not shown for members');
 
     await expect(addRequestButton).toBeVisible();
     expect(await screenshot(preprints)).toMatchSnapshot(
