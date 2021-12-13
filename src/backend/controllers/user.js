@@ -77,6 +77,7 @@ export default function controller(users, contacts, keys, thisUser) {
           'contacts',
           'keys',
           'defaultPersona.badges',
+          'defaultPersona.communities',
         ]);
       } catch (err) {
         log.debug(err);

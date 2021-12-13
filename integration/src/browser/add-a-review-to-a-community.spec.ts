@@ -3,15 +3,13 @@ import { screenshot } from './utils';
 
 test.asACommunityMember(
   'can add a review to a community',
-  async ({ community, page, preprint }, { fixme }) => {
+  async ({ community, page, preprint }) => {
     await page.goto(`/communities/${community.slug}`);
 
     const addReviewButton = page.locator('button:has-text("Add PREreview")');
     const preprints = page.locator(
       '.MuiPaper-root:has-text("Preprints with PREreviews")',
     );
-
-    fixme(true, '"Add PREreview" button is not shown for members');
 
     await expect(addReviewButton).toBeVisible();
     expect(await screenshot(preprints)).toMatchSnapshot(
