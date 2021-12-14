@@ -1,4 +1,4 @@
-import { MikroORM } from '@mikro-orm/core';
+import { EntityData, MikroORM } from '@mikro-orm/core';
 import { PostgreSqlDriver } from '@mikro-orm/postgresql';
 import faker from 'faker';
 import { RequestListener } from 'http';
@@ -43,12 +43,15 @@ global.afterAll(async () => {
   await orm.close(true);
 });
 
-export async function createPreprint(): Promise<Preprint> {
+export async function createPreprint(
+  data?: EntityData<Preprint>,
+): Promise<Preprint> {
   const preprints = preprintModelWrapper(orm);
 
   const preprint = preprints.create({
     handle: `doi:${fakeDoi()}`,
     title: faker.lorem.sentence(),
+    ...data,
   });
 
   await preprints.persistAndFlush(preprint);
