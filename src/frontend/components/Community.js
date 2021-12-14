@@ -295,6 +295,7 @@ export default function Community(props) {
               <Box p={4}>
                 {isOwner ? (
                   <IconButton
+                    aria-label="Edit this community"
                     href={`/community-settings/${community.uuid}`}
                     className={classes.settings}
                   >
