@@ -3,6 +3,7 @@ import request from 'supertest';
 import {
   createApiKey,
   createGroup,
+  createPersona,
   createPreprint,
   createRequest,
   createServer,
@@ -56,6 +57,29 @@ describe('requests', () => {
     const user = await createUser();
     const apiKey = await createApiKey(user);
     const reviewRequest = await createRequest({ author: user.defaultPersona });
+    const preprint = reviewRequest.preprint;
+    const server = await createServer();
+
+    const response = await request(server)
+      .post(`/api/v2/preprints/${preprint.uuid}/requests`)
+      .set({
+        'X-API-App': apiKey.app,
+        'X-API-Key': apiKey.secret,
+      })
+      .send({});
+
+    expect(response.status).toBe(StatusCodes.FORBIDDEN);
+    expect(response.type).toBe('application/json');
+    expect(response.body).toStrictEqual({
+      message: 'Request already exists',
+    });
+  });
+
+  it.skip("can't be duplicated with a different persona", async () => {
+    const user = await createUser();
+    const otherPersona = await createPersona(user);
+    const apiKey = await createApiKey(user);
+    const reviewRequest = await createRequest({ author: otherPersona });
     const preprint = reviewRequest.preprint;
     const server = await createServer();
 

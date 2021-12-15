@@ -16,6 +16,7 @@ import {
 import {
   Group,
   Key,
+  Persona,
   Preprint,
   Request,
   User,
@@ -94,23 +95,30 @@ export async function createGroup(name: string): Promise<Group> {
 
 export async function createUser(group?: Group): Promise<User> {
   const users = userModelWrapper(orm);
-  const personas = personaModelWrapper(orm);
 
   const user = users.create({ orcid: fakeOrcid() });
-  const publicPersona = personas.create({
-    identity: user,
-    name: faker.name.findName(),
-    isAnonymous: false,
-  });
-  user.defaultPersona = publicPersona;
+  user.defaultPersona = await createPersona(user);
+
   if (group) {
     user.groups.add(group);
   }
 
   await users.persistAndFlush(user);
-  await personas.persistAndFlush(publicPersona);
 
   return user;
+}
+
+export async function createPersona(user: User): Promise<Persona> {
+  const personas = personaModelWrapper(orm);
+
+  const persona = personas.create({
+    identity: user,
+    name: faker.name.findName(),
+  });
+
+  await personas.persistAndFlush(persona);
+
+  return persona;
 }
 
 export async function createApiKey(user: User): Promise<Key> {
