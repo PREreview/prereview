@@ -10,9 +10,16 @@ import {
   keyModelWrapper,
   personaModelWrapper,
   preprintModelWrapper,
+  requestModelWrapper,
   userModelWrapper,
 } from '../src/backend/models';
-import { Group, Key, Preprint, User } from '../src/backend/models/entities';
+import {
+  Group,
+  Key,
+  Preprint,
+  Request,
+  User,
+} from '../src/backend/models/entities';
 import configServer from '../src/backend/server';
 import { fakeDoi, fakeOrcid } from './utils';
 
@@ -42,6 +49,22 @@ global.afterEach(() => {
 global.afterAll(async () => {
   await orm.close(true);
 });
+
+export async function createRequest(
+  data?: EntityData<Request>,
+): Promise<Request> {
+  const requests = requestModelWrapper(orm);
+
+  const request = requests.create({
+    author: (await createUser()).defaultPersona,
+    preprint: await createPreprint(),
+    ...data,
+  });
+
+  await requests.persistAndFlush(request);
+
+  return request;
+}
 
 export async function createPreprint(
   data?: EntityData<Preprint>,

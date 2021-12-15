@@ -4,6 +4,7 @@ import {
   createApiKey,
   createGroup,
   createPreprint,
+  createRequest,
   createServer,
   createUser,
 } from '../setup';
@@ -48,6 +49,28 @@ describe('requests', () => {
         isPreprintAuthor: false,
         preprint: preprint.id,
       }),
+    });
+  });
+
+  it.skip("can't be duplicated", async () => {
+    const user = await createUser();
+    const apiKey = await createApiKey(user);
+    const reviewRequest = await createRequest({ author: user.defaultPersona });
+    const preprint = reviewRequest.preprint;
+    const server = await createServer();
+
+    const response = await request(server)
+      .post(`/api/v2/preprints/${preprint.uuid}/requests`)
+      .set({
+        'X-API-App': apiKey.app,
+        'X-API-Key': apiKey.secret,
+      })
+      .send({});
+
+    expect(response.status).toBe(StatusCodes.FORBIDDEN);
+    expect(response.type).toBe('application/json');
+    expect(response.body).toStrictEqual({
+      message: 'Request already exists',
     });
   });
 });
