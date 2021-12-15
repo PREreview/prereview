@@ -14,7 +14,7 @@ import {
 } from '../src/backend/models';
 import { Group, Key, Preprint, User } from '../src/backend/models/entities';
 import configServer from '../src/backend/server';
-import { fakeDoi } from './utils';
+import { fakeDoi, fakeOrcid } from './utils';
 
 let orm: MikroORM<PostgreSqlDriver>;
 let backup: IBackup;
@@ -73,7 +73,7 @@ export async function createUser(group?: Group): Promise<User> {
   const users = userModelWrapper(orm);
   const personas = personaModelWrapper(orm);
 
-  const user = users.create({ orcid: '0000-0002-6266-406X' });
+  const user = users.create({ orcid: fakeOrcid() });
   const publicPersona = personas.create({
     identity: user,
     name: faker.name.findName(),
