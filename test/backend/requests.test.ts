@@ -53,7 +53,7 @@ describe('requests', () => {
     });
   });
 
-  it.skip("can't be duplicated", async () => {
+  it("can't be duplicated", async () => {
     const user = await createUser();
     const apiKey = await createApiKey(user);
     const reviewRequest = await createRequest({ author: user.defaultPersona });
@@ -71,11 +71,13 @@ describe('requests', () => {
     expect(response.status).toBe(StatusCodes.FORBIDDEN);
     expect(response.type).toBe('application/json');
     expect(response.body).toStrictEqual({
+      error: 'Forbidden',
       message: 'Request already exists',
+      statusCode: StatusCodes.FORBIDDEN,
     });
   });
 
-  it.skip("can't be duplicated with a different persona", async () => {
+  it("can't be duplicated with a different persona", async () => {
     const user = await createUser();
     const otherPersona = await createPersona(user);
     const apiKey = await createApiKey(user);
@@ -94,7 +96,9 @@ describe('requests', () => {
     expect(response.status).toBe(StatusCodes.FORBIDDEN);
     expect(response.type).toBe('application/json');
     expect(response.body).toStrictEqual({
+      error: 'Forbidden',
       message: 'Request already exists',
+      statusCode: StatusCodes.FORBIDDEN,
     });
   });
 });

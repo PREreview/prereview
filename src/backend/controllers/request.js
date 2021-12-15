@@ -1,3 +1,4 @@
+import { StatusCodes } from 'http-status-codes';
 import router from 'koa-joi-router';
 import { getLogger } from '../log.ts';
 
@@ -55,6 +56,15 @@ export default function controller(reqModel, preprintModel, thisUser) {
       ctx.throw(404, 'Preprint not found');
     }
     const user = await thisUser.getUser(ctx);
+
+    const existing = await reqModel.count({
+      author: { identity: user },
+      preprint: preprint,
+    });
+
+    if (existing > 0) {
+      ctx.throw(StatusCodes.FORBIDDEN, 'Request already exists');
+    }
 
     log.debug(`Adding a request.`);
 
