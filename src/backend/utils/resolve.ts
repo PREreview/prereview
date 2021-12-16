@@ -88,7 +88,7 @@ async function scrapeUrl(
     }
 
     return {
-      handle: `${handleType}:${handle}`,
+      handle: `${handleType}:${handle.toLowerCase()}`,
       title: highwirePress.title ? highwirePress.title : undefined,
       abstractText:
         openGraph && openGraph.abstract
@@ -136,7 +136,7 @@ async function searchGoogleScholar(handle: string): Promise<PreprintMetadata> {
     datePosted = date.toISOString();
   }
   return {
-    handle: `doi:${handle}`,
+    handle: `doi:${handle.toLowerCase()}`,
     title: res[0].title,
     abstractText: res[0].description,
     url: res[0].url,
@@ -168,7 +168,7 @@ function searchCrossRef(handle: string): Promise<PreprintMetadata> {
           res.author.forEach(a => authors.push(`${a.given} ${a.family}`));
         }
         const metadata = {
-          handle: `doi:${res.DOI}`,
+          handle: `doi:${res.DOI.toLowerCase()}`,
           title: res.title[0],
           abstractText: res.abstract,
           url: res.URL,

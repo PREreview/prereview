@@ -29,6 +29,7 @@ function decodePreprintId(value: string) {
   let scheme;
   if (value.startsWith('doi-')) {
     scheme = 'doi' as const;
+    value = value.toLowerCase();
   } else if (value.startsWith('arxiv')) {
     scheme = 'arxiv' as const;
   }

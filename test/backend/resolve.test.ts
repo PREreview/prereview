@@ -59,7 +59,7 @@ describe('resolve', () => {
     expect(response.body).toMatchObject({ uuid: preprint.uuid });
   });
 
-  it.skip('treats DOIs as case insensitive', async () => {
+  it('treats DOIs as case insensitive', async () => {
     const preprint = await createPreprint({ handle: 'doi:10.5555/abcdef' });
 
     const response = await request(await createServer())
