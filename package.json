@@ -168,6 +168,7 @@
     "@types/koa__cors": "^2.2.3",
     "@types/koa-compress": "^4.0.3",
     "@types/koa-joi-router": "^8.0.1",
+    "@types/koa-joi-router-docs": "^1.0.1",
     "@types/koa-log4": "^2.3.3",
     "@types/koa-mount": "^4.0.1",
     "@types/koa-passport": "^4.0.2",

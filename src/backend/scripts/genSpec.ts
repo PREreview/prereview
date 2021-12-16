@@ -19,7 +19,7 @@ import notificationRoutes from '../controllers/notification';
 
 function docs() {
   const generator = new SwaggerAPI();
-  const authz = authWrapper({}); // authorization, not authentication
+  const authz = authWrapper({}, {}, {}, {}); // authorization, not authentication
 
   generator.addJoiRouter(preprintRoutes({}, authz));
   generator.addJoiRouter(userRoutes({}, {}, {}, authz));
@@ -46,6 +46,7 @@ function docs() {
         version: '2.0',
       },
       basePath: '/api/v2',
+      tags: [],
     },
     {
       defaultResponses: {
