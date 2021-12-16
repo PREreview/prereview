@@ -41,30 +41,6 @@ export function createPreprintId(
   return `${vendor}-${unprefix(id).replace(/-/g, '+').replace(/\//g, '-')}`;
 }
 
-export function decodePreprintId(value) {
-  if (!value) {
-    throw new ChainedError('You must provide a preprintId to decode');
-  }
-
-  let scheme;
-  if (value.startsWith('doi-')) {
-    scheme = 'doi';
-  } else if (value.startsWith('arxiv')) {
-    scheme = 'arxiv';
-  }
-
-  if (!scheme) {
-    throw new ChainedError(
-      'String is not an encoded preprint ID (could not extract scheme)',
-    );
-  }
-
-  return {
-    id: `${value.slice(value.indexOf('-') + 1).replace(/-/g, '/').replace(/\+/g, '-')}`,
-    scheme: scheme,
-  };
-}
-
 function getId(doc) {
   if (!doc) return doc;
   return typeof doc === 'string' || doc === 'number' ? doc : doc['@id'];
