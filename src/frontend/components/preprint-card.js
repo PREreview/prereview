@@ -7,7 +7,7 @@ import { formatDistanceStrict } from 'date-fns';
 // utils
 import { getTags } from '../utils/stats';
 import { getFormattedDatePosted } from '../utils/preprints';
-import { createPreprintId, decodePreprintId } from '../../common/utils/ids';
+import { createPreprintId } from '../../common/utils/ids';
 
 // hooks
 import { useAnimatedScore } from '../hooks/score-hooks';
@@ -116,7 +116,6 @@ export default function PreprintCard({
   const history = useHistory();
 
   const preprintId = createPreprintId(preprint.handle);
-  const { id, scheme } = decodePreprintId(preprintId);
 
   const [elevation, setElevation] = useState(0);
   const [hasReviewed, setHasReviewed] = useState(false);
@@ -278,7 +277,6 @@ export default function PreprintCard({
           <Box width="100%">
             <ReviewReader
               user={user}
-              identifier={id}
               preprint={preprint}
               isReader={false}
             />
