@@ -19,24 +19,27 @@ import notificationRoutes from '../controllers/notification';
 
 function docs() {
   const generator = new SwaggerAPI();
-  const authz = authWrapper({}, {}, {}, {}); // authorization, not authentication
 
-  generator.addJoiRouter(preprintRoutes({}, authz));
-  generator.addJoiRouter(userRoutes({}, {}, {}, authz));
-  generator.addJoiRouter(fullReviewRoutes({}, {}, {}, {}, {}, authz));
-  generator.addJoiRouter(eventRoutes({}, authz));
-  generator.addJoiRouter(groupRoutes({}, {}, authz));
-  generator.addJoiRouter(commentRoutes({}, {}, authz));
-  generator.addJoiRouter(badgeRoutes({}, authz));
-  generator.addJoiRouter(expertiseRoutes({}, authz));
-  generator.addJoiRouter(communityRoutes({}, {}, {}, {}, {}, authz));
-  generator.addJoiRouter(personaRoutes({}, {}, {}, {}, authz));
-  generator.addJoiRouter(rapidReviewRoutes({}, {}, authz));
-  generator.addJoiRouter(reportRoutes({}, {}, {}, {}, {}, authz));
-  generator.addJoiRouter(requestRoutes({}, {}, authz));
-  generator.addJoiRouter(tagRoutes({}, authz));
-  generator.addJoiRouter(templateRoutes({}, {}, authz));
-  generator.addJoiRouter(notificationRoutes({}, authz));
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const stub: any = {}
+  const authz = authWrapper(stub, stub, stub, stub); // authorization, not authentication
+
+  generator.addJoiRouter(preprintRoutes(stub, authz));
+  generator.addJoiRouter(userRoutes(stub, stub, stub, authz));
+  generator.addJoiRouter(fullReviewRoutes(stub, stub, stub, stub, stub, authz));
+  generator.addJoiRouter(eventRoutes(stub, authz));
+  generator.addJoiRouter(groupRoutes(stub, stub, authz));
+  generator.addJoiRouter(commentRoutes(stub, stub, authz));
+  generator.addJoiRouter(badgeRoutes(stub, authz));
+  generator.addJoiRouter(expertiseRoutes(stub, authz));
+  generator.addJoiRouter(communityRoutes(stub, stub, stub, stub, stub, authz));
+  generator.addJoiRouter(personaRoutes(stub, stub, stub, stub, authz));
+  generator.addJoiRouter(rapidReviewRoutes(stub, stub, authz));
+  generator.addJoiRouter(reportRoutes(stub, stub, stub, stub, stub, authz));
+  generator.addJoiRouter(requestRoutes(stub, stub, authz));
+  generator.addJoiRouter(tagRoutes(stub, authz));
+  generator.addJoiRouter(templateRoutes(stub, stub, authz));
+  generator.addJoiRouter(notificationRoutes(stub, authz));
 
   const spec = generator.generateSpec(
     {
