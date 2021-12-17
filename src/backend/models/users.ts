@@ -30,7 +30,7 @@ export class UserModel extends EntityRepository<User> {
   findOneByKey(
     app: string,
     secret: string,
-    params: string[],
+    params?: string[],
   ): Promise<User | null> {
     try {
       return this.em.findOne(

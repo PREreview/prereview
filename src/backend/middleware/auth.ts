@@ -1,22 +1,33 @@
+import { ParameterizedContext } from 'koa';
 import Roles from 'koa-roles';
 import { isString } from 'lodash';
 import { ORCID as orcidUtils } from 'orcid-utils';
-import config from '../config.ts';
-import { getLogger } from '../log.ts';
+import config from '../config';
+import { getLogger } from '../log';
+import { CommunityModel, GroupModel, PersonaModel, UserModel } from '../models';
+import { User } from '../models/entities';
 
 const log = getLogger('backend:middleware:auth');
 
-/**
- * Installs authorization middleware into the koa app.
- *
- * @param {Object} ctx - the koa context object
- * @param {funtion} next - continue to next middleware
- */
+export type Auth = {
+  can: Roles['can'];
+  middleware: Roles['middleware'];
+  getUser: (ctx: ParameterizedContext<{ user?: User }>) => Promise<User | null | undefined>;
+  isIdentityOf: PersonaModel['isIdentityOf'];
+  isMemberOf: GroupModel['isMemberOf'];
+  isMemberOfCommunity: CommunityModel['isMemberOf'];
+  isOwnerOfCommunity: CommunityModel['isOwnerOf'];
+};
 
-const authWrapper = (users, groups, communities, personas) => {
+const authWrapper = (
+  users: UserModel,
+  groups: GroupModel,
+  communities: CommunityModel,
+  personas: PersonaModel,
+): Auth => {
   const roles = new Roles();
 
-  roles.getUser = async ctx => {
+  const getUser: Auth['getUser'] = async ctx => {
     log.debug('Retrieving current user.');
 
     if (ctx.isAuthenticated() && ctx.state.user) {
@@ -38,7 +49,7 @@ const authWrapper = (users, groups, communities, personas) => {
     return;
   };
 
-  roles.isMemberOf = async (group, id) => {
+  const isMemberOf: Auth['isMemberOf'] = async (group, id) => {
     log.debug(`Checking if ${id} is a member of ${group}.`);
     if (
       config.adminUsers &&
@@ -55,57 +66,63 @@ const authWrapper = (users, groups, communities, personas) => {
     }
   };
 
-  roles.isMemberOfCommunity = async (community, id) => {
+  const isMemberOfCommunity: Auth['isMemberOfCommunity'] = async (
+    community,
+    id,
+  ) => {
     log.debug(`Checking if ${id} is a member of ${community}.`);
     return communities.isMemberOf(community, id);
   };
 
-  roles.isOwnerOfCommunity = async (community, id) => {
+  const isOwnerOfCommunity: Auth['isOwnerOfCommunity'] = async (
+    community,
+    id,
+  ) => {
     log.debug(`Checking if ${id} is an owner of ${community}.`);
     return communities.isOwnerOf(community, id);
   };
 
-  roles.isIdentityOf = async (persona, id) => {
+  const isIdentityOf: Auth['isIdentityOf'] = async (persona, id) => {
     log.debug(`Checking if ${id} is the identity of ${persona}.`);
     return personas.isIdentityOf(persona, id);
   };
 
   roles.use('access private pages', async ctx => {
     log.debug('Checking if user is authenticated...');
-    const user = await roles.getUser(ctx);
+    const user = await getUser(ctx);
     log.debug('User is authenticated:', !!user);
     return !!user;
   });
 
   roles.use('access moderator pages', async ctx => {
     log.debug('Checking if user can access moderator pages.');
-    const user = await roles.getUser(ctx);
+    const user = await getUser(ctx);
     if (!user) return false;
 
     return (
-      (await roles.isMemberOf('moderators', user.orcid)) ||
-      (await roles.isMemberOf('admins', user.orcid))
+      (await isMemberOf('moderators', user.orcid)) ||
+      (await isMemberOf('admins', user.orcid))
     );
   });
 
   roles.use('access admin pages', async ctx => {
     log.debug('Checking if user can access admin pages.');
-    const user = await roles.getUser(ctx);
+    const user = await getUser(ctx);
     if (!user) return false;
 
-    return roles.isMemberOf('admins', user.orcid);
+    return isMemberOf('admins', user.orcid);
   });
 
   roles.use('access this community', async ctx => {
     log.debug('Checking if user can edit this community.');
-    const user = await roles.getUser(ctx);
+    const user = await getUser(ctx);
     if (!user) return false;
 
-    const isAdmin = await roles.isMemberOf('admins', user.orcid);
+    const isAdmin = await isMemberOf('admins', user.orcid);
     if (isAdmin) return true;
 
     if (ctx.state.community) {
-      return roles.isMemberOfCommunity(ctx.state.community, user.orcid);
+      return isMemberOfCommunity(ctx.state.community, user.orcid);
     } else {
       return false;
     }
@@ -113,14 +130,14 @@ const authWrapper = (users, groups, communities, personas) => {
 
   roles.use('edit this community', async ctx => {
     log.debug('Checking if user can edit this community.');
-    const user = await roles.getUser(ctx);
+    const user = await getUser(ctx);
     if (!user) return false;
 
-    const isAdmin = await roles.isMemberOf('admins', user.orcid);
+    const isAdmin = await isMemberOf('admins', user.orcid);
     if (isAdmin) return true;
 
     if (ctx.state.community) {
-      return roles.isOwnerOfCommunity(ctx.state.community, user.orcid);
+      return isOwnerOfCommunity(ctx.state.community, user.orcid);
     } else {
       return false;
     }
@@ -128,14 +145,14 @@ const authWrapper = (users, groups, communities, personas) => {
 
   roles.use('edit this persona', async ctx => {
     log.debug('Checking if user can edit this persona.');
-    const user = await roles.getUser(ctx);
+    const user = await getUser(ctx);
     if (!user) return false;
 
-    const isAdmin = await roles.isMemberOf('admins', user.orcid);
+    const isAdmin = await isMemberOf('admins', user.orcid);
     if (isAdmin) return true;
 
     if (ctx.state.persona) {
-      return roles.isIdentityOf(ctx.state.persona, user.orcid);
+      return isIdentityOf(ctx.state.persona, user.orcid);
     } else {
       return false;
     }
@@ -143,10 +160,10 @@ const authWrapper = (users, groups, communities, personas) => {
 
   roles.use('edit this user', async ctx => {
     log.debug('Checking if user can edit this user.');
-    const user = await roles.getUser(ctx);
+    const user = await getUser(ctx);
     if (!user) return false;
 
-    const isAdmin = await roles.isMemberOf('admins', user.orcid);
+    const isAdmin = await isMemberOf('admins', user.orcid);
     if (isAdmin) return true;
 
     if (ctx.state.identity) {
@@ -158,7 +175,15 @@ const authWrapper = (users, groups, communities, personas) => {
     }
   });
 
-  return roles;
+  return {
+    can: roles.can.bind(roles),
+    middleware: roles.middleware.bind(roles),
+    getUser,
+    isIdentityOf,
+    isMemberOf,
+    isMemberOfCommunity,
+    isOwnerOfCommunity,
+  };
 };
 
 export default authWrapper;
