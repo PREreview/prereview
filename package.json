@@ -142,7 +142,7 @@
     "replacestream": "^4.0.3",
     "request-received": "0.0.3",
     "restful-react": "^15.2.0",
-    "scholarly": "^1.1.0",
+    "scholarly": "^1.1.1",
     "serialize-javascript": "^6.0.0",
     "slick-carousel": "^1.8.1",
     "styled-components": "^5.2.1",
