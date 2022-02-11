@@ -61,7 +61,7 @@ type UserDataFixtures = {
 
 export const fakerFixtures: Fixtures<FakerFixtures> = {
   seed: async ({}, use, testInfo) => {
-    await use(crc32.str(testInfo.snapshotPath(testInfo.title)));
+    await use(crc32.str(testInfo.snapshotPath(testInfo.title.replace(/ /g, '-'))));
   },
   faker: async ({ seed }, use) => {
     faker.seed(seed);
