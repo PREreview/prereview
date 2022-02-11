@@ -1,8 +1,10 @@
 FROM mcr.microsoft.com/playwright:v1.14.1-focal
 WORKDIR /app
 
-RUN apt-get install --yes --no-install-recommends \
-  wait-for-it
+RUN apt-get update && \
+  apt-get install --yes --no-install-recommends \
+  wait-for-it && \
+  rm -rf /var/lib/apt/lists/*
 
 COPY \
   .npmrc \
