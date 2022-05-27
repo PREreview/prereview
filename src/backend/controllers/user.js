@@ -113,7 +113,20 @@ export default function controller(users, contacts, keys, thisUser) {
             ...user,
             isAdmin: isAdmin,
             isModerator: isModerator,
-            defaultPersona: { ...user.defaultPersona, avatar: avatar },
+            defaultPersona: {
+              ...user.defaultPersona,
+              avatar: avatar,
+              identity: undefined,
+              communities: [...user.defaultPersona.communities].map(community => ({ ...community, banner: undefined })),
+              requests: [...user.defaultPersona.requests].map(request => ({...request, author: undefined})),
+            },
+            personas: [...user.personas].map(persona => ({
+              ...persona,
+              avatar: undefined,
+              identity: undefined,
+              communities: [...persona.communities].map(community => ({ ...community, banner: undefined })),
+              requests: [...persona.requests].map(request => ({...request, author: undefined})),
+            })),
           },
         };
       } else {
