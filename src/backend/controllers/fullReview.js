@@ -191,6 +191,7 @@ export default function controller(
         title: review.title || `Review of ${preprint.title}`,
         content: draft.contents,
         creators: creators,
+        preprint: preprint.handle,
       };
       try {
         // yay, the review gets a DOI!

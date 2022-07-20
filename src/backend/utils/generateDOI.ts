@@ -29,6 +29,7 @@ type PrereviewData = {
   title: string;
   content: string;
   creators: Array<Creator>;
+  preprint: string;
 };
 
 export default async function generateDOI(
@@ -43,6 +44,15 @@ export default async function generateDOI(
       title: prereviewData.title,
       description: prereviewData.content || 'No content.',
       creators: prereviewData.creators,
+      communities: [{ identifier: 'prereview-reviews' }],
+      language: 'eng',
+      related_identifiers: [
+        {
+          identifier: prereviewData.preprint,
+          relation: 'reviews',
+          resource_type: 'publication-preprint',
+        },
+      ],
     },
   };
 
