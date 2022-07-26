@@ -127,7 +127,7 @@ function NewPrereviewButton({ preprintId }) {
         <Button
           color='primary'
           variant='contained'
-          href={`http://localhost:3010/preprints/${preprintId}`}
+          href={`https://beta.prereview.org/preprints/${preprintId}`}
           aria-owns={open ? 'mouse-over-popover' : undefined}
           aria-haspopup="true"
           onMouseEnter={handlePopoverOpen}
