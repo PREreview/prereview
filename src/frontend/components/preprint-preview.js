@@ -219,7 +219,7 @@ export default function PreprintPreview({ preprint }) {
           </Typography>
         </Grid>
       </Grid>
-      {preprint.handle === 'doi:10.1101/2022.02.14.480364' &&
+      {preprint.handle.startsWith('doi:10.1101/') &&
         <Box
           position={{lg: 'absolute'}}
           right={{lg: 0}}
