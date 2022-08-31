@@ -219,7 +219,7 @@ export default function PreprintPreview({ preprint }) {
           </Typography>
         </Grid>
       </Grid>
-      {preprint.handle.startsWith('doi:10.1101/') &&
+      {(preprint.handle.startsWith('doi:10.1101/') || (preprint.handle.startsWith('doi:10.1590/') && preprint.publication === 'FapUNIFESP (SciELO)')) &&
         <Box
           position={{lg: 'absolute'}}
           right={{lg: 0}}
