@@ -4,7 +4,7 @@ services:
     build:
       target: integration
     environment:
-      FAKETIME: '@2022-08-12 00:00:00'
+      FAKETIME: '@2022-08-31 00:00:00'
       PREREVIEW_ADMIN_USERS: '0000-0002-6266-406X'
       PREREVIEW_ORCID_CALLBACK_URL: 'http://prereview:3000/api/v2/orcid/callback'
       TEST_ADMIN_USER_ORCID: '0000-0002-6266-406X'
