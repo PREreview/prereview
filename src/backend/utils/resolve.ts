@@ -212,11 +212,11 @@ export async function resolvePreprint(
   const baseUrlDoi = 'https://doi.org/';
 
   // as a last resort check Google Scholar
-  resolvers.push(
-    searchGoogleScholar(handle).catch(err =>
-      log.error('Not found on Google Scholar: ', err),
-    ),
-  );
+  // resolvers.push(
+  //   searchGoogleScholar(handle).catch(err =>
+  //     log.error('Not found on Google Scholar: ', err),
+  //   ),
+  // );
 
   // check crossref if nothing is found on official sites
   if (isDoi) {
