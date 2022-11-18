@@ -93,11 +93,14 @@ export async function createGroup(name: string): Promise<Group> {
   return group;
 }
 
-export async function createUser(group?: Group): Promise<User> {
+export async function createUser(group?: Group, persona?: Persona): Promise<User> {
   const users = userModelWrapper(orm);
 
   const user = users.create({ orcid: fakeOrcid() });
-  user.defaultPersona = await createPersona(user);
+  user.defaultPersona = await createPersona(user, false);
+  if (persona) {
+    user.personas.add(persona)
+  }
 
   if (group) {
     user.groups.add(group);
@@ -108,10 +111,11 @@ export async function createUser(group?: Group): Promise<User> {
   return user;
 }
 
-export async function createPersona(user: User): Promise<Persona> {
+export async function createPersona(user: User, isAnonymous: boolean): Promise<Persona> {
   const personas = personaModelWrapper(orm);
 
   const persona = personas.create({
+    isAnonymous,
     identity: user,
     name: faker.name.findName(),
   });

@@ -27,7 +27,7 @@ export default function docs(authz) {
 
   generator.addJoiRouter(preprintRoutes({}, authz));
   generator.addJoiRouter(userRoutes({}, {}, {}, authz));
-  generator.addJoiRouter(fullReviewRoutes({}, {}, {}, {}, {}, authz));
+  generator.addJoiRouter(fullReviewRoutes({}, {}, {}, {}, {}, {}, authz));
   generator.addJoiRouter(eventRoutes({}, authz));
   generator.addJoiRouter(badgeRoutes({}, authz));
   generator.addJoiRouter(expertiseRoutes({}, authz));

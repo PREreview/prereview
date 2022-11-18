@@ -26,7 +26,7 @@ function docs() {
 
   generator.addJoiRouter(preprintRoutes(stub, authz));
   generator.addJoiRouter(userRoutes(stub, stub, stub, authz));
-  generator.addJoiRouter(fullReviewRoutes(stub, stub, stub, stub, stub, authz));
+  generator.addJoiRouter(fullReviewRoutes(stub, stub, stub, stub, stub, stub, authz));
   generator.addJoiRouter(eventRoutes(stub, authz));
   generator.addJoiRouter(groupRoutes(stub, stub, authz));
   generator.addJoiRouter(commentRoutes(stub, stub, authz));

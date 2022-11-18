@@ -4,6 +4,8 @@ import nock from 'nock';
 import request from 'supertest';
 import {
   createApiKey,
+  createGroup,
+  createPersona,
   createPreprint,
   createServer,
   createUser,
@@ -26,6 +28,64 @@ describe('full reviews', () => {
     expect(response.body).toStrictEqual({
       message:
         "Access Denied - You don't have permission to: access private pages",
+    });
+  });
+
+  it('creates PREreviews with an existing DOI', async () => {
+    const group = await createGroup('admins');
+    const user = await createUser(group);
+    const apiKey = await createApiKey(user);
+    const preprint = await createPreprint();
+    const author1 = await createUser();
+    const author2Pseudonym = await createPersona(user, true)
+    const author2 = await createUser(undefined, author2Pseudonym);
+
+    const server = await createServer();
+
+    const createResponse = await request(server)
+      .post('/api/v2/full-reviews')
+      .set({
+        'X-API-App': apiKey.app,
+        'X-API-Key': apiKey.secret,
+      })
+      .send({
+        doi: '10.1111/12345678',
+        contents: faker.lorem.paragraphs(),
+        isPublished: true,
+        preprint: preprint.uuid,
+        authors: [
+          { orcid: author1.orcid, public: true },
+          { orcid: author2.orcid, public: false },
+        ],
+      });
+
+    expect(createResponse.status).toBe(StatusCodes.CREATED);
+
+    const listResponse = await request(server).get('/api/v2/full-reviews');
+
+    expect(listResponse.status).toBe(StatusCodes.OK);
+    expect(listResponse.type).toBe('application/json');
+    expect(listResponse.body).toMatchObject({
+      totalCount: 1,
+      data: [
+        expect.objectContaining({
+          authors: [
+            expect.objectContaining({
+              isAnonymous: false,
+              uuid: author1.defaultPersona?.uuid,
+            }),
+            expect.objectContaining({
+              isAnonymous: true,
+              uuid: author2Pseudonym.uuid,
+            }),
+          ],
+          doi: '10.1111/12345678',
+          isPublished: true,
+          preprint: expect.objectContaining({
+            uuid: preprint.uuid,
+          }),
+        }),
+      ],
     });
   });
 

@@ -24,6 +24,7 @@ export default function controller(
   reviewModel,
   draftModel,
   personaModel,
+  userModel,
   preprintModel,
   statementModel,
   thisUser,
@@ -119,6 +120,13 @@ export default function controller(
     const creators = [];
     const { authors, ...body } = ctx.request.body;
 
+    const user = await thisUser.getUser(ctx);
+    const isAdmin = await thisUser.isMemberOf('admins', user.orcid)
+
+    if (!isAdmin) {
+      delete body.doi
+    }
+
     try {
       preprint = await preprintModel.findOneByUuidOrHandle(
         ctx.request.body.preprint,
@@ -130,7 +138,17 @@ export default function controller(
 
       if (authors && authors.length > 0) {
         for (let p of authors) {
-          authorPersona = await personaModel.findOneOrFail({ uuid: p.uuid });
+          authorPersona = null
+
+          if (isAdmin && 'orcid' in p && 'public' in p) {
+            const authorUser = await userModel.findOneOrFail({ orcid: p.orcid })
+
+            authorPersona = await personaModel.findOneOrFail({ identity: authorUser, isAnonymous: !p.public })
+          }
+
+          if (!authorPersona) {
+            authorPersona = await personaModel.findOneOrFail({ uuid: p.uuid })
+          }
           if (authorPersona.isAnonymous) {
             creators.push({
               name: `PREreview.org community member`,
@@ -144,7 +162,6 @@ export default function controller(
           review.authors.add(authorPersona);
         }
       } else {
-        const user = await thisUser.getUser(ctx);
         authorPersona = await personaModel.findOne(user.defaultPersona);
         // ensuring anonymous reviewers stay anonymous
         authorPersona.isAnonymous
@@ -186,7 +203,7 @@ export default function controller(
     let reviewData;
 
     // shape data for ZENODO if none of the authors are anonymous
-    if (review.isPublished) {
+    if (review.isPublished && !review.doi) {
       reviewData = {
         title: review.title || `Review of ${preprint.title}`,
         content: draft.contents,
@@ -200,6 +217,10 @@ export default function controller(
         log.error(`Error generating DOI from Zenodo. ${err}`);
         ctx.throw(400, `Failed to generate DOI.`);
       }
+    }
+
+    if (review.isPublished) {
+      preprint.isPublished = true
     }
 
     try {

@@ -178,6 +178,7 @@ export default async function configServer(
     fullReviewModel,
     draftModel,
     personaModel,
+    userModel,
     preprintModel,
     statementModel,
     authz,
