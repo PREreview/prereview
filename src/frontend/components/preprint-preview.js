@@ -219,7 +219,28 @@ export default function PreprintPreview({ preprint }) {
           </Typography>
         </Grid>
       </Grid>
-      {(preprint.handle.startsWith('doi:10.1101/') || (preprint.handle.startsWith('doi:10.1590/') && preprint.publication === 'FapUNIFESP (SciELO)') || preprint.handle.startsWith('doi:10.31730/')) &&
+      {
+        (
+          preprint.handle.startsWith('doi:10.1101/')
+            ||
+          preprint.handle.startsWith('doi:10.1590/') && preprint.publication === 'FapUNIFESP (SciELO)'
+            ||
+          preprint.handle.startsWith('doi:10.21203/')
+            ||
+          preprint.handle.startsWith('doi:10.31219/')
+            ||
+          preprint.handle.startsWith('doi:10.31223/')
+            ||
+          preprint.handle.startsWith('doi:10.31224/')
+            ||
+          preprint.handle.startsWith('doi:10.31234/')
+            ||
+          preprint.handle.startsWith('doi:10.31235/')
+            ||
+          preprint.handle.startsWith('doi:10.31730/')
+            ||
+          preprint.handle.startsWith('doi:10.35542/')
+        ) &&
         <Box
           position={{lg: 'absolute'}}
           right={{lg: 0}}
