@@ -40,7 +40,7 @@ export default async function generateDOI(
   const data = {
     metadata: {
       upload_type: 'publication',
-      publication_type: 'article',
+      publication_type: 'peerreview',
       title: prereviewData.title,
       description: prereviewData.content || 'No content.',
       creators: prereviewData.creators,
