@@ -94,7 +94,7 @@ export default function Footer() {
                 <Link
                   className={classes.footerNavItem}
                   color="textPrimary"
-                  href="https://codeforscience.org/donate/prereview/"
+                  href="https://donorbox.org/prereview"
                 >
                   Donate
                 </Link>

@@ -847,7 +847,7 @@ export default function Home() {
             . Help us grow our impact!
           </Typography>
           <Link
-            href="https://codeforscience.org/donate/prereview/"
+            href="https://donorbox.org/prereview"
             className={classes.gridLink}
           >
             Donate

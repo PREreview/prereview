@@ -291,7 +291,7 @@ export default function HeaderBarReviews({ thisUser }) {
                 <MenuItem>
                   <Link
                     className={classes.mobileNavItem}
-                    href="https://codeforscience.org/donate/prereview/"
+                    href="https://donorbox.org/prereview"
                   >
                     Donate
                   </Link>

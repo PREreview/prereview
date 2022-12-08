@@ -333,7 +333,7 @@ export default function HeaderBar({ thisUser }) {
                 <MenuItem>
                   <Link
                     className={classes.mobileNavItem}
-                    href="https://codeforscience.org/donate/prereview/"
+                    href="https://donorbox.org/prereview"
                   >
                     Donate
                   </Link>
@@ -622,7 +622,7 @@ export default function HeaderBar({ thisUser }) {
                   <Link
                     className={classes.navItem}
                     color="textPrimary"
-                    href="https://codeforscience.org/donate/prereview/"
+                    href="https://donorbox.org/prereview"
                   >
                     Donate
                   </Link>
