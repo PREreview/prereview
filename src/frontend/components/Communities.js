@@ -108,7 +108,7 @@ const Communities = () => {
                       Communities
                     </Typography>
                   </Grid>
-                  <Grid item xs={12} md={4} className={classes.center}>
+                  {/*<Grid item xs={12} md={4} className={classes.center}>
                     <Button
                       type="button"
                       color="primary"
@@ -119,7 +119,7 @@ const Communities = () => {
                         Start your own community
                       </span>
                     </Button>
-                  </Grid>
+                  </Grid>*/}
                 </Grid>
               </Box>
               <SearchBar
