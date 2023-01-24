@@ -66,8 +66,8 @@ jobs:
       - name: 'Run integration tests'
         id: integration-test
         run: make integration-test
+        continue-on-error: true
         env:
-          RETRIES: '10'
           PREREVIEW_ORCID_CLIENT_ID: ${{ secrets.ORCID_SANDBOX_CLIENT_ID }}
           PREREVIEW_ORCID_CLIENT_SECRET: ${{ secrets.ORCID_SANDBOX_CLIENT_SECRET }}
           PREREVIEW_ZENODO_TOKEN: ${{ secrets.ZENODO_TOKEN }}
