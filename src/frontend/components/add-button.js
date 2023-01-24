@@ -19,7 +19,6 @@ const useStyles = makeStyles(theme => ({
     borderRadius: 50,
     color: theme.palette.primary.contrastText,
     textTransform: 'none',
-    width: 330,
     '&:hover': {
       backgroundColor: theme.palette.primary.dark,
     },
@@ -45,12 +44,9 @@ export default function AddButton({ ...buttonProps }) {
       <img src={icon} aria-hidden="true" alt="" className={classes.icon} />
       <Typography
         component="span"
-        className={`${classes.text} ${classes.border}`}
+        className={`${classes.text}`}
       >
         Add PREreview
-      </Typography>
-      <Typography component="span" className={classes.text}>
-        Add Request
       </Typography>
     </Button>
   );

@@ -1,40 +1,50 @@
 import { expect, test } from './test';
 import { screenshot } from './utils';
 
-test.asALoggedInUser('requesting a review', async ({ page, preprint }) => {
-  await page.goto('/reviews');
+test.asALoggedInUser(
+  'requesting a review',
+  async ({ page, preprint }, { fixme }) => {
+    await page.goto('/reviews');
 
-  await page.click(':text("Add Request")');
+    fixme(true, '"Add Request" button is not shown');
 
-  const dialog = page.locator('[role="dialog"]');
+    await page.click(':text("Add Request")');
 
-  await expect(dialog).toContainText('Search for a preprint');
-  expect(await screenshot(dialog)).toMatchSnapshot('search.png');
+    const dialog = page.locator('[role="dialog"]');
 
-  await dialog.locator('input').fill(preprint.handle.replace(/^doi:/, ''));
-  await page.click(':text("Request PREreviews")');
-  await page.click(':text("Add Request")');
+    await expect(dialog).toContainText('Search for a preprint');
+    expect(await screenshot(dialog)).toMatchSnapshot('search.png');
 
-  const paper = page.locator('.MuiDrawer-paper');
+    await dialog.locator('input').fill(preprint.handle.replace(/^doi:/, ''));
+    await page.click(':text("Request PREreviews")');
+    await page.click(':text("Add Request")');
 
-  await expect(paper).toContainText('0 requests');
-  expect(await screenshot(paper)).toMatchSnapshot('add-request.png');
+    const paper = page.locator('.MuiDrawer-paper');
 
-  await page.click(':text("Add a request for PREreview")');
-  await page.reload();
-  await page.click(':text("Add Request")');
+    await expect(paper).toContainText('0 requests');
+    expect(await screenshot(paper)).toMatchSnapshot('add-request.png');
 
-  await expect(paper).toContainText('1 request');
-  expect(await screenshot(paper)).toMatchSnapshot('added-a-request.png');
-});
+    await page.click(':text("Add a request for PREreview")');
+    await page.reload();
+    await page.click(':text("Add Request")');
 
-test.asAReturningUser('have to log in with ORCID', async ({ page }) => {
-  await page.goto('/reviews');
+    await expect(paper).toContainText('1 request');
+    expect(await screenshot(paper)).toMatchSnapshot('added-a-request.png');
+  },
+);
 
-  await page.click(':text("Add Request")');
+test.asAReturningUser(
+  'have to log in with ORCID',
+  async ({ page }, { fixme }) => {
+    await page.goto('/reviews');
 
-  const dialog = page.locator('[role="dialog"]');
+    fixme(true, '"Add Request" button is not shown');
 
-  await expect(dialog).toContainText('You must be logged in');
-  expect(await screenshot(dialog)).toMatchSnapshot('log-in.png');
-});
+    await page.click(':text("Add Request")');
+
+    const dialog = page.locator('[role="dialog"]');
+
+    await expect(dialog).toContainText('You must be logged in');
+    expect(await screenshot(dialog)).toMatchSnapshot('log-in.png');
+  },
+);

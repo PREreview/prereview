@@ -198,17 +198,6 @@ function StepPreprint({
         <Button
           onClick={() => {
             history.push(`/preprints/${createPreprintId(preprint.handle)}`, {
-              tab: 2,
-              isSingleStep: true,
-            });
-          }}
-          disabled={!identifier || !preprint}
-        >
-          Request PREreviews
-        </Button>
-        <Button
-          onClick={() => {
-            history.push(`/preprints/${createPreprintId(preprint.handle)}`, {
               tab: 1,
               isSingleStep: true,
             });

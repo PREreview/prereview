@@ -200,10 +200,9 @@ export default function Reviews() {
                     <InfoOutlinedIcon className={classes.infoIcon} />
                     This is a platform for the crowdsourcing of preprint
                     reviews. Use the search bar below to find preprints that
-                    already have PREreviews or requests for PREreviews. To add
-                    your own PREreview or request, use the Add PREreview |
-                    Request PREreview button, paste the preprint DOI and follow
-                    the instructions.
+                    already have PREreviews. To add your own PREreview use
+                    the Add PREreview button, paste the preprint DOI and
+                    follow the instructions.
                   </Typography>
                 </Box>
               </Grid>
@@ -513,8 +512,7 @@ export default function Reviews() {
                       }
                     }}
                   >
-                    Review or request a review of a preprint to add it to the
-                    platform.
+                    Review of a preprint to add it to the platform.
                   </Link>
                 </Typography>
               </div>

@@ -656,8 +656,7 @@ export default function ReviewReader({
         ) : (
           <Typography component="div" variant="body2">
             There are no PREreviews on this preprint yet. To add your review,
-            click on &quot;Add PREReview(s)&quot;. To request reviews, click on
-            &quot;Add Request&quot; in the menu above.
+            click on &quot;Add PREReview(s)&quot;.
           </Typography>
         )}
       </div>

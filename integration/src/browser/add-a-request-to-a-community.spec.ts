@@ -3,8 +3,10 @@ import { screenshot } from './utils';
 
 test.asACommunityMember(
   'can add a request to a community',
-  async ({ community, page, preprint }) => {
+  async ({ community, page, preprint }, { fixme }) => {
     await page.goto(`/communities/${community.slug}`);
+
+    fixme(true, '"Add Request" button is not shown');
 
     const addRequestButton = page.locator('button:has-text("Add Request")');
     const preprints = page.locator(
@@ -45,8 +47,10 @@ test.asACommunityMember(
 
 test.asAReturningUser(
   'cannot add a request to a community',
-  async ({ community, page }) => {
+  async ({ community, page }, { fixme }) => {
     await page.goto(`/communities/${community.slug}`);
+
+    fixme(true, '"Add Request" button is not shown');
 
     const addRequestButton = page.locator('button:has-text("Add Request")');
     const preprints = page.locator(

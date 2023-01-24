@@ -294,18 +294,6 @@ export default function PreprintCard({
                 )}
               </Grid>
               <Grid item>
-                {!hasRequested && (
-                  <Button
-                    className={classes.button}
-                    onClick={() => {
-                      onNewRequest(preprintId);
-                    }}
-                  >
-                    Request PREreview
-                  </Button>
-                )}
-              </Grid>
-              <Grid item>
                 <Link
                   className={classes.button}
                   href={`/preprints/${preprintId}`}
