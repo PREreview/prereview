@@ -3,7 +3,9 @@ import { screenshot } from './utils';
 
 test.asALoggedInUser(
   'submit a full review',
-  async ({ page, preprint, rapidReview }, { timeout }) => {
+  async ({ page, preprint, rapidReview }, { fixme, timeout }) => {
+    fixme(true, 'Preprints are redirected to the new site');
+
     await page.goto(
       `preprints/${preprint.uuid}/rapid-reviews/${rapidReview.uuid}`,
     );
@@ -56,6 +58,8 @@ test.asALoggedInUser(
 test.asACommunityMember(
   'can load a template',
   async ({ page, preprint, rapidReview, template }, { fixme }) => {
+    fixme(true, 'Preprints are redirected to the new site');
+
     await page.goto(
       `preprints/${preprint.uuid}/rapid-reviews/${rapidReview.uuid}`,
     );

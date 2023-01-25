@@ -20,7 +20,6 @@ const Community = loadable(() => import('./Community'));
 const Communities = loadable(() => import('./Communities'));
 const CommunityPanel = loadable(() => import('./community-panel'));
 const Event = loadable(() => import('./Event'));
-const ExtensionFallback = loadable(() => import('./extension-fallback'));
 const Home = loadable(() => import('./home'));
 const Login = loadable(() => import('./login'));
 const Logout = loadable(() => import('./logout'));
@@ -120,9 +119,14 @@ export default function App({ user }) {
                 </Suspense>
               </ModeratorRoute>
       */}
-              <Route exact={true} path="/preprints/:id">
-                <ExtensionFallback />
-              </Route>
+              <Route
+                path="/preprints/:id"
+                render={({ match }) => {
+                  window.location.replace(
+                    `https://beta.prereview.org/preprints/${match.params.id}`,
+                  );
+                }}
+              />
               <Route exact={true} path="/communities/">
                 <Communities />
               </Route>
@@ -134,25 +138,10 @@ export default function App({ user }) {
                 <Event />
               </Route>
 
-              <Route exact={true} path="/preprints/:id/reviews/:cid?">
-                <ExtensionFallback />
-              </Route>
               <Route exact={true} path="/validate/:token">
                 <Validate />
               </Route>
 
-              <Route exact={true} path="/preprints/:id/drafts/:cid?">
-                <ExtensionFallback />
-              </Route>
-              <Route exact={true} path="/preprints/:id/full-reviews/:cid">
-                <ExtensionFallback />
-              </Route>
-              <Route exact={true} path="/preprints/:id/reviews/:cid">
-                <ExtensionFallback />
-              </Route>
-              <Route exact={true} path="/preprints/:id/rapid-reviews/:cid">
-                <ExtensionFallback />
-              </Route>
               <Route exact={true} path="/validate/:token">
                 <Validate />
               </Route>

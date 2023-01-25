@@ -1,7 +1,9 @@
 import { expect, test } from './test';
 import { screenshot } from './utils';
 
-test.asALoggedInUser('see an author-requested review', async ({ page, preprint, requestByAuthor }) => {
+test.asALoggedInUser('see an author-requested review', async ({ page, preprint, requestByAuthor }, { fixme }) => {
+  fixme(true, 'Preprints are redirected to the new site');
+
   await page.goto(`preprints/${preprint.uuid}`);
 
   await page.click(':text("Add Request")');
