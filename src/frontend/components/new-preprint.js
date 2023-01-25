@@ -197,10 +197,7 @@ function StepPreprint({
         </Button>
         <Button
           onClick={() => {
-            history.push(`/preprints/${createPreprintId(preprint.handle)}`, {
-              tab: 1,
-              isSingleStep: true,
-            });
+            window.location.href = `https://beta.prereview.org/preprints/${createPreprintId(preprint.handle)}/write-a-prereview`;
           }}
           disabled={!identifier || !preprint}
         >

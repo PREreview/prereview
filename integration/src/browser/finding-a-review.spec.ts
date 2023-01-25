@@ -18,23 +18,28 @@ test.asAReturningUser('might not find anything', async ({ page }) => {
   expect(await screenshot(page, content)).toMatchSnapshot('empty-list.png');
 });
 
-test.asAReturningUser('can find and view a preprint', async ({ page }) => {
-  await page.goto('/');
+test.asAReturningUser(
+  'can find and view a preprint',
+  async ({ page }, { fixme }) => {
+    await page.goto('/');
 
-  await page.fill('[placeholder*="Search preprints"]', 'Silly String Theory');
-  await page.keyboard.press('Enter');
+    await page.fill('[placeholder*="Search preprints"]', 'Silly String Theory');
+    await page.keyboard.press('Enter');
 
-  let content = page.locator(
-    '.MuiContainer-root:has([placeholder*="Search preprints"])',
-  );
+    let content = page.locator(
+      '.MuiContainer-root:has([placeholder*="Search preprints"])',
+    );
 
-  await expect(content).not.toContainText('No preprints about');
-  expect(await screenshot(page, content)).toMatchSnapshot('1-preprint.png');
+    await expect(content).not.toContainText('No preprints about');
+    expect(await screenshot(page, content)).toMatchSnapshot('1-preprint.png');
 
-  await page.click(':text("Silly String Theory")');
+    fixme(true, 'Preprint goes to the new site');
 
-  content = page.locator('.MuiDrawer-paper');
+    await page.click(':text("Silly String Theory")');
 
-  await expect(content).toContainText('1 request');
-  expect(await screenshot(page, content)).toMatchSnapshot('preprint.png');
-});
+    content = page.locator('.MuiDrawer-paper');
+
+    await expect(content).toContainText('1 request');
+    expect(await screenshot(page, content)).toMatchSnapshot('preprint.png');
+  },
+);

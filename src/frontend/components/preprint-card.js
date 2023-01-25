@@ -148,7 +148,7 @@ export default function PreprintCard({
   };
 
   const handleCardClick = () => {
-    history.push(`/preprints/${preprintId}`);
+    window.location.href = `https://beta.prereview.org/preprints/${preprintId}`;
   };
 
   useEffect(() => {
@@ -207,7 +207,7 @@ export default function PreprintCard({
         </Grid>
         <Grid item xs={12} sm={8}>
           <Typography>
-            <Link href={`/preprints/${preprintId}`} className={classes.title}>
+            <Link href={`https://beta.prereview.org/preprints/${preprintId}`} className={classes.title}>
               {preprint.title}
             </Link>
           </Typography>
@@ -296,7 +296,7 @@ export default function PreprintCard({
               <Grid item>
                 <Link
                   className={classes.button}
-                  href={`/preprints/${preprintId}`}
+                  href={`https://beta.prereview.org/preprints/${preprintId}`}
                 >
                   View More
                 </Link>

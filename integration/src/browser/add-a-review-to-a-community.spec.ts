@@ -3,7 +3,7 @@ import { screenshot } from './utils';
 
 test.asACommunityMember(
   'can add a review to a community',
-  async ({ community, page, preprint }) => {
+  async ({ community, page, preprint }, { fixme }) => {
     await page.goto(`/communities/${community.slug}`);
 
     const addReviewButton = page.locator('button:has-text("Add PREreview")');
@@ -24,6 +24,9 @@ test.asACommunityMember(
     expect(await screenshot(dialog)).toMatchSnapshot('search.png');
 
     await dialog.locator('input').fill(preprint.handle.replace(/^doi:/, ''));
+
+    fixme(true, '"Add PREreviews" button goes to the new site');
+
     await page.click('button:has-text("Add PREreviews")');
 
     await page.check(

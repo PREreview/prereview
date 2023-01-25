@@ -137,14 +137,7 @@ export default function Reviews() {
   const [hoveredSortOption, setHoveredSortOption] = useState(null);
 
   const handleNewReview = preprintId => {
-    if (thisUser) {
-      history.push(`/preprints/${preprintId}`, {
-        tab: 1,
-        isSingleStep: true,
-      });
-    } else {
-      setLoginModalOpenNext(`/preprints/${preprintId}`);
-    }
+    window.location.href = `https://beta.prereview.org/preprints/${preprintId}/write-a-prereview`;
   };
 
   const handleNewRequest = preprintId => {

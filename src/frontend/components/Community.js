@@ -739,14 +739,7 @@ function CommunityContent({ thisUser, community, params }) {
   const [hoveredSortOption, setHoveredSortOption] = useState(null);
 
   const handleNewReview = preprintId => {
-    if (thisUser) {
-      history.push(`/preprints/${preprintId}`, {
-        tab: 'reviews',
-        isSingleStep: true,
-      });
-    } else {
-      setLoginModalOpenNext(`/preprints/${preprintId}`);
-    }
+    window.location.href = `https://beta.prereview.org/preprints/${preprintId}`
   };
 
   const handleNewRequest = preprintId => {

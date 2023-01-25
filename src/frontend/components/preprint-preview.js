@@ -178,7 +178,7 @@ export default function PreprintPreview({ preprint }) {
   };
 
   const handleCardClick = () => {
-    history.push(`/preprints/${preprintId}`);
+    window.location.href = `https://beta.prereview.org/preprints/${preprintId}`
   };
 
   return (

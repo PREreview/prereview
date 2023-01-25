@@ -112,7 +112,7 @@ export default function ActivityCard({ activity }) {
   };
 
   const handleCardClick = () => {
-    history.push(`/preprints/${createPreprintId(activity.preprint.handle)}`);
+    window.location.href = `https://beta.prereview.org/preprints/${createPreprintId(activity.preprint.handle)}`
   };
 
   const getActivityText = activity => {
