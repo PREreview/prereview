@@ -10,11 +10,9 @@ import { createPreprintId } from '../../common/utils/ids';
 // Material UI components
 import { makeStyles } from '@material-ui/core/styles';
 import Box from '@material-ui/core/Box';
-import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import Link from '@material-ui/core/Link';
 import Paper from '@material-ui/core/Paper';
-import Popover from '@material-ui/core/Popover';
 import Typography from '@material-ui/core/Typography';
 
 // components
@@ -82,15 +80,6 @@ const useStyles = makeStyles(theme => ({
     // marginTop: 10,
     width: '100%',
   },
-  popover: {
-    marginTop: theme.spacing(2),
-    pointerEvents: 'none',
-    zIndex: '20000 !important',
-  },
-  popoverInner: {
-    maxWidth: '40rem',
-    padding: theme.spacing(2),
-  },
   preprintServer: {
     color: theme.palette.primary.main,
     fontSize: '0.9rem',
@@ -107,61 +96,6 @@ const useStyles = makeStyles(theme => ({
     whiteSpace: 'pre-wrap',
   },
 }));
-
-function NewPrereviewButton({ preprintId }) {
-  const classes = useStyles();
-  const [anchorEl, setAnchorEl] = React.useState(null);
-
-  const handlePopoverOpen = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handlePopoverClose = () => {
-    setAnchorEl(null);
-  };
-
-  const open = Boolean(anchorEl);
-
-  return (
-    <>
-        <Button
-          color='primary'
-          variant='contained'
-          href={`https://beta.prereview.org/preprints/${preprintId}`}
-          aria-owns={open ? 'mouse-over-popover' : undefined}
-          aria-haspopup="true"
-          onMouseEnter={handlePopoverOpen}
-          onMouseLeave={handlePopoverClose}
-        >
-          Try the new PREreview
-        </Button>
-      <Popover
-        id="mouse-over-popover"
-        className={classes.popover}
-        open={open}
-        anchorEl={anchorEl}
-        anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'left',
-        }}
-        transformOrigin={{
-          vertical: 'top',
-          horizontal: 'left',
-        }}
-        onClose={handlePopoverClose}
-        disableRestoreFocus
-      >
-        <div className={classes.popoverInner}>
-          <Typography>
-            We‘re working on a new version of PREreview, where you can read and
-            write full PREreviews for this preprint. Try it out, and let us know
-            what you think.
-          </Typography>
-        </div>
-      </Popover>
-    </>
-  );
-}
 
 export default function PreprintPreview({ preprint }) {
   const classes = useStyles();
@@ -219,39 +153,6 @@ export default function PreprintPreview({ preprint }) {
           </Typography>
         </Grid>
       </Grid>
-      {
-        (
-          preprint.handle.startsWith('doi:10.1101/')
-            ||
-          preprint.handle.startsWith('doi:10.1590/') && preprint.publication === 'FapUNIFESP (SciELO)'
-            ||
-          preprint.handle.startsWith('doi:10.21203/')
-            ||
-          preprint.handle.startsWith('doi:10.31219/')
-            ||
-          preprint.handle.startsWith('doi:10.31223/')
-            ||
-          preprint.handle.startsWith('doi:10.31224/')
-            ||
-          preprint.handle.startsWith('doi:10.31234/')
-            ||
-          preprint.handle.startsWith('doi:10.31235/')
-            ||
-          preprint.handle.startsWith('doi:10.31730/')
-            ||
-          preprint.handle.startsWith('doi:10.35542/')
-        ) &&
-        <Box
-          position={{lg: 'absolute'}}
-          right={{lg: 0}}
-          mt={{lg: -7, xl: -5}}
-          mr={{lg: 8}}
-          mb={{xs: 1, lg: 0}}
-          ml={{xs: 2, lg: 0}}
-        >
-          <NewPrereviewButton preprintId={preprintId} />
-        </Box>
-      }
       <Box
         alignItems="center"
         justifycontent="space-between"
