@@ -67,17 +67,9 @@ export default function controller(users, contacts, keys, thisUser) {
       try {
         user = await users.findOneByUuidOrOrcid(ctx.params.id, [
           'personas',
-          'personas.fullReviews',
-          'personas.rapidReviews',
-          'personas.requests',
-          'personas.fullReviews.preprint',
-          'personas.rapidReviews.preprint',
-          'personas.requests.preprint',
           'groups',
           'contacts',
           'keys',
-          'defaultPersona.badges',
-          'defaultPersona.communities',
         ]);
       } catch (err) {
         log.debug(err);
@@ -97,14 +89,6 @@ export default function controller(users, contacts, keys, thisUser) {
           isModerator = true;
         }
 
-        let avatar;
-        if (
-          user.defaultPersona &&
-          user.defaultPersona.avatar &&
-          Buffer.isBuffer(user.defaultPersona.avatar)
-        ) {
-          avatar = user.defaultPersona.avatar.toString();
-        }
         ctx.status = 200;
         ctx.body = {
           status: '200',
@@ -115,17 +99,13 @@ export default function controller(users, contacts, keys, thisUser) {
             isModerator: isModerator,
             defaultPersona: {
               ...user.defaultPersona,
-              avatar: avatar,
+              avatar: undefined,
               identity: undefined,
-              communities: [...user.defaultPersona.communities].map(community => ({ ...community, banner: undefined })),
-              requests: [...user.defaultPersona.requests].map(request => ({...request, author: undefined})),
             },
             personas: [...user.personas].map(persona => ({
               ...persona,
               avatar: undefined,
               identity: undefined,
-              communities: [...persona.communities].map(community => ({ ...community, banner: undefined })),
-              requests: [...persona.requests].map(request => ({...request, author: undefined})),
             })),
           },
         };
