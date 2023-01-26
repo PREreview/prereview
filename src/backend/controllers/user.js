@@ -89,6 +89,14 @@ export default function controller(users, contacts, keys, thisUser) {
           isModerator = true;
         }
 
+        let avatar;
+        if (
+          user.defaultPersona &&
+          user.defaultPersona.avatar &&
+          Buffer.isBuffer(user.defaultPersona.avatar)
+        ) {
+          avatar = user.defaultPersona.avatar.toString();
+        }
         ctx.status = 200;
         ctx.body = {
           status: '200',
@@ -99,7 +107,7 @@ export default function controller(users, contacts, keys, thisUser) {
             isModerator: isModerator,
             defaultPersona: {
               ...user.defaultPersona,
-              avatar: undefined,
+              avatar,
               identity: undefined,
             },
             personas: [...user.personas].map(persona => ({
