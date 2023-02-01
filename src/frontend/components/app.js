@@ -84,6 +84,13 @@ export default function App({ user }) {
               <Route exact={true} path="/reviews/:new(new)?">
                 <Reviews />
               </Route>
+              <Route exact={true} path="/reviews/:id"
+                render={({ match }) => {
+                  window.location.replace(
+                    `https://beta.prereview.org/reviews/${match.params.id}`,
+                  );
+                }}
+              />
               <Route exact={true} path="/prereviewers">
                 <Personas />
               </Route>
