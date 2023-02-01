@@ -44,8 +44,8 @@ import CommunitiesImg from '../assets/images/home/communities.jpg?width=800';
 
 // sponsor logos
 import APSImg from '../assets/images/sponsors/aps-foundation.png?width=300';
+import CziImg from '../assets/images/sponsors/czi.svg';
 import ElifeImg from '../assets/images/sponsors/elife.jpg?width=300';
-import IOIImg from '../assets/images/sponsors/ioi.png?height=140';
 import MozillaImg from '../assets/images/sponsors/mozilla.png?width=300';
 import WellcomeImg from '../assets/images/sponsors/wellcome.jpg?height=140';
 
@@ -801,8 +801,8 @@ export default function Home() {
               <Grid item sm={12} md={4}>
                 <img
                   className={classes.sponsorImage}
-                  src={WellcomeImg}
-                  alt="Wellcome"
+                  src={CziImg}
+                  alt="Chan Zuckerberg Initiative"
                 />
               </Grid>
               <Grid item sm={12} md={4}>
@@ -815,12 +815,16 @@ export default function Home() {
               <Grid item sm={12} md={6}>
                 <img
                   className={classes.sponsorImage}
-                  src={MozillaImg}
-                  alt="Mozilla"
+                  src={WellcomeImg}
+                  alt="Wellcome"
                 />
               </Grid>
               <Grid item sm={12} md={6}>
-                <img className={classes.sponsorImage} src={IOIImg} alt="IOI" />
+                <img
+                  className={classes.sponsorImage}
+                  src={MozillaImg}
+                  alt="Mozilla"
+                />
               </Grid>
             </Grid>
           </Box>
