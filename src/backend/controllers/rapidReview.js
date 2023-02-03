@@ -43,7 +43,13 @@ export default function controller(rapidReviews, preprints, thisUser) {
       }
 
       if (pid) {
-        queries.push({ preprint: { uuid: { $eq: pid } } });
+        const preprint = await preprints.findOneByUuidOrHandle(pid);
+
+        if(!preprint) {
+          ctx.throw(404, "Preprint doesn't exist");
+        }
+
+        queries.push({ preprint });
       }
 
       const order = ctx.query.asc
