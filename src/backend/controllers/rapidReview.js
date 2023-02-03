@@ -33,43 +33,43 @@ export default function controller(rapidReviews, preprints, thisUser) {
       log.debug(`Retrieving all rapid reviews.`);
     }
 
+    const queries = [];
+    if (
+      ctx.query.is_published !== undefined &&
+      ctx.query.is_published !== null
+    ) {
+      queries.push({ isPublished: { $eq: ctx.query.is_published } });
+    }
+
+    if (pid) {
+      const preprint = await preprints.findOneByUuidOrHandle(pid);
+
+      if(!preprint) {
+        ctx.throw(404, "Preprint doesn't exist");
+      }
+
+      queries.push({ preprint });
+    }
+
+    const order = ctx.query.asc
+      ? QueryOrder.ASC_NULLS_LAST
+      : QueryOrder.DESC_NULLS_LAST;
+
+    const options = {
+      fields: getFields(
+        'RapidReview',
+        rapidReviews.em.getMetadata(),
+        ctx.query.include_images
+          ? ctx.query.include_images.split(',')
+          : undefined,
+      ),
+      populate: ['author', 'author.identity', 'preprint'],
+      orderBy: { updatedAt: order },
+      limit: ctx.query.limit,
+      offset: ctx.query.offset,
+    };
+
     try {
-      const queries = [];
-      if (
-        ctx.query.is_published !== undefined &&
-        ctx.query.is_published !== null
-      ) {
-        queries.push({ isPublished: { $eq: ctx.query.is_published } });
-      }
-
-      if (pid) {
-        const preprint = await preprints.findOneByUuidOrHandle(pid);
-
-        if(!preprint) {
-          ctx.throw(404, "Preprint doesn't exist");
-        }
-
-        queries.push({ preprint });
-      }
-
-      const order = ctx.query.asc
-        ? QueryOrder.ASC_NULLS_LAST
-        : QueryOrder.DESC_NULLS_LAST;
-
-      const options = {
-        fields: getFields(
-          'RapidReview',
-          rapidReviews.em.getMetadata(),
-          ctx.query.include_images
-            ? ctx.query.include_images.split(',')
-            : undefined,
-        ),
-        populate: ['author', 'author.identity', 'preprint'],
-        orderBy: { updatedAt: order },
-        limit: ctx.query.limit,
-        offset: ctx.query.offset,
-      };
-
       if (queries.length > 0) {
         let query;
         if (queries.length > 1) {
@@ -86,10 +86,6 @@ export default function controller(rapidReviews, preprints, thisUser) {
     } catch (err) {
       log.error('HTTP 400 Error: ', err);
       ctx.throw(400, `Failed to parse query: ${err}`);
-    }
-
-    if (!data || count <= 0) {
-      ctx.status = 204;
     }
 
     ctx.body = {
