@@ -58,7 +58,7 @@ export default function controller(rapidReviews, preprints, thisUser) {
             ? ctx.query.include_images.split(',')
             : undefined,
         ),
-        populate: ['author', 'preprint'],
+        populate: ['author', 'author.identity', 'preprint'],
         orderBy: { updatedAt: order },
         limit: ctx.query.limit,
         offset: ctx.query.offset,

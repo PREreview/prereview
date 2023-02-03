@@ -48,6 +48,14 @@ export class Persona extends BaseEntity {
     this.avatar = avatar;
     this.avatar_encoding = avatar_encoding;
   }
+
+  get orcid() {
+    if(this.isAnonymous) {
+      return
+    }
+
+    return this.identity?.orcid;
+  }
 }
 
 export const personaSchema = new EntitySchema<Persona, BaseEntity>({
@@ -62,6 +70,7 @@ export const personaSchema = new EntitySchema<Persona, BaseEntity>({
       nullable: true,
       hidden: true,
     },
+    orcid: { type: 'method', persist: false, getter: true },
     isAnonymous: { type: 'boolean' },
     isLocked: { type: 'boolean' },
     isFlagged: { type: 'boolean' },

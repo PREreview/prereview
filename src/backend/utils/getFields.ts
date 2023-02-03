@@ -11,7 +11,7 @@ export function getFields<T extends keyof typeof entities>(
 ): Fields<T> {
   return Object.values(meta.get(type).props).reduce<Fields<T>>(
     (props, prop) => {
-      if (!(prop.hidden === true)) {
+      if (prop.persist !== false) {
         if (prop.reference === 'scalar') {
           if (
             prop.type !== 'BlobType' ||
