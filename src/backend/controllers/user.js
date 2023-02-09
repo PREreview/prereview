@@ -1,13 +1,17 @@
 import { v4 as uuidv4 } from 'uuid';
 import router from 'koa-joi-router';
 import { isString } from 'lodash';
+import { ORCID as orcidUtils } from 'orcid-utils';
+import anonymus from 'anonymus';
 import { Key } from '../models/entities/index.ts';
 import { getLogger } from '../log.ts';
 
 const log = getLogger('backend:controllers:user');
 const Joi = router.Joi;
 
-export default function controller(users, contacts, keys, thisUser) {
+const ANON_TRIES_LIMIT = 5;
+
+export default function controller(users, personas, contacts, keys, thisUser) {
   const userRouter = router();
 
   userRouter.route({
@@ -461,6 +465,75 @@ export default function controller(users, contacts, keys, thisUser) {
       }
       // if deleted
       ctx.status = 204;
+    },
+  });
+
+  userRouter.route({
+    meta: {
+      swagger: {
+        operationId: 'PostUser',
+        summary: 'Endpoint to POST a user.',
+        required: true,
+      },
+    },
+    method: 'POST',
+    path: '/users',
+    pre: thisUser.can('access admin pages'),
+    handler: async (ctx) => {
+      if (typeof ctx.request.body.orcid !== 'string' || !orcidUtils.isValid(ctx.request.body.orcid)) {
+        ctx.throw(400, 'Invalid ORCID');
+      }
+
+      const existing = await users.findOne({ orcid: ctx.request.body.orcid });
+      if (existing) {
+        ctx.throw(
+          409,
+          `User with ORCID ${ctx.request.body.orcid} already exists`,
+        );
+      }
+
+      if(typeof ctx.request.body.name !== 'string') {
+        ctx.throw(400, 'No name')
+      }
+
+      log.debug('Creating new user.');
+      const newUser = users.create({ orcid: ctx.request.body.orcid });
+
+      let anonName = anonymus
+        .create()[0]
+        .replace(/(^|\s)\S/g, (l) => l.toUpperCase());
+      let tries = 0;
+      while ((await personas.findOne({ name: anonName })) !== null) {
+        log.debug('Anonymous name generation collision');
+        anonName = anonymus
+          .create()[0]
+          .replace(/(^|\s)\S/g, (l) => l.toUpperCase());
+        tries = tries + 1;
+        if (tries >= ANON_TRIES_LIMIT) {
+          anonName = anonName + ` ${tries - ANON_TRIES_LIMIT}`;
+        }
+      }
+
+      const anonPersona = personas.create({
+        name: anonName,
+        identity: newUser,
+        isAnonymous: true,
+      });
+      const publicPersona = personas.create({
+        name: ctx.request.body.name,
+        identity: newUser,
+        isAnonymous: false,
+      });
+
+      newUser.defaultPersona = anonPersona;
+      personas.persist([anonPersona, publicPersona]);
+      users.persist(newUser);
+
+      await users.em.flush();
+      await personas.em.flush();
+
+      ctx.status = 201;
+      ctx.body = anonName;
     },
   });
 

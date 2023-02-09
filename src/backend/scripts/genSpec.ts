@@ -25,7 +25,7 @@ function docs() {
   const authz = authWrapper(stub, stub, stub, stub); // authorization, not authentication
 
   generator.addJoiRouter(preprintRoutes(stub, authz));
-  generator.addJoiRouter(userRoutes(stub, stub, stub, authz));
+  generator.addJoiRouter(userRoutes(stub, stub, stub, stub, authz));
   generator.addJoiRouter(fullReviewRoutes(stub, stub, stub, stub, stub, stub, authz));
   generator.addJoiRouter(eventRoutes(stub, authz));
   generator.addJoiRouter(groupRoutes(stub, stub, authz));

@@ -188,7 +188,7 @@ export default async function configServer(
   const templateModel = templateModelWrapper(db);
   const templates = TemplateController(templateModel, communityModel, authz);
   const keyModel = keyModelWrapper(db);
-  const users = UserController(userModel, contactModel, keyModel, authz);
+  const users = UserController(userModel, personaModel, contactModel, keyModel, authz);
   const notifications = NotificationController(userModel, authz);
   const communities = CommunityController(
     communityModel,
