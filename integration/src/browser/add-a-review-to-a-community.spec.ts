@@ -16,6 +16,8 @@ test.asACommunityMember(
       'empty-with-button.png',
     );
 
+    fixme(true, '"Add PREreview" button goes to the new site');
+
     await addReviewButton.click();
 
     const dialog = page.locator('[role="dialog"]');
@@ -24,8 +26,6 @@ test.asACommunityMember(
     expect(await screenshot(dialog)).toMatchSnapshot('search.png');
 
     await dialog.locator('input').fill(preprint.handle.replace(/^doi:/, ''));
-
-    fixme(true, '"Add PREreviews" button goes to the new site');
 
     await page.click('button:has-text("Add PREreviews")');
 

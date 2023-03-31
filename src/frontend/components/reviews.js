@@ -244,14 +244,7 @@ export default function Reviews() {
                 ) : null}
                 <Grid item>
                   <AddButton
-                    onClick={() => {
-                      if (thisUser) {
-                        setNewPreprintOpen(true);
-                        history.push('/reviews/new');
-                      } else {
-                        setLoginModalOpenNext('/reviews/new');
-                      }
-                    }}
+                    href="https://beta.prereview.org/"
                     disabled={newPreprintOpen}
                   />
                   <PrivateRoute path="/reviews/new" exact={true}>

@@ -6,6 +6,8 @@ test.asALoggedInUser(
   async ({ page, preprint }, { fixme }) => {
     await page.goto('/reviews');
 
+    fixme(true, '"Add PREreview" button goes to the new site');
+
     await page.click('button:has-text("Add PREreview")');
 
     const dialog = page.locator('[role="dialog"]');
@@ -14,8 +16,6 @@ test.asALoggedInUser(
     expect(await screenshot(dialog)).toMatchSnapshot('search.png');
 
     await dialog.locator('input').fill(preprint.handle.replace(/^doi:/, ''));
-
-    fixme(true, '"Add PREreviews" button goes to the new site');
 
     await dialog.locator(':text("Add PREreview")').click();
     await page.click(':text("Add PREreview")');
@@ -89,6 +89,8 @@ test.asALoggedInUser(
   async ({ page, preprint }, { fixme }) => {
     await page.goto('/reviews');
 
+    fixme(true, '"Add PREreview" button goes to the new site');
+
     await page.click('button:has-text("Add PREreview")');
 
     const dialog = page.locator('[role="dialog"]');
@@ -96,8 +98,6 @@ test.asALoggedInUser(
     await expect(dialog).toContainText('Search for a preprint');
 
     await dialog.locator('input').fill(preprint.handle.replace(/^doi:/, ''));
-
-    fixme(true, '"Add PREreviews" button goes to the new site');
 
     await dialog.locator(':text("Add PREreview")').click();
     await page.click(':text("Add PREreview")');
@@ -122,13 +122,18 @@ test.asALoggedInUser(
   },
 );
 
-test.asAReturningUser('have to log in with ORCID', async ({ page }) => {
-  await page.goto('/reviews');
+test.asAReturningUser(
+  'have to log in with ORCID',
+  async ({ page }, { fixme }) => {
+    await page.goto('/reviews');
 
-  await page.click('button:has-text("Add PREreview")');
+    fixme(true, '"Add PREreview" button goes to the new site');
 
-  const dialog = page.locator('[role="dialog"]');
+    await page.click('button:has-text("Add PREreview")');
 
-  await expect(dialog).toContainText('You must be logged in');
-  expect(await screenshot(dialog)).toMatchSnapshot('log-in.png');
-});
+    const dialog = page.locator('[role="dialog"]');
+
+    await expect(dialog).toContainText('You must be logged in');
+    expect(await screenshot(dialog)).toMatchSnapshot('log-in.png');
+  },
+);
