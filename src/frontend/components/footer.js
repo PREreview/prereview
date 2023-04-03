@@ -211,7 +211,7 @@ export default function Footer() {
             </Typography>
             <Typography component="div" gutterBottom>
               <Link
-                href="https://mailchi.mp/97886570610a/prereview-newsletter-signup"
+                href="https://prereview.civicrm.org/civicrm/mailing/url?u=17&qid=30"
                 className={classes.signUp}
               >
                 Sign up for our newsletter

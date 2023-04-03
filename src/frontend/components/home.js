@@ -599,7 +599,7 @@ export default function Home() {
                 diversity and openness in peer review.
               </Typography>
               <Link
-                href="https://mailchi.mp/97886570610a/prereview-newsletter-signup"
+                href="https://prereview.civicrm.org/civicrm/mailing/url?u=17&qid=30"
                 className={classes.gridLink}
               >
                 Stay connected via our newsletter
