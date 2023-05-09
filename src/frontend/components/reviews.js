@@ -244,7 +244,7 @@ export default function Reviews() {
                 ) : null}
                 <Grid item>
                   <AddButton
-                    href="https://beta.prereview.org/find-a-preprint"
+                    href="https://beta.prereview.org/review-a-preprint"
                     disabled={newPreprintOpen}
                   />
                   <PrivateRoute path="/reviews/new" exact={true}>
