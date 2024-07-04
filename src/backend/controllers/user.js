@@ -38,7 +38,7 @@ export default function controller(users, personas, contacts, keys, thisUser) {
       ctx.body = {
         statusCode: 200,
         status: 'ok',
-        data: allUsers,
+        data: [...allUsers].map(user => ({...user, defaultPersona: {...user.defaultPersona, avatar: undefined}})),
       };
       ctx.response.status = 200;
     },
