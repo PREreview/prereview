@@ -79,7 +79,7 @@ export default function controller(
             ? ctx.query.include_images.split(',')
             : undefined,
         ),
-        populate: ['authors', 'author.identity', 'comments', 'drafts', 'preprint', 'statements'],
+        populate: ['authors', 'authors.identity', 'comments', 'drafts', 'preprint', 'statements'],
         orderBy: { updatedAt: order },
         limit: ctx.query.limit,
         offset: ctx.query.offset,
